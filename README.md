@@ -1,5 +1,6 @@
 # libCZI
 [![License: LGPL v3](https://img.shields.io/badge/License-LGPL_v3-blue.svg)](https://www.gnu.org/licenses/lgpl-3.0)
+[![REUSE status](https://api.reuse.software/badge/github.com/ZEISS/libczi)](https://api.reuse.software/info/github.com/ZEISS/libczi)
 [![CMake](https://github.com/ZEISS/libczi/actions/workflows/cmake.yml/badge.svg?branch=main&event=push)](https://github.com/ZEISS/libczi/actions/workflows/cmake.yml)
 [![CodeQL](https://github.com/ZEISS/libczi/actions/workflows/codeql.yml/badge.svg?branch=main&event=push)](https://github.com/ZEISS/libczi/actions/workflows/codeql.yml)
 [![GitHub Pages](https://github.com/ZEISS/libczi/actions/workflows/pages.yml/badge.svg?branch=main&event=push)](https://github.com/ZEISS/libczi/actions/workflows/pages.yml)
