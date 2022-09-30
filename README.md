@@ -1,9 +1,8 @@
 # libCZI
-***Adapt after migration***
 [![License: LGPL v3](https://img.shields.io/badge/License-LGPL_v3-blue.svg)](https://www.gnu.org/licenses/lgpl-3.0)
-[![CMake](https://github.com/FelixS90/libCZIrw_Demo/actions/workflows/cmake.yml/badge.svg?branch=main&event=push)](https://github.com/FelixS90/libCZIrw_Demo/actions/workflows/cmake.yml)
-[![CodeQL](https://github.com/FelixS90/libCZIrw_Demo/actions/workflows/codeql-analysis.yml/badge.svg?branch=main&event=push)](https://github.com/FelixS90/libCZIrw_Demo/actions/workflows/codeql-analysis.yml)
-[![GitHub Pages](https://github.com/FelixS90/libCZIrw_Demo/actions/workflows/pages.yml/badge.svg?branch=main&event=push)](https://github.com/FelixS90/libCZIrw_Demo/actions/workflows/pages.yml)
+[![CMake](https://github.com/ZEISS/libczi/actions/workflows/cmake.yml/badge.svg?branch=main&event=push)](https://github.com/ZEISS/libczi/actions/workflows/cmake.yml)
+[![CodeQL](https://github.com/ZEISS/libczi/actions/workflows/codeql-analysis.yml/badge.svg?branch=main&event=push)](https://github.com/ZEISS/libczi/actions/workflows/codeql-analysis.yml)
+[![GitHub Pages](https://github.com/ZEISS/libczi/actions/workflows/pages.yml/badge.svg?branch=main&event=push)](https://github.com/ZEISS/libczi/actions/workflows/pages.yml)
 
 ## What
 libCZI is an Open Source Cross-Platform C++ library to read and write [CZI](https://www.zeiss.com/microscopy/en/products/software/zeiss-zen/czi-image-file-format.html).
@@ -21,8 +20,6 @@ libCZI is a library intended for providing read and write access to [CZI](https:
 In a nutshell, it offers (almost...) the same functionality as the 2D-Viewer in [ZEN](https://www.zeiss.com/microscopy/en/products/software/zeiss-zen.html) - in terms of composing the image (including display-settings) and managing the data found in a CZI-file.
 
 ## Docs
-***Adapt after migration***
-https://felixs90.github.io/libCZIrw_Demo/
 https://zeiss.github.io/libczi/
 
 ## Related Software and Tooling
