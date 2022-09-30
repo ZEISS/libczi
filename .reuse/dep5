@@ -1,0 +1,20 @@
+Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: libCZI
+Upstream-Contact: Carl Zeiss Microscopy GmbH <github.microscopy@zeiss.com>
+Source: https://github.com/ZEISS/libczi
+
+Files: Src/libCZI/Doc/*
+Copyright: 2017-2022 Carl Zeiss Microscopy GmbH
+License: LGPL-3.0-or-later
+
+Files: cla_*.txt CMakeLists.txt CMakeSettings.json CODE_OF_CONDUCT.md CONTRIBUTING.md README.md SECURITY.md THIRD_PARTY_LICENSES.txt .gitignore
+Copyright: 2017-2022 Carl Zeiss Microscopy GmbH
+License: LGPL-3.0-or-later
+
+Files: Src/JxrDecode/Jxr/*
+Copyright: Microsoft Corp.
+License: BSD-3-Clause
+
+Files: .github/*
+Copyright: 2017-2022 Carl Zeiss Microscopy GmbH
+License: CC0-1.0

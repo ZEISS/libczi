@@ -1,0 +1,30 @@
+name: CLA
+
+on:
+  pull_request:
+    branches:
+      - main
+    types:
+      - opened
+      - reopened
+      - labeled
+      - unlabeled
+
+jobs:
+  # Based on https://stackoverflow.com/questions/71502652/prevent-merging-of-branch-conditionally-based-on-label
+  fail-for-no-cla:
+    if: ${{!contains(github.event.pull_request.labels.*.name, 'cla')}}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fail for missing cla label
+        run: |
+          echo "cla label missing. See CONTRIBUTING.md."
+          exit 1
+  succeed-for-cla:
+    if: ${{contains(github.event.pull_request.labels.*.name, 'cla')}}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Succeed for present cla label
+        run: |
+          echo "cla label present. See CONTRIBUTING.md."
+          exit 0

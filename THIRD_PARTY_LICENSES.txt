@@ -1,0 +1,128 @@
+============= Free and Open Source Software Disclosure Statement ==============
+
+For libCZI 
+
+This project includes copyrighted software from third parties that may be
+distributed under different licenses than this project as given below.
+
+In case we missed to list a specific software and/or underlying license,
+we appreciate your upfront notice.
+
+This project may include copyrighted software that is distributed under a
+license that requires us to provide the source code of that software and
+instructions on how to build and install it, such as the GNU GPL or GNU
+LGPL or other reciprocal licenses. Unless otherwise stated the original
+source code of such software has not been modified. As recipient and user of
+this project you may obtain the complete source code for such copyrighted
+software as well as build and install instructions from us for a period of
+three years starting with the reception of the project and at no charge.
+
+In any of such cases, please send an email to opensource@zeiss.com
+referencing this project's name and version.
+
+
+List of third-party software:
+-----------------------------------
+
+===============================================================================
+
+-------------------------------------------------------------------------------
+|  jxrlib 1.1 (used under BSD 3-clause "New" or "Revised" License) https://github.com/4creators/jxrlib
+-------------------------------------------------------------------------------
+
+--- --- --- --- --- --- --- Copyright notice(s) --- --- --- --- --- --- --- ---
+Copyright 2013 Microsoft Corporation
+
+--- --- --- --- --- --- --- License text(s) --- --- --- --- --- --- --- --- ---
+Copyright (c) <YEAR>, <OWNER>
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without modification,
+are permitted provided that the following conditions are met:
+
+  * Redistributions of source code must retain the above copyright notice, this
+    list of conditions and the following disclaimer.
+
+  * Redistributions in binary form must reproduce the above copyright notice,
+    this list of conditions and the following disclaimer in the documentation
+    and/or other materials provided with the distribution.
+
+  * Neither the name of the <ORGANIZATION> nor the names of its contributors may
+    be used to endorse or promote products derived from this software without
+    specific prior written permission.
+
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
+ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
+OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
+IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+-------------------------------------------------------------------------------
+|  md5sum (used under RSA MD4 or MD5 Message-Digest Algorithm License)
+-------------------------------------------------------------------------------
+
+--- --- --- --- --- --- --- License text(s) --- --- --- --- --- --- --- --- ---
+RSA MD4 or MD5 Message-Digest Algorithm License
+===============================================
+
+License to copy and use this software is granted provided that it is identified
+as the "RSA Data Security, Inc. MD4 or MD5 Message-Digest Algorithm" in all
+material mentioning or referencing this software or this function.
+
+License is also granted to make and use derivative works provided that such works
+are identified as "derived from the RSA Data Security, Inc. MD4 or MD5
+Message-Digest Algorithm" in all material mentioning or referencing the derived
+work.
+
+RSA Data Security, Inc. makes no representations concerning either the
+merchantability of this software or the suitability of this software for any
+particular purpose. It is provided "as is" without express or implied warranty of
+any kind.
+
+These notices must be retained in any copies of any part of this documentation
+and/or software.
+
+-------------------------------------------------------------------------------
+|  pugixml 1.10 (used under MIT License) http://pugixml.org/
+-------------------------------------------------------------------------------
+
+--- --- --- --- --- --- --- Copyright notice(s) --- --- --- --- --- --- --- ---
+Copyright (C) 2006-2019, by Arseny Kapoulkine (arseny.kapoulkine@gmail.com)
+Copyright (C) 2003, by Kristen Wegner (kristen@tima.net)
+
+--- --- --- --- --- --- --- License text(s) --- --- --- --- --- --- --- --- ---
+This library is distributed under the MIT License:
+
+Copyright (c) 2006-2019 Arseny Kapoulkine
+
+Permission is hereby granted, free of charge, to any person
+obtaining a copy of this software and associated documentation
+files (the "Software"), to deal in the Software without
+restriction, including without limitation the rights to use,
+copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the
+Software is furnished to do so, subject to the following
+conditions:
+
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+OTHER DEALINGS IN THE SOFTWARE
+
+
+--- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
+
+Generated on Thu, 29 Sep 2022 07:40:42 +0200 using Black Duck 2022.4.2.
