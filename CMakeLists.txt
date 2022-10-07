@@ -8,12 +8,13 @@ list (APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 include(GNUInstallDirs)
 
 # choose the appropriate MSVC-runtime
-option(LIBCZI_DYNAMIC_MSVC_RUNTIME "In case of building with VisualStudio, use the dynamic C-runtime" OFF)
+option(LIBCZI_DO_NOT_SET_MSVC_RUNTIME_LIBRARY "In case of building with VisualStudio, do NOT configure to link the static C-runtime" OFF)
 
 # By default, the binaries built here will link to the static MSVC-runtime.
-# However, if the option LIBCZI_DYNAMIC_MSVC_RUNTIME is given, we will not instruct CMake to choose
-#  the static runtime, and it will default to the dynamic runtime (c.f. https://cmake.org/cmake/help/latest/variable/CMAKE_MSVC_RUNTIME_LIBRARY.html).
-if (NOT LIBCZI_DYNAMIC_MSVC_RUNTIME)
+# However, if the option LIBCZI_DO_NOT_SET_MSVC_RUNTIME_LIBRARY is given, we will not instruct CMake to choose
+#  the static runtime, and it will default to the dynamic runtime (c.f. https://cmake.org/cmake/help/latest/variable/CMAKE_MSVC_RUNTIME_LIBRARY.html)
+#  (or what is configured by the upstream CMake-project)
+if (NOT LIBCZI_DO_NOT_SET_MSVC_RUNTIME_LIBRARY)
  set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 endif()
 
