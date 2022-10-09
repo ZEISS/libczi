@@ -67,7 +67,7 @@ namespace libCZI
 		/// \param whitePoint	   The white point.
 		/// \param gamma		   The gamma.
 		///
-		/// \return The new 8-bit look up table generated from the spline. The number is elements is as specified by <tt>tableElementCount</tt>.
+		/// \return The new 8-bit look up table generated from the gamma value. The number is elements is as specified by <tt>tableElementCount</tt>.
 		static std::vector<std::uint8_t> Create8BitLookUpTableFromGamma(int tableElementCnt, float blackPoint, float whitePoint, float gamma);
 
 		/// Creates 16-bit look-up table from the specified gamma value.
