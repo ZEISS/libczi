@@ -277,10 +277,10 @@ tFloat GetParameterForToeSlopeAdjustment(tFloat gamma)
 		}
 }
 
-template <typename tFloat>
-std::vector<std::uint8_t> InternalCreate8BitLookUpTableFromGamma(int tableElementCnt, tFloat blackPoint, tFloat whitePoint, tFloat gamma)
+template <typename tOutput, typename tFloat>
+std::vector<tOutput> InternalCreateLookUpTableFromGamma(int tableElementCnt, tFloat blackPoint, tFloat whitePoint, tFloat gamma)
 {
-		std::vector<std::uint8_t> lut; lut.reserve(tableElementCnt);
+		std::vector<tOutput> lut; lut.reserve(tableElementCnt);
 
 		int lowOut = (int)(blackPoint * tableElementCnt);
 		int highOut = (int)(whitePoint * tableElementCnt);
@@ -289,6 +289,8 @@ std::vector<std::uint8_t> InternalCreate8BitLookUpTableFromGamma(int tableElemen
 		{
 				lut.emplace_back(0);
 		}
+
+		constexpr tOutput maxOut = (std::numeric_limits<tOutput>::max)();
 
 		if (gamma < 1.0f)
 		{
@@ -301,12 +303,12 @@ std::vector<std::uint8_t> InternalCreate8BitLookUpTableFromGamma(int tableElemen
 				{
 						tFloat x = (i - lowOut) / tFloat(highOut - lowOut - 1);
 
-						tFloat val = 255 * (pow(a * x + 1, gamma) - 1) / denumeratorToeSlope;
-						if (val > 255) { val = 255; }
+						tFloat val = maxOut * (pow(a * x + 1, gamma) - 1) / denumeratorToeSlope;
+						if (val > maxOut) { val = maxOut; }
 						else if (val < 0) { val = 0; }
 
-						std::uint8_t val8 = (std::uint8_t)val;
-						lut.emplace_back(val8);
+						tOutput outVal = static_cast<tOutput>(val);
+						lut.emplace_back(outVal);
 				}
 		}
 		else
@@ -314,18 +316,18 @@ std::vector<std::uint8_t> InternalCreate8BitLookUpTableFromGamma(int tableElemen
 				for (int i = lowOut; i < highOut; ++i)
 				{
 						tFloat x = (i - lowOut) / tFloat(highOut - lowOut - 1);
-						tFloat val = 255 * pow(x, gamma);
-						if (val > 255) { val = 255; }
+						tFloat val = maxOut * pow(x, gamma);
+						if (val > maxOut) { val = maxOut; }
 						else if (val < 0) { val = 0; }
 
-						std::uint8_t val8 = (std::uint8_t)val;
-						lut.emplace_back(val8);
+						tOutput outVal = static_cast<tOutput>(val);
+						lut.emplace_back(outVal);
 				}
 		}
 
 		for (int i = highOut; i < tableElementCnt; ++i)
 		{
-				lut.emplace_back(255);
+				lut.emplace_back(maxOut);
 		}
 
 		return lut;
@@ -333,7 +335,12 @@ std::vector<std::uint8_t> InternalCreate8BitLookUpTableFromGamma(int tableElemen
 
 /*static*/std::vector<std::uint8_t> Utils::Create8BitLookUpTableFromGamma(int tableElementCnt, float blackPoint, float whitePoint, float gamma)
 {
-		return InternalCreate8BitLookUpTableFromGamma(tableElementCnt, blackPoint, whitePoint, gamma);
+		return InternalCreateLookUpTableFromGamma<uint8_t>(tableElementCnt, blackPoint, whitePoint, gamma);
+}
+
+/*static*/std::vector<std::uint16_t> Utils::Create16BitLookUpTableFromGamma(int tableElementCnt, float blackPoint, float whitePoint, float gamma)
+{
+		return InternalCreateLookUpTableFromGamma<uint16_t>(tableElementCnt, blackPoint, whitePoint, gamma);
 }
 
 /*static*/std::vector<libCZI::IDisplaySettings::SplineData> Utils::CalcSplineDataFromPoints(int pointCnt, std::function< std::tuple<double, double>(int idx)> getPoint)
