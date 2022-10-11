@@ -12,7 +12,7 @@ option(LIBCZI_DO_NOT_SET_MSVC_RUNTIME_LIBRARY "In case of building with VisualSt
 
 # By default, the binaries built here will link to the static MSVC-runtime.
 # However, if the option LIBCZI_DO_NOT_SET_MSVC_RUNTIME_LIBRARY is given, we will not instruct CMake to choose
-#  the static runtime, and it will default to the dynamic runtime (c.f. https://cmake.org/cmake/help/latest/variable/CMAKE_MSVC_RUNTIME_LIBRARY.html)
+#  the static runtime and it will default to the dynamic runtime (c.f. https://cmake.org/cmake/help/latest/variable/CMAKE_MSVC_RUNTIME_LIBRARY.html)
 #  (or what is configured by the upstream CMake-project)
 if (NOT LIBCZI_DO_NOT_SET_MSVC_RUNTIME_LIBRARY)
  set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
