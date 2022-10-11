@@ -2,13 +2,7 @@ name: CLA
 
 on:
   pull_request:
-    branches:
-      - main
-    types:
-      - opened
-      - reopened
-      - labeled
-      - unlabeled
+    branches: [ "main" ]
 
 jobs:
   # Based on https://stackoverflow.com/questions/71502652/prevent-merging-of-branch-conditionally-based-on-label
