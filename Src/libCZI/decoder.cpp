@@ -159,7 +159,7 @@ using namespace std;
 								}
 								else
 								{
-										memcpy(bmLckInfo.ptrDataRoi, ptrData, static_cast<size_t>(stride) * linesCount);
+										memcpy(bmLckInfo.ptrDataRoi, ptrData, stride * linesCount);
 								}
 
 								// since BGR48 is not available as output, we need to convert (#36)

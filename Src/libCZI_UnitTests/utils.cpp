@@ -40,7 +40,7 @@ public:
 			this->stride = width * bytesPerPel;
 		}
 
-		size_t s = static_cast<size_t>(this->stride) * height;
+		size_t s = this->stride * height;
 		this->ptrData = malloc(s);
 	}
 
@@ -65,7 +65,7 @@ public:
 		bitmapLockInfo.ptrData = this->ptrData;
 		bitmapLockInfo.ptrDataRoi = this->ptrData;
 		bitmapLockInfo.stride = this->stride;
-		bitmapLockInfo.size = static_cast<uint64_t>(this->stride) * this->height;
+		bitmapLockInfo.size = this->stride * this->height;
 		return bitmapLockInfo;
 	}
 

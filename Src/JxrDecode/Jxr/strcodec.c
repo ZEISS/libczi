@@ -771,7 +771,7 @@ Int allocateBitIOInfo(CWMImageStrCodec* pSC)
 		// allocate index table
 		if (cNumBitIO > MAX_TILES * 4 || pSC->WMISCP.cNumOfSliceMinus1H >= MAX_TILES)
 			return ICERR_ERROR;
-		pSC->pIndexTable = malloc((size_t)cNumBitIO * (pSC->WMISCP.cNumOfSliceMinus1H + 1) * sizeof(size_t));
+		pSC->pIndexTable = malloc(cNumBitIO * (pSC->WMISCP.cNumOfSliceMinus1H + 1) * sizeof(size_t));
 		if (NULL == pSC->pIndexTable) return ICERR_ERROR;
 	}
 

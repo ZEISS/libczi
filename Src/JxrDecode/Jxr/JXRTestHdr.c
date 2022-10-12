@@ -214,7 +214,7 @@ ERR PKImageDecode_Copy_HDR(
     {
         size_t offLine = pID->EXT.HDR.cbPixel * pRect->X;
         size_t offS = cbLineS * i + offLine;
-        size_t offM = (size_t)cbStride * (i - pRect->Y) + offLine;
+        size_t offM = cbStride * (i - pRect->Y) + offLine;
 
         Call(pS->SetPos(pS, pID->EXT.HDR.offPixel + offS));
         Call(pS->Read(pS, pb + offM, cbLineM));
