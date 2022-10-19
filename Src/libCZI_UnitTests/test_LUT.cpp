@@ -56,7 +56,9 @@ static bool Compare16bitLUT(const std::uint16_t* p1, const std::uint8_t* p2, siz
 
 TEST(LUTGeneration, Gamma1)
 {
-	auto gammaLutTest = libCZI::Utils::Create8BitLookUpTableFromGamma(256, 0, 1, 0.58f);
+	constexpr auto gamma = 0.58f;
+
+	auto gammaLutTest = libCZI::Utils::Create8BitLookUpTableFromGamma(256, 0, 1, gamma);
 
 	EXPECT_EQ(gammaLutTest.size(), (size_t)256) << "Incorrect result";
 
@@ -77,19 +79,21 @@ TEST(LUTGeneration, Gamma1)
 	EXPECT_TRUE(isCorrect) << "Incorrect result";
 
 	// test that the 16-bit result is basically the same
-	auto gammaLutTest16bit = libCZI::Utils::Create16BitLookUpTableFromGamma(65536, 0, 1, 0.58f);
+	auto gammaLutTest16bit = libCZI::Utils::Create16BitLookUpTableFromGamma(65536, 0, 1, gamma);
 	bool isCorrect16bit = Compare16bitLUT(&gammaLutTest16bit[0], ExpectedResult, 65536);
 	EXPECT_TRUE(isCorrect16bit) << "Incorrect 16-bit result";
 
 	// note that also bit depths between 8 and 16 are supported (e.g., 12)
-	auto gammaLutTest12bit = libCZI::Utils::Create16BitLookUpTableFromGamma(4096, 0, 1, 0.58f);
+	auto gammaLutTest12bit = libCZI::Utils::Create16BitLookUpTableFromGamma(4096, 0, 1, gamma);
 	bool isCorrect12bit = Compare16bitLUT(&gammaLutTest12bit[0], ExpectedResult, 4096);
 	EXPECT_TRUE(isCorrect12bit) << "Incorrect 12-bit result";
 }
 
 TEST(LUTGeneration, Gamma2)
 {
-	auto gammaLutTest = libCZI::Utils::Create8BitLookUpTableFromGamma(256, 0, 1, 1.58f);
+	constexpr auto gamma = 1.58f;
+
+	auto gammaLutTest = libCZI::Utils::Create8BitLookUpTableFromGamma(256, 0, 1, gamma);
 
 	EXPECT_EQ(gammaLutTest.size(), (size_t)256) << "Incorrect result";
 	static std::uint8_t ExpectedResult[256] = {
@@ -111,12 +115,12 @@ TEST(LUTGeneration, Gamma2)
 	EXPECT_TRUE(isCorrect) << "Incorrect result";
 
 	// test that the 16-bit result is basically the same
-	auto gammaLutTest16bit = libCZI::Utils::Create16BitLookUpTableFromGamma(65536, 0, 1, 1.58f);
+	auto gammaLutTest16bit = libCZI::Utils::Create16BitLookUpTableFromGamma(65536, 0, 1, gamma);
 	bool isCorrect16bit = Compare16bitLUT(&gammaLutTest16bit[0], ExpectedResult, 65536);
 	EXPECT_TRUE(isCorrect16bit) << "Incorrect 16-bit result";
 
 	// also 10-bit LUTs, for example, can be generated
-	auto gammaLutTest10bit = libCZI::Utils::Create16BitLookUpTableFromGamma(1024, 0, 1, 1.58f);
+	auto gammaLutTest10bit = libCZI::Utils::Create16BitLookUpTableFromGamma(1024, 0, 1, gamma);
 	bool isCorrect10bit = Compare16bitLUT(&gammaLutTest10bit[0], ExpectedResult, 1024);
 	EXPECT_TRUE(isCorrect10bit) << "Incorrect 10-bit result";
 }
