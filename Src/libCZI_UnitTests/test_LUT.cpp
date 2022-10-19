@@ -32,10 +32,10 @@ static bool Compare16bitLUT(const std::uint16_t* p1, const std::uint8_t* p2, siz
 
 	const auto scaler = elemCnt / 256;
 
-	for (size_t i = 0; i < 255 * scaler; ++i)
+	for (size_t i = 0; i < elemCnt; ++i)
 	{
 		const auto prev8bit = p2[i / scaler];
-		const auto next8bit = p2[i / scaler + 1];
+		const auto next8bit = i < 255 * scaler ? p2[i / scaler + 1] : 256;
 		const auto corresponding8bit = std::round(p1[i] / 256.0);
 		if (prev8bit > next8bit)
 		{
