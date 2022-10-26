@@ -42,7 +42,7 @@ jobs:
       run: ctest --debug -C ${{env.BUILD_TYPE}}
 
     - uses: codecov/codecov-action@v3
-      if: matrix.OS == "ubuntu-latest"
+      if: matrix.OS == 'ubuntu-latest'
       with:
         env_vars: OS
         fail_ci_if_error: true
