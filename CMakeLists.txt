@@ -68,16 +68,7 @@ option(LIBCZI_BUILD_DYNLIB "Build dynamic library 'libCZI'." ON)
 
 
 if (LIBCZI_BUILD_UNITTESTS)
-  enable_testing()
-endif()
-
-option(ENABLE_COVERAGE "Enable code coverage collection" OFF)
-if (ENABLE_COVERAGE)
-  find_package(codecov)
+ enable_testing()
 endif()
 
 add_subdirectory(Src)
-
-if (ENABLE_COVERAGE)
-  coverage_evaluate()
-endif()
