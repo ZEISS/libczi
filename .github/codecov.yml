@@ -7,3 +7,12 @@ coverage:
     patch:
       default:
         informational: true
+# Based on https://docs.codecov.com/docs/flags#recommended-automatic-flag-management
+flag_management:
+  default_rules:
+    carryforward: true
+    statuses:
+      - type: project
+        informational: true
+      - type: patch
+        informational: true
