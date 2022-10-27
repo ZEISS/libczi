@@ -48,11 +48,6 @@ jobs:
       working-directory: ${{github.workspace}}/build/Src/libCZI_UnitTests/${{matrix.build}}
       shell: cmd
       run: OpenCppCoverage.exe --export_type cobertura:${{github.workspace}}\coverage.xml --config_file "${{github.workspace}}\opencppcoverage.txt" -- libCZI_UnitTests.exe
-      
-    - name: Show Coverage
-      if: ${{ (matrix.OS == 'windows-latest') && ( matrix.build == 'Debug') }}
-      shell: cmd
-      run: dir
 
     - name: Upload Coverage
       uses: codecov/codecov-action@v3
