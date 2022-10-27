@@ -61,4 +61,6 @@ jobs:
         files: ./coverage.xml
         fail_ci_if_error: true
         verbose: true
-        flags: unit,${{matrix.OS}}
+        # Only one flag to be safe with
+        # https://docs.codecov.com/docs/flags#one-to-one-relationship-of-flags-to-uploads
+        flags: ${{matrix.OS}}
