@@ -47,7 +47,7 @@ jobs:
       if: ${{ (matrix.OS == 'windows-latest') && ( matrix.build == 'Debug') }}
       working-directory: ${{github.workspace}}/build/Src/libCZI_UnitTests/${{matrix.build}}
       shell: cmd
-      run: OpenCppCoverage.exe --export_type cobertura:${{github.workspace}}\libczi.xml --config_file "${{github.workspace}}\opencppcoverage.txt" -- libCZI_UnitTests.exe
+      run: OpenCppCoverage.exe --export_type cobertura:${{github.workspace}}\coverage.xml --config_file "${{github.workspace}}\opencppcoverage.txt" -- libCZI_UnitTests.exe
       
     - name: Show Coverage
       if: ${{ (matrix.OS == 'windows-latest') && ( matrix.build == 'Debug') }}
@@ -58,7 +58,7 @@ jobs:
       uses: codecov/codecov-action@v3
       if: ${{ (matrix.OS == 'windows-latest') && ( matrix.build == 'Debug') }}
       with:
-        files: ./libczi.xml
+        files: ./coverage.xml
         fail_ci_if_error: true
         verbose: true
         flags: unit,${{matrix.OS}}
