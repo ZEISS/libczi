@@ -37,6 +37,7 @@ jobs:
       # Use debug flag to show all exeucted tests 
       run: ctest --debug -C ${{matrix.build}}
 
+    # Coverage collection based on https://about.codecov.io/blog/how-to-set-up-codecov-with-c-plus-plus-and-github-actions/
     - name: Prepare Coverage
       if: ${{ (matrix.OS == 'windows-latest') && ( matrix.build == 'Debug') }}
       run: |
