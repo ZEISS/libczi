@@ -92,7 +92,7 @@ public:
 	{
 		libCZI::AddSubBlockInfo addSbInfo(addSbBlkInfoStrideBitmap);
 
-		addSbInfo.sizeData = addSbBlkInfoStrideBitmap.physicalHeight * addSbBlkInfoStrideBitmap.strideBitmap;
+		addSbInfo.sizeData = static_cast<size_t>(addSbBlkInfoStrideBitmap.physicalHeight) * addSbBlkInfoStrideBitmap.strideBitmap;
 		addSbInfo.getData = [&](int callCnt, size_t offset, const void*& ptr, size_t& size)->bool
 		{
 			if (callCnt < addSbBlkInfoStrideBitmap.physicalHeight)

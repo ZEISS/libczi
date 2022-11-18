@@ -21,9 +21,44 @@ static bool CompareWithMargin(const std::uint8_t* p1, const std::uint8_t* p2, si
 	return true;
 }
 
+// Compares a generated 16-bit LUT to a 8-bit expected result
+static bool Compare16bitLUT(const std::uint16_t* p1, const std::uint8_t* p2, size_t elemCnt, int maxAllowedDifference)
+{
+	if (elemCnt % 256 != 0)
+	{
+		// Only element counts divisible by 256 are supported (e.g., 4096)
+		return false;
+	}
+
+	const auto scaler = elemCnt / 256;
+
+	for (size_t i = 0; i < elemCnt; ++i)
+	{
+		const auto prev8bit = p2[i / scaler];
+		const auto next8bit = i < 255 * scaler ? p2[i / scaler + 1] : 256;
+		const auto corresponding8bit = std::round(p1[i] / 256.0);
+		if (prev8bit > next8bit)
+		{
+			return false;
+		}
+		if (corresponding8bit < prev8bit - maxAllowedDifference)
+		{
+			return false;
+		}
+		if (corresponding8bit > next8bit + maxAllowedDifference)
+		{
+			return false;
+		}
+	}
+
+	return true;
+}
+
 TEST(LUTGeneration, Gamma1)
 {
-	auto gammaLutTest = libCZI::Utils::Create8BitLookUpTableFromGamma(256, 0, 1, 0.58f);
+	constexpr auto gamma = 0.58f;
+
+	auto gammaLutTest = libCZI::Utils::Create8BitLookUpTableFromGamma(256, 0, 1, gamma);
 
 	EXPECT_EQ(gammaLutTest.size(), (size_t)256) << "Incorrect result";
 
@@ -42,11 +77,23 @@ TEST(LUTGeneration, Gamma1)
 	// allow for a difference of 1 (rounding is not yet the same as in the original code, need to look into this...)
 	bool isCorrect = CompareWithMargin(&gammaLutTest[0], ExpectedResult, 256, 1);
 	EXPECT_TRUE(isCorrect) << "Incorrect result";
+
+	// test that the 16-bit result is basically the same
+	auto gammaLutTest16bit = libCZI::Utils::Create16BitLookUpTableFromGamma(65536, 0, 1, gamma);
+	bool isCorrect16bit = Compare16bitLUT(&gammaLutTest16bit[0], ExpectedResult, 65536, 0);
+	EXPECT_TRUE(isCorrect16bit) << "Incorrect 16-bit result";
+
+	// note that also bit depths between 8 and 16 are supported (e.g., 12)
+	auto gammaLutTest12bit = libCZI::Utils::Create16BitLookUpTableFromGamma(4096, 0, 1, gamma);
+	bool isCorrect12bit = Compare16bitLUT(&gammaLutTest12bit[0], ExpectedResult, 4096, 0);
+	EXPECT_TRUE(isCorrect12bit) << "Incorrect 12-bit result";
 }
 
 TEST(LUTGeneration, Gamma2)
 {
-	auto gammaLutTest = libCZI::Utils::Create8BitLookUpTableFromGamma(256, 0, 1, 1.58f);
+	constexpr auto gamma = 1.58f;
+
+	auto gammaLutTest = libCZI::Utils::Create8BitLookUpTableFromGamma(256, 0, 1, gamma);
 
 	EXPECT_EQ(gammaLutTest.size(), (size_t)256) << "Incorrect result";
 	static std::uint8_t ExpectedResult[256] = {
@@ -66,6 +113,16 @@ TEST(LUTGeneration, Gamma2)
 	// allow for a difference of 1 (rounding is not yet the same as in the original code, need to look into this...)
 	bool isCorrect = CompareWithMargin(&gammaLutTest[0], ExpectedResult, 256, 1);
 	EXPECT_TRUE(isCorrect) << "Incorrect result";
+
+	// test that the 16-bit result is basically the same
+	auto gammaLutTest16bit = libCZI::Utils::Create16BitLookUpTableFromGamma(65536, 0, 1, gamma);
+	bool isCorrect16bit = Compare16bitLUT(&gammaLutTest16bit[0], ExpectedResult, 65536, 0);
+	EXPECT_TRUE(isCorrect16bit) << "Incorrect 16-bit result";
+
+	// also 10-bit LUTs, for example, can be generated
+	auto gammaLutTest10bit = libCZI::Utils::Create16BitLookUpTableFromGamma(1024, 0, 1, gamma);
+	bool isCorrect10bit = Compare16bitLUT(&gammaLutTest10bit[0], ExpectedResult, 1024, 0);
+	EXPECT_TRUE(isCorrect10bit) << "Incorrect 10-bit result";
 }
 
 TEST(LUTGeneration, Splines1)
@@ -115,7 +172,9 @@ TEST(LUTGeneration, Splines1)
 
 TEST(LUTGeneration, Gamma3)
 {
-	auto gammaLutTest = libCZI::Utils::Create8BitLookUpTableFromGamma(256, 0, 1, 0.28218746779620463f);
+	constexpr auto gamma = 0.28218746779620463f;
+
+	auto gammaLutTest = libCZI::Utils::Create8BitLookUpTableFromGamma(256, 0, 1, gamma);
 
 	EXPECT_EQ(gammaLutTest.size(), (size_t)256) << "Incorrect result";
 
@@ -132,7 +191,17 @@ TEST(LUTGeneration, Gamma3)
 		246, 246, 246, 247, 247, 247, 248, 248, 249, 249, 249, 250, 250, 250, 251, 251, 251, 252, 252, 252, 253, 253, 253, 254,
 		254, 254, 255, 255, 255, 255 };
 
-	// allow for a difference of 1 (rounding is not yet the same as in the original code, need to look into this...)
+	// allow for a difference of 2 (rounding is not yet the same as in the original code, need to look into this...)
 	bool isCorrect = CompareWithMargin(&gammaLutTest[0], ExpectedResult, 256, 2);
 	EXPECT_TRUE(isCorrect) << "Incorrect result";
+
+	// test that the 16-bit result is basically the same
+	auto gammaLutTest16bit = libCZI::Utils::Create16BitLookUpTableFromGamma(65536, 0, 1, gamma);
+	bool isCorrect16bit = Compare16bitLUT(&gammaLutTest16bit[0], ExpectedResult, 65536, 1);
+	EXPECT_TRUE(isCorrect16bit) << "Incorrect 16-bit result";
+
+	// also 14-bit LUTs, for example, can be generated
+	auto gammaLutTest14bit = libCZI::Utils::Create16BitLookUpTableFromGamma(16384, 0, 1, gamma);
+	bool isCorrect14bit = Compare16bitLUT(&gammaLutTest14bit[0], ExpectedResult, 16384, 1);
+	EXPECT_TRUE(isCorrect14bit) << "Incorrect 14-bit result";
 }

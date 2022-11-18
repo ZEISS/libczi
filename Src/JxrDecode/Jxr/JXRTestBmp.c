@@ -211,7 +211,7 @@ ERR PKImageEncode_WritePixels_BMP(
 
     for (i = cLine - 1; 0 <= i; --i)
     {
-        size_t offM = cbStride * i;
+        size_t offM = (size_t)cbStride * i;
         size_t offS = cbLineS * (pIE->uHeight - (pIE->idxCurrentLine + i + 1));
 
         Call(pS->SetPos(pS, pIE->offPixel + offS));
@@ -372,7 +372,7 @@ ERR PKImageDecode_Copy_BMP(
     {
         size_t offLine = pID->EXT.BMP.cbPixel * pRect->X;
         size_t offS = cbLineS * (pID->uHeight - i - 1) + offLine;
-        size_t offM = cbStride * (i - pRect->Y) + offLine;
+        size_t offM = (size_t)cbStride * (i - pRect->Y) + offLine;
 
         Call(pS->SetPos(pS, pID->EXT.BMP.offPixel + offS));
         Call(pS->Read(pS, pb + offM, cbLineM));

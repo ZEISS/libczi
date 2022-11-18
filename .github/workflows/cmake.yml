@@ -6,14 +6,12 @@ on:
   pull_request:
     branches: [ "main" ]
 
-env:
-  # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
-  BUILD_TYPE: Release
-
 jobs:
   build:
     strategy:
       matrix:
+        # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
+        build: [Release, Debug]
         os: [ubuntu-latest, windows-latest]
     # The CMake configure and build commands are platform agnostic and should work equally well on Windows or Mac.
     # You can convert this to a matrix build if you need cross-platform coverage.
@@ -26,16 +24,39 @@ jobs:
     - name: Configure CMake
       # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
       # See https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type
-      run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
+      run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{matrix.build}}
 
     - name: Build
       # Build your program with the given configuration
-      run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
+      run: cmake --build ${{github.workspace}}/build --config ${{matrix.build}}
 
     - name: Test
       working-directory: ${{github.workspace}}/build
       # Execute tests defined by the CMake configuration.  
       # See https://cmake.org/cmake/help/latest/manual/ctest.1.html for more detail
       # Use debug flag to show all exeucted tests 
-      run: ctest --debug -C ${{env.BUILD_TYPE}}
-      
+      run: ctest --debug -C ${{matrix.build}}
+
+    # Coverage collection based on https://about.codecov.io/blog/how-to-set-up-codecov-with-c-plus-plus-and-github-actions/
+    - name: Prepare Coverage
+      if: ${{ (matrix.OS == 'windows-latest') && ( matrix.build == 'Debug') }}
+      run: |
+        choco install OpenCppCoverage -y
+        echo "C:\Program Files\OpenCppCoverage" >> $env:GITHUB_PATH
+
+    - name: Get Coverage
+      if: ${{ (matrix.OS == 'windows-latest') && ( matrix.build == 'Debug') }}
+      working-directory: ${{github.workspace}}/build/Src/libCZI_UnitTests/${{matrix.build}}
+      shell: cmd
+      run: OpenCppCoverage.exe --export_type cobertura:${{github.workspace}}\coverage.xml --config_file "${{github.workspace}}\opencppcoverage.txt" -- libCZI_UnitTests.exe
+
+    - name: Upload Coverage
+      uses: codecov/codecov-action@v3
+      if: ${{ (matrix.OS == 'windows-latest') && ( matrix.build == 'Debug') }}
+      with:
+        files: ./coverage.xml
+        fail_ci_if_error: true
+        verbose: true
+        # Only one flag to be safe with
+        # https://docs.codecov.com/docs/flags#one-to-one-relationship-of-flags-to-uploads
+        flags: ${{matrix.OS}}
