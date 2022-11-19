@@ -370,7 +370,7 @@ CSimpleOutputStreamStreams::CSimpleOutputStreamStreams(const wchar_t* filename, 
 		}
 	}
 
-	this->fp = fopen(conv.c_str(), "wb");
+	this->fp = fopen(filename_utf8.c_str(), "wb");
 	if (!this->fp)
 	{
 		err = errno;
@@ -384,7 +384,7 @@ CSimpleOutputStreamStreams::CSimpleOutputStreamStreams(const wchar_t* filename, 
 		strerror_s(errMsg, err);
 		ss << "Error opening the file \"" << Utilities::convertWchar_tToUtf8(filename) << "\" -> errno=" << err << " (" << errMsg << ")";
 #else
-		ss << "Error opening the file \"" << conv << "\" -> errno=" << err << " (" << strerror(err) << ")";
+		ss << "Error opening the file \"" << filename_utf8 << "\" -> errno=" << err << " (" << strerror(err) << ")";
 #endif
 		throw std::runtime_error(ss.str());
 	}
@@ -576,7 +576,7 @@ CSimpleInputOutputStreamImpl::CSimpleInputOutputStreamImpl(const wchar_t* filena
 		strerror_s(errMsg, err);
 		ss << "Error opening the file \"" << Utilities::convertWchar_tToUtf8(filename) << "\" -> errno=" << err << " (" << errMsg << ")";
 #else
-		ss << "Error opening the file \"" << conv << "\" -> errno=" << err << " (" << strerror(err) << ")";
+		ss << "Error opening the file \"" << filename_utf8 << "\" -> errno=" << err << " (" << strerror(err) << ")";
 #endif
 		throw std::runtime_error(ss.str());
 	}
