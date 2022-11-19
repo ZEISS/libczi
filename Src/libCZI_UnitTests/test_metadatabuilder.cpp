@@ -576,3 +576,45 @@ TEST(MetadataBuilder, AddPropertyMultipleTimes_Expect_LastestUpdateWins)
 
 	EXPECT_TRUE(strcmp(expectedResult, xml.c_str()) == 0) << "Incorrect result";
 }
+
+TEST(MetadataBuilder, MetadataBuilderFromXml1)
+{
+	static const char* xml_document =
+		u8"<ImageDocument>\n"
+		u8"  <Metadata>\n"
+		u8"    <Scaling>\n"
+		u8"      <Items>\n"
+		u8"        <Distance Id=\"X\">\n"
+		u8"          <Value>1.06822e-07</Value>\n"
+		u8"          <DefaultUnitFormat>µm</DefaultUnitFormat>\n"
+		u8"        </Distance>\n"
+		u8"        <Distance Id=\"Y\">\n"
+		u8"          <Value>1.06822e-07</Value>\n"
+		u8"          <DefaultUnitFormat>µm</DefaultUnitFormat>\n"
+		u8"        </Distance>\n"
+		u8"        <Distance Id=\"Z\">\n"
+		u8"          <Value>5e-07</Value>\n"
+		u8"          <DefaultUnitFormat>µm</DefaultUnitFormat>\n"
+		u8"        </Distance>\n"
+		u8"      </Items>\n"
+		u8"    </Scaling>\n"
+		u8"  </Metadata>\n"
+		u8"</ImageDocument>\n";
+
+	auto mdBldr = CreateMetadataBuilderFromXml(xml_document);
+	const auto root = mdBldr->GetRootNode();
+	const auto node = root->GetChildNodeReadonly("Metadata/Scaling/Items/Distance[Id=Z]/DefaultUnitFormat");
+	wstring value;
+	const bool b = node->TryGetValue(&value);
+	ASSERT_TRUE(b);
+	EXPECT_TRUE(value == L"µm") << "Incorrect result";
+}
+
+TEST(MetadataBuilder, MetadataBuilderFromXml2)
+{
+	static const char* xml_document =
+		u8"<ImageDocumentXXX>\n"
+		u8"</ImageDocumentXXX>\n";
+
+	EXPECT_ANY_THROW(CreateMetadataBuilderFromXml(xml_document)) << "Expected to throw because no ImageDocument-root-node present";
+}
