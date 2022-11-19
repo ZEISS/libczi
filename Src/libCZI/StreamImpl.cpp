@@ -42,7 +42,7 @@ CSimpleStreamImpl::CSimpleStreamImpl(const wchar_t* filename)
 		strerror_s(errMsg, err);
 		ss << "Error opening the file \"" << Utilities::convertWchar_tToUtf8(filename) << "\" -> errno=" << err << " (" << errMsg << ")";
 #else
-		ss << "Error opening the file \"" << conv << "\" -> errno=" << err << " (" << strerror(err) << ")";
+		ss << "Error opening the file \"" << filename_utf8 << "\" -> errno=" << err << " (" << strerror(err) << ")";
 #endif
 		throw std::runtime_error(ss.str());
 	}
