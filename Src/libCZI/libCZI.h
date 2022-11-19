@@ -157,6 +157,13 @@ namespace libCZI
 	/// \return The newly created metadata-builder-object.
 	LIBCZI_API std::shared_ptr<ICziMetadataBuilder> CreateMetadataBuilder();
 
+	/// Creates metadata builder object from the specified UTF8-encoded XML-string. If the XML is
+    /// invalid or if the root-node "ImageDocument" is not present, then an exception is thrown.
+    /// \param  xml The UTF8-encoded XML string.
+    /// \return The newly created metadata-builder-object.
+	LIBCZI_API std::shared_ptr<ICziMetadataBuilder> CreateMetadataBuilderFromXml(const std::string& xml);
+
+
 	/// Interface used for accessing the data-stream.
 	///
 	class IStream

@@ -88,6 +88,13 @@ tString trimImpl(const tString& str, const tString& whitespace)
     return conv;
 }
 
+/*static*/std::string Utilities::convertWchar_tToUtf8(const wchar_t* szw)
+{
+    std::wstring_convert<std::codecvt_utf8<wchar_t>> utf8_conv;
+    std::string conv = utf8_conv.to_bytes(szw);
+    return conv;
+}
+
 /*static*/void Utilities::Tokenize(const std::wstring& str, std::vector<std::wstring>& tokens, const std::wstring& delimiters)
 {
     // Skip delimiters at beginning.

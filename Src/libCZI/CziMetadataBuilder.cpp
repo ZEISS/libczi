@@ -439,6 +439,22 @@ CCZiMetadataBuilder::CCZiMetadataBuilder(const wchar_t* rootNodeName)
 	this->rootNode = n;
 }
 
+CCZiMetadataBuilder::CCZiMetadataBuilder(const wchar_t* rootNodeName, const std::string& xml)
+{
+	if (!this->metadataDoc.load_buffer(xml.c_str(), xml.size(), pugi::parse_default, encoding_utf8))
+	{
+		throw LibCZIXmlParseException("XML is not well-formed");
+	}
+
+	this->rootNode = this->metadataDoc.child(rootNodeName);
+	if (!this->rootNode)
+	{
+		ostringstream ss;
+		ss << "Root-node \"" << Utilities::convertWchar_tToUtf8(rootNodeName) << "\" not found.";
+		throw LibCZIXmlParseException(ss.str().c_str());
+	}
+}
+
 /*virtual*/std::shared_ptr<libCZI::IXmlNodeRw> CCZiMetadataBuilder::GetRootNode()
 {
 	return std::make_shared<CNodeWrapper>(this->shared_from_this(), this->rootNode.internal_object());

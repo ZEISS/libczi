@@ -17,6 +17,7 @@ private:
 public:
 	CCZiMetadataBuilder() = delete;
 	CCZiMetadataBuilder(const wchar_t* rootNodeName);
+	CCZiMetadataBuilder(const wchar_t* rootNodeName, const std::string& xml);
 	virtual ~CCZiMetadataBuilder() override = default;
 
 
