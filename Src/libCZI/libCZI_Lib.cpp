@@ -127,3 +127,8 @@ std::shared_ptr<ICziMetadataBuilder> libCZI::CreateMetadataBuilder()
 {
 	return make_shared<CCZiMetadataBuilder>(L"ImageDocument");
 }
+
+std::shared_ptr<ICziMetadataBuilder> libCZI::CreateMetadataBuilderFromXml(const std::string& xml)
+{
+	return make_shared<CCZiMetadataBuilder>(L"ImageDocument", xml);
+}
