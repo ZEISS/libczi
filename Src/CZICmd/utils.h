@@ -1,0 +1,77 @@
+// SPDX-FileCopyrightText: 2017-2022 Carl Zeiss Microscopy GmbH
+//
+// SPDX-License-Identifier: LGPL-3.0-or-later
+
+#pragma once
+
+#include <string>
+#include <vector>
+#include "inc_libCZI.h"
+
+std::string convertToUtf8(const std::wstring& str);
+std::wstring convertUtf8ToUCS2(const std::string& str);
+
+std::string trim(const std::string& str, const std::string& whitespace = " \t");
+std::wstring trim(const std::wstring& str, const std::wstring& whitespace = L" \t");
+bool icasecmp(const std::string& l, const std::string& r);
+bool icasecmp(const std::wstring& l, const std::wstring& r);
+bool __wcasecmp(const wchar_t* l, const wchar_t* r);
+std::uint8_t HexCharToInt(char c);
+bool ConvertHexStringToInteger(const char* cp, std::uint32_t* value);
+char LowerNibbleToHexChar(std::uint8_t v);
+char UpperNibbleToHexChar(std::uint8_t v);
+
+std::string BytesToHexString(const std::uint8_t* ptr, size_t size);
+std::wstring BytesToHexWString(const std::uint8_t* ptr, size_t size);
+
+std::vector<std::wstring> wrap(const wchar_t* text, size_t line_length/* = 72*/);
+
+const wchar_t* skipWhiteSpaceAndOneOfThese(const wchar_t* s, const wchar_t* charToSkipOnce);
+
+std::ostream& operator<<(std::ostream& os, const GUID& guid); 
+
+bool TryParseGuid(const std::wstring& str, GUID* g);
+
+/// This is an utility in order to implement a "scope guard" - an object that when gets out-of-scope is executing
+/// a functor which may implement any kind of clean-up - akin to a finally-clause in C#. C.f. https://www.heise.de/blog/C-Core-Guidelines-finally-in-C-4133759.html
+/// or https://blog.rnstlr.ch/c-list-of-scopeguard.html.
+///
+/// \tparam F   Object to be executed when leaving the scope.
+template <class F>
+class final_act
+{
+public:
+    explicit final_act(F f) noexcept
+        : f_(std::move(f)), invoke_(true) {}
+
+    final_act(final_act&& other) noexcept
+        : f_(std::move(other.f_)),
+        invoke_(other.invoke_)
+    {
+        other.invoke_ = false;
+    }
+
+    final_act(const final_act&) = delete;
+    final_act& operator=(const final_act&) = delete;
+
+    ~final_act() noexcept
+    {
+        if (invoke_) f_();
+    }
+
+private:
+    F f_;
+    bool invoke_;
+};
+
+template <class F>
+inline final_act<F> finally(const F& f) noexcept
+{
+    return final_act<F>(f);
+}
+
+template <class F>
+inline final_act<F> finally(F&& f) noexcept
+{
+    return final_act<F>(std::forward<F>(f));
+}
