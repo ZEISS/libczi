@@ -8,7 +8,6 @@
 #include "executeCreateCzi.h"
 #include "executeReadWriteCzi.h"
 #include "inc_libCZI.h"
-#include "streamimpl.h"
 #include "SaveBitmap.h"
 #include "utils.h"
 #include "DisplaySettingsHelper.h"
