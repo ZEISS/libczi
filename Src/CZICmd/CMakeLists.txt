@@ -52,12 +52,10 @@ set (CZICMDSRCFILES
          BitmapGenNull.cpp      
          executeReadWriteCzi.cpp  
          inc_rapidjson.h      
-         streamimpl.cpp
          BitmapGenNull.h        
          CZIcmd.cpp          
          executeReadWriteCzi.h    
-         platform_defines.h   
-         streamimpl.h)
+         platform_defines.h)
 file(GLOB_RECURSE CZICMDRAPIDJSONSRCFILES "*.h" "*.cpp" "*.hpp")
 
 add_executable(CZIcmd ${CZICMDSRCFILES} ${CZICMDRAPIDJSONSRCFILES})
