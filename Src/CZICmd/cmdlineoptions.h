@@ -199,6 +199,7 @@ public:
 
 	void Clear();
 
+	bool Parse2(int argc, char** argv);
 #if defined(WIN32ENV)
 	bool Parse(int argc, wchar_t** argv);
 #endif
@@ -265,12 +266,15 @@ public:
 	std::shared_ptr<libCZI::ICompressParameters> GetCompressionParameters() const { return this->compressionParameters; }
 	libCZI::PixelType GetPixelGeneratorPixeltype() const { return this->pixelTypeForBitmapGenerator; }
 private:
+	friend struct RegionOfInterestValidator;
 	void PrintUsage(int switchesCnt, const std::function<std::tuple<int, std::wstring>(int idx)>& getSwitch);
 	bool CheckArgumentConsistency() const;
 
 	static Command ParseCommand(const wchar_t* s);
 	static Command ParseCommand(const std::string& s) { auto sucs2 = convertUtf8ToUCS2(s); return ParseCommand(sucs2.c_str()); }
 
+	static bool TryParseInt32(const std::string& str, int* value);
+	static bool TryParseRect(const std::string& str, bool* absolute_mode, int* x_position, int* y_position, int* width, int* height);
 	libCZI::CDimCoordinate ParseDimCoordinate(const std::string& s);
 	void ParseRect(const std::string& s) { auto sucs2 = convertUtf8ToUCS2(s); this->ParseRect(sucs2); }
 	void SetOutputFilename(const std::string& s) { auto sucs2 = convertUtf8ToUCS2(s); this->SetOutputFilename(sucs2); }

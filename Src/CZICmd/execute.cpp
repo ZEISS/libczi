@@ -829,16 +829,15 @@ class CExecuteScalingChannelComposite : CExecuteBase
 public:
 	static bool execute(const CCmdLineOptions& options)
 	{
-		auto spReader = CreateAndOpenCziReader(options);
+        const auto spReader = CreateAndOpenCziReader(options);
 		libCZI::CDisplaySettingsHelper dsplHlp;
-		std::vector<int> activeChannels;
-		static std::vector<shared_ptr<IBitmapData>> channelBitmaps;
+        static std::vector<shared_ptr<IBitmapData>> channelBitmaps;
 		std::shared_ptr<libCZI::IDisplaySettings> dsplSettings;
 		if (options.GetUseDisplaySettingsFromDocument())
 		{
-			auto mds = spReader->ReadMetadataSegment();
-			auto md = mds->CreateMetaFromMetadataSegment();
-			auto docInfo = md->GetDocumentInfo();
+			const auto mds = spReader->ReadMetadataSegment();
+			const auto md = mds->CreateMetaFromMetadataSegment();
+			const auto docInfo = md->GetDocumentInfo();
 			dsplSettings = docInfo->GetDisplaySettings();
 		}
 		else
@@ -852,7 +851,7 @@ public:
 			return false;
 		}
 
-		activeChannels = libCZI::CDisplaySettingsHelper::GetActiveChannels(dsplSettings.get());
+        const std::vector<int> activeChannels = libCZI::CDisplaySettingsHelper::GetActiveChannels(dsplSettings.get());
 		channelBitmaps = GetBitmapsFromSpecifiedChannels(
 			spReader.get(),
 			options,

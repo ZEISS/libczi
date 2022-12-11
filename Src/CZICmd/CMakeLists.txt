@@ -22,6 +22,15 @@ IF(UNIX)
  ENDIF()
 ENDIF(UNIX)
 
+include(FetchContent)
+FetchContent_Declare(
+  cli11
+  GIT_REPOSITORY https://github.com/CLIUtils/CLI11
+  GIT_TAG        v2.2.0
+)
+
+FetchContent_MakeAvailable(cli11)
+
 set (CZICMDSRCFILES
          BitmapGen.cpp          
          DisplaySettingsHelper.h  
@@ -63,7 +72,7 @@ add_executable(CZIcmd ${CZICMDSRCFILES} ${CZICMDRAPIDJSONSRCFILES})
 set_target_properties(CZIcmd PROPERTIES CXX_STANDARD 11)
 target_compile_definitions(CZIcmd PRIVATE _LIBCZISTATICLIB)
 
-target_link_libraries(CZIcmd PRIVATE libCZIStatic ${ZLIB_LIBRARIES}  ${PNG_LIBRARIES} )
+target_link_libraries(CZIcmd PRIVATE libCZIStatic ${ZLIB_LIBRARIES}  ${PNG_LIBRARIES}  CLI11::CLI11)
 target_include_directories(CZIcmd PRIVATE ${ZLIB_INCLUDE_DIR} ${PNG_INCLUDE_DIR} ${CMAKE_CURRENT_BINARY_DIR})
 
 IF (FREETYPE_FOUND)

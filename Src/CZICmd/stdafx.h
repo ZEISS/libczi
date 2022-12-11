@@ -26,6 +26,7 @@
 #include <sstream>
 
 #if defined(WIN32ENV)
+#define NOMINMAX
 #include <windows.h>
 #endif
 

@@ -59,9 +59,10 @@ public:
 int main(int argc, char** _argv)
 {
 #if defined(WIN32ENV)
-		wchar_t** argv;
+		/*wchar_t** argv;
 		CoInitialize(NULL);
-		argv = CommandLineToArgvW(GetCommandLineW(), &argc);
+		argv = CommandLineToArgvW(GetCommandLineW(), &argc);*/
+		CommandlineArgsWindowsHelper args_helper;
 #endif
 #if defined(LINUXENV)
 		setlocale(LC_CTYPE, "");
@@ -73,7 +74,11 @@ int main(int argc, char** _argv)
 		try
 		{
 				CCmdLineOptions options(log);
+#if defined(WIN32ENV)
+				bool cmdLineParsedOk = options.Parse2(args_helper.GetArgc(), args_helper.GetArgv());
+#else
 				bool cmdLineParsedOk = options.Parse(argc, argv);
+#endif
 				if (cmdLineParsedOk == true)
 				{
 						if (options.GetCommand() != Command::Invalid)
@@ -101,7 +106,7 @@ int main(int argc, char** _argv)
 
 #if defined(WIN32ENV)
 		CoUninitialize();
-		LocalFree(argv);
+		//LocalFree(argv);
 #endif
 
 		return retVal;
