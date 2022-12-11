@@ -34,6 +34,7 @@ CCmdLineOptions::CCmdLineOptions(std::shared_ptr<ILog> log)
     this->Clear();
 }
 
+/// CLI11-validator for the option "--plane-coordinate".
 struct PlaneCoordinateValidator : public CLI::Validator
 {
     PlaneCoordinateValidator()
@@ -56,6 +57,7 @@ struct PlaneCoordinateValidator : public CLI::Validator
     }
 };
 
+/// CLI11-validator for the option "--rect".
 struct RegionOfInterestValidator : public CLI::Validator
 {
     RegionOfInterestValidator()
@@ -76,6 +78,7 @@ struct RegionOfInterestValidator : public CLI::Validator
     }
 };
 
+/// CLI11-validator for the option "--display-settings".
 struct DisplaySettingsValidator : public CLI::Validator
 {
     DisplaySettingsValidator()
@@ -84,6 +87,7 @@ struct DisplaySettingsValidator : public CLI::Validator
     }
 };
 
+/// CLI11-validator for the option "--jpgxrcodec".
 struct JpgXrCodecValidator : public CLI::Validator
 {
     JpgXrCodecValidator()
@@ -103,6 +107,7 @@ struct JpgXrCodecValidator : public CLI::Validator
     }
 };
 
+/// CLI11-validator for the option "--verbosity".
 struct VerbosityValidator : public CLI::Validator
 {
     VerbosityValidator()
@@ -115,6 +120,7 @@ struct VerbosityValidator : public CLI::Validator
     }
 };
 
+/// CLI11-validator for the option "--background".
 struct BackgroundColorValidator : public CLI::Validator
 {
     BackgroundColorValidator()
@@ -127,6 +133,7 @@ struct BackgroundColorValidator : public CLI::Validator
     }
 };
 
+/// CLI11-validator for the option "--pyramidinfo".
 struct PyramidInfoValidator : public CLI::Validator
 {
     PyramidInfoValidator()
@@ -139,6 +146,7 @@ struct PyramidInfoValidator : public CLI::Validator
     }
 };
 
+/// CLI11-validator for the option "--info-level".
 struct InfoLevelValidator : public CLI::Validator
 {
     InfoLevelValidator()
@@ -151,6 +159,7 @@ struct InfoLevelValidator : public CLI::Validator
     }
 };
 
+/// CLI11-validator for the option "--selection".
 struct SelectionValidator : public CLI::Validator
 {
     SelectionValidator()
@@ -163,6 +172,7 @@ struct SelectionValidator : public CLI::Validator
     }
 };
 
+/// CLI11-validator for the option "--tile-filter".
 struct TileFilterValidator : public CLI::Validator
 {
     TileFilterValidator()
@@ -175,6 +185,7 @@ struct TileFilterValidator : public CLI::Validator
     }
 };
 
+/// CLI11-validator for the option "--channelcompositionformat".
 struct ChannelCompositionFormatValidator : public CLI::Validator
 {
     ChannelCompositionFormatValidator()
@@ -187,6 +198,7 @@ struct ChannelCompositionFormatValidator : public CLI::Validator
     }
 };
 
+/// CLI11-validator for the option "--createbounds".
 struct CreateBoundsValidator : public CLI::Validator
 {
     CreateBoundsValidator()
@@ -199,6 +211,7 @@ struct CreateBoundsValidator : public CLI::Validator
     }
 };
 
+/// CLI11-validator for the option "--createsubblocksize".
 struct CreateSubblockSizeValidator : public CLI::Validator
 {
     CreateSubblockSizeValidator()
@@ -211,6 +224,7 @@ struct CreateSubblockSizeValidator : public CLI::Validator
     }
 };
 
+/// CLI11-validator for the option "--createtileinfo".
 struct CreateTileInfoValidator : public CLI::Validator
 {
     CreateTileInfoValidator()
@@ -223,6 +237,7 @@ struct CreateTileInfoValidator : public CLI::Validator
     }
 };
 
+/// CLI11-validator for the option "--guidofczi".
 struct GuidOfCziValidator : public CLI::Validator
 {
     GuidOfCziValidator()
@@ -235,6 +250,7 @@ struct GuidOfCziValidator : public CLI::Validator
     }
 };
 
+/// CLI11-validator for the option "--bitmapgenerator".
 struct BitmapGeneratorValidator : public CLI::Validator
 {
     BitmapGeneratorValidator()
@@ -247,6 +263,7 @@ struct BitmapGeneratorValidator : public CLI::Validator
     }
 };
 
+/// CLI11-validator for the option "--createczisbblkmetadata".
 struct CreateSubblockMetadataValidator : public CLI::Validator
 {
     CreateSubblockMetadataValidator()
@@ -259,6 +276,7 @@ struct CreateSubblockMetadataValidator : public CLI::Validator
     }
 };
 
+/// CLI11-validator for the option "--compressionopts".
 struct CompressionOptionsValidator : public CLI::Validator
 {
     CompressionOptionsValidator()
@@ -271,6 +289,7 @@ struct CompressionOptionsValidator : public CLI::Validator
     }
 };
 
+/// CLI11-validator for the option "--generatorpixeltype".
 struct GeneratorPixelTypeValidator : public CLI::Validator
 {
     GeneratorPixelTypeValidator()
