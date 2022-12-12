@@ -25,7 +25,7 @@
 
 using namespace std;
 
-/*static*/const char* ItemValue::SelectionItem_Name  = "name";
+/*static*/const char* ItemValue::SelectionItem_Name = "name";
 /*static*/const char* ItemValue::SelectionItem_Index = "index";
 
 CCmdLineOptions::CCmdLineOptions(std::shared_ptr<ILog> log)
@@ -439,7 +439,7 @@ struct GeneratorPixelTypeValidator : public CLI::Validator
 class CustomFormatter : public CLI::Formatter
 {
 public:
-    CustomFormatter() : Formatter() 
+    CustomFormatter() : Formatter()
     {
         this->column_width(20);
     }
@@ -458,7 +458,7 @@ public:
             name = name.substr(1 + offset);
         }
 
-        auto result_from_stock_implementation = this->CLI::Formatter::make_usage(app, name);
+        const auto result_from_stock_implementation = this->CLI::Formatter::make_usage(app, name);
         ostringstream ss(result_from_stock_implementation);
         int majorVersion, minorVersion;
         libCZI::GetLibCZIVersion(&majorVersion, &minorVersion);
@@ -482,7 +482,7 @@ public:
     }
 };
 
-bool CCmdLineOptions::Parse(int argc, char** argv)
+CCmdLineOptions::ParseResult CCmdLineOptions::Parse(int argc, char** argv)
 {
     CLI::App cli_app{ };
 
@@ -708,7 +708,7 @@ bool CCmdLineOptions::Parse(int argc, char** argv)
     catch (const CLI::ParseError& e)
     {
         cli_app.exit(e);
-        return false;
+        return ParseResult::Error;
     }
 
     if (argument_versionflag)
@@ -717,9 +717,9 @@ bool CCmdLineOptions::Parse(int argc, char** argv)
         this->GetLog()->WriteLineStdOut("");
         this->GetLog()->WriteLineStdOut("");
         this->PrintHelpBitmapGenerator();
-        return false;
+        return ParseResult::Exit;
     }
-    
+
     this->calcHashOfResult = argument_calc_hash;
     this->drawTileBoundaries = argument_drawtileboundaries;
 
@@ -735,7 +735,7 @@ bool CCmdLineOptions::Parse(int argc, char** argv)
 
     if (!argument_plane_coordinate.empty())
     {
-        this->planeCoordinate = libCZI::CDimCoordinate::Parse(argument_plane_coordinate.c_str()); //this->ParseDimCoordinate(argument_plane_coordinate);
+        this->planeCoordinate = libCZI::CDimCoordinate::Parse(argument_plane_coordinate.c_str());
     }
 
     if (!argument_rect.empty())
@@ -758,7 +758,7 @@ bool CCmdLineOptions::Parse(int argc, char** argv)
     {
         const bool b = TryParseVerbosityLevel(argument_verbosity, &this->enabledOutputLevels);
     }
-    
+
     if (!argument_backgroundcolor.empty())
     {
         const bool b = TryParseParseBackgroundColor(argument_backgroundcolor, &this->backGroundColor);
@@ -849,7 +849,7 @@ bool CCmdLineOptions::Parse(int argc, char** argv)
         const bool b = TryParseGeneratorPixeltype(argument_generatorpixeltype, &this->pixelTypeForBitmapGenerator);
     }
 
-    return this->CheckArgumentConsistency();
+    return this->CheckArgumentConsistency() ? ParseResult::OK : ParseResult::Error;
 }
 
 bool CCmdLineOptions::CheckArgumentConsistency() const
@@ -1842,7 +1842,7 @@ void CCmdLineOptions::PrintHelpBitmapGenerator()
         [&](int no, std::tuple<std::string, std::string, bool> name_explanation_isdefault) -> bool
         {
             maxLengthClassName = (std::max)(get<0>(name_explanation_isdefault).length(), maxLengthClassName);
-            return true;
+    return true;
         });
 
     stringstream ss;
@@ -1850,9 +1850,9 @@ void CCmdLineOptions::PrintHelpBitmapGenerator()
         [&](int no, std::tuple<std::string, std::string, bool> name_explanation_isdefault) -> bool
         {
             ss << no + 1 << ": " << std::setw(maxLengthClassName) << std::left << get<0>(name_explanation_isdefault) << std::setw(0) <<
-                (!get<2>(name_explanation_isdefault) ? "     " : " (*) ") << "\"" <<
-                get<1>(name_explanation_isdefault) << "\"" << endl;
-            return true;
+            (!get<2>(name_explanation_isdefault) ? "     " : " (*) ") << "\"" <<
+        get<1>(name_explanation_isdefault) << "\"" << endl;
+    return true;
         });
 
     this->GetLog()->WriteLineStdOut(ss.str());

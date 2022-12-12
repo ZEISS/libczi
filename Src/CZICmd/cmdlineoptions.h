@@ -141,7 +141,6 @@ private:
 
 	Command command;
 	std::wstring cziFilename;
-
 	libCZI::CDimCoordinate planeCoordinate;
 
 	bool	rectModeAbsoluteOrRelative;	// true->absolute, false->relative
@@ -154,20 +153,15 @@ private:
 	bool useDisplaySettingsFromDocument;
 
 	bool calcHashOfResult;
-
 	bool drawTileBoundaries;
-
 	std::uint32_t enabledOutputLevels;
-
 	bool useWicJxrDecoder;
-
 	libCZI::RgbFloatColor	backGroundColor;
 
-	int pyramidMinificationFactor;
+    int pyramidMinificationFactor;
 	int pyramidLayerNo;
 
 	float zoom;
-
 	InfoLevel infoLevel;
 
 	libCZI::PixelType channelCompositePixelType;
@@ -195,19 +189,25 @@ private:
 	std::shared_ptr<libCZI::ICompressParameters> compressionParameters;
 	libCZI::PixelType pixelTypeForBitmapGenerator;
 public:
+    /// Values that represent the result of the "Parse"-operation.
+	enum class ParseResult
+	{
+        OK,		///< An enum constant representing the result "arguments successfully parsed, operation can start".
+		Exit,	///< An enum constant representing the result "operation complete, the program should now be terminated, e.g. the synopsis was printed".
+		Error	///< An enum constant representing the result "the was an error parsing the command line arguments, program should terminate".
+	};
+
 	explicit CCmdLineOptions(std::shared_ptr<ILog> log);
 
+	ParseResult Parse(int argc, char** argv);
 	void Clear();
 
-	bool Parse(int argc, char** argv);
-
-	std::shared_ptr<ILog> GetLog() const { return this->log; }
+    std::shared_ptr<ILog> GetLog() const { return this->log; }
 	Command GetCommand() const { return this->command; }
 	const std::wstring& GetCZIFilename() const { return this->cziFilename; }
 	const libCZI::CDimCoordinate& GetPlaneCoordinate() const { return this->planeCoordinate; }
 	const std::map<int, ChannelDisplaySettings>& GetMultiChannelCompositeChannelInfos() const { return this->multiChannelCompositeChannelInfos; }
 	bool GetUseDisplaySettingsFromDocument() const { return this->useDisplaySettingsFromDocument; }
-
 	libCZI::IntRect GetRect() const { return libCZI::IntRect{ this->rectX,this->rectY,this->rectW,this->rectH }; }
 	bool GetIsAbsoluteRectCoordinate() const { return this->rectModeAbsoluteOrRelative; }
 	bool GetIsRelativeRectCoordinate() const { return !this->rectModeAbsoluteOrRelative; }
@@ -216,46 +216,31 @@ public:
 	int GetRectW() const { return this->rectW; }
 	int GetRectH() const { return this->rectH; }
 	bool GetCalcHashOfResult() const { return this->calcHashOfResult; }
-
 	bool GetDrawTileBoundaries() const { return this->drawTileBoundaries; }
-
 	std::wstring MakeOutputFilename(const wchar_t* suffix, const wchar_t* extension) const;
 	std::wstring GetOutputFilename() const { return this->outputFilename; }
-
 	bool GetUseWICJxrDecoder() const { return this->useWicJxrDecoder; }
-
 	libCZI::RgbFloatColor GetBackGroundColor() const { return this->backGroundColor; }
-
 	bool IsLogLevelEnabled(int level) const;
-
 	int GetPyramidInfoMinificationFactor() const { return this->pyramidMinificationFactor; }
 	int GetPyramidInfoLayerNo() const { return this->pyramidLayerNo; }
 	float GetZoom() const { return this->zoom; }
-
 	InfoLevel GetInfoLevel() const { return this->infoLevel; }
 	bool IsInfoLevelEnabled(InfoLevel lvl) const { return (static_cast<std::underlying_type<InfoLevel>::type>(this->infoLevel)&static_cast<std::underlying_type<InfoLevel>::type>(lvl)) != 0; }
-
 	ItemValue GetSelectionItemValue(const char* sz) const;
-
 	std::shared_ptr<libCZI::IIndexSet> GetSceneIndexSet() const;
-
 	libCZI::PixelType GetChannelCompositeOutputPixelType() const { return this->channelCompositePixelType; }
 	std::uint8_t GetChannelCompositeOutputAlphaValue() const { return this->channelCompositeAlphaValue; }
 	const libCZI::CDimBounds& GetCreateBounds() const { return this->createBounds; }
 	const std::tuple<std::uint32_t, std::uint32_t>& GetCreateBitmapSize() const { return this->createSize; }
 	const CreateTileInfo& GetCreateTileInfo() const { return this->createTileInfo; }
-
-	std::wstring GetFontNameOrFile()const { return this->fontnameOrFile; }
-	int GetFontHeight()const { return this->fontHeight; }
-
+	std::wstring GetFontNameOrFile() const { return this->fontnameOrFile; }
+	int GetFontHeight() const { return this->fontHeight; }
 	bool GetIsFileGuidValid()const { return this->newCziFileGuidValid; }
 	const GUID& GetFileGuid()const { return this->newCziFileGuid; }
-
 	const std::string& GetBitmapGeneratorClassName()const { return this->bitmapGeneratorClassName; }
-
 	const std::map<std::string, std::string>& GetSubBlockKeyValueMetadata()const { return this->sbBlkMetadataKeyValue; }
 	bool GetHasSubBlockKeyValueMetadata()const { return this->sbBlkMetadataKeyValueValid; }
-
 	libCZI::CompressionMode GetCompressionMode() const { return this->compressionMode; }
 	std::shared_ptr<libCZI::ICompressParameters> GetCompressionParameters() const { return this->compressionParameters; }
 	libCZI::PixelType GetPixelGeneratorPixeltype() const { return this->pixelTypeForBitmapGenerator; }

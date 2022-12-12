@@ -64,9 +64,6 @@ public:
 int main(int argc, char** _argv)
 {
 #if defined(WIN32ENV)
-		/*wchar_t** argv;
-		CoInitialize(NULL);
-		argv = CommandLineToArgvW(GetCommandLineW(), &argc);*/
 		CommandlineArgsWindowsHelper args_helper;
 #endif
 #if defined(LINUXENV)
@@ -80,11 +77,11 @@ int main(int argc, char** _argv)
 		{
 				CCmdLineOptions options(log);
 #if defined(WIN32ENV)
-				bool cmdLineParsedOk = options.Parse(args_helper.GetArgc(), args_helper.GetArgv());
+				auto cmdLineParseResult = options.Parse(args_helper.GetArgc(), args_helper.GetArgv());
 #else
-				bool cmdLineParsedOk = options.Parse(argc, argv);
+				auto cmdLineParseResult = options.Parse(argc, argv);
 #endif
-				if (cmdLineParsedOk == true)
+				if (cmdLineParseResult == CCmdLineOptions::ParseResult::OK)
 				{
 						if (options.GetCommand() != Command::Invalid)
 						{
@@ -96,9 +93,14 @@ int main(int argc, char** _argv)
 								execute(options);
 						}
 				}
-				else
+				else if (cmdLineParseResult == CCmdLineOptions::ParseResult::Error)
 				{
 						log->WriteLineStdErr("There were errors parsing the arguments -> exiting.");
+						retVal = 2;
+				}
+				else if (cmdLineParseResult == CCmdLineOptions::ParseResult::Exit)
+				{
+					retVal = -1;
 				}
 		}
 		catch (std::exception& excp)
@@ -106,12 +108,11 @@ int main(int argc, char** _argv)
 				std::stringstream ss;
 				ss << "Exception caught -> \"" << excp.what() << "\"";
 				log->WriteLineStdErr(ss.str());
-				retVal = 1000;
+				retVal = 1;
 		}
 
 #if defined(WIN32ENV)
 		CoUninitialize();
-		//LocalFree(argv);
 #endif
 
 		return retVal;
