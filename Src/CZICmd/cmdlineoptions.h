@@ -281,6 +281,7 @@ private:
 	friend struct CreateTileInfoValidator;
 	friend struct GuidOfCziValidator;
 	friend struct BitmapGeneratorValidator;
+	friend struct CreateSubblockMetadataValidator;
 	void PrintUsage(int switchesCnt, const std::function<std::tuple<int, std::wstring>(int idx)>& getSwitch);
 	bool CheckArgumentConsistency() const;
 
@@ -375,8 +376,9 @@ private:
 	/**/void ParseBitmapGenerator(const std::wstring& s);
 	/**/void ParseBitmapGenerator(const std::string& s) { auto sucs2 = convertUtf8ToUCS2(s); this->ParseBitmapGenerator(sucs2); }
 
-	void ParseSubBlockMetadataKeyValue(const std::wstring& s) { auto str = convertToUtf8(s); this->ParseSubBlockMetadataKeyValue(str); }
-	void ParseSubBlockMetadataKeyValue(const std::string& s);
+	static bool TryParseSubBlockMetadataKeyValue(const std::string& s,std::map<std::string, std::string>* subblock_metadata_property_bag);
+	/**/void ParseSubBlockMetadataKeyValue(const std::wstring& s) { auto str = convertToUtf8(s); this->ParseSubBlockMetadataKeyValue(str); }
+	/**/void ParseSubBlockMetadataKeyValue(const std::string& s);
 
 	void ParseCompressionOptions(const std::wstring& s) { auto str = convertToUtf8(s); this->ParseCompressionOptions(str); }
 	void ParseCompressionOptions(const std::string& s);

@@ -380,6 +380,14 @@ struct CreateSubblockMetadataValidator : public CLI::Validator
         this->name_ = "CreateSubblockMetadataValidator";
         this->func_ = [](const std::string& str) -> string
         {
+            const bool parsed_ok = CCmdLineOptions::TryParseSubBlockMetadataKeyValue(str, nullptr);
+            if (!parsed_ok)
+            {
+                ostringstream string_stream;
+                string_stream << "Invalid create-subblock-metadata (JSON) given \"" << str << "\"";
+                throw CLI::ValidationError(string_stream.str());
+            }
+
             return {};
         };
     }
@@ -2663,6 +2671,59 @@ void CCmdLineOptions::PrintHelpBitmapGenerator()
         });
 
     this->GetLog()->WriteLineStdOut(ss.str());
+}
+
+/*static*/bool CCmdLineOptions::TryParseSubBlockMetadataKeyValue(const std::string& s, std::map<std::string, std::string>* subblock_metadata_property_bag)
+{
+    rapidjson::Document document;
+    document.Parse(s.c_str());
+    if (document.HasParseError())
+    {
+        return false;
+    }
+
+    if (!document.IsObject())
+    {
+        return false;
+    }
+
+    std::map<std::string, std::string> keyValue;
+    for (rapidjson::Value::ConstMemberIterator itr = document.MemberBegin(); itr != document.MemberEnd(); ++itr)
+    {
+        auto key = itr->name.GetString();
+        const auto type = itr->value.GetType();
+        string value;
+        switch (type)
+        {
+        case rapidjson::kNumberType:
+        {
+            stringstream ss;
+            ss << std::setprecision(numeric_limits<double>::digits10) << itr->value.GetDouble();
+            value = ss.str();
+            break;
+        }
+        case rapidjson::kStringType:
+            value = itr->value.GetString();
+            break;
+        case rapidjson::kTrueType:
+            value = "true";
+            break;
+        case rapidjson::kFalseType:
+            value = "false";
+            break;
+        default:
+            return false;
+        }
+
+        keyValue.insert(std::make_pair(key, value));
+    }
+
+    if (subblock_metadata_property_bag != nullptr)
+    {
+        subblock_metadata_property_bag->swap(keyValue);
+    }
+
+    return true;
 }
 
 void CCmdLineOptions::ParseSubBlockMetadataKeyValue(const std::string& s)
