@@ -55,7 +55,7 @@ namespace libCZI
 		enum class ErrorType
 		{
 			InvalidSyntax,		///< The string parsed has an invalid syntax.
-			DuplicateDimension, ///< When parsing a string representation of a coordinate, it was detected, that a dimension occured more than once.
+			DuplicateDimension, ///< When parsing a string representation of a coordinate, it was detected, that a dimension occurred more than once.
 			FromGreaterThanTo,  ///< A range was parsed, and the start value is bigger than the end value.
 			Unspecified			///< General error.
 		};
@@ -67,7 +67,7 @@ namespace libCZI
 		/// Constructor for the LibCZIStringParseException. This type is used
 		/// to signal that a string did not parse correctly.
 		/// \param szErrMsg				 Message describing the error.
-		/// \param numberOfCharsParsedOk Number of characters parsed ok. The parse error occured after this position. If negative, then this information is not available.
+		/// \param numberOfCharsParsedOk Number of characters parsed ok. The parse error occurred after this position. If negative, then this information is not available.
 		/// \param errorType			 Type of the error.
 		LibCZIStringParseException(const char* szErrMsg, int numberOfCharsParsedOk, ErrorType errorType)
 			: LibCZIException(szErrMsg), errorType(errorType), numberOfCharsParsedOk(numberOfCharsParsedOk)
@@ -77,7 +77,7 @@ namespace libCZI
 		/// \return The error type.
 		ErrorType GetErrorType() const { return this->errorType; };
 
-		/// Gets number of characters that parsed correctly. The parse error occured after this position.
+		/// Gets number of characters that parsed correctly. The parse error occurred after this position.
 		/// If this number is negative, then this information is not available and valid.
 		/// \return The number of characters parsed that parsed correctly. If the number is negative, this information is not available.
 		int GetNumberOfCharsParsedOk() const { return this->numberOfCharsParsedOk; }
@@ -115,8 +115,8 @@ namespace libCZI
 		/// to signal an I/O-error from the underlying stream.
 		///
 		/// \param szErrMsg Message describing the error.
-		/// \param offset   The offset (into the stream) at which the I/O-error occured.
-		/// \param size	    The size of data we have attempted to read (when the I/O-error occured).
+		/// \param offset   The offset (into the stream) at which the I/O-error occurred.
+		/// \param size	    The size of data we have attempted to read (when the I/O-error occurred).
 		LibCZIIOException(const char* szErrMsg, std::uint64_t offset, std::uint64_t size)
 			: LibCZIException(szErrMsg), offset(offset), size(size)  {}
 
@@ -127,7 +127,7 @@ namespace libCZI
 		std::uint64_t GetOffset() const { return this->offset; }
 
 		/// Gets the size of data (in bytes) we attempted to read
-		/// when the I/O-error occured.
+		/// when the I/O-error occurred.
 		///
 		/// \return The size (in bytes).
 		std::uint64_t GetSize() const { return this->size; }

@@ -303,7 +303,7 @@ ERR PKImageDecode_Copy_PNM(
     {
         size_t offLine = (BD_1 == PI.bdBitDepth ? ((PI.cbitUnit * pRect->X + 7) >> 3) : (((PI.cbitUnit + 7) >> 3) * pRect->X)); 
         size_t offS = cbLineS * (pRect->Y + i) + offLine;
-        size_t offM = cbStride * i + offLine;
+        size_t offM = (size_t)cbStride * i + offLine;
 
         Call(pS->SetPos(pS, pID->EXT.PNM.offPixel + offS));
         Call(pS->Read(pS, pb + offM, cbLineM));

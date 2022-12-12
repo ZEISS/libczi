@@ -113,6 +113,7 @@ public:
     }
 
     static std::wstring convertUtf8ToWchar_t(const char* sz);
+    static std::string convertWchar_tToUtf8(const wchar_t* szw);
 
     static void Tokenize(const std::wstring& str, std::vector<std::wstring>& tokens, const std::wstring& delimiters = L" ");
 

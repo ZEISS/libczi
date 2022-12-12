@@ -1,6 +1,7 @@
 # libCZI
 [![License: LGPL v3](https://img.shields.io/badge/License-LGPL_v3-blue.svg)](https://www.gnu.org/licenses/lgpl-3.0)
 [![REUSE status](https://api.reuse.software/badge/github.com/ZEISS/libczi)](https://api.reuse.software/info/github.com/ZEISS/libczi)
+[![codecov](https://codecov.io/gh/ZEISS/libczi/branch/main/graph/badge.svg?token=AZ8dGsDrWU)](https://codecov.io/gh/ZEISS/libczi)
 [![CMake](https://github.com/ZEISS/libczi/actions/workflows/cmake.yml/badge.svg?branch=main&event=push)](https://github.com/ZEISS/libczi/actions/workflows/cmake.yml)
 [![CodeQL](https://github.com/ZEISS/libczi/actions/workflows/codeql.yml/badge.svg?branch=main&event=push)](https://github.com/ZEISS/libczi/actions/workflows/codeql.yml)
 [![GitHub Pages](https://github.com/ZEISS/libczi/actions/workflows/pages.yml/badge.svg?branch=main&event=push)](https://github.com/ZEISS/libczi/actions/workflows/pages.yml)
@@ -32,9 +33,6 @@ The libCZI libary is part of the [Open Application Development Concept of Zeiss 
 ### pylibCZIrw
 [pylibCZIrw](https://pypi.org/project/pylibCZIrw/) is a python module for reading and writing CZI files by utilizing/wrapping libCZI.
 
-## Contributing
-[CONTRIBUTING.md](/CONTRIBUTING.md)
-
 ## Licensing
 Carl Zeiss Microscopy GmbH provides libCZI under a dual-license model - [LGPL Version 3](https://www.gnu.org/licenses/lgpl-3.0.en.html) as well as Proprietary/Commercial. 
 
@@ -57,6 +55,10 @@ Note: Purchasing a commercial/proprietary license does not dispense you from ful
 
 ## Credits to Third Party Components
 The authors and maintainers of libCZI give a big shout-out to all the [helpers](/THIRD_PARTY_LICENSES.txt) that have been part in bringing this library to where it is today.
+
+## Guidelines
+[Code of Conduct](/CODE_OF_CONDUCT.md)  
+[Contributing](/CONTRIBUTING.md)
 
 ## Disclaimer
 ZEISS, ZEISS.com are registered trademarks of Carl Zeiss AG.

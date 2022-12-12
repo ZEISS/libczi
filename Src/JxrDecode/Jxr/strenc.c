@@ -130,7 +130,8 @@ Int writeTileHeaderLP(CWMImageStrCodec * pSC, BitIOInfo * pIO)
     for(; k > 0; k --){
         if(pSC->WMISCP.sbSubband != SB_DC_ONLY && (pSC->m_param.uQPMode & 2) != 0){ // not LP uniform
             CWMITile * pTile = pSC->pTile + pSC->cTileColumn;
-            U8 i, j;
+            U8 i;
+            size_t j;
 
             pTile->bUseDC = ((rand() & 1) == 0 ? TRUE : FALSE); // use DC quantizer?
             putBit16(pIO, pTile->bUseDC == TRUE ? 1 : 0, 1);
@@ -174,7 +175,8 @@ Int writeTileHeaderHP(CWMImageStrCodec * pSC, BitIOInfo * pIO)
     for(; k > 0; k --){
         if(pSC->WMISCP.sbSubband != SB_DC_ONLY && pSC->WMISCP.sbSubband != SB_NO_HIGHPASS && (pSC->m_param.uQPMode & 4) != 0){ // not HP uniform
             CWMITile * pTile = pSC->pTile + pSC->cTileColumn;
-            U8 i, j;
+            U8 i;
+            size_t j;
 
             pTile->bUseLP = ((rand() & 1) == 0 ? TRUE : FALSE); // use LP quantizer?
             putBit16(pIO, pTile->bUseLP == TRUE ? 1 : 0, 1);

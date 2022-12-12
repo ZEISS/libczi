@@ -67,8 +67,19 @@ namespace libCZI
 		/// \param whitePoint	   The white point.
 		/// \param gamma		   The gamma.
 		///
-		/// \return The new 8-bit look up table generated from the spline. The number is elements is as specified by <tt>tableElementCount</tt>.
+		/// \return The new 8-bit look up table generated from the gamma value. The number is elements is as specified by <tt>tableElementCount</tt>.
 		static std::vector<std::uint8_t> Create8BitLookUpTableFromGamma(int tableElementCnt, float blackPoint, float whitePoint, float gamma);
+
+		/// Creates 16-bit look-up table from the specified gamma value.
+		/// An exponential with the specified gamma is sampled between \c blackPoint and \c whitePoint (i. e. points left of \c blackPoint are set to 0
+		/// and right of \c whitePoint are set to 1).
+		/// \param tableElementCnt Number of points to sample - the result will have as many samples as specified here.
+		/// \param blackPoint	   The black point.
+		/// \param whitePoint	   The white point.
+		/// \param gamma		   The gamma.
+		///
+		/// \return The new 16-bit look up table generated from the gamma value. The number is elements is as specified by <tt>tableElementCount</tt>.
+		static std::vector<std::uint16_t> Create16BitLookUpTableFromGamma(int tableElementCnt, float blackPoint, float whitePoint, float gamma);
 
 		/// Calculates the spline coefficients from a list of control points.
 		/// \param pointCnt Number of control points.
