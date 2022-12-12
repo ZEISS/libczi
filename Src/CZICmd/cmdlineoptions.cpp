@@ -254,6 +254,14 @@ struct ChannelCompositionFormatValidator : public CLI::Validator
         this->name_ = "ChannelCompositionFormatValidator";
         this->func_ = [](const std::string& str) -> string
         {
+            const bool parsed_ok = CCmdLineOptions::TryParseChannelCompositionFormat(str, nullptr, nullptr);
+            if (!parsed_ok)
+            {
+                ostringstream string_stream;
+                string_stream << "Invalid channel-composition-format given \"" << str << "\"";
+                throw CLI::ValidationError(string_stream.str());
+            }
+
             return {};
         };
     }
@@ -267,6 +275,14 @@ struct CreateBoundsValidator : public CLI::Validator
         this->name_ = "CreateBoundsValidator";
         this->func_ = [](const std::string& str) -> string
         {
+            const bool parsed_ok = CCmdLineOptions::TryParseCreateBounds(str, nullptr);
+            if (!parsed_ok)
+            {
+                ostringstream string_stream;
+                string_stream << "Invalid create-bounds given \"" << str << "\"";
+                throw CLI::ValidationError(string_stream.str());
+            }
+
             return {};
         };
     }
@@ -280,6 +296,14 @@ struct CreateSubblockSizeValidator : public CLI::Validator
         this->name_ = "CreateSubblockSizeValidator";
         this->func_ = [](const std::string& str) -> string
         {
+            const bool parsed_ok = CCmdLineOptions::TryParseCreateSize(str, nullptr);
+            if (!parsed_ok)
+            {
+                ostringstream string_stream;
+                string_stream << "Invalid create-subblock-size given \"" << str << "\"";
+                throw CLI::ValidationError(string_stream.str());
+            }
+
             return {};
         };
     }
@@ -293,6 +317,14 @@ struct CreateTileInfoValidator : public CLI::Validator
         this->name_ = "CreateTileInfoValidator";
         this->func_ = [](const std::string& str) -> string
         {
+            const bool parsed_ok = CCmdLineOptions::TryParseCreateTileInfo(str, nullptr);
+            if (!parsed_ok)
+            {
+                ostringstream string_stream;
+                string_stream << "Invalid create-tileinfo given \"" << str << "\"";
+                throw CLI::ValidationError(string_stream.str());
+            }
+
             return {};
         };
     }
@@ -306,6 +338,14 @@ struct GuidOfCziValidator : public CLI::Validator
         this->name_ = "GuidOfCziValidator";
         this->func_ = [](const std::string& str) -> string
         {
+            const bool parsed_ok = CCmdLineOptions::TryParseNewCziFileguid(str, nullptr);
+            if (!parsed_ok)
+            {
+                ostringstream string_stream;
+                string_stream << "Invalid GUID-of-CZI given \"" << str << "\"";
+                throw CLI::ValidationError(string_stream.str());
+            }
+
             return {};
         };
     }
@@ -319,6 +359,14 @@ struct BitmapGeneratorValidator : public CLI::Validator
         this->name_ = "BitmapGeneratorValidator";
         this->func_ = [](const std::string& str) -> string
         {
+            const bool parsed_ok = CCmdLineOptions::TryParseBitmapGenerator(str, nullptr);
+            if (!parsed_ok)
+            {
+                ostringstream string_stream;
+                string_stream << "Invalid bitmapgenerator-classname given \"" << str << "\"";
+                throw CLI::ValidationError(string_stream.str());
+            }
+
             return {};
         };
     }
@@ -2069,7 +2117,7 @@ ItemValue CCmdLineOptions::GetSelectionItemValue(const char* sz) const
         return false;
     }
 
-    if (scene_index_set!=nullptr)
+    if (scene_index_set != nullptr)
     {
         scene_index_set->swap(index_set);
     }
@@ -2085,6 +2133,54 @@ void CCmdLineOptions::ParseTileFilter(const wchar_t* s)
 std::shared_ptr<libCZI::IIndexSet> CCmdLineOptions::GetSceneIndexSet() const
 {
     return this->sceneIndexSet;
+}
+
+/*static*/bool CCmdLineOptions::TryParseChannelCompositionFormat(const std::string& s, libCZI::PixelType* channel_composition_format, std::uint8_t* channel_composition_alpha_value)
+{
+    auto arg = trim(s);
+    if (icasecmp(arg, "bgr24"))
+    {
+        if (channel_composition_format != nullptr)
+        {
+            *channel_composition_format = libCZI::PixelType::Bgr24;
+        }
+
+        return true;
+    }
+    else if (icasecmp(arg, "bgra32"))
+    {
+        if (channel_composition_format != nullptr)
+        {
+            *channel_composition_format = libCZI::PixelType::Bgra32;
+        }
+
+        if (channel_composition_alpha_value != nullptr)
+        {
+            *channel_composition_alpha_value = 0xff;
+        }
+
+        return true;
+    }
+
+    libCZI::PixelType pixel_type;
+    uint8_t alpha;
+
+    if (!TryParseChannelCompositionFormatWithAlphaValue(convertUtf8ToUCS2(arg), pixel_type, alpha))
+    {
+        return false;
+    }
+
+    if (channel_composition_format != nullptr)
+    {
+        *channel_composition_format = pixel_type;
+    }
+
+    if (channel_composition_alpha_value != nullptr)
+    {
+        *channel_composition_alpha_value = alpha;
+    }
+
+    return true;
 }
 
 void CCmdLineOptions::ParseChannelCompositionFormat(const wchar_t* s)
@@ -2150,9 +2246,64 @@ void CCmdLineOptions::ParseChannelCompositionFormat(const wchar_t* s)
     return false;
 }
 
+/*static*/bool CCmdLineOptions::TryParseCreateBounds(const std::string& s, libCZI::CDimBounds* create_bounds)
+{
+    try
+    {
+        const auto bounds = libCZI::CDimBounds::Parse(s.c_str());
+        if (create_bounds != nullptr)
+        {
+            *create_bounds = bounds;
+        }
+
+        return true;
+    }
+    catch (exception&)
+    {
+        return false;
+    }
+}
+
 void CCmdLineOptions::ParseCreateBounds(const std::wstring& s)
 {
     this->createBounds = libCZI::CDimBounds::Parse(convertToUtf8(s).c_str());
+}
+
+/*static*/bool CCmdLineOptions::TryParseCreateSize(const std::string& s, std::tuple<std::uint32_t, std::uint32_t>* size)
+{
+    // expected format is: 1024x768 or 1024*768
+    std::regex regex(R"((\d+)\s*[\*xX]\s*(\d+))");
+    std::smatch pieces_match;
+    if (std::regex_match(s, pieces_match, regex))
+    {
+        if (pieces_match.size() == 3 && pieces_match[1].matched && pieces_match[2].matched)
+        {
+            auto v = std::stoull(pieces_match[1].str());
+            if (v == 0 || v > (std::numeric_limits<uint32_t>::max)())
+            {
+                return false;
+            }
+
+            const uint32_t w = static_cast<uint32_t>(v);
+
+            v = std::stoull(pieces_match[2].str());
+            if (v == 0 || v > (std::numeric_limits<uint32_t>::max)())
+            {
+                return false;
+            }
+
+            const uint32_t h = static_cast<uint32_t>(v);
+
+            if (size != nullptr)
+            {
+                *size = make_tuple(w, h);
+            }
+
+            return true;
+        }
+    }
+
+    return false;
 }
 
 void CCmdLineOptions::ParseCreateSize(const std::wstring& s)
@@ -2186,6 +2337,93 @@ void CCmdLineOptions::ParseCreateSize(const std::wstring& s)
     }
 
     throw std::invalid_argument("Invalid size specification for sub-block creation.");
+}
+
+/*static*/bool CCmdLineOptions::TryParseCreateTileInfo(const std::string& s, CreateTileInfo* create_tile_info)
+{
+    // expected format: 4x4  or 4x4;10%
+    std::regex regex(R"((\d+)\s*[*xX]\s*(\d+)\s*(?:[,;-]\s*(\d+)\s*%){0,1}\s*)");
+    std::smatch pieces_match;
+    if (std::regex_match(s, pieces_match, regex))
+    {
+        if (pieces_match.size() == 4 && pieces_match[0].matched == true && pieces_match[1].matched == true && pieces_match[2].matched == true && pieces_match[3].matched == false)
+        {
+            if (pieces_match[0].str().size() != s.size())
+            {
+                return false;
+            }
+
+            if (pieces_match[0].str().size() != s.size())
+            {
+                return false;
+            }
+
+            auto v = std::stoull(pieces_match[1].str());
+            if (v == 0 || v > (numeric_limits<uint32_t>::max)())
+            {
+                return false;
+            }
+
+            const uint32_t rows = static_cast<uint32_t>(v);
+            v = std::stoull(pieces_match[2].str());
+            if (v == 0 || v > (numeric_limits<uint32_t>::max)())
+            {
+                return false;
+            }
+
+            const uint32_t cols = static_cast<uint32_t>(v);
+
+            if (create_tile_info != nullptr)
+            {
+                create_tile_info->rows = rows;
+                create_tile_info->columns = cols;
+                create_tile_info->overlap = 0;
+            }
+
+            return true;
+        }
+        else if (pieces_match.size() == 4 && pieces_match[0].matched == true && pieces_match[1].matched == true && pieces_match[2].matched == true && pieces_match[3].matched == true)
+        {
+            if (pieces_match[0].str().size() != s.size())
+            {
+                return false;
+            }
+
+            auto v = std::stoull(pieces_match[1].str());
+            if (v == 0 || v > (numeric_limits<uint32_t>::max)())
+            {
+                return false;
+            }
+
+            const uint32_t rows = static_cast<uint32_t>(v);
+            v = std::stoull(pieces_match[2].str());
+            if (v == 0 || v > (numeric_limits<uint32_t>::max)())
+            {
+                return false;
+            }
+
+            const uint32_t cols = static_cast<uint32_t>(v);
+            v = std::stoull(pieces_match[3].str());
+            if (v == 0 || v > (numeric_limits<uint32_t>::max)())
+            {
+                return false;
+            }
+
+            const uint32_t overlapPercent = (uint32_t)v;
+
+            if (create_tile_info != nullptr)
+            {
+                create_tile_info->rows = rows;
+                create_tile_info->columns = cols;
+                create_tile_info->overlap = overlapPercent / 100.0f;
+            }
+
+            return true;
+        }
+    }
+
+    //throw std::invalid_argument("Invalid tile-info specification for sub-block creation.");
+    return false;
 }
 
 void CCmdLineOptions::ParseCreateTileInfo(const std::wstring& s)
@@ -2276,6 +2514,23 @@ void CCmdLineOptions::ParseFontHeight(const std::wstring& s)
     this->fontHeight = stoul(s);
 }
 
+/*static*/bool CCmdLineOptions::TryParseNewCziFileguid(const std::string& s, GUID* guid)
+{
+    GUID g;
+    bool b = TryParseGuid(convertUtf8ToUCS2(s), &g);
+    if (!b)
+    {
+        return false;
+    }
+
+    if (guid != nullptr)
+    {
+        *guid = g;
+    }
+
+    return true;
+}
+
 void CCmdLineOptions::ParseNewCziFileguid(const std::wstring& s)
 {
     GUID g;
@@ -2287,6 +2542,39 @@ void CCmdLineOptions::ParseNewCziFileguid(const std::wstring& s)
 
     this->newCziFileGuid = g;
     this->newCziFileGuidValid = true;
+}
+
+/*static*/bool CCmdLineOptions::TryParseBitmapGenerator(const std::string& s, std::string* generator_class_name)
+{
+    string class_name;
+    if (icasecmp("null", s))
+    {
+        class_name = "null";
+    }
+    else if (icasecmp("default", s))
+    {
+        class_name = "default";
+    }
+    else if (icasecmp("gdi", s))
+    {
+        class_name = "gdi";
+    }
+    else if (icasecmp("freetype", s))
+    {
+        class_name = "freetype";
+    }
+
+    if (class_name.empty())
+    {
+        return false;
+    }
+
+    if (generator_class_name != nullptr)
+    {
+        *generator_class_name = class_name;
+    }
+
+    return true;
 }
 
 void CCmdLineOptions::ParseBitmapGenerator(const std::wstring& s)

@@ -275,6 +275,12 @@ private:
 	friend struct InfoLevelValidator;
 	friend struct SelectionValidator;
 	friend struct TileFilterValidator;
+	friend struct ChannelCompositionFormatValidator;
+	friend struct CreateBoundsValidator;
+	friend struct CreateSubblockSizeValidator;
+	friend struct CreateTileInfoValidator;
+	friend struct GuidOfCziValidator;
+	friend struct BitmapGeneratorValidator;
 	void PrintUsage(int switchesCnt, const std::function<std::tuple<int, std::wstring>(int idx)>& getSwitch);
 	bool CheckArgumentConsistency() const;
 
@@ -334,22 +340,26 @@ private:
 	/**/void ParseSelection(const std::string& s);
 
 	static bool TryParseTileFilter(const std::string& s, std::shared_ptr<libCZI::IIndexSet>* scene_index_set);
-	void ParseTileFilter(const wchar_t* s);
-	void ParseTileFilter(const std::string& s) { auto sucs2 = convertUtf8ToUCS2(s); this->ParseTileFilter(sucs2.c_str()); }
+	/**/void ParseTileFilter(const wchar_t* s);
+	/**/void ParseTileFilter(const std::string& s) { auto sucs2 = convertUtf8ToUCS2(s); this->ParseTileFilter(sucs2.c_str()); }
 
-	void ParseChannelCompositionFormat(const wchar_t* s);
-	void ParseChannelCompositionFormat(const std::string& s) { auto sucs2 = convertUtf8ToUCS2(s); this->ParseChannelCompositionFormat(sucs2.c_str()); }
+	static bool TryParseChannelCompositionFormat(const std::string& s, libCZI::PixelType* channel_composition_format, std::uint8_t* channel_composition_alpha_value);
+	/**/void ParseChannelCompositionFormat(const wchar_t* s);
+	/**/void ParseChannelCompositionFormat(const std::string& s) { auto sucs2 = convertUtf8ToUCS2(s); this->ParseChannelCompositionFormat(sucs2.c_str()); }
 
 	static bool TryParseChannelCompositionFormatWithAlphaValue(const std::wstring& s, libCZI::PixelType& channelCompositePixelType, std::uint8_t& channelCompositeAlphaValue);
 
-	void ParseCreateBounds(const std::string& s) { auto sucs2 = convertUtf8ToUCS2(s); this->ParseCreateBounds(sucs2); }
-	void ParseCreateBounds(const std::wstring& s);
+	static bool TryParseCreateBounds(const std::string& s, libCZI::CDimBounds* create_bounds);
+	/**/void ParseCreateBounds(const std::string& s) { auto sucs2 = convertUtf8ToUCS2(s); this->ParseCreateBounds(sucs2); }
+	/**/void ParseCreateBounds(const std::wstring& s);
 
-	void ParseCreateSize(const std::string& s) { auto sucs2 = convertUtf8ToUCS2(s); this->ParseCreateSize(sucs2); }
-	void ParseCreateSize(const std::wstring& s);
+	static bool TryParseCreateSize(const std::string& s, std::tuple<std::uint32_t, std::uint32_t>* size);
+	/**/void ParseCreateSize(const std::string& s) { auto sucs2 = convertUtf8ToUCS2(s); this->ParseCreateSize(sucs2); }
+	/**/void ParseCreateSize(const std::wstring& s);
 
-	void ParseCreateTileInfo(const std::string& s) { auto sucs2 = convertUtf8ToUCS2(s); this->ParseCreateTileInfo(sucs2); }
-	void ParseCreateTileInfo(const std::wstring& s);
+	static bool TryParseCreateTileInfo(const std::string& s, CreateTileInfo* create_tile_info);
+	/**/void ParseCreateTileInfo(const std::string& s) { auto sucs2 = convertUtf8ToUCS2(s); this->ParseCreateTileInfo(sucs2); }
+	/**/void ParseCreateTileInfo(const std::wstring& s);
 
 	void ParseFont(const std::wstring& s);
 	void ParseFont(const std::string& s) { auto sucs2 = convertUtf8ToUCS2(s); this->ParseFont(sucs2); }
@@ -357,11 +367,13 @@ private:
 	void ParseFontHeight(const std::wstring& s);
 	void ParseFontHeight(const std::string& s) { auto sucs2 = convertUtf8ToUCS2(s); this->ParseFontHeight(sucs2); }
 
-	void ParseNewCziFileguid(const std::wstring& s);
-	void ParseNewCziFileguid(const std::string& s) { auto sucs2 = convertUtf8ToUCS2(s); this->ParseNewCziFileguid(sucs2); }
+	static bool TryParseNewCziFileguid(const std::string& s, GUID* guid);
+	/**/void ParseNewCziFileguid(const std::wstring& s);
+	/**/void ParseNewCziFileguid(const std::string& s) { auto sucs2 = convertUtf8ToUCS2(s); this->ParseNewCziFileguid(sucs2); }
 
-	void ParseBitmapGenerator(const std::wstring& s);
-	void ParseBitmapGenerator(const std::string& s) { auto sucs2 = convertUtf8ToUCS2(s); this->ParseBitmapGenerator(sucs2); }
+	static bool TryParseBitmapGenerator(const std::string& s, std::string* generator_class_name);
+	/**/void ParseBitmapGenerator(const std::wstring& s);
+	/**/void ParseBitmapGenerator(const std::string& s) { auto sucs2 = convertUtf8ToUCS2(s); this->ParseBitmapGenerator(sucs2); }
 
 	void ParseSubBlockMetadataKeyValue(const std::wstring& s) { auto str = convertToUtf8(s); this->ParseSubBlockMetadataKeyValue(str); }
 	void ParseSubBlockMetadataKeyValue(const std::string& s);
