@@ -25,10 +25,4 @@
 #include <memory>
 #include <sstream>
 
-#if defined(WIN32ENV)
-#define NOMINMAX
-#include <windows.h>
-#endif
-
-
 // TODO: reference additional headers your program requires here

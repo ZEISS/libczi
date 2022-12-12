@@ -1,3 +1,5 @@
+#if false
+
 // SPDX-FileCopyrightText: 2017-2022 Carl Zeiss Microscopy GmbH
 //
 // SPDX-License-Identifier: LGPL-3.0-or-later
@@ -109,5 +111,7 @@ extern "C" {
 
 //#include <unistd.h>
 #include <getopt.h>
+
+#endif
 
 #endif

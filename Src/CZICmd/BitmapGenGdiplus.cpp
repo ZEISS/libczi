@@ -8,7 +8,7 @@
 #include "utils.h"
 #include "inc_libCZI.h"
 
-#ifdef _WIN32
+#if CZICMD_USE_GDIPLUS == 1
 
 #include <gdiplus.h>
 

@@ -435,17 +435,36 @@ struct GeneratorPixelTypeValidator : public CLI::Validator
     }
 };
 
+/// A custom formatter for CLI11 - used to have nicely formatted descriptions.
 class CustomFormatter : public CLI::Formatter
 {
 public:
-    CustomFormatter() : Formatter() {}
-    //std::string make_option_opts(const CLI::Option*) const override { return " OPTION"; }
+    CustomFormatter() : Formatter() 
+    {
+        this->column_width(20);
+    }
 
-    //std::string make_option_opts(const CLI::Option* o) const override
-    //{
-    //    auto rv = this->CLI::Formatter::make_option_opts(o);
-    //    return rv;
-    //}
+    std::string make_usage(const CLI::App* app, std::string name) const
+    {
+        // 'name' is the full path of the executable, we only take the path "after the last slash or backslash"
+        size_t offset = name.rfind('/');
+        if (offset == string::npos)
+        {
+            offset = name.rfind('\\');
+        }
+
+        if (offset != string::npos && offset < name.length())
+        {
+            name = name.substr(1 + offset);
+        }
+
+        auto result_from_stock_implementation = this->CLI::Formatter::make_usage(app, name);
+        ostringstream ss(result_from_stock_implementation);
+        int majorVersion, minorVersion;
+        libCZI::GetLibCZIVersion(&majorVersion, &minorVersion);
+        ss << result_from_stock_implementation << endl << "  using libCZI version " << majorVersion << "." << minorVersion << endl;
+        return ss.str();
+    }
 
     std::string make_option_desc(const CLI::Option* o) const override
     {
@@ -463,10 +482,9 @@ public:
     }
 };
 
-
 bool CCmdLineOptions::Parse2(int argc, char** argv)
 {
-    CLI::App cli_app{ "CZIcmd" };
+    CLI::App cli_app{ };
 
     // specify the string-to-enum-mapping for "command"
     std::map<string, Command> map_string_to_command
@@ -669,12 +687,12 @@ bool CCmdLineOptions::Parse2(int argc, char** argv)
     cli_app.add_option("--compressionopts", argument_compressionoptions,
         "Only used for 'CreateCZI': a string in a defined format which states the compression-method and (compression-method specific) "
         "parameters.The format is \"compression_method: key=value; ...\". It starts with the name of the compression-method, followed by a colon, "
-        "then followed by a list of key-value pairs which are separated by a semicolon.Examples: \"zstd0:ExplicitLevel=3\", \"zstd1:ExplicitLevel=2;PreProcess=HiLoByteUnpack\".")
+        "then followed by a list of key-value pairs which are separated by a semicolon. Examples: \"zstd0:ExplicitLevel=3\", \"zstd1:ExplicitLevel=2;PreProcess=HiLoByteUnpack\".")
         ->option_text("COMPRESSIONDESCRIPTION")
         ->check(compressionoptions_validator);
     cli_app.add_option("--generatorpixeltype", argument_generatorpixeltype,
-        "Only used for 'CreateCZI': a string defining the pixeltype used by the bitmap - generator.Possible valules are 'Gray8', 'Gray16', "
-        "'Bgr24' or 'Bgr48'.Default is 'Bgr24'.")
+        "Only used for 'CreateCZI': a string defining the pixeltype used by the bitmap - generator. Possible valules are 'Gray8', 'Gray16', "
+        "'Bgr24' or 'Bgr48'. Default is 'Bgr24'.")
         ->option_text("PIXELTYPE")
         ->check(generatorpixeltype_validator);
 
@@ -691,8 +709,103 @@ bool CCmdLineOptions::Parse2(int argc, char** argv)
         return false;
     }
 
-    return false;
+    if (!argument_source_filename.empty())
+    {
+        this->cziFilename = convertUtf8ToUCS2(argument_source_filename);
+    }
+
+    if (!argument_output_filename.empty())
+    {
+        this->SetOutputFilename(argument_output_filename);
+    }
+
+    if (!argument_plane_coordinate.empty())
+    {
+        this->planeCoordinate = this->ParseDimCoordinate(argument_plane_coordinate);
+    }
+
+    if (!argument_rect.empty())
+    {
+        const bool b = TryParseRect(argument_rect, &this->rectModeAbsoluteOrRelative, &this->rectX, &this->rectY, &this->rectW, &this->rectH);
+    }
+
+    if (!argument_display_settings.empty())
+    {
+        const bool b = TryParseDisplaySettings(argument_display_settings, &this->multiChannelCompositeChannelInfos);
+        this->useDisplaySettingsFromDocument = false;
+    }
+
+    if (!argument_jpgxrcodec.empty())
+    {
+        const bool b = TryParseJxrCodecUseWicCodec(argument_jpgxrcodec, &this->useWicJxrDecoder);
+    }
+
+    if (!argument_verbosity.empty())
+    {
+        const bool b = TryParseVerbosityLevel(argument_verbosity, &this->enabledOutputLevels);
+    }
+    
+    if (!argument_backgroundcolor.empty())
+    {
+        const bool b = TryParseParseBackgroundColor(argument_backgroundcolor, &this->backGroundColor);
+    }
+
+    if (!argument_pyramidinfo.empty())
+    {
+        const bool b = TryParsePyramidInfo(argument_pyramidinfo, &this->pyramidMinificationFactor, &this->pyramidLayerNo);
+    }
+
+    if (!argument_zoom.empty())
+    {
+        this->ParseZoom(argument_zoom);
+    }
+
+    if (!argument_info_level.empty())
+    {
+        const bool b = TryParseInfoLevel(argument_info_level, &this->infoLevel);
+    }
+
+    if (!argument_selection.empty())
+    {
+        const bool b = TryParseSelection(argument_selection, &this->mapSelection);
+    }
+
+    if (!argument_tile_filter.empty())
+    {
+        const bool b = TryParseTileFilter(argument_tile_filter, &this->sceneIndexSet);
+    }
+
+    if (!argument_channelcompositionformat.empty())
+    {
+        const bool b = TryParseChannelCompositionFormat(argument_channelcompositionformat, &this->channelCompositePixelType, &this->channelCompositeAlphaValue);
+    }
+
+    if (!arguments_createbounds.empty())
+    {
+        const bool b = TryParseCreateBounds(arguments_createbounds, &this->createBounds);
+    }
+
+    if (!arguments_createsubblocksize.empty())
+    {
+        const bool b = TryParseCreateSize(arguments_createsubblocksize, &this->createSize);
+    }
+
+    
+    //string argument_createtileinfo;
+    //string argument_truetypefontname;
+    //string argument_fontheight;
+    //string argument_guidofczi;
+    //string argument_bitmapgenerator;
+    //string argument_createczisubblockmetadata;
+    //string argument_compressionoptions;
+    //string argument_generatorpixeltype;
+
+
+
+    return this->CheckArgumentConsistency();
 }
+
+#if false
 
 #if defined(WIN32ENV)
 bool CCmdLineOptions::Parse(int argc, wchar_t** argv)
@@ -780,7 +893,7 @@ bool CCmdLineOptions::Parse(int argc, char** argv)
                     return make_tuple(long_options[idx].val, wstring(long_options[idx].name));
 #endif
 #if defined(LINUXENV)
-            return make_tuple(long_options[idx].val, convertUtf8ToUCS2(long_options[idx].name));
+                    return make_tuple(long_options[idx].val, convertUtf8ToUCS2(long_options[idx].name));
 #endif
                 });
             return true;
@@ -867,6 +980,8 @@ bool CCmdLineOptions::Parse(int argc, char** argv)
 
     return this->CheckArgumentConsistency();
 }
+
+#endif
 
 bool CCmdLineOptions::CheckArgumentConsistency() const
 {
@@ -1211,7 +1326,7 @@ void CCmdLineOptions::PrintUsage(int switchesCnt, const std::function<std::tuple
                 }
             }
 
-    return make_tuple(wstring(), wstring());
+            return make_tuple(wstring(), wstring());
         });
 }
 
@@ -2673,7 +2788,7 @@ void CCmdLineOptions::PrintHelpBitmapGenerator()
         [&](int no, std::tuple<std::string, std::string, bool> name_explanation_isdefault) -> bool
         {
             maxLengthClassName = (std::max)(get<0>(name_explanation_isdefault).length(), maxLengthClassName);
-    return true;
+            return true;
         });
 
     stringstream ss;
@@ -2681,9 +2796,9 @@ void CCmdLineOptions::PrintHelpBitmapGenerator()
         [&](int no, std::tuple<std::string, std::string, bool> name_explanation_isdefault) -> bool
         {
             ss << no + 1 << ": " << std::setw(maxLengthClassName) << std::left << get<0>(name_explanation_isdefault) << std::setw(0) <<
-            (!get<2>(name_explanation_isdefault) ? "     " : " (*) ") << "\"" <<
-        get<1>(name_explanation_isdefault) << "\"" << endl;
-    return true;
+                (!get<2>(name_explanation_isdefault) ? "     " : " (*) ") << "\"" <<
+                get<1>(name_explanation_isdefault) << "\"" << endl;
+            return true;
         });
 
     this->GetLog()->WriteLineStdOut(ss.str());
@@ -2840,7 +2955,7 @@ void CCmdLineOptions::ParseGeneratorPixeltype(const std::string& s)
 {
     auto pixeltypeString = trim(s);
 
-    static constexpr libCZI::PixelType possibleGeneratorPixeltypes[] = 
+    static constexpr libCZI::PixelType possibleGeneratorPixeltypes[] =
     {
         libCZI::PixelType::Gray8,
         libCZI::PixelType::Gray16,
@@ -2856,7 +2971,7 @@ void CCmdLineOptions::ParseGeneratorPixeltype(const std::string& s)
             {
                 *pixel_type = possibleGeneratorPixeltypes[i];
             }
-            
+
             return true;
         }
     }

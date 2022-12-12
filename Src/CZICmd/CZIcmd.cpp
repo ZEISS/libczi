@@ -14,6 +14,11 @@
 #include <clocale>
 #endif
 
+#if defined(WIN32ENV)
+#define NOMINMAX
+#include <Windows.h>
+#endif
+
 class CLibCZISite : public libCZI::ISite
 {
 		libCZI::ISite* pSite;
