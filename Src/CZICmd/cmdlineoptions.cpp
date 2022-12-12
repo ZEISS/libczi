@@ -526,8 +526,8 @@ bool CCmdLineOptions::Parse2(int argc, char** argv)
     string argument_plane_coordinate;
     string argument_rect;
     string argument_display_settings;
-    bool argument_calc_hash;
-    bool argument_drawtileboundaries;
+    bool argument_calc_hash = false;
+    bool argument_drawtileboundaries = false;
     string argument_jpgxrcodec;
     string argument_verbosity;
     string argument_backgroundcolor;
@@ -547,6 +547,7 @@ bool CCmdLineOptions::Parse2(int argc, char** argv)
     string argument_createczisubblockmetadata;
     string argument_compressionoptions;
     string argument_generatorpixeltype;
+    bool argument_versionflag = false;
 
     cli_app.add_option("-c,--command", argument_command,
         R"(COMMAND can be one of 'PrintInformation', 'ExtractSubBlock', 'SingleChannelTileAccessor', 'ChannelComposite',
@@ -569,7 +570,6 @@ bool CCmdLineOptions::Parse2(int argc, char** argv)
     	   \N'CreateCZI' is used to demonstrate the CZI-creation capabilities of libCZI.)")
         ->default_val(Command::Invalid)
         ->option_text("COMMAND")
-        ->required()
         ->transform(CLI::CheckedTransformer(map_string_to_command, CLI::ignore_case));
     cli_app.add_option("-s,--source", argument_source_filename,
         "specifies the source CZI-file.")
@@ -676,7 +676,7 @@ bool CCmdLineOptions::Parse2(int argc, char** argv)
         ->check(guidofczi_validator);
     cli_app.add_option("--bitmapgenerator", argument_bitmapgenerator,
         "Only used for 'CreateCZI': specifies the bitmap-generator to use. Possibly values are \"gdi\", \"freetype\", \"null\" or \"default\". "
-        "Run with argument '--help=bitmapgen' to get a list of available bitmap-generators.")
+        "Run with argument '--version' to get a list of available bitmap-generators.")
         ->option_text("BITMAPGENERATORCLASSNAME")
         ->check(bitmapgenerator_validator);
     cli_app.add_option("--createczisbblkmetadata", argument_createczisubblockmetadata,
@@ -691,10 +691,12 @@ bool CCmdLineOptions::Parse2(int argc, char** argv)
         ->option_text("COMPRESSIONDESCRIPTION")
         ->check(compressionoptions_validator);
     cli_app.add_option("--generatorpixeltype", argument_generatorpixeltype,
-        "Only used for 'CreateCZI': a string defining the pixeltype used by the bitmap - generator. Possible valules are 'Gray8', 'Gray16', "
+        "Only used for 'CreateCZI': a string defining the pixeltype used by the bitmap - generator. Possible values are 'Gray8', 'Gray16', "
         "'Bgr24' or 'Bgr48'. Default is 'Bgr24'.")
         ->option_text("PIXELTYPE")
         ->check(generatorpixeltype_validator);
+    cli_app.add_flag("--version", argument_versionflag,
+        "Print extended version-info and supported operations, then exit.");
 
     auto formatter = make_shared<CustomFormatter>();
     cli_app.formatter(formatter);
@@ -709,6 +711,18 @@ bool CCmdLineOptions::Parse2(int argc, char** argv)
         return false;
     }
 
+    if (argument_versionflag)
+    {
+        this->PrintHelpBuildInfo();
+        this->GetLog()->WriteLineStdOut("");
+        this->GetLog()->WriteLineStdOut("");
+        this->PrintHelpBitmapGenerator();
+        return false;
+    }
+    
+    this->calcHashOfResult = argument_calc_hash;
+    this->drawTileBoundaries = argument_drawtileboundaries;
+
     if (!argument_source_filename.empty())
     {
         this->cziFilename = convertUtf8ToUCS2(argument_source_filename);
@@ -721,7 +735,7 @@ bool CCmdLineOptions::Parse2(int argc, char** argv)
 
     if (!argument_plane_coordinate.empty())
     {
-        this->planeCoordinate = this->ParseDimCoordinate(argument_plane_coordinate);
+        this->planeCoordinate = libCZI::CDimCoordinate::Parse(argument_plane_coordinate.c_str()); //this->ParseDimCoordinate(argument_plane_coordinate);
     }
 
     if (!argument_rect.empty())
@@ -795,15 +809,45 @@ bool CCmdLineOptions::Parse2(int argc, char** argv)
         const bool b = TryParseCreateTileInfo(argument_createtileinfo, &this->createTileInfo);
     }
 
-    //string argument_truetypefontname;
-    //string argument_fontheight;
-    //string argument_guidofczi;
-    //string argument_bitmapgenerator;
-    //string argument_createczisubblockmetadata;
-    //string argument_compressionoptions;
-    //string argument_generatorpixeltype;
+    if (!argument_truetypefontname.empty())
+    {
+        this->fontnameOrFile = convertUtf8ToUCS2(argument_truetypefontname);
+    }
 
+    if (!argument_fontheight.empty())
+    {
+        const bool b = TryParseInt32(argument_fontheight, &this->fontHeight);
+    }
 
+    if (!argument_guidofczi.empty())
+    {
+        const bool b = TryParseNewCziFileguid(argument_guidofczi, &this->newCziFileGuid);
+        this->newCziFileGuidValid = true;
+    }
+
+    if (!argument_bitmapgenerator.empty())
+    {
+        const bool b = TryParseBitmapGenerator(argument_bitmapgenerator, &this->bitmapGeneratorClassName);
+    }
+
+    if (!argument_createczisubblockmetadata.empty())
+    {
+        const bool b = TryParseSubBlockMetadataKeyValue(argument_createczisubblockmetadata, &this->sbBlkMetadataKeyValue);
+        this->sbBlkMetadataKeyValueValid = true;
+    }
+
+    if (!argument_compressionoptions.empty())
+    {
+        libCZI::Utils::CompressionOption compression_options;
+        const bool b = TryParseCompressionOptions(argument_compressionoptions, &compression_options);
+        this->compressionMode = compression_options.first;
+        this->compressionParameters = compression_options.second;
+    }
+
+    if (!argument_generatorpixeltype.empty())
+    {
+        const bool b = TryParseGeneratorPixeltype(argument_generatorpixeltype, &this->pixelTypeForBitmapGenerator);
+    }
 
     return this->CheckArgumentConsistency();
 }
@@ -1102,6 +1146,7 @@ void CCmdLineOptions::Clear()
     this->pixelTypeForBitmapGenerator = libCZI::PixelType::Bgr24;
 }
 
+#if false
 void CCmdLineOptions::PrintUsage(int switchesCnt, const std::function<std::tuple<int, std::wstring>(int idx)>& getSwitch)
 {
     static const char* Synopsis[] =
@@ -1403,6 +1448,7 @@ void CCmdLineOptions::PrintSynopsis(int switchesCnt, std::function<std::tuple<in
         }
     }
 }
+#endif
 
 bool CCmdLineOptions::IsLogLevelEnabled(int level) const
 {
@@ -1418,16 +1464,17 @@ bool CCmdLineOptions::IsLogLevelEnabled(int level) const
     return (this->enabledOutputLevels & (1 << level)) ? true : false;;
 }
 
-libCZI::CDimCoordinate CCmdLineOptions::ParseDimCoordinate(const std::wstring& str)
-{
-    return libCZI::CDimCoordinate::Parse(convertToUtf8(str).c_str());
-}
+//libCZI::CDimCoordinate CCmdLineOptions::ParseDimCoordinate(const std::wstring& str)
+//{
+//    return libCZI::CDimCoordinate::Parse(convertToUtf8(str).c_str());
+//}
+//
+//libCZI::CDimCoordinate CCmdLineOptions::ParseDimCoordinate(const std::string& s)
+//{
+//    return libCZI::CDimCoordinate::Parse(s.c_str());
+//}
 
-libCZI::CDimCoordinate CCmdLineOptions::ParseDimCoordinate(const std::string& s)
-{
-    return libCZI::CDimCoordinate::Parse(s.c_str());
-}
-
+#if false
 /*static*/Command CCmdLineOptions::ParseCommand(const wchar_t* s)
 {
     static const struct
@@ -1458,45 +1505,46 @@ libCZI::CDimCoordinate CCmdLineOptions::ParseDimCoordinate(const std::string& s)
 
     throw std::invalid_argument("Invalid command.");
 }
+#endif
 
-void CCmdLineOptions::ParseRect(const std::wstring& s)
-{
-    int x, y, w, h;
-    bool absOrRel;
-
-    std::wregex rect_regex(LR"(((abs|rel)\(([\+|-]?[[:digit:]]+),([\+|-]?[[:digit:]]+)),([\+]?[[:digit:]]+),([\+]?[[:digit:]]+)\))");
-    std::wsmatch pieces_match;
-
-    if (std::regex_match(s, pieces_match, rect_regex))
-    {
-        if (pieces_match.size() == 7)
-        {
-            std::wssub_match sub_match = pieces_match[2];
-            if (sub_match.compare(L"abs") == 0)
-            {
-                absOrRel = true;
-            }
-            else
-            {
-                absOrRel = false;
-            }
-
-            x = std::stoi(pieces_match[3]);
-            y = std::stoi(pieces_match[4]);
-            w = std::stoi(pieces_match[5]);
-            h = std::stoi(pieces_match[6]);
-
-            this->rectModeAbsoluteOrRelative = absOrRel;
-            this->rectX = x;
-            this->rectY = y;
-            this->rectW = w;
-            this->rectH = h;
-            return;
-        }
-    }
-
-    throw std::invalid_argument("Invalid rect");
-}
+//void CCmdLineOptions::ParseRect(const std::wstring& s)
+//{
+//    int x, y, w, h;
+//    bool absOrRel;
+//
+//    std::wregex rect_regex(LR"(((abs|rel)\(([\+|-]?[[:digit:]]+),([\+|-]?[[:digit:]]+)),([\+]?[[:digit:]]+),([\+]?[[:digit:]]+)\))");
+//    std::wsmatch pieces_match;
+//
+//    if (std::regex_match(s, pieces_match, rect_regex))
+//    {
+//        if (pieces_match.size() == 7)
+//        {
+//            std::wssub_match sub_match = pieces_match[2];
+//            if (sub_match.compare(L"abs") == 0)
+//            {
+//                absOrRel = true;
+//            }
+//            else
+//            {
+//                absOrRel = false;
+//            }
+//
+//            x = std::stoi(pieces_match[3]);
+//            y = std::stoi(pieces_match[4]);
+//            w = std::stoi(pieces_match[5]);
+//            h = std::stoi(pieces_match[6]);
+//
+//            this->rectModeAbsoluteOrRelative = absOrRel;
+//            this->rectX = x;
+//            this->rectY = y;
+//            this->rectW = w;
+//            this->rectH = h;
+//            return;
+//        }
+//    }
+//
+//    throw std::invalid_argument("Invalid rect");
+//}
 
 void CCmdLineOptions::SetOutputFilename(const std::wstring& s)
 {
@@ -1549,11 +1597,11 @@ std::wstring CCmdLineOptions::MakeOutputFilename(const wchar_t* suffix, const wc
     return out;
 }
 
-void CCmdLineOptions::ParseDisplaySettings(const std::wstring& s)
-{
-    auto str = convertToUtf8(s);
-    this->ParseDisplaySettings(str);
-}
+//void CCmdLineOptions::ParseDisplaySettings(const std::wstring& s)
+//{
+//    auto str = convertToUtf8(s);
+//    this->ParseDisplaySettings(str);
+//}
 
 static std::vector<std::tuple<double, double>> ParseSplintPoints(const rapidjson::Value& v)
 {
@@ -1720,31 +1768,31 @@ bool CCmdLineOptions::TryParseDisplaySettings(const std::string& s, std::map<int
     return true;
 }
 
-void CCmdLineOptions::ParseDisplaySettings(const std::string& s)
-{
-    // TODO: provide a reasonable error handling
-    vector<std::tuple<int, ChannelDisplaySettings>> vecChNoAndChannelInfo;
-    rapidjson::Document document;
-    document.Parse(s.c_str());
-    if (document.HasParseError())
-    {
-        throw std::logic_error("Invalid JSON");
-    }
-
-    bool isObj = document.IsObject();
-    bool hasChannels = document.HasMember("channels");
-    bool isChannelsArray = document["channels"].IsArray();
-    const auto& channels = document["channels"];
-    for (decltype(channels.Size()) i = 0; i < channels.Size(); ++i)
-    {
-        vecChNoAndChannelInfo.emplace_back(GetChannelInfo(channels[i]));
-    }
-
-    for (const auto& it : vecChNoAndChannelInfo)
-    {
-        this->multiChannelCompositeChannelInfos[get<0>(it)] = get<1>(it);
-    }
-}
+//void CCmdLineOptions::ParseDisplaySettings(const std::string& s)
+//{
+//    // TODO: provide a reasonable error handling
+//    vector<std::tuple<int, ChannelDisplaySettings>> vecChNoAndChannelInfo;
+//    rapidjson::Document document;
+//    document.Parse(s.c_str());
+//    if (document.HasParseError())
+//    {
+//        throw std::logic_error("Invalid JSON");
+//    }
+//
+//    bool isObj = document.IsObject();
+//    bool hasChannels = document.HasMember("channels");
+//    bool isChannelsArray = document["channels"].IsArray();
+//    const auto& channels = document["channels"];
+//    for (decltype(channels.Size()) i = 0; i < channels.Size(); ++i)
+//    {
+//        vecChNoAndChannelInfo.emplace_back(GetChannelInfo(channels[i]));
+//    }
+//
+//    for (const auto& it : vecChNoAndChannelInfo)
+//    {
+//        this->multiChannelCompositeChannelInfos[get<0>(it)] = get<1>(it);
+//    }
+//}
 
 /*static*/bool CCmdLineOptions::TryParseVerbosityLevel(const std::string& s, std::uint32_t* levels)
 {
@@ -1814,57 +1862,57 @@ void CCmdLineOptions::ParseDisplaySettings(const std::string& s)
     return true;
 }
 
-std::uint32_t CCmdLineOptions::ParseVerbosityLevel(const wchar_t* s)
-{
-    static const struct
-    {
-        const wchar_t* name;
-        std::uint32_t flags;
-    } Verbosities[] =
-    {
-        { L"All",0xffffffff} ,
-        { L"Errors",(1 << 0) | (1 << 1)},
-        { L"Errors1",(1 << 0) },
-        { L"Errors2",(1 << 1) },
-        { L"Warnings",(1 << 2) | (1 << 3) },
-        { L"Warnings1",(1 << 2)  },
-        { L"Warnings2",(1 << 3) },
-        { L"Infos",(1 << 4) | (1 << 5) },
-        { L"Infos1",(1 << 4)  },
-        { L"Infos2",(1 << 5) }
-    };
-
-    std::uint32_t levels = 0;
-    static const wchar_t* Delimiters = L",;";
-
-    for (;;)
-    {
-        size_t length = wcscspn(s, L",;");
-        if (length == 0)
-            break;
-
-        std::wstring tk(s, length);
-        std::wstring tktr = trim(tk);
-        if (tktr.length() > 0)
-        {
-            for (size_t i = 0; i < sizeof(Verbosities) / sizeof(Verbosities[0]); ++i)
-            {
-                if (__wcasecmp(Verbosities[i].name, tktr.c_str()))
-                {
-                    levels |= Verbosities[i].flags;
-                    break;
-                }
-            }
-        }
-
-        if (*(s + length) == L'\0')
-            break;
-
-        s += (length + 1);
-    }
-
-    return levels;
-}
+//std::uint32_t CCmdLineOptions::ParseVerbosityLevel(const wchar_t* s)
+//{
+//    static const struct
+//    {
+//        const wchar_t* name;
+//        std::uint32_t flags;
+//    } Verbosities[] =
+//    {
+//        { L"All",0xffffffff} ,
+//        { L"Errors",(1 << 0) | (1 << 1)},
+//        { L"Errors1",(1 << 0) },
+//        { L"Errors2",(1 << 1) },
+//        { L"Warnings",(1 << 2) | (1 << 3) },
+//        { L"Warnings1",(1 << 2)  },
+//        { L"Warnings2",(1 << 3) },
+//        { L"Infos",(1 << 4) | (1 << 5) },
+//        { L"Infos1",(1 << 4)  },
+//        { L"Infos2",(1 << 5) }
+//    };
+//
+//    std::uint32_t levels = 0;
+//    static const wchar_t* Delimiters = L",;";
+//
+//    for (;;)
+//    {
+//        size_t length = wcscspn(s, L",;");
+//        if (length == 0)
+//            break;
+//
+//        std::wstring tk(s, length);
+//        std::wstring tktr = trim(tk);
+//        if (tktr.length() > 0)
+//        {
+//            for (size_t i = 0; i < sizeof(Verbosities) / sizeof(Verbosities[0]); ++i)
+//            {
+//                if (__wcasecmp(Verbosities[i].name, tktr.c_str()))
+//                {
+//                    levels |= Verbosities[i].flags;
+//                    break;
+//                }
+//            }
+//        }
+//
+//        if (*(s + length) == L'\0')
+//            break;
+//
+//        s += (length + 1);
+//    }
+//
+//    return levels;
+//}
 
 /*static*/bool CCmdLineOptions::TryParseInfoLevel(const std::string& s, InfoLevel* info_level)
 {
@@ -1935,6 +1983,7 @@ std::uint32_t CCmdLineOptions::ParseVerbosityLevel(const wchar_t* s)
     return true;
 }
 
+#if false
 void CCmdLineOptions::ParseInfoLevel(const wchar_t* s)
 {
     static const struct
@@ -1987,6 +2036,7 @@ void CCmdLineOptions::ParseInfoLevel(const wchar_t* s)
 
     this->infoLevel = (InfoLevel)levels;
 }
+#endif
 
 /*static*/bool CCmdLineOptions::TryParseJxrCodecUseWicCodec(const std::string& s, bool* use_wic_codec)
 {
@@ -2004,16 +2054,16 @@ void CCmdLineOptions::ParseInfoLevel(const wchar_t* s)
     return false;
 }
 
-bool CCmdLineOptions::ParseJxrCodec(const wchar_t* s)
-{
-    wstring str = trim(wstring(s));
-    if (__wcasecmp(str.c_str(), L"WIC") || __wcasecmp(str.c_str(), L"WICDecoder"))
-    {
-        return true;
-    }
-
-    return false;
-}
+//bool CCmdLineOptions::ParseJxrCodec(const wchar_t* s)
+//{
+//    wstring str = trim(wstring(s));
+//    if (__wcasecmp(str.c_str(), L"WIC") || __wcasecmp(str.c_str(), L"WICDecoder"))
+//    {
+//        return true;
+//    }
+//
+//    return false;
+//}
 
 /*static*/bool CCmdLineOptions::TryParseParseBackgroundColor(const std::string& s, libCZI::RgbFloatColor* color)
 {
@@ -2062,28 +2112,28 @@ bool CCmdLineOptions::ParseJxrCodec(const wchar_t* s)
     return true;
 }
 
-libCZI::RgbFloatColor CCmdLineOptions::ParseBackgroundColor(const wchar_t* s)
-{
-    // TODO: somewhat stricter parsing...
-    float f[3];
-    f[0] = f[1] = f[2] = std::numeric_limits<float>::quiet_NaN();
-    for (int i = 0; i < 3; ++i)
-    {
-        wchar_t* endPtr;
-        f[i] = wcstof(s, &endPtr);
-
-        const wchar_t* endPtrSkipped = skipWhiteSpaceAndOneOfThese(endPtr, L";,|");
-        if (*endPtrSkipped == L'\0')
-            break;
-    }
-
-    if (isnan(f[1]) && isnan(f[2]))
-    {
-        return libCZI::RgbFloatColor{ f[0],f[0],f[0] };
-    }
-
-    return libCZI::RgbFloatColor{ f[0],f[1],f[2] };
-}
+//libCZI::RgbFloatColor CCmdLineOptions::ParseBackgroundColor(const wchar_t* s)
+//{
+//    // TODO: somewhat stricter parsing...
+//    float f[3];
+//    f[0] = f[1] = f[2] = std::numeric_limits<float>::quiet_NaN();
+//    for (int i = 0; i < 3; ++i)
+//    {
+//        wchar_t* endPtr;
+//        f[i] = wcstof(s, &endPtr);
+//
+//        const wchar_t* endPtrSkipped = skipWhiteSpaceAndOneOfThese(endPtr, L";,|");
+//        if (*endPtrSkipped == L'\0')
+//            break;
+//    }
+//
+//    if (isnan(f[1]) && isnan(f[2]))
+//    {
+//        return libCZI::RgbFloatColor{ f[0],f[0],f[0] };
+//    }
+//
+//    return libCZI::RgbFloatColor{ f[0],f[1],f[2] };
+//}
 
 /*static*/bool CCmdLineOptions::TryParsePyramidInfo(const std::string& s, int* pyramidMinificationFactor, int* pyramidLayerNo)
 {
@@ -2141,11 +2191,11 @@ void CCmdLineOptions::ParseZoom(const wchar_t* sz)
     this->zoom = zoom;
 }
 
-void CCmdLineOptions::ParseSelection(const std::wstring& s)
-{
-    auto str = convertToUtf8(s);
-    this->ParseSelection(str);
-}
+//void CCmdLineOptions::ParseSelection(const std::wstring& s)
+//{
+//    auto str = convertToUtf8(s);
+//    this->ParseSelection(str);
+//}
 
 /*static*/bool CCmdLineOptions::TryParseSelection(const std::string& s, std::map<std::string, ItemValue>* key_value)
 {
@@ -2194,6 +2244,7 @@ void CCmdLineOptions::ParseSelection(const std::wstring& s)
     return true;
 }
 
+#if false
 void CCmdLineOptions::ParseSelection(const std::string& s)
 {
     std::map<string, ItemValue> map;
@@ -2235,6 +2286,7 @@ void CCmdLineOptions::ParseSelection(const std::string& s)
 
     std::swap(this->mapSelection, map);
 }
+#endif
 
 ItemValue CCmdLineOptions::GetSelectionItemValue(const char* sz) const
 {
@@ -2267,10 +2319,10 @@ ItemValue CCmdLineOptions::GetSelectionItemValue(const char* sz) const
     return true;
 }
 
-void CCmdLineOptions::ParseTileFilter(const wchar_t* s)
-{
-    this->sceneIndexSet = libCZI::Utils::IndexSetFromString(s);
-}
+//void CCmdLineOptions::ParseTileFilter(const wchar_t* s)
+//{
+//    this->sceneIndexSet = libCZI::Utils::IndexSetFromString(s);
+//}
 
 std::shared_ptr<libCZI::IIndexSet> CCmdLineOptions::GetSceneIndexSet() const
 {
@@ -2325,6 +2377,7 @@ std::shared_ptr<libCZI::IIndexSet> CCmdLineOptions::GetSceneIndexSet() const
     return true;
 }
 
+#if false
 void CCmdLineOptions::ParseChannelCompositionFormat(const wchar_t* s)
 {
     auto arg = trim(s);
@@ -2346,6 +2399,7 @@ void CCmdLineOptions::ParseChannelCompositionFormat(const wchar_t* s)
 
     throw std::invalid_argument("Invalid channel-composition-format.");
 }
+#endif
 
 /*static*/bool CCmdLineOptions::TryParseChannelCompositionFormatWithAlphaValue(const std::wstring& s, libCZI::PixelType& channelCompositePixelType, std::uint8_t& channelCompositeAlphaValue)
 {
@@ -2406,10 +2460,10 @@ void CCmdLineOptions::ParseChannelCompositionFormat(const wchar_t* s)
     }
 }
 
-void CCmdLineOptions::ParseCreateBounds(const std::wstring& s)
-{
-    this->createBounds = libCZI::CDimBounds::Parse(convertToUtf8(s).c_str());
-}
+//void CCmdLineOptions::ParseCreateBounds(const std::wstring& s)
+//{
+//    this->createBounds = libCZI::CDimBounds::Parse(convertToUtf8(s).c_str());
+//}
 
 /*static*/bool CCmdLineOptions::TryParseCreateSize(const std::string& s, std::tuple<std::uint32_t, std::uint32_t>* size)
 {
@@ -2448,6 +2502,7 @@ void CCmdLineOptions::ParseCreateBounds(const std::wstring& s)
     return false;
 }
 
+#if false
 void CCmdLineOptions::ParseCreateSize(const std::wstring& s)
 {
     // expected format is: 1024x768 or 1024*768
@@ -2480,6 +2535,7 @@ void CCmdLineOptions::ParseCreateSize(const std::wstring& s)
 
     throw std::invalid_argument("Invalid size specification for sub-block creation.");
 }
+#endif
 
 /*static*/bool CCmdLineOptions::TryParseCreateTileInfo(const std::string& s, CreateTileInfo* create_tile_info)
 {
@@ -2568,6 +2624,7 @@ void CCmdLineOptions::ParseCreateSize(const std::wstring& s)
     return false;
 }
 
+#if false
 void CCmdLineOptions::ParseCreateTileInfo(const std::wstring& s)
 {
     // expected format: 4x4  or 4x4;10%
@@ -2645,11 +2702,12 @@ void CCmdLineOptions::ParseCreateTileInfo(const std::wstring& s)
 
     throw std::invalid_argument("Invalid tile-info specification for sub-block creation.");
 }
+#endif
 
-void CCmdLineOptions::ParseFont(const std::wstring& s)
-{
-    this->fontnameOrFile = s;
-}
+//void CCmdLineOptions::ParseFont(const std::wstring& s)
+//{
+//    this->fontnameOrFile = s;
+//}
 
 void CCmdLineOptions::ParseFontHeight(const std::wstring& s)
 {
@@ -2673,18 +2731,18 @@ void CCmdLineOptions::ParseFontHeight(const std::wstring& s)
     return true;
 }
 
-void CCmdLineOptions::ParseNewCziFileguid(const std::wstring& s)
-{
-    GUID g;
-    bool b = TryParseGuid(s, &g);
-    if (!b)
-    {
-        throw invalid_argument("invalid argument for file-GUID");
-    }
-
-    this->newCziFileGuid = g;
-    this->newCziFileGuidValid = true;
-}
+//void CCmdLineOptions::ParseNewCziFileguid(const std::wstring& s)
+//{
+//    GUID g;
+//    bool b = TryParseGuid(s, &g);
+//    if (!b)
+//    {
+//        throw invalid_argument("invalid argument for file-GUID");
+//    }
+//
+//    this->newCziFileGuid = g;
+//    this->newCziFileGuidValid = true;
+//}
 
 /*static*/bool CCmdLineOptions::TryParseBitmapGenerator(const std::string& s, std::string* generator_class_name)
 {
@@ -2719,16 +2777,17 @@ void CCmdLineOptions::ParseNewCziFileguid(const std::wstring& s)
     return true;
 }
 
-void CCmdLineOptions::ParseBitmapGenerator(const std::wstring& s)
-{
-    if (!icasecmp(L"null", s) && !icasecmp(L"default", s) && !icasecmp(L"gdi", s) && !icasecmp(L"freetype", s))
-    {
-        throw invalid_argument("invalid argument for bitmap-generator");
-    }
+//void CCmdLineOptions::ParseBitmapGenerator(const std::wstring& s)
+//{
+//    if (!icasecmp(L"null", s) && !icasecmp(L"default", s) && !icasecmp(L"gdi", s) && !icasecmp(L"freetype", s))
+//    {
+//        throw invalid_argument("invalid argument for bitmap-generator");
+//    }
+//
+//    this->bitmapGeneratorClassName = convertToUtf8(s);
+//}
 
-    this->bitmapGeneratorClassName = convertToUtf8(s);
-}
-
+#if false
 void CCmdLineOptions::PrintHelp(const wchar_t* sz, int switchesCnt, const std::function<std::tuple<int, std::wstring>(int idx)>& getSwitch)
 {
     if (sz != nullptr)
@@ -2746,8 +2805,9 @@ void CCmdLineOptions::PrintHelp(const wchar_t* sz, int switchesCnt, const std::f
         }
     }
 
-    this->PrintHelp(switchesCnt, getSwitch);
+    //this->PrintHelp(switchesCnt, getSwitch);
 }
+#endif
 
 void CCmdLineOptions::PrintHelpBuildInfo()
 {
@@ -2776,10 +2836,10 @@ void CCmdLineOptions::PrintHelpBuildInfo()
     this->GetLog()->WriteLineStdOut(ss.str());
 }
 
-void CCmdLineOptions::PrintHelp(int switchesCnt, const std::function<std::tuple<int, std::wstring>(int idx)>& getSwitch)
-{
-    this->PrintUsage(switchesCnt, getSwitch);
-}
+//void CCmdLineOptions::PrintHelp(int switchesCnt, const std::function<std::tuple<int, std::wstring>(int idx)>& getSwitch)
+//{
+//    this->PrintUsage(switchesCnt, getSwitch);
+//}
 
 void CCmdLineOptions::PrintHelpBitmapGenerator()
 {
@@ -2860,6 +2920,7 @@ void CCmdLineOptions::PrintHelpBitmapGenerator()
     return true;
 }
 
+#if false
 void CCmdLineOptions::ParseSubBlockMetadataKeyValue(const std::string& s)
 {
     rapidjson::Document document;
@@ -2908,6 +2969,7 @@ void CCmdLineOptions::ParseSubBlockMetadataKeyValue(const std::string& s)
     this->sbBlkMetadataKeyValue = move(keyValue);
     this->sbBlkMetadataKeyValueValid = true;
 }
+#endif
 
 /*static*/bool CCmdLineOptions::TryParseCompressionOptions(const std::string& s, libCZI::Utils::CompressionOption* compression_option)
 {
@@ -2927,13 +2989,14 @@ void CCmdLineOptions::ParseSubBlockMetadataKeyValue(const std::string& s)
     }
 }
 
-void CCmdLineOptions::ParseCompressionOptions(const std::string& s)
-{
-    const libCZI::Utils::CompressionOption opt = libCZI::Utils::ParseCompressionOptions(s);
-    this->compressionMode = opt.first;
-    this->compressionParameters = opt.second;
-}
+//void CCmdLineOptions::ParseCompressionOptions(const std::string& s)
+//{
+//    const libCZI::Utils::CompressionOption opt = libCZI::Utils::ParseCompressionOptions(s);
+//    this->compressionMode = opt.first;
+//    this->compressionParameters = opt.second;
+//}
 
+#if false
 void CCmdLineOptions::ParseGeneratorPixeltype(const std::string& s)
 {
     auto pixeltypeString = trim(s);
@@ -2953,6 +3016,7 @@ void CCmdLineOptions::ParseGeneratorPixeltype(const std::string& s)
     ss << "Error parsing the generator-pixeltype - \"" << s << "\" is not valid.";
     throw logic_error(ss.str());
 }
+#endif
 
 /*static*/ bool CCmdLineOptions::TryParseGeneratorPixeltype(const std::string& s, libCZI::PixelType* pixel_type)
 {
