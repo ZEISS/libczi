@@ -84,6 +84,18 @@ struct DisplaySettingsValidator : public CLI::Validator
     DisplaySettingsValidator()
     {
         this->name_ = "DisplaySettings";
+        this->func_ = [](const std::string& str) -> string
+        {
+            const bool parsed_ok = CCmdLineOptions::TryParseDisplaySettings(str, nullptr);
+            if (!parsed_ok)
+            {
+                ostringstream string_stream;
+                string_stream << "Invalid DisplaySettings (JSON) given \"" << str << "\"";
+                throw CLI::ValidationError(string_stream.str());
+            }
+
+            return {};
+        };
     }
 };
 
@@ -95,7 +107,8 @@ struct JpgXrCodecValidator : public CLI::Validator
         this->name_ = "JpgXrCodecValidator";
         this->func_ = [](const std::string& str) -> string
         {
-            if (!(str == "WIC" || str == "WICDecoder"))
+            const bool parsed_ok = CCmdLineOptions::TryParseJxrCodecUseWicCodec(str, nullptr);
+            if (!parsed_ok)
             {
                 ostringstream string_stream;
                 string_stream << "Invalid JPGXR-decoder-name given \"" << str << "\"";
@@ -115,6 +128,14 @@ struct VerbosityValidator : public CLI::Validator
         this->name_ = "VerbosityValidator";
         this->func_ = [](const std::string& str) -> string
         {
+            const bool parsed_ok = CCmdLineOptions::TryParseVerbosityLevel(str, nullptr);
+            if (!parsed_ok)
+            {
+                ostringstream string_stream;
+                string_stream << "Invalid verbosity given \"" << str << "\"";
+                throw CLI::ValidationError(string_stream.str());
+            }
+
             return {};
         };
     }
@@ -128,6 +149,14 @@ struct BackgroundColorValidator : public CLI::Validator
         this->name_ = "BackgroundColorValidator";
         this->func_ = [](const std::string& str) -> string
         {
+            const bool parsed_ok = CCmdLineOptions::TryParseParseBackgroundColor(str, nullptr);
+            if (!parsed_ok)
+            {
+                ostringstream string_stream;
+                string_stream << "Invalid background-color given \"" << str << "\"";
+                throw CLI::ValidationError(string_stream.str());
+            }
+
             return {};
         };
     }
@@ -141,6 +170,14 @@ struct PyramidInfoValidator : public CLI::Validator
         this->name_ = "PyramidInfoValidator";
         this->func_ = [](const std::string& str) -> string
         {
+            const bool parsed_ok = CCmdLineOptions::TryParsePyramidInfo(str, nullptr, nullptr);
+            if (!parsed_ok)
+            {
+                ostringstream string_stream;
+                string_stream << "Invalid pyramid-info given \"" << str << "\"";
+                throw CLI::ValidationError(string_stream.str());
+            }
+
             return {};
         };
     }
@@ -154,6 +191,14 @@ struct InfoLevelValidator : public CLI::Validator
         this->name_ = "InfoLevelValidator";
         this->func_ = [](const std::string& str) -> string
         {
+            const bool parsed_ok = CCmdLineOptions::TryParseInfoLevel(str, nullptr);
+            if (!parsed_ok)
+            {
+                ostringstream string_stream;
+                string_stream << "Invalid info-level given \"" << str << "\"";
+                throw CLI::ValidationError(string_stream.str());
+            }
+
             return {};
         };
     }
@@ -167,6 +212,14 @@ struct SelectionValidator : public CLI::Validator
         this->name_ = "SelectionValidator";
         this->func_ = [](const std::string& str) -> string
         {
+            const bool parsed_ok = CCmdLineOptions::TryParseSelection(str, nullptr);
+            if (!parsed_ok)
+            {
+                ostringstream string_stream;
+                string_stream << "Invalid selection given \"" << str << "\"";
+                throw CLI::ValidationError(string_stream.str());
+            }
+
             return {};
         };
     }
@@ -180,6 +233,14 @@ struct TileFilterValidator : public CLI::Validator
         this->name_ = "TileFilterValidator";
         this->func_ = [](const std::string& str) -> string
         {
+            const bool parsed_ok = CCmdLineOptions::TryParseTileFilter(str, nullptr);
+            if (!parsed_ok)
+            {
+                ostringstream string_stream;
+                string_stream << "Invalid tile-filter given \"" << str << "\"";
+                throw CLI::ValidationError(string_stream.str());
+            }
+
             return {};
         };
     }
@@ -1417,6 +1478,58 @@ static std::tuple<int, ChannelDisplaySettings> GetChannelInfo(const rapidjson::V
     return std::make_tuple(chNo, chInfo);
 }
 
+bool CCmdLineOptions::TryParseDisplaySettings(const std::string& s, std::map<int, ChannelDisplaySettings>* multiChannelCompositeChannelInfos)
+{
+    vector<std::tuple<int, ChannelDisplaySettings>> vecChNoAndChannelInfo;
+    rapidjson::Document document;
+    document.Parse(s.c_str());
+    if (document.HasParseError())
+    {
+        return false;
+    }
+
+    const bool isObject = document.IsObject();
+    if (!isObject)
+    {
+        return false;
+    }
+
+    const bool hasChannels = document.HasMember("channels");
+    if (!hasChannels)
+    {
+        return false;
+    }
+
+    const bool isChannelsArray = document["channels"].IsArray();
+    if (!isChannelsArray)
+    {
+        return false;
+    }
+
+    const auto& channels = document["channels"];
+    for (decltype(channels.Size()) i = 0; i < channels.Size(); ++i)
+    {
+        try
+        {
+            vecChNoAndChannelInfo.emplace_back(GetChannelInfo(channels[i]));
+        }
+        catch (exception&)
+        {
+            return false;
+        }
+    }
+
+    if (multiChannelCompositeChannelInfos != nullptr)
+    {
+        for (const auto& it : vecChNoAndChannelInfo)
+        {
+            multiChannelCompositeChannelInfos->at(get<0>(it)) = get<1>(it);
+        }
+    }
+
+    return true;
+}
+
 void CCmdLineOptions::ParseDisplaySettings(const std::string& s)
 {
     // TODO: provide a reasonable error handling
@@ -1441,6 +1554,74 @@ void CCmdLineOptions::ParseDisplaySettings(const std::string& s)
     {
         this->multiChannelCompositeChannelInfos[get<0>(it)] = get<1>(it);
     }
+}
+
+/*static*/bool CCmdLineOptions::TryParseVerbosityLevel(const std::string& s, std::uint32_t* levels)
+{
+    static constexpr struct
+    {
+        const char* name;
+        std::uint32_t flags;
+    } verbosities[] =
+    {
+        { "All",0xffffffff} ,
+        { "Errors",(1 << 0) | (1 << 1)},
+        { "Errors1",(1 << 0) },
+        { "Errors2",(1 << 1) },
+        { "Warnings",(1 << 2) | (1 << 3) },
+        { "Warnings1",(1 << 2)  },
+        { "Warnings2",(1 << 3) },
+        { "Infos",(1 << 4) | (1 << 5) },
+        { "Infos1",(1 << 4)  },
+        { "Infos2",(1 << 5) }
+    };
+
+    std::uint32_t verbosity_levels = 0;
+
+    size_t offset = 0;
+    for (;;)
+    {
+        const size_t length = strcspn(offset + s.c_str(), ",;");
+        if (length == 0)
+        {
+            break;
+        }
+
+        string tk(s.c_str() + offset, length);
+        string tktr = trim(tk);
+        if (tktr.length() > 0)
+        {
+            bool token_found = false;
+            for (size_t i = 0; i < sizeof(verbosities) / sizeof(verbosities[0]); ++i)
+            {
+                if (icasecmp(verbosities[i].name, tktr))
+                {
+                    verbosity_levels |= verbosities[i].flags;
+                    token_found = true;
+                    break;
+                }
+            }
+
+            if (!token_found)
+            {
+                return false;
+            }
+        }
+
+        if (s[length + offset] == '\0')
+        {
+            break;
+        }
+
+        offset += (length + 1);
+    }
+
+    if (levels != nullptr)
+    {
+        *levels = verbosity_levels;
+    }
+
+    return true;
 }
 
 std::uint32_t CCmdLineOptions::ParseVerbosityLevel(const wchar_t* s)
@@ -1493,6 +1674,75 @@ std::uint32_t CCmdLineOptions::ParseVerbosityLevel(const wchar_t* s)
     }
 
     return levels;
+}
+
+/*static*/bool CCmdLineOptions::TryParseInfoLevel(const std::string& s, InfoLevel* info_level)
+{
+    static constexpr struct
+    {
+        const char* name;
+        InfoLevel flag;
+    } info_levels[] =
+    {
+        { "Statistics", InfoLevel::Statistics },
+        { "RawXML", InfoLevel::RawXML },
+        { "DisplaySettings", InfoLevel::DisplaySettings },
+        { "DisplaySettingsJson", InfoLevel::DisplaySettingsJson },
+        { "AllSubBlocks", InfoLevel::AllSubBlocks },
+        { "Attachments", InfoLevel::AttachmentInfo },
+        { "AllAttachments", InfoLevel::AllAttachments },
+        { "PyramidStatistics", InfoLevel::PyramidStatistics },
+        { "GeneralInfo", InfoLevel::GeneralInfo },
+        { "ScalingInfo", InfoLevel::ScalingInfo },
+        { "All", InfoLevel::All }
+    };
+
+    std::underlying_type<InfoLevel>::type levels = (std::underlying_type<InfoLevel>::type)InfoLevel::None;
+
+    size_t offset = 0;
+    for (;;)
+    {
+        const size_t length = strcspn(offset + s.c_str(), ",;");
+        if (length == 0)
+        {
+            break;
+        }
+
+        string tk(s.c_str() + offset, length);
+        string tktr = trim(tk);
+        if (tktr.length() > 0)
+        {
+            bool token_found = false;
+            for (size_t i = 0; i < sizeof(info_levels) / sizeof(info_levels[0]); ++i)
+            {
+                if (icasecmp(info_levels[i].name, tktr))
+                {
+                    levels |= static_cast<std::underlying_type<InfoLevel>::type>(info_levels[i].flag);
+                    token_found = true;
+                    break;
+                }
+            }
+
+            if (!token_found)
+            {
+                return false;
+            }
+        }
+
+        if (s[length + offset] == '\0')
+        {
+            break;
+        }
+
+        offset += (length + 1);
+    }
+
+    if (info_level != nullptr)
+    {
+        *info_level = static_cast<InfoLevel>(levels);
+    }
+
+    return true;
 }
 
 void CCmdLineOptions::ParseInfoLevel(const wchar_t* s)
@@ -1548,6 +1798,22 @@ void CCmdLineOptions::ParseInfoLevel(const wchar_t* s)
     this->infoLevel = (InfoLevel)levels;
 }
 
+/*static*/bool CCmdLineOptions::TryParseJxrCodecUseWicCodec(const std::string& s, bool* use_wic_codec)
+{
+    // for the time being, we just decide whether to use the WIC-codec or not    
+    if (icasecmp(s, "WIC") || icasecmp(s, "WICDecoder"))
+    {
+        if (use_wic_codec != nullptr)
+        {
+            *use_wic_codec = true;
+        }
+
+        return true;
+    }
+
+    return false;
+}
+
 bool CCmdLineOptions::ParseJxrCodec(const wchar_t* s)
 {
     wstring str = trim(wstring(s));
@@ -1557,6 +1823,53 @@ bool CCmdLineOptions::ParseJxrCodec(const wchar_t* s)
     }
 
     return false;
+}
+
+/*static*/bool CCmdLineOptions::TryParseParseBackgroundColor(const std::string& s, libCZI::RgbFloatColor* color)
+{
+    float f[3];
+    f[0] = f[1] = f[2] = std::numeric_limits<float>::quiet_NaN();
+
+    const char* pointer = s.c_str();
+    for (int i = 0; i < 3; ++i)
+    {
+        char* endPtr;
+        f[i] = strtof(pointer, &endPtr);
+
+        const char* endPtrSkipped = skipWhiteSpaceAndOneOfThese(endPtr, ";,|");
+        if (*endPtrSkipped == L'\0')
+        {
+            if (i == 1)
+            {
+                // we expect to have exactly one float or three, anything else is invalid
+                return false;
+            }
+
+            break;
+        }
+
+        if (i == 2)
+        {
+            return false;
+        }
+
+        pointer = endPtrSkipped;
+    }
+
+    if (isnan(f[1]) && isnan(f[2]))
+    {
+        if (color != nullptr)
+        {
+            *color = libCZI::RgbFloatColor{ f[0],f[0],f[0] };
+        }
+    }
+
+    if (color != nullptr)
+    {
+        *color = libCZI::RgbFloatColor{ f[0],f[1],f[2] };
+    }
+
+    return true;
 }
 
 libCZI::RgbFloatColor CCmdLineOptions::ParseBackgroundColor(const wchar_t* s)
@@ -1580,6 +1893,37 @@ libCZI::RgbFloatColor CCmdLineOptions::ParseBackgroundColor(const wchar_t* s)
     }
 
     return libCZI::RgbFloatColor{ f[0],f[1],f[2] };
+}
+
+/*static*/bool CCmdLineOptions::TryParsePyramidInfo(const std::string& s, int* pyramidMinificationFactor, int* pyramidLayerNo)
+{
+    size_t position_of_delimiter = s.find_first_of(";,|");
+    if (position_of_delimiter == string::npos)
+    {
+        return false;
+    }
+
+    string minification_factor_string = s.substr(0, position_of_delimiter);
+    string pyramid_layer_no_string = s.substr(1 + position_of_delimiter);
+
+    int minificationFactor, layerNo;
+    if (!TryParseInt32(minification_factor_string, &minificationFactor) ||
+        !TryParseInt32(pyramid_layer_no_string, &layerNo))
+    {
+        return false;
+    }
+
+    if (pyramidLayerNo != nullptr)
+    {
+        *pyramidLayerNo = layerNo;
+    }
+
+    if (pyramidMinificationFactor != nullptr)
+    {
+        *pyramidMinificationFactor = minificationFactor;
+    }
+
+    return true;
 }
 
 void CCmdLineOptions::ParsePyramidInfo(const wchar_t* sz)
@@ -1611,6 +1955,53 @@ void CCmdLineOptions::ParseSelection(const std::wstring& s)
 {
     auto str = convertToUtf8(s);
     this->ParseSelection(str);
+}
+
+/*static*/bool CCmdLineOptions::TryParseSelection(const std::string& s, std::map<std::string, ItemValue>* key_value)
+{
+    std::map<string, ItemValue> map;
+    rapidjson::Document document;
+    document.Parse(s.c_str());
+    if (document.HasParseError() || !document.IsObject())
+    {
+        return false;
+    }
+
+    for (rapidjson::Value::ConstMemberIterator itr = document.MemberBegin(); itr != document.MemberEnd(); ++itr)
+    {
+        if (!itr->name.IsString())
+        {
+            return false;
+        }
+
+        string name = itr->name.GetString();
+        ItemValue iv;
+        if (itr->value.IsString())
+        {
+            iv = ItemValue(itr->value.GetString());
+        }
+        else if (itr->value.IsDouble())
+        {
+            iv = ItemValue(itr->value.GetDouble());
+        }
+        else if (itr->value.IsBool())
+        {
+            iv = ItemValue(itr->value.GetBool());
+        }
+        else
+        {
+            return false;
+        }
+
+        map[name] = iv;
+    }
+
+    if (key_value != nullptr)
+    {
+        key_value->swap(map);
+    }
+
+    return true;
 }
 
 void CCmdLineOptions::ParseSelection(const std::string& s)
@@ -1664,6 +2055,26 @@ ItemValue CCmdLineOptions::GetSelectionItemValue(const char* sz) const
     }
 
     return ItemValue();
+}
+
+/*static*/bool CCmdLineOptions::TryParseTileFilter(const std::string& s, std::shared_ptr<libCZI::IIndexSet>* scene_index_set)
+{
+    shared_ptr<libCZI::IIndexSet> index_set;
+    try
+    {
+        index_set = libCZI::Utils::IndexSetFromString(convertUtf8ToUCS2(s));
+    }
+    catch (exception&)
+    {
+        return false;
+    }
+
+    if (scene_index_set!=nullptr)
+    {
+        scene_index_set->swap(index_set);
+    }
+
+    return true;
 }
 
 void CCmdLineOptions::ParseTileFilter(const wchar_t* s)

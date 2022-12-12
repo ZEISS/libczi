@@ -288,6 +288,28 @@ std::vector<std::string> wrap(const char* text, size_t line_length/* = 72*/)
     return vec;
 }
 
+const char* skipWhiteSpaceAndOneOfThese(const char* s, const char* charsToSkipOnce)
+{
+    bool delimiter_already_skipped = false;
+    for (; *s != '\0'; ++s)
+    {
+        if (isspace(*s))
+        {
+            continue;
+        }
+
+        if (delimiter_already_skipped == false && charsToSkipOnce != nullptr && std::strchr(charsToSkipOnce, *s) != nullptr)
+        {
+            delimiter_already_skipped = true;
+            continue;
+        }
+
+        return s;
+    }
+
+    return s;
+}
+
 const wchar_t* skipWhiteSpaceAndOneOfThese(const wchar_t* s, const wchar_t* charsToSkipOnce)
 {
     bool delimiteralreadyskipped = false;

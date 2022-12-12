@@ -267,6 +267,14 @@ public:
 	libCZI::PixelType GetPixelGeneratorPixeltype() const { return this->pixelTypeForBitmapGenerator; }
 private:
 	friend struct RegionOfInterestValidator;
+	friend struct DisplaySettingsValidator;
+	friend struct JpgXrCodecValidator;
+	friend struct VerbosityValidator;
+	friend struct BackgroundColorValidator;
+	friend struct PyramidInfoValidator;
+	friend struct InfoLevelValidator;
+	friend struct SelectionValidator;
+	friend struct TileFilterValidator;
 	void PrintUsage(int switchesCnt, const std::function<std::tuple<int, std::wstring>(int idx)>& getSwitch);
 	bool CheckArgumentConsistency() const;
 
@@ -282,14 +290,17 @@ private:
 	void ParseRect(const std::wstring& s);
 	void SetOutputFilename(const std::wstring& s);
 
-	void ParseDisplaySettings(const std::wstring& s);
-	void ParseDisplaySettings(const std::string& s);
+	static bool TryParseDisplaySettings(const std::string& s, std::map<int, ChannelDisplaySettings>* multiChannelCompositeChannelInfos);
+	/**/void ParseDisplaySettings(const std::wstring& s);
+	/**/void ParseDisplaySettings(const std::string& s);
 
-	std::uint32_t ParseVerbosityLevel(const std::string& s) { auto sucs2 = convertUtf8ToUCS2(s); return ParseVerbosityLevel(sucs2.c_str()); }
-	std::uint32_t ParseVerbosityLevel(const wchar_t* s);
+	static bool TryParseVerbosityLevel(const std::string& s, std::uint32_t* levels);
+	/**/std::uint32_t ParseVerbosityLevel(const std::string& s) { auto sucs2 = convertUtf8ToUCS2(s); return ParseVerbosityLevel(sucs2.c_str()); }
+	/**/std::uint32_t ParseVerbosityLevel(const wchar_t* s);
 
-	bool ParseJxrCodec(const std::string& s) { auto sucs2 = convertUtf8ToUCS2(s); return ParseJxrCodec(sucs2.c_str()); }
-	bool ParseJxrCodec(const wchar_t* s);
+	static bool TryParseJxrCodecUseWicCodec(const std::string& s, bool* use_wic_codec);
+	/**/bool ParseJxrCodec(const std::string& s) { auto sucs2 = convertUtf8ToUCS2(s); return ParseJxrCodec(sucs2.c_str()); }
+	/**/bool ParseJxrCodec(const wchar_t* s);
 
 	void PrintSynopsis(int switchesCnt, std::function<std::tuple<int, std::wstring>(int idx)> getSwitch, std::function<std::tuple<std::wstring, std::wstring>(int shortOption)> getExplanation);
 
@@ -303,21 +314,26 @@ private:
 	}
 	void PrintHelpBitmapGenerator();
 
-	static libCZI::RgbFloatColor ParseBackgroundColor(const wchar_t* s);
-	static libCZI::RgbFloatColor ParseBackgroundColor(const std::string& s) { auto sucs2 = convertUtf8ToUCS2(s); return ParseBackgroundColor(sucs2.c_str()); }
+	static bool TryParseParseBackgroundColor(const std::string& s, libCZI::RgbFloatColor* color);
+	/**/static libCZI::RgbFloatColor ParseBackgroundColor(const wchar_t* s);
+	/**/static libCZI::RgbFloatColor ParseBackgroundColor(const std::string& s) { auto sucs2 = convertUtf8ToUCS2(s); return ParseBackgroundColor(sucs2.c_str()); }
 
-	void ParsePyramidInfo(const wchar_t* sz);
-	void ParsePyramidInfo(const std::string& s) { auto sucs2 = convertUtf8ToUCS2(s); this->ParsePyramidInfo(sucs2.c_str()); }
+	static bool TryParsePyramidInfo(const std::string& s, int* pyramidMinificationFactor, int* pyramidLayerNo);
+	/**/void ParsePyramidInfo(const wchar_t* sz);
+	/**/void ParsePyramidInfo(const std::string& s) { auto sucs2 = convertUtf8ToUCS2(s); this->ParsePyramidInfo(sucs2.c_str()); }
 
 	void ParseZoom(const wchar_t* sz);
 	void ParseZoom(const std::string& s) { auto sucs2 = convertUtf8ToUCS2(s); this->ParseZoom(sucs2.c_str()); }
 
-	void ParseInfoLevel(const wchar_t* s);
-	void ParseInfoLevel(const std::string& s) { auto sucs2 = convertUtf8ToUCS2(s); this->ParseInfoLevel(sucs2.c_str()); }
+	static bool TryParseInfoLevel(const std::string& s, InfoLevel* info_level);
+	/**/void ParseInfoLevel(const wchar_t* s);
+	/**/void ParseInfoLevel(const std::string& s) { auto sucs2 = convertUtf8ToUCS2(s); this->ParseInfoLevel(sucs2.c_str()); }
 
-	void ParseSelection(const std::wstring& s);
-	void ParseSelection(const std::string& s);
+	static bool TryParseSelection(const std::string& s, std::map<std::string, ItemValue>* key_value);
+	/**/void ParseSelection(const std::wstring& s);
+	/**/void ParseSelection(const std::string& s);
 
+	static bool TryParseTileFilter(const std::string& s, std::shared_ptr<libCZI::IIndexSet>* scene_index_set);
 	void ParseTileFilter(const wchar_t* s);
 	void ParseTileFilter(const std::string& s) { auto sucs2 = convertUtf8ToUCS2(s); this->ParseTileFilter(sucs2.c_str()); }
 
