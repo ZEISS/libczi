@@ -790,8 +790,11 @@ bool CCmdLineOptions::Parse2(int argc, char** argv)
         const bool b = TryParseCreateSize(arguments_createsubblocksize, &this->createSize);
     }
 
-    
-    //string argument_createtileinfo;
+    if (!argument_createtileinfo.empty())
+    {
+        const bool b = TryParseCreateTileInfo(argument_createtileinfo, &this->createTileInfo);
+    }
+
     //string argument_truetypefontname;
     //string argument_fontheight;
     //string argument_guidofczi;
