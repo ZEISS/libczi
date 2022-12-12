@@ -444,7 +444,7 @@ public:
         this->column_width(20);
     }
 
-    std::string make_usage(const CLI::App* app, std::string name) const
+    std::string make_usage(const CLI::App* app, std::string name) const override
     {
         // 'name' is the full path of the executable, we only take the path "after the last slash or backslash"
         size_t offset = name.rfind('/');
