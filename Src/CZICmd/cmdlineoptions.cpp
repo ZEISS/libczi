@@ -2166,23 +2166,23 @@ void CCmdLineOptions::ParseInfoLevel(const wchar_t* s)
     return true;
 }
 
-void CCmdLineOptions::ParsePyramidInfo(const wchar_t* sz)
-{
-    int minificationFactor, layerNo;
-    const wchar_t* endPtr;
-    minificationFactor = wcstol(sz, (wchar_t**)&endPtr, 10);
-    sz = skipWhiteSpaceAndOneOfThese(endPtr, L";,|");
-    if (*sz == L'\0')
-    {
-        throw std::logic_error("Invalid pyramidinfo argument");
-    }
-
-    layerNo = wcstol(sz, (wchar_t**)&endPtr, 10);
-
-    // TODO: check arguments...
-    this->pyramidLayerNo = layerNo;
-    this->pyramidMinificationFactor = minificationFactor;
-}
+//void CCmdLineOptions::ParsePyramidInfo(const wchar_t* sz)
+//{
+//    int minificationFactor, layerNo;
+//    const wchar_t* endPtr;
+//    minificationFactor = wcstol(sz, (wchar_t**)&endPtr, 10);
+//    sz = skipWhiteSpaceAndOneOfThese(endPtr, L";,|");
+//    if (*sz == L'\0')
+//    {
+//        throw std::logic_error("Invalid pyramidinfo argument");
+//    }
+//
+//    layerNo = wcstol(sz, (wchar_t**)&endPtr, 10);
+//
+//    // TODO: check arguments...
+//    this->pyramidLayerNo = layerNo;
+//    this->pyramidMinificationFactor = minificationFactor;
+//}
 
 void CCmdLineOptions::ParseZoom(const wchar_t* sz)
 {
