@@ -80,7 +80,7 @@ int main(int argc, char** _argv)
 		{
 				CCmdLineOptions options(log);
 #if defined(WIN32ENV)
-				bool cmdLineParsedOk = options.Parse2(args_helper.GetArgc(), args_helper.GetArgv());
+				bool cmdLineParsedOk = options.Parse(args_helper.GetArgc(), args_helper.GetArgv());
 #else
 				bool cmdLineParsedOk = options.Parse(argc, argv);
 #endif

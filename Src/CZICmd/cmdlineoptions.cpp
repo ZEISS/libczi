@@ -482,7 +482,7 @@ public:
     }
 };
 
-bool CCmdLineOptions::Parse2(int argc, char** argv)
+bool CCmdLineOptions::Parse(int argc, char** argv)
 {
     CLI::App cli_app{ };
 

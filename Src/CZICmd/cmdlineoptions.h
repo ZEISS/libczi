@@ -199,13 +199,7 @@ public:
 
 	void Clear();
 
-	bool Parse2(int argc, char** argv);
-#if defined(WIN32ENV)
-	bool Parse(int argc, wchar_t** argv);
-#endif
-#if defined(LINUXENV)
 	bool Parse(int argc, char** argv);
-#endif
 
 	std::shared_ptr<ILog> GetLog() const { return this->log; }
 	Command GetCommand() const { return this->command; }
