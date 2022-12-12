@@ -401,6 +401,14 @@ struct CompressionOptionsValidator : public CLI::Validator
         this->name_ = "CompressionOptionsValidator";
         this->func_ = [](const std::string& str) -> string
         {
+            const bool parsed_ok = CCmdLineOptions::TryParseCompressionOptions(str, nullptr);
+            if (!parsed_ok)
+            {
+                ostringstream string_stream;
+                string_stream << "Invalid compression-options given \"" << str << "\"";
+                throw CLI::ValidationError(string_stream.str());
+            }
+
             return {};
         };
     }
@@ -414,6 +422,14 @@ struct GeneratorPixelTypeValidator : public CLI::Validator
         this->name_ = "GeneratorPixelTypeValidator";
         this->func_ = [](const std::string& str) -> string
         {
+            const bool parsed_ok = CCmdLineOptions::TryParseGeneratorPixeltype(str, nullptr);
+            if (!parsed_ok)
+            {
+                ostringstream string_stream;
+                string_stream << "Invalid generator-pixel-type given \"" << str << "\"";
+                throw CLI::ValidationError(string_stream.str());
+            }
+
             return {};
         };
     }
@@ -2774,6 +2790,25 @@ void CCmdLineOptions::ParseSubBlockMetadataKeyValue(const std::string& s)
     this->sbBlkMetadataKeyValue = move(keyValue);
     this->sbBlkMetadataKeyValueValid = true;
 }
+
+/*static*/bool CCmdLineOptions::TryParseCompressionOptions(const std::string& s, libCZI::Utils::CompressionOption* compression_option)
+{
+    try
+    {
+        const libCZI::Utils::CompressionOption opt = libCZI::Utils::ParseCompressionOptions(s);
+        if (compression_option != nullptr)
+        {
+            *compression_option = opt;
+        }
+
+        return true;
+    }
+    catch (exception&)
+    {
+        return false;
+    }
+}
+
 void CCmdLineOptions::ParseCompressionOptions(const std::string& s)
 {
     const libCZI::Utils::CompressionOption opt = libCZI::Utils::ParseCompressionOptions(s);
@@ -2799,6 +2834,34 @@ void CCmdLineOptions::ParseGeneratorPixeltype(const std::string& s)
     stringstream ss;
     ss << "Error parsing the generator-pixeltype - \"" << s << "\" is not valid.";
     throw logic_error(ss.str());
+}
+
+/*static*/ bool CCmdLineOptions::TryParseGeneratorPixeltype(const std::string& s, libCZI::PixelType* pixel_type)
+{
+    auto pixeltypeString = trim(s);
+
+    static constexpr libCZI::PixelType possibleGeneratorPixeltypes[] = 
+    {
+        libCZI::PixelType::Gray8,
+        libCZI::PixelType::Gray16,
+        libCZI::PixelType::Bgr24,
+        libCZI::PixelType::Bgr48
+    };
+
+    for (size_t i = 0; i < sizeof(possibleGeneratorPixeltypes) / sizeof(possibleGeneratorPixeltypes[0]); ++i)
+    {
+        if (icasecmp(pixeltypeString, libCZI::Utils::PixelTypeToInformalString(possibleGeneratorPixeltypes[i])))
+        {
+            if (pixel_type != nullptr)
+            {
+                *pixel_type = possibleGeneratorPixeltypes[i];
+            }
+            
+            return true;
+        }
+    }
+
+    return false;
 }
 
 /*static*/bool CCmdLineOptions::TryParseInt32(const std::string& str, int* value)

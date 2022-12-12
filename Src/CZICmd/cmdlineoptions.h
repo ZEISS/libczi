@@ -282,6 +282,8 @@ private:
 	friend struct GuidOfCziValidator;
 	friend struct BitmapGeneratorValidator;
 	friend struct CreateSubblockMetadataValidator;
+	friend struct CompressionOptionsValidator;
+	friend struct GeneratorPixelTypeValidator;
 	void PrintUsage(int switchesCnt, const std::function<std::tuple<int, std::wstring>(int idx)>& getSwitch);
 	bool CheckArgumentConsistency() const;
 
@@ -380,9 +382,11 @@ private:
 	/**/void ParseSubBlockMetadataKeyValue(const std::wstring& s) { auto str = convertToUtf8(s); this->ParseSubBlockMetadataKeyValue(str); }
 	/**/void ParseSubBlockMetadataKeyValue(const std::string& s);
 
-	void ParseCompressionOptions(const std::wstring& s) { auto str = convertToUtf8(s); this->ParseCompressionOptions(str); }
-	void ParseCompressionOptions(const std::string& s);
+	static bool TryParseCompressionOptions(const std::string& s, libCZI::Utils::CompressionOption* compression_option);
+	/**/void ParseCompressionOptions(const std::wstring& s) { auto str = convertToUtf8(s); this->ParseCompressionOptions(str); }
+	/**/void ParseCompressionOptions(const std::string& s);
 
-	void ParseGeneratorPixeltype(const std::wstring& s) { auto str = convertToUtf8(s); this->ParseGeneratorPixeltype(str); }
-	void ParseGeneratorPixeltype(const std::string& s);
+	static bool TryParseGeneratorPixeltype(const std::string& s, libCZI::PixelType* pixel_type);
+	/**/void ParseGeneratorPixeltype(const std::wstring& s) { auto str = convertToUtf8(s); this->ParseGeneratorPixeltype(str); }
+	/**/void ParseGeneratorPixeltype(const std::string& s);
 };
