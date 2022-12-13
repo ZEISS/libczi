@@ -23,13 +23,26 @@ IF(UNIX)
 ENDIF(UNIX)
 
 include(FetchContent)
+
+# make "CLI11" available
 FetchContent_Declare(
   cli11
   GIT_REPOSITORY https://github.com/CLIUtils/CLI11
   GIT_TAG        v2.2.0
 )
-
 FetchContent_MakeAvailable(cli11)
+
+
+# make ""RapidJSON" available
+FetchContent_Declare(
+  rapidjson
+  GIT_REPOSITORY "https://github.com/Tencent/rapidjson.git"
+  GIT_TAG        v1.1.0
+)
+set(RAPIDJSON_BUILD_TESTS OFF)
+set(RAPIDJSON_BUILD_DOC OFF)
+set(RAPIDJSON_BUILD_EXAMPLES OFF)
+FetchContent_MakeAvailable(rapidjson)
 
 set (CZICMDSRCFILES
          BitmapGen.cpp          
@@ -61,15 +74,14 @@ set (CZICMDSRCFILES
          BitmapGenNull.h        
          CZIcmd.cpp          
          platform_defines.h)
-file(GLOB_RECURSE CZICMDRAPIDJSONSRCFILES "*.h" "*.cpp" "*.hpp")
 
-add_executable(CZIcmd ${CZICMDSRCFILES} ${CZICMDRAPIDJSONSRCFILES})
+add_executable(CZIcmd ${CZICMDSRCFILES})
 
 set_target_properties(CZIcmd PROPERTIES CXX_STANDARD 11)
 target_compile_definitions(CZIcmd PRIVATE _LIBCZISTATICLIB)
 
-target_link_libraries(CZIcmd PRIVATE libCZIStatic ${ZLIB_LIBRARIES}  ${PNG_LIBRARIES}  CLI11::CLI11)
-target_include_directories(CZIcmd PRIVATE ${ZLIB_INCLUDE_DIR} ${PNG_INCLUDE_DIR} ${CMAKE_CURRENT_BINARY_DIR})
+target_link_libraries(CZIcmd PRIVATE libCZIStatic ${ZLIB_LIBRARIES}  ${PNG_LIBRARIES} CLI11::CLI11)
+target_include_directories(CZIcmd PRIVATE ${ZLIB_INCLUDE_DIR} ${PNG_INCLUDE_DIR} ${CMAKE_CURRENT_BINARY_DIR} ${RapidJSON_SOURCE_DIR}/include)
 
 IF (FREETYPE_FOUND)
     target_compile_definitions(CZIcmd PRIVATE _USE_FREETYPE)
