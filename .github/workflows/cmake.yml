@@ -42,9 +42,9 @@ jobs:
       # See https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type
       run: |
         if [ "$RUNNER_OS" == "Windows" ]; then
-         cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{matrix.build}} -DLIBCZI_BUILD_CZICMD=ON -DCMAKE_TOOLCHAIN_FILE=C:/vcpkg/scripts/buildsystems/vcpkg.cmake
+         cmake -B "${{github.workspace}}/build" -DCMAKE_BUILD_TYPE=${{matrix.build}} -DLIBCZI_BUILD_CZICMD=ON -DCMAKE_TOOLCHAIN_FILE=C:/vcpkg/scripts/buildsystems/vcpkg.cmake
         else
-         cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{matrix.build}} -DLIBCZI_BUILD_CZICMD=ON
+         cmake -B "${{github.workspace}}/build" -DCMAKE_BUILD_TYPE=${{matrix.build}} -DLIBCZI_BUILD_CZICMD=ON
         fi
 
     - name: Build
