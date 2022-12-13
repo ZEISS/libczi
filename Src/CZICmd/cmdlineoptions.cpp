@@ -1890,20 +1890,20 @@ void CCmdLineOptions::PrintHelpBitmapGenerator()
         [&](int no, std::tuple<std::string, std::string, bool> name_explanation_isdefault) -> bool
         {
             maxLengthClassName = (std::max)(get<0>(name_explanation_isdefault).length(), maxLengthClassName);
-    return true;
+            return true;
         });
 
-    stringstream ss;
+    ostringstream string_stream;
     BitmapGenFactory::EnumBitmapGenerator(
         [&](int no, std::tuple<std::string, std::string, bool> name_explanation_isdefault) -> bool
         {
-            ss << no + 1 << ": " << std::setw(maxLengthClassName) << std::left << get<0>(name_explanation_isdefault) << std::setw(0) <<
-            (!get<2>(name_explanation_isdefault) ? "     " : " (*) ") << "\"" <<
-        get<1>(name_explanation_isdefault) << "\"" << endl;
-    return true;
+            string_stream << no + 1 << ": " << std::setw(maxLengthClassName) << std::left << get<0>(name_explanation_isdefault) << std::setw(0) <<
+                (!get<2>(name_explanation_isdefault) ? "     " : " (*) ") << "\"" <<
+                get<1>(name_explanation_isdefault) << "\"" << endl;
+            return true;
         });
 
-    this->GetLog()->WriteLineStdOut(ss.str());
+    this->GetLog()->WriteLineStdOut(string_stream.str());
 }
 
 /*static*/bool CCmdLineOptions::TryParseSubBlockMetadataKeyValue(const std::string& s, std::map<std::string, std::string>* subblock_metadata_property_bag)
@@ -1979,9 +1979,9 @@ void CCmdLineOptions::PrintHelpBitmapGenerator()
 
 /*static*/ bool CCmdLineOptions::TryParseGeneratorPixeltype(const std::string& s, libCZI::PixelType* pixel_type)
 {
-    auto pixeltypeString = trim(s);
+    auto pixeltype_string = trim(s);
 
-    static constexpr libCZI::PixelType possibleGeneratorPixeltypes[] =
+    static constexpr libCZI::PixelType possible_generator_pixeltypes[] =
     {
         libCZI::PixelType::Gray8,
         libCZI::PixelType::Gray16,
@@ -1989,13 +1989,13 @@ void CCmdLineOptions::PrintHelpBitmapGenerator()
         libCZI::PixelType::Bgr48
     };
 
-    for (size_t i = 0; i < sizeof(possibleGeneratorPixeltypes) / sizeof(possibleGeneratorPixeltypes[0]); ++i)
+    for (size_t i = 0; i < sizeof(possible_generator_pixeltypes) / sizeof(possible_generator_pixeltypes[0]); ++i)
     {
-        if (icasecmp(pixeltypeString, libCZI::Utils::PixelTypeToInformalString(possibleGeneratorPixeltypes[i])))
+        if (icasecmp(pixeltype_string, libCZI::Utils::PixelTypeToInformalString(possible_generator_pixeltypes[i])))
         {
             if (pixel_type != nullptr)
             {
-                *pixel_type = possibleGeneratorPixeltypes[i];
+                *pixel_type = possible_generator_pixeltypes[i];
             }
 
             return true;

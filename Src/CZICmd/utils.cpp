@@ -90,15 +90,6 @@ bool icasecmp(const std::wstring& l, const std::wstring& r)
             { return towupper(l1) == towupper(r1); });
 }
 
-bool __wcasecmp(const wchar_t* l, const wchar_t* r)
-{
-#if defined(_WIN32)
-    return _wcsicmp(l, r) == 0 ? true : false;
-#else
-    return wcscasecmp(l, r) == 0 ? true : false;
-#endif
-}
-
 std::uint8_t HexCharToInt(char c)
 {
     switch (c)
