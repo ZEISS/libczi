@@ -309,4 +309,6 @@ private:
 	static bool TryParseSubBlockMetadataKeyValue(const std::string& s,std::map<std::string, std::string>* subblock_metadata_property_bag);
 	static bool TryParseCompressionOptions(const std::string& s, libCZI::Utils::CompressionOption* compression_option);
 	static bool TryParseGeneratorPixeltype(const std::string& s, libCZI::PixelType* pixel_type);
+
+	/*static*/void ThrowIfFalse(bool b, const std::string& argument_switch, const std::string& argument);
 };

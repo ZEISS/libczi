@@ -722,133 +722,170 @@ CCmdLineOptions::ParseResult CCmdLineOptions::Parse(int argc, char** argv)
     this->calcHashOfResult = argument_calc_hash;
     this->drawTileBoundaries = argument_drawtileboundaries;
 
-    if (!argument_source_filename.empty())
+    try
     {
-        this->cziFilename = convertUtf8ToUCS2(argument_source_filename);
-    }
+        if (!argument_source_filename.empty())
+        {
+            this->cziFilename = convertUtf8ToUCS2(argument_source_filename);
+        }
 
-    if (!argument_output_filename.empty())
-    {
-        this->SetOutputFilename(argument_output_filename);
-    }
+        if (!argument_output_filename.empty())
+        {
+            this->SetOutputFilename(argument_output_filename);
+        }
 
-    if (!argument_plane_coordinate.empty())
-    {
-        this->planeCoordinate = libCZI::CDimCoordinate::Parse(argument_plane_coordinate.c_str());
-    }
+        if (!argument_plane_coordinate.empty())
+        {
+            this->planeCoordinate = libCZI::CDimCoordinate::Parse(argument_plane_coordinate.c_str());
+        }
 
-    if (!argument_rect.empty())
-    {
-        const bool b = TryParseRect(argument_rect, &this->rectModeAbsoluteOrRelative, &this->rectX, &this->rectY, &this->rectW, &this->rectH);
-    }
+        if (!argument_rect.empty())
+        {
+            const bool b = TryParseRect(argument_rect, &this->rectModeAbsoluteOrRelative, &this->rectX, &this->rectY, &this->rectW, &this->rectH);
+            ThrowIfFalse(b, "'--rect", argument_rect);
+        }
 
-    if (!argument_display_settings.empty())
-    {
-        const bool b = TryParseDisplaySettings(argument_display_settings, &this->multiChannelCompositeChannelInfos);
-        this->useDisplaySettingsFromDocument = false;
-    }
+        if (!argument_display_settings.empty())
+        {
+            const bool b = TryParseDisplaySettings(argument_display_settings, &this->multiChannelCompositeChannelInfos);
+            ThrowIfFalse(b, "'--display-settings", argument_display_settings);
+            this->useDisplaySettingsFromDocument = false;
+        }
 
-    if (!argument_jpgxrcodec.empty())
-    {
-        const bool b = TryParseJxrCodecUseWicCodec(argument_jpgxrcodec, &this->useWicJxrDecoder);
-    }
+        if (!argument_jpgxrcodec.empty())
+        {
+            const bool b = TryParseJxrCodecUseWicCodec(argument_jpgxrcodec, &this->useWicJxrDecoder);
+            ThrowIfFalse(b, "'--jpgxrcodec", argument_jpgxrcodec);
+        }
 
-    if (!argument_verbosity.empty())
-    {
-        const bool b = TryParseVerbosityLevel(argument_verbosity, &this->enabledOutputLevels);
-    }
+        if (!argument_verbosity.empty())
+        {
+            const bool b = TryParseVerbosityLevel(argument_verbosity, &this->enabledOutputLevels);
+            ThrowIfFalse(b, "'--verbosity", argument_verbosity);
+        }
 
-    if (!argument_backgroundcolor.empty())
-    {
-        const bool b = TryParseParseBackgroundColor(argument_backgroundcolor, &this->backGroundColor);
-    }
+        if (!argument_backgroundcolor.empty())
+        {
+            const bool b = TryParseParseBackgroundColor(argument_backgroundcolor, &this->backGroundColor);
+            ThrowIfFalse(b, "'--background", argument_backgroundcolor);
+        }
 
-    if (!argument_pyramidinfo.empty())
-    {
-        const bool b = TryParsePyramidInfo(argument_pyramidinfo, &this->pyramidMinificationFactor, &this->pyramidLayerNo);
-    }
+        if (!argument_pyramidinfo.empty())
+        {
+            const bool b = TryParsePyramidInfo(argument_pyramidinfo, &this->pyramidMinificationFactor, &this->pyramidLayerNo);
+            ThrowIfFalse(b, "'--pyramidinfo", argument_pyramidinfo);
+        }
 
-    if (!argument_zoom.empty())
-    {
-        this->ParseZoom(argument_zoom);
-    }
+        if (!argument_zoom.empty())
+        {
+            this->ParseZoom(argument_zoom);
+        }
 
-    if (!argument_info_level.empty())
-    {
-        const bool b = TryParseInfoLevel(argument_info_level, &this->infoLevel);
-    }
+        if (!argument_info_level.empty())
+        {
+            const bool b = TryParseInfoLevel(argument_info_level, &this->infoLevel);
+            ThrowIfFalse(b, "'--info-level", argument_info_level);
+        }
 
-    if (!argument_selection.empty())
-    {
-        const bool b = TryParseSelection(argument_selection, &this->mapSelection);
-    }
+        if (!argument_selection.empty())
+        {
+            const bool b = TryParseSelection(argument_selection, &this->mapSelection);
+            ThrowIfFalse(b, "'--selection", argument_selection);
+        }
 
-    if (!argument_tile_filter.empty())
-    {
-        const bool b = TryParseTileFilter(argument_tile_filter, &this->sceneIndexSet);
-    }
+        if (!argument_tile_filter.empty())
+        {
+            const bool b = TryParseTileFilter(argument_tile_filter, &this->sceneIndexSet);
+            ThrowIfFalse(b, "'--tile-filter", argument_tile_filter);
+        }
 
-    if (!argument_channelcompositionformat.empty())
-    {
-        const bool b = TryParseChannelCompositionFormat(argument_channelcompositionformat, &this->channelCompositePixelType, &this->channelCompositeAlphaValue);
-    }
+        if (!argument_channelcompositionformat.empty())
+        {
+            const bool b = TryParseChannelCompositionFormat(argument_channelcompositionformat, &this->channelCompositePixelType, &this->channelCompositeAlphaValue);
+            ThrowIfFalse(b, "'--channelcompositionformat", argument_channelcompositionformat);
+        }
 
-    if (!arguments_createbounds.empty())
-    {
-        const bool b = TryParseCreateBounds(arguments_createbounds, &this->createBounds);
-    }
+        if (!arguments_createbounds.empty())
+        {
+            const bool b = TryParseCreateBounds(arguments_createbounds, &this->createBounds);
+            ThrowIfFalse(b, "'--createbounds", arguments_createbounds);
+        }
 
-    if (!arguments_createsubblocksize.empty())
-    {
-        const bool b = TryParseCreateSize(arguments_createsubblocksize, &this->createSize);
-    }
+        if (!arguments_createsubblocksize.empty())
+        {
+            const bool b = TryParseCreateSize(arguments_createsubblocksize, &this->createSize);
+            ThrowIfFalse(b, "'--createsubblocksize", arguments_createsubblocksize);
+        }
 
-    if (!argument_createtileinfo.empty())
-    {
-        const bool b = TryParseCreateTileInfo(argument_createtileinfo, &this->createTileInfo);
-    }
+        if (!argument_createtileinfo.empty())
+        {
+            const bool b = TryParseCreateTileInfo(argument_createtileinfo, &this->createTileInfo);
+            ThrowIfFalse(b, "'--createtileinfo", argument_createtileinfo);
+        }
 
-    if (!argument_truetypefontname.empty())
-    {
-        this->fontnameOrFile = convertUtf8ToUCS2(argument_truetypefontname);
-    }
+        if (!argument_truetypefontname.empty())
+        {
+            this->fontnameOrFile = convertUtf8ToUCS2(argument_truetypefontname);
+        }
 
-    if (!argument_fontheight.empty())
-    {
-        const bool b = TryParseInt32(argument_fontheight, &this->fontHeight);
-    }
+        if (!argument_fontheight.empty())
+        {
+            const bool b = TryParseInt32(argument_fontheight, &this->fontHeight);
+            ThrowIfFalse(b, "'--fontheight", argument_fontheight);
+        }
 
-    if (!argument_guidofczi.empty())
-    {
-        const bool b = TryParseNewCziFileguid(argument_guidofczi, &this->newCziFileGuid);
-        this->newCziFileGuidValid = true;
-    }
+        if (!argument_guidofczi.empty())
+        {
+            const bool b = TryParseNewCziFileguid(argument_guidofczi, &this->newCziFileGuid);
+            ThrowIfFalse(b, "'--guidofczi", argument_guidofczi);
+            this->newCziFileGuidValid = true;
+        }
 
-    if (!argument_bitmapgenerator.empty())
-    {
-        const bool b = TryParseBitmapGenerator(argument_bitmapgenerator, &this->bitmapGeneratorClassName);
-    }
+        if (!argument_bitmapgenerator.empty())
+        {
+            const bool b = TryParseBitmapGenerator(argument_bitmapgenerator, &this->bitmapGeneratorClassName);
+            ThrowIfFalse(b, "'--bitmapgenerator", argument_bitmapgenerator);
+        }
 
-    if (!argument_createczisubblockmetadata.empty())
-    {
-        const bool b = TryParseSubBlockMetadataKeyValue(argument_createczisubblockmetadata, &this->sbBlkMetadataKeyValue);
-        this->sbBlkMetadataKeyValueValid = true;
-    }
+        if (!argument_createczisubblockmetadata.empty())
+        {
+            const bool b = TryParseSubBlockMetadataKeyValue(argument_createczisubblockmetadata, &this->sbBlkMetadataKeyValue);
+            ThrowIfFalse(b, "'--createczisbblkmetadata", argument_createczisubblockmetadata);
+            this->sbBlkMetadataKeyValueValid = true;
+        }
 
-    if (!argument_compressionoptions.empty())
-    {
-        libCZI::Utils::CompressionOption compression_options;
-        const bool b = TryParseCompressionOptions(argument_compressionoptions, &compression_options);
-        this->compressionMode = compression_options.first;
-        this->compressionParameters = compression_options.second;
-    }
+        if (!argument_compressionoptions.empty())
+        {
+            libCZI::Utils::CompressionOption compression_options;
+            const bool b = TryParseCompressionOptions(argument_compressionoptions, &compression_options);
+            ThrowIfFalse(b, "'--compressionopts", argument_compressionoptions);
+            this->compressionMode = compression_options.first;
+            this->compressionParameters = compression_options.second;
+        }
 
-    if (!argument_generatorpixeltype.empty())
+        if (!argument_generatorpixeltype.empty())
+        {
+            const bool b = TryParseGeneratorPixeltype(argument_generatorpixeltype, &this->pixelTypeForBitmapGenerator);
+            ThrowIfFalse(b, "'--generatorpixeltype", argument_generatorpixeltype);
+        }
+    }
+    catch (runtime_error& exception)
     {
-        const bool b = TryParseGeneratorPixeltype(argument_generatorpixeltype, &this->pixelTypeForBitmapGenerator);
+        this->GetLog()->WriteLineStdErr(exception.what());
+        return ParseResult::Error;
     }
 
     return this->CheckArgumentConsistency() ? ParseResult::OK : ParseResult::Error;
+}
+
+/*static*/void CCmdLineOptions::ThrowIfFalse(bool b, const std::string& argument_switch, const std::string& argument)
+{
+    if (!b)
+    {
+        ostringstream string_stream;
+        string_stream << "Error parsing argument for '" << argument_switch << "' -> \"" << argument << "\".";
+        throw runtime_error(string_stream.str());
+    }
 }
 
 bool CCmdLineOptions::CheckArgumentConsistency() const
