@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2017-2022 Carl Zeiss Microscopy GmbH
+#
+# SPDX-License-Identifier: LGPL-3.0-or-later
+
 IF(UNIX)
  find_package(ZLIB QUIET)
  if (NOT ZLIB_FOUND)
