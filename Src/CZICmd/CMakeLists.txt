@@ -22,6 +22,8 @@ IF(UNIX)
  ENDIF()
 ENDIF(UNIX)
 
+find_package(RapidJSON)
+
 include(FetchContent)
 
 # make "CLI11" available
@@ -31,18 +33,6 @@ FetchContent_Declare(
   GIT_TAG        v2.2.0
 )
 FetchContent_MakeAvailable(cli11)
-
-
-# make ""RapidJSON" available
-FetchContent_Declare(
-  rapidjson
-  GIT_REPOSITORY "https://github.com/Tencent/rapidjson.git"
-  GIT_TAG        v1.1.0
-)
-set(RAPIDJSON_BUILD_TESTS OFF)
-set(RAPIDJSON_BUILD_DOC OFF)
-set(RAPIDJSON_BUILD_EXAMPLES OFF)
-FetchContent_MakeAvailable(rapidjson)
 
 set (CZICMDSRCFILES
          BitmapGen.cpp          

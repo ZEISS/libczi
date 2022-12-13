@@ -76,7 +76,7 @@ message("check for open -> ${HAVE_FCNTL_H_OPEN_TEXT} ; check for pread -> ${HAVE
 # Google-Test-framework which is downloaded from GitHub during the CMake-run.
 option(LIBCZI_BUILD_UNITTESTS "Build the gTest-based unit-tests" ON)
 
-option(LIBCZI_BUILD_CZICMD "Build application 'CZICmd'." ON)
+option(LIBCZI_BUILD_CZICMD "Build application 'CZICmd'." OFF)
 
 option(LIBCZI_BUILD_DYNLIB "Build dynamic library 'libCZI'." ON)
 
