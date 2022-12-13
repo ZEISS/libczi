@@ -21,18 +21,19 @@ jobs:
     steps:
     - uses: actions/checkout@v3
 
-     - name: Install dependencies
-       shell: bash
-       run: |
-          if [ "$RUNNER_OS" == "Windows" ]; then
-           vcpkg install --triplet windows:x64 rapidjson
-          else
-           if [ "$RUNNER_OS" == "Linux" ]; then
-            sudo apt-get install zlib1g-dev -y
-            sudo apt-get install libpng-dev -y
-            sudo apt-get install libfreetype6-dev -y
-            sudo apt-get install rapidjson-dev -y
+    - name: Install dependencies
+      shell: bash
+      run: |
+         if [ "$RUNNER_OS" == "Windows" ]; then
+          vcpkg install --triplet windows:x64 rapidjson
+         else
+          if [ "$RUNNER_OS" == "Linux" ]; then
+           sudo apt-get install zlib1g-dev -y
+           sudo apt-get install libpng-dev -y
+           sudo apt-get install libfreetype6-dev -y
+           sudo apt-get install rapidjson-dev -y
           fi
+        fi
   
     - name: Configure CMake
       # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
