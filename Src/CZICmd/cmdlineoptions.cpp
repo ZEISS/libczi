@@ -1084,9 +1084,12 @@ static std::vector<std::tuple<double, double>> ParseSplintPoints(const rapidjson
         double d1 = it->GetDouble();
         ++it;
         if (it == v.End())
+        {
             break;
+        }
+
         double d2 = it->GetDouble();
-        result.push_back(make_tuple(d1, d2));
+        result.emplace_back(d1, d2);
     }
 
     return result;
@@ -1103,7 +1106,7 @@ static std::tuple<int, ChannelDisplaySettings> GetChannelInfo(const rapidjson::V
     ChannelDisplaySettings chInfo; chInfo.Clear();
     if (v.HasMember("black-point"))
     {
-        chInfo.blackPoint = (float)v["black-point"].GetDouble();
+        chInfo.blackPoint = static_cast<float>(v["black-point"].GetDouble());
     }
     else
     {
@@ -1112,7 +1115,7 @@ static std::tuple<int, ChannelDisplaySettings> GetChannelInfo(const rapidjson::V
 
     if (v.HasMember("white-point"))
     {
-        chInfo.whitePoint = (float)v["white-point"].GetDouble();
+        chInfo.whitePoint = static_cast<float>(v["white-point"].GetDouble());
     }
     else
     {
@@ -1121,7 +1124,7 @@ static std::tuple<int, ChannelDisplaySettings> GetChannelInfo(const rapidjson::V
 
     if (v.HasMember("weight"))
     {
-        chInfo.weight = (float)v["weight"].GetDouble();
+        chInfo.weight = static_cast<float>(v["weight"].GetDouble());
     }
     else
     {
@@ -1169,7 +1172,7 @@ static std::tuple<int, ChannelDisplaySettings> GetChannelInfo(const rapidjson::V
 
     if (v.HasMember("gamma"))
     {
-        chInfo.gamma = (float)v["gamma"].GetDouble();
+        chInfo.gamma = static_cast<float>(v["gamma"].GetDouble());
     }
 
     if (!chInfo.IsGammaValid())

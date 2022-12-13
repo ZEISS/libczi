@@ -50,7 +50,7 @@ public:
 		auto gdiplusPxlFmt = this->bitmap->GetPixelFormat();
 		libCZI::BitmapLockInfo bitmapLockInfo;
 		Rect rect(0, 0, (INT)this->bitmap->GetWidth(), (INT)this->bitmap->GetHeight());
-		this->bitmap->LockBits(&rect, ImageLockModeRead, gdiplusPxlFmt/*PixelFormat24bppRGB*/, &this->bd);
+		this->bitmap->LockBits(&rect, ImageLockModeRead, gdiplusPxlFmt, &this->bd);
 		bitmapLockInfo.ptrData = this->bd.Scan0;
 		bitmapLockInfo.ptrDataRoi = this->bd.Scan0;
 		bitmapLockInfo.stride = this->bd.Stride;
