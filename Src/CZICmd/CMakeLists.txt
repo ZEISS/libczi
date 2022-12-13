@@ -26,7 +26,7 @@ IF(UNIX)
  ENDIF()
 ENDIF(UNIX)
 
-find_package(RapidJSON CONFIG REQUIRED)
+find_package(RapidJSON REQUIRED)
 
 include(FetchContent)
 
@@ -74,8 +74,8 @@ add_executable(CZIcmd ${CZICMDSRCFILES})
 set_target_properties(CZIcmd PROPERTIES CXX_STANDARD 11)
 target_compile_definitions(CZIcmd PRIVATE _LIBCZISTATICLIB)
 
-target_link_libraries(CZIcmd PRIVATE libCZIStatic ${ZLIB_LIBRARIES}  ${PNG_LIBRARIES} CLI11::CLI11 rapidjson)
-target_include_directories(CZIcmd PRIVATE ${ZLIB_INCLUDE_DIR} ${PNG_INCLUDE_DIR} ${CMAKE_CURRENT_BINARY_DIR})
+target_link_libraries(CZIcmd PRIVATE libCZIStatic ${ZLIB_LIBRARIES}  ${PNG_LIBRARIES} CLI11::CLI11)
+target_include_directories(CZIcmd PRIVATE ${ZLIB_INCLUDE_DIR} ${PNG_INCLUDE_DIR} ${CMAKE_CURRENT_BINARY_DIR} "${RAPIDJSON_INCLUDE_DIRS}")
 
 IF (FREETYPE_FOUND)
     target_compile_definitions(CZIcmd PRIVATE _USE_FREETYPE)
