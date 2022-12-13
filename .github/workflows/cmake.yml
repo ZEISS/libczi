@@ -26,7 +26,7 @@ jobs:
       shell: bash
       run: |
          if [ "$RUNNER_OS" == "Windows" ]; then
-          vcpkg install --triplet windows:x64 rapidjson
+          vcpkg install --triplet x64-windows rapidjson
          else
           if [ "$RUNNER_OS" == "Linux" ]; then
            sudo apt-get install zlib1g-dev -y
@@ -37,9 +37,15 @@ jobs:
          fi
   
     - name: Configure CMake
+      shell: bash
       # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
       # See https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type
-      run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{matrix.build}} -DLIBCZI_BUILD_CZICMD=ON
+      run: |
+        if [ "$RUNNER_OS" == "Windows" ]; then
+         cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{matrix.build}} -DLIBCZI_BUILD_CZICMD=ON -DCMAKE_TOOLCHAIN_FILE=C:/vcpkg/scripts/buildsystems/vcpkg.cmake
+        else
+         cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{matrix.build}} -DLIBCZI_BUILD_CZICMD=ON
+        fi
 
     - name: Build
       # Build your program with the given configuration
