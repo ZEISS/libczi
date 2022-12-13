@@ -28,12 +28,6 @@ using namespace std;
 /*static*/const char* ItemValue::SelectionItem_Name = "name";
 /*static*/const char* ItemValue::SelectionItem_Index = "index";
 
-CCmdLineOptions::CCmdLineOptions(std::shared_ptr<ILog> log)
-    : log(std::move(log))
-{
-    this->Clear();
-}
-
 /// CLI11-validator for the option "--plane-coordinate".
 struct PlaneCoordinateValidator : public CLI::Validator
 {
@@ -481,6 +475,12 @@ public:
         return options_description;
     }
 };
+
+CCmdLineOptions::CCmdLineOptions(std::shared_ptr<ILog> log)
+    : log(std::move(log))
+{
+    this->Clear();
+}
 
 CCmdLineOptions::ParseResult CCmdLineOptions::Parse(int argc, char** argv)
 {
@@ -1363,7 +1363,7 @@ bool CCmdLineOptions::TryParseDisplaySettings(const std::string& s, std::map<int
         f[i] = strtof(pointer, &endPtr);
 
         const char* endPtrSkipped = skipWhiteSpaceAndOneOfThese(endPtr, ";,|");
-        if (*endPtrSkipped == L'\0')
+        if (*endPtrSkipped == '\0')
         {
             if (i == 1)
             {
@@ -1400,14 +1400,14 @@ bool CCmdLineOptions::TryParseDisplaySettings(const std::string& s, std::map<int
 
 /*static*/bool CCmdLineOptions::TryParsePyramidInfo(const std::string& s, int* pyramidMinificationFactor, int* pyramidLayerNo)
 {
-    size_t position_of_delimiter = s.find_first_of(";,|");
+    const size_t position_of_delimiter = s.find_first_of(";,|");
     if (position_of_delimiter == string::npos)
     {
         return false;
     }
 
-    string minification_factor_string = s.substr(0, position_of_delimiter);
-    string pyramid_layer_no_string = s.substr(1 + position_of_delimiter);
+    const string minification_factor_string = s.substr(0, position_of_delimiter);
+    const string pyramid_layer_no_string = s.substr(1 + position_of_delimiter);
 
     int minificationFactor, layerNo;
     if (!TryParseInt32(minification_factor_string, &minificationFactor) ||
@@ -1521,7 +1521,7 @@ std::shared_ptr<libCZI::IIndexSet> CCmdLineOptions::GetSceneIndexSet() const
 
 /*static*/bool CCmdLineOptions::TryParseChannelCompositionFormat(const std::string& s, libCZI::PixelType* channel_composition_format, std::uint8_t* channel_composition_alpha_value)
 {
-    auto arg = trim(s);
+    const auto arg = trim(s);
     if (icasecmp(arg, "bgr24"))
     {
         if (channel_composition_format != nullptr)
@@ -1549,7 +1549,7 @@ std::shared_ptr<libCZI::IIndexSet> CCmdLineOptions::GetSceneIndexSet() const
     libCZI::PixelType pixel_type;
     uint8_t alpha;
 
-    if (!TryParseChannelCompositionFormatWithAlphaValue(convertUtf8ToUCS2(arg), pixel_type, alpha))
+    if (!TryParseChannelCompositionFormatWithAlphaValue(arg, pixel_type, alpha))
     {
         return false;
     }
@@ -1567,20 +1567,20 @@ std::shared_ptr<libCZI::IIndexSet> CCmdLineOptions::GetSceneIndexSet() const
     return true;
 }
 
-/*static*/bool CCmdLineOptions::TryParseChannelCompositionFormatWithAlphaValue(const std::wstring& s, libCZI::PixelType& channelCompositePixelType, std::uint8_t& channelCompositeAlphaValue)
+/*static*/bool CCmdLineOptions::TryParseChannelCompositionFormatWithAlphaValue(const std::string& s, libCZI::PixelType& channelCompositePixelType, std::uint8_t& channelCompositeAlphaValue)
 {
-    std::wregex regex(LR"_(bgra32\((\d+|0x[\d|a-f|A-F]+)\))_", regex_constants::ECMAScript | regex_constants::icase);
-    std::wsmatch pieces_match;
+    std::regex regex(R"_(bgra32\((\d+|0x[\d|a-f|A-F]+)\))_", regex_constants::ECMAScript | regex_constants::icase);
+    std::smatch pieces_match;
     if (std::regex_match(s, pieces_match, regex))
     {
         if (pieces_match.size() == 2)
         {
-            std::wssub_match sub_match = pieces_match[1];
+            std::ssub_match sub_match = pieces_match[1];
             if (sub_match.length() > 2)
             {
-                if (sub_match.str()[0] == L'0' && (sub_match.str()[1] == L'x' || sub_match.str()[0] == L'X'))
+                if (sub_match.str()[0] == '0' && (sub_match.str()[1] == 'x' || sub_match.str()[0] == 'X'))
                 {
-                    auto hexStr = convertToUtf8(sub_match);
+                    auto hexStr = string{ sub_match };
                     std::uint32_t value;
                     if (!ConvertHexStringToInteger(hexStr.c_str() + 2, &value) || value > 0xff)
                     {

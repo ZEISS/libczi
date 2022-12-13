@@ -2,6 +2,7 @@
 //
 // SPDX-License-Identifier: LGPL-3.0-or-later
 
+#if false
 #include "stdafx.h"
 #include "executeReadWriteCzi.h"
 #include "IBitmapGen.h"
@@ -164,3 +165,4 @@ bool executeReadWriteCzi_(const CCmdLineOptions& options)
 
 	return true;
 }
+#endif

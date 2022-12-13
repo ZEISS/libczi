@@ -199,6 +199,15 @@ public:
 
 	explicit CCmdLineOptions(std::shared_ptr<ILog> log);
 
+    /// Parses the command line arguments. The arguments are expected to be given in UTF8-encoding.
+    /// This method handles some operations like "printing the help text" internally, and in such 
+    /// cases (where the is no additional operation to take place), the value 'ParseResult::Exit'
+    /// is returned.
+    ///
+    /// \param          argc    The number of arguments.
+    /// \param [in]		argv    An array containing the arguments.
+    ///
+    /// \returns    An enum indicating the result.
 	ParseResult Parse(int argc, char** argv);
 	void Clear();
 
@@ -287,7 +296,7 @@ private:
 	static bool TryParseSelection(const std::string& s, std::map<std::string, ItemValue>* key_value);
 	static bool TryParseTileFilter(const std::string& s, std::shared_ptr<libCZI::IIndexSet>* scene_index_set);
 	static bool TryParseChannelCompositionFormat(const std::string& s, libCZI::PixelType* channel_composition_format, std::uint8_t* channel_composition_alpha_value);
-	static bool TryParseChannelCompositionFormatWithAlphaValue(const std::wstring& s, libCZI::PixelType& channelCompositePixelType, std::uint8_t& channelCompositeAlphaValue);
+	static bool TryParseChannelCompositionFormatWithAlphaValue(const std::string& s, libCZI::PixelType& channelCompositePixelType, std::uint8_t& channelCompositeAlphaValue);
 	static bool TryParseCreateBounds(const std::string& s, libCZI::CDimBounds* create_bounds);
 	static bool TryParseCreateSize(const std::string& s, std::tuple<std::uint32_t, std::uint32_t>* size);
 	static bool TryParseCreateTileInfo(const std::string& s, CreateTileInfo* create_tile_info);

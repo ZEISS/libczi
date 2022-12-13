@@ -68,7 +68,6 @@ int main(int argc, char** _argv)
 #endif
 #if defined(LINUXENV)
 		setlocale(LC_CTYPE, "");
-		char** argv = _argv;
 #endif
 
 		int retVal = 0;
@@ -79,7 +78,7 @@ int main(int argc, char** _argv)
 #if defined(WIN32ENV)
 				auto cmdLineParseResult = options.Parse(args_helper.GetArgc(), args_helper.GetArgv());
 #else
-				auto cmdLineParseResult = options.Parse(argc, argv);
+				auto cmdLineParseResult = options.Parse(argc, _argv);
 #endif
 				if (cmdLineParseResult == CCmdLineOptions::ParseResult::OK)
 				{
