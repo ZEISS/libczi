@@ -75,7 +75,7 @@ set_target_properties(CZIcmd PROPERTIES CXX_STANDARD 11)
 target_compile_definitions(CZIcmd PRIVATE _LIBCZISTATICLIB)
 
 target_link_libraries(CZIcmd PRIVATE libCZIStatic ${ZLIB_LIBRARIES}  ${PNG_LIBRARIES} CLI11::CLI11)
-target_include_directories(CZIcmd PRIVATE ${ZLIB_INCLUDE_DIR} ${PNG_INCLUDE_DIR} ${CMAKE_CURRENT_BINARY_DIR} "${RAPIDJSON_INCLUDE_DIRS}")
+target_include_directories(CZIcmd PRIVATE ${CMAKE_CURRENT_BINARY_DIR} "${RAPIDJSON_INCLUDE_DIRS}")
 
 IF (FREETYPE_FOUND)
     target_compile_definitions(CZIcmd PRIVATE _USE_FREETYPE)
@@ -84,6 +84,7 @@ IF (FREETYPE_FOUND)
 ENDIF()
 
 IF(UNIX)
+  target_include_directories(CZIcmd PRIVATE ${ZLIB_INCLUDE_DIR} ${PNG_INCLUDE_DIR})
   # seems to be problem with glibc I'd reckon -> https://stackoverflow.com/questions/51584960/stdcall-once-throws-stdsystem-error-unknown-error-1
   target_link_libraries(CZIcmd  PUBLIC pthread)
 ENDIF(UNIX)
