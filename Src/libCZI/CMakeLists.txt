@@ -218,7 +218,7 @@ FetchContent_Declare(
 if(NOT zstd_POPULATED)
 	message(STATUS "Fetching zstd...")
 	set(ZSTD_BUILD_PROGRAMS  OFF CACHE BOOL "" FORCE)
-        set(ZSTD_BUILD_SHARED    OFF CACHE BOOL "" FORCE)
+  set(ZSTD_BUILD_SHARED    OFF CACHE BOOL "" FORCE)
 
 	FetchContent_Populate(zstd)
 
@@ -240,7 +240,7 @@ set(libCZIPublicHeaders "ImportExport.h" "libCZI.h" "libCZI_Compositor.h" "libCZ
 #define the shared libCZI - library
 #
 if (LIBCZI_BUILD_DYNLIB)
-	add_library(libCZI SHARED ${LIBCZISRCFILES} ${LIBCZISRCEIGENFILES}  $<TARGET_OBJECTS:JxrDecodeStatic>)
+	add_library(libCZI SHARED ${LIBCZISRCFILES} $<TARGET_OBJECTS:JxrDecodeStatic>)
 	target_link_libraries(libCZI PRIVATE libzstd_static)
 	set_target_properties(libCZI PROPERTIES CXX_STANDARD 11 CXX_STANDARD_REQUIRED YES) # https://crascit.com/2015/03/28/enabling-cxx11-in-cmake/
 	SET_TARGET_PROPERTIES (libCZI PROPERTIES DEFINE_SYMBOL  "LIBCZI_EXPORTS" )
@@ -261,7 +261,7 @@ endif(LIBCZI_BUILD_DYNLIB)
 #define the static libCZI - library
 #
 # Notes: -we use JxrDecode as an "object-library" in order have it "embedded" into libCZI.a
-add_library(libCZIStatic STATIC ${LIBCZISRCFILES} ${LIBCZISRCEIGENFILES} $<TARGET_OBJECTS:JxrDecodeStatic>)
+add_library(libCZIStatic STATIC ${LIBCZISRCFILES} $<TARGET_OBJECTS:JxrDecodeStatic>)
 target_link_libraries(libCZIStatic PRIVATE libzstd_static)
 set_target_properties(libCZIStatic PROPERTIES CXX_STANDARD 11)
 target_compile_definitions(libCZIStatic PRIVATE _LIBCZISTATICLIB)
