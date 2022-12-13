@@ -6,7 +6,6 @@
 #include <limits>
 #include "execute.h"
 #include "executeCreateCzi.h"
-#include "executeReadWriteCzi.h"
 #include "inc_libCZI.h"
 #include "SaveBitmap.h"
 #include "utils.h"
@@ -1191,9 +1190,6 @@ bool execute(const CCmdLineOptions& options)
 		case Command::CreateCZI:
 			success = executeCreateCzi(options);
 			break;
-		//case Command::ReadWriteCZI:
-		//	success = executeReadWriteCzi(options);
-		//	break;
 		default:
 			break;
 		}

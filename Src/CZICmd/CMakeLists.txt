@@ -34,12 +34,10 @@ FetchContent_MakeAvailable(cli11)
 set (CZICMDSRCFILES
          BitmapGen.cpp          
          DisplaySettingsHelper.h  
-         getOpt.cpp           
          targetver.h
          BitmapGenFreeType.cpp  
          cmdlineoptions.cpp  
          execute.cpp              
-         getOpt.h             
          SaveBitmap.cpp  
          utils.cpp
          BitmapGenFreeType.h    
@@ -59,11 +57,9 @@ set (CZICMDSRCFILES
          inc_libCZI.h         
          stdafx.h
          BitmapGenNull.cpp      
-         executeReadWriteCzi.cpp  
          inc_rapidjson.h      
          BitmapGenNull.h        
          CZIcmd.cpp          
-         executeReadWriteCzi.h    
          platform_defines.h)
 file(GLOB_RECURSE CZICMDRAPIDJSONSRCFILES "*.h" "*.cpp" "*.hpp")
 

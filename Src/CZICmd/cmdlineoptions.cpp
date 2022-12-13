@@ -4,7 +4,6 @@
 
 #include "stdafx.h"
 #include "cmdlineoptions.h"
-#include "getOpt.h"
 
 #include <clocale>
 #include <locale>
