@@ -618,7 +618,7 @@ CCmdLineOptions::ParseResult CCmdLineOptions::Parse(int argc, char** argv)
         "the second the pyramid-layer (starting with 0 for the layer with the highest resolution).")
         ->option_text("PYRAMIDINFO")
         ->check(pyramidinfo_validator);
-    cli_app.add_option("-z,--zoom", argument_zoom,
+     cli_app.add_option("-z,--zoom", argument_zoom,
         "The zoom-factor (which is used for the commands 'SingleChannelScalingTileAccessor' and 'ScalingChannelComposite'). "
         "It is a float between 0 and 1.")
         ->option_text("ZOOM")
@@ -731,7 +731,7 @@ CCmdLineOptions::ParseResult CCmdLineOptions::Parse(int argc, char** argv)
 
         if (!argument_output_filename.empty())
         {
-            this->SetOutputFilename(argument_output_filename);
+            this->SetOutputFilename(convertUtf8ToUCS2(argument_output_filename));
         }
 
         if (!argument_plane_coordinate.empty())
@@ -742,85 +742,86 @@ CCmdLineOptions::ParseResult CCmdLineOptions::Parse(int argc, char** argv)
         if (!argument_rect.empty())
         {
             const bool b = TryParseRect(argument_rect, &this->rectModeAbsoluteOrRelative, &this->rectX, &this->rectY, &this->rectW, &this->rectH);
-            ThrowIfFalse(b, "'--rect", argument_rect);
+            ThrowIfFalse(b, "-r,--rect", argument_rect);
         }
 
         if (!argument_display_settings.empty())
         {
             const bool b = TryParseDisplaySettings(argument_display_settings, &this->multiChannelCompositeChannelInfos);
-            ThrowIfFalse(b, "'--display-settings", argument_display_settings);
+            ThrowIfFalse(b, "-d,--display-settings", argument_display_settings);
             this->useDisplaySettingsFromDocument = false;
         }
 
         if (!argument_jpgxrcodec.empty())
         {
             const bool b = TryParseJxrCodecUseWicCodec(argument_jpgxrcodec, &this->useWicJxrDecoder);
-            ThrowIfFalse(b, "'--jpgxrcodec", argument_jpgxrcodec);
+            ThrowIfFalse(b, "-j,--jpgxrcodec", argument_jpgxrcodec);
         }
 
         if (!argument_verbosity.empty())
         {
             const bool b = TryParseVerbosityLevel(argument_verbosity, &this->enabledOutputLevels);
-            ThrowIfFalse(b, "'--verbosity", argument_verbosity);
+            ThrowIfFalse(b, "-v,--verbosity", argument_verbosity);
         }
 
         if (!argument_backgroundcolor.empty())
         {
             const bool b = TryParseParseBackgroundColor(argument_backgroundcolor, &this->backGroundColor);
-            ThrowIfFalse(b, "'--background", argument_backgroundcolor);
+            ThrowIfFalse(b, "-b,--background", argument_backgroundcolor);
         }
 
         if (!argument_pyramidinfo.empty())
         {
             const bool b = TryParsePyramidInfo(argument_pyramidinfo, &this->pyramidMinificationFactor, &this->pyramidLayerNo);
-            ThrowIfFalse(b, "'--pyramidinfo", argument_pyramidinfo);
+            ThrowIfFalse(b, "-y,--pyramidinfo", argument_pyramidinfo);
         }
 
         if (!argument_zoom.empty())
         {
-            this->ParseZoom(argument_zoom);
+            const bool b = TryParseZoom(argument_zoom, &this->zoom);
+            ThrowIfFalse(b, "-z,--zoom", argument_pyramidinfo);
         }
 
         if (!argument_info_level.empty())
         {
             const bool b = TryParseInfoLevel(argument_info_level, &this->infoLevel);
-            ThrowIfFalse(b, "'--info-level", argument_info_level);
+            ThrowIfFalse(b, "-i,--info-level", argument_info_level);
         }
 
         if (!argument_selection.empty())
         {
             const bool b = TryParseSelection(argument_selection, &this->mapSelection);
-            ThrowIfFalse(b, "'--selection", argument_selection);
+            ThrowIfFalse(b, "-e,--selection", argument_selection);
         }
 
         if (!argument_tile_filter.empty())
         {
             const bool b = TryParseTileFilter(argument_tile_filter, &this->sceneIndexSet);
-            ThrowIfFalse(b, "'--tile-filter", argument_tile_filter);
+            ThrowIfFalse(b, "-f,--tile-filter", argument_tile_filter);
         }
 
         if (!argument_channelcompositionformat.empty())
         {
             const bool b = TryParseChannelCompositionFormat(argument_channelcompositionformat, &this->channelCompositePixelType, &this->channelCompositeAlphaValue);
-            ThrowIfFalse(b, "'--channelcompositionformat", argument_channelcompositionformat);
+            ThrowIfFalse(b, "-m,--channelcompositionformat", argument_channelcompositionformat);
         }
 
         if (!arguments_createbounds.empty())
         {
             const bool b = TryParseCreateBounds(arguments_createbounds, &this->createBounds);
-            ThrowIfFalse(b, "'--createbounds", arguments_createbounds);
+            ThrowIfFalse(b, "--createbounds", arguments_createbounds);
         }
 
         if (!arguments_createsubblocksize.empty())
         {
             const bool b = TryParseCreateSize(arguments_createsubblocksize, &this->createSize);
-            ThrowIfFalse(b, "'--createsubblocksize", arguments_createsubblocksize);
+            ThrowIfFalse(b, "--createsubblocksize", arguments_createsubblocksize);
         }
 
         if (!argument_createtileinfo.empty())
         {
             const bool b = TryParseCreateTileInfo(argument_createtileinfo, &this->createTileInfo);
-            ThrowIfFalse(b, "'--createtileinfo", argument_createtileinfo);
+            ThrowIfFalse(b, "--createtileinfo", argument_createtileinfo);
         }
 
         if (!argument_truetypefontname.empty())
@@ -830,27 +831,27 @@ CCmdLineOptions::ParseResult CCmdLineOptions::Parse(int argc, char** argv)
 
         if (!argument_fontheight.empty())
         {
-            const bool b = TryParseInt32(argument_fontheight, &this->fontHeight);
-            ThrowIfFalse(b, "'--fontheight", argument_fontheight);
+            const bool b = TryParseFontHeight(argument_fontheight, &this->fontHeight);
+            ThrowIfFalse(b, "--fontheight", argument_fontheight);
         }
 
         if (!argument_guidofczi.empty())
         {
             const bool b = TryParseNewCziFileguid(argument_guidofczi, &this->newCziFileGuid);
-            ThrowIfFalse(b, "'--guidofczi", argument_guidofczi);
+            ThrowIfFalse(b, "--guidofczi", argument_guidofczi);
             this->newCziFileGuidValid = true;
         }
 
         if (!argument_bitmapgenerator.empty())
         {
             const bool b = TryParseBitmapGenerator(argument_bitmapgenerator, &this->bitmapGeneratorClassName);
-            ThrowIfFalse(b, "'--bitmapgenerator", argument_bitmapgenerator);
+            ThrowIfFalse(b, "--bitmapgenerator", argument_bitmapgenerator);
         }
 
         if (!argument_createczisubblockmetadata.empty())
         {
             const bool b = TryParseSubBlockMetadataKeyValue(argument_createczisubblockmetadata, &this->sbBlkMetadataKeyValue);
-            ThrowIfFalse(b, "'--createczisbblkmetadata", argument_createczisubblockmetadata);
+            ThrowIfFalse(b, "--createczisbblkmetadata", argument_createczisubblockmetadata);
             this->sbBlkMetadataKeyValueValid = true;
         }
 
@@ -858,7 +859,7 @@ CCmdLineOptions::ParseResult CCmdLineOptions::Parse(int argc, char** argv)
         {
             libCZI::Utils::CompressionOption compression_options;
             const bool b = TryParseCompressionOptions(argument_compressionoptions, &compression_options);
-            ThrowIfFalse(b, "'--compressionopts", argument_compressionoptions);
+            ThrowIfFalse(b, "--compressionopts", argument_compressionoptions);
             this->compressionMode = compression_options.first;
             this->compressionParameters = compression_options.second;
         }
@@ -866,7 +867,7 @@ CCmdLineOptions::ParseResult CCmdLineOptions::Parse(int argc, char** argv)
         if (!argument_generatorpixeltype.empty())
         {
             const bool b = TryParseGeneratorPixeltype(argument_generatorpixeltype, &this->pixelTypeForBitmapGenerator);
-            ThrowIfFalse(b, "'--generatorpixeltype", argument_generatorpixeltype);
+            ThrowIfFalse(b, "--generatorpixeltype", argument_generatorpixeltype);
         }
     }
     catch (runtime_error& exception)
@@ -1465,11 +1466,22 @@ bool CCmdLineOptions::TryParseDisplaySettings(const std::string& s, std::map<int
     return true;
 }
 
-void CCmdLineOptions::ParseZoom(const wchar_t* sz)
+/*static*/bool CCmdLineOptions::TryParseZoom(const std::string& s, float* zoom)
 {
-    // TODO: error handling
-    float zoom = stof(sz);
-    this->zoom = zoom;
+    try
+    {
+        float zoom_value = stof(s);
+        if (zoom != nullptr)
+        {
+            *zoom = zoom_value;
+        }
+
+        return true;
+    }
+    catch (exception&)
+    {
+        return false;
+    }
 }
 
 /*static*/bool CCmdLineOptions::TryParseSelection(const std::string& s, std::map<std::string, ItemValue>* key_value)
@@ -1786,9 +1798,9 @@ std::shared_ptr<libCZI::IIndexSet> CCmdLineOptions::GetSceneIndexSet() const
 }
 
 
-void CCmdLineOptions::ParseFontHeight(const std::wstring& s)
+/*static*/bool CCmdLineOptions::TryParseFontHeight(const std::string& s, int* font_height)
 {
-    this->fontHeight = stoul(s);
+    return CCmdLineOptions::TryParseInt32(s, font_height);
 }
 
 /*static*/bool CCmdLineOptions::TryParseNewCziFileguid(const std::string& s, GUID* guid)

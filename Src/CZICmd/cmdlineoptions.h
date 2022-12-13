@@ -122,7 +122,7 @@ struct ItemValue
 
 	bool TryGetNumber(double* p) const { if (this->IsNumber()) { if (p != nullptr) { *p = this->doubleValue; } return true; } return false; }
 	bool TryGetString(std::string* p) const { if (this->IsString()) { if (p != nullptr) { *p = this->strValue; } return true; } return false; }
-	bool TryGetBoolean(std::string* p) const { if (this->IsBoolean()) { if (p != nullptr) { *p = this->boolValue; } return true; } return false; }
+	bool TryGetBoolean(bool* p) const { if (this->IsBoolean()) { if (p != nullptr) { *p = this->boolValue; } return true; } return false; }
 };
 
 struct CreateTileInfo
@@ -274,24 +274,19 @@ private:
 	friend struct GeneratorPixelTypeValidator;
 
 	bool CheckArgumentConsistency() const;
-	void SetOutputFilename(const std::string& s) { auto sucs2 = convertUtf8ToUCS2(s); this->SetOutputFilename(sucs2); }
 	void SetOutputFilename(const std::wstring& s);
+
+	void PrintHelpBuildInfo();
+	void PrintHelpBitmapGenerator();
 
 	static bool TryParseInt32(const std::string& str, int* value);
 	static bool TryParseRect(const std::string& str, bool* absolute_mode, int* x_position, int* y_position, int* width, int* height);
 	static bool TryParseDisplaySettings(const std::string& s, std::map<int, ChannelDisplaySettings>* multiChannelCompositeChannelInfos);
 	static bool TryParseVerbosityLevel(const std::string& s, std::uint32_t* levels);
 	static bool TryParseJxrCodecUseWicCodec(const std::string& s, bool* use_wic_codec);
-
-	void PrintHelpBuildInfo();
-	void PrintHelpBitmapGenerator();
-
 	static bool TryParseParseBackgroundColor(const std::string& s, libCZI::RgbFloatColor* color);
 	static bool TryParsePyramidInfo(const std::string& s, int* pyramidMinificationFactor, int* pyramidLayerNo);
-
-	void ParseZoom(const wchar_t* sz);
-	void ParseZoom(const std::string& s) { auto sucs2 = convertUtf8ToUCS2(s); this->ParseZoom(sucs2.c_str()); }
-
+	static bool TryParseZoom(const std::string& s, float* zoom);
 	static bool TryParseInfoLevel(const std::string& s, InfoLevel* info_level);
 	static bool TryParseSelection(const std::string& s, std::map<std::string, ItemValue>* key_value);
 	static bool TryParseTileFilter(const std::string& s, std::shared_ptr<libCZI::IIndexSet>* scene_index_set);
@@ -300,15 +295,12 @@ private:
 	static bool TryParseCreateBounds(const std::string& s, libCZI::CDimBounds* create_bounds);
 	static bool TryParseCreateSize(const std::string& s, std::tuple<std::uint32_t, std::uint32_t>* size);
 	static bool TryParseCreateTileInfo(const std::string& s, CreateTileInfo* create_tile_info);
-
-	void ParseFontHeight(const std::wstring& s);
-	void ParseFontHeight(const std::string& s) { auto sucs2 = convertUtf8ToUCS2(s); this->ParseFontHeight(sucs2); }
-
+	static bool TryParseFontHeight(const std::string& s, int* font_height);
 	static bool TryParseNewCziFileguid(const std::string& s, GUID* guid);
 	static bool TryParseBitmapGenerator(const std::string& s, std::string* generator_class_name);
 	static bool TryParseSubBlockMetadataKeyValue(const std::string& s,std::map<std::string, std::string>* subblock_metadata_property_bag);
 	static bool TryParseCompressionOptions(const std::string& s, libCZI::Utils::CompressionOption* compression_option);
 	static bool TryParseGeneratorPixeltype(const std::string& s, libCZI::PixelType* pixel_type);
 
-	/*static*/void ThrowIfFalse(bool b, const std::string& argument_switch, const std::string& argument);
+	static void ThrowIfFalse(bool b, const std::string& argument_switch, const std::string& argument);
 };
