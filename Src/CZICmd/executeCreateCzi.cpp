@@ -342,8 +342,8 @@ private:
     }
 
     m = cnt;
-    x = c * get<0>(size) - lrint(c * get<0>(size) * tileInfo.overlap);
-    y = r * get<1>(size) - lrint(r * get<1>(size) * tileInfo.overlap);
+    x = c * get<0>(size) - static_cast<uint32_t>(lrint(c * get<0>(size) * tileInfo.overlap));
+    y = r * get<1>(size) - static_cast<uint32_t>(lrint(r * get<1>(size) * tileInfo.overlap));
     return true;
 }
 

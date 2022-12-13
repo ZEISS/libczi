@@ -21,13 +21,13 @@ CNullBitmapWrapper::CNullBitmapWrapper(libCZI::PixelType pixeltype, std::uint32_
     }
 
     this->stride = width * bytesPerPel;
-    size_t s = this->stride * height;
+    size_t s = static_cast<size_t>(this->stride) * height;
     this->ptrData = malloc(s);
 }
 
 void CNullBitmapWrapper::Clear()
 {
-    memset(this->ptrData, 0, this->stride * height);
+    memset(this->ptrData, 0, static_cast<size_t>(this->stride) * height);
 }
 
 void CNullBitmapWrapper::Clear(const ColorSpecification& color)
@@ -104,7 +104,7 @@ void CNullBitmapWrapper::Clear(const ColorSpecification& color)
     bitmapLockInfo.ptrData = this->ptrData;
     bitmapLockInfo.ptrDataRoi = this->ptrData;
     bitmapLockInfo.stride = this->stride;
-    bitmapLockInfo.size = this->stride * this->height;
+    bitmapLockInfo.size = static_cast<uint64_t>(this->stride) * this->height;
     return bitmapLockInfo;
 }
 
