@@ -721,6 +721,7 @@ CCmdLineOptions::ParseResult CCmdLineOptions::Parse(int argc, char** argv)
 
     this->calcHashOfResult = argument_calc_hash;
     this->drawTileBoundaries = argument_drawtileboundaries;
+    this->command = argument_command;
 
     try
     {
