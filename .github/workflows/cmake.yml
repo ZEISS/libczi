@@ -19,12 +19,40 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     steps:
-    - uses: actions/checkout@v3
+    - name: Checkout
+      uses: actions/checkout@v3
 
-    - name: Configure CMake
-      # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
-      # See https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type
-      run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{matrix.build}}
+    - name: Install dependencies (Windows)
+      if: ${{ (matrix.OS == 'windows-latest') }}     
+      # on Windows, we rely on vcpkg to pull in dependencies
+      shell: bash
+      run: |
+        vcpkg install --triplet x64-windows rapidjson
+
+    - name: Install dependencies (Linux)
+      if: ${{ (matrix.OS == 'ubuntu-latest') }}
+      # on Linux, we use apt to get our dependencies
+      shell: bash
+      run: |
+        sudo apt-get install zlib1g-dev -y
+        sudo apt-get install libpng-dev -y
+        sudo apt-get install libfreetype6-dev -y
+        sudo apt-get install rapidjson-dev -y
+  
+    - name: Configure CMake (Windows)
+      if: ${{ (matrix.OS == 'windows-latest') }}
+      shell: bash
+      run: |
+        # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
+        # See https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type
+        # on Windows, we need to point CMake to the vcpkg-toolchain-file
+        cmake -B "${{github.workspace}}/build" -DCMAKE_BUILD_TYPE=${{matrix.build}} -DLIBCZI_BUILD_CZICMD=ON -DCMAKE_TOOLCHAIN_FILE="${VCPKG_INSTALLATION_ROOT}/scripts/buildsystems/vcpkg.cmake"
+
+    - name: Configure CMake (Linux)
+      if: ${{ (matrix.OS == 'ubuntu-latest') }}
+      shell: bash
+      run: |
+        cmake -B "${{github.workspace}}/build" -DCMAKE_BUILD_TYPE=${{matrix.build}} -DLIBCZI_BUILD_CZICMD=ON
 
     - name: Build
       # Build your program with the given configuration

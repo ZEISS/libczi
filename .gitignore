@@ -307,3 +307,4 @@ cmake-build-debug/
 /out/Src/Build/Doxygen/
 /out/
 /Src/.vscode
+/CMakeSettings.json
