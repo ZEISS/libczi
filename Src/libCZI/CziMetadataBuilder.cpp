@@ -8,6 +8,7 @@
 #include <regex>
 #include <codecvt>
 #include <iomanip>
+#include <limits>
 #include "CziUtils.h"
 #include "XmlNodeWrapper.h"
 
@@ -956,6 +957,29 @@ static void WriteChannelDisplaySettings(const IChannelDisplaySetting* channel_di
         if (channel_display_setting->TryGetGamma(&gamma))
         {
             node->GetOrCreateChildNode("Gamma")->SetValueFlt(gamma);
+        }
+    }
+    else if (gradation_curve_mode == IDisplaySettings::GradationCurveMode::Spline)
+    {
+        vector<libCZI::IDisplaySettings::SplineControlPoint> spline_control_points;
+        if (channel_display_setting->TryGetSplineControlPoints(&spline_control_points))
+        {
+            ostringstream string_stream;
+            string_stream << setprecision(numeric_limits<double>::max_digits10 + 2) << scientific;
+            bool is_first_iteration = true;
+            for (auto& it = spline_control_points.cbegin(); it != spline_control_points.cend(); ++it)
+            {
+                if (!is_first_iteration)
+                {
+                    string_stream << ' ';
+                }
+
+                string_stream << it->x << "," << it->y;
+                is_first_iteration = false;
+            }
+
+            node->GetOrCreateChildNode("Points")->SetValue(string_stream.str());
+            node->GetOrCreateChildNode("Mode")->SetValue("spline");
         }
     }
 }
