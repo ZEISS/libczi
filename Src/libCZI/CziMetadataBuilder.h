@@ -64,7 +64,10 @@ public:
 	void SetValueBool(bool value) override;
 	void SetValueI64(long long value) override;
 	void SetValueUI64(unsigned long long value) override;
-
+	void RemoveChildren() override;
+	void RemoveAttributes() override;
+    bool RemoveChild(const char* name) override;
+	bool RemoveAttribute(const char* name) override;
 private:
 	std::shared_ptr<IXmlNodeRw> GetOrCreateChildNode(const char* path, bool allowCreation);
 	pugi::xml_node GetOrCreateChildElementNode(const wchar_t* sz, bool allowCreation);

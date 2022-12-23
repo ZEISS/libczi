@@ -19,8 +19,8 @@ using namespace std;
 struct AddHelper
 {
     ICziReaderWriter* t;
-    AddHelper(ICziReaderWriter* t)
-        :t(t) {};
+    AddHelper(ICziReaderWriter* t) :t(t)
+    {}
 
     void operator()(const AddSubBlockInfo& addSbBlkInfo) const
     {
@@ -274,7 +274,7 @@ void CCziReaderWriter::Finish()
                 [&](size_t index, const CCziSubBlockDirectoryBase::SubBlkEntry& e)->bool
                 {
                     f(index, e);
-                    return true;
+            return true;
                 });
         };
         sbBlkDirWriteInfo.writeFunc = std::bind(&CCziReaderWriter::WriteToOutputStream, this, placeholders::_1, placeholders::_2, placeholders::_3, placeholders::_4, placeholders::_5);
@@ -312,7 +312,7 @@ void CCziReaderWriter::Finish()
                 [&](size_t index, const CCziAttachmentsDirectoryBase::AttachmentEntry& e)->bool
                 {
                     f(index, e);
-                    return true;
+            return true;
                 });
         };
         attchmntDirWriteInfo.writeFunc = std::bind(&CCziReaderWriter::WriteToOutputStream, this, placeholders::_1, placeholders::_2, placeholders::_3, placeholders::_4, placeholders::_5);
@@ -481,7 +481,7 @@ void CCziReaderWriter::DetermineNextSubBlockOffset()
                 lastSegmentPos = sbBlkEntry.FilePosition;
             }
 
-            return true;
+    return true;
         });
 
     this->attachmentDirectory.EnumEntries(
@@ -492,7 +492,7 @@ void CCziReaderWriter::DetermineNextSubBlockOffset()
                 lastSegmentPos = attEntry.FilePosition;
             }
 
-            return true;
+    return true;
         });
 
     if (this->hdrSegmentData.GetIsSubBlockDirectoryPositionValid())
@@ -641,12 +641,12 @@ void CCziReaderWriter::WriteToOutputStream(std::uint64_t offset, const void* pv,
         [&](int index, const CCziSubBlockDirectory::SubBlkEntry& entry)->bool
         {
             SubBlockInfo info;
-            info.coordinate = entry.coordinate;
-            info.logicalRect = IntRect{ entry.x,entry.y,entry.width,entry.height };
-            info.physicalSize = IntSize{ (std::uint32_t)entry.storedWidth, (std::uint32_t)entry.storedHeight };
-            info.mIndex = entry.mIndex;
-            info.pixelType = CziUtils::PixelTypeFromInt(entry.PixelType);
-            return funcEnum(index, info);
+    info.coordinate = entry.coordinate;
+    info.logicalRect = IntRect{ entry.x,entry.y,entry.width,entry.height };
+    info.physicalSize = IntSize{ (std::uint32_t)entry.storedWidth, (std::uint32_t)entry.storedHeight };
+    info.mIndex = entry.mIndex;
+    info.pixelType = CziUtils::PixelTypeFromInt(entry.PixelType);
+    return funcEnum(index, info);
         });
 }
 
@@ -727,11 +727,11 @@ void CCziReaderWriter::WriteToOutputStream(std::uint64_t offset, const void* pv,
         [&](int index, const CCziAttachmentsDirectoryBase::AttachmentEntry& entry)->bool
         {
             libCZI::AttachmentInfo info;
-            info.contentGuid = entry.ContentGuid;
-            memcpy(info.contentFileType, entry.ContentFileType, sizeof(entry.ContentFileType));
-            info.name = entry.Name;
-            bool b = funcEnum(index, info);
-            return b;
+    info.contentGuid = entry.ContentGuid;
+    memcpy(info.contentFileType, entry.ContentFileType, sizeof(entry.ContentFileType));
+    info.name = entry.Name;
+    bool b = funcEnum(index, info);
+    return b;
         });
 }
 

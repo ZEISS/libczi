@@ -618,3 +618,235 @@ TEST(MetadataBuilder, MetadataBuilderFromXml2)
 
 	EXPECT_ANY_THROW(CreateMetadataBuilderFromXml(xml_document)) << "Expected to throw because no ImageDocument-root-node present";
 }
+
+TEST(MetadataBuilder, RemoveChildren)
+{
+	static const char* xml_document =
+		u8"<ImageDocument>\n"
+		u8"  <Metadata>\n"
+		u8"    <Scaling>\n"
+		u8"      <Items>\n"
+		u8"        <Distance Id=\"X\">\n"
+		u8"          <Value>1.06822e-07</Value>\n"
+		u8"          <DefaultUnitFormat>µm</DefaultUnitFormat>\n"
+		u8"        </Distance>\n"
+		u8"        <Distance Id=\"Y\">\n"
+		u8"          <Value>1.06822e-07</Value>\n"
+		u8"          <DefaultUnitFormat>µm</DefaultUnitFormat>\n"
+		u8"        </Distance>\n"
+		u8"        <Distance Id=\"Z\">\n"
+		u8"          <Value>5e-07</Value>\n"
+		u8"          <DefaultUnitFormat>µm</DefaultUnitFormat>\n"
+		u8"        </Distance>\n"
+		u8"      </Items>\n"
+		u8"    </Scaling>\n"
+		u8"  </Metadata>\n"
+		u8"</ImageDocument>\n";
+
+	const auto metadata_builder = CreateMetadataBuilderFromXml(xml_document);
+	const auto items_node = metadata_builder->GetRootNode()->GetChildNode("Metadata/Scaling/Items");
+	items_node->RemoveChildren();
+
+	const auto xml = metadata_builder->GetXml(true);
+
+	static const char* expected_result =
+		u8"<ImageDocument>\n"
+		u8"  <Metadata>\n"
+		u8"    <Scaling>\n"
+		u8"      <Items />\n"
+		u8"    </Scaling>\n"
+		u8"  </Metadata>\n"
+		u8"</ImageDocument>\n";
+
+	EXPECT_STREQ(expected_result, xml.c_str()) << "Incorrect result";
+}
+
+TEST(MetadataBuilder, RemoveChild)
+{
+	static const char* xml_document =
+		u8"<ImageDocument>\n"
+		u8"  <Metadata>\n"
+		u8"    <Scaling>\n"
+		u8"      <Items>\n"
+		u8"        <Distance Id=\"X\">\n"
+		u8"          <Value>1.06822e-07</Value>\n"
+		u8"          <DefaultUnitFormat>µm</DefaultUnitFormat>\n"
+		u8"        </Distance>\n"
+		u8"        <Distance Id=\"Y\">\n"
+		u8"          <Value>1.06822e-07</Value>\n"
+		u8"          <DefaultUnitFormat>µm</DefaultUnitFormat>\n"
+		u8"        </Distance>\n"
+		u8"        <Distance Id=\"Z\">\n"
+		u8"          <Value>5e-07</Value>\n"
+		u8"          <DefaultUnitFormat>µm</DefaultUnitFormat>\n"
+		u8"        </Distance>\n"
+		u8"      </Items>\n"
+		u8"    </Scaling>\n"
+		u8"  </Metadata>\n"
+		u8"</ImageDocument>\n";
+
+	const auto metadata_builder = CreateMetadataBuilderFromXml(xml_document);
+	const auto items_node = metadata_builder->GetRootNode()->GetChildNode("Metadata/Scaling/Items");
+	bool b = items_node->RemoveChild("Distance");
+	EXPECT_TRUE(b);
+
+	auto xml = metadata_builder->GetXml(true);
+
+	static const char* expected_result1 =
+		u8"<ImageDocument>\n"
+		u8"  <Metadata>\n"
+		u8"    <Scaling>\n"
+		u8"      <Items>\n"
+		u8"        <Distance Id=\"Y\">\n"
+		u8"          <Value>1.06822e-07</Value>\n"
+		u8"          <DefaultUnitFormat>µm</DefaultUnitFormat>\n"
+		u8"        </Distance>\n"
+		u8"        <Distance Id=\"Z\">\n"
+		u8"          <Value>5e-07</Value>\n"
+		u8"          <DefaultUnitFormat>µm</DefaultUnitFormat>\n"
+		u8"        </Distance>\n"
+		u8"      </Items>\n"
+		u8"    </Scaling>\n"
+		u8"  </Metadata>\n"
+		u8"</ImageDocument>\n";
+	EXPECT_STREQ(expected_result1, xml.c_str()) << "Incorrect result";
+
+	b = items_node->RemoveChild("Distance");
+	EXPECT_TRUE(b);
+
+	xml = metadata_builder->GetXml(true);
+
+	static const char* expected_result2 =
+		u8"<ImageDocument>\n"
+		u8"  <Metadata>\n"
+		u8"    <Scaling>\n"
+		u8"      <Items>\n"
+		u8"        <Distance Id=\"Z\">\n"
+		u8"          <Value>5e-07</Value>\n"
+		u8"          <DefaultUnitFormat>µm</DefaultUnitFormat>\n"
+		u8"        </Distance>\n"
+		u8"      </Items>\n"
+		u8"    </Scaling>\n"
+		u8"  </Metadata>\n"
+		u8"</ImageDocument>\n";
+	EXPECT_STREQ(expected_result2, xml.c_str()) << "Incorrect result";
+
+	b = items_node->RemoveChild("Distance");
+	EXPECT_TRUE(b);
+	xml = metadata_builder->GetXml(true);
+
+	static const char* expected_result3 =
+		u8"<ImageDocument>\n"
+		u8"  <Metadata>\n"
+		u8"    <Scaling>\n"
+		u8"      <Items />\n"
+		u8"    </Scaling>\n"
+		u8"  </Metadata>\n"
+		u8"</ImageDocument>\n";
+	EXPECT_STREQ(expected_result3, xml.c_str()) << "Incorrect result";
+
+	b = items_node->RemoveChild("Distance");
+	EXPECT_FALSE(b);
+}
+
+TEST(MetadataBuilder, RemoveAttributes)
+{
+	static const char* xml_document =
+		u8"<ImageDocument>\n"
+		u8"  <Metadata>\n"
+		u8"    <Scaling>\n"
+		u8"      <Items>\n"
+		u8"        <Distance Id=\"X\" Attr1=\"a\" Attr2=\"b\">\n"
+		u8"          <Value>1.06822e-07</Value>\n"
+		u8"          <DefaultUnitFormat>µm</DefaultUnitFormat>\n"
+		u8"        </Distance>\n"
+		u8"      </Items>\n"
+		u8"    </Scaling>\n"
+		u8"  </Metadata>\n"
+		u8"</ImageDocument>\n";
+
+	const auto metadata_builder = CreateMetadataBuilderFromXml(xml_document);
+	const auto distance_node = metadata_builder->GetRootNode()->GetChildNode("Metadata/Scaling/Items/Distance");
+	distance_node->RemoveAttributes();
+
+	const auto xml = metadata_builder->GetXml(true);
+
+	static const char* expected_result =
+		u8"<ImageDocument>\n"
+		u8"  <Metadata>\n"
+		u8"    <Scaling>\n"
+		u8"      <Items>\n"
+		u8"        <Distance>\n"
+		u8"          <Value>1.06822e-07</Value>\n"
+		u8"          <DefaultUnitFormat>µm</DefaultUnitFormat>\n"
+		u8"        </Distance>\n"
+		u8"      </Items>\n"
+		u8"    </Scaling>\n"
+		u8"  </Metadata>\n"
+		u8"</ImageDocument>\n";
+
+	EXPECT_STREQ(expected_result, xml.c_str()) << "Incorrect result";
+}
+
+TEST(MetadataBuilder, RemoveAttribute)
+{
+	static const char* xml_document =
+		u8"<ImageDocument>\n"
+		u8"  <Metadata>\n"
+		u8"    <Scaling>\n"
+		u8"      <Items>\n"
+		u8"        <Distance Id=\"X\" Attr1=\"a\" Attr2=\"b\">\n"
+		u8"          <Value>1.06822e-07</Value>\n"
+		u8"          <DefaultUnitFormat>µm</DefaultUnitFormat>\n"
+		u8"        </Distance>\n"
+		u8"      </Items>\n"
+		u8"    </Scaling>\n"
+		u8"  </Metadata>\n"
+		u8"</ImageDocument>\n";
+
+	const auto metadata_builder = CreateMetadataBuilderFromXml(xml_document);
+	const auto distance_node = metadata_builder->GetRootNode()->GetChildNode("Metadata/Scaling/Items/Distance");
+	bool b = distance_node->RemoveAttribute("Id");
+	EXPECT_TRUE(b);
+
+	auto xml = metadata_builder->GetXml(true);
+
+	static const char* expected_result1 =
+		u8"<ImageDocument>\n"
+		u8"  <Metadata>\n"
+		u8"    <Scaling>\n"
+		u8"      <Items>\n"
+		u8"        <Distance Attr1=\"a\" Attr2=\"b\">\n"
+		u8"          <Value>1.06822e-07</Value>\n"
+		u8"          <DefaultUnitFormat>µm</DefaultUnitFormat>\n"
+		u8"        </Distance>\n"
+		u8"      </Items>\n"
+		u8"    </Scaling>\n"
+		u8"  </Metadata>\n"
+		u8"</ImageDocument>\n";
+	EXPECT_STREQ(expected_result1, xml.c_str()) << "Incorrect result";
+
+	b = distance_node->RemoveAttribute("Attr1");
+	EXPECT_TRUE(b);
+	b = distance_node->RemoveAttribute("Attr2");
+	EXPECT_TRUE(b);
+	b = distance_node->RemoveAttribute("Attr2");
+	EXPECT_FALSE(b);
+
+	xml = metadata_builder->GetXml(true);
+
+	static const char* expected_result2 =
+		u8"<ImageDocument>\n"
+		u8"  <Metadata>\n"
+		u8"    <Scaling>\n"
+		u8"      <Items>\n"
+		u8"        <Distance>\n"
+		u8"          <Value>1.06822e-07</Value>\n"
+		u8"          <DefaultUnitFormat>µm</DefaultUnitFormat>\n"
+		u8"        </Distance>\n"
+		u8"      </Items>\n"
+		u8"    </Scaling>\n"
+		u8"  </Metadata>\n"
+		u8"</ImageDocument>\n";
+	EXPECT_STREQ(expected_result2, xml.c_str()) << "Incorrect result";
+}

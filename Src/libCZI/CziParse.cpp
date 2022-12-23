@@ -482,7 +482,7 @@ using namespace libCZI;
 	return ad;
 }
 
-/*static*/void CCZIParse::ParseThroughDirectoryEntries(int count, std::function<void(int, void*)> funcRead, std::function<void(const SubBlockDirectoryEntryDE*, const SubBlockDirectoryEntryDV*)> funcAddEntry)
+/*static*/void CCZIParse::ParseThroughDirectoryEntries(int count, const std::function<void(int, void*)>& funcRead, const std::function<void(const SubBlockDirectoryEntryDE*, const SubBlockDirectoryEntryDV*)>& funcAddEntry)
 {
 	for (int i = 0; i < count; ++i)
 	{

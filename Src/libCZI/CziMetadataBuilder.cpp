@@ -195,6 +195,26 @@ using namespace std;
     pcdata.set_value(ss.str().c_str());
 }
 
+/*virtual*/void CNodeWrapper::RemoveChildren()
+{
+    this->node.remove_children();
+}
+
+/*virtual*/void CNodeWrapper::RemoveAttributes()
+{
+    this->node.remove_attributes();
+}
+
+/*virtual*/bool CNodeWrapper::RemoveChild(const char* name)
+{
+    return this->node.remove_child(Utilities::convertUtf8ToWchar_t(name).c_str());
+}
+
+/*virtual*/bool CNodeWrapper::RemoveAttribute(const char* name)
+{
+    return this->node.remove_attribute(Utilities::convertUtf8ToWchar_t(name).c_str());
+}
+
 //--------------------------------------------------------------------------------------
 
 std::shared_ptr<IXmlNodeRw> CNodeWrapper::GetOrCreateChildNode(const char* path, bool allowCreation)
@@ -966,7 +986,7 @@ static void WriteChannelDisplaySettings(const IChannelDisplaySetting* channel_di
             ostringstream string_stream;
             string_stream << setprecision(numeric_limits<double>::max_digits10 + 2) << scientific;
             bool is_first_iteration = true;
-            for (auto& it = spline_control_points.cbegin(); it != spline_control_points.cend(); ++it)
+            for (auto it = spline_control_points.cbegin(); it != spline_control_points.cend(); ++it)
             {
                 if (!is_first_iteration)
                 {
@@ -985,7 +1005,12 @@ static void WriteChannelDisplaySettings(const IChannelDisplaySetting* channel_di
 
 /*static*/void libCZI::MetadataUtils::WriteDisplaySettings(libCZI::ICziMetadataBuilder* builder, const libCZI::IDisplaySettings* display_settings, int channel_count)
 {
-    auto display_settings_channel_node = builder->GetRootNode()->GetOrCreateChildNode("Metadata/DisplaySetting/Channels");
+    const auto display_settings_channel_node = builder->GetRootNode()->GetOrCreateChildNode("Metadata/DisplaySetting/Channels");
+
+    // remove existing "Channel"-nodes (if any)
+    while (display_settings_channel_node->RemoveChild("Channel"))
+    {}
+
     for (int c = 0; c < channel_count; ++c)
     {
         auto channel_display_settings = display_settings->GetChannelDisplaySettings(c);
