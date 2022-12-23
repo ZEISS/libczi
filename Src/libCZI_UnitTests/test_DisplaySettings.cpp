@@ -263,7 +263,7 @@ TEST(DisplaySettings, WriteDisplaySettingsWithGradionCurveGammaAndSplineToDocume
     display_settings.channelDisplaySettings[1] = channel_display_settings;  // set the channel-display-settings for channel 1
 
     // and now, write those display-settings into the metadata-builder-object
-    MetadataUtils::WriteDisplaySettings(metadata_to_be_written.get(), DisplaySettingsPOD::CreateIDisplaySettingSp(display_settings).get(), 2);
+    MetadataUtils::WriteDisplaySettings(metadata_to_be_written.get(), DisplaySettingsPOD::CreateIDisplaySettingSp(display_settings).get());
 
     // then, get the XML-string containing the metadata, and put this into the CZI-file
     string xml = metadata_to_be_written->GetXml(true);

@@ -1321,8 +1321,17 @@ namespace libCZI
 		/// \param 		value       Value of the custom key-value pair.                       
 		static void SetOrAddCustomKeyValuePair(libCZI::ICziMetadataBuilder* builder, const std::string& key, const libCZI::CustomValueVariant& value);
 
+		/// Helper function which writes the specified display-settings into the specified metadata-builder. The display-settings
+		/// XML-metadata-node will have as many channel-items as the highest channel-number found in the display-settings object.
+		/// \param [in] builder             The metadata-builder object.
+		/// \param      display_settings	The display settings.
 		static void WriteDisplaySettings(libCZI::ICziMetadataBuilder* builder, const libCZI::IDisplaySettings* display_settings);
 
+        /// Helper function which writes the specified display-settings into the specified metadata-builder. The display-settings
+        /// XML-metadata-node will have as many channel-items as specified with the argument 'channel_count'.
+        /// \param [in] builder             The metadata-builder object.
+        /// \param      display_settings	The display settings.
+        /// \param      channel_count       The number of channels (which are constructed in the display-settings XML-metadata).
 		static void WriteDisplaySettings(libCZI::ICziMetadataBuilder* builder, const libCZI::IDisplaySettings* display_settings, int channel_count);
 	};
 	}

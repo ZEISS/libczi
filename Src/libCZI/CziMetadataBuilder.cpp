@@ -918,12 +918,11 @@ bool libCZI::XmlDateTime::IsValid() const
 
 /*static*/void libCZI::MetadataUtils::WriteDisplaySettings(libCZI::ICziMetadataBuilder* builder, const libCZI::IDisplaySettings* display_settings)
 {
-    //vector<int> channel_indices_from_display_settings;
+    // we determine the highest channel-number that we find in the display-settings object
     int max_channel_index_in_display_settings = 0;
     display_settings->EnumChannels(
         [&](int channel_index)->bool
         {
-            //channel_indices_from_display_settings.push_back(channel_index);
             if (channel_index > max_channel_index_in_display_settings)
             {
                 max_channel_index_in_display_settings = channel_index;
@@ -932,7 +931,7 @@ bool libCZI::XmlDateTime::IsValid() const
             return true;
         });
 
-    MetadataUtils::WriteDisplaySettings(builder, display_settings, max_channel_index_in_display_settings);
+    MetadataUtils::WriteDisplaySettings(builder, display_settings, 1+max_channel_index_in_display_settings);
 }
 
 static void WriteChannelDisplaySettings(const IChannelDisplaySetting* channel_display_setting, IXmlNodeRw* node)
