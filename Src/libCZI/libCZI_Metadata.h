@@ -1320,6 +1320,10 @@ namespace libCZI
 		/// \param 		key         Key of the custom key-value pair.
 		/// \param 		value       Value of the custom key-value pair.                       
 		static void SetOrAddCustomKeyValuePair(libCZI::ICziMetadataBuilder* builder, const std::string& key, const libCZI::CustomValueVariant& value);
+
+		static void WriteDisplaySettings(libCZI::ICziMetadataBuilder* builder, const libCZI::IDisplaySettings* display_settings);
+
+		static void WriteDisplaySettings(libCZI::ICziMetadataBuilder* builder, const libCZI::IDisplaySettings* display_settings, int channel_count);
 	};
 	}
 
