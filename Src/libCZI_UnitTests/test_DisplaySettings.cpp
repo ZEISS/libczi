@@ -108,7 +108,7 @@ TEST(DisplaySettings, WriteDisplaySettingsToDocumentAndReadFromThereAndCompare)
     writer->Create(outStream, spWriterInfo);
 
     // now add two subblocks (does not really matter, though)
-    auto bitmap = CreateTestBitmap(PixelType::Gray8, 400, 400);
+    auto bitmap = CreateTestBitmap(PixelType::Gray8, 64, 64);
 
     ScopedBitmapLockerSP lockBm{ bitmap };
     AddSubBlockInfoStridedBitmap addSbBlkInfo;
