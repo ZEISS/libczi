@@ -369,8 +369,6 @@ void CSbBlkStatisticsUpdater::SortPyramidStatistics()
 
 CCziSubBlockDirectory::CCziSubBlockDirectory() : state(State::AddingAllowed)
 {
-	/*this->statistics.Invalidate();
-	this->statistics.subBlockCount = 0;*/
 }
 
 void CCziSubBlockDirectory::AddSubBlock(const SubBlkEntry& entry)
@@ -381,7 +379,6 @@ void CCziSubBlockDirectory::AddSubBlock(const SubBlkEntry& entry)
 	}
 
 	this->subBlks.push_back(entry);
-	//this->UpdateStatistics(entry);
 	this->sblkStatistics.UpdateStatistics(entry);
 }
 
@@ -389,12 +386,10 @@ void CCziSubBlockDirectory::AddingFinished()
 {
 	this->state = State::AddingFinished;
 	this->sblkStatistics.Consolidate();
-	//this->SortPyramidStatistics();
 }
 
 const libCZI::SubBlockStatistics& CCziSubBlockDirectory::GetStatistics() const
 {
-	//return this->statistics;
 	return this->sblkStatistics.GetStatistics();
 }
 
