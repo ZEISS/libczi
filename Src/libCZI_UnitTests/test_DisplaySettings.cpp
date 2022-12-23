@@ -89,8 +89,14 @@ TEST(DisplaySettings, Test3)
     EXPECT_THAT(splineCtrlPts1, ::testing::ContainerEq(splineCtrlPts2)) << "The data should have been equal";
 }
 
-TEST(DisplaySettings, WriteToDocumentAndReadFromThereAndCompare)
+TEST(DisplaySettings, WriteDisplaySettingsToDocumentAndReadFromThereAndCompare)
 {
+    // what happens here:
+    // - we are creating a simple 2-channel-CZI-document, add two subblocks 
+    // - and, we construct "display-settings" for the document, write them into the CZI-document
+    // - then we open the CZI-document
+    // - and read the display-settings from it
+    // - and, finally, compare them to what we put into
     auto writer = CreateCZIWriter();
     auto outStream = make_shared<CMemOutputStream>(0);
     //auto outStream = CreateOutputStreamForFile(L"D:\\libczi_displaysettings.czi", true);
@@ -101,6 +107,7 @@ TEST(DisplaySettings, WriteToDocumentAndReadFromThereAndCompare)
 
     writer->Create(outStream, spWriterInfo);
 
+    // now add two subblocks (does not really matter, though)
     auto bitmap = CreateTestBitmap(PixelType::Gray8, 400, 400);
 
     ScopedBitmapLockerSP lockBm{ bitmap };
@@ -123,8 +130,10 @@ TEST(DisplaySettings, WriteToDocumentAndReadFromThereAndCompare)
     addSbBlkInfo.coordinate = CDimCoordinate::Parse("C1");
     writer->SyncAddSubBlock(addSbBlkInfo);
 
+    // the writer-object can give us a "partially filled out metadata-object"
     auto metadata_to_be_written = writer->GetPreparedMetadata(PrepareMetadataInfo{});
 
+    // ...to which we add here some display-settings
     DisplaySettingsPOD display_settings;
     ChannelDisplaySettingsPOD channel_display_settings;
     channel_display_settings.Clear();
@@ -133,13 +142,16 @@ TEST(DisplaySettings, WriteToDocumentAndReadFromThereAndCompare)
     channel_display_settings.tintingColor = Rgb8Color{ 0xff,0,0 };
     channel_display_settings.blackPoint = 0.3f;
     channel_display_settings.whitePoint = 0.8f;
-    display_settings.channelDisplaySettings[0] = channel_display_settings;
+    display_settings.channelDisplaySettings[0] = channel_display_settings;  // set the channel-display-settings for channel 0
     channel_display_settings.tintingColor = Rgb8Color{ 0,0xff,0 };
     channel_display_settings.blackPoint = 0.1f;
     channel_display_settings.whitePoint = 0.4f;
-    display_settings.channelDisplaySettings[1] = channel_display_settings;
+    display_settings.channelDisplaySettings[1] = channel_display_settings;  // set the channel-display-settings for channel 1
+
+    // and now, write those display-settings into the metadata-builder-object
     MetadataUtils::WriteDisplaySettings(metadata_to_be_written.get(), DisplaySettingsPOD::CreateIDisplaySettingSp(display_settings).get(), 2);
 
+    // then, get the XML-string containing the metadata, and put this into the CZI-file
     string xml = metadata_to_be_written->GetXml(true);
     WriteMetadataInfo writerMdInfo = { 0 };
     writerMdInfo.szMetadata = xml.c_str();
@@ -153,14 +165,16 @@ TEST(DisplaySettings, WriteToDocumentAndReadFromThereAndCompare)
     auto cziData = outStream->GetCopy(&cziData_Size);
     outStream.reset();	// not needed anymore
 
+    // now, we open the CZI-document (note: this is "in-memory")
     auto inputStream = CreateStreamFromMemory(cziData, cziData_Size);
     auto spReader = libCZI::CreateCZIReader();
     spReader->Open(inputStream);
 
+    // read the metadata-segment, get the document-info-object, and from it the display-settings
     auto metadata = spReader->ReadMetadataSegment()->CreateMetaFromMetadataSegment();
-
     auto display_settings_from_document = metadata->GetDocumentInfo()->GetDisplaySettings();
 
+    // and here, compare those display-settings we got from the document to the information we put in before
     auto channel_display_settings_from_document = display_settings_from_document->GetChannelDisplaySettings(0);
     ASSERT_TRUE(channel_display_settings_from_document);
     EXPECT_TRUE(channel_display_settings_from_document->GetIsEnabled());
