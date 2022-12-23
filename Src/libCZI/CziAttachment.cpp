@@ -3,9 +3,8 @@
 // SPDX-License-Identifier: LGPL-3.0-or-later
 
 #include "stdafx.h"
-#include "CziAttachment.h"
-
 #include <utility>
+#include "CziAttachment.h"
 #include "CziUtils.h"
 
 using namespace libCZI;
