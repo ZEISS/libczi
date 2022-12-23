@@ -404,7 +404,7 @@ const libCZI::PyramidStatistics& CCziSubBlockDirectory::GetPyramidStatistics() c
 	return this->sblkStatistics.GetPyramidStatistics();
 }
 
-void CCziSubBlockDirectory::EnumSubBlocks(std::function<bool(int index, const SubBlkEntry&)> func)
+void CCziSubBlockDirectory::EnumSubBlocks(const std::function<bool(int index, const SubBlkEntry&)>& func)
 {
 	int i = 0;
 	for (auto it = this->subBlks.cbegin(); it != this->subBlks.cend(); ++it)
