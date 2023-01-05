@@ -6,7 +6,7 @@ include(FetchContent)
 include(CheckIncludeFiles)
 include(CheckSymbolExists)
 
-set(LIBCZISRCFILES 
+set(LIBCZISRCFILES
             BitmapOperations.cpp
             CreateBitmap.cpp
             CziAttachment.cpp
@@ -184,7 +184,7 @@ else()
  set(libCZI_HAS_AVXINTRINSICS 0)
 endif()
 
-# check whether we can use NEON-intrinsics (on ARM) -> 
+# check whether we can use NEON-intrinsics (on ARM) ->
 set(libCZI_HAS_NEOININTRINSICS 0)
 if (NOT libCZI_HAS_AVXINTRINSICS)
   CHECK_INCLUDE_FILES(arm_neon.h ARMNEONFOUND)
@@ -215,6 +215,7 @@ FetchContent_Declare(
   GIT_TAG "v1.5.2"
 )
 
+FetchContent_GetProperties(zstd)
 if(NOT zstd_POPULATED)
   message(STATUS "Fetching zstd...")
   set(ZSTD_BUILD_PROGRAMS  OFF CACHE BOOL "" FORCE)
@@ -241,7 +242,7 @@ set(libCZIPublicHeaders "ImportExport.h" "libCZI.h" "libCZI_Compositor.h" "libCZ
 #
 if (LIBCZI_BUILD_DYNLIB)
   add_library(libCZI SHARED ${LIBCZISRCFILES} $<TARGET_OBJECTS:JxrDecodeStatic>)
-  target_link_libraries(libCZI PRIVATE libzstd_static)
+  target_link_libraries(libCZI PRIVATE ${Zstd_LIBRARY})
   set_target_properties(libCZI PROPERTIES CXX_STANDARD 11 CXX_STANDARD_REQUIRED YES) # https://crascit.com/2015/03/28/enabling-cxx11-in-cmake/
   SET_TARGET_PROPERTIES (libCZI PROPERTIES DEFINE_SYMBOL  "LIBCZI_EXPORTS" )
   set_target_properties(libCZI PROPERTIES VERSION ${PROJECT_VERSION} SOVERSION 1)
@@ -262,7 +263,7 @@ endif(LIBCZI_BUILD_DYNLIB)
 #
 # Notes: -we use JxrDecode as an "object-library" in order have it "embedded" into libCZI.a
 add_library(libCZIStatic STATIC ${LIBCZISRCFILES} $<TARGET_OBJECTS:JxrDecodeStatic>)
-target_link_libraries(libCZIStatic PRIVATE libzstd_static)
+target_link_libraries(libCZIStatic PRIVATE ${Zstd_LIBRARY})
 set_target_properties(libCZIStatic PROPERTIES CXX_STANDARD 11)
 target_compile_definitions(libCZIStatic PRIVATE _LIBCZISTATICLIB)
 set_target_properties(libCZIStatic PROPERTIES VERSION ${PROJECT_VERSION})
