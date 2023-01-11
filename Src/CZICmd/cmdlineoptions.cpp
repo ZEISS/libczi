@@ -618,7 +618,7 @@ CCmdLineOptions::ParseResult CCmdLineOptions::Parse(int argc, char** argv)
         "the second the pyramid-layer (starting with 0 for the layer with the highest resolution).")
         ->option_text("PYRAMIDINFO")
         ->check(pyramidinfo_validator);
-     cli_app.add_option("-z,--zoom", argument_zoom,
+    cli_app.add_option("-z,--zoom", argument_zoom,
         "The zoom-factor (which is used for the commands 'SingleChannelScalingTileAccessor' and 'ScalingChannelComposite'). "
         "It is a float between 0 and 1.")
         ->option_text("ZOOM")
@@ -703,6 +703,11 @@ CCmdLineOptions::ParseResult CCmdLineOptions::Parse(int argc, char** argv)
     try
     {
         cli_app.parse(argc, argv);
+    }
+    catch (const CLI::CallForHelp& e)
+    {
+        cli_app.exit(e);
+        return ParseResult::Exit;
     }
     catch (const CLI::ParseError& e)
     {
@@ -1894,7 +1899,7 @@ void CCmdLineOptions::PrintHelpBitmapGenerator()
         [&](int no, std::tuple<std::string, std::string, bool> name_explanation_isdefault) -> bool
         {
             maxLengthClassName = (std::max)(get<0>(name_explanation_isdefault).length(), maxLengthClassName);
-            return true;
+    return true;
         });
 
     ostringstream string_stream;
@@ -1902,9 +1907,9 @@ void CCmdLineOptions::PrintHelpBitmapGenerator()
         [&](int no, std::tuple<std::string, std::string, bool> name_explanation_isdefault) -> bool
         {
             string_stream << no + 1 << ": " << std::setw(maxLengthClassName) << std::left << get<0>(name_explanation_isdefault) << std::setw(0) <<
-                (!get<2>(name_explanation_isdefault) ? "     " : " (*) ") << "\"" <<
-                get<1>(name_explanation_isdefault) << "\"" << endl;
-            return true;
+            (!get<2>(name_explanation_isdefault) ? "     " : " (*) ") << "\"" <<
+        get<1>(name_explanation_isdefault) << "\"" << endl;
+    return true;
         });
 
     this->GetLog()->WriteLineStdOut(string_stream.str());
