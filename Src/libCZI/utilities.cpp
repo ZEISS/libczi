@@ -11,7 +11,7 @@
 #endif
 #include "inc_libCZI_Config.h"
 #if LIBCZI_HAVE_ENDIAN_H
- #include "endian.h"
+#include "endian.h"
 #endif
 
 using namespace std;
@@ -39,6 +39,12 @@ using namespace std;
     }
 
     return 0xff;
+}
+
+/*static*/char Utilities::NibbleToHexChar(std::uint8_t nibble)
+{
+    static const char* hex_digits = "0123456789ABCDEF";
+    return hex_digits[nibble & 0x0f];
 }
 
 template <class tString>
@@ -128,8 +134,8 @@ tString trimImpl(const tString& str, const tString& whitespace)
     auto r = distu32(rng);
     g.Data2 = (uint16_t)r;
     g.Data3 = (uint16_t)(r >> 16);
-    
-	r = distu32(rng);
+
+    r = distu32(rng);
     for (int i = 0; i < 4; ++i)
     {
         g.Data4[i] = (uint8_t)r;
@@ -145,6 +151,21 @@ tString trimImpl(const tString& str, const tString& whitespace)
 
     return g;
 #endif
+}
+
+/*static*/std::string Utilities::Rgb8ColorToString(const libCZI::Rgb8Color& color)
+{
+    string color_text;
+    color_text.reserve(10);
+    color_text += '#';
+    color_text += "FF";
+    color_text += Utilities::NibbleToHexChar(color.r >> 4);
+    color_text += Utilities::NibbleToHexChar(color.r);
+    color_text += Utilities::NibbleToHexChar(color.g >> 4);
+    color_text += Utilities::NibbleToHexChar(color.g);
+    color_text += Utilities::NibbleToHexChar(color.b >> 4);
+    color_text += Utilities::NibbleToHexChar(color.b);
+    return color_text;
 }
 
 /*static*/bool Utilities::TryGetRgb8ColorFromString(const std::wstring& strXml, libCZI::Rgb8Color& color)

@@ -92,7 +92,7 @@ public:
 	void AddSubBlock(const SubBlkEntry& entry);
 	void AddingFinished();
 
-	void EnumSubBlocks(std::function<bool(int index, const SubBlkEntry&)> func);
+	void EnumSubBlocks(const std::function<bool(int index, const SubBlkEntry&)>& func);
 	bool TryGetSubBlock(int index, SubBlkEntry& entry) const;
 };
 

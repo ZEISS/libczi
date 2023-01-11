@@ -90,6 +90,7 @@ public:
     }
 
     static std::uint8_t HexCharToInt(char c);
+    static char NibbleToHexChar(std::uint8_t nibble);
 
     static std::string Trim(const std::string& str, const std::string& whitespace = " \t");
     static std::wstring Trim(const std::wstring& str, const std::wstring& whitespace = L" \t");
@@ -127,6 +128,7 @@ public:
     static void ConvertGuidToHostByteOrder(GUID* p);
 
     static bool TryGetRgb8ColorFromString(const std::wstring& strXml, libCZI::Rgb8Color& color);
+    static std::string Rgb8ColorToString(const libCZI::Rgb8Color& color);
 };
 
 class LoHiBytePackUnpack
