@@ -33,7 +33,7 @@ void CCziAttachmentsDirectory::AddAttachmentEntry(const AttachmentEntry& entry)
 	this->attachmentEntries.emplace_back(entry);
 }
 
-void CCziAttachmentsDirectory::EnumAttachments(std::function<bool(int index, const CCziAttachmentsDirectory::AttachmentEntry&)> func)
+void CCziAttachmentsDirectory::EnumAttachments(const std::function<bool(int index, const CCziAttachmentsDirectory::AttachmentEntry&)>& func)
 {
 	int i = 0;
 	for (const auto& ae : this->attachmentEntries)
@@ -169,7 +169,7 @@ bool CReaderWriterCziAttachmentsDirectory::TryGetAttachment(int key, AttachmentE
 
 bool CReaderWriterCziAttachmentsDirectory::TryModifyAttachment(int key, const AttachmentEntry& attchmntEntry)
 {
-	auto it = this->attchmnts.find(key);
+	const auto it = this->attchmnts.find(key);
 	if (it == this->attchmnts.end())
 	{
 		return false;
@@ -182,7 +182,7 @@ bool CReaderWriterCziAttachmentsDirectory::TryModifyAttachment(int key, const At
 
 bool CReaderWriterCziAttachmentsDirectory::TryRemoveAttachment(int key, AttachmentEntry* attchmntEntry)
 {
-	auto it = this->attchmnts.find(key);
+	const auto it = this->attchmnts.find(key);
 	if (it == this->attchmnts.end())
 	{
 		return false;

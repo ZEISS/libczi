@@ -987,7 +987,25 @@ namespace libCZI
 		/// \param value The unsigned long integer to write into the node.
 		virtual void SetValueUI64(unsigned long long value) = 0;
 
-		virtual ~IXmlNodeWrite() {};
+        /// Removes all children of this node.
+		virtual void RemoveChildren() = 0;
+
+		/// Removes all attributes of this node.
+		virtual void RemoveAttributes() = 0;
+
+        /// Removes the child node with the specified name. In case that there a multiple children
+        /// with the specified name, then only the first is removed.
+        /// \param  name    The name of the node to be removed.
+        /// \returns    True if the node was found and successfully removed; false otherwise (i.e. if it did not exist).
+		virtual bool RemoveChild(const char* name) = 0;
+
+		/// Removes the attribute with the specified name. In case that there a multiple attributes
+		/// with the specified name, then only the first is removed.
+		/// \param  name    The name of the attribute to be removed.
+		/// \returns    True if the attribute was found and successfully removed; false otherwise (i.e. if it did not exist).
+		virtual bool RemoveAttribute(const char* name) = 0;
+
+		virtual ~IXmlNodeWrite() = default;
 
 		/// Sets the node value - which is specified as an UTF8-string.
 		///
@@ -1320,6 +1338,23 @@ namespace libCZI
 		/// \param 		key         Key of the custom key-value pair.
 		/// \param 		value       Value of the custom key-value pair.                       
 		static void SetOrAddCustomKeyValuePair(libCZI::ICziMetadataBuilder* builder, const std::string& key, const libCZI::CustomValueVariant& value);
+
+		/// Helper function which writes the specified display-settings into the specified metadata-builder. The display-settings
+		/// XML-metadata-node will have as many channel-items as the highest channel-number found in the display-settings object.
+        /// If there are nodes with name "Channel" existing (prior to calling this function) under the node
+        /// "Metadata/DisplaySetting/Channels", they are removed (before adding new content).
+		/// \param [in] builder             The metadata-builder object.
+		/// \param      display_settings	The display settings.
+		static void WriteDisplaySettings(libCZI::ICziMetadataBuilder* builder, const libCZI::IDisplaySettings* display_settings);
+
+        /// Helper function which writes the specified display-settings into the specified metadata-builder. The display-settings
+        /// XML-metadata-node will have as many channel-items as specified with the argument 'channel_count'.
+		/// If there are nodes with name "Channel" existing (prior to calling this function) under the node
+		/// "Metadata/DisplaySetting/Channels", they are removed (before adding new content).
+        /// \param [in] builder             The metadata-builder object.
+        /// \param      display_settings	The display settings.
+        /// \param      channel_count       The number of channels (which are constructed in the display-settings XML-metadata).
+		static void WriteDisplaySettings(libCZI::ICziMetadataBuilder* builder, const libCZI::IDisplaySettings* display_settings, int channel_count);
 	};
 	}
 

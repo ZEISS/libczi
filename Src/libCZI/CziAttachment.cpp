@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: LGPL-3.0-or-later
 
 #include "stdafx.h"
+#include <utility>
 #include "CziAttachment.h"
 #include "CziUtils.h"
 
@@ -10,7 +11,7 @@ using namespace libCZI;
 
 CCziAttachment::CCziAttachment(const libCZI::AttachmentInfo& info, const CCZIParse::AttachmentData& data, std::function<void(void*)> deleter)
 	:	
-	spData(std::shared_ptr<const void>(data.ptrData, deleter)),
+	spData(std::shared_ptr<const void>(data.ptrData, std::move(deleter))),
 	dataSize(data.dataSize),
 	info(info)
 {

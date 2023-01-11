@@ -38,7 +38,7 @@ public:
 	}
 
 	void AddAttachmentEntry(const AttachmentEntry& entry);
-	void EnumAttachments(std::function<bool(int index, const CCziAttachmentsDirectory::AttachmentEntry&)> func);
+	void EnumAttachments(const std::function<bool(int index, const CCziAttachmentsDirectory::AttachmentEntry&)>& func);
 	bool TryGetAttachment(int index, AttachmentEntry& entry);
 };
 
