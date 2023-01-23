@@ -92,6 +92,7 @@ int main(int argc, char** _argv)
                 }
                 else if (cmdLineParseResult == CCmdLineOptions::ParseResult::Error)
                 {
+                        log->WriteLineStdErr("");
                         log->WriteLineStdErr("There were errors parsing the arguments -> exiting.");
                         retVal = 2;
                 }
