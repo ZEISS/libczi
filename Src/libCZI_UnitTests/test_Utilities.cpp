@@ -283,3 +283,30 @@ TEST(Utilities, ParseCompressionOptionEmptyPropertyBagCheckForCorrectCompression
     compressionOptions = Utils::ParseCompressionOptions("zstd1:");
     EXPECT_EQ(compressionOptions.first, CompressionMode::Zstd1);
 }
+
+TEST(Utilities, CallGetLibCZIVersionAndCheckResultForPlausibility)
+{
+    int major, minor, patch, tweak;
+    major = minor = patch = tweak = (std::numeric_limits<int>::min)();
+    GetLibCZIVersion(&major, &minor, &patch, &tweak);
+    ASSERT_NE(major, (std::numeric_limits<int>::min)());
+    ASSERT_NE(minor, (std::numeric_limits<int>::min)());
+    ASSERT_NE(patch, (std::numeric_limits<int>::min)());
+    ASSERT_NE(tweak, (std::numeric_limits<int>::min)());
+
+    // I guess it is safe to assume that major or minor must be greater than 0
+    ASSERT_TRUE(major > 0 || minor > 0) << "One of major and minor version number should be greater than 0.";
+}
+
+TEST(Utilities, CallGetLibCZIBuildInformationAndCheckResultForPlausibility)
+{
+    BuildInformation build_information;
+    GetLibCZIBuildInformation(build_information);
+
+    // I guess it is safe to assume that at least one string must be non-empty
+    ASSERT_FALSE(
+        build_information.compilerIdentification.empty() && 
+        build_information.repositoryUrl.empty() &&
+        build_information.repositoryBranch.empty() && 
+        build_information.repositoryTag.empty());
+}
