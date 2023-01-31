@@ -210,7 +210,7 @@ if (libCZI_HAS_AVXINTRINSICS)
 endif()
 
 if (LIBCZI_BUILD_PREFER_EXTERNALPACKAGE_ZSTD)
-  find_package(zstd  REQUIRED)
+  find_package(zstd CONFIG REQUIRED)
 else()
   FetchContent_Declare(
     zstd
@@ -245,7 +245,7 @@ set(libCZIPublicHeaders "ImportExport.h" "libCZI.h" "libCZI_Compositor.h" "libCZ
 #
 if (LIBCZI_BUILD_DYNLIB)
   add_library(libCZI SHARED ${LIBCZISRCFILES} $<TARGET_OBJECTS:JxrDecodeStatic>)
- # target_link_libraries(libCZI PRIVATE libzstd_static)
+ 
   set_target_properties(libCZI PROPERTIES CXX_STANDARD 11 CXX_STANDARD_REQUIRED YES) # https://crascit.com/2015/03/28/enabling-cxx11-in-cmake/
   SET_TARGET_PROPERTIES (libCZI PROPERTIES DEFINE_SYMBOL  "LIBCZI_EXPORTS" )
   set_target_properties(libCZI PROPERTIES VERSION ${PROJECT_VERSION} SOVERSION 1)
@@ -254,9 +254,6 @@ if (LIBCZI_BUILD_DYNLIB)
   target_include_directories(libCZI PRIVATE  ${EIGEN3_INCLUDE_DIR})
   set_target_properties(libCZI PROPERTIES DEBUG_POSTFIX "d")
   set_target_properties(libCZI PROPERTIES PUBLIC_HEADER "${libCZIPublicHeaders}")
-  #target_include_directories(libCZI PRIVATE ${zstd_SOURCE_DIR}/lib)
-  #target_link_libraries(libCZI PRIVATE zstd::libzstd_static)ls
-
   if (LIBCZI_BUILD_PREFER_EXTERNALPACKAGE_ZSTD)
    target_link_libraries(libCZI PRIVATE zstd::libzstd_static)
   else()
@@ -278,7 +275,6 @@ endif(LIBCZI_BUILD_DYNLIB)
 #
 # Notes: -we use JxrDecode as an "object-library" in order have it "embedded" into libCZI.a
 add_library(libCZIStatic STATIC ${LIBCZISRCFILES} $<TARGET_OBJECTS:JxrDecodeStatic>)
-#target_link_libraries(libCZIStatic PRIVATE libzstd_static)
 set_target_properties(libCZIStatic PROPERTIES CXX_STANDARD 11)
 target_compile_definitions(libCZIStatic PRIVATE _LIBCZISTATICLIB)
 set_target_properties(libCZIStatic PROPERTIES VERSION ${PROJECT_VERSION})
@@ -287,8 +283,6 @@ target_include_directories(libCZIStatic PRIVATE  "${CMAKE_CURRENT_BINARY_DIR}")
 target_include_directories(libCZIStatic PRIVATE  ${EIGEN3_INCLUDE_DIR})
 set_target_properties(libCZIStatic PROPERTIES DEBUG_POSTFIX "d")
 set_target_properties(libCZIStatic PROPERTIES PUBLIC_HEADER "${libCZIPublicHeaders}")
-#target_include_directories(libCZIStatic PRIVATE ${zstd_SOURCE_DIR}/lib)
-#target_link_libraries(libCZI PRIVATE zstd::libzstd_static)
 if (LIBCZI_BUILD_PREFER_EXTERNALPACKAGE_ZSTD)
    target_link_libraries(libCZIStatic PRIVATE zstd::libzstd_static)
 else()
