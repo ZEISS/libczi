@@ -80,6 +80,11 @@ option(LIBCZI_BUILD_CZICMD "Build application 'CZICmd'." OFF)
 
 option(LIBCZI_BUILD_DYNLIB "Build dynamic library 'libCZI'." ON)
 
+# With this option one can choose between "downloading a private copy of Eigen3 during build" or use
+#  an existing Eigen3 (on the system). If CMake is unable to find an Eigen3-package (and this option is
+#  "ON"), the build will fail.
+option(LIBCZI_BUILD_PREFER_EXTERNALPACKAGE_EIGEN3 "Prefer an Eigen3-package present on the system" OFF)
+
 
 if (LIBCZI_BUILD_UNITTESTS)
  enable_testing()
