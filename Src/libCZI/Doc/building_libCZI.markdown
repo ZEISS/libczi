@@ -43,8 +43,8 @@ option                                     | description
 LIBCZI_BUILD_UNITTESTS                     | Whether to build the unit-tests for libCZI. Default is **ON**.
 LIBCZI_BUILD_CZICMD                        | Whether to build the test- and sample-application CZICmd. Default is **OFF**.
 LIBCZI_BUILD_DYNLIB                        | Whether to build the dynamic link libaray for libczi. Default is **ON**.
-LIBCZI_BUILD_PREFER_EXTERNALPACKAGE_EIGEN3 | Whether to use an existing Eigen3-library on the system (included via find_package). If this is OFF, then a copy of Eigen3 is downloaded as part of the build. Default is **OFF*.
-LIBCZI_BUILD_PREFER_EXTERNALPACKAGE_ZSTD   | Whether to use an existing zstd-library on the system (included via find_package). If this is OFF, then a copy of zstd is downloaded as part of the build. Default is **OFF*.
+LIBCZI_BUILD_PREFER_EXTERNALPACKAGE_EIGEN3 | Whether to use an existing Eigen3-library on the system (included via find_package). If this is OFF, then a copy of Eigen3 is downloaded as part of the build. Default is **OFF**.
+LIBCZI_BUILD_PREFER_EXTERNALPACKAGE_ZSTD   | Whether to use an existing zstd-library on the system (included via find_package). If this is OFF, then a copy of zstd is downloaded as part of the build. Default is **OFF**.
 
 If building CZICmd is desired, then running CMake with this command line will enable building CZICmd:
     
