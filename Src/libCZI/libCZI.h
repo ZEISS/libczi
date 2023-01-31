@@ -82,11 +82,14 @@ namespace libCZI
 		std::string repositoryTag;
 	};
 
-	/// Gets the version of the library.
+	/// Gets the version of the library. For versioning libCZI, SemVer2 (<https://semver.org/>) is used.
+    /// Note that the value of the tweak version number does not have a meaning (as far as SemVer2 is concerned).
 	///
 	/// \param [out] pMajor If non-null, will receive the major version number.
 	/// \param [out] pMinor If non-null, will receive the minor version number.
-	LIBCZI_API void GetLibCZIVersion(int* pMajor, int* pMinor);
+	/// \param [out] pPatch If non-null, will receive the patch version number.
+	/// \param [out] pTweak If non-null, will receive the tweak version number.
+	LIBCZI_API void GetLibCZIVersion(int* pMajor, int* pMinor = nullptr, int* pPatch = nullptr, int* pTweak = nullptr);
 
 	/// Gets information about the libCZI-library - e.g. how it was built.
 	/// \param [out] info The information.

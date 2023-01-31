@@ -18,7 +18,7 @@
 using namespace libCZI;
 using namespace std;
 
-void libCZI::GetLibCZIVersion(int* pMajor, int* pMinor)
+void libCZI::GetLibCZIVersion(int* pMajor, int* pMinor/*nullptr*/, int* pPatch/*nullptr*/, int* pTweak/*nullptr*/)
 {
 	if (pMajor != nullptr)
 	{
@@ -28,6 +28,16 @@ void libCZI::GetLibCZIVersion(int* pMajor, int* pMinor)
 	if (pMinor != nullptr)
 	{
 		*pMinor = LIBCZI_VERSION_MINOR;
+	}
+
+	if (pPatch != nullptr)
+	{
+		*pPatch = LIBCZI_VERSION_PATCH;
+	}
+
+	if (pTweak != nullptr)
+	{
+		*pTweak = LIBCZI_VERSION_TWEAK;
 	}
 }
 
