@@ -85,6 +85,8 @@ option(LIBCZI_BUILD_DYNLIB "Build dynamic library 'libCZI'." ON)
 #  "ON"), the build will fail.
 option(LIBCZI_BUILD_PREFER_EXTERNALPACKAGE_EIGEN3 "Prefer an Eigen3-package present on the system" OFF)
 
+option(LIBCZI_BUILD_PREFER_EXTERNALPACKAGE_ZSTD "Prefer a ZSTD-package present on the system" OFF)
+
 
 if (LIBCZI_BUILD_UNITTESTS)
  enable_testing()
