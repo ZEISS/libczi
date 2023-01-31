@@ -5,6 +5,8 @@ libCZI aims to be portable and should build readily using any decent C++ compile
 
 Here are some instructions for building on Windows and on Linux.
 
+
+
 Building on Windows with Visual Studio
 --------------------------------------
 
@@ -23,17 +25,38 @@ For building on the command-line, it is recommended to do an out-of-source build
 Building on Linux
 -----------------
 
-When building on Linux, the packages zlib and libpng must be available. If necessary, they can be installed like this (assuming a Debian based distro):
-
-    sudo apt-get install zlib1g-dev
-    sudo apt-get install libpng-dev
-
 The same steps as above will build the code - go into the folder where the libCZI-repo is located, and run
 
     mkdir build
     cd build
     cmake ..
     cmake --build .
+
+
+Configurations
+--------------
+
+The CMake-file defines the following options for customizing the build:
+
+option                                     | description
+-------------------------------------------|------------
+LIBCZI_BUILD_UNITTESTS                     | Whether to build the unit-tests for libCZI. Default is **ON**.
+LIBCZI_BUILD_CZICMD                        | Whether to build the test- and sample-application CZICmd. Default is **OFF**.
+LIBCZI_BUILD_DYNLIB                        | Whether to build the dynamic link libaray for libczi. Default is **ON**.
+LIBCZI_BUILD_PREFER_EXTERNALPACKAGE_EIGEN3 | Whether to use an existing Eigen3-library on the system (included via find_package). If this is OFF, then a copy of Eigen3 is downloaded as part of the build. Default is **OFF*.
+LIBCZI_BUILD_PREFER_EXTERNALPACKAGE_ZSTD   | Whether to use an existing zstd-library on the system (included via find_package). If this is OFF, then a copy of zstd is downloaded as part of the build. Default is **OFF*.
+
+If building CZICmd is desired, then running CMake with this command line will enable building CZICmd:
+    
+    cmake .. -DLIBCZI_BUILD_CZICMD=ON
+
+Building CZICmd requires the external package RapidJSON to be available. In addition, on Linux the packages ZLIB, PNG and (optionally) Freetype are needed.
+
+If necessary, they can be installed like this (assuming a Debian based distro):
+
+    sudo apt-get install zlib1g-dev
+    sudo apt-get install libpng-dev
+    sudo apt-get install rapidjson-dev
 
 
 Building the documentation
