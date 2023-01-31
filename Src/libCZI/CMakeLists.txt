@@ -210,7 +210,7 @@ if (libCZI_HAS_AVXINTRINSICS)
 endif()
 
 if (LIBCZI_BUILD_PREFER_EXTERNALPACKAGE_ZSTD)
-  find_package(zstd CONFIG REQUIRED)
+  find_package(zstd  REQUIRED)
 else()
   FetchContent_Declare(
     zstd
@@ -255,7 +255,8 @@ if (LIBCZI_BUILD_DYNLIB)
   set_target_properties(libCZI PROPERTIES DEBUG_POSTFIX "d")
   set_target_properties(libCZI PROPERTIES PUBLIC_HEADER "${libCZIPublicHeaders}")
   #target_include_directories(libCZI PRIVATE ${zstd_SOURCE_DIR}/lib)
-  #target_link_libraries(libCZI PRIVATE zstd::libzstd_static)
+  #target_link_libraries(libCZI PRIVATE zstd::libzstd_static)ls
+
   if (LIBCZI_BUILD_PREFER_EXTERNALPACKAGE_ZSTD)
    target_link_libraries(libCZI PRIVATE zstd::libzstd_static)
   else()
