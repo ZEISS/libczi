@@ -32,7 +32,7 @@ The library itself does not leverage multithreading, but it is designed for bein
 Versioning of libCZI
 ====================
 
-For libCZI the [semantic versioning scheme 2.0](https://semver.org/) is to be applied. The version number is defined in the top-level CMakeList.txt file [here](https://github.com/ZEISS/libczi/blob/60be42d839665e3fdc33c14ab5149aadfadd7ddd/CMakeLists.txt#L4).
+For libCZI the [semantic versioning scheme 2.0](https://semver.org/) is to be applied. The version number is defined in the top-level CMakeList.txt file [here](https://github.com/ZEISS/libczi/blob/main/CMakeLists.txt#L4).
 This is the only place where the version number is defined. When making changes, this version number needs to be updated accordingly.
 
 Note that the number defined in the [project](https://cmake.org/cmake/help/latest/command/project.html#command:project) statement allows for four numbers: <tt><major>.<minor>.<patch>.<tweak></tt>. 
