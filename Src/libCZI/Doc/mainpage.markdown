@@ -29,6 +29,15 @@ It is intended to be easily portable to other platforms.
 It aims to be thread-safe (by most [definitions](https://en.wikipedia.org/wiki/Thread_safety)) - which isn't too surprising since it only allows read-only functionality.
 The library itself does not leverage multithreading, but it is designed for being used in a multithreaded environment.
 
+Versioning of libCZI
+====================
+
+For libCZI the [semantic versioning scheme 2.0](https://semver.org/) is to be applied. The version number is defined in the top-level CMakeList.txt file [here](https://github.com/ZEISS/libczi/blob/main/CMakeLists.txt#L4).
+This is the only place where the version number is defined. When making changes, this version number needs to be updated accordingly.
+
+Note that the number defined in the [project](https://cmake.org/cmake/help/latest/command/project.html#command:project) statement allows for four numbers: <tt><major>.<minor>.<patch>.<tweak></tt>. 
+The number for <tt><tweak></tt> has no semantic meaning.
+
 
 CZI in a nutshell
 =================
@@ -65,3 +74,4 @@ between a pixel and an increment by 1 on the X- or Y-coordinate. This concept is
 
 [link_enum_dimensionindex]: @ref libCZI::DimensionIndex "cf. DimensionIndex"
 [link_subblockinfo]: @ref libCZI::SubBlockInfo "cf. SubBlockInfo"
+

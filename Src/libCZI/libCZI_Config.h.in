@@ -4,8 +4,11 @@
 
 #pragma once
 
-#define LIBCZI_VERSION_MAJOR @libCZI_VERSION_MAJOR@
-#define LIBCZI_VERSION_MINOR @libCZI_VERSION_MINOR@
+// those numbers define the version of libCZI
+#define LIBCZI_VERSION_MAJOR "@libCZI_VERSION_MAJOR@"
+#define LIBCZI_VERSION_MINOR "@libCZI_VERSION_MINOR@"
+#define LIBCZI_VERSION_PATCH "@libCZI_VERSION_PATCH@"
+#define LIBCZI_VERSION_TWEAK "@libCZI_VERSION_TWEAK@"
 
 // if the host system is a big-endian system, this is "1", otherwise 0
 #define LIBCZI_ISBIGENDIANHOST @libCZI_ISBIGENDIANHOST@

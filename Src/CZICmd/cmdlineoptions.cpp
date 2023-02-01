@@ -453,9 +453,9 @@ public:
 
         const auto result_from_stock_implementation = this->CLI::Formatter::make_usage(app, name);
         ostringstream ss(result_from_stock_implementation);
-        int majorVersion, minorVersion;
-        libCZI::GetLibCZIVersion(&majorVersion, &minorVersion);
-        ss << result_from_stock_implementation << endl << "  using libCZI version " << majorVersion << "." << minorVersion << endl;
+        int majorVersion, minorVersion, patchVersion;
+        libCZI::GetLibCZIVersion(&majorVersion, &minorVersion, &patchVersion);
+        ss << result_from_stock_implementation << endl << "  using libCZI version " << majorVersion << "." << minorVersion << "." << patchVersion << endl;
         return ss.str();
     }
 
@@ -1864,16 +1864,16 @@ std::shared_ptr<libCZI::IIndexSet> CCmdLineOptions::GetSceneIndexSet() const
 
 void CCmdLineOptions::PrintHelpBuildInfo()
 {
-    int majorVer, minorVer;
+    int majorVer, minorVer, patchVer;
     libCZI::BuildInformation buildInfo;
-    libCZI::GetLibCZIVersion(&majorVer, &minorVer);
+    libCZI::GetLibCZIVersion(&majorVer, &minorVer, &patchVer);
     libCZI::GetLibCZIBuildInformation(buildInfo);
 
     this->GetLog()->WriteLineStdOut("Build-Information");
     this->GetLog()->WriteLineStdOut("-----------------");
     this->GetLog()->WriteLineStdOut("");
     stringstream ss;
-    ss << "version          : " << majorVer << "." << minorVer;
+    ss << "version          : " << majorVer << "." << minorVer << "." << patchVer;
     this->GetLog()->WriteLineStdOut(ss.str());
     ss = stringstream();
     ss << "compiler         : " << buildInfo.compilerIdentification;
