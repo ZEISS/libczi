@@ -22,22 +22,22 @@ void libCZI::GetLibCZIVersion(int* pMajor, int* pMinor/*nullptr*/, int* pPatch/*
 {
 	if (pMajor != nullptr)
 	{
-		*pMajor = LIBCZI_VERSION_MAJOR;
+		*pMajor = atoi(LIBCZI_VERSION_MAJOR);
 	}
 
 	if (pMinor != nullptr)
 	{
-		*pMinor = LIBCZI_VERSION_MINOR;
+		*pMinor = atoi(LIBCZI_VERSION_MINOR);
 	}
 
 	if (pPatch != nullptr)
 	{
-		*pPatch = LIBCZI_VERSION_PATCH;
+		*pPatch = atoi(LIBCZI_VERSION_PATCH);
 	}
 
 	if (pTweak != nullptr)
 	{
-		*pTweak = LIBCZI_VERSION_TWEAK;
+		*pTweak = atoi(LIBCZI_VERSION_TWEAK);
 	}
 }
 
