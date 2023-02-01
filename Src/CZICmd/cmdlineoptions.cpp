@@ -1899,7 +1899,7 @@ void CCmdLineOptions::PrintHelpBitmapGenerator()
         [&](int no, std::tuple<std::string, std::string, bool> name_explanation_isdefault) -> bool
         {
             maxLengthClassName = (std::max)(get<0>(name_explanation_isdefault).length(), maxLengthClassName);
-            return true;
+    return true;
         });
 
     ostringstream string_stream;
@@ -1907,9 +1907,9 @@ void CCmdLineOptions::PrintHelpBitmapGenerator()
         [&](int no, std::tuple<std::string, std::string, bool> name_explanation_isdefault) -> bool
         {
             string_stream << no + 1 << ": " << std::setw(maxLengthClassName) << std::left << get<0>(name_explanation_isdefault) << std::setw(0) <<
-                    (!get<2>(name_explanation_isdefault) ? "     " : " (*) ") << "\"" <<
-                    get<1>(name_explanation_isdefault) << "\"" << endl;
-            return true;
+            (!get<2>(name_explanation_isdefault) ? "     " : " (*) ") << "\"" <<
+        get<1>(name_explanation_isdefault) << "\"" << endl;
+    return true;
         });
 
     this->GetLog()->WriteLineStdOut(string_stream.str());

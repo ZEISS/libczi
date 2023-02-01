@@ -53,15 +53,15 @@ public:
     void Clear(const ColorSpecification& color);
     void CopyMonochromeBitmap(int posX, int posY, const void* ptrData, int stride, int width, int height, const ColorSpecification& color);
 private:
-    template<typename t,int tBytesPerPel>
-    void InternalCopyMonochromeBitmap(int posX, int posY, const void* ptrData, int stride, int width, int height,t& setPixel)
+    template<typename t, int tBytesPerPel>
+    void InternalCopyMonochromeBitmap(int posX, int posY, const void* ptrData, int stride, int width, int height, t& setPixel)
     {
         // TODO: posX/posY must be positive for this code to work correctly
         for (int y = posY; y < posY + height; ++y)
         {
             if (y >= (int)this->height) break;
 
-            const std::uint8_t* ptr = ((const std::uint8_t*)ptrData) + (y - posY)*stride;
+            const std::uint8_t* ptr = ((const std::uint8_t*)ptrData) + (y - posY) * stride;
             std::uint8_t* ptrDst = ((std::uint8_t*)this->ptrData) + y * this->stride + tBytesPerPel * posX;
             int v = 0x80;
             for (int x = posX; x < posX + width; ++x)

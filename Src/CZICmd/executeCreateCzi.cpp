@@ -61,9 +61,9 @@ private:
                         return false;
                     }
 
-                    nodeNameAndValue = make_tuple((*kvIter).first, (*kvIter).second);
-                    ++kvIter;
-                    return true;
+            nodeNameAndValue = make_tuple((*kvIter).first, (*kvIter).second);
+            ++kvIter;
+            return true;
                 });
 
             sbMdXml = sbBlkMd->GetXml();
@@ -237,53 +237,53 @@ private:
         {
             auto str = Utils::DimCoordinateToString(&coord);
 
-            std::stringstream ss;
-            ss << "Writing subblock #" << cnt << " coordinate: " << str << " ";
-            options.GetLog()->WriteStdOut(ss.str().c_str());
+    std::stringstream ss;
+    ss << "Writing subblock #" << cnt << " coordinate: " << str << " ";
+    options.GetLog()->WriteStdOut(ss.str().c_str());
 
-            const auto tileInfo = options.GetCreateTileInfo();
+    const auto tileInfo = options.GetCreateTileInfo();
 
-            // loop through all tiles
-            AddSubBlock(coord, options, get.get(), writer.get(),
-                [&](uint32_t cntTiles, int& x, int& y, int& m)->bool
+    // loop through all tiles
+    AddSubBlock(coord, options, get.get(), writer.get(),
+        [&](uint32_t cntTiles, int& x, int& y, int& m)->bool
+        {
+            // if no tile-info is given, just write one tile
+            if (!tileInfo.IsValid())
+            {
+                if (cntTiles == 0)
                 {
-                    // if no tile-info is given, just write one tile
-                    if (!tileInfo.IsValid())
-                    {
-                        if (cntTiles == 0)
-                        {
-                            x = y = m = 0;
-                            options.GetLog()->WriteLineStdOut("(no M).");
-                            return true;
-                        }
+                    x = y = m = 0;
+                    options.GetLog()->WriteLineStdOut("(no M).");
+                    return true;
+                }
 
-                        return false;
-                    }
+                return false;
+            }
 
-                    bool b = CExecuteCreateCzi::CalcTilePosition(tileInfo, options.GetCreateBitmapSize(), cntTiles, x, y, m);
-                    if (b)
-                    {
-                        stringstream ss;
-                        if (cntTiles == 0)
-                        {
-                            ss << "M=" << m;
-                        }
-                        else
-                        {
-                            ss << ", " << m;
-                        };
+    bool b = CExecuteCreateCzi::CalcTilePosition(tileInfo, options.GetCreateBitmapSize(), cntTiles, x, y, m);
+    if (b)
+    {
+        stringstream ss;
+        if (cntTiles == 0)
+        {
+            ss << "M=" << m;
+        }
+        else
+        {
+            ss << ", " << m;
+        };
 
-                        options.GetLog()->WriteStdOut(ss.str().c_str());
-                    }
-                    else
-                    {
-                        options.GetLog()->WriteLineStdOut(".");
-                    }
+        options.GetLog()->WriteStdOut(ss.str().c_str());
+    }
+    else
+    {
+        options.GetLog()->WriteLineStdOut(".");
+    }
 
-                    return b;
-                });
+    return b;
+        });
 
-            return true;
+    return true;
         });
 
     get.reset();	// not needed any more

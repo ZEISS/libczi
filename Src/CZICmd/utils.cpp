@@ -78,16 +78,16 @@ bool icasecmp(const std::string& l, const std::string& r)
 {
     return l.size() == r.size()
         && equal(l.cbegin(), l.cend(), r.cbegin(),
-            [](std::string::value_type l1, std::string::value_type r1)
-            { return toupper(l1) == toupper(r1); });
+        [](std::string::value_type l1, std::string::value_type r1)
+        { return toupper(l1) == toupper(r1); });
 }
 
 bool icasecmp(const std::wstring& l, const std::wstring& r)
 {
     return l.size() == r.size()
         && equal(l.cbegin(), l.cend(), r.cbegin(),
-            [](std::wstring::value_type l1, std::wstring::value_type r1)
-            { return towupper(l1) == towupper(r1); });
+        [](std::wstring::value_type l1, std::wstring::value_type r1)
+        { return towupper(l1) == towupper(r1); });
 }
 
 std::uint8_t HexCharToInt(char c)
@@ -339,15 +339,15 @@ std::ostream& operator<<(std::ostream& os, const GUID& guid)
     os << std::hex << guid.Data3 << '-';
 
     os << std::hex
-        << std::setw(2) << static_cast<short>(guid.Data4[0])
-        << std::setw(2) << static_cast<short>(guid.Data4[1])
-        << '-'
-        << std::setw(2) << static_cast<short>(guid.Data4[2])
-        << std::setw(2) << static_cast<short>(guid.Data4[3])
-        << std::setw(2) << static_cast<short>(guid.Data4[4])
-        << std::setw(2) << static_cast<short>(guid.Data4[5])
-        << std::setw(2) << static_cast<short>(guid.Data4[6])
-        << std::setw(2) << static_cast<short>(guid.Data4[7]);
+       << std::setw(2) << static_cast<short>(guid.Data4[0])
+       << std::setw(2) << static_cast<short>(guid.Data4[1])
+       << '-'
+       << std::setw(2) << static_cast<short>(guid.Data4[2])
+       << std::setw(2) << static_cast<short>(guid.Data4[3])
+       << std::setw(2) << static_cast<short>(guid.Data4[4])
+       << std::setw(2) << static_cast<short>(guid.Data4[5])
+       << std::setw(2) << static_cast<short>(guid.Data4[6])
+       << std::setw(2) << static_cast<short>(guid.Data4[7]);
     os << std::nouppercase;
     return os;
 }

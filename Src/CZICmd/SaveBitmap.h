@@ -8,23 +8,23 @@
 
 enum class SaveDataFormat
 {
-	Invalid,
-	PNG
+    Invalid,
+    PNG
 };
 
 class ISaveBitmap
 {
 public:
-	virtual void Save(const wchar_t* fileName, SaveDataFormat dataFormat, libCZI::IBitmapData* bitmap)=0;
-	virtual ~ISaveBitmap() = default;
+    virtual void Save(const wchar_t* fileName, SaveDataFormat dataFormat, libCZI::IBitmapData* bitmap) = 0;
+    virtual ~ISaveBitmap() = default;
 };
 
 class CSaveBitmapFactory
 {
 public:
-	static const char WIC_CLASS[];
-	static const char LIBPNG_CLASS[];
+    static const char WIC_CLASS[];
+    static const char LIBPNG_CLASS[];
 
-	static std::shared_ptr<ISaveBitmap> CreateSaveBitmapObj(const char* className);
-	static std::shared_ptr<ISaveBitmap> CreateDefaultSaveBitmapObj();
+    static std::shared_ptr<ISaveBitmap> CreateSaveBitmapObj(const char* className);
+    static std::shared_ptr<ISaveBitmap> CreateDefaultSaveBitmapObj();
 };

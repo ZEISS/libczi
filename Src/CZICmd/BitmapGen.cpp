@@ -105,7 +105,7 @@ using namespace libCZI;
     };
 
     const auto defaultClassName = BitmapGenFactory::GetDefaultBitmapGeneratorClassName();
-    for (int i=0; i < static_cast<int>(sizeof(BitmapGenerators) / sizeof(BitmapGenerators[0])); ++i)
+    for (int i = 0; i < static_cast<int>(sizeof(BitmapGenerators) / sizeof(BitmapGenerators[0])); ++i)
     {
         bool isDefault = BitmapGenerators[i].className == defaultClassName;
         if (!enumGenerators(i, make_tuple(BitmapGenerators[i].className, BitmapGenerators[i].explanation, isDefault)))
