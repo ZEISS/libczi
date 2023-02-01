@@ -258,7 +258,8 @@ static void _testWriteReadCompressedImageZStd0(uint32_t width, uint32_t height, 
         EXPECT_TRUE(buffer != nullptr);
         EXPECT_TRUE(sizeBuffer != 0);
 
-    } while (false);
+    }
+    while (false);
 
     do
     {
@@ -300,7 +301,8 @@ static void _testWriteReadCompressedImageZStd0(uint32_t width, uint32_t height, 
 
         reader.Close();
 
-    } while (false);
+    }
+    while (false);
 
     if (compressed != nullptr)
         delete[] compressed;
@@ -383,7 +385,8 @@ static void _testWriteReadCompressedImageZStd1(uint32_t width, uint32_t height, 
         EXPECT_TRUE(buffer != nullptr);
         EXPECT_TRUE(sizeBuffer != 0);
 
-    } while (false);
+    }
+    while (false);
 
     do
     {
@@ -412,7 +415,8 @@ static void _testWriteReadCompressedImageZStd1(uint32_t width, uint32_t height, 
 
         reader.Close();
 
-    } while (false);
+    }
+    while (false);
 
     if (compressed != nullptr)
         delete[] compressed;
@@ -656,7 +660,7 @@ TEST(CziWriter, WriteAndReadBitmapBgr24)
         {
             const uint8_t* ptrBitmap1 = static_cast<const uint8_t*>(sbBlkDataRead.get()) + y * sizeOfLine;
             const uint8_t* ptrBitmap2 = static_cast<const uint8_t*>(lockBm.ptrDataRoi) + y * lockBm.stride;
-            EXPECT_TRUE(memcmp(ptrBitmap1,ptrBitmap2,sizeOfLine)==0) << "Incorrect result";
+            EXPECT_TRUE(memcmp(ptrBitmap1, ptrBitmap2, sizeOfLine) == 0) << "Incorrect result";
         }
     }
 
@@ -1055,7 +1059,7 @@ TEST(CziWriter, Writer11)
         CDimBounds{ { DimensionIndex::Z,0,10 },{ DimensionIndex::C,0,1 } },	// set a bounds for Z and C
         0, 5);	// set a bounds M : 0<=m<=5
 
-                // reserve space for the subblockdirectory large enough to hold a many subblocks as we specified above
+    // reserve space for the subblockdirectory large enough to hold a many subblocks as we specified above
     spWriterInfo->SetReservedSizeForSubBlockDirectory(true, 0);
 
     writer->Create(outStream, spWriterInfo);
@@ -1136,8 +1140,8 @@ TEST(CziWriter, Writer11)
                 return true;
             }
 
-            success = false;
-            return false;
+    success = false;
+    return false;
         });
 
     EXPECT_TRUE(success) << "did not behave as expected";
@@ -1154,8 +1158,8 @@ TEST(CziWriter, Writer12)
         CDimBounds{ { DimensionIndex::Z,0,10 },{ DimensionIndex::C,0,1 } },	// set a bounds for Z and C
         0, 5);	// set a bounds M : 0<=m<=5
 
-                // reserve size in the subblockdirectory-segment for 10 subblocks, which is too small to hold all 50 subblocks,
-                //  so we expect the subblockdirectory-segment at the end of the file
+    // reserve size in the subblockdirectory-segment for 10 subblocks, which is too small to hold all 50 subblocks,
+    //  so we expect the subblockdirectory-segment at the end of the file
     spWriterInfo->SetReservedSizeForSubBlockDirectory(true, 2);
 
     writer->Create(outStream, spWriterInfo);
@@ -1247,8 +1251,8 @@ TEST(CziWriter, Writer12)
                 return true;
             }
 
-            success = false;
-            return false;
+    success = false;
+    return false;
         });
 
     EXPECT_TRUE(success && allReceived) << "did not behave as expected";
@@ -1605,7 +1609,7 @@ TEST(CziWriter, WriterReturnOneByteAndThenFalseFromCallback)
                 return true;
             }
 
-            return false;
+    return false;
         }
     );
 

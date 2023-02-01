@@ -47,7 +47,7 @@ std::shared_ptr<libCZI::IBitmapData> GetZeissLogoBitmap(void);
  * \param	bmp2	The bitmap data to check.
  * \return	Returns true if bitmaps have same data.
  */
-bool AreBitmapDataEqual(const std::shared_ptr<libCZI::IBitmapData> & bmp1, const std::shared_ptr<libCZI::IBitmapData> & bmp2);
+bool AreBitmapDataEqual(const std::shared_ptr<libCZI::IBitmapData>& bmp1, const std::shared_ptr<libCZI::IBitmapData>& bmp2);
 
 void WriteOutTestCzi(const char* testcaseName, const char* testname, const void* ptr, size_t size);
 
@@ -56,15 +56,15 @@ void WriteOutTestCzi(const char* testcaseName, const char* testname, const std::
 template<typename input_iterator>
 void CalcHash(std::uint8_t* ptrHash, input_iterator begin, input_iterator end)
 {
-	memset(ptrHash, 0, 16);
-	for (input_iterator it = begin; it != end; ++it)
-	{
-		std::uint8_t hash[16];
-		libCZI::Utils::CalcMd5SumHash(it->c_str(), it->length(), hash, 16);
-		for (uint8_t i = 0; i < 16; ++i)
-		{
-			*(ptrHash + i) ^= hash[i];
-		}
-	}
+    memset(ptrHash, 0, 16);
+    for (input_iterator it = begin; it != end; ++it)
+    {
+        std::uint8_t hash[16];
+        libCZI::Utils::CalcMd5SumHash(it->c_str(), it->length(), hash, 16);
+        for (uint8_t i = 0; i < 16; ++i)
+        {
+            *(ptrHash + i) ^= hash[i];
+        }
+    }
 }
 

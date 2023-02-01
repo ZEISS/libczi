@@ -11,13 +11,13 @@
 class CSegmentWalker
 {
 public:
-	static void Walk(libCZI::IStream* stream, std::function<bool(int cnt, const std::string& id, std::int64_t allocatedSize, std::int64_t usedSize)> func);
+    static void Walk(libCZI::IStream* stream, std::function<bool(int cnt, const std::string& id, std::int64_t allocatedSize, std::int64_t usedSize)> func);
 
-	struct ExpectedSegment
-	{
-		int cnt;
-		const char* segmentId;
-	};
+    struct ExpectedSegment
+    {
+        int cnt;
+        const char* segmentId;
+    };
 
-	static bool CheckSegments(libCZI::IStream* stream, const CSegmentWalker::ExpectedSegment* expectedSegments, size_t countExpectedSegments);
+    static bool CheckSegments(libCZI::IStream* stream, const CSegmentWalker::ExpectedSegment* expectedSegments, size_t countExpectedSegments);
 };
