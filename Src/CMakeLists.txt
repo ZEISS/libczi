@@ -2,7 +2,11 @@
 #
 # SPDX-License-Identifier: LGPL-3.0-or-later
 
-include(ExternalEIGEN3)
+if (LIBCZI_BUILD_PREFER_EXTERNALPACKAGE_EIGEN3)
+ find_package (Eigen3 3.3 REQUIRED NO_MODULE)
+else()
+ include(ExternalEIGEN3)
+endif()
 
 add_subdirectory(JxrDecode)
 add_subdirectory(libCZI)

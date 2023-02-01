@@ -209,20 +209,24 @@ if (libCZI_HAS_AVXINTRINSICS)
   ENDIF()
 endif()
 
-FetchContent_Declare(
-  zstd
-  GIT_REPOSITORY https://github.com/facebook/zstd.git
-  GIT_TAG "v1.5.2"
-)
+if (LIBCZI_BUILD_PREFER_EXTERNALPACKAGE_ZSTD)
+  find_package(zstd CONFIG REQUIRED)
+else()
+  FetchContent_Declare(
+    zstd
+    GIT_REPOSITORY https://github.com/facebook/zstd.git
+    GIT_TAG "v1.5.2"
+  )
 
-if(NOT zstd_POPULATED)
-  message(STATUS "Fetching zstd...")
-  set(ZSTD_BUILD_PROGRAMS  OFF CACHE BOOL "" FORCE)
-  set(ZSTD_BUILD_SHARED    OFF CACHE BOOL "" FORCE)
+  if(NOT zstd_POPULATED)
+    message(STATUS "Fetching zstd...")
+    set(ZSTD_BUILD_PROGRAMS  OFF CACHE BOOL "" FORCE)
+    set(ZSTD_BUILD_SHARED    OFF CACHE BOOL "" FORCE)
 
-  FetchContent_Populate(zstd)
+    FetchContent_Populate(zstd)
 
-  add_subdirectory(${zstd_SOURCE_DIR}/build/cmake ${zstd_BINARY_DIR})
+    add_subdirectory(${zstd_SOURCE_DIR}/build/cmake ${zstd_BINARY_DIR})
+  endif()
 endif()
 
 configure_file (
@@ -241,7 +245,7 @@ set(libCZIPublicHeaders "ImportExport.h" "libCZI.h" "libCZI_Compositor.h" "libCZ
 #
 if (LIBCZI_BUILD_DYNLIB)
   add_library(libCZI SHARED ${LIBCZISRCFILES} $<TARGET_OBJECTS:JxrDecodeStatic>)
-  target_link_libraries(libCZI PRIVATE libzstd_static)
+ 
   set_target_properties(libCZI PROPERTIES CXX_STANDARD 11 CXX_STANDARD_REQUIRED YES) # https://crascit.com/2015/03/28/enabling-cxx11-in-cmake/
   SET_TARGET_PROPERTIES (libCZI PROPERTIES DEFINE_SYMBOL  "LIBCZI_EXPORTS" )
   set_target_properties(libCZI PROPERTIES VERSION ${PROJECT_VERSION} SOVERSION 1)
@@ -250,8 +254,17 @@ if (LIBCZI_BUILD_DYNLIB)
   target_include_directories(libCZI PRIVATE  ${EIGEN3_INCLUDE_DIR})
   set_target_properties(libCZI PROPERTIES DEBUG_POSTFIX "d")
   set_target_properties(libCZI PROPERTIES PUBLIC_HEADER "${libCZIPublicHeaders}")
-  target_include_directories(libCZI PRIVATE ${zstd_SOURCE_DIR}/lib)
-  add_dependencies(libCZI eigen_ext)
+  if (LIBCZI_BUILD_PREFER_EXTERNALPACKAGE_ZSTD)
+   target_link_libraries(libCZI PRIVATE zstd::libzstd_static)
+  else()
+   target_link_libraries(libCZI PRIVATE libzstd_static)
+   target_include_directories(libCZI PRIVATE ${zstd_SOURCE_DIR}/lib)
+  endif()
+  if (LIBCZI_BUILD_PREFER_EXTERNALPACKAGE_EIGEN3)
+   target_link_libraries(libCZI PRIVATE Eigen3::Eigen)
+  else()
+   add_dependencies(libCZI eigen_ext)
+  endif()
   IF(UNIX)
     target_compile_options(libCZI PRIVATE -D_FILE_OFFSET_BITS=64)
   ENDIF(UNIX)
@@ -262,7 +275,6 @@ endif(LIBCZI_BUILD_DYNLIB)
 #
 # Notes: -we use JxrDecode as an "object-library" in order have it "embedded" into libCZI.a
 add_library(libCZIStatic STATIC ${LIBCZISRCFILES} $<TARGET_OBJECTS:JxrDecodeStatic>)
-target_link_libraries(libCZIStatic PRIVATE libzstd_static)
 set_target_properties(libCZIStatic PROPERTIES CXX_STANDARD 11)
 target_compile_definitions(libCZIStatic PRIVATE _LIBCZISTATICLIB)
 set_target_properties(libCZIStatic PROPERTIES VERSION ${PROJECT_VERSION})
@@ -271,8 +283,18 @@ target_include_directories(libCZIStatic PRIVATE  "${CMAKE_CURRENT_BINARY_DIR}")
 target_include_directories(libCZIStatic PRIVATE  ${EIGEN3_INCLUDE_DIR})
 set_target_properties(libCZIStatic PROPERTIES DEBUG_POSTFIX "d")
 set_target_properties(libCZIStatic PROPERTIES PUBLIC_HEADER "${libCZIPublicHeaders}")
-target_include_directories(libCZIStatic PRIVATE ${zstd_SOURCE_DIR}/lib)
-add_dependencies(libCZIStatic eigen_ext)
+if (LIBCZI_BUILD_PREFER_EXTERNALPACKAGE_ZSTD)
+   target_link_libraries(libCZIStatic PRIVATE zstd::libzstd_static)
+else()
+   target_link_libraries(libCZIStatic PRIVATE libzstd_static)
+   target_include_directories(libCZIStatic PRIVATE ${zstd_SOURCE_DIR}/lib)
+endif()
+
+if (LIBCZI_BUILD_PREFER_EXTERNALPACKAGE_EIGEN3)
+  target_link_libraries(libCZI PRIVATE Eigen3::Eigen)
+else()
+  add_dependencies(libCZI eigen_ext)
+endif()
 IF(UNIX)
   target_compile_options(libCZIStatic PRIVATE -D_FILE_OFFSET_BITS=64)
   set_property(TARGET libCZIStatic PROPERTY POSITION_INDEPENDENT_CODE ON)

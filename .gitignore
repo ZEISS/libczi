@@ -308,3 +308,4 @@ cmake-build-debug/
 /out/
 /Src/.vscode
 /CMakeSettings.json
+/Src/Build/html

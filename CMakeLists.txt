@@ -76,9 +76,21 @@ message("check for open -> ${HAVE_FCNTL_H_OPEN_TEXT} ; check for pread -> ${HAVE
 # Google-Test-framework which is downloaded from GitHub during the CMake-run.
 option(LIBCZI_BUILD_UNITTESTS "Build the gTest-based unit-tests" ON)
 
+# Whether to build the test- and sample-application CZICmd.
 option(LIBCZI_BUILD_CZICMD "Build application 'CZICmd'." OFF)
 
-option(LIBCZI_BUILD_DYNLIB "Build dynamic library 'libCZI'." ON)
+# Whether to build dynamic libCZI-library.
+option(LIBCZI_BUILD_DYNLIB "Build dynamic library for 'libCZI'." ON)
+
+# With this option one can choose between "downloading a private copy of Eigen3 during build" or use
+#  an existing Eigen3 (on the system). If CMake is unable to find an Eigen3-package (and this option is
+#  "ON"), the build will fail.
+option(LIBCZI_BUILD_PREFER_EXTERNALPACKAGE_EIGEN3 "Prefer an Eigen3-package present on the system" OFF)
+
+# With this option, we try to use an existing zstd-library. Note: this seems to work with vcpkg, but
+#  on Debian it seems that the package "libzstd-dev" does not have the required CMake-config-file.
+#  See here: https://discourse.cmake.org/t/findzstd/3506
+option(LIBCZI_BUILD_PREFER_EXTERNALPACKAGE_ZSTD "Prefer a ZSTD-package present on the system" OFF)
 
 
 if (LIBCZI_BUILD_UNITTESTS)
