@@ -10,14 +10,14 @@
 class CCziMetadataSegment : public  libCZI::IMetadataSegment
 {
 private:
-	std::shared_ptr<const void> spXmlData, spAttachment;
-	std::uint64_t	xmlDataSize;
-	std::uint32_t	attachmentSize;
+    std::shared_ptr<const void> spXmlData, spAttachment;
+    std::uint64_t	xmlDataSize;
+    std::uint32_t	attachmentSize;
 public:
-	CCziMetadataSegment(const CCZIParse::MetadataSegmentData& data, std::function<void(void*)> deleter);
-	~CCziMetadataSegment() override;
+    CCziMetadataSegment(const CCZIParse::MetadataSegmentData& data, std::function<void(void*)> deleter);
+    ~CCziMetadataSegment() override;
 
-	// interface ISubBlock
-	void DangerousGetRawData(MemBlkType type, const void*& ptr, size_t& size) const override;
-	std::shared_ptr<const void> GetRawData(MemBlkType type, size_t* ptrSize) override;
+    // interface ISubBlock
+    void DangerousGetRawData(MemBlkType type, const void*& ptr, size_t& size) const override;
+    std::shared_ptr<const void> GetRawData(MemBlkType type, size_t* ptrSize) override;
 };

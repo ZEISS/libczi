@@ -75,16 +75,16 @@ tString trimImpl(const tString& str, const tString& whitespace)
 {
     return l.size() == r.size()
         && equal(l.cbegin(), l.cend(), r.cbegin(),
-            [](std::string::value_type l1, std::string::value_type r1)
-            { return toupper(l1) == toupper(r1); });
+        [](std::string::value_type l1, std::string::value_type r1)
+        { return toupper(l1) == toupper(r1); });
 }
 
 /*static*/bool Utilities::icasecmp(const std::wstring& l, const std::wstring& r)
 {
     return l.size() == r.size()
         && equal(l.cbegin(), l.cend(), r.cbegin(),
-            [](std::wstring::value_type l1, std::wstring::value_type r1)
-            { return towupper(l1) == towupper(r1); });
+        [](std::wstring::value_type l1, std::wstring::value_type r1)
+        { return towupper(l1) == towupper(r1); });
 }
 
 /*static*/std::wstring Utilities::convertUtf8ToWchar_t(const char* sz)

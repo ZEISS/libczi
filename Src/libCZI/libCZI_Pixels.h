@@ -49,22 +49,22 @@ namespace libCZI
             return IntRect::Intersect(*this, r);
         }
 
-				/// Calculate the intersection of the two specified rectangle.
-				///
-				/// \param a The first rectangle.
-				/// \param b The second rectangle.
-				///
-				/// \return A rectangle which is the intersection of the two rectangles. If the two rectangles do not intersect, an empty rectangle is returned (width=height=0).
-				static IntRect Intersect(const IntRect& a, const IntRect& b)
-				{
-						const int x1 = (std::max)(a.x, b.x);
-						const int x2 = (std::min)(a.x + a.w, b.x + b.w);
-						const int y1 = (std::max)(a.y, b.y);
-						const int y2 = (std::min)(a.y + a.h, b.y + b.h);
-						if (x2 >= x1 && y2 >= y1)
-						{
-								return IntRect{ x1, y1, x2 - x1, y2 - y1 };
-						}
+        /// Calculate the intersection of the two specified rectangle.
+        ///
+        /// \param a The first rectangle.
+        /// \param b The second rectangle.
+        ///
+        /// \return A rectangle which is the intersection of the two rectangles. If the two rectangles do not intersect, an empty rectangle is returned (width=height=0).
+        static IntRect Intersect(const IntRect& a, const IntRect& b)
+        {
+            const int x1 = (std::max)(a.x, b.x);
+            const int x2 = (std::min)(a.x + a.w, b.x + b.w);
+            const int y1 = (std::max)(a.y, b.y);
+            const int y2 = (std::min)(a.y + a.h, b.y + b.h);
+            if (x2 >= x1 && y2 >= y1)
+            {
+                return IntRect{ x1, y1, x2 - x1, y2 - y1 };
+            }
 
             return IntRect{ 0,0,0,0 };
         }
@@ -136,8 +136,8 @@ namespace libCZI
     /// Information about a locked bitmap - allowing direct access to the image data in memory.
     struct BitmapLockInfo
     {
-        void*           ptrData;	///< Not currently used, to be ignored.
-        void*           ptrDataRoi;	///< The pointer to the first (top-left) pixel of the bitmap.
+        void* ptrData;	///< Not currently used, to be ignored.
+        void* ptrDataRoi;	///< The pointer to the first (top-left) pixel of the bitmap.
         std::uint32_t	stride;		///< The stride of the bitmap data (pointed to by `ptrDataRoi`).
         std::uint64_t	size;		///< The size of the bitmap data (pointed to by `ptrDataRoi`) in bytes.
     };

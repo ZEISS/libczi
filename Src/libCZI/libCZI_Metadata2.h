@@ -543,7 +543,7 @@ namespace libCZI
         virtual ~IDimensionChannelLightSourcesSetting() = default;
     };
 
-        /// The light sources settings keyed by channel index.
+    /// The light sources settings keyed by channel index.
     class IDimensionChannelLightSourcesSettings
     {
     public:

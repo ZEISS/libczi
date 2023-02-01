@@ -8,9 +8,9 @@
 #include <zstd.h>
 #include <cassert>  
 #if (ZSTD_VERSION_MAJOR >= 1 && ZSTD_VERSION_MINOR >= 5) 
- #include <zstd_errors.h>
+#include <zstd_errors.h>
 #else
- #include <common/zstd_errors.h>
+#include <common/zstd_errors.h>
 #endif
 #include "BitmapOperations.h"
 #include "libCZI_compress.h"

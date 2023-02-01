@@ -57,11 +57,11 @@ public:
 
     struct SubBlockData
     {
-        void*           ptrData;
+        void* ptrData;
         std::uint64_t	dataSize;
-        void*           ptrAttachment;
+        void* ptrAttachment;
         std::uint32_t	attachmentSize;
-        void*           ptrMetadata;
+        void* ptrMetadata;
         std::uint32_t	metaDataSize;
 
         int						compression;
@@ -76,9 +76,9 @@ public:
 
     struct MetadataSegmentData
     {
-        void*           ptrXmlData;
+        void* ptrXmlData;
         std::uint64_t	xmlDataSize;
-        void*           ptrAttachment;
+        void* ptrAttachment;
         std::uint32_t	attachmentSize;
     };
 
@@ -86,7 +86,7 @@ public:
 
     struct AttachmentData
     {
-        void*           ptrData;
+        void* ptrData;
         std::uint64_t	dataSize;
     };
 
