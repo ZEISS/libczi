@@ -83,7 +83,7 @@ namespace libCZI
 	};
 
 	/// Gets the version of the library. For versioning libCZI, SemVer2 (<https://semver.org/>) is used.
-    /// Note that the value of the tweak version number does not have a meaning (as far as SemVer2 is concerned).
+	/// Note that the value of the tweak version number does not have a meaning (as far as SemVer2 is concerned).
 	///
 	/// \param [out] pMajor If non-null, will receive the major version number.
 	/// \param [out] pMinor If non-null, will receive the minor version number.
