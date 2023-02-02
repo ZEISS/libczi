@@ -93,7 +93,7 @@ void CNullBitmapWrapper::Clear(const ColorSpecification& color)
     return this->pixeltype;
 }
 
-/*virtual*/libCZI::IntSize	CNullBitmapWrapper::GetSize() const
+/*virtual*/libCZI::IntSize  CNullBitmapWrapper::GetSize() const
 {
     return libCZI::IntSize{ this->width, this->height };
 }

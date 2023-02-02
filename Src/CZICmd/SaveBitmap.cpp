@@ -32,8 +32,8 @@ public:
     {
         static const struct
         {
-            libCZI::PixelType	pixelType;
-            GUID				wicPixelFormat;
+            libCZI::PixelType   pixelType;
+            GUID                wicPixelFormat;
         } LibCZIPixelTypeToWicPixelFormat[] =
         {
             { libCZI::PixelType::Bgr24 ,  GUID_WICPixelFormat24bppBGR },

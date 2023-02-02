@@ -204,7 +204,7 @@ std::vector<std::wstring> wrap(const wchar_t* text, size_t line_length/* = 72*/)
         // '\n' before a word means "insert a linebreak", and "\N' means "insert a linebreak and one more empty line"
         if (word.size() > 2 && word[0] == L'\\' && (word[1] == L'n' || word[1] == L'N'))
         {
-            line.erase(line.size() - 1);	// remove trailing space
+            line.erase(line.size() - 1);    // remove trailing space
             vec.push_back(line);
             if (word[1] == L'N')
             {
@@ -251,7 +251,7 @@ std::vector<std::string> wrap(const char* text, size_t line_length/* = 72*/)
         // '\n' before a word means "insert a linebreak", and "\N' means "insert a linebreak and one more empty line"
         if (word.size() > 2 && word[0] == '\\' && (word[1] == 'n' || word[1] == 'N'))
         {
-            line.erase(line.size() - 1);	// remove trailing space
+            line.erase(line.size() - 1);    // remove trailing space
             vec.push_back(line);
             if (word[1] == 'N')
             {
@@ -355,7 +355,7 @@ std::ostream& operator<<(std::ostream& os, const GUID& guid)
 /// Attempts to parse a GUID from the given std::wstring. The string has to have the form 
 /// "cfc4a2fe-f968-4ef8-b685-e73d1b77271a" or "{cfc4a2fe-f968-4ef8-b685-e73d1b77271a}".
 ///
-/// \param 		    str	    The string.
+/// \param          str     The string.
 /// \param [in,out] outGuid If non-null, the Guid will be put here if successful.
 ///
 /// \return True if it succeeds, false if it fails.

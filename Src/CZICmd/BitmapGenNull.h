@@ -18,7 +18,7 @@ public:
 
         struct
         {
-            std::uint8_t r;	///< The red component.
+            std::uint8_t r; ///< The red component.
             std::uint8_t g; ///< The green component.
             std::uint8_t b; ///< The blue component.
         } Bgr24;
@@ -45,8 +45,8 @@ public:
     CNullBitmapWrapper(libCZI::PixelType pixeltype, std::uint32_t width, std::uint32_t height);
     virtual ~CNullBitmapWrapper();
     virtual libCZI::PixelType GetPixelType() const;
-    virtual libCZI::IntSize	GetSize() const;
-    virtual libCZI::BitmapLockInfo	Lock();
+    virtual libCZI::IntSize GetSize() const;
+    virtual libCZI::BitmapLockInfo  Lock();
     virtual void Unlock();
 
     void Clear();

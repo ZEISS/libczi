@@ -286,7 +286,7 @@ private:
     return true;
         });
 
-    get.reset();	// not needed any more
+    get.reset();    // not needed any more
 
     // get "partially filled out" metadata - the metadata contains information which was derived from the 
     //  subblocks added, in particular we "pre-fill" the Size-information, and the Pixeltype-information
