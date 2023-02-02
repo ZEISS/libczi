@@ -4,6 +4,12 @@
 
 #pragma once
 
+#include <vector>
+#include <tuple>
+#include <limits>
+#include <utility>
+#include <memory>
+#include <string>
 #include "libCZI_Metadata.h"
 #include "libCZI_Pixels.h"
 
@@ -17,7 +23,7 @@ namespace libCZI
     class LIBCZI_API Utils
     {
     public:
-        /// Convert the specifed dimension enum to the corresponding "single char representation". The returned
+        /// Convert the specified dimension enum to the corresponding "single char representation". The returned
         /// character will be uppercase. If the specified dimension enum cannot be converted, '?' is returned.
         ///
         /// \param dim The dimension enum.
@@ -25,7 +31,7 @@ namespace libCZI
         /// \return A character representing the specified dimension.
         static char DimensionToChar(libCZI::DimensionIndex dim);
 
-        /// Convert the specifed single character to the corresponding dimension enum. The single character
+        /// Convert the specified single character to the corresponding dimension enum. The single character
         /// may be given uppercase or lowercase. In case that no corresponding dimension enum exists,
         /// `DimensionIndex::invalid` is returned.
         ///

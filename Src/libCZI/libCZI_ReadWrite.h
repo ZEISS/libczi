@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <memory>
 #include "libCZI.h"
 
 namespace libCZI
@@ -94,7 +95,7 @@ namespace libCZI
         /// close the file immediately without finalization.
         virtual void Close() = 0;
 
-        virtual ~ICziReaderWriter() override = default;
+        ~ICziReaderWriter() override = default;
 
         /// This helper method uses the structure 'AddSubBlockInfoMemPtr' in order to describe the
         /// subblock to be added. What it does is to cast the parameters into the form required by the
@@ -156,13 +157,13 @@ namespace libCZI
         /// Constructor.
         ///
         /// \param fileGuid Unique identifier for the file.
-        CCziReaderWriterInfo(const GUID& fileGuid) : forceFileGuid(false)
+        explicit CCziReaderWriterInfo(const GUID& fileGuid) : forceFileGuid(false)
         {
             this->fileGuid = fileGuid;
         }
 
-        virtual bool GetForceFileGuid() const override { return this->forceFileGuid; }
-        virtual const GUID& GetFileGuid() const override { return this->fileGuid; }
+        bool GetForceFileGuid() const override { return this->forceFileGuid; }
+        const GUID& GetFileGuid() const override { return this->fileGuid; }
 
         /// Sets "force file GUID" flag.
         ///

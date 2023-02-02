@@ -92,7 +92,7 @@ namespace libCZI
         /// \return True if space (in bytes) for the metadata is to be reserved, false otherwise.
         virtual bool TryGetReservedSizeForMetadataSegment(size_t* size) const = 0;
 
-        virtual ~ICziWriterInfo() {};
+        virtual ~ICziWriterInfo() {}
     };
 
     /// An implementation of the ICziWriterInfo-interface.
@@ -117,7 +117,7 @@ namespace libCZI
         /// then we will create a new Guid and use it.
         /// \param mMin     (Optional) The minimum for the M-index (inclusive).
         /// \param mMax     (Optional) The maximum for the M-index (inclusive).
-        CCziWriterInfo(const GUID& fileGuid, int mMin = 1, int mMax = -1)
+        explicit CCziWriterInfo(const GUID& fileGuid, int mMin = 1, int mMax = -1)
             : fileGuid(fileGuid), reservedSizeAttachmentsDirValid(false), reservedSizeSubBlkDirValid(false), reservedSizeMetadataSegmentValid(false)
         {
             this->SetDimBounds(nullptr);
@@ -138,12 +138,12 @@ namespace libCZI
             this->SetMIndexBounds(mMin, mMax);
         }
 
-        virtual const IDimBounds* GetDimBounds() const override { return this->dimBoundsValid ? &this->dimBounds : nullptr; }
-        virtual const GUID& GetFileGuid() const override { return this->fileGuid; }
-        virtual bool TryGetMIndexMinMax(int* min, int* max) const override;
-        virtual bool TryGetReservedSizeForAttachmentDirectory(size_t* size) const override;
-        virtual bool TryGetReservedSizeForSubBlockDirectory(size_t* size) const override;
-        virtual bool TryGetReservedSizeForMetadataSegment(size_t* size) const override;
+        const IDimBounds* GetDimBounds() const override { return this->dimBoundsValid ? &this->dimBounds : nullptr; }
+        const GUID& GetFileGuid() const override { return this->fileGuid; }
+        bool TryGetMIndexMinMax(int* min, int* max) const override;
+        bool TryGetReservedSizeForAttachmentDirectory(size_t* size) const override;
+        bool TryGetReservedSizeForSubBlockDirectory(size_t* size) const override;
+        bool TryGetReservedSizeForMetadataSegment(size_t* size) const override;
 
         /// Sets reserved size for the "attachments directory".
         ///
@@ -259,7 +259,7 @@ namespace libCZI
         std::function<bool(int callCnt, size_t offset, const void*& ptr, size_t& size)> getAttachment;
 
         /// Clears this object to its blank/initial state.
-        virtual void Clear() override;
+        void Clear() override;
     };
 
     /// This struct defines the data to be added to the subblock segment. Unused entries (e.g. no subblock-metadata) must have a size of 0.
@@ -282,7 +282,7 @@ namespace libCZI
         std::uint32_t sbBlkAttachmentSize;  ///< The size of the subblock-attachment in bytes. If this is 0, then ptrSbBlkMetadata is not used (and no sub-block-metadata written).
 
         /// Clears this object to its blank/initial state.
-        virtual void Clear() override;
+        void Clear() override;
     };
 
     /// This struct defines the data to be added to the subblock segment.
@@ -305,7 +305,7 @@ namespace libCZI
         std::uint32_t sbBlkAttachmentSize;  ///< The size of the subblock-attachment in bytes. If this is 0, then ptrSbBlkMetadata is not used (and no sub-block-metadata written).
 
         /// Clears this object to its blank/initial state.
-        virtual void Clear() override;
+        void Clear() override;
     };
 
     /// This struct defines the data to be added to the subblock segment.
@@ -328,7 +328,7 @@ namespace libCZI
         std::uint32_t sbBlkAttachmentSize;  ///< The size of the subblock-attachment in bytes. If this is 0, then ptrSbBlkMetadata is not used (and no sub-block-metadata written).
 
         /// Clears this object to its blank/initial state.
-        virtual void Clear() override;
+        void Clear() override;
     };
 
     /// This struct describes an attachment to be added to a CZI-file.

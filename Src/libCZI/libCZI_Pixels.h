@@ -8,6 +8,7 @@
 #include <memory>
 #include <algorithm>
 #include <ostream>
+#include <utility>
 
 namespace libCZI
 {
@@ -178,7 +179,7 @@ namespace libCZI
         /// The BitmapLockInfo returned must only considered to be valid until Unlock is called.
         virtual void            Unlock() = 0;
 
-        virtual ~IBitmapData() {};
+        virtual ~IBitmapData() {}
 
         /// Gets the width of the bitmap in pixels.
         ///

@@ -4,8 +4,10 @@
 
 #pragma once
 
-#include "libCZI_Pixels.h"
 #include <sstream>
+#include <memory>
+#include <string>
+#include "libCZI_Pixels.h"
 
 namespace libCZI
 {
