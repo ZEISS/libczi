@@ -5,7 +5,7 @@
 #pragma once
 
 #include <functional>
-#include <stdint.h>
+#include <cstdint>
 #include "libCZI_Pixels.h"
 #include "libCZI_DimCoordinate.h"
 

@@ -6,6 +6,7 @@
 
 #include <tuple>
 #include <vector>
+#include <memory>
 #include "CZIReader.h"
 #include "libCZI.h"
 #include "SingleChannelAccessorBase.h"

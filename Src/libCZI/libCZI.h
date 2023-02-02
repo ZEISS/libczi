@@ -182,7 +182,7 @@ namespace libCZI
         /// \param [out] ptrBytesRead    If non-null, the variable pointed to will receive the number of bytes actually read.
         virtual void Read(std::uint64_t offset, void* pv, std::uint64_t size, std::uint64_t* ptrBytesRead) = 0;
 
-        virtual ~IStream() {}
+        virtual ~IStream() = default;
     };
 
     /// Interface used for writing a data-stream. The abstraction used is:

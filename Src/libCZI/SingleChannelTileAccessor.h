@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <memory>
+#include <vector>
 #include "CZIReader.h"
 #include "libCZI.h"
 #include "SingleChannelAccessorBase.h"
