@@ -488,15 +488,15 @@ CCmdLineOptions::ParseResult CCmdLineOptions::Parse(int argc, char** argv)
     // specify the string-to-enum-mapping for "command"
     std::map<string, Command> map_string_to_command
     {
-        { "PrintInformation",					Command::PrintInformation },
-        { "ExtractSubBlock",					Command::ExtractSubBlock },
-        { "SingleChannelTileAccessor",			Command::SingleChannelTileAccessor },
-        { "ChannelComposite",					Command::ChannelComposite },
-        { "SingleChannelPyramidTileAccessor",	Command::SingleChannelPyramidTileAccessor },
+        { "PrintInformation",                   Command::PrintInformation },
+        { "ExtractSubBlock",                    Command::ExtractSubBlock },
+        { "SingleChannelTileAccessor",          Command::SingleChannelTileAccessor },
+        { "ChannelComposite",                   Command::ChannelComposite },
+        { "SingleChannelPyramidTileAccessor",   Command::SingleChannelPyramidTileAccessor },
         { "SingleChannelScalingTileAccessor",   Command::SingleChannelScalingTileAccessor },
-        { "ScalingChannelComposite",			Command::ScalingChannelComposite },
+        { "ScalingChannelComposite",            Command::ScalingChannelComposite },
         { "ExtractAttachment",                  Command::ExtractAttachment},
-        { "CreateCZI",							Command::CreateCZI },
+        { "CreateCZI",                          Command::CreateCZI },
     };
 
     const static PlaneCoordinateValidator plane_coordinate_validator;
@@ -550,23 +550,23 @@ CCmdLineOptions::ParseResult CCmdLineOptions::Parse(int argc, char** argv)
 
     cli_app.add_option("-c,--command", argument_command,
         R"(COMMAND can be one of 'PrintInformation', 'ExtractSubBlock', 'SingleChannelTileAccessor', 'ChannelComposite',
-    	   'SingleChannelPyramidTileAccessor', 'SingleChannelScalingTileAccessor', 'ScalingChannelComposite', 'ExtractAttachment' and 'CreateCZI'.
-    	   \N'PrintInformation' will print information about the CZI-file to the console. The argument 'info-level' can be used
-    	   to specify which information is to be printed.
-    	   \N'ExtractSubBlock' will write the bitmap contained in the specified sub-block to the OUTPUTFILE.
-    	   \N'ChannelComposite' will create a
-    	   channel-composite of the specified region and plane and apply display-settings to it. The resulting bitmap will be written
-    	   to the specified OUTPUTFILE.
-    	   \N'SingleChannelTileAccessor' will create a tile-composite (only from sub-blocks on pyramid-layer 0) of the specified region and plane.
-    	   The resulting bitmap will be written to the specified OUTPUTFILE.
-    	   \N'SingleChannelPyramidTileAccessor' adds to the previous command the ability to explictely address a specific pyramid-layer (which must
-    	   exist in the CZI-document).
-    	   \N'SingleChannelScalingTileAccessor' gets the specified region with an arbitrary zoom factor. It uses the pyramid-layers in the CZI-document
-    	   and scales the bitmap if neccessary. The resulting bitmap will be written to the specified OUTPUTFILE.
-    	   \N'ScalingChannelComposite' operates like the previous command, but in addition gets all channels and creates a multi-channel-composite from them
-    	   using display-settings.
-    	   \N'ExtractAttachment' allows to extract (and save to a file) the contents of attachments.)
-    	   \N'CreateCZI' is used to demonstrate the CZI-creation capabilities of libCZI.)")
+           'SingleChannelPyramidTileAccessor', 'SingleChannelScalingTileAccessor', 'ScalingChannelComposite', 'ExtractAttachment' and 'CreateCZI'.
+           \N'PrintInformation' will print information about the CZI-file to the console. The argument 'info-level' can be used
+           to specify which information is to be printed.
+           \N'ExtractSubBlock' will write the bitmap contained in the specified sub-block to the OUTPUTFILE.
+           \N'ChannelComposite' will create a
+           channel-composite of the specified region and plane and apply display-settings to it. The resulting bitmap will be written
+           to the specified OUTPUTFILE.
+           \N'SingleChannelTileAccessor' will create a tile-composite (only from sub-blocks on pyramid-layer 0) of the specified region and plane.
+           The resulting bitmap will be written to the specified OUTPUTFILE.
+           \N'SingleChannelPyramidTileAccessor' adds to the previous command the ability to explictely address a specific pyramid-layer (which must
+           exist in the CZI-document).
+           \N'SingleChannelScalingTileAccessor' gets the specified region with an arbitrary zoom factor. It uses the pyramid-layers in the CZI-document
+           and scales the bitmap if neccessary. The resulting bitmap will be written to the specified OUTPUTFILE.
+           \N'ScalingChannelComposite' operates like the previous command, but in addition gets all channels and creates a multi-channel-composite from them
+           using display-settings.
+           \N'ExtractAttachment' allows to extract (and save to a file) the contents of attachments.)
+           \N'CreateCZI' is used to demonstrate the CZI-creation capabilities of libCZI.)")
         ->default_val(Command::Invalid)
         ->option_text("COMMAND")
         ->transform(CLI::CheckedTransformer(map_string_to_command, CLI::ignore_case));

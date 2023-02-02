@@ -56,15 +56,15 @@ enum class InfoLevel : std::uint32_t
 struct ChannelDisplaySettings
 {
 
-    float		 weight;
+    float        weight;
 
-    bool		 enableTinting;
+    bool         enableTinting;
     libCZI::Compositors::TintingColor tinting;
 
-    float		 blackPoint;
-    float		 whitePoint;
+    float        blackPoint;
+    float        whitePoint;
 
-    float		 gamma;
+    float        gamma;
     std::vector<std::tuple<double, double>> splinePoints;
 
     bool IsGammaValid() const
@@ -110,15 +110,15 @@ struct ItemValue
     explicit ItemValue(double v) : type(Type::Number), doubleValue(v) {}
     explicit ItemValue(bool b) : type(Type::Boolean), boolValue(b) {}
 
-    Type		type;
+    Type        type;
     std::string strValue;
     double      doubleValue;
     bool        boolValue;
 
-    bool	IsValid() const { return this->type != Type::Invalid; }
-    bool	IsNumber() const { return this->type == Type::Number; }
-    bool	IsString() const { return this->type == Type::String; }
-    bool	IsBoolean() const { return this->type == Type::Boolean; }
+    bool    IsValid() const { return this->type != Type::Invalid; }
+    bool    IsNumber() const { return this->type == Type::Number; }
+    bool    IsString() const { return this->type == Type::String; }
+    bool    IsBoolean() const { return this->type == Type::Boolean; }
 
     bool TryGetNumber(double* p) const { if (this->IsNumber()) { if (p != nullptr) { *p = this->doubleValue; } return true; } return false; }
     bool TryGetString(std::string* p) const { if (this->IsString()) { if (p != nullptr) { *p = this->strValue; } return true; } return false; }
@@ -143,8 +143,8 @@ private:
     std::wstring cziFilename;
     libCZI::CDimCoordinate planeCoordinate;
 
-    bool	rectModeAbsoluteOrRelative;	// true->absolute, false->relative
-    int		rectX, rectY, rectW, rectH;
+    bool    rectModeAbsoluteOrRelative; // true->absolute, false->relative
+    int     rectX, rectY, rectW, rectH;
 
     std::wstring outputPath;
     std::wstring outputFilename;
@@ -156,7 +156,7 @@ private:
     bool drawTileBoundaries;
     std::uint32_t enabledOutputLevels;
     bool useWicJxrDecoder;
-    libCZI::RgbFloatColor	backGroundColor;
+    libCZI::RgbFloatColor   backGroundColor;
 
     int pyramidMinificationFactor;
     int pyramidLayerNo;
@@ -185,16 +185,16 @@ private:
     std::map<std::string, std::string> sbBlkMetadataKeyValue;
     bool sbBlkMetadataKeyValueValid;
 
-    libCZI::CompressionMode	compressionMode;
+    libCZI::CompressionMode compressionMode;
     std::shared_ptr<libCZI::ICompressParameters> compressionParameters;
     libCZI::PixelType pixelTypeForBitmapGenerator;
 public:
     /// Values that represent the result of the "Parse"-operation.
     enum class ParseResult
     {
-        OK,		///< An enum constant representing the result "arguments successfully parsed, operation can start".
-        Exit,	///< An enum constant representing the result "operation complete, the program should now be terminated, e.g. the synopsis was printed".
-        Error	///< An enum constant representing the result "the was an error parsing the command line arguments, program should terminate".
+        OK,     ///< An enum constant representing the result "arguments successfully parsed, operation can start".
+        Exit,   ///< An enum constant representing the result "operation complete, the program should now be terminated, e.g. the synopsis was printed".
+        Error   ///< An enum constant representing the result "the was an error parsing the command line arguments, program should terminate".
     };
 
     explicit CCmdLineOptions(std::shared_ptr<ILog> log);
@@ -205,7 +205,7 @@ public:
     /// is returned.
     ///
     /// \param          argc    The number of arguments.
-    /// \param [in]		argv    An array containing the arguments.
+    /// \param [in]     argv    An array containing the arguments.
     ///
     /// \returns    An enum indicating the result.
     ParseResult Parse(int argc, char** argv);
