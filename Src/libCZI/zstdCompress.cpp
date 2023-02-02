@@ -29,7 +29,7 @@ public:
     MemoryBlock(const MemoryBlock&) = delete;
     MemoryBlock& operator=(const MemoryBlock&) = delete;
 
-    MemoryBlock(size_t initialSize)
+    explicit MemoryBlock(size_t initialSize)
         : ptr(nullptr), sizeOfData(0)
     {
         this->ptr = malloc(initialSize);

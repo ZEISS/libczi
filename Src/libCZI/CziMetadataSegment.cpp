@@ -26,7 +26,7 @@ CCziMetadataSegment::~CCziMetadataSegment()
     {
     case XmlMetadata:
         ptr = this->spXmlData.get();
-        size = (size_t)this->xmlDataSize;
+        size = static_cast<size_t>(this->xmlDataSize);
         break;
     case Attachment:
         ptr = this->spAttachment.get();
@@ -44,7 +44,7 @@ CCziMetadataSegment::~CCziMetadataSegment()
     case XmlMetadata:
         if (ptrSize != nullptr)
         {
-            *ptrSize = (size_t)this->xmlDataSize;
+            *ptrSize = static_cast<size_t>(this->xmlDataSize);
         }
 
         return this->spXmlData;

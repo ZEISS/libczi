@@ -18,21 +18,21 @@ using namespace std;
 class CSiteImpBase : public ISite
 {
 public:
-    virtual bool IsEnabled(int logLevel) override
+    bool IsEnabled(int logLevel) override
     {
         return false;
     }
 
-    virtual void Log(int level, const char* szMsg) override
+    void Log(int level, const char* szMsg) override
     {
     }
 
-    virtual std::shared_ptr<libCZI::IBitmapData> CreateBitmap(libCZI::PixelType pixeltype, std::uint32_t width, std::uint32_t height, std::uint32_t stride, std::uint32_t extraRows, std::uint32_t extraColumns) override
+    std::shared_ptr<libCZI::IBitmapData> CreateBitmap(libCZI::PixelType pixeltype, std::uint32_t width, std::uint32_t height, std::uint32_t stride, std::uint32_t extraRows, std::uint32_t extraColumns) override
     {
         return CStdBitmapData::Create(pixeltype, width, height, stride, extraRows, extraColumns);
     }
 
-    virtual std::shared_ptr<IDecoder> GetDecoder(ImageDecoderType type, const char* arguments) override
+    std::shared_ptr<IDecoder> GetDecoder(ImageDecoderType type, const char* arguments) override
     {
         throw std::runtime_error("must not be called...");
     }
@@ -49,7 +49,7 @@ private:
     std::once_flag  zstd1DecoderInitialized;
     std::shared_ptr<IDecoder> zstd1decoder;
 public:
-    virtual std::shared_ptr<IDecoder> GetDecoder(ImageDecoderType type, const char* arguments) override
+    std::shared_ptr<IDecoder> GetDecoder(ImageDecoderType type, const char* arguments) override
     {
         switch (type)
         {
@@ -100,7 +100,7 @@ private:
     std::once_flag  zstd1DecoderInitialized;
     std::shared_ptr<IDecoder> zstd1decoder;
 public:
-    virtual std::shared_ptr<IDecoder> GetDecoder(ImageDecoderType type, const char* arguments) override
+    std::shared_ptr<IDecoder> GetDecoder(ImageDecoderType type, const char* arguments) override
     {
         switch (type)
         {

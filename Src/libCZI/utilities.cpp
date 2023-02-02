@@ -186,12 +186,12 @@ tString trimImpl(const tString& str, const tString& whitespace)
             switch (i)
             {
             case 1: a = Utilities::HexCharToInt(static_cast<char>(str[i])); break;
-            case 2: a = (a << 4) + Utilities::HexCharToInt((char)str[i]); break;
+            case 2: a = (a << 4) + Utilities::HexCharToInt(static_cast<char>(str[i])); break;
             case 3: r = Utilities::HexCharToInt(static_cast<char>(str[i])); break;
             case 4: r = (r << 4) + Utilities::HexCharToInt(static_cast<char>(str[i])); break;
-            case 5: g = Utilities::HexCharToInt((char)str[i]); break;
+            case 5: g = Utilities::HexCharToInt(static_cast<char>(str[i])); break;
             case 6: g = (g << 4) + Utilities::HexCharToInt(static_cast<char>(str[i])); break;
-            case 7: b = Utilities::HexCharToInt((char)str[i]); break;
+            case 7: b = Utilities::HexCharToInt(static_cast<char>(str[i])); break;
             case 8: b = (b << 4) + Utilities::HexCharToInt(static_cast<char>(str[i])); break;
             }
         }

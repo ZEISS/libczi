@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: LGPL-3.0-or-later
 
 #include "stdafx.h"
+#include <limits>
 #include "CziMetadataDocumentInfo.h"
 #include "CziMetadataDocumentInfo2.h"
 
@@ -923,7 +924,7 @@ CDimensionsChannelsInfo::CDimensionsChannelsInfo(pugi::xml_node node)
 
 int CDimensionsChannelsInfo::GetChannelCount() const /*override*/
 {
-    return (int)this->channels.size();
+    return static_cast<int>(this->channels.size());
 }
 
 std::shared_ptr<IDimensionChannelInfo> CDimensionsChannelsInfo::GetChannel(int i) const /*override*/
@@ -1158,7 +1159,7 @@ CDimensionChannelLightSourcesSettings::CDimensionChannelLightSourcesSettings(pug
 
 int CDimensionChannelLightSourcesSettings::GetLightSourceSettingCount() const /*override*/
 {
-    return (int)this->lightSourceSettings.size();
+    return static_cast<int>(this->lightSourceSettings.size());
 }
 
 std::shared_ptr<IDimensionChannelLightSourcesSetting> CDimensionChannelLightSourcesSettings::GetLightSourceSetting(int i) const /*override*/
@@ -1809,7 +1810,7 @@ void CDimensionChannelPolarizingSettings::ParseInformation(pugi::xml_node node)
                 break;
             }
 
-            for (++s; isspace(str[offset + s]); ++s) {};
+            for (++s; isspace(str[offset + s]); ++s) {}
             offset += s;
             vec.push_back(d);
         }
@@ -1846,7 +1847,7 @@ void CDimensionChannelPolarizingSettings::ParseInformation(pugi::xml_node node)
                 break;
             }
 
-            for (++s; isspace(str[offset + s]); ++s) {};
+            for (++s; isspace(str[offset + s]); ++s) {}
             offset += s;
             vec.push_back(d);
         }

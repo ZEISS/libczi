@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: LGPL-3.0-or-later
 
 #include "stdafx.h"
+#include <utility>
 #include "BitmapOperations.h"
 #include "MD5Sum.h"
 #include "utilities.h"
@@ -275,7 +276,7 @@ using namespace std;
 {
     for (int y = 0; y < h; ++y)
     {
-        std::uint16_t* p = reinterpret_cast<std::uint16_t*>(((char*)ptr) + (y * static_cast<ptrdiff_t>(stride)));
+        std::uint16_t* p = reinterpret_cast<std::uint16_t*>(static_cast<char*>(ptr) + (y * static_cast<ptrdiff_t>(stride)));
         for (int x = 0; x < w; ++x)
         {
             *(p + x) = val;
@@ -287,7 +288,7 @@ using namespace std;
 {
     for (int y = 0; y < h; ++y)
     {
-        std::uint8_t* p = reinterpret_cast<std::uint8_t*>(((char*)ptr) + (y * static_cast<ptrdiff_t>(stride)));
+        std::uint8_t* p = reinterpret_cast<std::uint8_t*>(static_cast<char*>(ptr) + (y * static_cast<ptrdiff_t>(stride)));
         for (int x = 0; x < w; ++x)
         {
             *(p + x * 3 + 0) = b;
@@ -301,7 +302,7 @@ void CBitmapOperations::Fill_Bgra32(int w, int h, void* ptr, int stride, std::ui
 {
     for (int y = 0; y < h; ++y)
     {
-        std::uint8_t* p = reinterpret_cast<std::uint8_t*>(((char*)ptr) + (y * static_cast<ptrdiff_t>(stride)));
+        std::uint8_t* p = reinterpret_cast<std::uint8_t*>(static_cast<char*>(ptr) + (y * static_cast<ptrdiff_t>(stride)));
         for (int x = 0; x < w; ++x)
         {
             *(p + x * 4 + 0) = b;
@@ -316,7 +317,7 @@ void CBitmapOperations::Fill_Bgra32(int w, int h, void* ptr, int stride, std::ui
 {
     for (int y = 0; y < h; ++y)
     {
-        std::uint16_t* p = reinterpret_cast<std::uint16_t*>(((char*)ptr) + (y * static_cast<ptrdiff_t>(stride)));
+        std::uint16_t* p = reinterpret_cast<std::uint16_t*>(static_cast<char*>(ptr) + (y * static_cast<ptrdiff_t>(stride)));
         for (int x = 0; x < w; ++x)
         {
             *(p + x * 3 + 0) = b;
@@ -379,7 +380,7 @@ void CBitmapOperations::Fill_Bgra32(int w, int h, void* ptr, int stride, std::ui
         for (uint32_t y = 0; y < height; ++y)
         {
             const uint16_t* pSrc = reinterpret_cast<const uint16_t*>(static_cast<const char*>(ptrSrc) + y * static_cast<ptrdiff_t>(srcStride));
-            uint16_t* pDst = (uint16_t*)(((char*)ptrDst) + y * ((ptrdiff_t)dstStride));
+            uint16_t* pDst = reinterpret_cast<uint16_t*>(static_cast<char*>(ptrDst) + y * static_cast<ptrdiff_t>(dstStride));
             for (uint32_t x = 0; x < width; ++x)
             {
                 *(pDst + x) = ((*(pSrc + x)) << 8) | ((*(pSrc + x)) >> 8);

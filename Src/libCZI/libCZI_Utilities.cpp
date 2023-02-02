@@ -170,7 +170,7 @@ const char* const Utils::VALUE_COMPRESS_HILO_BYTE_UNPACK = "HiLoByteUnpack";
     CMd5Sum md5sum;
     md5sum.update(ptrData, sizeData);
     md5sum.complete();
-    md5sum.getHash((char*)ptrHash);
+    md5sum.getHash(reinterpret_cast<char*>(ptrHash));
     return 16;
 }
 
@@ -197,11 +197,12 @@ static double CalcSplineValue(double x, const std::vector<libCZI::IDisplaySettin
 
 /*static*/std::vector<std::uint8_t> Utils::Create8BitLookUpTableFromSplines(int tableElementCnt, float blackPoint, float whitePoint, const std::vector<libCZI::IDisplaySettings::SplineData>& splineData)
 {
-    std::vector<std::uint8_t> lut; lut.reserve(tableElementCnt);
+    std::vector<std::uint8_t> lut;
+    lut.reserve(tableElementCnt);
 
     // TODO - look into rounding
-    int blackVal = (int)(tableElementCnt * blackPoint);
-    int whiteVal = (int)(tableElementCnt * whitePoint);
+    int blackVal = static_cast<int>(tableElementCnt * blackPoint);
+    int whiteVal = static_cast<int>(tableElementCnt * whitePoint);
 
     for (int i = 0; i < blackVal; ++i)
     {
@@ -210,10 +211,10 @@ static double CalcSplineValue(double x, const std::vector<libCZI::IDisplaySettin
 
     for (int i = blackVal; i < whiteVal; ++i)
     {
-        double x = (i - blackVal) / double(whiteVal - blackVal - 1);
+        double x = (i - blackVal) / static_cast<double>(whiteVal - blackVal - 1);
         double s = CalcSplineValue(x, splineData);
-        int is = (int)(s * 255);
-        std::uint8_t value = (is < 0 ? 0 : is>255 ? 255 : (std::uint8_t)is);
+        int is = static_cast<int>(s * 255);
+        std::uint8_t value = (is < 0 ? 0 : is>255 ? 255 : static_cast<std::uint8_t>(is));
         lut.emplace_back(value);
     }
 
@@ -241,15 +242,15 @@ static double CalcSplineValue(double x, const std::vector<libCZI::IDisplaySettin
 template <typename tFloat>
 tFloat GetParameterForToeSlopeAdjustment(tFloat gamma)
 {
-    const double GammaTolerance = (tFloat)0.0001;
+    const double GammaTolerance = static_cast<tFloat>(0.0001);
     if (abs(gamma - 0.5) < GammaTolerance)
     {
         return 224;
     }
-    else if (abs(gamma - (tFloat)0.45) < GammaTolerance)
+    else if (abs(gamma - static_cast<tFloat>(0.45)) < GammaTolerance)
     {
         // Optimization for frequently used gamma value.
-        return (tFloat)287.806332841221;
+        return static_cast<tFloat>(287.806332841221);
     }
     else
     {
@@ -259,7 +260,7 @@ tFloat GetParameterForToeSlopeAdjustment(tFloat gamma)
         tFloat gamma2 = gamma * gamma;
         tFloat factor = 1 / (gamma2 * gamma2);
 
-        const tFloat ResultTolerance = (tFloat)0.000001;
+        const tFloat ResultTolerance = static_cast<tFloat>(0.000001);
         const int MaxIterationCount = 200;
 
         for (int i = 0; i < MaxIterationCount; i++)
@@ -282,8 +283,8 @@ std::vector<tOutput> InternalCreateLookUpTableFromGamma(int tableElementCnt, tFl
 {
     std::vector<tOutput> lut; lut.reserve(tableElementCnt);
 
-    int lowOut = (int)(blackPoint * tableElementCnt);
-    int highOut = (int)(whitePoint * tableElementCnt);
+    int lowOut = static_cast<int>(blackPoint * tableElementCnt);
+    int highOut = static_cast<int>(whitePoint * tableElementCnt);
 
     for (int i = 0; i < lowOut; ++i)
     {
@@ -369,9 +370,9 @@ std::vector<tOutput> InternalCreateLookUpTableFromGamma(int tableElementCnt, tFl
 
     std::vector<libCZI::IDisplaySettings::SplineData> splineData; splineData.reserve(coeffs.size());
 
-    for (int i = 0; i < (int)coeffs.size(); ++i)
+    for (int i = 0; i < static_cast<int>(coeffs.size()); ++i)
     {
-        double xCoord = (i == 0) ? 0. : get<0>(getPoint(i - 1));
+        double xCoord = (i == 0) ? 0 : get<0>(getPoint(i - 1));
         IDisplaySettings::SplineData spD{ xCoord, coeffs.at(i) };
         splineData.push_back(spD);
     }
@@ -466,12 +467,12 @@ std::vector<tOutput> InternalCreateLookUpTableFromGamma(int tableElementCnt, tFl
 /*static*/std::string Utils::DimCoordinateToString(const libCZI::IDimCoordinate* coord)
 {
     stringstream ss;
-    for (int i = (int)(libCZI::DimensionIndex::MinDim); i <= (int)(libCZI::DimensionIndex::MaxDim); ++i)
+    for (int i = static_cast<int>(libCZI::DimensionIndex::MinDim); i <= static_cast<int>(libCZI::DimensionIndex::MaxDim); ++i)
     {
         int value;
-        if (coord->TryGetPosition((libCZI::DimensionIndex)i, &value))
+        if (coord->TryGetPosition(static_cast<libCZI::DimensionIndex>(i), &value))
         {
-            ss << DimensionToChar((libCZI::DimensionIndex)i) << value;
+            ss << DimensionToChar(static_cast<libCZI::DimensionIndex>(i)) << value;
         }
     }
 
@@ -502,12 +503,12 @@ std::vector<tOutput> InternalCreateLookUpTableFromGamma(int tableElementCnt, tFl
 /*static*/std::string Utils::DimBoundsToString(const libCZI::IDimBounds* bounds)
 {
     stringstream ss;
-    for (int i = (int)(libCZI::DimensionIndex::MinDim); i <= (int)(libCZI::DimensionIndex::MaxDim); ++i)
+    for (int i = (int)(libCZI::DimensionIndex::MinDim); i <= static_cast<int>(libCZI::DimensionIndex::MaxDim); ++i)
     {
         int start, size;
-        if (bounds->TryGetInterval((libCZI::DimensionIndex)i, &start, &size))
+        if (bounds->TryGetInterval(static_cast<libCZI::DimensionIndex>(i), &start, &size))
         {
-            ss << DimensionToChar((libCZI::DimensionIndex)i) << start << ':' << size;
+            ss << DimensionToChar(static_cast<libCZI::DimensionIndex>(i)) << start << ':' << size;
         }
     }
 
