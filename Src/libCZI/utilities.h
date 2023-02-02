@@ -8,6 +8,7 @@
 #include <string>
 #include <cwctype>
 #include <functional>
+#include <vector>
 #include "libCZI_Pixels.h"
 
 class Utilities
