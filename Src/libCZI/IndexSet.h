@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <vector>
+#include <tuple>
 #include "libCZI.h"
 
 class CIndexSet : public libCZI::IIndexSet
@@ -18,7 +20,7 @@ private:
 
     std::vector<interval> intervals;
 public:
-    CIndexSet(const std::wstring& str);
+    explicit CIndexSet(const std::wstring& str);
 
     /// Query if 'index' is contained in the set.
     ///

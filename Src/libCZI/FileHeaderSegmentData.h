@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <limits>
 #include "CziStructs.h"
 
 class CFileHeaderSegmentData
@@ -26,7 +27,7 @@ public:
 
     }
 
-    CFileHeaderSegmentData(const FileHeaderSegmentData* hdrSegmentData) :
+    explicit CFileHeaderSegmentData(const FileHeaderSegmentData* hdrSegmentData) :
         verMajor(hdrSegmentData->Major),
         verMinor(hdrSegmentData->Minor),
         fileGuid(hdrSegmentData->FileGuid),
