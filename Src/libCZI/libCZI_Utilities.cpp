@@ -305,8 +305,14 @@ std::vector<tOutput> InternalCreateLookUpTableFromGamma(int tableElementCnt, tFl
             tFloat x = (i - lowOut) / tFloat(highOut - lowOut - 1);
 
             tFloat val = maxOut * (pow(a * x + 1, gamma) - 1) / denumeratorToeSlope;
-            if (val > maxOut) { val = maxOut; }
-            else if (val < 0) { val = 0; }
+            if (val > maxOut)
+            {
+                val = maxOut;
+            }
+            else if (val < 0)
+            {
+                val = 0;
+            }
 
             tOutput outVal = static_cast<tOutput>(val);
             lut.emplace_back(outVal);
@@ -318,8 +324,14 @@ std::vector<tOutput> InternalCreateLookUpTableFromGamma(int tableElementCnt, tFl
         {
             tFloat x = (i - lowOut) / tFloat(highOut - lowOut - 1);
             tFloat val = maxOut * pow(x, gamma);
-            if (val > maxOut) { val = maxOut; }
-            else if (val < 0) { val = 0; }
+            if (val > maxOut)
+            {
+                val = maxOut;
+            }
+            else if (val < 0)
+            {
+                val = 0;
+            }
 
             tOutput outVal = static_cast<tOutput>(val);
             lut.emplace_back(outVal);
@@ -503,7 +515,7 @@ std::vector<tOutput> InternalCreateLookUpTableFromGamma(int tableElementCnt, tFl
 /*static*/std::string Utils::DimBoundsToString(const libCZI::IDimBounds* bounds)
 {
     stringstream ss;
-    for (int i = (int)(libCZI::DimensionIndex::MinDim); i <= static_cast<int>(libCZI::DimensionIndex::MaxDim); ++i)
+    for (int i = static_cast<int>(libCZI::DimensionIndex::MinDim); i <= static_cast<int>(libCZI::DimensionIndex::MaxDim); ++i)
     {
         int start, size;
         if (bounds->TryGetInterval(static_cast<libCZI::DimensionIndex>(i), &start, &size))
