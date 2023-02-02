@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <memory>
 #include <atomic>
 #include "libCZI_Pixels.h"
 #include "CziUtils.h"
@@ -58,7 +59,7 @@ public:
         }
     }
 
-    virtual ~CBitmapData() override
+    ~CBitmapData() override
     {
 #if defined(_DEBUG)
         const int lckCnt = std::atomic_load(&this->lockCnt);
