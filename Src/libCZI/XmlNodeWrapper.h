@@ -30,7 +30,7 @@ private:
 public:
     XmlNodeWrapperReadonly(std::shared_ptr<t> parentRef, pugi::xml_node_struct* node_struct) :node(node_struct), parentRef(std::move(parentRef)) {};
     XmlNodeWrapperReadonly(pugi::xml_node_struct* node_struct) :node(node_struct) {};
-public:	// interface IXmlNodeRead
+public: // interface IXmlNodeRead
     std::wstring Name() const override
     {
         return this->node.name();

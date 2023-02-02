@@ -18,27 +18,27 @@ template  <typename tAllocator = CHeapAllocator>
 class CBitmapData : public libCZI::IBitmapData
 {
 private:
-    tAllocator	allocator;
-    libCZI::PixelType	pixelType;
-    std::uint32_t		width;
-    std::uint32_t		height;
-    std::uint32_t		pitch;
+    tAllocator          allocator;
+    libCZI::PixelType   pixelType;
+    std::uint32_t       width;
+    std::uint32_t       height;
+    std::uint32_t       pitch;
 
-    std::uint32_t		extraRows;
-    std::uint32_t		extraColumns;
+    std::uint32_t       extraRows;
+    std::uint32_t       extraColumns;
 
     void* pData;
-    std::uint64_t		dataSize;
+    std::uint64_t       dataSize;
 
     std::atomic<int> lockCnt = ATOMIC_VAR_INIT(0);
 public:
     static std::shared_ptr<libCZI::IBitmapData> Create(libCZI::PixelType pixeltype, std::uint32_t width, std::uint32_t height, std::uint32_t pitch = 0, std::uint32_t extraRows = 0, std::uint32_t extraColumns = 0);
     static std::shared_ptr<libCZI::IBitmapData> Create(tAllocator allocator, libCZI::PixelType pixeltype, std::uint32_t width, std::uint32_t height, std::uint32_t pitch);
 
-    libCZI::PixelType		GetPixelType() const override { return this->pixelType; }
-    libCZI::IntSize			GetSize() const override { return libCZI::IntSize{ this->width,this->height }; }
+    libCZI::PixelType       GetPixelType() const override { return this->pixelType; }
+    libCZI::IntSize         GetSize() const override { return libCZI::IntSize{ this->width,this->height }; }
 
-    libCZI::BitmapLockInfo	Lock() override
+    libCZI::BitmapLockInfo  Lock() override
     {
         std::atomic_fetch_add(&this->lockCnt, 1);
         libCZI::BitmapLockInfo bli;

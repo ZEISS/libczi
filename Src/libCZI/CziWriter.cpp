@@ -197,14 +197,14 @@ void libCZI::ICziWriter::SyncAddSubBlock(const AddSubBlockInfoStridedBitmap& add
     attchmntSegment.data.DataSize = addAttchmntInfo.dataSize;
     attchmntSegment.data.entry.SchemaType[0] = 'A';
     attchmntSegment.data.entry.SchemaType[1] = '1';
-    attchmntSegment.data.entry.FilePosition = info.segmentPos;	// this is redundant, does not really make sense
+    attchmntSegment.data.entry.FilePosition = info.segmentPos;  // this is redundant, does not really make sense
     attchmntSegment.data.entry.ContentGuid = addAttchmntInfo.contentGuid;
     memcpy(&attchmntSegment.data.entry.ContentFileType[0], &addAttchmntInfo.contentFileType[0], sizeof(attchmntSegment.data.entry.ContentFileType));
     memcpy(&attchmntSegment.data.entry.Name[0], &addAttchmntInfo.name[0], sizeof(attchmntSegment.data.entry.Name));
 
     uint64_t  bytesWritten;
     uint64_t  totalBytesWritten = 0;
-    auto attchmntSegmentHeaderAllocatedSize = attchmntSegment.header.AllocatedSize;	// save this before we (potentially) modify the byte-order
+    auto attchmntSegmentHeaderAllocatedSize = attchmntSegment.header.AllocatedSize; // save this before we (potentially) modify the byte-order
 
     ConvertToHostByteOrder::Convert(&attchmntSegment);
     info.writeFunc(info.segmentPos, &attchmntSegment, sizeof(attchmntSegment), &bytesWritten, "AttachmentSegment");
@@ -313,7 +313,7 @@ void libCZI::ICziWriter::SyncAddSubBlock(const AddSubBlockInfoStridedBitmap& add
 
 /*static*/int CWriterUtils::CalcCountOfDimensionsEntriesInDirectoryEntryDV(const CCziSubBlockDirectoryBase::SubBlkEntry& entry)
 {
-    int numberOfDimensionEntries = 2;	// we always have X AND Y
+    int numberOfDimensionEntries = 2;   // we always have X AND Y
     numberOfDimensionEntries += entry.coordinate.GetValidDimensionsCount();
     if (entry.IsMIndexValid())
     {
@@ -397,7 +397,7 @@ void libCZI::ICziWriter::SyncAddSubBlock(const AddSubBlockInfoStridedBitmap& add
 
 /*static*/int CWriterUtils::CalcCountOfDimensionsEntriesInDirectoryEntryDV(const libCZI::AddSubBlockInfo& addSbBlkInfo)
 {
-    int numberOfDimensionEntries = 2;	// we always have X AND Y
+    int numberOfDimensionEntries = 2;   // we always have X AND Y
     numberOfDimensionEntries += addSbBlkInfo.coordinate.GetValidDimensionsCount();
     if (addSbBlkInfo.mIndexValid)
     {
@@ -540,7 +540,7 @@ void libCZI::ICziWriter::SyncAddSubBlock(const AddSubBlockInfoStridedBitmap& add
 
 /*static*/size_t CWriterUtils::CalcSizeOfSubBlockDirectoryEntryDV(const CCziSubBlockDirectoryBase::SubBlkEntry& entry)
 {
-    int numberOfDimensionEntries = 2;	// we always have X AND Y
+    int numberOfDimensionEntries = 2;   // we always have X AND Y
     numberOfDimensionEntries += entry.coordinate.GetValidDimensionsCount();
     if (entry.IsMIndexValid())
     {
@@ -586,7 +586,7 @@ void libCZI::ICziWriter::SyncAddSubBlock(const AddSubBlockInfoStridedBitmap& add
 
     uint64_t bytesWritten;
     uint64_t totalBytesWritten = 0;
-    auto msHeaderAllocatedSize = ms.header.AllocatedSize;	// need to save this information before (potentially) changing the byte-order
+    auto msHeaderAllocatedSize = ms.header.AllocatedSize;   // need to save this information before (potentially) changing the byte-order
 
     ConvertToHostByteOrder::Convert(&ms);
     info.writeFunc(metadataSegmentPos, &ms, sizeof(ms), &bytesWritten, "MetadataSegment");
@@ -1199,7 +1199,7 @@ std::tuple<std::uint64_t, std::uint64_t>  CCziWriter::WriteCurrentAttachmentsDir
 /// The segment is appeneded to the file at the next available fileposition.
 ///
 /// \return A std::tuple&lt;std::uint64_t,std::uint64_t&gt; giving the file-position (first parameter) and
-/// 		the "allocated-size" of the segment.
+///         the "allocated-size" of the segment.
 std::tuple<std::uint64_t, std::uint64_t> CCziWriter::WriteCurrentSubBlkDirectory()
 {
     CWriterUtils::SubBlkDirWriteInfo info;
@@ -1240,7 +1240,7 @@ std::tuple<std::uint64_t, std::uint64_t> CCziWriter::WriteCurrentSubBlkDirectory
 /// \param metadataInfo Information describing the metadata.
 ///
 /// \return A std::tuple<std::uint64_t,std::uint64_t>; giving the file-position (first parameter) and
-/// 		the "allocated-size" of the segment.
+///         the "allocated-size" of the segment.
 std::tuple<std::uint64_t, std::uint64_t> CCziWriter::WriteMetadata(const libCZI::WriteMetadataInfo& metadataInfo)
 {
     CWriterUtils::MetadataWriteInfo info;

@@ -222,9 +222,9 @@ const libCZI::PyramidStatistics& CSbBlkStatisticsUpdater::GetPyramidStatistics()
 /// Attempts to to determine pyramid layer information from the given data.
 /// If we have a layer-0 subblock, minificationFactor and pyramdidLayerNo are set to 0.
 ///
-/// \param entry					   The subblock-entry.
+/// \param entry                       The subblock-entry.
 /// \param [out] ptrMinificationFactor If non-null, the minification factor will be stored here.
-/// \param [out] ptrPyramidLayerNo	   If non-null, the pyramid layer no will be stored here.
+/// \param [out] ptrPyramidLayerNo     If non-null, the pyramid layer no will be stored here.
 ///
 /// \return True if it succeeds, false if it fails.
 /*static*/bool CSbBlkStatisticsUpdater::TryToDeterminePyramidLayerInfo(const CCziSubBlockDirectoryBase::SubBlkEntry& entry, std::uint8_t* ptrMinificationFactor, std::uint8_t* ptrPyramidLayerNo)
@@ -595,7 +595,7 @@ void CReaderWriterCziSubBlockDirectory::AddSubBlock(const SubBlkEntry& entry, in
     }
 
     this->SetModified(true);
-    if (this->sbBlkStatisticsCurrent)	// no need to update if it is already "not up-to-date"
+    if (this->sbBlkStatisticsCurrent)   // no need to update if it is already "not up-to-date"
     {
         this->sblkStatistics.UpdateStatistics(entry);
         this->sbBlkStatisticsConsolidated = false;
@@ -677,7 +677,7 @@ bool CReaderWriterCziSubBlockDirectory::TryRemoveSubBlock(int key, SubBlkEntry* 
 /// First check whether a subblock already exists (with an equal coordinate); and if so, we return false.
 /// Otherwise, we add the subblock and store its index into "key" (if it is non-null).
 ///
-/// \param 		    entry The entry to add.
+/// \param          entry The entry to add.
 /// \param [in,out] key   If non-null, this will receive the key for the newly added enty (if return value is true).
 ///
 /// \return True if it succeeds, false if it fails (because an entry with identical coordinate already exists).

@@ -29,7 +29,7 @@ CCziAttachment::~CCziAttachment()
 /*virtual*/void CCziAttachment::DangerousGetRawData(const void*& ptr, size_t& size) const
 {
     ptr = this->spData.get();
-    size = (size_t)this->dataSize;	// TODO: check the cast
+    size = (size_t)this->dataSize;  // TODO: check the cast
 }
 
 /*virtual*/std::shared_ptr<const void> CCziAttachment::GetRawData(size_t* ptrSize)

@@ -35,7 +35,7 @@ CCziSubBlock::~CCziSubBlock()
     {
     case Metadata:
         ptr = this->spMetadata.get();
-        size = (size_t)this->metaDataSize;	// TODO: check the cast
+        size = (size_t)this->metaDataSize;  // TODO: check the cast
         break;
     case Data:
         ptr = this->spData.get();

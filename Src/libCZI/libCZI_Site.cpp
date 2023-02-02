@@ -42,11 +42,11 @@ public:
 class CSiteImpWic : public CSiteImpBase
 {
 private:
-    std::once_flag	jxrDecoderInitialized;
+    std::once_flag  jxrDecoderInitialized;
     std::shared_ptr<IDecoder> jpgXrdecoder;
-    std::once_flag	zstd0DecoderInitialized;
+    std::once_flag  zstd0DecoderInitialized;
     std::shared_ptr<IDecoder> zstd0decoder;
-    std::once_flag	zstd1DecoderInitialized;
+    std::once_flag  zstd1DecoderInitialized;
     std::shared_ptr<IDecoder> zstd1decoder;
 public:
     virtual std::shared_ptr<IDecoder> GetDecoder(ImageDecoderType type, const char* arguments) override
@@ -93,11 +93,11 @@ public:
 class CSiteImpJxrLib : public CSiteImpBase
 {
 private:
-    std::once_flag	jxrDecoderInitialized;
+    std::once_flag  jxrDecoderInitialized;
     std::shared_ptr<IDecoder> jpgXrdecoder;
-    std::once_flag	zstd0DecoderInitialized;
+    std::once_flag  zstd0DecoderInitialized;
     std::shared_ptr<IDecoder> zstd0decoder;
-    std::once_flag	zstd1DecoderInitialized;
+    std::once_flag  zstd1DecoderInitialized;
     std::shared_ptr<IDecoder> zstd1decoder;
 public:
     virtual std::shared_ptr<IDecoder> GetDecoder(ImageDecoderType type, const char* arguments) override

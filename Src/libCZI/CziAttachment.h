@@ -11,8 +11,8 @@ class CCziAttachment : public  libCZI::IAttachment
 {
 private:
     std::shared_ptr<const void> spData;
-    std::uint64_t	dataSize;
-    libCZI::AttachmentInfo	info;
+    std::uint64_t   dataSize;
+    libCZI::AttachmentInfo  info;
 public:
     CCziAttachment(const libCZI::AttachmentInfo& info, const CCZIParse::AttachmentData& data, std::function<void(void*)> deleter);
     virtual ~CCziAttachment();

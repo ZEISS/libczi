@@ -136,7 +136,7 @@ using namespace Eigen;
 
 /*static*/double CSplines::CalculateSplineValue(double xPosition, const CSplines::Coefficients& coeffs)
 {
-    constexpr int n = 4;	// cubic spline, polynomial number is 4
+    constexpr int n = 4;    // cubic spline, polynomial number is 4
 
     double y = 0;
     double xPower = 1;

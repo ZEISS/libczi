@@ -35,17 +35,17 @@ namespace libCZI
         static libCZI::DimensionIndex CharToDimension(char c);
 
         /// Calculates the MD5SUM hash for the pixels in the specified bitmap.
-        /// \param [in] bm	    The bitmap.
+        /// \param [in] bm      The bitmap.
         /// \param [in,out] ptrHash Pointer to the hash-code result. The result will be of size 16 bytes.
-        /// \param hashSize		    Size of the hash-code result pointed to by <tt>ptrHash</tt>. We need 16 bytes.
+        /// \param hashSize         Size of the hash-code result pointed to by <tt>ptrHash</tt>. We need 16 bytes.
         /// \return The count of bytes that were written to in ptrHash as the MD5SUM-hash (always 16).
         static int CalcMd5SumHash(libCZI::IBitmapData* bm, std::uint8_t* ptrHash, int hashSize);
 
         /// Calculates the MD5SUM hash for the specified data.
-        /// \param [in] ptrData	    Pointer to the data (for which to calculate the MD5SUM-hash).
-        /// \param [in] sizeData	The size of the data (pointed to by ptrData).
+        /// \param [in] ptrData     Pointer to the data (for which to calculate the MD5SUM-hash).
+        /// \param [in] sizeData    The size of the data (pointed to by ptrData).
         /// \param [in,out] ptrHash Pointer to the hash-code result. The result will be of size 16 bytes.
-        /// \param hashSize		    Size of the hash-code result pointed to by <tt>ptrHash</tt>. We need 16 bytes.
+        /// \param hashSize         Size of the hash-code result pointed to by <tt>ptrHash</tt>. We need 16 bytes.
         /// \return The count of bytes that were written to in ptrHash as the MD5SUM-hash (always 16).
         static int CalcMd5SumHash(const void* ptrData, size_t sizeData, std::uint8_t* ptrHash, int hashSize);
 
@@ -53,9 +53,9 @@ namespace libCZI
         /// A spline is sampled between \c blackPoint and \c whitePoint (i. e. points left of \c blackPoint are set to 0
         /// and right of \c whitePoint are set to 1). 
         /// \param tableElementCnt Number of points to sample - the result will have as many samples as specified here.
-        /// \param blackPoint	   The black point.
-        /// \param whitePoint	   The white point.
-        /// \param splineData	   Information describing the spline.
+        /// \param blackPoint      The black point.
+        /// \param whitePoint      The white point.
+        /// \param splineData      Information describing the spline.
         /// \return The new 8-bit look up table generated from the spline. The number is elements is as specified by <tt>tableElementCount</tt>.
         static std::vector<std::uint8_t> Create8BitLookUpTableFromSplines(int tableElementCnt, float blackPoint, float whitePoint, const std::vector<libCZI::IDisplaySettings::SplineData>& splineData);
 
@@ -63,9 +63,9 @@ namespace libCZI
         /// An exponential with the specified gamma is sampled between \c blackPoint and \c whitePoint (i. e. points left of \c blackPoint are set to 0
         /// and right of \c whitePoint are set to 1).
         /// \param tableElementCnt Number of points to sample - the result will have as many samples as specified here.
-        /// \param blackPoint	   The black point.
-        /// \param whitePoint	   The white point.
-        /// \param gamma		   The gamma.
+        /// \param blackPoint      The black point.
+        /// \param whitePoint      The white point.
+        /// \param gamma           The gamma.
         ///
         /// \return The new 8-bit look up table generated from the gamma value. The number is elements is as specified by <tt>tableElementCount</tt>.
         static std::vector<std::uint8_t> Create8BitLookUpTableFromGamma(int tableElementCnt, float blackPoint, float whitePoint, float gamma);
@@ -74,9 +74,9 @@ namespace libCZI
         /// An exponential with the specified gamma is sampled between \c blackPoint and \c whitePoint (i. e. points left of \c blackPoint are set to 0
         /// and right of \c whitePoint are set to 1).
         /// \param tableElementCnt Number of points to sample - the result will have as many samples as specified here.
-        /// \param blackPoint	   The black point.
-        /// \param whitePoint	   The white point.
-        /// \param gamma		   The gamma.
+        /// \param blackPoint      The black point.
+        /// \param whitePoint      The white point.
+        /// \param gamma           The gamma.
         ///
         /// \return The new 16-bit look up table generated from the gamma value. The number is elements is as specified by <tt>tableElementCount</tt>.
         static std::vector<std::uint16_t> Create16BitLookUpTableFromGamma(int tableElementCnt, float blackPoint, float whitePoint, float gamma);
@@ -89,17 +89,17 @@ namespace libCZI
 
         /// Resize the specified bitmap to the specified width and height. This method employs a nearest-neighbor-scaling algorihm.
         /// \param [in] bmSrc The source bitmap.
-        /// \param dstWidth		  Width of the destination.
-        /// \param dstHeight	  Height of the destination.
+        /// \param dstWidth       Width of the destination.
+        /// \param dstHeight      Height of the destination.
         /// \return A std::shared_ptr&lt;libCZI::IBitmapData &gt; containing the scaled bitmap.
         static std::shared_ptr<libCZI::IBitmapData > NearestNeighborResize(libCZI::IBitmapData* bmSrc, int dstWidth, int dstHeight);
 
         /// Resize a ROI from the specified bitmap to the specified width and height. This method employs a nearest-neighbor-scaling algorihm.
-        /// \param [in] bmSrc	  The source bitmap.
-        /// \param dstWidth		  Width of the destination.
-        /// \param dstHeight	  Height of the destination.
-        /// \param roiSrc		  The ROI (in the source bitmap).
-        /// \param roiDest		  The ROI (in the destination bitmap)
+        /// \param [in] bmSrc     The source bitmap.
+        /// \param dstWidth       Width of the destination.
+        /// \param dstHeight      Height of the destination.
+        /// \param roiSrc         The ROI (in the source bitmap).
+        /// \param roiDest        The ROI (in the destination bitmap)
         /// \return A std::shared_ptr&lt;libCZI::IBitmapData &gt;
         static std::shared_ptr<libCZI::IBitmapData > NearestNeighborResize(libCZI::IBitmapData* bmSrc, int dstWidth, int dstHeight, const DblRect& roiSrc, const DblRect& roiDest);
 
@@ -166,8 +166,8 @@ namespace libCZI
         static std::string DimCoordinateToString(const libCZI::IDimCoordinate* coord);
 
         /// Convert the specified string into a dimension-coordinate instance.
-        /// \param 		    sz    The string to convert.
-        /// \param [out]	coord If non-null and if the parsing was successful, the information will be put here.
+        /// \param          sz    The string to convert.
+        /// \param [out]    coord If non-null and if the parsing was successful, the information will be put here.
         /// \returns True if the string parsed successfully, false otherwise.
         static bool StringToDimCoordinate(const char* sz, libCZI::CDimCoordinate* coord);
 
@@ -188,11 +188,11 @@ namespace libCZI
         /// Try to determine the pixel type for channel. This is done by looking at an (arbitrary) subblock within the specified
         /// channel. There are cases where this does not yield a result - e. g. if there is no subblock present
         /// with the specified channel-index.
-        /// \param [in] repository	   The CZI-document.
-        /// \param channelIdx	       The channel index.
+        /// \param [in] repository     The CZI-document.
+        /// \param channelIdx          The channel index.
         ///
         /// \return The pixeltype if it can be determined. If it cannot be determined reliably (e.g. there is no subblock with
-        /// 		the specified channel-index), then PixelType::Invalid is returned.
+        ///         the specified channel-index), then PixelType::Invalid is returned.
         static libCZI::PixelType TryDeterminePixelTypeForChannel(libCZI::ISubBlockRepository* repository, int channelIdx);
 
         /// Compares two coordinate-objects to determine their relative ordering.
@@ -218,18 +218,18 @@ namespace libCZI
         /// Creates a metadata-builder object suitable for generating sub-block metadata. It generates XML in the form
         /// \code{.unparsed}
         /// <METADATA>
-        ///		<Tags>
-        ///			<StageXPosition>-8906.346</StageXPosition>
-        ///			<StageYPosition>-648.51</StageYPosition>
-        ///		</Tags>
-        ///	</METADATA>
+        ///     <Tags>
+        ///         <StageXPosition>-8906.346</StageXPosition>
+        ///         <StageYPosition>-648.51</StageYPosition>
+        ///     </Tags>
+        /// </METADATA>
         /// \endcode
         /// The specified function can be used to give a set of nodename-value-pairs - which are added under the "Tags"-node.
         ///
         /// \param [in] tagsEnum Optionally, a function which is called to provide a pair of strings, where the first element
-        /// 			gives the node-name and the second the value. The first integer argument counts the number of calls made
-        /// 			to this function. The function has to return true, if it provided valid information and it will be called
-        /// 			again. If it returns false, it will not be called again.
+        ///             gives the node-name and the second the value. The first integer argument counts the number of calls made
+        ///             to this function. The function has to return true, if it provided valid information and it will be called
+        ///             again. If it returns false, it will not be called again.
         ///
         /// \return The newly created metadata-builder object.
         static std::shared_ptr<ICziMetadataBuilder> CreateSubBlockMetadata(const std::function<bool(int, std::tuple<std::string, std::string>&)>& tagsEnum = nullptr);
@@ -275,18 +275,18 @@ namespace libCZI
 
         //! ZStd1 compression preprocessing parameter. The valid value is "HiLoByteUnpack"
         //! The parameter is valid only for ZStd1 compression and ignored in case of ZStd0.
-        //! Example:	"zstd1:ExplicitLevel=2;PreProcess=HiLoByteUnpack" 
-        //!				and ignored in case of "zstd0:ExplicitLevel=2;PreProcess=HiLoByteUnpack"
-        static const char* const KEY_COMPRESS_PRE_PROCESS		 /*= "PreProcess"*/;
+        //! Example:    "zstd1:ExplicitLevel=2;PreProcess=HiLoByteUnpack" 
+        //!             and ignored in case of "zstd0:ExplicitLevel=2;PreProcess=HiLoByteUnpack"
+        static const char* const KEY_COMPRESS_PRE_PROCESS        /*= "PreProcess"*/;
 
         //! The valid (expected) value in case of Pre-Processing.
         //! The flag indicates whether the "HiLoByteUnpack" is enabled or not.
         //! The parameter and the value are valid only for 16- and 48-bit pixel images.
         //! For all other pixel types the parameter and the value are ignored.
-        //! Example:	- Pixel type Bgr8  : Ignored	--> "zstd1:ExplicitLevel=2;PreProcess=HiLoByteUnpack"
-        //!             - Pixel type Bgr24 : Ignored	--> "zstd1:ExplicitLevel=2;PreProcess=HiLoByteUnpack"
-        //!				- Pixel type Gray16: Used		--> "zstd1:ExplicitLevel=2;PreProcess=HiLoByteUnpack"
-        //!				- Pixel type Gray48: Used		--> "zstd1:ExplicitLevel=2;PreProcess=HiLoByteUnpack"
+        //! Example:    - Pixel type Bgr8  : Ignored    --> "zstd1:ExplicitLevel=2;PreProcess=HiLoByteUnpack"
+        //!             - Pixel type Bgr24 : Ignored    --> "zstd1:ExplicitLevel=2;PreProcess=HiLoByteUnpack"
+        //!             - Pixel type Gray16: Used       --> "zstd1:ExplicitLevel=2;PreProcess=HiLoByteUnpack"
+        //!             - Pixel type Gray48: Used       --> "zstd1:ExplicitLevel=2;PreProcess=HiLoByteUnpack"
         static const char* const VALUE_COMPRESS_HILO_BYTE_UNPACK /*= "HiLoByteUnpack"*/;
 
         //! Define a type for compression options. It is a pair where one parameter is compression mode

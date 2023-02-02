@@ -72,8 +72,8 @@ void CMd5Sum::getHash(char* pHash)
     }
 }
 
-void CMd5Sum::MD5Update(unsigned char* input,		// input block
-    size_t inputLen)	// length of input block
+void CMd5Sum::MD5Update(unsigned char* input,       // input block
+    size_t inputLen)    // length of input block
 {
     // MD5 block update operation. Continues an MD5 message-digest
     // operation, processing another message block, and updating the
@@ -117,7 +117,7 @@ void CMd5Sum::MD5Update(unsigned char* input,		// input block
 
 }
 
-void CMd5Sum::MD5Final(unsigned char* digest)		// message digest
+void CMd5Sum::MD5Final(unsigned char* digest)       // message digest
 {
     // MD5 finalization. Ends an MD5 message-digest operation, writing the
     // the message digest and zeroizing the context.

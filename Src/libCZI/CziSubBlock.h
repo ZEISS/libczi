@@ -11,10 +11,10 @@ class CCziSubBlock : public  libCZI::ISubBlock
 {
 private:
     std::shared_ptr<const void> spData, spAttachment, spMetadata;
-    std::uint64_t	dataSize;
-    std::uint32_t	attachmentSize;
-    std::uint32_t	metaDataSize;
-    libCZI::SubBlockInfo	info;
+    std::uint64_t   dataSize;
+    std::uint32_t   attachmentSize;
+    std::uint32_t   metaDataSize;
+    libCZI::SubBlockInfo    info;
 public:
     CCziSubBlock(const libCZI::SubBlockInfo& info, const CCZIParse::SubBlockData& data, std::function<void(void*)> deleter);
     ~CCziSubBlock() override;

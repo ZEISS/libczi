@@ -16,7 +16,7 @@ public:
         : cdsPod(pod)
     {}
 
-public:	// interface IChannelDisplaySetting
+public: // interface IChannelDisplaySetting
     bool GetIsEnabled() const override;
     float GetWeight() const override;
     bool TryGetTintingColorRgb8(libCZI::Rgb8Color* pColor) const override;
@@ -36,7 +36,7 @@ public:
     CDisplaySettingsOnPod(const libCZI::DisplaySettingsPOD& pod);
 
     static std::shared_ptr<libCZI::IDisplaySettings> CreateFromXml(pugi::xml_node node);
-public:	// interface IDisplaySettings
+public: // interface IDisplaySettings
     void EnumChannels(std::function<bool(int)> func) const override;
     std::shared_ptr<libCZI::IChannelDisplaySetting> GetChannelDisplaySettings(int chIndex) const override;
 };

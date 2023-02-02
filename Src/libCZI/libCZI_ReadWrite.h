@@ -45,7 +45,7 @@ namespace libCZI
 
         /// Replace an existing subblock. The subblock is identified by an index (as reported by ISubBlockRepository::EnumerateSubBlocks).
         ///
-        /// \param key		    The key (as retrieved by ISubBlockRepository::EnumerateSubBlocks).
+        /// \param key          The key (as retrieved by ISubBlockRepository::EnumerateSubBlocks).
         /// \param addSbBlkInfo Information describing the subblock to be added.
         virtual void ReplaceSubBlock(int key, const AddSubBlockInfo& addSbBlkInfo) = 0;
 
@@ -56,7 +56,7 @@ namespace libCZI
 
         /// Replace an existing attachment. The attachment is identified by an index (as reported by IAttachmentRepository::EnumerateAttachments).
         ///
-        /// \param attchmntId		 Identifier for the attachmnt  (as reported by IAttachmentRepository::EnumerateAttachments).
+        /// \param attchmntId        Identifier for the attachmnt  (as reported by IAttachmentRepository::EnumerateAttachments).
         /// \param addAttachmentInfo Information describing attachment to be added.
         virtual void ReplaceAttachment(int attchmntId, const AddAttachmentInfo& addAttachmentInfo) = 0;
 
@@ -121,7 +121,7 @@ namespace libCZI
         /// subblock to be replaced. What it does is to cast the parameters into the form required by the
         /// ICziReaderWriterInfo::ReplaceSubBlock method and call it.
         ///
-        /// \param key				  The key identifying the subblock to be replaced.
+        /// \param key                The key identifying the subblock to be replaced.
         /// \param addSbBlkInfoMemPtr Information describing the subblock to be added.
         void ReplaceSubBlock(int key, const libCZI::AddSubBlockInfoMemPtr& addSbBlkInfoMemPtr);
 
@@ -129,7 +129,7 @@ namespace libCZI
         /// the subblock to be replaced. What it does is to cast the parameters into the form required by
         /// the ICziReaderWriterInfo::ReplaceSubBlock method and call it.
         ///
-        /// \param key				 The key identifying the subblock to be replaced.
+        /// \param key               The key identifying the subblock to be replaced.
         /// \param addSbInfoLinewise Information describing the subblock to be added.
         void ReplaceSubBlock(int key, const libCZI::AddSubBlockInfoLinewiseBitmap& addSbInfoLinewise);
 
@@ -137,7 +137,7 @@ namespace libCZI
         /// subblock to be replaced. What it does is to cast the parameters into the form required by the
         /// ICziReaderWriterInfo::ReplaceSubBlock method and call it.
         ///
-        /// \param key				 The key identifying the subblock to be replaced.
+        /// \param key               The key identifying the subblock to be replaced.
         /// \param addSbBlkInfoStrideBitmap Information describing the subblock to be added.
         void ReplaceSubBlock(int key, const libCZI::AddSubBlockInfoStridedBitmap& addSbBlkInfoStrideBitmap);
     };
@@ -147,7 +147,7 @@ namespace libCZI
     {
     private:
         bool forceFileGuid;
-        GUID fileGuid;			///< The GUID to be set as the CZI's file-guid.
+        GUID fileGuid;          ///< The GUID to be set as the CZI's file-guid.
     public:
         /// Default constructor - sets all information to "invalid" and sets fileGuid to GUID_NULL.
         CCziReaderWriterInfo() : CCziReaderWriterInfo(GUID{ 0,0,0,{ 0,0,0,0,0,0,0,0 } })

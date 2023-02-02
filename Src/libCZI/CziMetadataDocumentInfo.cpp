@@ -95,7 +95,7 @@ CCziMetadataDocumentInfo::CCziMetadataDocumentInfo(std::shared_ptr<CCziMetadata>
 
     static const struct
     {
-        char	dimChar;
+        char    dimChar;
         double(ScalingInfoEx::* scaleVarPtr);
         std::wstring(ScalingInfoEx::* defaultUnit);
     } dimScalingData[] =
@@ -138,7 +138,7 @@ CCziMetadataDocumentInfo::CCziMetadataDocumentInfo(std::shared_ptr<CCziMetadata>
 
     static const struct
     {
-        char	dimChar;
+        char    dimChar;
         double(ScalingInfo::* scaleVarPtr);
     } dimScalingData[] =
     {

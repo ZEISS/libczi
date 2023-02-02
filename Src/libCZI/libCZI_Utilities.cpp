@@ -132,23 +132,23 @@ const char* const Utils::VALUE_COMPRESS_HILO_BYTE_UNPACK = "HiLoByteUnpack";
     switch (c)
     {
     case 'z':case'Z':
-        return	DimensionIndex::Z;
+        return  DimensionIndex::Z;
     case 'c':case'C':
         return DimensionIndex::C;
     case 't':case'T':
-        return 	DimensionIndex::T;
+        return  DimensionIndex::T;
     case 'r':case'R':
-        return 	DimensionIndex::R;
+        return  DimensionIndex::R;
     case 's':case'S':
-        return 	DimensionIndex::S;
+        return  DimensionIndex::S;
     case 'i':case'I':
-        return 	DimensionIndex::I;
+        return  DimensionIndex::I;
     case 'h':case'H':
-        return 	DimensionIndex::H;
+        return  DimensionIndex::H;
     case 'v':case'V':
-        return 	DimensionIndex::V;
+        return  DimensionIndex::V;
     case 'b':case'B':
-        return 	DimensionIndex::B;
+        return  DimensionIndex::B;
     default:
         return DimensionIndex::invalid;
     }
@@ -420,18 +420,18 @@ std::vector<tOutput> InternalCreateLookUpTableFromGamma(int tableElementCnt, tFl
 {
     switch (pixeltype)
     {
-    case PixelType::Invalid:			return "invalid";
-    case PixelType::Gray8:				return "gray8";
-    case PixelType::Gray16:				return "gray16";
-    case PixelType::Gray32Float:		return "gray32float";
-    case PixelType::Bgr24:				return "bgr24";
-    case PixelType::Bgr48:				return "bgr48";
-    case PixelType::Bgr96Float:			return "bgr96float";
-    case PixelType::Bgra32:				return "bgra32";
+    case PixelType::Invalid:            return "invalid";
+    case PixelType::Gray8:              return "gray8";
+    case PixelType::Gray16:             return "gray16";
+    case PixelType::Gray32Float:        return "gray32float";
+    case PixelType::Bgr24:              return "bgr24";
+    case PixelType::Bgr48:              return "bgr48";
+    case PixelType::Bgr96Float:         return "bgr96float";
+    case PixelType::Bgra32:             return "bgra32";
     case PixelType::Gray64ComplexFloat: return "gray64complexfloat";
     case PixelType::Bgr192ComplexFloat: return "bgr192complexfloat";
-    case PixelType::Gray32:				return "gray32";
-    case PixelType::Gray64Float:		return "gray64float";
+    case PixelType::Gray32:             return "gray32";
+    case PixelType::Gray64Float:        return "gray64float";
     }
 
     return "illegal value";

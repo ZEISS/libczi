@@ -14,9 +14,9 @@ namespace libCZI
     /// A rectangle (with integer coordinates).
     struct IntRect
     {
-        int x;	///< The x-coordinate of the upper-left point of the rectangle.
+        int x;  ///< The x-coordinate of the upper-left point of the rectangle.
         int y;  ///< The y-coordinate of the upper-left point of the rectangle.
-        int w;	///< The width of the rectangle.
+        int w;  ///< The width of the rectangle.
         int h;  ///< The height of the rectangle.
 
         /// Invalidates this object.
@@ -73,10 +73,10 @@ namespace libCZI
     /// A rectangle (with double coordinates).
     struct DblRect
     {
-        double x;	///< The x-coordinate of the upper-left point of the rectangle.
+        double x;   ///< The x-coordinate of the upper-left point of the rectangle.
         double y;   ///< The y-coordinate of the upper-left point of the rectangle.
-        double w;	///< The width of the rectangle.
-        double h;	///< The height of the rectangle.
+        double w;   ///< The width of the rectangle.
+        double h;   ///< The height of the rectangle.
 
         /// Invalidates this object.
         void Invalidate() { this->w = this->h = -1; }
@@ -85,14 +85,14 @@ namespace libCZI
     ///  A structure representing a size (width and height) in integers.
     struct IntSize
     {
-        std::uint32_t w;	///< The width
-        std::uint32_t h;	///< The height
+        std::uint32_t w;    ///< The width
+        std::uint32_t h;    ///< The height
     };
 
     /// A structure representing an R-G-B-color triple (as bytes).
     struct Rgb8Color
     {
-        std::uint8_t r;	///< The red component.
+        std::uint8_t r; ///< The red component.
         std::uint8_t g; ///< The green component.
         std::uint8_t b; ///< The blue component.
     };
@@ -108,38 +108,38 @@ namespace libCZI
     /// An enum representing a pixel-type.
     enum class PixelType : std::uint8_t
     {
-        Invalid = 0xff,				///< Invalid pixel type.
-        Gray8 = 0,					///< Grayscale 8-bit unsigned.
-        Gray16 = 1,					///< Grayscale 16-bit unsigned.
-        Gray32Float = 2,			///< Grayscale 4 byte float.
-        Bgr24 = 3,					///< BGR-color 8-bytes triples (memory order B, G, R).
-        Bgr48 = 4,					///< BGR-color 16-bytes triples (memory order B, G, R).
-        Bgr96Float = 8,				///< BGR-color 4 byte float triples (memory order B, G, R).
-        Bgra32 = 9,					///< Currently not supported in libCZI.
-        Gray64ComplexFloat = 10,	///< Currently not supported in libCZI.
-        Bgr192ComplexFloat = 11,	///< Currently not supported in libCZI.
-        Gray32 = 12,				///< Currently not supported in libCZI.
-        Gray64Float = 13,			///< Currently not supported in libCZI.
+        Invalid = 0xff,             ///< Invalid pixel type.
+        Gray8 = 0,                  ///< Grayscale 8-bit unsigned.
+        Gray16 = 1,                 ///< Grayscale 16-bit unsigned.
+        Gray32Float = 2,            ///< Grayscale 4 byte float.
+        Bgr24 = 3,                  ///< BGR-color 8-bytes triples (memory order B, G, R).
+        Bgr48 = 4,                  ///< BGR-color 16-bytes triples (memory order B, G, R).
+        Bgr96Float = 8,             ///< BGR-color 4 byte float triples (memory order B, G, R).
+        Bgra32 = 9,                 ///< Currently not supported in libCZI.
+        Gray64ComplexFloat = 10,    ///< Currently not supported in libCZI.
+        Bgr192ComplexFloat = 11,    ///< Currently not supported in libCZI.
+        Gray32 = 12,                ///< Currently not supported in libCZI.
+        Gray64Float = 13,           ///< Currently not supported in libCZI.
     };
 
     /// An enum specifying the compression method.
     enum class CompressionMode : std::uint8_t
     {
         Invalid = 0xff,     ///< Invalid compression type.
-        UnCompressed = 0,	///< The data is uncompressed.
-        Jpg = 1,			///< The data is JPG-compressed.
-        JpgXr = 4,			///< The data is JPG-XR-compressed.
-        Zstd0 = 5,			///< The data is compressed with zstd.
-        Zstd1 = 6			///< The data contains a header, followed by a zstd-compressed block. 
+        UnCompressed = 0,   ///< The data is uncompressed.
+        Jpg = 1,            ///< The data is JPG-compressed.
+        JpgXr = 4,          ///< The data is JPG-XR-compressed.
+        Zstd0 = 5,          ///< The data is compressed with zstd.
+        Zstd1 = 6           ///< The data contains a header, followed by a zstd-compressed block. 
     };
 
     /// Information about a locked bitmap - allowing direct access to the image data in memory.
     struct BitmapLockInfo
     {
-        void* ptrData;	///< Not currently used, to be ignored.
-        void* ptrDataRoi;	///< The pointer to the first (top-left) pixel of the bitmap.
-        std::uint32_t	stride;		///< The stride of the bitmap data (pointed to by `ptrDataRoi`).
-        std::uint64_t	size;		///< The size of the bitmap data (pointed to by `ptrDataRoi`) in bytes.
+        void* ptrData;              ///< Not currently used, to be ignored.
+        void* ptrDataRoi;           ///< The pointer to the first (top-left) pixel of the bitmap.
+        std::uint32_t   stride;     ///< The stride of the bitmap data (pointed to by `ptrDataRoi`).
+        std::uint64_t   size;       ///< The size of the bitmap data (pointed to by `ptrDataRoi`) in bytes.
     };
 
     /// This interface is used to represent a bitmap.
@@ -155,12 +155,12 @@ namespace libCZI
         /// Gets pixel type.
         ///
         /// \return The pixel type.
-        virtual PixelType		GetPixelType() const = 0;
+        virtual PixelType       GetPixelType() const = 0;
 
         /// Gets the size of the bitmap (i. e. its width and height in pixels).
         ///
         /// \return The size (in pixels).
-        virtual IntSize			GetSize() const = 0;
+        virtual IntSize         GetSize() const = 0;
 
         /// Gets a data structure allowing for direct access of the bitmap.
         /// 
@@ -170,13 +170,13 @@ namespace libCZI
         /// fatal error if the object is destroyed when it is locked.
         ///
         /// \return The BitmapLockInfo allowing to directly access the data representing the bitmap.
-        virtual BitmapLockInfo	Lock() = 0;
+        virtual BitmapLockInfo  Lock() = 0;
 
         /// Inform the bitmap object that the data (previously retrieved by a call to Lock)
         /// is not longer used.
         /// 
         /// The BitmapLockInfo returned must only considered to be valid until Unlock is called.
-        virtual void			Unlock() = 0;
+        virtual void            Unlock() = 0;
 
         virtual ~IBitmapData() {};
 
@@ -195,7 +195,7 @@ namespace libCZI
     ///
     /// It is intended to be used like this:
     /// \code{.cpp}
-    /// 		 
+    ///          
     /// libCZI::IBitmapData* bm = ... // assume that we have a pointer to a bitmap
     /// 
     /// // this example assumes that the pixel type is Gray8 and nothing else...
@@ -203,7 +203,7 @@ namespace libCZI
     /// 
     /// {
     ///     // access the bitmap's pixels directly within this scope
-    ///     libCZI::ScopedBitmapLocker<libCZI::IBitmapData*> lckBm{ bm };	// <- will call bm->Lock here
+    ///     libCZI::ScopedBitmapLocker<libCZI::IBitmapData*> lckBm{ bm };   // <- will call bm->Lock here
     ///     for (std::uint32_t y  = 0; y < bm->GetHeight(); ++y)
     ///     {
     ///         const std::uint8_t* ptrLine = ((const std::uint8_t*)lckBm.ptrDataRoi) + y * lckBm.stride;
@@ -311,8 +311,8 @@ namespace libCZI
     //-------------------------------------------------------------------------
 
     /// Stream insertion operator for the libCZI::IntRect type. A string of the form '(x,y,width,height)' is output to the stream.
-    /// \param [in] os	   The stream to output the rect to.
-    /// \param rect		   The rectangle.
+    /// \param [in] os     The stream to output the rect to.
+    /// \param rect        The rectangle.
     /// \return The ostream object <tt>os</tt>.
     inline std::ostream& operator<<(std::ostream& os, const IntRect& rect)
     {
@@ -321,8 +321,8 @@ namespace libCZI
     }
 
     /// Stream insertion operator for the libCZI::IntSize type. A string of the form '(width,height)' is output to the stream.
-    /// \param [in] os	   The stream to output the size to.
-    /// \param size		   The size structure.
+    /// \param [in] os     The stream to output the size to.
+    /// \param size        The size structure.
     /// \return The ostream object <tt>os</tt>.
     inline std::ostream& operator<<(std::ostream& os, const IntSize& size)
     {

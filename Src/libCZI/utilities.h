@@ -149,7 +149,7 @@ struct Nullable
     Nullable() :isValid(false) {};
 
     bool isValid;
-    t	 value;
+    t    value;
 
     bool TryGet(t* p) const
     {

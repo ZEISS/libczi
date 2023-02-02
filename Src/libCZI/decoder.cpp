@@ -23,7 +23,7 @@ using namespace std;
     std::shared_ptr<IBitmapData> bm;
 
     JxrDecode::WMPDECAPPARGS args; args.Clear();
-    args.uAlphaMode = 0;	// we don't need any alpha, never
+    args.uAlphaMode = 0;    // we don't need any alpha, never
 
     try
     {

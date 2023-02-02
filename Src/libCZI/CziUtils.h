@@ -35,14 +35,14 @@ public:
     static constexpr std::uint8_t BytesPerPel();
 };
 
-template <>	constexpr std::uint8_t CziUtils::BytesPerPel<libCZI::PixelType::Gray8>() { return 1; }
-template <>	constexpr std::uint8_t CziUtils::BytesPerPel<libCZI::PixelType::Gray16>() { return 2; }
-template <>	constexpr std::uint8_t CziUtils::BytesPerPel<libCZI::PixelType::Bgr24>() { return 3; }
-template <>	constexpr std::uint8_t CziUtils::BytesPerPel<libCZI::PixelType::Bgr48>() { return 6; }
-template <>	constexpr std::uint8_t CziUtils::BytesPerPel<libCZI::PixelType::Gray32Float>() { return 4; }
-template <>	constexpr std::uint8_t CziUtils::BytesPerPel<libCZI::PixelType::Gray64Float>() { return 8; }
-template <>	constexpr std::uint8_t CziUtils::BytesPerPel<libCZI::PixelType::Bgra32>() { return 4; }
-template <>	constexpr std::uint8_t CziUtils::BytesPerPel<libCZI::PixelType::Gray32>() { return 4; }
-template <>	constexpr std::uint8_t CziUtils::BytesPerPel<libCZI::PixelType::Bgr96Float>() { return 3 * 4; }
-template <>	constexpr std::uint8_t CziUtils::BytesPerPel<libCZI::PixelType::Gray64ComplexFloat>() { return 2 * 8; }
-template <>	constexpr std::uint8_t CziUtils::BytesPerPel<libCZI::PixelType::Bgr192ComplexFloat>() { return 48; }
+template <> constexpr std::uint8_t CziUtils::BytesPerPel<libCZI::PixelType::Gray8>() { return 1; }
+template <> constexpr std::uint8_t CziUtils::BytesPerPel<libCZI::PixelType::Gray16>() { return 2; }
+template <> constexpr std::uint8_t CziUtils::BytesPerPel<libCZI::PixelType::Bgr24>() { return 3; }
+template <> constexpr std::uint8_t CziUtils::BytesPerPel<libCZI::PixelType::Bgr48>() { return 6; }
+template <> constexpr std::uint8_t CziUtils::BytesPerPel<libCZI::PixelType::Gray32Float>() { return 4; }
+template <> constexpr std::uint8_t CziUtils::BytesPerPel<libCZI::PixelType::Gray64Float>() { return 8; }
+template <> constexpr std::uint8_t CziUtils::BytesPerPel<libCZI::PixelType::Bgra32>() { return 4; }
+template <> constexpr std::uint8_t CziUtils::BytesPerPel<libCZI::PixelType::Gray32>() { return 4; }
+template <> constexpr std::uint8_t CziUtils::BytesPerPel<libCZI::PixelType::Bgr96Float>() { return 3 * 4; }
+template <> constexpr std::uint8_t CziUtils::BytesPerPel<libCZI::PixelType::Gray64ComplexFloat>() { return 2 * 8; }
+template <> constexpr std::uint8_t CziUtils::BytesPerPel<libCZI::PixelType::Bgr192ComplexFloat>() { return 48; }

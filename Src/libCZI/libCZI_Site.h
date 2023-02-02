@@ -13,11 +13,11 @@ namespace libCZI
     /// created by `ISite::GetDecoder`.
     enum class ImageDecoderType
     {
-        JPXR_JxrLib,	///< Identifies an decoder capable of decoding a JPG-XR compressed image.
+        JPXR_JxrLib,    ///< Identifies an decoder capable of decoding a JPG-XR compressed image.
 
-        ZStd0,			///< Identifies a decoder capable of decoding a zstd compressed image (type "zstd0").
+        ZStd0,          ///< Identifies a decoder capable of decoding a zstd compressed image (type "zstd0").
 
-        ZStd1			///< Identifies a decoder capable of decoding a zstd compressed image (type "zstd1").
+        ZStd1           ///< Identifies a decoder capable of decoding a zstd compressed image (type "zstd1").
     };
 
     class IBitmapData;
@@ -35,11 +35,11 @@ namespace libCZI
         /// \remark
         /// In case of an error (of whatever kind) the method is expected to throw an exception.
         /// 
-        /// \param ptrData			Pointer to a a block of memory (which contains the encoded image).
-        /// \param size					The size of the memory block pointed by `ptrData`.
+        /// \param ptrData          Pointer to a a block of memory (which contains the encoded image).
+        /// \param size                 The size of the memory block pointed by `ptrData`.
         /// \param pixelType    The pixel type of the expected bitmap.
-        /// \param width				The width of the expected bitmap, used for validation purposes only.
-        /// \param height				The height of the expected bitmap, used for validation purposes only.
+        /// \param width                The width of the expected bitmap, used for validation purposes only.
+        /// \param height               The height of the expected bitmap, used for validation purposes only.
         ///
         /// \return A bitmap object with the decoded data.
         virtual std::shared_ptr<libCZI::IBitmapData> Decode(const void* ptrData, size_t size, libCZI::PixelType pixelType, std::uint32_t width, std::uint32_t height) = 0;
@@ -47,12 +47,12 @@ namespace libCZI
         virtual ~IDecoder() = default;
     };
 
-    const int LOGLEVEL_CATASTROPHICERROR = 0;	///< Identifies a catastrophic error (i. e. the program cannot continue).
-    const int LOGLEVEL_ERROR = 1;				///< Identifies a non-recoverable error.
-    const int LOGLEVEL_SEVEREWARNING = 2;		///< Identifies that a severe problem has occured. Proper operation of the module is not ensured.
-    const int LOGLEVEL_WARNING = 3;				///< Identifies that a problem has been identified. It is likely that proper operation can be kept up.
-    const int LOGLEVEL_INFORMATION = 4;			///< Identifies an informational output. It has no impact on the proper operation.
-    const int LOGLEVEL_CHATTYINFORMATION = 5;	///< Identifies an informational output which has no impact on proper operation. Use this for output which may occur with high frequency.
+    const int LOGLEVEL_CATASTROPHICERROR = 0;   ///< Identifies a catastrophic error (i. e. the program cannot continue).
+    const int LOGLEVEL_ERROR = 1;               ///< Identifies a non-recoverable error.
+    const int LOGLEVEL_SEVEREWARNING = 2;       ///< Identifies that a severe problem has occured. Proper operation of the module is not ensured.
+    const int LOGLEVEL_WARNING = 3;             ///< Identifies that a problem has been identified. It is likely that proper operation can be kept up.
+    const int LOGLEVEL_INFORMATION = 4;         ///< Identifies an informational output. It has no impact on the proper operation.
+    const int LOGLEVEL_CHATTYINFORMATION = 5;   ///< Identifies an informational output which has no impact on proper operation. Use this for output which may occur with high frequency.
 
     /// Interface for the Site-object. It is intented for customizing the library (by injecting a
     /// custom implementation of this interface).
@@ -80,7 +80,7 @@ namespace libCZI
 
         /// Gets a decoder object.
         ///
-        /// \param type		 The type.
+        /// \param type      The type.
         /// \param arguments The arguments.
         ///
         /// \return The decoder object.
@@ -90,10 +90,10 @@ namespace libCZI
         /// this method allows to use a externally controlled memory management to be injected.
         ///
         /// \param pixeltype    The pixeltype of the newly allocated bitmap.
-        /// \param width	    The width of the newly allocated bitmap.
-        /// \param height	    The height of the newly allocated bitmap.
-        /// \param stride	    The stride of the newly allocated bitmap. If <= 0, then the method may choose an appropriate stride
-        /// 					on its own. If a stride >0 is given here, then we expect that the newly created bitmap adheres to it.
+        /// \param width        The width of the newly allocated bitmap.
+        /// \param height       The height of the newly allocated bitmap.
+        /// \param stride       The stride of the newly allocated bitmap. If <= 0, then the method may choose an appropriate stride
+        ///                     on its own. If a stride >0 is given here, then we expect that the newly created bitmap adheres to it.
         /// \param extraRows    The extra rows (not currently used, will always be 0).
         /// \param extraColumns The extra columns  (not currently used, will always be 0).
         ///
@@ -109,7 +109,7 @@ namespace libCZI
         }
 
         /// Output the specified stringstream object at the specified logging level.
-        /// \param level	   The level.
+        /// \param level       The level.
         /// \param [in] ss The stringstream object.
         void Log(int level, std::stringstream& ss)
         {

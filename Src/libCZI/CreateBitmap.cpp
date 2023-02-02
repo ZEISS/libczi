@@ -83,7 +83,7 @@ std::shared_ptr<libCZI::IBitmapData> libCZI::CreateBitmapFromSubBlock(ISubBlock*
         return CreateBitmapFromSubBlock_ZStd1(subBlk);
     case CompressionMode::UnCompressed:
         return CreateBitmapFromSubBlock_Uncompressed(subBlk);
-    default:	// silence warnings
+    default:    // silence warnings
         throw std::logic_error("The method or operation is not implemented.");
     }
 }

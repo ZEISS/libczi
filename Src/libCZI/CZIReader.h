@@ -17,7 +17,7 @@ private:
     CFileHeaderSegmentData hdrSegmentData;
     CCziSubBlockDirectory subBlkDir;
     CCziAttachmentsDirectory attachmentDir;
-    bool	isOperational;	///<	If true, then stream, hdrSegmentData and subBlkDir can be considered valid and operational
+    bool    isOperational;  ///<    If true, then stream, hdrSegmentData and subBlkDir can be considered valid and operational
 public:
     CCZIReader();
     ~CCZIReader() override;

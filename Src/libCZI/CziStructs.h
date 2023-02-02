@@ -139,7 +139,7 @@ struct PACKED SubBlockDirectoryEntryDE
     std::int32_t SizeXStored;
     std::int32_t SizeYStored;
     unsigned char _pad[2];
-    std::int32_t StartX;		// offset 16
+    std::int32_t StartX;        // offset 16
     std::int32_t SizeX;
     std::int32_t StartY;
     std::int32_t SizeY;
@@ -214,7 +214,7 @@ struct PACKED AttachmentSegmentData
     union
     {
         std::uint8_t reserved[SIZE_ATTACHMENTENTRY];
-        struct AttachmentEntryA1 entry;		// offset 16
+        struct AttachmentEntryA1 entry;     // offset 16
     };
     unsigned char _spare2[SIZE_ATTACHMENT_DATA - SIZE_ATTACHMENTENTRY - 16];
 };

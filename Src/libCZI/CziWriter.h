@@ -327,7 +327,7 @@ private:
         bool GetIsMarkedAsDeleted()const { return this->isMarkedAsDeleted; }
     };
 
-    WrittenSegmentInfo	metadataSegment;
-    WrittenSegmentInfo	subBlockDirectorySegment;
-    WrittenSegmentInfo	attachmentDirectorySegment;
+    WrittenSegmentInfo  metadataSegment;
+    WrittenSegmentInfo  subBlockDirectorySegment;
+    WrittenSegmentInfo  attachmentDirectorySegment;
 };

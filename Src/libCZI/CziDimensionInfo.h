@@ -35,7 +35,7 @@ private:
         List
     };
 
-    DefType	type;
+    DefType type;
     double intervalStart;
     double intervalIncrement;
     std::vector<double> data;
@@ -79,7 +79,7 @@ private:
         List
     };
 
-    DefType	type;
+    DefType type;
     double intervalStart;
     double intervalIncrement;
     std::vector<double> offsets;

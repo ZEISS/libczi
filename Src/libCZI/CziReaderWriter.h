@@ -83,10 +83,10 @@ private:
     {
     private:
         bool lastSegmentPosValid;
-        std::uint64_t lastSegmentPos;	///< file-position of the _start_ of the last segment
+        std::uint64_t lastSegmentPos;   ///< file-position of the _start_ of the last segment
 
         bool nextSegmentPosValid;
-        std::uint64_t nextSegmentPos;	///< file-position of the _next_ segment
+        std::uint64_t nextSegmentPos;   ///< file-position of the _next_ segment
     public:
         CNextSegment() :lastSegmentPosValid(false), nextSegmentPosValid(false)
         {}
@@ -123,7 +123,7 @@ private:
         std::uint64_t GetNextSegmentPos() const { return this->nextSegmentPos; }
     };
 
-    CNextSegment	nextSegmentInfo;
+    CNextSegment    nextSegmentInfo;
 
     class WrittenSegmentInfo
     {
@@ -147,7 +147,7 @@ private:
         bool GetIsMarkedAsDeleted()const { return this->isMarkedAsDeleted; }
     };
 
-    WrittenSegmentInfo	metadataSegment;
-    WrittenSegmentInfo	subBlockDirectorySegment;
-    WrittenSegmentInfo	attachmentDirectorySegment;
+    WrittenSegmentInfo  metadataSegment;
+    WrittenSegmentInfo  subBlockDirectorySegment;
+    WrittenSegmentInfo  attachmentDirectorySegment;
 };

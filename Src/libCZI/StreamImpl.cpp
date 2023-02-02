@@ -13,7 +13,7 @@
 #if LIBCZI_USE_PREADPWRITEBASED_STREAMIMPL
 #include <fcntl.h>
 #include <unistd.h>
-#include <sys/stat.h>	// required on BSD
+#include <sys/stat.h>   // required on BSD
 #endif
 
 using namespace std;

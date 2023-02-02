@@ -97,7 +97,7 @@ namespace libCZI
     private:
         bool dimBoundsValid;
         CDimBounds dimBounds;
-        GUID fileGuid;			///< The GUID to be set as the CZI's file-guid.
+        GUID fileGuid;          ///< The GUID to be set as the CZI's file-guid.
         bool mBoundsValid;
         int mMin, mMax;
         size_t reservedSizeAttachmentsDir, reservedSizeSubBlkDir, reservedSizeMetadataSegment;
@@ -111,8 +111,8 @@ namespace libCZI
         ///
         /// \param fileGuid The GUID to be set as the CZI's file-guid. If this is GUID_NULL (all 0's),
         /// then we will create a new Guid and use it.
-        /// \param mMin	    (Optional) The minimum for the M-index (inclusive).
-        /// \param mMax	    (Optional) The maximum for the M-index (inclusive).
+        /// \param mMin     (Optional) The minimum for the M-index (inclusive).
+        /// \param mMax     (Optional) The maximum for the M-index (inclusive).
         CCziWriterInfo(const GUID& fileGuid, int mMin = 1, int mMax = -1)
             : fileGuid(fileGuid), reservedSizeAttachmentsDirValid(false), reservedSizeSubBlkDirValid(false), reservedSizeMetadataSegmentValid(false)
         {
@@ -125,8 +125,8 @@ namespace libCZI
         /// \param fileGuid The GUID to be set as the CZI's file-guid. If this is GUID_NULL (all 0's),
         /// then we will create a new Guid and use it.
         /// \param bounds   The bounds.
-        /// \param mMin	    (Optional) The minimum for the M-index (inclusive).
-        /// \param mMax	    (Optional) The maximum for the M-index (inclusive).
+        /// \param mMin     (Optional) The minimum for the M-index (inclusive).
+        /// \param mMax     (Optional) The maximum for the M-index (inclusive).
         CCziWriterInfo(const GUID& fileGuid, const IDimBounds& bounds, int mMin = 1, int mMax = -1)
             : fileGuid(fileGuid), reservedSizeAttachmentsDirValid(false), reservedSizeSubBlkDirValid(false), reservedSizeMetadataSegmentValid(false)
         {
@@ -144,19 +144,19 @@ namespace libCZI
         /// Sets reserved size for the "attachments directory".
         ///
         /// \param reserveSpace True to reserve space.
-        /// \param s		    The size (in bytes) to reserve for the "attachments directory".
+        /// \param s            The size (in bytes) to reserve for the "attachments directory".
         void SetReservedSizeForAttachmentsDirectory(bool reserveSpace, size_t s);
 
         /// Sets reserved size for the "subblock directory".
         ///
         /// \param reserveSpace True to reserve space.
-        /// \param s		    The size (in bytes) to reserve for the "subblock directory".
+        /// \param s            The size (in bytes) to reserve for the "subblock directory".
         void SetReservedSizeForSubBlockDirectory(bool reserveSpace, size_t s);
 
         /// Sets reserved size for the "metadata segment".
         ///
         /// \param reserveSpace True to reserve space.
-        /// \param s		    The size (in bytes) to reserve for the "metadata segment".
+        /// \param s            The size (in bytes) to reserve for the "metadata segment".
         void SetReservedSizeForMetadataSegment(bool reserveSpace, size_t s);
 
         /// Sets the bounds. If null is specified, then we report "no valid bounds" with 'GetDimBounds()'.
@@ -176,16 +176,16 @@ namespace libCZI
         /// Default constructor
         AddSubBlockInfoBase() { this->Clear(); }
 
-        libCZI::CDimCoordinate coordinate;	///< The subblock's coordinate.
-        bool mIndexValid;					///< Whether the field 'mIndex' is valid;
-        int mIndex;							///< The M-index of the subblock.
-        int x;								///< The x-coordinate of the subblock.
-        int y;								///< The x-coordinate of the subblock.
-        int logicalWidth;					///< The logical with of the subblock (in pixels).
-        int logicalHeight;					///< The logical height of the subblock (in pixels).
-        int physicalWidth;					///< The physical with of the subblock (in pixels).
-        int physicalHeight;					///< The physical height of the subblock (in pixels).
-        libCZI::PixelType PixelType;		///< The pixel type of the subblock.
+        libCZI::CDimCoordinate coordinate;  ///< The subblock's coordinate.
+        bool mIndexValid;                   ///< Whether the field 'mIndex' is valid;
+        int mIndex;                         ///< The M-index of the subblock.
+        int x;                              ///< The x-coordinate of the subblock.
+        int y;                              ///< The x-coordinate of the subblock.
+        int logicalWidth;                   ///< The logical with of the subblock (in pixels).
+        int logicalHeight;                  ///< The logical height of the subblock (in pixels).
+        int physicalWidth;                  ///< The physical with of the subblock (in pixels).
+        int physicalHeight;                 ///< The physical height of the subblock (in pixels).
+        libCZI::PixelType PixelType;        ///< The pixel type of the subblock.
 
         /// The compression-mode (applying to the subblock-data). If using a compressed format, the data
         /// passed in must be already compressed - the writer does _not_ perform the compression.
@@ -268,13 +268,13 @@ namespace libCZI
             ptrData(nullptr), dataSize(0), ptrSbBlkMetadata(nullptr), sbBlkMetadataSize(0), ptrSbBlkAttachment(nullptr), sbBlkAttachmentSize(0)
         {}
 
-        const void* ptrData;				///< Pointer to the data to be put into the subblock.
-        std::uint32_t dataSize;				///< The size of the data in bytes. If this is 0, then ptrSbBlkMetadata is not used (and no sub-block-data written).
+        const void* ptrData;                ///< Pointer to the data to be put into the subblock.
+        std::uint32_t dataSize;             ///< The size of the data in bytes. If this is 0, then ptrSbBlkMetadata is not used (and no sub-block-data written).
 
-        const void* ptrSbBlkMetadata;		///< Pointer to the subblock-metadata.
-        std::uint32_t sbBlkMetadataSize;	///< The size of the subblock-metadata in bytes. If this is 0, then ptrSbBlkMetadata is not used (and no sub-block-metadata written).
+        const void* ptrSbBlkMetadata;       ///< Pointer to the subblock-metadata.
+        std::uint32_t sbBlkMetadataSize;    ///< The size of the subblock-metadata in bytes. If this is 0, then ptrSbBlkMetadata is not used (and no sub-block-metadata written).
 
-        const void* ptrSbBlkAttachment;		///< Pointer to the subblock-attachment.
+        const void* ptrSbBlkAttachment;     ///< Pointer to the subblock-attachment.
         std::uint32_t sbBlkAttachmentSize;  ///< The size of the subblock-attachment in bytes. If this is 0, then ptrSbBlkMetadata is not used (and no sub-block-metadata written).
 
         /// Clears this object to its blank/initial state.
@@ -291,13 +291,13 @@ namespace libCZI
             ptrBitmap(nullptr), strideBitmap(0), ptrSbBlkMetadata(nullptr), sbBlkMetadataSize(0), ptrSbBlkAttachment(nullptr), sbBlkAttachmentSize(0)
         {}
 
-        const void* ptrBitmap;				///< Pointer to the the bitmap to be put into the subblock. The size of the memory-block must be (strideBitmap * physicalWidth).
-        std::uint32_t strideBitmap;			///< The stride of the bitmap.
+        const void* ptrBitmap;              ///< Pointer to the the bitmap to be put into the subblock. The size of the memory-block must be (strideBitmap * physicalWidth).
+        std::uint32_t strideBitmap;         ///< The stride of the bitmap.
 
-        const void* ptrSbBlkMetadata;		///< Pointer to the subblock-metadata.
-        std::uint32_t sbBlkMetadataSize;	///< The size of the subblock-metadata in bytes. If this is 0, then ptrSbBlkMetadata is not used (and no sub-block-metadata written).
+        const void* ptrSbBlkMetadata;       ///< Pointer to the subblock-metadata.
+        std::uint32_t sbBlkMetadataSize;    ///< The size of the subblock-metadata in bytes. If this is 0, then ptrSbBlkMetadata is not used (and no sub-block-metadata written).
 
-        const void* ptrSbBlkAttachment;		///< Pointer to the subblock-attachment.
+        const void* ptrSbBlkAttachment;     ///< Pointer to the subblock-attachment.
         std::uint32_t sbBlkAttachmentSize;  ///< The size of the subblock-attachment in bytes. If this is 0, then ptrSbBlkMetadata is not used (and no sub-block-metadata written).
 
         /// Clears this object to its blank/initial state.
@@ -317,10 +317,10 @@ namespace libCZI
         /// returned by this function must be valid until the next call into the functor (or returning from the 'SyncAddSubBlock' method).
         std::function<const void* (int line)> getBitmapLine;
 
-        const void* ptrSbBlkMetadata;		///< Pointer to the subblock-metadata.
-        std::uint32_t sbBlkMetadataSize;	///< The size of the subblock-metadata in bytes. If this is 0, then ptrSbBlkMetadata is not used (and no sub-block-metadata written).
+        const void* ptrSbBlkMetadata;       ///< Pointer to the subblock-metadata.
+        std::uint32_t sbBlkMetadataSize;    ///< The size of the subblock-metadata in bytes. If this is 0, then ptrSbBlkMetadata is not used (and no sub-block-metadata written).
 
-        const void* ptrSbBlkAttachment;		///< Pointer to the subblock-attachment.
+        const void* ptrSbBlkAttachment;     ///< Pointer to the subblock-attachment.
         std::uint32_t sbBlkAttachmentSize;  ///< The size of the subblock-attachment in bytes. If this is 0, then ptrSbBlkMetadata is not used (and no sub-block-metadata written).
 
         /// Clears this object to its blank/initial state.
@@ -339,7 +339,7 @@ namespace libCZI
         /// The attachment's name.
         std::uint8_t name[80];
 
-        const void* ptrData;	///< Pointer to the attachment data.
+        const void* ptrData;    ///< Pointer to the attachment data.
         std::uint32_t dataSize; ///< Size of the attachment data (in bytes).
 
         /// Sets content file type. Note that the 'content file type' is a fixed-length string (of length 8),
@@ -368,10 +368,10 @@ namespace libCZI
     /// This struct defines the data to be added as metadata-segment. Unused entries (e. g. no attachment) must have a size of 0.
     struct LIBCZI_API WriteMetadataInfo
     {
-        const char* szMetadata;		///< The xml-string (in UTF-8 encoding)
-        size_t      szMetadataSize;	///< The size of the XML-string (in bytes)
-        const void* ptrAttachment;	///< The metadata-attachment (not commonly used).
-        size_t		attachmentSize;	///< The size of the metadata-attachment.
+        const char* szMetadata;     ///< The xml-string (in UTF-8 encoding)
+        size_t      szMetadataSize; ///< The size of the XML-string (in bytes)
+        const void* ptrAttachment;  ///< The metadata-attachment (not commonly used).
+        size_t      attachmentSize; ///< The size of the metadata-attachment.
 
         /// Clears this object to its blank/initial state.
         void Clear() { memset(this, 0, sizeof(*this)); }

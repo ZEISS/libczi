@@ -29,7 +29,7 @@ public:
 public:
     const pugi::xml_document& GetXmlDoc() const;
 
-public:	// interface ICziMetadata
+public: // interface ICziMetadata
     virtual bool IsXmlValid() const override;
     virtual std::string GetXml() override;
     virtual std::shared_ptr<libCZI::ICziMultiDimensionDocumentInfo> GetDocumentInfo() override;

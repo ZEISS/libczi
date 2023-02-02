@@ -132,15 +132,15 @@ static bool DeterminePixelType(const WICPixelFormatGUID& wicPxlFmt, GUID* destPi
 {
     static const struct
     {
-        /// <summary>	The WIC-pixel-format as reported by the decoder. </summary>
+        /// <summary>   The WIC-pixel-format as reported by the decoder. </summary>
         GUID wicPxlFmt;
 
-        /// <summary>	The WIC-pixel-format  that we wish to get from the decoder (if necessary, utilizing a WIC-fomat converter). 
-        /// 			If this has the value "GUID_WICPixelFormatUndefined" it means: I am not sure at this point, I have never 
-        /// 			seen this and it is not obvious to me what to do. </summary>
+        /// <summary>   The WIC-pixel-format  that we wish to get from the decoder (if necessary, utilizing a WIC-fomat converter). 
+        ///             If this has the value "GUID_WICPixelFormatUndefined" it means: I am not sure at this point, I have never 
+        ///             seen this and it is not obvious to me what to do. </summary>
         GUID wicDstPxlFmt;
 
-        /// <summary>	The libCZI-pixelType which we finally want to end up with. </summary>
+        /// <summary>   The libCZI-pixelType which we finally want to end up with. </summary>
         PixelType pxlType;
     } WicPxlFmtAndPixelType[] =
     {
@@ -291,7 +291,7 @@ static bool DeterminePixelType(const WICPixelFormatGUID& wicPxlFmt, GUID* destPi
         ThrowIfFailed("pFactory->CreateFormatConverter", hr);
         hr = pFormatConverter->Initialize(
             cpWicBitmapFrameDecode,          // Input bitmap to convert
-            wicDestPxlFmt,				     // Destination pixel format
+            wicDestPxlFmt,                   // Destination pixel format
             WICBitmapDitherTypeNone,         // Specified dither pattern
             nullptr,                         // Specify a particular palette 
             0,                               // Alpha threshold

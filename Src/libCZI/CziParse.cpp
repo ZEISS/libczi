@@ -674,7 +674,7 @@ using namespace libCZI;
     }
 
     CCZIParse::ThrowIllegalData("invalid dimension");
-    return DimensionIndex::invalid;		// not reachable, just to silence compiler warning
+    return DimensionIndex::invalid;     // not reachable, just to silence compiler warning
 }
 
 /*static*/bool CCZIParse::IsMDimension(const char* ptr, size_t size)
