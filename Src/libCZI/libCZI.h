@@ -4,6 +4,13 @@
 
 #pragma once
 
+#include <functional>
+#include <memory>
+#include <map>
+#include <limits>
+#include <string>
+#include <vector>
+
 #include "ImportExport.h"
 
 #include "priv_guiddef.h"
@@ -16,11 +23,6 @@
 #include "libCZI_Compositor.h"
 #include "libCZI_Site.h"
 #include "libCZI_compress.h"
-
-#include <functional>
-#include <memory>
-#include <map>
-#include <limits>
 
 // virtual d'tor -> https://isocpp.org/wiki/faq/virtual-functions#virtual-dtors
 
@@ -237,10 +239,10 @@ namespace libCZI
         {
             if (this->physicalSize.w > this->physicalSize.h)
             {
-                return double(this->physicalSize.w) / this->logicalRect.w;
+                return static_cast<double>(this->physicalSize.w) / this->logicalRect.w;
             }
 
-            return double(this->physicalSize.h) / this->logicalRect.h;
+            return static_cast<double>(this->physicalSize.h) / this->logicalRect.h;
         }
 
         /// Gets compression mode enumeration. Note that unknown compression-mode identifiers (unknown to libCZI)
@@ -349,7 +351,7 @@ namespace libCZI
         /// \return The raw data.
         virtual std::shared_ptr<const void> GetRawData(size_t* ptrSize) = 0;
 
-        virtual ~IAttachment() {};
+        virtual ~IAttachment() {}
 
         /// A helper method used to cast the pointer to a specific type.
         /// \param [out] ptr     The pointer to the data is stored here.
@@ -359,7 +361,7 @@ namespace libCZI
         {
             const void* p;
             this->DangerousGetRawData(p, size);
-            ptr = (Q*)p;
+            ptr = static_cast<Q*>(p);
         }
     };
 

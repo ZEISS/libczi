@@ -395,9 +395,9 @@ namespace libCZI
         /// \param [out] startIndex If non-null, it will receive the start index.
         /// \param [out] size       If non-null, it will receive the size.
         /// \return True if it succeeds, false if it fails.
-        virtual bool TryGetInterval(libCZI::DimensionIndex dim, int* startIndex, int* size) const override
+        bool TryGetInterval(libCZI::DimensionIndex dim, int* startIndex, int* size) const override
         {
-            int index = CDimBounds::GetBitIndexForDimension(dim);
+            const int index = CDimBounds::GetBitIndexForDimension(dim);
             if ((this->validDims & (1 << index)) != 0)
             {
                 if (startIndex != nullptr)
