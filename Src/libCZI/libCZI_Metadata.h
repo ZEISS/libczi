@@ -82,14 +82,14 @@ namespace libCZI
 
         /// Attempts to parse an XmlDateTime from the given string. The string needs to
         /// conform to ISO8601.
-        /// \param 		    sz		    The string to parse.
+        /// \param          sz          The string to parse.
         /// \param [in,out] ptrDateTime If non-null and the parsing was successful, the information will be put here.
         /// \returns True if it succeeds, false if it fails.
         static bool TryParse(const char* sz, XmlDateTime* ptrDateTime);
 
         /// Attempts to parse an XmlDateTime from the given string. The string needs to
         /// conform to ISO8601.
-        /// \param 		    szw		    The string to parse.
+        /// \param          szw         The string to parse.
         /// \param [in,out] ptrDateTime If non-null and the parsing was successful, the information will be put here.
         /// \returns True if it succeeds, false if it fails.
         static bool TryParse(const wchar_t* szw, XmlDateTime* ptrDateTime);
@@ -100,22 +100,22 @@ namespace libCZI
     {
         /// Default constructor - all fields are intially marked "invalid".
         LIBCZI_API GeneralDocumentInfo() : name_valid(false), title_valid(false), userName_valid(false), description_valid(false), comment_valid(false), keywords_valid(false), rating_valid(false), rating(0), creationDateTime_valid(false) {}
-        bool name_valid;				///< Whether the field #name is valid.		
-        std::wstring name;				///< Name of the document.
-        bool title_valid;				///< Whether the field #title is valid.			
-        std::wstring title;				///< Title of the document.
-        bool userName_valid;			///< Whether the field #userName is valid.			
-        std::wstring userName;			///< Name of the user who created the document.
-        bool description_valid;			///< Whether the field #description is valid.			
-        std::wstring description;		///< A text describing the document.
-        bool comment_valid;				///< Whether the field #comment is valid.			
-        std::wstring comment;			///< A text with comments on the document.
-        bool keywords_valid;			///< Whether the field #keywords is valid.			
-        std::wstring keywords;			///< List of keywords (should be separated by semicolons)
-        bool rating_valid;				///< Whether the field #rating is valid.			
-        int rating;						///< An integer specifying a "five-star-rating" (should be between 0 and 5).
-        bool creationDateTime_valid;	///< Whether the field #creationDateTime is valid.			
-        std::wstring creationDateTime;	///< The creation date of the document (formatted as xml-datatype "dateTime").
+        bool name_valid;                ///< Whether the field #name is valid.      
+        std::wstring name;              ///< Name of the document.
+        bool title_valid;               ///< Whether the field #title is valid.         
+        std::wstring title;             ///< Title of the document.
+        bool userName_valid;            ///< Whether the field #userName is valid.          
+        std::wstring userName;          ///< Name of the user who created the document.
+        bool description_valid;         ///< Whether the field #description is valid.           
+        std::wstring description;       ///< A text describing the document.
+        bool comment_valid;             ///< Whether the field #comment is valid.           
+        std::wstring comment;           ///< A text with comments on the document.
+        bool keywords_valid;            ///< Whether the field #keywords is valid.          
+        std::wstring keywords;          ///< List of keywords (should be separated by semicolons)
+        bool rating_valid;              ///< Whether the field #rating is valid.            
+        int rating;                     ///< An integer specifying a "five-star-rating" (should be between 0 and 5).
+        bool creationDateTime_valid;    ///< Whether the field #creationDateTime is valid.          
+        std::wstring creationDateTime;  ///< The creation date of the document (formatted as xml-datatype "dateTime").
 
         /// Sets the name and marks it valid if the specified string is non-null and non-empty. Otherwise, the name is set to invalid.
         ///
@@ -223,9 +223,9 @@ namespace libCZI
     {
         /// Default constructor - sets all members to invalid.
         ScalingInfo() : scaleX(std::numeric_limits<double>::quiet_NaN()), scaleY(std::numeric_limits<double>::quiet_NaN()), scaleZ(std::numeric_limits<double>::quiet_NaN()) {}
-        double scaleX;	///< The length of a pixel in x-direction in the unit meters. If unknown/invalid, this value is numeric_limits<double>::quiet_NaN().
-        double scaleY;	///< The length of a pixel in y-direction in the unit meters. If unknown/invalid, this value is numeric_limits<double>::quiet_NaN().
-        double scaleZ;	///< The length of a pixel in y-direction in the unit meters. If unknown/invalid, this value is numeric_limits<double>::quiet_NaN().
+        double scaleX;  ///< The length of a pixel in x-direction in the unit meters. If unknown/invalid, this value is numeric_limits<double>::quiet_NaN().
+        double scaleY;  ///< The length of a pixel in y-direction in the unit meters. If unknown/invalid, this value is numeric_limits<double>::quiet_NaN().
+        double scaleZ;  ///< The length of a pixel in y-direction in the unit meters. If unknown/invalid, this value is numeric_limits<double>::quiet_NaN().
 
         /// Query if this object's scaleX value is valid.
         ///
@@ -283,9 +283,9 @@ namespace libCZI
     /// given in meter, here we just suggest a unit to display the scale.
     struct ScalingInfoEx : ScalingInfo
     {
-        std::wstring defaultUnitFormatX;	///< The default unit-format for X.
-        std::wstring defaultUnitFormatY;	///< The default unit-format for Y.
-        std::wstring defaultUnitFormatZ;	///< The default unit-format for Z.
+        std::wstring defaultUnitFormatX;    ///< The default unit-format for X.
+        std::wstring defaultUnitFormatY;    ///< The default unit-format for Y.
+        std::wstring defaultUnitFormatZ;    ///< The default unit-format for Z.
 
         /// Gets the specified default unit-format.
         ///
@@ -342,9 +342,9 @@ namespace libCZI
         ///  when arranging the z-slices according to their associated distances(as given by ../Dimensions/Z/Positions).
         enum class XyzHandedness : std::uint8_t
         {
-            LeftHanded,	///< The coordinate-system is orientated left-handed.
+            LeftHanded, ///< The coordinate-system is orientated left-handed.
             RightHanded,///< The coordinate-system is orientated right-handed.
-            Undefined	///< The coordinate-system is undefined.
+            Undefined   ///< The coordinate-system is undefined.
         };
 
         ///  We define the z-axis to be collinear with the optical axis. On this axis the z-coordinates
@@ -358,19 +358,19 @@ namespace libCZI
         ///  Note that the coordinate system defined here is different to the one defined with "XYZHandedness".
         enum class ZaxisDirection : std::uint8_t
         {
-            FromSpecimenToObjective,	///< The z-axis is pointing from specimen to objective.
-            FromObjectiveToSpecimen,	///< The z-axis is pointing from objective to specimen.
-            Undefined					///< This parameter is undefined.
+            FromSpecimenToObjective,    ///< The z-axis is pointing from specimen to objective.
+            FromObjectiveToSpecimen,    ///< The z-axis is pointing from objective to specimen.
+            Undefined                   ///< This parameter is undefined.
         };
 
         /// Description of mode of operation of the Z-Drive. "Continuous" means that
-        ///	the z - drive did not stop while acquiring the image. "Step" means that the
-        ///	Z - drive did not move during the acquisition of the image.
-        ///	Used for SPIM.
+        /// the z - drive did not stop while acquiring the image. "Step" means that the
+        /// Z - drive did not move during the acquisition of the image.
+        /// Used for SPIM.
         enum class ZDriveMode : std::uint8_t
         {
-            Continuous,	///< The z-drive did not stop while acquiring the image.
-            Step		///< The z-drive did not move during the acquisition of the image.
+            Continuous, ///< The z-drive did not stop while acquiring the image.
+            Step        ///< The z-drive did not move during the acquisition of the image.
         };
 
         /// Gets the reference position in units of µm. If this is not valid, then the Z-positions only have a relative meaning.
@@ -447,8 +447,8 @@ namespace libCZI
         /// The (normalized) control points of a spline.
         struct SplineControlPoint
         {
-            double x;	///< The normalized x-coordinate of a spline control point.
-            double y;	///< The normalized y-coordinate of a spline control point.
+            double x;   ///< The normalized x-coordinate of a spline control point.
+            double y;   ///< The normalized y-coordinate of a spline control point.
 
             /// Initializes a new instance of the SplineControlPoint class.
             /// \param x The x coordinate.
@@ -469,9 +469,9 @@ namespace libCZI
         /// Values that represent the gradation curve modes.
         enum class GradationCurveMode : std::uint8_t
         {
-            Linear,		///< The gradation curve is a straight line (from white point to black point).
-            Gamma,		///< The gradation curve is defined by a gamma.
-            Spline		///< The gradation curve is defined by piecewise splines.
+            Linear,     ///< The gradation curve is a straight line (from white point to black point).
+            Gamma,      ///< The gradation curve is defined by a gamma.
+            Spline      ///< The gradation curve is defined by piecewise splines.
         };
 
 
@@ -481,10 +481,10 @@ namespace libCZI
         /// is conveniently contained in the method "TryGetTintingColorRgb8".
         enum class TintingMode : std::uint8_t
         {
-            None = 0,					///< None - which gives the "original color", ie. in case of RGB the RGB-value is directly used, in case of grayscale we get a gray pixel.
-            Color = 1,					///< The pixel value is multiplied with the tinting-color.
-            LookUpTableExplicit = 2,	///< (NOT YET IMPLEMENTED) There is an explicit look-up-table specified.
-            LookUpTableWellKnown = 3	///< (NOT YET IMPLEMENTED) We are using a "well-known" look-up-table, and it is identified by its name (which is a string).
+            None = 0,                   ///< None - which gives the "original color", ie. in case of RGB the RGB-value is directly used, in case of grayscale we get a gray pixel.
+            Color = 1,                  ///< The pixel value is multiplied with the tinting-color.
+            LookUpTableExplicit = 2,    ///< (NOT YET IMPLEMENTED) There is an explicit look-up-table specified.
+            LookUpTableWellKnown = 3    ///< (NOT YET IMPLEMENTED) We are using a "well-known" look-up-table, and it is identified by its name (which is a string).
         };
 
         /// The coefficients of a cubic spline defined by \f$a\,x^3 + b\,x^2 + c\,x + d =y\f$.
@@ -504,11 +504,11 @@ namespace libCZI
             {
                 switch (index)
                 {
-                case 0:		return this->a;
-                case 1:		return this->b;
-                case 2:		return this->c;
-                case 3:		return this->d;
-                default:	return std::numeric_limits<double>::quiet_NaN();
+                case 0:     return this->a;
+                case 1:     return this->b;
+                case 2:     return this->c;
+                case 3:     return this->d;
+                default:    return std::numeric_limits<double>::quiet_NaN();
                 }
             }
         };
@@ -526,7 +526,7 @@ namespace libCZI
         /// Enum all channels (which are described by the display-settings object).
         ///
         /// \param func The functor to be called (passing in the channel index). If the functor returns false, the 
-        /// 			enumeration is stopped.
+        ///             enumeration is stopped.
         virtual void EnumChannels(std::function<bool(int chIndex)> func) const = 0;
 
         /// Gets channel display settings for the specified channel. If the channel index is not valid, then
@@ -540,7 +540,7 @@ namespace libCZI
         virtual ~IDisplaySettings() {}
 
         /// Makes a deep copy of the information in this object and store the information in the POD.
-        /// \param 		    disp The display-settings object.
+        /// \param          disp The display-settings object.
         /// \param [in,out] pod  The POD-display-settings object to store the information in.
         static void Clone(const IDisplaySettings* disp, DisplaySettingsPOD& pod);
     };
@@ -552,12 +552,12 @@ namespace libCZI
         /// Gets a boolean indicating whether the corresponding channel is 'active' in the multi-channel-composition.
         ///
         /// \return True if the corresponding channel is 'active', false otherwise.
-        virtual bool	GetIsEnabled() const = 0;
+        virtual bool    GetIsEnabled() const = 0;
 
         /// Gets the weight of the channel (for multi-channel-composition).
         ///
         /// \return The weight.
-        virtual float	GetWeight() const = 0;
+        virtual float   GetWeight() const = 0;
 
         /// Attempts to get the RGB24-tinting color for the corresponding channel. If tinting is not enabled, then
         /// this method will return false.
@@ -565,13 +565,13 @@ namespace libCZI
         /// \param [out] pColor If tinting is enabled for the corresponding channel, then (if non-null) will receive the tinting-color.
         ///
         /// \return True if tinting is enabled for the corresponding channel (and in this case <tt>pColor</tt> will be set), false otherwise (and <tt>pColor</tt> will not be set).
-        virtual bool	TryGetTintingColorRgb8(libCZI::Rgb8Color* pColor) const = 0;
+        virtual bool    TryGetTintingColorRgb8(libCZI::Rgb8Color* pColor) const = 0;
 
         /// Gets the black point and the white point.
         ///
         /// \param [out] pBlack If non-null, the black point will be returned.
         /// \param [out] pWhite If non-null, the white point will be returned.
-        virtual void	GetBlackWhitePoint(float* pBlack, float* pWhite) const = 0;
+        virtual void    GetBlackWhitePoint(float* pBlack, float* pWhite) const = 0;
 
         /// Gets gradation curve mode.
         ///
@@ -583,7 +583,7 @@ namespace libCZI
         /// \param [out] gamma If non-null and applicable, the gamma will be returned.
         ///
         /// \return True if the corresponding channel uses gradation curve mode <tt>Gamma</tt> (and a value for gamma is available), false otherwise.
-        virtual bool	TryGetGamma(float* gamma)const = 0;
+        virtual bool    TryGetGamma(float* gamma)const = 0;
 
         /// Attempts to get spline control points - this will only be available if gradation curve mode is <tt>Spline</tt>.
         /// \remark
@@ -596,19 +596,19 @@ namespace libCZI
         /// \param [in,out] ctrlPts If non-null, the control points will be written to this vector.
         ///
         /// \return True if it succeeds, false if it fails.
-        virtual bool	TryGetSplineControlPoints(std::vector<libCZI::IDisplaySettings::SplineControlPoint>* ctrlPts) const = 0;
+        virtual bool    TryGetSplineControlPoints(std::vector<libCZI::IDisplaySettings::SplineControlPoint>* ctrlPts) const = 0;
 
         /// Attempts to get the spline data - this will only be available if gradation curve mode is <tt>Spline</tt>.
         ///
         /// \param [in,out] data If non-null, the spline data will be written to this vector.
         ///
         /// \return True if it the corresponding channels uses gradation curve mode <tt>Spline</tt>, false otherwise.
-        virtual bool	TryGetSplineData(std::vector<libCZI::IDisplaySettings::SplineData>* data) const = 0;
+        virtual bool    TryGetSplineData(std::vector<libCZI::IDisplaySettings::SplineData>* data) const = 0;
 
         virtual ~IChannelDisplaySetting() {}
 
         /// Makes a deep copy of the information in this object and store the information in the POD.
-        /// \param 		    disp The channel-display-settings object.
+        /// \param          disp The channel-display-settings object.
         /// \param [in,out] pod  The POD-channel-display-settings object to store the information in.
         static void Clone(const IChannelDisplaySetting* disp, ChannelDisplaySettingsPOD& pod);
     };
@@ -766,7 +766,7 @@ namespace libCZI
         /// Attempts to get the attribute with the name specified by "attributeName". If it exists, the value is stored in
         /// "attribValue" (if it is non-null) and the return value is true. Otherwise, the return value is false.
         ///
-        /// \param 		    attributeName Name of the attribute.
+        /// \param          attributeName Name of the attribute.
         /// \param [out] attribValue   If non-null, the attribute value will be put here (if the attribute exists).
         ///
         /// \return True if it succeeds, false if it fails.
@@ -790,20 +790,20 @@ namespace libCZI
         /// At path "A/B/C" selects (or creates) a node-structure like this
         /// \code{.unparsed}
         /// <A>
-        ///	  <B>
+        ///   <B>
         ///     <C/>
-        ///	  </B>
-        ///	</A>
+        ///   </B>
+        /// </A>
         /// \endcode
         /// Attributes can be specified with a node, in the form 'NodeName[attr1=abc,attr2=xyz]'. This will
         /// search for nodes with the specified attributes, and if not found, create one.
         /// In this example "A/B[Id=ab,Name=xy]/C" we will get
         /// \code{.unparsed}
         /// <A>
-        ///	  <B Id="ab" Name="xy">
+        ///   <B Id="ab" Name="xy">
         ///     <C/>
-        ///	  </B>
-        ///	</A>
+        ///   </B>
+        /// </A>
         /// \endcode
         /// \param path The path  (in UTF8-encoding).
         /// \return Either the requested node if it exists or nullptr.
@@ -887,20 +887,20 @@ namespace libCZI
         /// At path "A/B/C" selects (or creates) a node-structure like this
         /// \code{.unparsed}
         /// <A>
-        ///	  <B>
+        ///   <B>
         ///     <C/>
-        ///	  </B>
-        ///	</A>
+        ///   </B>
+        /// </A>
         /// \endcode
         /// Attributes can be specified with a node, in the form 'NodeName[attr1=abc,attr2=xyz]'. This will
         /// search for nodes with the specified attributes, and if not found, create one.
         /// In this example "A/B[Id=ab,Name=xy]/C" we will get
         /// \code{.unparsed}
         /// <A>
-        ///	  <B Id="ab" Name="xy">
+        ///   <B Id="ab" Name="xy">
         ///     <C/>
-        ///	  </B>
-        ///	</A>
+        ///   </B>
+        /// </A>
         /// \endcode
         /// \param path The path  (in UTF8-encoding).
         /// \return Either an existing node or a newly created one.
@@ -910,20 +910,20 @@ namespace libCZI
         /// At path "A/B/C" selects (or creates) a node-structure like this
         /// \code{.unparsed}
         /// <A>
-        ///	  <B>
+        ///   <B>
         ///     <C/>
-        ///	  </B>
-        ///	</A>
+        ///   </B>
+        /// </A>
         /// \endcode
         /// Attributes can be specified with a node, in the form 'NodeName[attr1=abc,attr2=xyz]'. This will
         /// search for nodes with the specified attributes, and if not found, create one.
         /// In this example "A/B[Id=ab,Name=xy]/C" we will get
         /// \code{.unparsed}
         /// <A>
-        ///	  <B Id="ab" Name="xy">
+        ///   <B Id="ab" Name="xy">
         ///     <C/>
-        ///	  </B>
-        ///	</A>
+        ///   </B>
+        /// </A>
         /// \endcode
         /// \param path The path (in UTF8-encoding).
         /// \return The existing node conforming to the path if it exists, null otherwise.
@@ -1021,20 +1021,20 @@ namespace libCZI
         /// At path "A/B/C" selects (or creates) a node-structure like this
         /// \code{.unparsed}
         /// <A>
-        ///	  <B>
+        ///   <B>
         ///     <C/>
-        ///	  </B>
-        ///	</A>
+        ///   </B>
+        /// </A>
         /// \endcode
         /// Attributes can be specified with a node, in the form 'NodeName[attr1=abc,attr2=xyz]'. This will
         /// search for nodes with the specified attributes, and if not found, create one.
         /// In this example "A/B[Id=ab,Name=xy]/C" we will get
         /// \code{.unparsed}
         /// <A>
-        ///	  <B Id="ab" Name="xy">
+        ///   <B Id="ab" Name="xy">
         ///     <C/>
-        ///	  </B>
-        ///	</A>
+        ///   </B>
+        /// </A>
         /// \endcode
         /// \param path The path.
         /// \return Either an existing node or a newly created one.
@@ -1251,27 +1251,27 @@ namespace libCZI
         /// Writes the nodes ""Metadata/Information/Image/SizeX" and ""Metadata/Information/Image/SizeY".
         ///
         /// \param [in,out] builder The metadata-builder object.
-        /// \param 		    width   The width (=SizeX).
-        /// \param 		    height  The height (=SizeY).
+        /// \param          width   The width (=SizeX).
+        /// \param          height  The height (=SizeY).
         static void WriteImageSizeInformation(libCZI::ICziMetadataBuilder* builder, int width, int height);
 
         /// Writes the node ""Metadata/Information/Image/SizeM".
         ///
         /// \param [in,out] builder The metadata-builder object.
-        /// \param 		    mSize   The M-size.
+        /// \param          mSize   The M-size.
         static void WriteMIndexSizeInformation(libCZI::ICziMetadataBuilder* builder, int mSize);
 
         /// Writes the size-information for the specified dimension (to "Metadata/Information/Image/Size?").
         ///
         /// \param [in,out] builder The metadata-builder object.
-        /// \param 		    dim	    The dimension.
-        /// \param 		    size    The size of the dimension.
+        /// \param          dim     The dimension.
+        /// \param          size    The size of the dimension.
         static void WriteDimensionSize(libCZI::ICziMetadataBuilder* builder, libCZI::DimensionIndex dim, int size);
 
         /// Uses the specified statistics-data in order to write the "size"-information-
         ///
         /// \param [in,out] builder    The metadata-builder object.
-        /// \param 		    statistics The subblock-statistics.
+        /// \param          statistics The subblock-statistics.
         static void WriteFillWithSubBlockStatistics(libCZI::ICziMetadataBuilder* builder, const libCZI::SubBlockStatistics& statistics);
 
         /// Writes the "dimension-T"-information ("Information/Dimensions/T") - this associates a timestamp with each T-coordinate. With this
@@ -1280,63 +1280,63 @@ namespace libCZI
         /// An absolute time-point may be specified as startTime. 
         /// Example: say, startOffSet is 1 and increment is 2. Then T=0 is associated with 1, T=1 with 1+2, T=2 with 1+2*2, T=3 with 1+2*3 and so on.
         /// 
-        /// \param [in,out] builder	    The metadata-builder object.
-        /// \param 		    startTime   If non-null, the (absolute) start time.
-        /// \param 		    startOffSet The offset for the first timepoint (in units of seconds). If numeric_limits<double>::quiet_NaN() is specified, this parameter is ignored.
-        /// \param 		    increment   The increment (in units of seconds). If numeric_limits<double>::quiet_NaN() is specified, this parameter is ignored.
+        /// \param [in,out] builder     The metadata-builder object.
+        /// \param          startTime   If non-null, the (absolute) start time.
+        /// \param          startOffSet The offset for the first timepoint (in units of seconds). If numeric_limits<double>::quiet_NaN() is specified, this parameter is ignored.
+        /// \param          increment   The increment (in units of seconds). If numeric_limits<double>::quiet_NaN() is specified, this parameter is ignored.
         static void WriteDimInfoT_Interval(libCZI::ICziMetadataBuilder* builder, const libCZI::XmlDateTime* startTime, double startOffSet, double increment);
 
         /// Writes the "dimension-T"-information ("Information/Dimensions/T") - this associates a timestamp with each T-coordinate. With this function
         /// we provide a list of timestamps. 
         /// 
-        /// \param [in,out] builder		   The metadata-builder object.
-        /// \param 		    startTime	   If non-null, the (absolute) start time.
-        /// \param 		    funcGetOffsets A function which is called for providing the timestamp. The integer parameter is incremented with each call,
-        /// 							   starting with 0. The return value is the timestamp (in units of seconds). If numeric_limits<double>::quiet_NaN() is
-        /// 							   returned, the enumeration is ended.
+        /// \param [in,out] builder        The metadata-builder object.
+        /// \param          startTime      If non-null, the (absolute) start time.
+        /// \param          funcGetOffsets A function which is called for providing the timestamp. The integer parameter is incremented with each call,
+        ///                                starting with 0. The return value is the timestamp (in units of seconds). If numeric_limits<double>::quiet_NaN() is
+        ///                                returned, the enumeration is ended.
         static void WriteDimInfoT_List(libCZI::ICziMetadataBuilder* builder, const libCZI::XmlDateTime* startTime, const std::function<double(int)>& funcGetOffsets);
 
         /// Helper function in order to write the Dimension-Z information - as a an equal-distance sequence.
         ///
-        /// \param [in] builder			The metadata-builder object.
-        /// \param 		    startPos    The start position.
-        /// \param 		    startOffSet The offset of the first item in the sequence.
-        /// \param 		    increment   The increment.
+        /// \param [in] builder         The metadata-builder object.
+        /// \param          startPos    The start position.
+        /// \param          startOffSet The offset of the first item in the sequence.
+        /// \param          increment   The increment.
         static void WriteDimInfoZ_Interval(libCZI::ICziMetadataBuilder* builder, double startPos, double startOffSet, double increment);
 
         /// Helper function in order to write the Dimension-Z information - as a an explicit list.
         ///
-        /// \param [in] builder		   The metadata-builder object.
-        /// \param 	    startPos	   The start position.
-        /// \param 	    funcGetOffsets The function which is called to retrieve the offset. The argument is incremented with each call (starting with 0);
-        /// 						   a return value of infinity or NaN will end the enumeration.
+        /// \param [in] builder        The metadata-builder object.
+        /// \param      startPos       The start position.
+        /// \param      funcGetOffsets The function which is called to retrieve the offset. The argument is incremented with each call (starting with 0);
+        ///                            a return value of infinity or NaN will end the enumeration.
         static void WriteDimInfoZ_List(libCZI::ICziMetadataBuilder* builder, double startPos, const std::function<double(int)>& funcGetOffsets);
 
         /// Helper function which writes the information from the specified "GeneralDocumentInfo" into the metadata-builder object.
         ///
-        /// \param [in] builder		The metadata-builder object.
-        /// \param 		    info    The general-document-information to be written into the metadata-builder object.
+        /// \param [in] builder     The metadata-builder object.
+        /// \param          info    The general-document-information to be written into the metadata-builder object.
         static void WriteGeneralDocumentInfo(libCZI::ICziMetadataBuilder* builder, const libCZI::GeneralDocumentInfo& info);
 
         /// Helper function in order to write scaling-information into the metadata-builder object.
         ///
-        /// \param [in] builder		The metadata-builder object.
-        /// \param 		scalingInfo The scaling  to be written into the metadata-builder object.
+        /// \param [in] builder     The metadata-builder object.
+        /// \param      scalingInfo The scaling  to be written into the metadata-builder object.
         static void WriteScalingInfo(libCZI::ICziMetadataBuilder* builder, const libCZI::ScalingInfo& scalingInfo);
 
         /// Helper function in order to write scaling-information into the metadata-builder object.
         ///
-        /// \param [in] builder		The metadata-builder object.
-        /// \param 		scalingInfo The scaling  to be written into the metadata-builder object.
+        /// \param [in] builder     The metadata-builder object.
+        /// \param      scalingInfo The scaling  to be written into the metadata-builder object.
         static void WriteScalingInfoEx(libCZI::ICziMetadataBuilder* builder, const libCZI::ScalingInfoEx& scalingInfo);
 
         /// Helper function which is putting a set of key-value pairs into the XML-metadata at the position "Metadata/Information/CustomAttributes/KeyValue". An element with the specified "key"-name is created/overwritten in this node, and the value is put into this element as the value.
         /// Type of the written custom key-value pair is explicitly marked with attribute of the xml node, e.g. Type="String" if the type of value is string.
         /// Special case: If two custom key-value pairs have the same key name, the last pair would overwrite the xml node created by the previous pair. 
         /// 
-        /// \param [in] builder		The metadata-builder object.
-        /// \param 		key         Key of the custom key-value pair.
-        /// \param 		value       Value of the custom key-value pair.                       
+        /// \param [in] builder     The metadata-builder object.
+        /// \param      key         Key of the custom key-value pair.
+        /// \param      value       Value of the custom key-value pair.                       
         static void SetOrAddCustomKeyValuePair(libCZI::ICziMetadataBuilder* builder, const std::string& key, const libCZI::CustomValueVariant& value);
 
         /// Helper function which writes the specified display-settings into the specified metadata-builder. The display-settings
@@ -1344,7 +1344,7 @@ namespace libCZI
         /// If there are nodes with name "Channel" existing (prior to calling this function) under the node
         /// "Metadata/DisplaySetting/Channels", they are removed (before adding new content).
         /// \param [in] builder             The metadata-builder object.
-        /// \param      display_settings	The display settings.
+        /// \param      display_settings    The display settings.
         static void WriteDisplaySettings(libCZI::ICziMetadataBuilder* builder, const libCZI::IDisplaySettings* display_settings);
 
         /// Helper function which writes the specified display-settings into the specified metadata-builder. The display-settings
@@ -1352,7 +1352,7 @@ namespace libCZI
         /// If there are nodes with name "Channel" existing (prior to calling this function) under the node
         /// "Metadata/DisplaySetting/Channels", they are removed (before adding new content).
         /// \param [in] builder             The metadata-builder object.
-        /// \param      display_settings	The display settings.
+        /// \param      display_settings    The display settings.
         /// \param      channel_count       The number of channels (which are constructed in the display-settings XML-metadata).
         static void WriteDisplaySettings(libCZI::ICziMetadataBuilder* builder, const libCZI::IDisplaySettings* display_settings, int channel_count);
     };
