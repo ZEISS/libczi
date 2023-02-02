@@ -32,12 +32,12 @@ private:
 
     static uint8_t toByte(float f)
     {
-        return (uint8_t)(f + .5f);
+        return static_cast<uint8_t>(f + .5f);
     }
 
     static int toInt(float f)
     {
-        return (int)(f + .5f);
+        return static_cast<int>(f + .5f);
     }
 
     struct bgr8 { uint8_t b; uint8_t g; uint8_t r; };
@@ -112,7 +112,7 @@ private:
     struct CGetTintedBase
     {
         Rgb8Color tintingColor;
-        explicit CGetTintedBase(Rgb8Color tintingColor) :tintingColor(tintingColor) {};
+        explicit CGetTintedBase(Rgb8Color tintingColor) :tintingColor(tintingColor) {}
     };
 
     struct CGetTintedGray8 : CGetTintedBase, CGray8BytesPerPel
@@ -142,7 +142,7 @@ private:
         explicit CGetTintedBgr24(Rgb8Color tintingColor) :CGetTintedBase(tintingColor) {}
         bgr8 operator()(const uint8_t* p) const
         {
-            float f = (float)(((int)p[0]) + p[1] + p[2]);
+            float f = static_cast<float>(static_cast<int>(p[0]) + p[1] + p[2]);
             f /= (3 * 255);
             return bgr8{ toByte(f * this->tintingColor.b),toByte(f * this->tintingColor.g),toByte(f * this->tintingColor.r) };
         }
@@ -155,7 +155,7 @@ private:
         // Alpha is ignored currently.
         bgr8 operator()(const uint8_t* p) const
         {
-            float f = (float)(((int)p[0]) + p[1] + p[2]);
+            float f = static_cast<float>(static_cast<int>(p[0]) + p[1] + p[2]);
             f /= (3 * 255);
             return bgr8{ toByte(f * this->tintingColor.b),toByte(f * this->tintingColor.g),toByte(f * this->tintingColor.r) };
         }
@@ -166,8 +166,8 @@ private:
         explicit CGetTintedBgr48(Rgb8Color tintingColor) :CGetTintedBase(tintingColor) {}
         bgr8 operator()(const uint8_t* p) const
         {
-            const uint16_t* puv = (const uint16_t*)p;
-            float f = (float)(((int)(puv[0])) + puv[1] + puv[2]);
+            const uint16_t* puv = reinterpret_cast<const uint16_t*>(p);
+            float f = static_cast<float>(static_cast<int>(puv[0]) + puv[1] + puv[2]);
             f /= (3 * (256 * 256 - 1));
             return bgr8{ toByte(f * this->tintingColor.b),toByte(f * this->tintingColor.g),toByte(f * this->tintingColor.r) };
         }
@@ -178,8 +178,8 @@ private:
     {
         for (uint32_t y = 0; y < h; ++y)
         {
-            const uint8_t* pSrc = ptrSrc + y * ((ptrdiff_t)strideSrc);
-            uint8_t* pDst = ptrDst + y * ((ptrdiff_t)strideDst);
+            const uint8_t* pSrc = ptrSrc + y * static_cast<ptrdiff_t>(strideSrc);
+            uint8_t* pDst = ptrDst + y * static_cast<ptrdiff_t>(strideDst);
             for (uint32_t x = 0; x < w; ++x)
             {
                 bgr8 bgr = op(pSrc);
