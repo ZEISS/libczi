@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <memory>
+#include <tuple>
 #include "libCZI.h"
 #include "CziSubBlockDirectory.h"
 #include "CziAttachmentsDirectory.h"
@@ -24,32 +26,32 @@ private:
     CReaderWriterCziAttachmentsDirectory attachmentDirectory;
 
 public:
-    virtual void Create(std::shared_ptr<libCZI::IInputOutputStream> stream, std::shared_ptr<libCZI::ICziReaderWriterInfo> info) override;
-    virtual void ReplaceSubBlock(int key, const libCZI::AddSubBlockInfo& addSbBlkInfo) override;
-    virtual void RemoveSubBlock(int key) override;
-    virtual void ReplaceAttachment(int attchmntId, const libCZI::AddAttachmentInfo& addAttachmentInfo) override;
-    virtual void RemoveAttachment(int attchmntId) override;
-    virtual void SyncAddSubBlock(const libCZI::AddSubBlockInfo& addSbBlkInfo) override;
-    virtual void SyncAddAttachment(const libCZI::AddAttachmentInfo& addAttachmentInfo) override;
-    virtual void SyncWriteMetadata(const libCZI::WriteMetadataInfo& metadataInfo) override;
-    virtual std::shared_ptr<libCZI::IMetadataSegment> ReadMetadataSegment() override;
-    virtual libCZI::FileHeaderInfo GetFileHeaderInfo() override;
+    void Create(std::shared_ptr<libCZI::IInputOutputStream> stream, std::shared_ptr<libCZI::ICziReaderWriterInfo> info) override;
+    void ReplaceSubBlock(int key, const libCZI::AddSubBlockInfo& addSbBlkInfo) override;
+    void RemoveSubBlock(int key) override;
+    void ReplaceAttachment(int attchmntId, const libCZI::AddAttachmentInfo& addAttachmentInfo) override;
+    void RemoveAttachment(int attchmntId) override;
+    void SyncAddSubBlock(const libCZI::AddSubBlockInfo& addSbBlkInfo) override;
+    void SyncAddAttachment(const libCZI::AddAttachmentInfo& addAttachmentInfo) override;
+    void SyncWriteMetadata(const libCZI::WriteMetadataInfo& metadataInfo) override;
+    std::shared_ptr<libCZI::IMetadataSegment> ReadMetadataSegment() override;
+    libCZI::FileHeaderInfo GetFileHeaderInfo() override;
 
-    virtual void Close() override;
+    void Close() override;
 
     // interface ISubBlockRepository
-    virtual void EnumerateSubBlocks(const std::function<bool(int index, const libCZI::SubBlockInfo& info)>& funcEnum) override;
-    virtual void EnumSubset(const libCZI::IDimCoordinate* planeCoordinate, const libCZI::IntRect* roi, bool onlyLayer0, const std::function<bool(int index, const libCZI::SubBlockInfo& info)>& funcEnum) override;
-    virtual std::shared_ptr<libCZI::ISubBlock> ReadSubBlock(int index) override;
-    virtual bool TryGetSubBlockInfoOfArbitrarySubBlockInChannel(int channelIndex, libCZI::SubBlockInfo& info) override;
-    virtual bool TryGetSubBlockInfo(int index, libCZI::SubBlockInfo* info) const override;
-    virtual libCZI::SubBlockStatistics GetStatistics() override;
-    virtual libCZI::PyramidStatistics GetPyramidStatistics() override;
+    void EnumerateSubBlocks(const std::function<bool(int index, const libCZI::SubBlockInfo& info)>& funcEnum) override;
+    void EnumSubset(const libCZI::IDimCoordinate* planeCoordinate, const libCZI::IntRect* roi, bool onlyLayer0, const std::function<bool(int index, const libCZI::SubBlockInfo& info)>& funcEnum) override;
+    std::shared_ptr<libCZI::ISubBlock> ReadSubBlock(int index) override;
+    bool TryGetSubBlockInfoOfArbitrarySubBlockInChannel(int channelIndex, libCZI::SubBlockInfo& info) override;
+    bool TryGetSubBlockInfo(int index, libCZI::SubBlockInfo* info) const override;
+    libCZI::SubBlockStatistics GetStatistics() override;
+    libCZI::PyramidStatistics GetPyramidStatistics() override;
 
     // interface IAttachmentRepository
-    virtual void EnumerateAttachments(const std::function<bool(int index, const libCZI::AttachmentInfo& info)>& funcEnum) override;
-    virtual void EnumerateSubset(const char* contentFileType, const char* name, const std::function<bool(int index, const libCZI::AttachmentInfo& infi)>& funcEnum) override;
-    virtual std::shared_ptr<libCZI::IAttachment> ReadAttachment(int index) override;
+    void EnumerateAttachments(const std::function<bool(int index, const libCZI::AttachmentInfo& info)>& funcEnum) override;
+    void EnumerateSubset(const char* contentFileType, const char* name, const std::function<bool(int index, const libCZI::AttachmentInfo& infi)>& funcEnum) override;
+    std::shared_ptr<libCZI::IAttachment> ReadAttachment(int index) override;
 
 private:
     void Finish();

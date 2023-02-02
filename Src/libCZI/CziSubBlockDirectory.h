@@ -4,6 +4,9 @@
 
 #pragma once
 
+#include <limits>
+#include <vector>
+#include <map>
 #include <functional>
 #include <set>
 #include "libCZI.h"
