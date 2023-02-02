@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <vector>
+#include <memory>
 #include "libCZI.h"
 
 namespace libCZI
@@ -104,7 +106,7 @@ namespace libCZI
         /// Gets count of active channels.
         ///
         /// \return The active channels count.
-        int GetActiveChannelsCount() const { return (int)this->activeChannels.size(); }
+        int GetActiveChannelsCount() const { return static_cast<int>(this->activeChannels.size()); }
 
         /// Gets a reference to the channel-info for the channel with the specified index.
         /// The index must be in less than the number returned from GetActiveChannelsCount(),

@@ -7,6 +7,8 @@
 #include "ImportExport.h"
 #include <cstring>
 #include <limits>
+#include <vector>
+#include <memory>
 #include "libCZI_Pixels.h"
 #include "libCZI_Metadata.h"
 

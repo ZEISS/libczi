@@ -453,7 +453,7 @@ namespace libCZI
             /// Initializes a new instance of the SplineControlPoint class.
             /// \param x The x coordinate.
             /// \param y The y coordinate.
-            SplineControlPoint(double x, double y) : x(x), y(y) {};
+            SplineControlPoint(double x, double y) : x(x), y(y) {}
 
             /// Equality operator
             /// \param rhs The right hand side.
@@ -850,7 +850,7 @@ namespace libCZI
         /// \returns True if it succeeds, false if it fails.
         bool TryGetValueAsBool(bool* p);
 
-        virtual ~IXmlNodeRead() {};
+        virtual ~IXmlNodeRead() {}
     };
 
     /// Representation of the CZI-metadata.
@@ -1065,7 +1065,7 @@ namespace libCZI
         /// \return The metadata (UTF8-encoded XML).
         virtual std::string GetXml(bool withIndent = false) = 0;
 
-        virtual ~ICziMetadataBuilder() {};
+        virtual ~ICziMetadataBuilder() {}
     };
 
     /// Variant for CustomValue.
@@ -1091,7 +1091,7 @@ namespace libCZI
         /// Constructor for initializing the 'int32' type.
         ///
         /// \param  v   The value to set the variant to.
-        CustomValueVariant(std::int32_t v)
+        explicit CustomValueVariant(std::int32_t v)
         {
             this->SetInt32(v);
         }
@@ -1099,7 +1099,7 @@ namespace libCZI
         /// Constructor for initializing the 'double' type.
         ///
         /// \param  v   The value to set the variant to.
-        CustomValueVariant(double v)
+        explicit CustomValueVariant(double v)
         {
             this->SetDouble(v);
         }
@@ -1107,7 +1107,7 @@ namespace libCZI
         /// Constructor for initializing the 'float' type.
         ///
         /// \param  v   The value to set the variant to.
-        CustomValueVariant(float v)
+        explicit CustomValueVariant(float v)
         {
             this->SetFloat(v);
         }
@@ -1115,7 +1115,7 @@ namespace libCZI
         /// Constructor for initializing the 'bool' type.
         ///
         /// \param  v   The value to set the variant to.
-        CustomValueVariant(bool v)
+        explicit CustomValueVariant(bool v)
         {
             this->SetBool(v);
         }
@@ -1123,7 +1123,7 @@ namespace libCZI
         /// Constructor for initializing the 'string' type.
         ///
         /// \param  v   The value to set the variant to.
-        CustomValueVariant(const std::string& v)
+        explicit CustomValueVariant(const std::string& v)
         {
             this->SetString(v);
         }
@@ -1131,7 +1131,7 @@ namespace libCZI
         /// Constructor for initializing the 'string' type.
         ///
         /// \param  string   The value to set the variant to.
-        CustomValueVariant(const char* string)
+        explicit CustomValueVariant(const char* string)
         {
             this->SetString(string);
         }

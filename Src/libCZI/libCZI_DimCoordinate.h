@@ -149,7 +149,7 @@ namespace libCZI
     {
     private:
         std::uint32_t validDims;
-        int values[(int)(libCZI::DimensionIndex::MaxDim)];
+        int values[static_cast<int>(libCZI::DimensionIndex::MaxDim)];
     public:
         /// Default constructor which constructs an empty coordinate (no valid dimensions).
         CDimCoordinate() : validDims(0) {}
@@ -173,7 +173,7 @@ namespace libCZI
         /// Copy-constructor which creates a copy of the specifed coordinate.
         ///
         /// \param other The coordinate for which to create a copy. It may be null in which case an empty coordinate is created.
-        CDimCoordinate(const libCZI::IDimCoordinate* other) : CDimCoordinate()
+        explicit CDimCoordinate(const libCZI::IDimCoordinate* other) : CDimCoordinate()
         {
             if (other != nullptr)
             {
@@ -266,7 +266,7 @@ namespace libCZI
         /// \return A CDimCoordinate object constructed from the string.
         static CDimCoordinate Parse(const char* str);
     public: // IDimCoordinate
-        virtual bool TryGetPosition(libCZI::DimensionIndex dim, int* coordinate) const override
+        bool TryGetPosition(libCZI::DimensionIndex dim, int* coordinate) const override
         {
             const int index = CDimCoordinate::GetBitIndexForDimension(dim);
             if ((this->validDims & (1 << index)) != 0)
@@ -288,8 +288,8 @@ namespace libCZI
     {
     private:
         std::uint32_t validDims;
-        int start[(int)(libCZI::DimensionIndex::MaxDim)];
-        int size[(int)(libCZI::DimensionIndex::MaxDim)];
+        int start[static_cast<int>(libCZI::DimensionIndex::MaxDim)];
+        int size[static_cast<int>(libCZI::DimensionIndex::MaxDim)];
     public:
         /// Default constructor - the object will contain no valid dimension.
         CDimBounds() : validDims(0) {}
@@ -297,7 +297,7 @@ namespace libCZI
         /// Constructor which copies the content of the specified IDimBounds-object.
         ///
         /// \param other The IDimBounds-object to copy information from.
-        CDimBounds(const IDimBounds* other) : validDims(0)
+        explicit CDimBounds(const IDimBounds* other) : validDims(0)
         {
             if (other != nullptr)
             {
@@ -338,13 +338,15 @@ namespace libCZI
         /// \param func The functor which will be called for all valid dimensions.
         void EnumValidDimensions(const std::function<bool(libCZI::DimensionIndex dim, int start, int size)>& func) const
         {
-            for (int i = (int)(libCZI::DimensionIndex::MinDim); i <= (int)(libCZI::DimensionIndex::MaxDim); ++i)
+            for (int i = static_cast<int>(libCZI::DimensionIndex::MinDim); i <= static_cast<int>(libCZI::DimensionIndex::MaxDim); ++i)
             {
-                const int bitIndex = CDimBase::GetBitIndexForDimension((libCZI::DimensionIndex)i);
+                const int bitIndex = CDimBase::GetBitIndexForDimension(static_cast<libCZI::DimensionIndex>(i));
                 if ((this->validDims & (1 << bitIndex)) != 0)
                 {
-                    if (func((libCZI::DimensionIndex)i, this->start[bitIndex], this->size[bitIndex]) != true)
+                    if (func(static_cast<libCZI::DimensionIndex>(i), this->start[bitIndex], this->size[bitIndex]) != true)
+                    {
                         break;
+                    }
                 }
             }
         }

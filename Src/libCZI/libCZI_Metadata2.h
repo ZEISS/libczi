@@ -6,7 +6,8 @@
 
 #include <cstdint>
 #include <string>
-
+#include <vector>
+#include <memory>
 #include "libCZI.h"
 
 namespace libCZI
@@ -345,7 +346,7 @@ namespace libCZI
         /// \returns The ratio.
         virtual std::shared_ptr<IDimensionChannelRatio> GetRatio() = 0;
 
-        virtual ~IDimensionChannelInfo() override = default;
+        ~IDimensionChannelInfo() override = default;
     };
 
     /// Information about the set of channels.
