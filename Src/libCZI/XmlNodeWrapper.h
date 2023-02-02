@@ -4,6 +4,11 @@
 
 #pragma once
 
+#include <memory>
+#include <map>
+#include <vector>
+#include <utility>
+
 #include "libCZI_Metadata.h"
 #include <regex>
 #include <exception>
@@ -28,8 +33,8 @@ private:
     pugi::xml_node node;
     std::shared_ptr<t> parentRef;
 public:
-    XmlNodeWrapperReadonly(std::shared_ptr<t> parentRef, pugi::xml_node_struct* node_struct) :node(node_struct), parentRef(std::move(parentRef)) {};
-    XmlNodeWrapperReadonly(pugi::xml_node_struct* node_struct) :node(node_struct) {};
+    XmlNodeWrapperReadonly(std::shared_ptr<t> parentRef, pugi::xml_node_struct* node_struct) :node(node_struct), parentRef(std::move(parentRef)) {}
+    explicit XmlNodeWrapperReadonly(pugi::xml_node_struct* node_struct) :node(node_struct) {}
 public: // interface IXmlNodeRead
     std::wstring Name() const override
     {
