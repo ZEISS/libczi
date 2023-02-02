@@ -18,15 +18,15 @@ public:
     CCziMetadataDocumentInfo(std::shared_ptr<CCziMetadata> md);
 
 public: // interface ICziMultiDimensionDocumentInfo
-    virtual libCZI::GeneralDocumentInfo GetGeneralDocumentInfo() const override;
-    virtual libCZI::ScalingInfoEx GetScalingInfoEx() const override;
-    virtual libCZI::ScalingInfo GetScalingInfo() const override;
-    virtual void EnumDimensions(const std::function<bool(libCZI::DimensionIndex)>& enumDimensions) override;
-    virtual std::shared_ptr<libCZI::IDimensionInfo> GetDimensionInfo(libCZI::DimensionIndex dim) override;
-    virtual std::shared_ptr<libCZI::IDimensionZInfo> GetDimensionZInfo() override;
-    virtual std::shared_ptr<libCZI::IDimensionTInfo> GetDimensionTInfo() override;
-    virtual std::shared_ptr<libCZI::IDimensionsChannelsInfo> GetDimensionChannelsInfo() override;
-    virtual std::shared_ptr<libCZI::IDisplaySettings> GetDisplaySettings() const override;
+    libCZI::GeneralDocumentInfo GetGeneralDocumentInfo() const override;
+    libCZI::ScalingInfoEx GetScalingInfoEx() const override;
+    libCZI::ScalingInfo GetScalingInfo() const override;
+    void EnumDimensions(const std::function<bool(libCZI::DimensionIndex)>& enumDimensions) override;
+    std::shared_ptr<libCZI::IDimensionInfo> GetDimensionInfo(libCZI::DimensionIndex dim) override;
+    std::shared_ptr<libCZI::IDimensionZInfo> GetDimensionZInfo() override;
+    std::shared_ptr<libCZI::IDimensionTInfo> GetDimensionTInfo() override;
+    std::shared_ptr<libCZI::IDimensionsChannelsInfo> GetDimensionChannelsInfo() override;
+    std::shared_ptr<libCZI::IDisplaySettings> GetDisplaySettings() const override;
 
 private:
     void ParseDimensionInfo();

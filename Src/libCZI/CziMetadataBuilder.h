@@ -5,6 +5,10 @@
 #pragma once
 
 #include <utility>
+#include <memory>
+#include <map>
+#include <tuple>
+#include <string>
 #include "libCZI.h"
 #include "CziSubBlockDirectory.h"
 #include "pugixml.hpp"
@@ -16,13 +20,13 @@ private:
     pugi::xml_node rootNode;
 public:
     CCZiMetadataBuilder() = delete;
-    CCZiMetadataBuilder(const wchar_t* rootNodeName);
+    explicit CCZiMetadataBuilder(const wchar_t* rootNodeName);
     CCZiMetadataBuilder(const wchar_t* rootNodeName, const std::string& xml);
-    virtual ~CCZiMetadataBuilder() override = default;
+    ~CCZiMetadataBuilder() override = default;
 
 
-    virtual std::shared_ptr<libCZI::IXmlNodeRw> GetRootNode() override;
-    virtual std::string GetXml(bool withIndent = false) override;
+    std::shared_ptr<libCZI::IXmlNodeRw> GetRootNode() override;
+    std::string GetXml(bool withIndent = false) override;
 };
 
 class CNodeWrapper : public libCZI::IXmlNodeRw
