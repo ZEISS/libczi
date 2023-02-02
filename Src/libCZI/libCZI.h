@@ -32,7 +32,7 @@ namespace libCZI
     /// an internal JPEG-XR decoder (JXRLib).
     enum class SiteObjectType
     {
-        Default,		///< An enum constant representing the default option (which is JXRLib)
+        Default,        ///< An enum constant representing the default option (which is JXRLib)
         WithJxrDecoder  ///< An enum constant representing a Site-object using the internal JXRLib.
 #if defined(_WIN32)
         , WithWICDecoder///< An enum constant representing a Site-object using the Windows WIC-codec.
@@ -70,7 +70,7 @@ namespace libCZI
     struct BuildInformation
     {
         /// The compiler identification. This is a free-form string.
-        std::string	compilerIdentification;
+        std::string compilerIdentification;
 
         /// The URL of the repository - if available.
         std::string repositoryUrl;
@@ -130,21 +130,21 @@ namespace libCZI
     LIBCZI_API std::shared_ptr<IStream> CreateStreamFromFile(const wchar_t* szFilename);
 
     /// Creates a stream-object on a memory-block.
-    /// \param ptr	Shared pointer to a memory-block.
+    /// \param ptr  Shared pointer to a memory-block.
     /// \param dataSize Size of the memory-block.
-    /// \return			The new stream object.
+    /// \return         The new stream object.
     LIBCZI_API std::shared_ptr<IStream> CreateStreamFromMemory(std::shared_ptr<const void> ptr, size_t dataSize);
 
     /// Creates a stream-object on the memory-block in an attachment.
-    /// \param attachment	Pointer to attachment.
-    /// \return			The new stream object.
+    /// \param attachment   Pointer to attachment.
+    /// \return         The new stream object.
     LIBCZI_API std::shared_ptr<IStream> CreateStreamFromMemory(IAttachment* attachment);
 
     /// Creates an output-stream-object for the specified filename. A stock-implementation of a
     /// stream-object (for writing a file from disk) is provided here. For a more specialized and
     /// tuned version, libCZI-users should consider implementing the interface "IOutputStream" in
     /// their own code.
-    /// \param szFilename		 Filename of the file.
+    /// \param szFilename        Filename of the file.
     /// \param overwriteExisting True if an existing file should be overwritten, false otherwise.
     /// \return The new output-stream object.
     LIBCZI_API std::shared_ptr<IOutputStream> CreateOutputStreamForFile(const wchar_t* szFilename, bool overwriteExisting);
@@ -174,10 +174,10 @@ namespace libCZI
     public:
         /// Reads the specified amount of data from the stream at the specified position.
         ///
-        /// \param offset				 The offset to start reading from.
-        /// \param [out] pv				 The caller-provided buffer for the data. Must be non-null.
-        /// \param size					 The size of the buffer.
-        /// \param [out] ptrBytesRead	 If non-null, the variable pointed to will receive the number of bytes actually read.
+        /// \param offset                The offset to start reading from.
+        /// \param [out] pv              The caller-provided buffer for the data. Must be non-null.
+        /// \param size                  The size of the buffer.
+        /// \param [out] ptrBytesRead    If non-null, the variable pointed to will receive the number of bytes actually read.
         virtual void Read(std::uint64_t offset, void* pv, std::uint64_t size, std::uint64_t* ptrBytesRead) = 0;
 
         virtual ~IStream() {}
@@ -193,9 +193,9 @@ namespace libCZI
 
         /// Writes the specified data to the stream, starting at the position specified by "offset".
         ///
-        /// \param 		    offset		    The offset into the stream where to start the write-operation.
-        /// \param 		    pv			    Pointer to the data.
-        /// \param 		    size		    The size of the data.
+        /// \param          offset          The offset into the stream where to start the write-operation.
+        /// \param          pv              Pointer to the data.
+        /// \param          size            The size of the data.
         /// \param [in,out] ptrBytesWritten If non-null, then the number of bytes actually written will be put here.
         virtual void Write(std::uint64_t offset, const void* pv, std::uint64_t size, std::uint64_t* ptrBytesWritten) = 0;
         virtual ~IOutputStream() = default;
@@ -212,28 +212,28 @@ namespace libCZI
         /// The (raw) compression mode identification of the sub-block. This value is not interpreted, use "GetCompressionMode" to have it
         /// converted to the CompressionMode-enumeration. Note that unknown compression-mode identifiers (unknown to libCZI) 
         /// are mapped to CompressionMode::Invalid.
-        std::int32_t			compressionModeRaw;
+        std::int32_t            compressionModeRaw;
 
         /// The pixel type of the sub-block.
-        PixelType				pixelType;
+        PixelType               pixelType;
 
         /// The coordinate of the sub-block.
-        libCZI::CDimCoordinate	coordinate;
+        libCZI::CDimCoordinate  coordinate;
 
         /// The rectangle where the bitmap (in this sub-block) is located.
-        libCZI::IntRect			logicalRect;
+        libCZI::IntRect         logicalRect;
 
         /// The physical size of the bitmap (which may be different to the size of logicalRect).
-        libCZI::IntSize			physicalSize;
+        libCZI::IntSize         physicalSize;
 
         /// The M-index of the sub-block (if available). If not available, it has the value std::numeric_limits<int>::max() or std::numeric_limits<int>::min().
-        int						mIndex;
+        int                     mIndex;
 
         /// Calculate a zoom-factor from the physical- and logical size.
         /// \remark
         /// This calculation not really well-defined.
         /// \return The zoom factor.
-        double					GetZoom() const
+        double                  GetZoom() const
         {
             if (this->physicalSize.w > this->physicalSize.h)
             {
@@ -246,14 +246,14 @@ namespace libCZI
         /// Gets compression mode enumeration. Note that unknown compression-mode identifiers (unknown to libCZI)
         /// are mapped to CompressionMode::Invalid.
         /// \returns The compression mode enumeration.
-        CompressionMode			GetCompressionMode() const
+        CompressionMode         GetCompressionMode() const
         {
             return Utils::CompressionModeFromRawCompressionIdentifier(this->compressionModeRaw);
         }
 
         /// Query if the M-index is valid.
         /// \returns True if the M-index is valid, false if not.
-        bool					IsMindexValid() const
+        bool                    IsMindexValid() const
         {
             return libCZI::Utils::IsValidMindex(this->mIndex);
         }
@@ -274,9 +274,9 @@ namespace libCZI
         /// Values that represent the three different data types found in a sub-block.
         enum MemBlkType
         {
-            Metadata,	///< An enum constant representing the metadata.
-            Data,		///< An enum constant representing the bitmap-data.
-            Attachment	///< An enum constant representing the attachment (of a sub-block).
+            Metadata,   ///< An enum constant representing the metadata.
+            Data,       ///< An enum constant representing the bitmap-data.
+            Attachment  ///< An enum constant representing the attachment (of a sub-block).
         };
 
         /// Gets sub-block information.
@@ -285,14 +285,14 @@ namespace libCZI
 
         ///  Get a pointer to the raw data. Note that the pointer returned is only valid during the
         ///  lifetime of the sub-block-object.
-        /// \param type			 The sub-block data-type.
-        /// \param [out] ptr 	 The pointer to the data is stored here.
-        /// \param [out] size	 The size of the data.
+        /// \param type          The sub-block data-type.
+        /// \param [out] ptr     The pointer to the data is stored here.
+        /// \param [out] size    The size of the data.
         virtual void DangerousGetRawData(MemBlkType type, const void*& ptr, size_t& size) const = 0;
 
         /// Gets raw data.
-        /// \param type			    The type.
-        /// \param [out] ptrSize	If non-null, size of the data buffer is stored here.
+        /// \param type             The type.
+        /// \param [out] ptrSize    If non-null, size of the data buffer is stored here.
         /// \return The raw data.
         virtual std::shared_ptr<const void> GetRawData(MemBlkType type, size_t* ptrSize) = 0;
 
@@ -310,9 +310,9 @@ namespace libCZI
         virtual ~ISubBlock() = default;
 
         /// A helper method used to cast the pointer to a specific type.
-        /// \param type			 The sub-block data-type.
-        /// \param [out] ptr 	 The pointer to the data is stored here.
-        /// \param [out] size	 The size of the data.
+        /// \param type          The sub-block data-type.
+        /// \param [out] ptr     The pointer to the data is stored here.
+        /// \param [out] size    The size of the data.
         template <class Q>
         void DangerousGetRawData(MemBlkType type, const Q*& ptr, size_t& size) const
         {
@@ -325,9 +325,9 @@ namespace libCZI
     /// Information about an attachment.
     struct AttachmentInfo
     {
-        GUID		contentGuid;			///< A Guid identifying the content of the attachment.
-        char		contentFileType[9];		///< A null-terminated character array identifying the content of the attachment.
-        std::string name;					///< A string identifying the content of the attachment.
+        GUID        contentGuid;            ///< A Guid identifying the content of the attachment.
+        char        contentFileType[9];     ///< A null-terminated character array identifying the content of the attachment.
+        std::string name;                   ///< A string identifying the content of the attachment.
     };
 
     /// Representation of an attachment. An attachment is a binary blob, its inner structure is opaque.
@@ -340,20 +340,20 @@ namespace libCZI
 
         ///  Get a pointer to the raw data. Note that the pointer returned is only valid during the
         ///  lifetime of the sub-block-object.
-        /// \param [out] ptr 	 The pointer to the data is stored here.
-        /// \param [out] size	 The size of the data.
+        /// \param [out] ptr     The pointer to the data is stored here.
+        /// \param [out] size    The size of the data.
         virtual void DangerousGetRawData(const void*& ptr, size_t& size) const = 0;
 
         /// Gets raw data.
-        /// \param [out] ptrSize	If non-null, size of the data buffer is stored here.
+        /// \param [out] ptrSize    If non-null, size of the data buffer is stored here.
         /// \return The raw data.
         virtual std::shared_ptr<const void> GetRawData(size_t* ptrSize) = 0;
 
         virtual ~IAttachment() {};
 
         /// A helper method used to cast the pointer to a specific type.
-        /// \param [out] ptr 	 The pointer to the data is stored here.
-        /// \param [out] size	 The size of the data.
+        /// \param [out] ptr     The pointer to the data is stored here.
+        /// \param [out] size    The size of the data.
         template <class Q>
         void DangerousGetRawData(const Q*& ptr, size_t& size) const
         {
@@ -370,21 +370,21 @@ namespace libCZI
         /// Values that represent the two different data types found in the metadata-segment.
         enum MemBlkType
         {
-            XmlMetadata,	///< The metadata (in UTF8-XML-format)
-            Attachment		///< The attachment (not currently used).
+            XmlMetadata,    ///< The metadata (in UTF8-XML-format)
+            Attachment      ///< The attachment (not currently used).
         };
 
         /// Gets raw data.
-        /// \param type			    The metadata-segment memory-block type.
-        /// \param [out] ptrSize	If non-null, thus size of the data (in bytes) is stored here.
+        /// \param type             The metadata-segment memory-block type.
+        /// \param [out] ptrSize    If non-null, thus size of the data (in bytes) is stored here.
         /// \return The raw data.
         virtual std::shared_ptr<const void> GetRawData(MemBlkType type, size_t* ptrSize) = 0;
 
         ///  Get a pointer to the raw data. Note that the pointer returned is only valid during the
         ///  lifetime of the sub-block-object.
-        /// \param type			 The metadata-segment memory-block type.
-        /// \param [out] ptr 	 The pointer to the data is stored here.
-        /// \param [out] size	 The size of the data.
+        /// \param type          The metadata-segment memory-block type.
+        /// \param [out] ptr     The pointer to the data is stored here.
+        /// \param [out] size    The size of the data.
         virtual void DangerousGetRawData(MemBlkType type, const void*& ptr, size_t& size) const = 0;
 
         virtual ~IMetadataSegment() = default;
@@ -398,7 +398,7 @@ namespace libCZI
     struct BoundingBoxes
     {
         /// The bounding-box determined from all sub-blocks.
-        IntRect	boundingBox;
+        IntRect boundingBox;
 
         /// The bounding-boxes determined only from sub-blocks of pyramid-layer 0.
         IntRect boundingBoxLayer0;
@@ -473,8 +473,8 @@ namespace libCZI
         /// a pyramid-layer).
         struct PyramidLayerInfo
         {
-            std::uint8_t minificationFactor;	///< Factor by which adjacent pyramid-layers are shrunk. Commonly used in CZI are 2 or 3.
-            std::uint8_t pyramidLayerNo;		///< The pyramid layer number.
+            std::uint8_t minificationFactor;    ///< Factor by which adjacent pyramid-layers are shrunk. Commonly used in CZI are 2 or 3.
+            std::uint8_t pyramidLayerNo;        ///< The pyramid layer number.
 
             /// Query if this object represents layer 0 (=no minification).
             ///
@@ -490,8 +490,8 @@ namespace libCZI
         /// Information about a pyramid-layer.
         struct PyramidLayerStatistics
         {
-            PyramidLayerInfo	layerInfo;	///< This identifies the pyramid-layer.
-            int					count;		///< The number of sub-blocks which are present in the pyramid-layer.
+            PyramidLayerInfo    layerInfo;  ///< This identifies the pyramid-layer.
+            int                 count;      ///< The number of sub-blocks which are present in the pyramid-layer.
         };
 
         /// A map with key "scene-index" and value "list of subblock-counts per pyramid-layer".
@@ -505,19 +505,19 @@ namespace libCZI
     public:
         /// Enumerate all sub-blocks. 
         /// \param funcEnum The functor which will be called for every sub-block. If the return value of the
-        /// 				functor is true, the enumeration is continued, otherwise it is stopped.
-        /// 				The first argument is the index of the sub-block and the second is providing
-        /// 				information about the sub-block.
+        ///                 functor is true, the enumeration is continued, otherwise it is stopped.
+        ///                 The first argument is the index of the sub-block and the second is providing
+        ///                 information about the sub-block.
         virtual void EnumerateSubBlocks(const std::function<bool(int index, const SubBlockInfo& info)>& funcEnum) = 0;
 
         /// Enumerate the subset of sub-blocks defined by the parameters.
         /// \param planeCoordinate The plane coordinate. Only sub-blocks on this plane will be considered.
-        /// \param roi			   The ROI - only sub-blocks which intersects with this ROI will be considered.
-        /// \param onlyLayer0	   If true, then only sub-blocks on pyramid-layer 0 will be considered.
+        /// \param roi             The ROI - only sub-blocks which intersects with this ROI will be considered.
+        /// \param onlyLayer0      If true, then only sub-blocks on pyramid-layer 0 will be considered.
         /// \param funcEnum The functor which will be called for every sub-block. If the return value of the
-        /// 				functor is true, the enumeration is continued, otherwise it is stopped.
-        /// 				The first argument is the index of the sub-block and the second is providing
-        /// 				information about the sub-block.
+        ///                 functor is true, the enumeration is continued, otherwise it is stopped.
+        ///                 The first argument is the index of the sub-block and the second is providing
+        ///                 information about the sub-block.
         virtual void EnumSubset(const IDimCoordinate* planeCoordinate, const IntRect* roi, bool onlyLayer0, const std::function<bool(int index, const SubBlockInfo& info)>& funcEnum) = 0;
 
         /// Reads the sub-block identified by the specified index. If there is no sub-block present (for
@@ -566,9 +566,9 @@ namespace libCZI
     public:
         /// Enumerate all sub-blocks and provide extended information. 
         /// \param funcEnum The functor which will be called for every sub-block. If the return value of the
-        /// 				functor is true, the enumeration is continued, otherwise it is stopped.
-        /// 				The first argument is the index of the sub-block and the second is providing
-        /// 				information about the sub-block.
+        ///                 functor is true, the enumeration is continued, otherwise it is stopped.
+        ///                 The first argument is the index of the sub-block and the second is providing
+        ///                 information about the sub-block.
         virtual void EnumerateSubBlocksEx(const std::function<bool(int index, const DirectorySubBlockInfo& info)>& funcEnum) = 0;
 
         virtual ~ISubBlockRepositoryEx() = default;
@@ -581,18 +581,18 @@ namespace libCZI
         /// Enumerate all attachments.
         ///
         /// \param funcEnum The functor which will be called for every attachment. If the return value of the
-        /// 				functor is true, the enumeration is continued, otherwise it is stopped.
-        /// 				The first argument is the index of the attachment and the second is providing
-        /// 				information about the attachment.
+        ///                 functor is true, the enumeration is continued, otherwise it is stopped.
+        ///                 The first argument is the index of the attachment and the second is providing
+        ///                 information about the attachment.
         virtual void EnumerateAttachments(const std::function<bool(int index, const AttachmentInfo& info)>& funcEnum) = 0;
 
         /// Enumerate the subset of the attachments defined by the parameters.
         /// \param contentFileType If non-null, only attachments with this contentFileType will be considered.
-        /// \param name 		   If non-null, only attachments with this name will be considered.
+        /// \param name            If non-null, only attachments with this name will be considered.
         /// \param funcEnum The functor which will be called for every attachment (within the subset). If the return value of the
-        /// 				functor is true, the enumeration is continued, otherwise it is stopped.
-        /// 				The first argument is the index of the attachment and the second is providing
-        /// 				information about the attachment.
+        ///                 functor is true, the enumeration is continued, otherwise it is stopped.
+        ///                 The first argument is the index of the attachment and the second is providing
+        ///                 information about the attachment.
         virtual void EnumerateSubset(const char* contentFileType, const char* name, const std::function<bool(int index, const AttachmentInfo& infi)>& funcEnum) = 0;
 
         /// Reads the attachment identified by the specified index. If there is no attachment present (for
@@ -611,8 +611,8 @@ namespace libCZI
         ///< The file-GUID of the CZI. Note: CZI defines two GUIDs, this is the "FileGuid". Multi-file containers 
         /// (for which the other GUID "PrimaryFileGuid" is used) are not supported by libCZI currently.
         GUID fileGuid;
-        int majorVersion;	///< The major version.
-        int minorVersion;	///< The minor version.
+        int majorVersion;   ///< The major version.
+        int minorVersion;   ///< The minor version.
     };
 
     /// This interface is used to represent the CZI-file.

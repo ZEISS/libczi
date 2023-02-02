@@ -39,8 +39,8 @@ namespace libCZI
 
         /// Attempts to get position index in the specified dimension.
         ///
-        /// \param dim				   The dimension.
-        /// \param [out] coordinate	   If non-null and the dimension is valid (in this coordinate), it will receive the value of the coordinate for the specified dimension.
+        /// \param dim                 The dimension.
+        /// \param [out] coordinate    If non-null and the dimension is valid (in this coordinate), it will receive the value of the coordinate for the specified dimension.
         ///
         /// \return True if it succeeds (i. e. the specified dimension is given in this coordinate), false otherwise.
         virtual bool TryGetPosition(DimensionIndex dim, int* coordinate) const = 0;
@@ -81,9 +81,9 @@ namespace libCZI
     public:
 
         /// Attempts to get the interval for the specified dimension.
-        /// \param dim				   The dimension.
+        /// \param dim                 The dimension.
         /// \param [in,out] startIndex If non-null, it will receive the start index.
-        /// \param [in,out] size	   If non-null, it will receive the size.
+        /// \param [in,out] size       If non-null, it will receive the size.
         /// \return True if the dimension is valid and the data was succeessfully retrieved, false if it fails.
         virtual bool TryGetInterval(DimensionIndex dim, int* startIndex, int* size) const = 0;
 
@@ -117,16 +117,16 @@ namespace libCZI
     /// A structure combining a dimension and a value.
     struct DimensionAndValue
     {
-        libCZI::DimensionIndex dimension;	///< The dimension.
-        int value;							///< The value (for this dimension).
+        libCZI::DimensionIndex dimension;   ///< The dimension.
+        int value;                          ///< The value (for this dimension).
     };
 
     /// A structure combining a dimension and an interval (defined by a start value and the size).
     struct DimensionAndStartSize
     {
-        libCZI::DimensionIndex dimension;	///< The dimension.
-        int start;							///< The start value.
-        int size;							///< The size.
+        libCZI::DimensionIndex dimension;   ///< The dimension.
+        int start;                          ///< The start value.
+        int size;                           ///< The size.
     };
 
     /// Base class containing some commonly used methods.
@@ -191,7 +191,7 @@ namespace libCZI
         /// Sets the value for the specified dimension. The specified dimension will be marked 'valid'.
         ///
         /// \param dimension The dimension to set.
-        /// \param value	 The value to set.
+        /// \param value     The value to set.
         void Set(libCZI::DimensionIndex dimension, int value)
         {
             int index = CDimCoordinate::GetBitIndexForDimension(dimension);
@@ -265,7 +265,7 @@ namespace libCZI
         ///
         /// \return A CDimCoordinate object constructed from the string.
         static CDimCoordinate Parse(const char* str);
-    public:	// IDimCoordinate
+    public: // IDimCoordinate
         virtual bool TryGetPosition(libCZI::DimensionIndex dim, int* coordinate) const override
         {
             const int index = CDimCoordinate::GetBitIndexForDimension(dim);
@@ -324,8 +324,8 @@ namespace libCZI
 
         /// Sets (for the specified dimension) the start and the size.
         /// \param dimension The dimension.
-        /// \param start	 The start.
-        /// \param size		 The size.
+        /// \param start     The start.
+        /// \param size      The size.
         void Set(libCZI::DimensionIndex dimension, int start, int size)
         {
             const int index = CDimBounds::GetBitIndexForDimension(dimension);
@@ -387,11 +387,11 @@ namespace libCZI
         /// \return A CDimBounds object constructed from the string.
         static CDimBounds Parse(const char* str);
 
-    public:	// IDimBounds
+    public: // IDimBounds
         /// Attempts to get interval and size for the specified dimension.
-        /// \param dim				   The dimemension.
+        /// \param dim              The dimemension.
         /// \param [out] startIndex If non-null, it will receive the start index.
-        /// \param [out] size	   If non-null, it will receive the size.
+        /// \param [out] size       If non-null, it will receive the size.
         /// \return True if it succeeds, false if it fails.
         virtual bool TryGetInterval(libCZI::DimensionIndex dim, int* startIndex, int* size) const override
         {
