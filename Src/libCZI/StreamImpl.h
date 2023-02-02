@@ -43,7 +43,7 @@ private:
 public:
     CSimpleStreamImplCppStreams() = delete;
     explicit CSimpleStreamImplCppStreams(const wchar_t* filename);
-    virtual ~CSimpleStreamImplCppStreams() override;
+    ~CSimpleStreamImplCppStreams() override;
 public: // interface libCZI::IStream
     void Read(std::uint64_t offset, void* pv, std::uint64_t size, std::uint64_t* ptrBytesRead) override;
 };
@@ -57,7 +57,7 @@ private:
 public:
     CStreamImplPread() = delete;
     explicit CStreamImplPread(const wchar_t* filename);
-    virtual ~CStreamImplPread() override;
+    ~CStreamImplPread() override;
 public: // interface libCZI::IStream
     void Read(std::uint64_t offset, void* pv, std::uint64_t size, std::uint64_t* ptrBytesRead) override;
 };
@@ -70,7 +70,7 @@ private:
 public:
     COutputStreamImplPwrite() = delete;
     COutputStreamImplPwrite(const wchar_t* filename, bool overwriteExisting);
-    virtual ~COutputStreamImplPwrite() override;
+    ~COutputStreamImplPwrite() override;
 public: // interface libCZI::IOutputStream
     void Write(std::uint64_t offset, const void* pv, std::uint64_t size, std::uint64_t* ptrBytesWritten) override;
 };
@@ -124,7 +124,7 @@ private:
 public:
     CInputOutputStreamImplPreadPwrite() = delete;
     explicit CInputOutputStreamImplPreadPwrite(const wchar_t* filename);
-    virtual ~CInputOutputStreamImplPreadPwrite() override;
+    ~CInputOutputStreamImplPreadPwrite() override;
 public:
     void Read(std::uint64_t offset, void* pv, std::uint64_t size, std::uint64_t* ptrBytesRead) override;
     void Write(std::uint64_t offset, const void* pv, std::uint64_t size, std::uint64_t* ptrBytesWritten) override;
@@ -153,7 +153,7 @@ private:
 public:
     CSimpleInputOutputStreamImpl() = delete;
     explicit CSimpleInputOutputStreamImpl(const wchar_t* filename);
-    virtual ~CSimpleInputOutputStreamImpl() override;
+    ~CSimpleInputOutputStreamImpl() override;
 public:
     void Read(std::uint64_t offset, void* pv, std::uint64_t size, std::uint64_t* ptrBytesRead) override;
     void Write(std::uint64_t offset, const void* pv, std::uint64_t size, std::uint64_t* ptrBytesWritten) override;
