@@ -49,7 +49,7 @@ static std::shared_ptr<libCZI::IBitmapData> CreateBitmapFromSubBlock_Uncompresse
 
     // TODO: How exactly shoud the stride be derived? It seems that stride must be exactly linesize.
     const std::uint32_t stride = sbBlkInfo.physicalSize.w * CziUtils::GetBytesPerPel(sbBlkInfo.pixelType);
-    if ((size_t)stride * sbBlkInfo.physicalSize.h > size)
+    if (static_cast<size_t>(stride) * sbBlkInfo.physicalSize.h > size)
     {
         throw std::logic_error("insufficient size of subblock");
     }
