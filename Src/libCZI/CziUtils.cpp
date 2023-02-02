@@ -32,18 +32,18 @@ using namespace libCZI;
 {
     switch (p)
     {
-    case PixelType::Gray8:				return 0;
-    case PixelType::Gray16:				return 1;
-    case PixelType::Gray32Float:		return 2;
-    case PixelType::Bgr24:				return 3;
-    case PixelType::Bgr48:				return 4;
-    case PixelType::Bgr96Float:			return 8;
-    case PixelType::Bgra32:				return 9;
-    case PixelType::Gray64ComplexFloat:	return 10;
-    case PixelType::Bgr192ComplexFloat:	return 11;
-    case PixelType::Gray32:				return 12;
-    case PixelType::Gray64Float:		return 13;
-    default:							return (std::numeric_limits<int>::min)();
+    case PixelType::Gray8:              return 0;
+    case PixelType::Gray16:             return 1;
+    case PixelType::Gray32Float:        return 2;
+    case PixelType::Bgr24:              return 3;
+    case PixelType::Bgr48:              return 4;
+    case PixelType::Bgr96Float:         return 8;
+    case PixelType::Bgra32:             return 9;
+    case PixelType::Gray64ComplexFloat: return 10;
+    case PixelType::Bgr192ComplexFloat: return 11;
+    case PixelType::Gray32:             return 12;
+    case PixelType::Gray64Float:        return 13;
+    default:                            return (std::numeric_limits<int>::min)();
     }
 }
 
@@ -84,31 +84,31 @@ using namespace libCZI;
 {
     switch (pixelType)
     {
-    case PixelType::Gray8:				return 1;
-    case PixelType::Gray16:				return 2;
-    case PixelType::Gray32Float:		return 4;
-    case PixelType::Bgr24:				return 3;
-    case PixelType::Bgr48:				return 6;
-    case PixelType::Bgr96Float:			return 12;
-    case PixelType::Bgra32:				return 4;
+    case PixelType::Gray8:              return 1;
+    case PixelType::Gray16:             return 2;
+    case PixelType::Gray32Float:        return 4;
+    case PixelType::Bgr24:              return 3;
+    case PixelType::Bgr48:              return 6;
+    case PixelType::Bgr96Float:         return 12;
+    case PixelType::Bgra32:             return 4;
     case PixelType::Gray64ComplexFloat: return 16;
     case PixelType::Bgr192ComplexFloat: return 48;
-    case PixelType::Gray32:				return 4;
-    case PixelType::Gray64Float:		return 8;
+    case PixelType::Gray32:             return 4;
+    case PixelType::Gray64Float:        return 8;
     default: throw std::invalid_argument("illegal pixeltype");
     }
 }
 
-/// <summary>	Compare coordinate in the following way:
-/// 			All dimensions that are present in the first coordinate MUST be present
-/// 			in the second and have the same value, otherwise we return false.
-/// 			We DO NOT check if the second coordinate contains dimension that are
-/// 			not present in the first.
+/// <summary>   Compare coordinate in the following way:
+///             All dimensions that are present in the first coordinate MUST be present
+///             in the second and have the same value, otherwise we return false.
+///             We DO NOT check if the second coordinate contains dimension that are
+///             not present in the first.
 /// </summary>
-/// <param name="coord1">	[in] The first coordinate. </param>
-/// <param name="coord2">	[in] The second coordinate. </param>
+/// <param name="coord1">   [in] The first coordinate. </param>
+/// <param name="coord2">   [in] The second coordinate. </param>
 ///
-/// <returns>	A boolean indicating whether the coordinates are equal or not (according to the above definition of equality). </returns>
+/// <returns>   A boolean indicating whether the coordinates are equal or not (according to the above definition of equality). </returns>
 /*static*/bool CziUtils::CompareCoordinate(const libCZI::IDimCoordinate* coord1, const libCZI::IDimCoordinate* coord2)
 {
     bool areEqual = true;

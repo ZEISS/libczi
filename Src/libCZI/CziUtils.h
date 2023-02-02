@@ -32,7 +32,7 @@ public:
     static bool IsPixelTypeEndianessAgnostic(libCZI::PixelType);
 
     template <libCZI::PixelType tPixelType>
-    static constexpr std::uint8_t BytesPerPel();// { /*throw std::logic_error("invalid pixeltype");*/return 0; }
+    static constexpr std::uint8_t BytesPerPel();
 };
 
 template <>	constexpr std::uint8_t CziUtils::BytesPerPel<libCZI::PixelType::Gray8>() { return 1; }
