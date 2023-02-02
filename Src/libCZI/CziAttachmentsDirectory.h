@@ -4,6 +4,7 @@
 
 #pragma once
 #include <functional>
+#include <vector>
 #include <set>
 #include <map>
 

@@ -18,11 +18,11 @@ public:
         : dimAndStartSize_(dimAndStartSize), startExplicitlyStated_(startExplicitlyStated), endExplicitlyStated_(endExplicitlyStated)
     {}
 
-    virtual ~CCziDimensionInfo() override = default;
+    ~CCziDimensionInfo() override = default;
 public: // interface IDimensionInfo
     libCZI::DimensionIndex GetDimension() const override;
-    virtual void GetInterval(int* start, int* end) const override;
-    virtual void GetIntervalIsExplicitlyStated(bool* startExplicitlyStated, bool* endExplicitlyStated) const override;
+    void GetInterval(int* start, int* end) const override;
+    void GetIntervalIsExplicitlyStated(bool* startExplicitlyStated, bool* endExplicitlyStated) const override;
 };
 
 class CCziDimensionZInfo : public libCZI::IDimensionZInfo

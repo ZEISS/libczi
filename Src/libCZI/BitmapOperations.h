@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <memory>
 #include <algorithm>
 #include "libCZI_Pixels.h"
 

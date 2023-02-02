@@ -3,6 +3,9 @@
 // SPDX-License-Identifier: LGPL-3.0-or-later
 
 #pragma once
+#include <vector>
+#include <map>
+#include <memory>
 #include "libCZI.h"
 #include "splines.h"
 #include "pugixml.hpp"
@@ -12,7 +15,7 @@ class CChannelDisplaySettingsOnPod : public libCZI::IChannelDisplaySetting
 private:
     libCZI::ChannelDisplaySettingsPOD cdsPod;
 public:
-    CChannelDisplaySettingsOnPod(const libCZI::ChannelDisplaySettingsPOD& pod)
+    explicit CChannelDisplaySettingsOnPod(const libCZI::ChannelDisplaySettingsPOD& pod)
         : cdsPod(pod)
     {}
 
@@ -33,7 +36,7 @@ private:
     std::map<int, std::shared_ptr<libCZI::IChannelDisplaySetting>> channelDs;
 public:
     explicit CDisplaySettingsOnPod(std::function<bool(int no, int&, libCZI::ChannelDisplaySettingsPOD& dispSetting)> getChannelDisplaySettings);
-    CDisplaySettingsOnPod(const libCZI::DisplaySettingsPOD& pod);
+    explicit CDisplaySettingsOnPod(const libCZI::DisplaySettingsPOD& pod);
 
     static std::shared_ptr<libCZI::IDisplaySettings> CreateFromXml(pugi::xml_node node);
 public: // interface IDisplaySettings
