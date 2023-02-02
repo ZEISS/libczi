@@ -4,10 +4,10 @@
 
 #pragma once
 
-#include "libCZI_Pixels.h"
-#include "libCZI_DimCoordinate.h"
 #include <functional>
 #include <stdint.h>
+#include "libCZI_Pixels.h"
+#include "libCZI_DimCoordinate.h"
 
 enum class CompareResult
 {

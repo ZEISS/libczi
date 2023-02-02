@@ -15,7 +15,7 @@ private:
     std::shared_ptr<CCziMetadata>   metadata;
     std::map < libCZI::DimensionIndex, std::shared_ptr<libCZI::IDimensionInfo>> dimensions;
 public:
-    CCziMetadataDocumentInfo(std::shared_ptr<CCziMetadata> md);
+    explicit CCziMetadataDocumentInfo(std::shared_ptr<CCziMetadata> md);
 
 public: // interface ICziMultiDimensionDocumentInfo
     libCZI::GeneralDocumentInfo GetGeneralDocumentInfo() const override;

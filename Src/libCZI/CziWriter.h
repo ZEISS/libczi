@@ -4,6 +4,9 @@
 
 #pragma once
 
+#include <memory>
+#include <string>
+#include <tuple>
 #include "libCZI.h"
 #include "CziSubBlockDirectory.h"
 #include "CziAttachmentsDirectory.h"
@@ -233,7 +236,7 @@ private:
         std::shared_ptr<libCZI::ICziWriterInfo> writerInfo;
         GUID fileGuid;
     public:
-        CziWriterInfoWrapper(std::shared_ptr<libCZI::ICziWriterInfo> writerInfo);
+        explicit CziWriterInfoWrapper(std::shared_ptr<libCZI::ICziWriterInfo> writerInfo);
 
         const libCZI::IDimBounds* GetDimBounds() const override { return this->writerInfo->GetDimBounds(); }
         const GUID& GetFileGuid() const override { return this->fileGuid; }
@@ -246,13 +249,13 @@ public:
     CCziWriter();
 
     void Create(std::shared_ptr<libCZI::IOutputStream> stream, std::shared_ptr<libCZI::ICziWriterInfo> info) override;
-    virtual ~CCziWriter();
+    ~CCziWriter() override;
 
-    virtual void SyncAddSubBlock(const libCZI::AddSubBlockInfo& addSbBlkInfo) override;
-    virtual void SyncAddAttachment(const libCZI::AddAttachmentInfo& addAttachmentInfo) override;
-    virtual void SyncWriteMetadata(const libCZI::WriteMetadataInfo& metadataInfo) override;
-    virtual std::shared_ptr<libCZI::ICziMetadataBuilder> GetPreparedMetadata(const libCZI::PrepareMetadataInfo& info) override;
-    virtual void Close() override;
+    void SyncAddSubBlock(const libCZI::AddSubBlockInfo& addSbBlkInfo) override;
+    void SyncAddAttachment(const libCZI::AddAttachmentInfo& addAttachmentInfo) override;
+    void SyncWriteMetadata(const libCZI::WriteMetadataInfo& metadataInfo) override;
+    std::shared_ptr<libCZI::ICziMetadataBuilder> GetPreparedMetadata(const libCZI::PrepareMetadataInfo& info) override;
+    void Close() override;
 
 private:
     void WriteSubBlock(const libCZI::AddSubBlockInfo& addSbBlkInfo);
