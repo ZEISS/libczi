@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <memory>
 #include "libCZI.h"
 #include "inc_libCZI_Config.h"
 #include <fstream>
@@ -15,10 +16,10 @@ private:
     FILE* fp;
 public:
     CSimpleStreamImpl() = delete;
-    CSimpleStreamImpl(const wchar_t* filename);
-    virtual ~CSimpleStreamImpl() override;
+    explicit CSimpleStreamImpl(const wchar_t* filename);
+    ~CSimpleStreamImpl() override;
 public: // interface libCZI::IStream
-    virtual void Read(std::uint64_t offset, void* pv, std::uint64_t size, std::uint64_t* ptrBytesRead) override;
+    void Read(std::uint64_t offset, void* pv, std::uint64_t size, std::uint64_t* ptrBytesRead) override;
 };
 
 /// <summary>   A simplistic output-stream implementation (based on C-runtime fopen). Note that this implementation is NOT thread-safe.</summary>
@@ -29,9 +30,9 @@ private:
 public:
     CSimpleOutputStreamStreams() = delete;
     CSimpleOutputStreamStreams(const wchar_t* filename, bool overwriteExisting);
-    virtual ~CSimpleOutputStreamStreams() override;
+    ~CSimpleOutputStreamStreams() override;
 public: // interface libCZI::IOutputStream
-    virtual void Write(std::uint64_t offset, const void* pv, std::uint64_t size, std::uint64_t* ptrBytesWritten) override;
+    void Write(std::uint64_t offset, const void* pv, std::uint64_t size, std::uint64_t* ptrBytesWritten) override;
 };
 
 /// <summary>   A simplistic stream implementation (based on C++ streams). Note that this implementation is NOT thread-safe.</summary>
@@ -41,10 +42,10 @@ private:
     std::ifstream infile;
 public:
     CSimpleStreamImplCppStreams() = delete;
-    CSimpleStreamImplCppStreams(const wchar_t* filename);
+    explicit CSimpleStreamImplCppStreams(const wchar_t* filename);
     virtual ~CSimpleStreamImplCppStreams() override;
 public: // interface libCZI::IStream
-    virtual void Read(std::uint64_t offset, void* pv, std::uint64_t size, std::uint64_t* ptrBytesRead) override;
+    void Read(std::uint64_t offset, void* pv, std::uint64_t size, std::uint64_t* ptrBytesRead) override;
 };
 
 #if LIBCZI_USE_PREADPWRITEBASED_STREAMIMPL
@@ -55,10 +56,10 @@ private:
     int fileDescriptor;
 public:
     CStreamImplPread() = delete;
-    CStreamImplPread(const wchar_t* filename);
+    explicit CStreamImplPread(const wchar_t* filename);
     virtual ~CStreamImplPread() override;
 public: // interface libCZI::IStream
-    virtual void Read(std::uint64_t offset, void* pv, std::uint64_t size, std::uint64_t* ptrBytesRead) override;
+    void Read(std::uint64_t offset, void* pv, std::uint64_t size, std::uint64_t* ptrBytesRead) override;
 };
 
 /// <summary>   An output-stream implementation (based on open and pwrite). This implementation is thread-safe.</summary>
@@ -71,7 +72,7 @@ public:
     COutputStreamImplPwrite(const wchar_t* filename, bool overwriteExisting);
     virtual ~COutputStreamImplPwrite() override;
 public: // interface libCZI::IOutputStream
-    virtual void Write(std::uint64_t offset, const void* pv, std::uint64_t size, std::uint64_t* ptrBytesWritten) override;
+    void Write(std::uint64_t offset, const void* pv, std::uint64_t size, std::uint64_t* ptrBytesWritten) override;
 };
 #endif
 
@@ -82,10 +83,10 @@ private:
     HANDLE handle;
 public:
     CSimpleStreamImplWindows() = delete;
-    CSimpleStreamImplWindows(const wchar_t* filename);
-    virtual ~CSimpleStreamImplWindows() override;
+    explicit CSimpleStreamImplWindows(const wchar_t* filename);
+    ~CSimpleStreamImplWindows() override;
 public: // interface libCZI::IStream
-    virtual void Read(std::uint64_t offset, void* pv, std::uint64_t size, std::uint64_t* ptrBytesRead) override;
+    void Read(std::uint64_t offset, void* pv, std::uint64_t size, std::uint64_t* ptrBytesRead) override;
 };
 
 class CSimpleOutputStreamImplWindows : public libCZI::IOutputStream
@@ -95,9 +96,9 @@ private:
 public:
     CSimpleOutputStreamImplWindows() = delete;
     CSimpleOutputStreamImplWindows(const wchar_t* filename, bool overwriteExisting);
-    virtual ~CSimpleOutputStreamImplWindows() override;
+    ~CSimpleOutputStreamImplWindows() override;
 public: // interface libCZI::IOutputStream
-    virtual void Write(std::uint64_t offset, const void* pv, std::uint64_t size, std::uint64_t* ptrBytesWritten) override;
+    void Write(std::uint64_t offset, const void* pv, std::uint64_t size, std::uint64_t* ptrBytesWritten) override;
 };
 #endif
 
@@ -110,9 +111,9 @@ private:
 public:
     CStreamImplInMemory() = delete;
     CStreamImplInMemory(std::shared_ptr<const void> ptr, std::size_t dataSize);
-    CStreamImplInMemory(libCZI::IAttachment* attachement);
+    explicit CStreamImplInMemory(libCZI::IAttachment* attachement);
 public: // interface libCZI::IStream
-    virtual void Read(std::uint64_t offset, void* pv, std::uint64_t size, std::uint64_t* ptrBytesRead) override;
+    void Read(std::uint64_t offset, void* pv, std::uint64_t size, std::uint64_t* ptrBytesRead) override;
 };
 
 #if LIBCZI_USE_PREADPWRITEBASED_STREAMIMPL
@@ -122,11 +123,11 @@ private:
     int fileDescriptor;
 public:
     CInputOutputStreamImplPreadPwrite() = delete;
-    CInputOutputStreamImplPreadPwrite(const wchar_t* filename);
+    explicit CInputOutputStreamImplPreadPwrite(const wchar_t* filename);
     virtual ~CInputOutputStreamImplPreadPwrite() override;
 public:
-    virtual void Read(std::uint64_t offset, void* pv, std::uint64_t size, std::uint64_t* ptrBytesRead) override;
-    virtual void Write(std::uint64_t offset, const void* pv, std::uint64_t size, std::uint64_t* ptrBytesWritten) override;
+    void Read(std::uint64_t offset, void* pv, std::uint64_t size, std::uint64_t* ptrBytesRead) override;
+    void Write(std::uint64_t offset, const void* pv, std::uint64_t size, std::uint64_t* ptrBytesWritten) override;
 };
 #endif
 
@@ -137,11 +138,11 @@ private:
     HANDLE handle;
 public:
     CSimpleInputOutputStreamImplWindows() = delete;
-    CSimpleInputOutputStreamImplWindows(const wchar_t* filename);
-    virtual ~CSimpleInputOutputStreamImplWindows() override;
+    explicit CSimpleInputOutputStreamImplWindows(const wchar_t* filename);
+    ~CSimpleInputOutputStreamImplWindows() override;
 public:
-    virtual void Read(std::uint64_t offset, void* pv, std::uint64_t size, std::uint64_t* ptrBytesRead) override;
-    virtual void Write(std::uint64_t offset, const void* pv, std::uint64_t size, std::uint64_t* ptrBytesWritten) override;
+    void Read(std::uint64_t offset, void* pv, std::uint64_t size, std::uint64_t* ptrBytesRead) override;
+    void Write(std::uint64_t offset, const void* pv, std::uint64_t size, std::uint64_t* ptrBytesWritten) override;
 };
 #endif
 
@@ -151,9 +152,9 @@ private:
     FILE* fp;
 public:
     CSimpleInputOutputStreamImpl() = delete;
-    CSimpleInputOutputStreamImpl(const wchar_t* filename);
+    explicit CSimpleInputOutputStreamImpl(const wchar_t* filename);
     virtual ~CSimpleInputOutputStreamImpl() override;
 public:
-    virtual void Read(std::uint64_t offset, void* pv, std::uint64_t size, std::uint64_t* ptrBytesRead) override;
-    virtual void Write(std::uint64_t offset, const void* pv, std::uint64_t size, std::uint64_t* ptrBytesWritten) override;
+    void Read(std::uint64_t offset, void* pv, std::uint64_t size, std::uint64_t* ptrBytesRead) override;
+    void Write(std::uint64_t offset, const void* pv, std::uint64_t size, std::uint64_t* ptrBytesWritten) override;
 };
