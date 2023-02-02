@@ -147,7 +147,7 @@ protected:
 template <typename t>
 struct Nullable
 {
-    Nullable() :isValid(false) {};
+    Nullable() :isValid(false) {}
 
     bool isValid;
     t    value;

@@ -5,6 +5,7 @@
 #pragma once
 
 #include <functional>
+#include <vector>
 #include "libCZI_Metadata.h"
 
 class CSplines

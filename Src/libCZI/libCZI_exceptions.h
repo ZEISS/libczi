@@ -44,7 +44,7 @@ namespace libCZI
 
         /// Gets error type.
         /// \return The error type.
-        ErrorType GetErrorType() const { return this->errorType; };
+        ErrorType GetErrorType() const { return this->errorType; }
     };
 
     /// Exception for signaling that a string did not parse correctly.
@@ -75,7 +75,7 @@ namespace libCZI
 
         /// Gets error type.
         /// \return The error type.
-        ErrorType GetErrorType() const { return this->errorType; };
+        ErrorType GetErrorType() const { return this->errorType; }
 
         /// Gets number of characters that parsed correctly. The parse error occurred after this position.
         /// If this number is negative, then this information is not available and valid.
@@ -169,7 +169,7 @@ namespace libCZI
         /// to signal that a requested segment (metadata, subblock-directory or
         /// attachment-directory) is not present in the CZI.
         /// \param szErrMsg Message describing the error.
-        LibCZISegmentNotPresent(const char* szErrMsg)
+        explicit LibCZISegmentNotPresent(const char* szErrMsg)
             : LibCZIException(szErrMsg)
         {
         }
@@ -324,7 +324,7 @@ namespace libCZI
         /// Constructor for the LibCZIXmlParseException. This type is used
         /// signaling errors when parsing the XML-metadata.
         /// \param szErrMsg Message describing the error.
-        LibCZIXmlParseException(const char* szErrMsg)
+        explicit LibCZIXmlParseException(const char* szErrMsg)
             : LibCZIException(szErrMsg)
         {
         }

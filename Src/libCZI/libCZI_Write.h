@@ -4,6 +4,10 @@
 
 #pragma once
 
+#include <string>
+#include <tuple>
+#include <memory>
+#include <limits>
 #include "libCZI.h"
 
 #if !defined(_LIBCZISTATICLIB) && !defined(__GNUC__)

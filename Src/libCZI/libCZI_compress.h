@@ -7,6 +7,7 @@
 #include <memory>
 #include <cstdint>
 #include <functional>
+#include <map>
 #include <type_traits>
 #include "libCZI.h"
 
@@ -46,7 +47,7 @@ namespace libCZI
         /// Constructor for initializing the 'int32' type.
         ///
         /// \param  v   The value to set the variant to.
-        CompressParameter(std::int32_t v)
+        explicit CompressParameter(std::int32_t v)
         {
             this->SetInt32(v);
         }
@@ -54,7 +55,7 @@ namespace libCZI
         /// Constructor for initializing the 'uint32' type.
         ///
         /// \param  v   The value to set the variant to.
-        CompressParameter(std::uint32_t v)
+        explicit CompressParameter(std::uint32_t v)
         {
             this->SetUInt32(v);
         }
@@ -62,7 +63,7 @@ namespace libCZI
         /// Constructor for initializing the 'bool' type.
         ///
         /// \param  v   The value to set the variant to.
-        CompressParameter(bool v)
+        explicit CompressParameter(bool v)
         {
             this->SetBoolean(v);
         }
