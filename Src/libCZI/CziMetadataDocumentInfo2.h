@@ -4,13 +4,15 @@
 
 #pragma once
 
+#include <memory>
+#include <vector>
 #include "libCZI.h"
 #include "utilities.h"
 
 class CAttributeId : public libCZI::IAttributeId
 {
 public:
-    CAttributeId(pugi::xml_node node) { this->ParseInformation(node); }
+    explicit CAttributeId(pugi::xml_node node) { this->ParseInformation(node); }
 private:
     void ParseInformation(pugi::xml_node node);
 public:
@@ -22,7 +24,7 @@ private:
 class CAttributeName : public libCZI::IAttributeName
 {
 public:
-    CAttributeName(pugi::xml_node node) { this->ParseInformation(node); }
+    explicit CAttributeName(pugi::xml_node node) { this->ParseInformation(node); }
 private:
     void ParseInformation(pugi::xml_node node);
 public:
@@ -34,7 +36,7 @@ private:
 class CDimensionChannelInfo : public libCZI::IDimensionChannelInfo
 {
 public:
-    CDimensionChannelInfo(pugi::xml_node node);
+    explicit CDimensionChannelInfo(pugi::xml_node node);
 public:
     bool TryGetChannelType(libCZI::DimensionChannelChannelType* type) override;
     bool TryGetChannelUnit(std::wstring* unit) override;
@@ -159,7 +161,7 @@ class CDimensionsChannelsInfo : public libCZI::IDimensionsChannelsInfo
 private:
     std::vector<std::shared_ptr<CDimensionChannelInfo>> channels;
 public:
-    CDimensionsChannelsInfo(pugi::xml_node node);
+    explicit CDimensionsChannelsInfo(pugi::xml_node node);
     static std::shared_ptr<CDimensionsChannelsInfo> TryParse(const CCziMetadata* md);
 public:
     int GetChannelCount() const override;
@@ -172,7 +174,7 @@ private:
 class CDimensionChannelDetectorSettings : public libCZI::IDimensionChannelDetectorSettings
 {
 public:
-    CDimensionChannelDetectorSettings(pugi::xml_node node);
+    explicit CDimensionChannelDetectorSettings(pugi::xml_node node);
 
 public:
     bool TryGetDetectorRef(std::wstring* detectorRef) override;
@@ -231,7 +233,7 @@ private:
 class CDimensionChannelLightSourcesSetting : public libCZI::IDimensionChannelLightSourcesSetting
 {
 public:
-    CDimensionChannelLightSourcesSetting(pugi::xml_node node);
+    explicit CDimensionChannelLightSourcesSetting(pugi::xml_node node);
 
 public:
     bool TryGetLightSourceRef(std::wstring* lightsourceref)override;
@@ -279,7 +281,7 @@ class CDimensionChannelLightSourcesSettings : public libCZI::IDimensionChannelLi
 private:
     std::vector<std::shared_ptr<CDimensionChannelLightSourcesSetting>> lightSourceSettings;
 public:
-    CDimensionChannelLightSourcesSettings(pugi::xml_node node);
+    explicit CDimensionChannelLightSourcesSettings(pugi::xml_node node);
 public:
     int GetLightSourceSettingCount() const override;
     std::shared_ptr<libCZI::IDimensionChannelLightSourcesSetting> GetLightSourceSetting(int i) const override;
@@ -291,7 +293,7 @@ private:
 class CDimensionChannelLightPath : public libCZI::IDimensionChannelLightPath
 {
 public:
-    CDimensionChannelLightPath(pugi::xml_node node);
+    explicit CDimensionChannelLightPath(pugi::xml_node node);
 private:
     void ParseInformation(pugi::xml_node node);
 public:
@@ -311,7 +313,7 @@ private:
 class CDimensionChannelLaserScanInfo : public libCZI::IDimensionChannelLaserScanInfo
 {
 public:
-    CDimensionChannelLaserScanInfo(pugi::xml_node node);
+    explicit CDimensionChannelLaserScanInfo(pugi::xml_node node);
 private:
     void ParseInformation(pugi::xml_node node);
 public:
@@ -385,7 +387,7 @@ private:
 class CDimensionChannelSPIMIlluminationSettings : public libCZI::IDimensionChannelSPIMIlluminationSettings
 {
 public:
-    CDimensionChannelSPIMIlluminationSettings(pugi::xml_node node) { this->ParseInformation(node); }
+    explicit CDimensionChannelSPIMIlluminationSettings(pugi::xml_node node) { this->ParseInformation(node); }
 private:
     void ParseInformation(pugi::xml_node node);
 public:
@@ -411,7 +413,7 @@ private:
 class CInstrumentObjectiveSettings : public libCZI::IInstrumentObjectiveSettings
 {
 public:
-    CInstrumentObjectiveSettings(pugi::xml_node node) { this->ParseInformation(node); }
+    explicit CInstrumentObjectiveSettings(pugi::xml_node node) { this->ParseInformation(node); }
 private:
     void ParseInformation(pugi::xml_node node);
 public:
@@ -446,7 +448,7 @@ private:
 class CSPIMIlluminationResonanceScannerSettings :public libCZI::ISPIMIlluminationResonanceScannerSettings
 {
 public:
-    CSPIMIlluminationResonanceScannerSettings(pugi::xml_node node) { this->ParseInformation(node); }
+    explicit CSPIMIlluminationResonanceScannerSettings(pugi::xml_node node) { this->ParseInformation(node); }
 private:
     void ParseInformation(pugi::xml_node node);
 public:
@@ -460,7 +462,7 @@ private:
 class CSPIMIlluminationGalvoScannerSettings :public libCZI::ISPIMIlluminationGalvoScannerSettings
 {
 public:
-    CSPIMIlluminationGalvoScannerSettings(pugi::xml_node node) { this->ParseInformation(node); }
+    explicit CSPIMIlluminationGalvoScannerSettings(pugi::xml_node node) { this->ParseInformation(node); }
 private:
     void ParseInformation(pugi::xml_node node);
 public:
@@ -489,7 +491,7 @@ private:
 class CDimensionChannelSPIMDetectionSettings :public libCZI::IDimensionChannelSPIMDetectionSettings
 {
 public:
-    CDimensionChannelSPIMDetectionSettings(pugi::xml_node node) { this->ParseInformation(node); }
+    explicit CDimensionChannelSPIMDetectionSettings(pugi::xml_node node) { this->ParseInformation(node); }
 private:
     void ParseInformation(pugi::xml_node node);
 public:
@@ -503,7 +505,7 @@ private:
 class CDimensionChannelSIMSettings :public libCZI::IDimensionChannelSIMSettings
 {
 public:
-    CDimensionChannelSIMSettings(pugi::xml_node node) { this->ParseInformation(node); }
+    explicit CDimensionChannelSIMSettings(pugi::xml_node node) { this->ParseInformation(node); }
 private:
     void ParseInformation(pugi::xml_node node);
 public:
@@ -541,7 +543,7 @@ private:
 class CDimensionChannelAiryscanSettings : public libCZI::IDimensionChannelAiryscanSettings
 {
 public:
-    CDimensionChannelAiryscanSettings(pugi::xml_node node) { this->ParseInformation(node); }
+    explicit CDimensionChannelAiryscanSettings(pugi::xml_node node) { this->ParseInformation(node); }
 private:
     void ParseInformation(pugi::xml_node node);
 public:
@@ -575,7 +577,7 @@ private:
 class CFastAiryScanSettings : public libCZI::IFastAiryScanSettings
 {
 public:
-    CFastAiryScanSettings(pugi::xml_node node) { this->ParseInformation(node); }
+    explicit CFastAiryScanSettings(pugi::xml_node node) { this->ParseInformation(node); }
 private:
     void ParseInformation(pugi::xml_node node);
 public:
@@ -601,7 +603,7 @@ private:
 class CDimensionChannelPolarizingSettings : public libCZI::IDimensionChannelPolarizingSettings
 {
 public:
-    CDimensionChannelPolarizingSettings(pugi::xml_node node) { this->ParseInformation(node); }
+    explicit CDimensionChannelPolarizingSettings(pugi::xml_node node) { this->ParseInformation(node); }
 private:
     void ParseInformation(pugi::xml_node node);
 public:
@@ -618,7 +620,7 @@ private:
 class CDimensionChannelRatio :public libCZI::IDimensionChannelRatio
 {
 public:
-    CDimensionChannelRatio(pugi::xml_node node) { this->ParseInformation(node); }
+    explicit CDimensionChannelRatio(pugi::xml_node node) { this->ParseInformation(node); }
 private:
     void ParseInformation(pugi::xml_node node);
     static std::vector<std::wstring> ParseChannelRefSequence(pugi::xml_node node);

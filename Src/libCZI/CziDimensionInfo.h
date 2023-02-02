@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <vector>
 #include "libCZI.h"
 #include "CziMetadata.h"
 

@@ -44,7 +44,7 @@ public:
     {
     }
 
-    virtual ~CNodeWrapper() override = default;
+    ~CNodeWrapper() override = default;
 
     // interface IXmlNodeRead
     bool TryGetAttribute(const wchar_t* attributeName, std::wstring* attribValue) const override;

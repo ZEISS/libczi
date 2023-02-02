@@ -5,7 +5,7 @@
 #pragma once
 
 #include <map>
-
+#include <memory>
 #include "libCZI.h"
 #include "CziMetadata.h"
 
