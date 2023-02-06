@@ -9,7 +9,7 @@
 ## What
 libCZI is an Open Source Cross-Platform C++ library to read and write [CZI](https://www.zeiss.com/microscopy/en/products/software/zeiss-zen/czi-image-file-format.html).
 
-## Why 
+## Why
 libCZI is a library intended for providing read and write access to [CZI](https://www.zeiss.com/microscopy/en/products/software/zeiss-zen/czi-image-file-format.html) featuring:
 
 * reading subblocks and get the content as a bitmap
@@ -34,7 +34,7 @@ The libCZI libary is part of the [Open Application Development Concept of Zeiss 
 [pylibCZIrw](https://pypi.org/project/pylibCZIrw/) is a python module for reading and writing CZI files by utilizing/wrapping libCZI.
 
 ## Licensing
-Carl Zeiss Microscopy GmbH provides libCZI under a dual-license model - [LGPL Version 3](https://www.gnu.org/licenses/lgpl-3.0.en.html) as well as Proprietary/Commercial. 
+Carl Zeiss Microscopy GmbH provides libCZI under a dual-license model - [LGPL Version 3](https://www.gnu.org/licenses/lgpl-3.0.en.html) as well as Proprietary/Commercial.
 
 ### LGPL Version 3
 libCZI is a reader and writer for the CZI fileformat written in C++
@@ -46,7 +46,7 @@ This program is distributed in the hope that it will be useful, but WITHOUT ANY 
 
 You should have received a copy of the GNU Lesser General Public License along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-See [COPYING](/COPYING) and [COPYING.LESSER](/COPYING.LESSER).
+See [COPYING](./COPYING) and [COPYING.LESSER](./COPYING.LESSER).
 
 ### Commercial/Proprietary
 Contact github.microscopy@zeiss.com for a commercial/proprietary license in case you do not want to be subject to the [LGPL Version 3](#lgpl-version-3).  
@@ -54,11 +54,11 @@ Contact github.microscopy@zeiss.com for a commercial/proprietary license in case
 Note: Purchasing a commercial/proprietary license does not dispense you from fulfilling all obligations that arise from [3rd Party Components](#credits-to-third-party-components) used/consumed by libCZI.
 
 ## Credits to Third Party Components
-The authors and maintainers of libCZI give a big shout-out to all the [helpers](/THIRD_PARTY_LICENSES.txt) that have been part in bringing this library to where it is today.
+The authors and maintainers of libCZI give a big shout-out to all the [helpers](./THIRD_PARTY_LICENSES.txt) that have been part in bringing this library to where it is today.
 
 ## Guidelines
-[Code of Conduct](/CODE_OF_CONDUCT.md)  
-[Contributing](/CONTRIBUTING.md)
+[Code of Conduct](./CODE_OF_CONDUCT.md)  
+[Contributing](./CONTRIBUTING.md)
 
 ## Disclaimer
 ZEISS, ZEISS.com are registered trademarks of Carl Zeiss AG.

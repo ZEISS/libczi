@@ -2,7 +2,7 @@ name: CLA
 
 on:
   pull_request:
-    branches: 
+    branches:
       - main
     types:
       - opened

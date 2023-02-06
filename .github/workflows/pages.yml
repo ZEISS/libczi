@@ -35,7 +35,7 @@ jobs:
         shell: bash
       - name: Generate Doxygen Documentation
         working-directory: ${{github.workspace}}/Src
-        run: doxygen Doxyfile 
+        run: doxygen Doxyfile
         shell: bash
       - name: Setup Pages
         uses: actions/configure-pages@v2

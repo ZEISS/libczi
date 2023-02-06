@@ -5,13 +5,13 @@ Following these guidelines helps to communicate that you respect the time of the
 
 libCZI is an open source project and we love to receive contributions from our community — you! There are many ways to contribute, from writing tutorials or blog posts, improving the documentation, submitting bug reports and feature requests or writing code which can be incorporated into libCZI itself.  
 
-No matter how you intend to participate in improving libCZI - please make sure to follow our [Code of Conduct](/CODE_OF_CONDUCT.md).
+No matter how you intend to participate in improving libCZI - please make sure to follow our [Code of Conduct](./CODE_OF_CONDUCT.md).
 
 # Reporting Issues
 Depending on the nature of the bug/issue, the following guidelines apply:
 
 ## Security
-You must never report security related issues, vulnerabilities or bugs including sensitive information to the bug/issue tracker, or elsewhere in public. Instead, please follow the guidelines set-up in [SECURITY.md](/SECURITY.md).
+You must never report security related issues, vulnerabilities or bugs including sensitive information to the bug/issue tracker, or elsewhere in public. Instead, please follow the guidelines set-up in [SECURITY.md](./SECURITY.md).
 
 ## Other Issues
 Please revisit all previously created issues before creating a new issue.  
