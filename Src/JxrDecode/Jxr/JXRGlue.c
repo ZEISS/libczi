@@ -432,35 +432,35 @@ Cleanup:
 
 ERR PKCodecFactory_CreateDecoderFromStream(struct WMPStream* pStream, PKImageDecode** ppDecoder)
 {
-	ERR err = WMP_errSuccess;
+    ERR err = WMP_errSuccess;
 
-	char *pExt = NULL;
-	const PKIID* pIID = NULL;
+    char *pExt = NULL;
+    const PKIID* pIID = NULL;
 
-	//struct WMPStream* pStream = NULL;
-	PKImageDecode* pDecoder = NULL;
+    //struct WMPStream* pStream = NULL;
+    PKImageDecode* pDecoder = NULL;
 
-	//// get file extension
-	//pExt = strrchr(szFilename, '.');
-	//FailIf(NULL == pExt, WMP_errUnsupportedFormat);
+    //// get file extension
+    //pExt = strrchr(szFilename, '.');
+    //FailIf(NULL == pExt, WMP_errUnsupportedFormat);
 
-	//// get decode PKIID
-	//Call(GetImageDecodeIID(pExt, &pIID));
+    //// get decode PKIID
+    //Call(GetImageDecodeIID(pExt, &pIID));
 
-	//// create stream
-	//Call(CreateWS_File(&pStream, szFilename, "rb"));
-	pIID = &IID_PKImageWmpDecode;
+    //// create stream
+    //Call(CreateWS_File(&pStream, szFilename, "rb"));
+    pIID = &IID_PKImageWmpDecode;
 
-	// Create decoder
-	Call(PKCodecFactory_CreateCodec(pIID, (void **)ppDecoder));
-	pDecoder = *ppDecoder;
+    // Create decoder
+    Call(PKCodecFactory_CreateCodec(pIID, (void **)ppDecoder));
+    pDecoder = *ppDecoder;
 
-	// attach stream to decoder
-	Call(pDecoder->Initialize(pDecoder, pStream));
-	pDecoder->fStreamOwner = 0;
+    // attach stream to decoder
+    Call(pDecoder->Initialize(pDecoder, pStream));
+    pDecoder->fStreamOwner = 0;
 
 Cleanup:
-	return err;
+    return err;
 }
 
 ERR PKCodecFactory_CreateFormatConverter(PKFormatConverter** ppFConverter)
@@ -507,7 +507,7 @@ ERR PKCreateCodecFactory(PKCodecFactory** ppCFactory, U32 uVersion)
 
     pCFactory->CreateCodec = PKCodecFactory_CreateCodec;
     pCFactory->CreateDecoderFromFile = PKCodecFactory_CreateDecoderFromFile;
-	pCFactory->CreateDecoderFromStream = PKCodecFactory_CreateDecoderFromStream;
+    pCFactory->CreateDecoderFromStream = PKCodecFactory_CreateDecoderFromStream;
     pCFactory->CreateFormatConverter = PKCodecFactory_CreateFormatConverter;
     pCFactory->Release = PKCreateCodecFactory_Release;
 
@@ -633,7 +633,7 @@ ERR PKImageEncode_WriteSource(
 
     U8* pb = NULL;
 
-	// CWMTranscodingParam* pParam = NULL; 
+    // CWMTranscodingParam* pParam = NULL; 
 
     // get pixel format
     Call(pFC->GetSourcePixelFormat(pFC, &enPFFrom));
@@ -668,7 +668,7 @@ ERR PKImageEncode_WriteSource(
 
     Call(pFC->Copy(pFC, pRect, pb, cbStride));
 
-	Call(pIE->WritePixels(pIE, pRect->Height, pb, cbStride));
+    Call(pIE->WritePixels(pIE, pRect->Height, pb, cbStride));
 
 Cleanup:
     PKFreeAligned((void **) &pb);
@@ -762,13 +762,13 @@ ERR PKImageEncode_Transcode(
         
         Call(pIE->Transcode(pIE, pFC->pDecoder, &cParam));
     }
-	else 
-	{
-		// actual dec/enc with local buffer
-	    Call(PKAllocAligned((void **) &pb, (size_t)cbStride * pRect->Height, 128));
-		Call(pFC->Copy(pFC, pRect, pb, cbStride));
-		Call(pIE->WritePixels(pIE, pRect->Height, pb, cbStride));
-	}
+    else 
+    {
+        // actual dec/enc with local buffer
+        Call(PKAllocAligned((void **) &pb, (size_t)cbStride * pRect->Height, 128));
+        Call(pFC->Copy(pFC, pRect, pb, cbStride));
+        Call(pIE->WritePixels(pIE, pRect->Height, pb, cbStride));
+    }
 
 Cleanup:
     PKFreeAligned((void **) &pb);
@@ -791,10 +791,10 @@ ERR PKImageEncode_Release(
     PKImageEncode** ppIE)
 {
     PKImageEncode *pIE = *ppIE;
-	if (pIE->pStream != NULL)
-	{
-		pIE->pStream->Close(&pIE->pStream);
-	}
+    if (pIE->pStream != NULL)
+    {
+        pIE->pStream->Close(&pIE->pStream);
+    }
 
     return PKFree((void **) ppIE);
 }
@@ -823,7 +823,7 @@ ERR PKImageEncode_Create(PKImageEncode** ppIE)
 
     pIE->CreateNewFrame = PKImageEncode_CreateNewFrame;
     pIE->Release = PKImageEncode_Release;
-	pIE->bWMP = FALSE; 
+    pIE->bWMP = FALSE; 
 
 Cleanup:
     return err;

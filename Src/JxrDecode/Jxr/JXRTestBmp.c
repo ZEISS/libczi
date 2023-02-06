@@ -262,10 +262,10 @@ ERR ParseBMPHeader(
 
     FailIf(((sizeof(bmpIH) > bmpIH.uSize) || ((sizeof(bmpIH) + sizeof(bmpIHE)) < bmpIH.uSize)), WMP_errUnsupportedFormat);
 
-	if (sizeof(bmpIH) < bmpIH.uSize)
-	{
-		Call(pWS->Read(pWS, &bmpIHE, bmpIH.uSize - sizeof(bmpIH)));
-	}
+    if (sizeof(bmpIH) < bmpIH.uSize)
+    {
+        Call(pWS->Read(pWS, &bmpIHE, bmpIH.uSize - sizeof(bmpIH)));
+    }
 
     switch (bmpIH.iBitCount)
     {

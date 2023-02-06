@@ -251,7 +251,7 @@ static Int AdaptiveScanZero (const PixelI *pCoeffs, CAdaptiveScan *pScan,
 {
     Int k, iRun = 1, iLevel, iNumNonzero = 0; 
 
-	iLevel = pCoeffs[pScan[1].uScan];
+    iLevel = pCoeffs[pScan[1].uScan];
     if (iLevel) {
         pScan[1].uTotal++;
         pRLCoeffs[iNumNonzero * 2] = 0;
@@ -441,7 +441,7 @@ static Int AdaptiveScan (const PixelI *pCoeffs, Int *pResidual,
         for (k = 2; k < iCount; k++) {
             const Int sk = pScan[k].uScan;
             //pResidual++;
-			iLevel = pCoeffs[sk];
+            iLevel = pCoeffs[sk];
             if ((unsigned int)(iLevel + iThOff) >= iTh) {
                 iTemp1 = abs (iLevel);
                 iTemp = iTemp1 >> iModelBits;

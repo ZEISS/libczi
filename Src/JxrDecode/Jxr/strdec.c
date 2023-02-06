@@ -336,20 +336,20 @@ Int processMacroblockDec(CWMImageStrCodec * pSC)
                 return ICERR_ERROR;
          
             // check if we need to do entropy decode
-			if(!pSC->m_Dparam->bDecodeFullFrame){
-				if(pSC->cColumn == pSC->WMISCP.uiTileX[pSC->cTileColumn]){ // switching to a new tile
-					size_t rLeft = pSC->m_Dparam->cROILeftX, rRight = pSC->m_Dparam->cROIRightX;
-					size_t rTop = pSC->m_Dparam->cROITopY, rBottom = pSC->m_Dparam->cROIBottomY;
-					size_t rExt = (olOverlap == OL_NONE ? 0 : olOverlap == OL_ONE ? 2 : 10);
-					size_t tLeft = pSC->cColumn * 16, tTop = pSC->WMISCP.uiTileY[pSC->cTileRow] * 16;
-					size_t tRight = (pSC->cTileColumn != pSC->WMISCP.cNumOfSliceMinus1V ? pSC->WMISCP.uiTileX[pSC->cTileColumn + 1] : pSC->cmbWidth) * 16;
-					size_t tBottom = (pSC->cTileRow != pSC->WMISCP.cNumOfSliceMinus1H ? pSC->WMISCP.uiTileY[pSC->cTileRow + 1] : pSC->cmbHeight) * 16;
+            if(!pSC->m_Dparam->bDecodeFullFrame){
+                if(pSC->cColumn == pSC->WMISCP.uiTileX[pSC->cTileColumn]){ // switching to a new tile
+                    size_t rLeft = pSC->m_Dparam->cROILeftX, rRight = pSC->m_Dparam->cROIRightX;
+                    size_t rTop = pSC->m_Dparam->cROITopY, rBottom = pSC->m_Dparam->cROIBottomY;
+                    size_t rExt = (olOverlap == OL_NONE ? 0 : olOverlap == OL_ONE ? 2 : 10);
+                    size_t tLeft = pSC->cColumn * 16, tTop = pSC->WMISCP.uiTileY[pSC->cTileRow] * 16;
+                    size_t tRight = (pSC->cTileColumn != pSC->WMISCP.cNumOfSliceMinus1V ? pSC->WMISCP.uiTileX[pSC->cTileColumn + 1] : pSC->cmbWidth) * 16;
+                    size_t tBottom = (pSC->cTileRow != pSC->WMISCP.cNumOfSliceMinus1H ? pSC->WMISCP.uiTileY[pSC->cTileRow + 1] : pSC->cmbHeight) * 16;
 
-					// tile overlaps with ROI?
-					pContext->m_bInROI = ((rLeft >= tRight + rExt || rTop >= tBottom + rExt || tLeft > rRight + rExt ||
-						tTop > rBottom + rExt || pSC->cRow * 16 > rBottom + rExt) ? FALSE : TRUE);
-				}
-			}
+                    // tile overlaps with ROI?
+                    pContext->m_bInROI = ((rLeft >= tRight + rExt || rTop >= tBottom + rExt || tLeft > rRight + rExt ||
+                        tTop > rBottom + rExt || pSC->cRow * 16 > rBottom + rExt) ? FALSE : TRUE);
+                }
+            }
 
             if(pSC->m_Dparam->bDecodeFullFrame || pContext->m_bInROI){                
                 if ((result = DecodeMacroblockDC(pSC, pContext, (Int)pSC->cColumn, (Int)pSC->cRow)) != ICERR_OK)
@@ -884,8 +884,8 @@ Int outputMBRow(CWMImageStrCodec * pSC)
     const PixelI *pU = (pSC->m_bUVResolutionChange ? pSC->pResU : pSC->a0MBbuffer[1]);
     const PixelI *pV = (pSC->m_bUVResolutionChange ? pSC->pResV : pSC->a0MBbuffer[2]);
     const PixelI *pA = NULL;
-	const size_t iB = (pSC->WMII.bRGB ? 2 : 0);
-	const size_t iR = 2 - iB;
+    const size_t iB = (pSC->WMII.bRGB ? 2 : 0);
+    const size_t iR = 2 - iB;
     const U8 nLen = pSC->WMISCP.nLenMantissaOrShift;
     const I8 nExpBias = pSC->WMISCP.nExpBias;
     size_t iRow, iColumn, iIdx;
@@ -937,47 +937,47 @@ Int outputMBRow(CWMImageStrCodec * pSC)
 
         case YUV_422:
             {
-				PixelI y0, y1, u, v;
-	
-				for(iRow = iFirstRow; iRow < cHeight; iRow ++){
+                PixelI y0, y1, u, v;
+    
+                for(iRow = iFirstRow; iRow < cHeight; iRow ++){
                     I32 * pRow = pDst;
-					for(iColumn = iFirstColumn; iColumn < cWidth; iColumn += 2){
-						iIdx = ((iColumn >> 4) << 7) + idxCC[iRow][(iColumn >> 1) & 7];
-						u = pU[iIdx], v = pV[iIdx];
-	
-						y0 = pY[((iColumn >> 4) << 8) + idxCC[iRow][iColumn & 15]];
-						y1 = pY[(((iColumn + 1) >> 4) << 8) + idxCC[iRow][(iColumn + 1) & 15]];
-						
-						pRow[0] = u, pRow[1] = y0, pRow[2] = v, pRow[3] = y1;
+                    for(iColumn = iFirstColumn; iColumn < cWidth; iColumn += 2){
+                        iIdx = ((iColumn >> 4) << 7) + idxCC[iRow][(iColumn >> 1) & 7];
+                        u = pU[iIdx], v = pV[iIdx];
+    
+                        y0 = pY[((iColumn >> 4) << 8) + idxCC[iRow][iColumn & 15]];
+                        y1 = pY[(((iColumn + 1) >> 4) << 8) + idxCC[iRow][(iColumn + 1) & 15]];
+                        
+                        pRow[0] = u, pRow[1] = y0, pRow[2] = v, pRow[3] = y1;
                         pRow += 4;
-					}
+                    }
                     pDst += pSC->WMIBI.cbStride / sizeof(I32);
-				}
-			}
+                }
+            }
             break;
 
         case YUV_420:
-			{
-				PixelI y0, y1, y2, y3, u, v;
-				// const size_t iS4[8][4] = {{0, 1, 2, 3}, {2, 3, 0, 1}, {1, 0, 3, 2}, {3, 2, 1, 0}, {1, 3, 0, 2}, {3, 1, 2, 0}, {0, 2, 1, 3}, {2, 0, 3, 1}};
-	
-				for(iRow = iFirstRow; iRow < cHeight; iRow += 2){
+            {
+                PixelI y0, y1, y2, y3, u, v;
+                // const size_t iS4[8][4] = {{0, 1, 2, 3}, {2, 3, 0, 1}, {1, 0, 3, 2}, {3, 2, 1, 0}, {1, 3, 0, 2}, {3, 1, 2, 0}, {0, 2, 1, 3}, {2, 0, 3, 1}};
+    
+                for(iRow = iFirstRow; iRow < cHeight; iRow += 2){
                     I32 * pRow = pDst;
-					for(iColumn = iFirstColumn; iColumn < cWidth; iColumn += 2){
-						iIdx = ((iColumn >> 4) << 6) + idxCC_420[iRow >> 1][(iColumn >> 1) & 7];
-						u = pU[iIdx], v = pV[iIdx];
-	
-						y0 = pY[((iColumn >> 4) << 8) + idxCC[iRow][iColumn & 15]];
-						y1 = pY[(((iColumn + 1) >> 4) << 8) + idxCC[iRow][(iColumn + 1) & 15]];
-						y2 = pY[((iColumn >> 4) << 8) + idxCC[iRow + 1][iColumn & 15]];
-						y3 = pY[(((iColumn + 1) >> 4) << 8) + idxCC[iRow + 1][(iColumn + 1) & 15]];
-	
-						pRow[0] = y0, pRow[1] = y1, pRow[2] = y2, pRow[3] = y3, pRow[4] = u, pRow[5] = v;
+                    for(iColumn = iFirstColumn; iColumn < cWidth; iColumn += 2){
+                        iIdx = ((iColumn >> 4) << 6) + idxCC_420[iRow >> 1][(iColumn >> 1) & 7];
+                        u = pU[iIdx], v = pV[iIdx];
+    
+                        y0 = pY[((iColumn >> 4) << 8) + idxCC[iRow][iColumn & 15]];
+                        y1 = pY[(((iColumn + 1) >> 4) << 8) + idxCC[iRow][(iColumn + 1) & 15]];
+                        y2 = pY[((iColumn >> 4) << 8) + idxCC[iRow + 1][iColumn & 15]];
+                        y3 = pY[(((iColumn + 1) >> 4) << 8) + idxCC[iRow + 1][(iColumn + 1) & 15]];
+    
+                        pRow[0] = y0, pRow[1] = y1, pRow[2] = y2, pRow[3] = y3, pRow[4] = u, pRow[5] = v;
                         pRow += 6;
-					}
+                    }
                     pDst += pSC->WMIBI.cbStride / sizeof(I32);
-				}
-			}
+                }
+            }
             break;
 
         default:
@@ -1081,100 +1081,100 @@ Int outputMBRow(CWMImageStrCodec * pSC)
             break;
 
         case YUV_422:
-			{
-				PixelI y0, y1, u, v;
-				// const ORIENTATION oO = pSC->WMII.oOrientation;
-				// const size_t i0 = ((oO > O_FLIPV && oO <= O_RCW_FLIPVH) ? 1 : 0), i1 = 1 - i0;
-	
-				for(iRow = iFirstRow; iRow < cHeight; iRow ++){
-					for(iColumn = iFirstColumn, iY = pOffsetY[iRow]; iColumn < cWidth; iColumn += 2){
-						iIdx = ((iColumn >> 4) << 7) + idxCC[iRow][(iColumn >> 1) & 7];
-						u = ((pU[iIdx] + iBias) >> iShift), v = ((pV[iIdx] + iBias) >> iShift);
-	
-						y0 = ((pY[((iColumn >> 4) << 8) + idxCC[iRow][iColumn & 15]] + iBias) >> iShift);
-						y1 = ((pY[(((iColumn + 1) >> 4) << 8) + idxCC[iRow][(iColumn + 1) & 15]] + iBias) >> iShift);
-						
-						pDst = (U8 *)pSC->WMIBI.pv + pOffsetX[iColumn >> 1] + iY;
-						if ((y0 | y1 | u | v) & ~0xff)//UYVY
-							pDst[0] = _CLIP8(u), pDst[1] = _CLIP8(y0), pDst[2] = _CLIP8(v), pDst[3] = _CLIP8(y1);
-						else
-							pDst[0] = (U8)u, pDst[1] = (U8)y0, pDst[2] = (U8)v, pDst[3] = (U8)y1;
-					}
-				}
-			}
-			break;
+            {
+                PixelI y0, y1, u, v;
+                // const ORIENTATION oO = pSC->WMII.oOrientation;
+                // const size_t i0 = ((oO > O_FLIPV && oO <= O_RCW_FLIPVH) ? 1 : 0), i1 = 1 - i0;
+    
+                for(iRow = iFirstRow; iRow < cHeight; iRow ++){
+                    for(iColumn = iFirstColumn, iY = pOffsetY[iRow]; iColumn < cWidth; iColumn += 2){
+                        iIdx = ((iColumn >> 4) << 7) + idxCC[iRow][(iColumn >> 1) & 7];
+                        u = ((pU[iIdx] + iBias) >> iShift), v = ((pV[iIdx] + iBias) >> iShift);
+    
+                        y0 = ((pY[((iColumn >> 4) << 8) + idxCC[iRow][iColumn & 15]] + iBias) >> iShift);
+                        y1 = ((pY[(((iColumn + 1) >> 4) << 8) + idxCC[iRow][(iColumn + 1) & 15]] + iBias) >> iShift);
+                        
+                        pDst = (U8 *)pSC->WMIBI.pv + pOffsetX[iColumn >> 1] + iY;
+                        if ((y0 | y1 | u | v) & ~0xff)//UYVY
+                            pDst[0] = _CLIP8(u), pDst[1] = _CLIP8(y0), pDst[2] = _CLIP8(v), pDst[3] = _CLIP8(y1);
+                        else
+                            pDst[0] = (U8)u, pDst[1] = (U8)y0, pDst[2] = (U8)v, pDst[3] = (U8)y1;
+                    }
+                }
+            }
+            break;
 
         case YUV_420:
-			{
-				PixelI y0, y1, y2, y3, u, v;
-				const size_t iS4[8][4] = {{0, 1, 2, 3}, {2, 3, 0, 1}, {1, 0, 3, 2}, {3, 2, 1, 0}, {1, 3, 0, 2}, {3, 1, 2, 0}, {0, 2, 1, 3}, {2, 0, 3, 1}};
-				const ORIENTATION oO = pSC->WMII.oOrientation;
-				const size_t i0 = iS4[oO][0], i1 = iS4[oO][1], i2 = iS4[oO][2], i3 = iS4[oO][3];
-	
-				for(iRow = iFirstRow; iRow < cHeight; iRow += 2){
-					for(iColumn = iFirstColumn, iY = pOffsetY[iRow >> 1]; iColumn < cWidth; iColumn += 2){
-						iIdx = ((iColumn >> 4) << 6) + idxCC_420[iRow >> 1][(iColumn >> 1) & 7];
-						u = ((pU[iIdx] + iBias) >> iShift), v = ((pV[iIdx] + iBias) >> iShift);
-	
-						y0 = ((pY[((iColumn >> 4) << 8) + idxCC[iRow][iColumn & 15]] + iBias) >> iShift);
-						y1 = ((pY[(((iColumn + 1) >> 4) << 8) + idxCC[iRow][(iColumn + 1) & 15]] + iBias) >> iShift);
-						y2 = ((pY[((iColumn >> 4) << 8) + idxCC[iRow + 1][iColumn & 15]] + iBias) >> iShift);
-						y3 = ((pY[(((iColumn + 1) >> 4) << 8) + idxCC[iRow + 1][(iColumn + 1) & 15]] + iBias) >> iShift);
-	
-						pDst = (U8 *)pSC->WMIBI.pv + pOffsetX[iColumn >> 1] + iY;
-						if ((y0 | y1 | y2 | y3 | u | v) & ~0xff)
-							pDst[i0] = _CLIP8(y0), pDst[i1] = _CLIP8(y1), pDst[i2] = _CLIP8(y2), pDst[i3] = _CLIP8(y3), pDst[4] = _CLIP8(u), pDst[5] = _CLIP8(v);
-						else
-							pDst[i0] = (U8)y0, pDst[i1] = (U8)y1, pDst[i2] = (U8)y2, pDst[i3] = (U8)y3, pDst[4] = (U8)u, pDst[5] = (U8)v;
-					}
-				}
-			}
-			break;
+            {
+                PixelI y0, y1, y2, y3, u, v;
+                const size_t iS4[8][4] = {{0, 1, 2, 3}, {2, 3, 0, 1}, {1, 0, 3, 2}, {3, 2, 1, 0}, {1, 3, 0, 2}, {3, 1, 2, 0}, {0, 2, 1, 3}, {2, 0, 3, 1}};
+                const ORIENTATION oO = pSC->WMII.oOrientation;
+                const size_t i0 = iS4[oO][0], i1 = iS4[oO][1], i2 = iS4[oO][2], i3 = iS4[oO][3];
+    
+                for(iRow = iFirstRow; iRow < cHeight; iRow += 2){
+                    for(iColumn = iFirstColumn, iY = pOffsetY[iRow >> 1]; iColumn < cWidth; iColumn += 2){
+                        iIdx = ((iColumn >> 4) << 6) + idxCC_420[iRow >> 1][(iColumn >> 1) & 7];
+                        u = ((pU[iIdx] + iBias) >> iShift), v = ((pV[iIdx] + iBias) >> iShift);
+    
+                        y0 = ((pY[((iColumn >> 4) << 8) + idxCC[iRow][iColumn & 15]] + iBias) >> iShift);
+                        y1 = ((pY[(((iColumn + 1) >> 4) << 8) + idxCC[iRow][(iColumn + 1) & 15]] + iBias) >> iShift);
+                        y2 = ((pY[((iColumn >> 4) << 8) + idxCC[iRow + 1][iColumn & 15]] + iBias) >> iShift);
+                        y3 = ((pY[(((iColumn + 1) >> 4) << 8) + idxCC[iRow + 1][(iColumn + 1) & 15]] + iBias) >> iShift);
+    
+                        pDst = (U8 *)pSC->WMIBI.pv + pOffsetX[iColumn >> 1] + iY;
+                        if ((y0 | y1 | y2 | y3 | u | v) & ~0xff)
+                            pDst[i0] = _CLIP8(y0), pDst[i1] = _CLIP8(y1), pDst[i2] = _CLIP8(y2), pDst[i3] = _CLIP8(y3), pDst[4] = _CLIP8(u), pDst[5] = _CLIP8(v);
+                        else
+                            pDst[i0] = (U8)y0, pDst[i1] = (U8)y1, pDst[i2] = (U8)y2, pDst[i3] = (U8)y3, pDst[4] = (U8)u, pDst[5] = (U8)v;
+                    }
+                }
+            }
+            break;
 
         case CMYK:
-			{
-				PixelI c, m, y, k;
-				PixelI * pK = pSC->a0MBbuffer[3];
-	
-				for(iRow = iFirstRow; iRow < cHeight; iRow++){
-					for(iColumn = iFirstColumn, iY = pOffsetY[iRow]; iColumn < cWidth; iColumn++){
-						iIdx = ((iColumn >> 4) << 8) + idxCC[iRow][iColumn & 15];
-	
-						m = -pY[iIdx] + iBias1, c = pU[iIdx], y = -pV[iIdx], k = pK[iIdx] + iBias2;
-						
-						_ICC_CMYK(c, m, y, k); // color conversion
-	
-						c >>= iShift, m >>= iShift, y >>= iShift, k >>= iShift;
-	
-						pDst = (U8 *)pSC->WMIBI.pv + pOffsetX[iColumn] + iY;
-						if ((c | m | y | k) & ~0xff)
-							pDst[0] = _CLIP8(c), pDst[1] = _CLIP8(m), pDst[2] = _CLIP8(y), pDst[3] = _CLIP8(k);
-						else
-							pDst[0] = (U8)c, pDst[1] = (U8)m, pDst[2] = (U8)y, pDst[3] = (U8)k;
-					}
-				}
-			}
-			break;
+            {
+                PixelI c, m, y, k;
+                PixelI * pK = pSC->a0MBbuffer[3];
+    
+                for(iRow = iFirstRow; iRow < cHeight; iRow++){
+                    for(iColumn = iFirstColumn, iY = pOffsetY[iRow]; iColumn < cWidth; iColumn++){
+                        iIdx = ((iColumn >> 4) << 8) + idxCC[iRow][iColumn & 15];
+    
+                        m = -pY[iIdx] + iBias1, c = pU[iIdx], y = -pV[iIdx], k = pK[iIdx] + iBias2;
+                        
+                        _ICC_CMYK(c, m, y, k); // color conversion
+    
+                        c >>= iShift, m >>= iShift, y >>= iShift, k >>= iShift;
+    
+                        pDst = (U8 *)pSC->WMIBI.pv + pOffsetX[iColumn] + iY;
+                        if ((c | m | y | k) & ~0xff)
+                            pDst[0] = _CLIP8(c), pDst[1] = _CLIP8(m), pDst[2] = _CLIP8(y), pDst[3] = _CLIP8(k);
+                        else
+                            pDst[0] = (U8)c, pDst[1] = (U8)m, pDst[2] = (U8)y, pDst[3] = (U8)k;
+                    }
+                }
+            }
+            break;
 
         case CF_RGBE:
-			{
-				PixelI r, g, b;
-				
-				for(iRow = iFirstRow; iRow < cHeight; iRow ++){
-					for(iColumn = iFirstColumn, iY = pOffsetY[iRow]; iColumn < cWidth; iColumn ++){
-							iIdx = ((iColumn >> 4) << 8) + idxCC[iRow][iColumn & 15];
-							
-							g = pY[iIdx] + iBias2, r = -pU[iIdx], b = pV[iIdx];
-	
-							_ICC(r, g, b);
-	
-							pDst = (U8 *)pSC->WMIBI.pv + pOffsetX[iColumn] + iY;
-	
-							inverseConvertRGBE (r >> iShift, g >> iShift, b >> iShift, pDst, pDst + 1, pDst + 2, pDst + 3);
-						}
-				}
-			}
-			break;
+            {
+                PixelI r, g, b;
+                
+                for(iRow = iFirstRow; iRow < cHeight; iRow ++){
+                    for(iColumn = iFirstColumn, iY = pOffsetY[iRow]; iColumn < cWidth; iColumn ++){
+                            iIdx = ((iColumn >> 4) << 8) + idxCC[iRow][iColumn & 15];
+                            
+                            g = pY[iIdx] + iBias2, r = -pU[iIdx], b = pV[iIdx];
+    
+                            _ICC(r, g, b);
+    
+                            pDst = (U8 *)pSC->WMIBI.pv + pOffsetX[iColumn] + iY;
+    
+                            inverseConvertRGBE (r >> iShift, g >> iShift, b >> iShift, pDst, pDst + 1, pDst + 2, pDst + 3);
+                        }
+                }
+            }
+            break;
 
         default:
             assert(0);
@@ -1189,42 +1189,42 @@ Int outputMBRow(CWMImageStrCodec * pSC)
         case CF_RGB:
         {
             PixelI r, g, b;
-			if (pSC->m_param.bScaledArith == FALSE) {
-				for(iRow = iFirstRow; iRow < cHeight; iRow ++)
-					for(iColumn = iFirstColumn, iY = pOffsetY[iRow]; iColumn < cWidth; iColumn ++){
-						iIdx = ((iColumn >> 4) << 8) + idxCC[iRow][iColumn & 15];
-						
-						g = pY[iIdx] + iBias, r = -pU[iIdx], b = pV[iIdx];
+            if (pSC->m_param.bScaledArith == FALSE) {
+                for(iRow = iFirstRow; iRow < cHeight; iRow ++)
+                    for(iColumn = iFirstColumn, iY = pOffsetY[iRow]; iColumn < cWidth; iColumn ++){
+                        iIdx = ((iColumn >> 4) << 8) + idxCC[iRow][iColumn & 15];
+                        
+                        g = pY[iIdx] + iBias, r = -pU[iIdx], b = pV[iIdx];
 
-						_ICC(r, g, b);
+                        _ICC(r, g, b);
 
-						g <<= nLen, b <<= nLen, r <<= nLen;
-						
-						pDst = (U16 *)pSC->WMIBI.pv + pOffsetX[iColumn] + iY;
-						
-						if ((g | b | r) & ~0xffff)
-							pDst[0] = _CLIPU16(r),  pDst[1] = _CLIPU16(g), pDst[2] = _CLIPU16(b);
-						else
-							pDst[0] = (U16)r, pDst[1] = (U16)g, pDst[2] = (U16)b;
-					}
-			}
-			else{
-				for(iRow = iFirstRow; iRow < cHeight; iRow ++)
-					for(iColumn = iFirstColumn, iY = pOffsetY[iRow]; iColumn < cWidth; iColumn ++){
-						iIdx = ((iColumn >> 4) << 8) + idxCC[iRow][iColumn & 15];
-						
-						g = pY[iIdx] + iBias, r = -pU[iIdx], b = pV[iIdx];
+                        g <<= nLen, b <<= nLen, r <<= nLen;
+                        
+                        pDst = (U16 *)pSC->WMIBI.pv + pOffsetX[iColumn] + iY;
+                        
+                        if ((g | b | r) & ~0xffff)
+                            pDst[0] = _CLIPU16(r),  pDst[1] = _CLIPU16(g), pDst[2] = _CLIPU16(b);
+                        else
+                            pDst[0] = (U16)r, pDst[1] = (U16)g, pDst[2] = (U16)b;
+                    }
+            }
+            else{
+                for(iRow = iFirstRow; iRow < cHeight; iRow ++)
+                    for(iColumn = iFirstColumn, iY = pOffsetY[iRow]; iColumn < cWidth; iColumn ++){
+                        iIdx = ((iColumn >> 4) << 8) + idxCC[iRow][iColumn & 15];
+                        
+                        g = pY[iIdx] + iBias, r = -pU[iIdx], b = pV[iIdx];
 
-						_ICC(r, g, b);
+                        _ICC(r, g, b);
 
-						g = (g >> iShift) << nLen, b = (b >> iShift) << nLen, r = (r >> iShift) << nLen;
-						pDst = (U16 *)pSC->WMIBI.pv + pOffsetX[iColumn] + iY;
-						if ((g | b | r) & ~0xffff)
-							pDst[0] = _CLIPU16(r),  pDst[1] = _CLIPU16(g), pDst[2] = _CLIPU16(b);
-						else
-							pDst[0] = (U16)r, pDst[1] = (U16)g, pDst[2] = (U16)b;
-					}
-			}
+                        g = (g >> iShift) << nLen, b = (b >> iShift) << nLen, r = (r >> iShift) << nLen;
+                        pDst = (U16 *)pSC->WMIBI.pv + pOffsetX[iColumn] + iY;
+                        if ((g | b | r) & ~0xffff)
+                            pDst[0] = _CLIPU16(r),  pDst[1] = _CLIPU16(g), pDst[2] = _CLIPU16(b);
+                        else
+                            pDst[0] = (U16)r, pDst[1] = (U16)g, pDst[2] = (U16)b;
+                    }
+            }
             break;
         }
 
@@ -1235,106 +1235,106 @@ Int outputMBRow(CWMImageStrCodec * pSC)
             break;
 
         case YUV_422:
-			{
-				PixelI y0, y1, u, v;
-				const ORIENTATION oO = pSC->WMII.oOrientation;
-				const size_t i0 = ((oO == O_FLIPH || oO == O_FLIPVH || oO == O_RCW_FLIPV || oO == O_RCW_FLIPVH) ? 1 : 0), i1 = 1 - i0;
-	
-				for(iRow = iFirstRow; iRow < cHeight; iRow ++){
-					for(iColumn = iFirstColumn, iY = pOffsetY[iRow]; iColumn < cWidth; iColumn += 2){
-						iIdx = ((iColumn >> 4) << 7) + idxCC[iRow][(iColumn >> 1) & 7];
-						u = ((pU[iIdx] + iBias) >> iShift) << nLen, v = ((pV[iIdx] + iBias) >> iShift) << nLen;
-	
-						y0 = ((pY[((iColumn >> 4) << 8) + idxCC[iRow][iColumn & 15]] + iBias) >> iShift) << nLen;
-						y1 = ((pY[(((iColumn + 1) >> 4) << 8) + idxCC[iRow][(iColumn + 1) & 15]] + iBias) >> iShift) << nLen;
-						
-						pDst = (U16 *)pSC->WMIBI.pv + pOffsetX[iColumn >> 1] + iY;
-						if ((y0 | y1 | u | v) & ~0xffff)
-							{
-								pDst[i0] = _CLIPU16(u);
-								pDst[i1] = _CLIPU16(y0); 
-								pDst[2] = _CLIPU16(v); 
-								pDst[3] = _CLIPU16(y1);
-							}
-						else
-							{
-								pDst[i0] = (U16)(u);
-								pDst[i1] = (U16)(y0);
-								pDst[2] = (U16)(v); 
-								pDst[3] = (U16)(y1);
-							}
-					}
-				}
-			}
-			break;
+            {
+                PixelI y0, y1, u, v;
+                const ORIENTATION oO = pSC->WMII.oOrientation;
+                const size_t i0 = ((oO == O_FLIPH || oO == O_FLIPVH || oO == O_RCW_FLIPV || oO == O_RCW_FLIPVH) ? 1 : 0), i1 = 1 - i0;
+    
+                for(iRow = iFirstRow; iRow < cHeight; iRow ++){
+                    for(iColumn = iFirstColumn, iY = pOffsetY[iRow]; iColumn < cWidth; iColumn += 2){
+                        iIdx = ((iColumn >> 4) << 7) + idxCC[iRow][(iColumn >> 1) & 7];
+                        u = ((pU[iIdx] + iBias) >> iShift) << nLen, v = ((pV[iIdx] + iBias) >> iShift) << nLen;
+    
+                        y0 = ((pY[((iColumn >> 4) << 8) + idxCC[iRow][iColumn & 15]] + iBias) >> iShift) << nLen;
+                        y1 = ((pY[(((iColumn + 1) >> 4) << 8) + idxCC[iRow][(iColumn + 1) & 15]] + iBias) >> iShift) << nLen;
+                        
+                        pDst = (U16 *)pSC->WMIBI.pv + pOffsetX[iColumn >> 1] + iY;
+                        if ((y0 | y1 | u | v) & ~0xffff)
+                            {
+                                pDst[i0] = _CLIPU16(u);
+                                pDst[i1] = _CLIPU16(y0); 
+                                pDst[2] = _CLIPU16(v); 
+                                pDst[3] = _CLIPU16(y1);
+                            }
+                        else
+                            {
+                                pDst[i0] = (U16)(u);
+                                pDst[i1] = (U16)(y0);
+                                pDst[2] = (U16)(v); 
+                                pDst[3] = (U16)(y1);
+                            }
+                    }
+                }
+            }
+            break;
 
         case YUV_420:
-			{
-				PixelI y0, y1, y2, y3, u, v;
-				const size_t iS4[8][4] = {{0, 1, 2, 3}, {2, 3, 0, 1}, {1, 0, 3, 2}, {3, 2, 1, 0}, {1, 3, 0, 2}, {3, 1, 2, 0}, {0, 2, 1, 3}, {2, 0, 3, 1}};
-				const ORIENTATION oO = pSC->WMII.oOrientation;
-				const size_t i0 = iS4[oO][0], i1 = iS4[oO][1], i2 = iS4[oO][2], i3 = iS4[oO][3];
-	
-				for(iRow = iFirstRow; iRow < cHeight; iRow += 2){
-					for(iColumn = iFirstColumn, iY = pOffsetY[iRow >> 1]; iColumn < cWidth; iColumn += 2){
-						iIdx = ((iColumn >> 3) << 6) + idxCC[iRow][(iColumn >> 1) & 7];
-						u = ((pU[iIdx] + iBias) >> iShift) << nLen, v = ((pV[iIdx] + iBias) >> iShift) << nLen;
-	
-						y0 = ((pY[((iColumn >> 4) << 8) + idxCC[iRow][iColumn & 15]] + iBias) >> iShift) << nLen;
-						y1 = ((pY[(((iColumn + 1) >> 4) << 8) + idxCC[iRow][(iColumn + 1) & 15]] + iBias) >> iShift) << nLen;
-						y2 = ((pY[((iColumn >> 4) << 8) + idxCC[iRow + 1][iColumn & 15]] + iBias) >> iShift) << nLen;
-						y3 = ((pY[(((iColumn + 1) >> 4) << 8) + idxCC[iRow + 1][(iColumn + 1) & 15]] + iBias) >> iShift) << nLen;
-	
-						pDst = (U16 *)pSC->WMIBI.pv + pOffsetX[iColumn >> 1] + iY;
-						if ((y0 | y1 | y2 | y3 | u | v) & ~0xffff)
-							{
-								pDst[i0] = _CLIPU16(y0); 
-								pDst[i1] = _CLIPU16(y1); 
-								pDst[i2] = _CLIPU16(y2); 
-								pDst[i3] = _CLIPU16(y3); 
-								pDst[4] = _CLIPU16(u);
-								pDst[5] = _CLIPU16(v);
-							}
-						else
-							{
-								pDst[i0] = (U16)(y0);
-								pDst[i1] = (U16)(y1);
-								pDst[i2] = (U16)(y2);
-								pDst[i3] = (U16)(y3);
-								pDst[4] = (U16)(u);
-								pDst[5] = (U16)(v);
-							}
-					}
-				}
-			}
-			break;
+            {
+                PixelI y0, y1, y2, y3, u, v;
+                const size_t iS4[8][4] = {{0, 1, 2, 3}, {2, 3, 0, 1}, {1, 0, 3, 2}, {3, 2, 1, 0}, {1, 3, 0, 2}, {3, 1, 2, 0}, {0, 2, 1, 3}, {2, 0, 3, 1}};
+                const ORIENTATION oO = pSC->WMII.oOrientation;
+                const size_t i0 = iS4[oO][0], i1 = iS4[oO][1], i2 = iS4[oO][2], i3 = iS4[oO][3];
+    
+                for(iRow = iFirstRow; iRow < cHeight; iRow += 2){
+                    for(iColumn = iFirstColumn, iY = pOffsetY[iRow >> 1]; iColumn < cWidth; iColumn += 2){
+                        iIdx = ((iColumn >> 3) << 6) + idxCC[iRow][(iColumn >> 1) & 7];
+                        u = ((pU[iIdx] + iBias) >> iShift) << nLen, v = ((pV[iIdx] + iBias) >> iShift) << nLen;
+    
+                        y0 = ((pY[((iColumn >> 4) << 8) + idxCC[iRow][iColumn & 15]] + iBias) >> iShift) << nLen;
+                        y1 = ((pY[(((iColumn + 1) >> 4) << 8) + idxCC[iRow][(iColumn + 1) & 15]] + iBias) >> iShift) << nLen;
+                        y2 = ((pY[((iColumn >> 4) << 8) + idxCC[iRow + 1][iColumn & 15]] + iBias) >> iShift) << nLen;
+                        y3 = ((pY[(((iColumn + 1) >> 4) << 8) + idxCC[iRow + 1][(iColumn + 1) & 15]] + iBias) >> iShift) << nLen;
+    
+                        pDst = (U16 *)pSC->WMIBI.pv + pOffsetX[iColumn >> 1] + iY;
+                        if ((y0 | y1 | y2 | y3 | u | v) & ~0xffff)
+                            {
+                                pDst[i0] = _CLIPU16(y0); 
+                                pDst[i1] = _CLIPU16(y1); 
+                                pDst[i2] = _CLIPU16(y2); 
+                                pDst[i3] = _CLIPU16(y3); 
+                                pDst[4] = _CLIPU16(u);
+                                pDst[5] = _CLIPU16(v);
+                            }
+                        else
+                            {
+                                pDst[i0] = (U16)(y0);
+                                pDst[i1] = (U16)(y1);
+                                pDst[i2] = (U16)(y2);
+                                pDst[i3] = (U16)(y3);
+                                pDst[4] = (U16)(u);
+                                pDst[5] = (U16)(v);
+                            }
+                    }
+                }
+            }
+            break;
 
         case CMYK:
-			{
-				PixelI c, m, y, k;
-				PixelI * pK = pSC->a0MBbuffer[3];
-				const PixelI iBias1 = (32768 >> nLen) << iShift;
-				const PixelI iBias2 = iBias - iBias1;
-	
-				for(iRow = iFirstRow; iRow < cHeight; iRow++){
-					for(iColumn = iFirstColumn, iY = pOffsetY[iRow]; iColumn < cWidth; iColumn++){
-						iIdx = ((iColumn >> 4) << 8) + idxCC[iRow][iColumn & 15];
-	
-						m = -pY[iIdx] + iBias1, c = pU[iIdx], y = -pV[iIdx], k = pK[iIdx] + iBias2;
-						
-						_ICC_CMYK(c, m, y, k); // color conversion
-	
-						c = (c >> iShift) << nLen, m = (m >> iShift) << nLen, y = (y >> iShift) << nLen, k = (k >> iShift) << nLen;
-	
-						pDst = (U16 *)pSC->WMIBI.pv + pOffsetX[iColumn] + iY;
-						if ((c | m | y | k) & ~0xffff)
-							pDst[0] = _CLIPU16(c), pDst[1] = _CLIPU16(m), pDst[2] = _CLIPU16(y), pDst[3] = _CLIPU16(k);
-						else
-							pDst[0] = (U16)(c), pDst[1] = (U16)(m), pDst[2] = (U16)(y), pDst[3] = (U16)(k);
-						}
-				}
-			}
-			break; 
+            {
+                PixelI c, m, y, k;
+                PixelI * pK = pSC->a0MBbuffer[3];
+                const PixelI iBias1 = (32768 >> nLen) << iShift;
+                const PixelI iBias2 = iBias - iBias1;
+    
+                for(iRow = iFirstRow; iRow < cHeight; iRow++){
+                    for(iColumn = iFirstColumn, iY = pOffsetY[iRow]; iColumn < cWidth; iColumn++){
+                        iIdx = ((iColumn >> 4) << 8) + idxCC[iRow][iColumn & 15];
+    
+                        m = -pY[iIdx] + iBias1, c = pU[iIdx], y = -pV[iIdx], k = pK[iIdx] + iBias2;
+                        
+                        _ICC_CMYK(c, m, y, k); // color conversion
+    
+                        c = (c >> iShift) << nLen, m = (m >> iShift) << nLen, y = (y >> iShift) << nLen, k = (k >> iShift) << nLen;
+    
+                        pDst = (U16 *)pSC->WMIBI.pv + pOffsetX[iColumn] + iY;
+                        if ((c | m | y | k) & ~0xffff)
+                            pDst[0] = _CLIPU16(c), pDst[1] = _CLIPU16(m), pDst[2] = _CLIPU16(y), pDst[3] = _CLIPU16(k);
+                        else
+                            pDst[0] = (U16)(c), pDst[1] = (U16)(m), pDst[2] = (U16)(y), pDst[3] = (U16)(k);
+                        }
+                }
+            }
+            break; 
         default:
             assert(0);
             break;
@@ -1372,26 +1372,26 @@ Int outputMBRow(CWMImageStrCodec * pSC)
             break;
 
         case CMYK:
-			{
-				PixelI c, m, y, k;
-				PixelI * pK = pSC->a0MBbuffer[3];
-	
-				for(iRow = iFirstRow; iRow < cHeight; iRow++){
-					for(iColumn = iFirstColumn, iY = pOffsetY[iRow]; iColumn < cWidth; iColumn++){
-						iIdx = ((iColumn >> 4) << 8) + idxCC[iRow][iColumn & 15];
-	
-						m = -pY[iIdx], c = pU[iIdx], y = -pV[iIdx], k = pK[iIdx] + iBias;
-						
-						_ICC_CMYK(c, m, y, k); // color conversion
-	
-						c = (c >> iShift) << nLen, m = (m >> iShift) << nLen, y = (y >> iShift) << nLen, k = (k >> iShift) << nLen;
-	
-						pDst = (I16 *)pSC->WMIBI.pv + pOffsetX[iColumn] + iY;
-						pDst[0] = (I16)(c), pDst[1] = (I16)(m), pDst[2] = (I16)(y), pDst[3] = (I16)(k);
-					}
-				}
-			}
-			break;
+            {
+                PixelI c, m, y, k;
+                PixelI * pK = pSC->a0MBbuffer[3];
+    
+                for(iRow = iFirstRow; iRow < cHeight; iRow++){
+                    for(iColumn = iFirstColumn, iY = pOffsetY[iRow]; iColumn < cWidth; iColumn++){
+                        iIdx = ((iColumn >> 4) << 8) + idxCC[iRow][iColumn & 15];
+    
+                        m = -pY[iIdx], c = pU[iIdx], y = -pV[iIdx], k = pK[iIdx] + iBias;
+                        
+                        _ICC_CMYK(c, m, y, k); // color conversion
+    
+                        c = (c >> iShift) << nLen, m = (m >> iShift) << nLen, y = (y >> iShift) << nLen, k = (k >> iShift) << nLen;
+    
+                        pDst = (I16 *)pSC->WMIBI.pv + pOffsetX[iColumn] + iY;
+                        pDst[0] = (I16)(c), pDst[1] = (I16)(m), pDst[2] = (I16)(y), pDst[3] = (I16)(k);
+                    }
+                }
+            }
+            break;
 
         default:
             assert(0);
@@ -1443,25 +1443,25 @@ Int outputMBRow(CWMImageStrCodec * pSC)
         switch (cfExt)
         {
         case CF_RGB:
-			{
-				PixelI r, g, b;
-				
-				for(iRow = iFirstRow; iRow < cHeight; iRow ++){
-					for(iColumn = iFirstColumn, iY = pOffsetY[iRow]; iColumn < cWidth; iColumn ++){
-						iIdx = ((iColumn >> 4) << 8) + idxCC[iRow][iColumn & 15];
-						
-						g = pY[iIdx] + iBias, r = -pU[iIdx], b = pV[iIdx];
-	
-						_ICC(r, g, b);
-						
-						pDst = (U32 *)pSC->WMIBI.pv + pOffsetX[iColumn] + iY;
-						pDst[0] = ((r >> iShift) << nLen);
-						pDst[1] = ((g >> iShift) << nLen);
-						pDst[2] = ((b >> iShift) << nLen);
-					}
-				}
-			}
-			break;
+            {
+                PixelI r, g, b;
+                
+                for(iRow = iFirstRow; iRow < cHeight; iRow ++){
+                    for(iColumn = iFirstColumn, iY = pOffsetY[iRow]; iColumn < cWidth; iColumn ++){
+                        iIdx = ((iColumn >> 4) << 8) + idxCC[iRow][iColumn & 15];
+                        
+                        g = pY[iIdx] + iBias, r = -pU[iIdx], b = pV[iIdx];
+    
+                        _ICC(r, g, b);
+                        
+                        pDst = (U32 *)pSC->WMIBI.pv + pOffsetX[iColumn] + iY;
+                        pDst[0] = ((r >> iShift) << nLen);
+                        pDst[1] = ((g >> iShift) << nLen);
+                        pDst[2] = ((b >> iShift) << nLen);
+                    }
+                }
+            }
+            break;
 
         case Y_ONLY:
         case YUV_444:
@@ -1508,7 +1508,7 @@ Int outputMBRow(CWMImageStrCodec * pSC)
             outputNChannel(pSC, iFirstRow, iFirstColumn, cWidth, cHeight, iShift, iBias);
             break;    
 
-		default:
+        default:
             assert(0);
             break;
         }
@@ -1923,7 +1923,7 @@ Int decodeThumbnail(CWMImageStrCodec * pSC)
     const COLORFORMAT cfExt = (pSC->m_param.cfColorFormat == Y_ONLY ? Y_ONLY : pSC->WMII.cfColorFormat);
     const BITDEPTH_BITS bd = pSC->WMII.bdBitDepth;
     const OVERLAP ol = pSC->WMISCP.olOverlap;
-	const size_t iB = (pSC->WMII.bRGB ? 2 : 0);
+    const size_t iB = (pSC->WMII.bRGB ? 2 : 0);
     const size_t iR = 2 - iB;
 
     const U8 nLen = pSC->WMISCP.nLenMantissaOrShift;
@@ -2148,26 +2148,26 @@ Int decodeThumbnail(CWMImageStrCodec * pSC)
             break;
 
         case CMYK:
-			{
-				PixelI * pSrcK = pSC->a0MBbuffer[3];
-	
-				for(iRow = iFirstRow; iRow < cHeight; iRow += tScale){
-					for(iColumn = iFirstColumn, iY = pOffsetY[iRow >> nBits]; iColumn < cWidth; iColumn += tScale){
-						size_t iPos = ((iColumn >> 4) << 8) + idxCC[iRow][iColumn & 0xf];
-						PixelI m = -(pSrcY[iPos] * cMul) >> rShiftY, c = (pSrcU[iPos] * cMul) >> rShiftUV, y = -(pSrcV[iPos] * cMul) >> rShiftUV, k = (pSrcK[iPos] * cMul) >> rShiftUV;
-						
-						_ICC_CMYK(c, m, y, k);
-	
-						pDst = (I16 *)pSC->WMIBI.pv + pOffsetX[iColumn >> nBits] + iY;
-						c <<= nLen, m <<= nLen, y <<= nLen, k <<= nLen;
-						pDst[0] = _CLIP16(c); 
-						pDst[1] = _CLIP16(m);
-						pDst[2] = _CLIP16(y);
-						pDst[3] = _CLIP16(k);
-					}
-				}
-			}
-			break;
+            {
+                PixelI * pSrcK = pSC->a0MBbuffer[3];
+    
+                for(iRow = iFirstRow; iRow < cHeight; iRow += tScale){
+                    for(iColumn = iFirstColumn, iY = pOffsetY[iRow >> nBits]; iColumn < cWidth; iColumn += tScale){
+                        size_t iPos = ((iColumn >> 4) << 8) + idxCC[iRow][iColumn & 0xf];
+                        PixelI m = -(pSrcY[iPos] * cMul) >> rShiftY, c = (pSrcU[iPos] * cMul) >> rShiftUV, y = -(pSrcV[iPos] * cMul) >> rShiftUV, k = (pSrcK[iPos] * cMul) >> rShiftUV;
+                        
+                        _ICC_CMYK(c, m, y, k);
+    
+                        pDst = (I16 *)pSC->WMIBI.pv + pOffsetX[iColumn >> nBits] + iY;
+                        c <<= nLen, m <<= nLen, y <<= nLen, k <<= nLen;
+                        pDst[0] = _CLIP16(c); 
+                        pDst[1] = _CLIP16(m);
+                        pDst[2] = _CLIP16(y);
+                        pDst[3] = _CLIP16(k);
+                    }
+                }
+            }
+            break;
 
         default:
             assert(0);
@@ -3562,7 +3562,7 @@ Int ImageStrDecDecode(
             if(pSC->m_Dparam->cThumbnailScale < 2 && (pSC->m_Dparam->bDecodeFullFrame || 
                 ((pSC->cRow * 16 > pSC->m_Dparam->cROITopY) && (pSC->cRow * 16 <= pSC->m_Dparam->cROIBottomY + 16)))) {
                 if( pSC->Load(pSC) != ICERR_OK ) // bypass CC for thumbnail decode
-            		return ICERR_ERROR;
+                    return ICERR_ERROR;
             }
 
             if(pSC->m_Dparam->cThumbnailScale >= 2) // decode thumbnail

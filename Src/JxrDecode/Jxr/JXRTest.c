@@ -64,7 +64,7 @@ static ERR GetTestInfo(const char* szExt, const PKIIDInfo** ppInfo)
     ERR err = WMP_errSuccess;
 
     static PKIIDInfo iidInfo[] = {
-		{"wrapper", &IID_PKImageEncodeWrapper, /*don't care/not used*/&IID_PKImageBmpDecode },
+        {"wrapper", &IID_PKImageEncodeWrapper, /*don't care/not used*/&IID_PKImageBmpDecode },
         {".bmp", &IID_PKImageBmpEncode, &IID_PKImageBmpDecode},
         {".ppm", &IID_PKImagePnmEncode, &IID_PKImagePnmDecode},
         {".pgm", &IID_PKImagePnmEncode, &IID_PKImagePnmDecode},
@@ -156,10 +156,10 @@ ERR PKTestFactory_CreateCodec(const PKIID* iid, void** ppv)
     {
         Call(PKImageEncode_Create_YUV444((PKImageEncode**)ppv));
     }
-	else if (IID_PKImageEncodeWrapper == *iid)
-	{
-		Call(PKImageEncode_Create_Wrapper((PKImageEncode**)ppv));
-	}
+    else if (IID_PKImageEncodeWrapper == *iid)
+    {
+        Call(PKImageEncode_Create_Wrapper((PKImageEncode**)ppv));
+    }
 
     else if (IID_PKImageBmpDecode == *iid)
     {
