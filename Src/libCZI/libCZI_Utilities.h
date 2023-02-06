@@ -251,8 +251,8 @@ namespace libCZI
         static bool EnumAllCoordinates(const libCZI::CDimBounds& bounds, const std::function<bool(std::uint64_t, const libCZI::CDimCoordinate& coord)>& func);
 
         /// Fill the specified bitmap with the specified color.
-       /// \param [in,out] bm         The bitmap.
-       /// \param          floatColor The color.
+        /// \param [in,out] bm         The bitmap.
+        /// \param          floatColor The color.
         static void FillBitmap(libCZI::IBitmapData* bm, const libCZI::RgbFloatColor& floatColor);
 
         /// Convert the "raw compression identifier" to an enumeration. Note that all unknown values (unknown to

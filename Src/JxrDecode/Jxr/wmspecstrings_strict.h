@@ -1072,15 +1072,12 @@
 #ifdef __cplusplus
 #define SA(x) x
 #define DECL_SA(name,loc) \
-  [repeatable] \
-  [source_annotation_attribute( loc )] \
-  struct name##Attribute { name##Attribute(); const char* ignored; }; 
+    [repeatable] \
+    [source_annotation_attribute( loc )] \
+    struct name##Attribute { name##Attribute(); const char* ignored; }; 
 #else
 #define SA(x) SA_##x
-#define DECL_SA(name,loc) \
-  [source_annotation_attribute( loc )] \
-  struct name { const char* ignored; };\
-  typedef struct name name;
+#define DECL_SA(name,loc) [source_annotation_attribute( loc )] struct name { const char* ignored; }; typedef struct name name;
 #endif  /* #endif  __cplusplus */
 DECL_SA(OnParameterOnly, SA(Parameter));
 DECL_SA(OnReturnOnly, SA(ReturnValue));
@@ -1091,7 +1088,4 @@ DECL_SA(OnParameterOrReturnOnly, SA(Parameter) | SA(ReturnValue));
 #pragma pop_macro( "SA" )
 #pragma pop_macro( "DECL_SA" )
 #endif 
-#endif 
-
-
-
+#endif

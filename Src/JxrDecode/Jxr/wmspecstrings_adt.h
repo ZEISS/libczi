@@ -57,8 +57,8 @@ typedef __$compname_props const  __$TCHAR* SAL_ConstValidCompNameT;
 #ifdef  __cplusplus
 extern "C" {
 #endif
-	void __inline __nothrow __SAL_ValidCompNameA(__out_has_type_adt_props(ValidCompNameA) const void *expr) { expr; }
-	void __inline __nothrow __SAL_ValidCompNameW(__out_has_type_adt_props(ValidCompNameW) const void *expr) { expr; }
+    void __inline __nothrow __SAL_ValidCompNameA(__out_has_type_adt_props(ValidCompNameA) const void *expr) { expr; }
+    void __inline __nothrow __SAL_ValidCompNameW(__out_has_type_adt_props(ValidCompNameW) const void *expr) { expr; }
 #ifdef  __cplusplus
 }
 #endif

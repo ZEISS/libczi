@@ -338,6 +338,7 @@ std::ostream& operator<<(std::ostream& os, const GUID& guid)
     os.width(4);
     os << std::hex << guid.Data3 << '-';
 
+    // editorconfig-checker-disable
     os << std::hex
        << std::setw(2) << static_cast<short>(guid.Data4[0])
        << std::setw(2) << static_cast<short>(guid.Data4[1])
@@ -348,6 +349,7 @@ std::ostream& operator<<(std::ostream& os, const GUID& guid)
        << std::setw(2) << static_cast<short>(guid.Data4[5])
        << std::setw(2) << static_cast<short>(guid.Data4[6])
        << std::setw(2) << static_cast<short>(guid.Data4[7]);
+    // editorconfig-checker-enable
     os << std::nouppercase;
     return os;
 }

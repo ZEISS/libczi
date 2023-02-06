@@ -1,14 +1,14 @@
 //*@@@+++@@@@******************************************************************
 //
-// Copyright © Microsoft Corp.
+// Copyright Â© Microsoft Corp.
 // All rights reserved.
 // 
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are met:
 // 
-// • Redistributions of source code must retain the above copyright notice,
+// â€¢ Redistributions of source code must retain the above copyright notice,
 //   this list of conditions and the following disclaimer.
-// • Redistributions in binary form must reproduce the above copyright notice,
+// â€¢ Redistributions in binary form must reproduce the above copyright notice,
 //   this list of conditions and the following disclaimer in the documentation
 //   and/or other materials provided with the distribution.
 // 
@@ -42,7 +42,7 @@
 #endif // __cplusplus
 
 /********************************************************************************
-  Type definitions
+Type definitions
 ********************************************************************************/
 typedef int Bool;
 typedef char Char;
@@ -72,14 +72,14 @@ typedef void* CTXSTRCODEC;
 
     This compiler flag is related to the capability of banded decode 
     (decoding only one MB row of the source JPEG XR image at a time). 
-	
+
     With REENTRANT_MODE defined, the decoder decodes one MB row on each call to 
     ImageStrDecDecode().
     
     The decoder acts as if it can only write to the single MBRow whose pointer was passed to it. 
     This acts as a proof of concept that the API would work if you passed it a small buffer 
     on each call to ImageStrDecDecode(). 
-	
+
     The REENTRANT_MODE flag only works when the output image is in Orientations 0, 1 
     (vertically	flipped) or 2 (horizontally flipped).
 
@@ -142,16 +142,16 @@ typedef enum BITSTREAMFORMAT {
 
 typedef enum COLORFORMAT {
     Y_ONLY  = 0, 
-	YUV_420 = 1,
-	YUV_422 = 2,
-	YUV_444 = 3,
-	CMYK    = 4, 
-	//CMYKDIRECT = 5,
-	NCOMPONENT = 6,
+    YUV_420 = 1,
+    YUV_422 = 2,
+    YUV_444 = 3,
+    CMYK    = 4, 
+    //CMYKDIRECT = 5,
+    NCOMPONENT = 6,
 
     // these are external-only
     CF_RGB  = 7,
-	CF_RGBE = 8,
+    CF_RGBE = 8,
 
     /* add new COLORFORMAT here */ CFT_MAX
 } COLORFORMAT;
@@ -395,13 +395,13 @@ typedef struct tagCWMIStrCodecParam {
     Bool bBlackWhite;
 
     Bool bUseHardTileBoundaries; //default is soft tile boundaries
- 
+
     Bool bProgressiveMode; //default is sequential mode
 
     Bool bYUVData; //default is cfColorFormat data
 
     Bool bUnscaledArith; //force unscaled arithmetic
-   
+
     // Perf measurement
     Bool fMeasurePerf;
 } CWMIStrCodecParam;

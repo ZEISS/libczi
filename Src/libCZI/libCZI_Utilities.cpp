@@ -728,5 +728,3 @@ Utils::CompressionOption Utils::ParseCompressionOptions(const std::string& optio
 
     throw logic_error("The specified string could not be processed.");
 }
-
-// ----------------------------------------------------------------------------

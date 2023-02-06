@@ -8,6 +8,7 @@
 using namespace libCZI;
 using namespace std;
 
+// editorconfig-checker-disable
 static const char* testMetadata[] =
 {
 R"(<?xml version="1.0"?>)",
@@ -5290,7 +5291,9 @@ R"(<ImageDocument>)",
  R"(</Metadata>)",
 R"(</ImageDocument>)"
 };
+// editorconfig-checker-enable
 
+// editorconfig-checker-disable
 static const char* test2Metadata[] =
 {
 R"_(<?xml version="1.0"?>)_",
@@ -5539,7 +5542,9 @@ R"_(  </MetadataNodes>)_",
 R"_( </Metadata>)_",
 R"_(</ImageDocument>)_"
 };
+// editorconfig-checker-enable
 
+// editorconfig-checker-disable
 static const char* test3Metadata[] =
 {
 R"_(<ImageDocument>)_",
@@ -5772,7 +5777,9 @@ R"_(    </MetadataNodes>)_",
 R"_(  </Metadata>)_",
 R"_(</ImageDocument>)_"
 };
+// editorconfig-checker-enable
 
+// editorconfig-checker-disable
 static const char* test4Metadata[] =
 {
     R"_(<ImageDocument>)_",
@@ -6004,7 +6011,9 @@ R"_(    </MetadataNodes>)_",
 R"_(  </Metadata>)_",
 R"_(</ImageDocument>)_"
 };
+// editorconfig-checker-enable
 
+// editorconfig-checker-disable
 static const char* test5Metadata[] =
 {
 R"_(<?xml version="1.0"?>)_",
@@ -6717,7 +6726,9 @@ R"_(  </Metadata>)_",
 R"_(  )_",
 R"_(</ImageDocument>)_"
 };
+// editorconfig-checker-enable
 
+// editorconfig-checker-disable
 static const char* test6Metadata[] =
 {
 R"(<ImageDocument>)",
@@ -6760,6 +6771,7 @@ R"(    </Information>)",
 R"(  </Metadata>)",
 R"(</ImageDocument>)"
 };
+// editorconfig-checker-enable
 
 static string GetTestData()
 {

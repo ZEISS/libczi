@@ -548,6 +548,7 @@ CCmdLineOptions::ParseResult CCmdLineOptions::Parse(int argc, char** argv)
     string argument_generatorpixeltype;
     bool argument_versionflag = false;
 
+    // editorconfig-checker-disable
     cli_app.add_option("-c,--command", argument_command,
         R"(COMMAND can be one of 'PrintInformation', 'ExtractSubBlock', 'SingleChannelTileAccessor', 'ChannelComposite',
            'SingleChannelPyramidTileAccessor', 'SingleChannelScalingTileAccessor', 'ScalingChannelComposite', 'ExtractAttachment' and 'CreateCZI'.
@@ -570,6 +571,7 @@ CCmdLineOptions::ParseResult CCmdLineOptions::Parse(int argc, char** argv)
         ->default_val(Command::Invalid)
         ->option_text("COMMAND")
         ->transform(CLI::CheckedTransformer(map_string_to_command, CLI::ignore_case));
+    // editorconfig-checker-enable
     cli_app.add_option("-s,--source", argument_source_filename,
         "specifies the source CZI-file.")
         ->option_text("SOURCEFILE")
@@ -577,11 +579,14 @@ CCmdLineOptions::ParseResult CCmdLineOptions::Parse(int argc, char** argv)
     cli_app.add_option("-o,--output", argument_output_filename,
         "specifies the output-filename. A suffix will be appended to the name given here depending on the type of the file.")
         ->option_text("OUTPUTFILE");
+    // editorconfig-checker-disable
     cli_app.add_option("-p,--plane-coordinate", argument_plane_coordinate,
         R"(Uniquely select a 2D-plane from the document. It is given in the form [DimChar][number], where 'DimChar' specifies a dimension and 
            can be any of 'Z', 'C', 'T', 'R', 'I', 'H', 'V' or 'B'. 'number' is an integer. \nExamples: C1T3, C0T-2, C1T44Z15H1.)")
         ->option_text("PLANE-COORDINATE")
         ->check(plane_coordinate_validator);
+    // editorconfig-checker-enable
+    // editorconfig-checker-disable
     cli_app.add_option("-r,--rect", argument_rect,
         R"(Select a paraxial rectangular region as the region-of-interest. The coordinates may be given either absolute or relative. If using relative
             coordinates, they are relative to what is determined as the upper-left point in the document.\nRelative coordinates are specified with
@@ -589,6 +594,7 @@ CCmdLineOptions::ParseResult CCmdLineOptions::Parse(int argc, char** argv)
             \nExamples: rel(0, 0, 1024, 1024), rel(-100, -100, 500, 500), abs(-230, 100, 800, 800).)")
         ->option_text("ROI")
         ->check(region_of_interest_validator);
+    // editorconfig-checker-enable
     cli_app.add_option("-d,--display-settings", argument_display_settings,
         "Specifies the display-settings used for creating a channel-composite. The data is given in JSON-notation.")
         ->option_text("DISPLAYSETTINGS")

@@ -304,41 +304,41 @@ bool libCZI::ZstdCompress::CompressZStd1(std::uint32_t sourceWidth, std::uint32_
     // so, now put the correct "header" in front of the compressed data
 
     /*
-             The syntax for the header is:
+            The syntax for the header is:
 
-             [size]
+            [size]
 
-             [chunk] ---<---+
-                |           |   - 0 or more of them
-                |           |
-                +----->-----+
+            [chunk] ---<---+
+            |           |   - 0 or more of them
+            |           |
+            +----->-----+
 
-             The size-field gives the size of the header (starting counting at offset 0, i. e. including the size-field itself).
-             For the size-field we use "MSB varint encoding" (cf. here https://techoverflow.net/2013/01/25/efficiently-encoding-variable-length-integers-in-cc/ or https://developpaper.com/explain-the-principle-of-varint-coding-in-detail/):
-             - The most-significant bit (MSB) in a byte indicates whether the next byte is part of the size.
-             - For numbers <128, the size field is just one byte long (and the most-significant bit is not set)
-             - For number >=128, the field extends into the second byte (and byte 0 gives the least significant 7 bytes of the result),
-                so we have ( ([0]&127) + ([1]&127)*128 as the value (provided that the MSB of [1] is zero)
-             - if the MSB of the second byte is also one, then we extend to the third byte, the result is then given by
-                ([0]&127) + ([1]&127)*128 + [2]*16384
-             - We do not extend beyond the third byte (even if its MSB is one), so the MSB of the third byte is a "valid bit for the number".
-             - The max number which can be encoded like this therefore is: 127 + 127*128 + 255*16384 = 4194303 = 0x400000 - 1
+            The size-field gives the size of the header (starting counting at offset 0, i. e. including the size-field itself).
+            For the size-field we use "MSB varint encoding" (cf. here https://techoverflow.net/2013/01/25/efficiently-encoding-variable-length-integers-in-cc/ or https://developpaper.com/explain-the-principle-of-varint-coding-in-detail/):
+            - The most-significant bit (MSB) in a byte indicates whether the next byte is part of the size.
+            - For numbers <128, the size field is just one byte long (and the most-significant bit is not set)
+            - For number >=128, the field extends into the second byte (and byte 0 gives the least significant 7 bytes of the result),
+            so we have ( ([0]&127) + ([1]&127)*128 as the value (provided that the MSB of [1] is zero)
+            - if the MSB of the second byte is also one, then we extend to the third byte, the result is then given by
+            ([0]&127) + ([1]&127)*128 + [2]*16384
+            - We do not extend beyond the third byte (even if its MSB is one), so the MSB of the third byte is a "valid bit for the number".
+            - The max number which can be encoded like this therefore is: 127 + 127*128 + 255*16384 = 4194303 = 0x400000 - 1
 
-             A chunk is composed of a number (encoded like the size field) and payload. This number identifies the "type" of
-             the chunk, and the size of the chunk must be derivable from the data. So, it can either be a fixed size chunk or
-             the size must be encoded in the payload (in a unambiguous way).
-             The sum of the sizes of the chunks must exactly match the size given in the size-field (plus the size of the size-field itself), there
-             must be no "unused" data.
+            A chunk is composed of a number (encoded like the size field) and payload. This number identifies the "type" of
+            the chunk, and the size of the chunk must be derivable from the data. So, it can either be a fixed size chunk or
+            the size must be encoded in the payload (in a unambiguous way).
+            The sum of the sizes of the chunks must exactly match the size given in the size-field (plus the size of the size-field itself), there
+            must be no "unused" data.
 
-             Currently, we have only a chunk of type "1" with a fixed size of 1 byte. The first bit of this 1 byte payload
-             indicates whether hi-lo-byte unpacking was applied (as a preprocessing step). Default (if this chunk is not present)
-             is "no hi-lo-byte unpacking".
+            Currently, we have only a chunk of type "1" with a fixed size of 1 byte. The first bit of this 1 byte payload
+            indicates whether hi-lo-byte unpacking was applied (as a preprocessing step). Default (if this chunk is not present)
+            is "no hi-lo-byte unpacking".
 
-             So, the header looks like this (for unpacking was applied) : 0x03 0x01 0x01
-                                     and if unpacking was _not_ applied : 0x03 0x01 0x00
+            So, the header looks like this (for unpacking was applied) : 0x03 0x01 0x01
+                                    and if unpacking was _not_ applied : 0x03 0x01 0x00
 
-             Note that we could make use of the definition of the default to shorten the header to: 0x01 - for the case "no unpacking".
-             We leave this optimization to some interested collaborator.
+            Note that we could make use of the definition of the default to shorten the header to: 0x01 - for the case "no unpacking".
+            We leave this optimization to some interested collaborator.
     */
 
     // for the time being, we have this simple implementation here (since we only have to distinguish two cases)
