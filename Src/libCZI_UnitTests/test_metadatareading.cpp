@@ -661,5 +661,5 @@ TEST(MetadataReading, DimensionInfoAtrribute1Test)
     wstring id;
     bool b = ch1->TryGetAttributeId(&id);
     ASSERT_TRUE(b);
-    EXPECT_TRUE(id.compare(L"Channel:1") == 0);
+	EXPECT_EQ(id.compare(L"Channel:1"), 0);
 }

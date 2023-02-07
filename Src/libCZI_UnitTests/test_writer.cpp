@@ -256,7 +256,7 @@ static void _testWriteReadCompressedImageZStd0(uint32_t width, uint32_t height, 
 
         buffer = stream->GetCopy(&sizeBuffer);
         EXPECT_TRUE(buffer != nullptr);
-        EXPECT_TRUE(sizeBuffer != 0);
+        EXPECT_NE(sizeBuffer, 0);
 
     }
     while (false);
@@ -271,7 +271,7 @@ static void _testWriteReadCompressedImageZStd0(uint32_t width, uint32_t height, 
         size_t sizeBlock = 0;
         std::shared_ptr<const void> imgBlock = sbBlkRead->GetRawData(ISubBlock::MemBlkType::Data, &sizeBlock);
 
-        EXPECT_TRUE(sizeBlock != 0);
+        EXPECT_NE(sizeBlock, 0);
         EXPECT_TRUE(imgBlock != nullptr);
         EXPECT_EQ(sizeBlock, sizeCompressed);
         EXPECT_TRUE(memcmp(compressed, imgBlock.get(), sizeCompressed) == 0) << "Unexpected image block";
@@ -294,7 +294,7 @@ static void _testWriteReadCompressedImageZStd0(uint32_t width, uint32_t height, 
 
         for (uint32_t i = 0; i < height; ++i)
         {
-            EXPECT_TRUE(memcmp(origin, decode, line) == 0);
+            EXPECT_EQ(memcmp(origin, decode, line), 0);
             origin += strideOrigin;
             decode += strideDecode;
         }
@@ -383,7 +383,7 @@ static void _testWriteReadCompressedImageZStd1(uint32_t width, uint32_t height, 
 
         buffer = stream->GetCopy(&sizeBuffer);
         EXPECT_TRUE(buffer != nullptr);
-        EXPECT_TRUE(sizeBuffer != 0);
+        EXPECT_NE(sizeBuffer, 0);
 
     }
     while (false);
@@ -398,7 +398,7 @@ static void _testWriteReadCompressedImageZStd1(uint32_t width, uint32_t height, 
         size_t sizeBlock = 0;
         std::shared_ptr<const void> imgBlock = sbBlkRead->GetRawData(ISubBlock::MemBlkType::Data, &sizeBlock);
 
-        EXPECT_TRUE(sizeBlock != 0);
+        EXPECT_NE(sizeBlock, 0);
         EXPECT_TRUE(imgBlock != nullptr);
         EXPECT_EQ(sizeBlock, sizeCompressed);
         EXPECT_TRUE(memcmp(compressed, imgBlock.get(), sizeCompressed) == 0) << "Unexpected image block";
