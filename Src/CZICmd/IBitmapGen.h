@@ -63,6 +63,6 @@ public:
     static void Shutdown();
     static std::string GetDefaultBitmapGeneratorClassName();
     static std::shared_ptr<IBitmapGen> CreateDefaultBitmapGenerator(const IBitmapGenParameters* params = nullptr);
-    static std::shared_ptr<IBitmapGen> CreateBitmapGenerator(const char *className, const IBitmapGenParameters* params = nullptr);
+    static std::shared_ptr<IBitmapGen> CreateBitmapGenerator(const char* className, const IBitmapGenParameters* params = nullptr);
     static void EnumBitmapGenerator(const std::function<bool(int no, std::tuple<std::string, std::string, bool>)>& enumGenerators);
 };
