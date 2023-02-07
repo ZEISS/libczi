@@ -18,11 +18,8 @@ jobs:
     name: MegaLinter
     runs-on: ubuntu-latest
     steps:
-      # Git Checkout
       - name: Checkout Code
         uses: actions/checkout@v3
-        with:
-          token: ${{ secrets.PAT || secrets.GITHUB_TOKEN }}
 
       # MegaLinter
       - name: MegaLinter
@@ -33,9 +30,7 @@ jobs:
         env:
           # All available variables are described in documentation
           # https://megalinter.io/configuration/
-          VALIDATE_ALL_CODEBASE: true # Set ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }} to validate only diff with main branch
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          # ADD YOUR CUSTOM ENV VARIABLES HERE TO OVERRIDE VALUES OF .mega-linter.yml AT THE ROOT OF YOUR REPOSITORY
+          VALIDATE_ALL_CODEBASE: true
 
       # Upload MegaLinter artifacts
       - name: Archive production artifacts
