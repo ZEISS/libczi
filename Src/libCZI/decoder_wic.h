@@ -6,6 +6,7 @@
 
 #if defined(_WIN32)
 
+#include <memory>
 #include "libCZI_Pixels.h"
 #include "libCZI_Site.h"
 
@@ -15,16 +16,16 @@ struct IWICImagingFactory;
 class CWicJpgxrDecoder : public libCZI::IDecoder
 {
 private:
-		IWICImagingFactory* pFactory;
+    IWICImagingFactory* pFactory;
 public:
-		static std::shared_ptr<CWicJpgxrDecoder> Create();
+    static std::shared_ptr<CWicJpgxrDecoder> Create();
 
-		CWicJpgxrDecoder() = delete;
-		CWicJpgxrDecoder(IWICImagingFactory* pFactory);
-		virtual ~CWicJpgxrDecoder();
+    CWicJpgxrDecoder() = delete;
+    explicit CWicJpgxrDecoder(IWICImagingFactory* pFactory);
+    virtual ~CWicJpgxrDecoder();
 
 public:
-		virtual std::shared_ptr<libCZI::IBitmapData> Decode(const void* ptrData, size_t size, libCZI::PixelType pixelType, std::uint32_t height, std::uint32_t width) override;
+    std::shared_ptr<libCZI::IBitmapData> Decode(const void* ptrData, size_t size, libCZI::PixelType pixelType, std::uint32_t height, std::uint32_t width) override;
 };
 
 #endif

@@ -1,14 +1,14 @@
 //*@@@+++@@@@******************************************************************
 //
-// Copyright © Microsoft Corp.
+// Copyright Â© Microsoft Corp.
 // All rights reserved.
 // 
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are met:
 // 
-// • Redistributions of source code must retain the above copyright notice,
+// â€¢ Redistributions of source code must retain the above copyright notice,
 //   this list of conditions and the following disclaimer.
-// • Redistributions in binary form must reproduce the above copyright notice,
+// â€¢ Redistributions in binary form must reproduce the above copyright notice,
 //   this list of conditions and the following disclaimer in the documentation
 //   and/or other materials provided with the distribution.
 // 
@@ -32,9 +32,9 @@ extern "C" {
 #endif
 
 #if defined(_MSC_VER)
- #include <guiddef.h>
+#include <guiddef.h>
 #else
- #include "priv_guiddef.h"
+#include "priv_guiddef.h"
 #endif
 #include "JXRMeta.h"
 
@@ -159,15 +159,15 @@ DEFINE_GUID(GUID_PKPixelFormat64bppPRGBA, 0x6fddc324, 0x4e03, 0x4bfe, 0xb1, 0x85
 DEFINE_GUID(GUID_PKPixelFormat96bppRGBFixedPoint, 0x6fddc324, 0x4e03, 0x4bfe, 0xb1, 0x85, 0x3d, 0x77, 0x76, 0x8d, 0xc9, 0x18);
 DEFINE_GUID(GUID_PKPixelFormat96bppRGBFloat, 0xe3fed78f, 0xe8db, 0x4acf, 0x84, 0xc1, 0xe9, 0x7f, 0x61, 0x36, 0xb3, 0x27);
 
- /* Floating point scRGB formats */
+/* Floating point scRGB formats */
 DEFINE_GUID(GUID_PKPixelFormat128bppRGBAFloat,  0x6fddc324, 0x4e03, 0x4bfe, 0xb1, 0x85, 0x3d, 0x77, 0x76, 0x8d, 0xc9, 0x19);
 DEFINE_GUID(GUID_PKPixelFormat128bppPRGBAFloat, 0x6fddc324, 0x4e03, 0x4bfe, 0xb1, 0x85, 0x3d, 0x77, 0x76, 0x8d, 0xc9, 0x1a);
 DEFINE_GUID(GUID_PKPixelFormat128bppRGBFloat,   0x6fddc324, 0x4e03, 0x4bfe, 0xb1, 0x85, 0x3d, 0x77, 0x76, 0x8d, 0xc9, 0x1b);
 
- /* CMYK formats. */
+/* CMYK formats. */
 DEFINE_GUID(GUID_PKPixelFormat32bppCMYK, 0x6fddc324, 0x4e03, 0x4bfe, 0xb1, 0x85, 0x3d, 0x77, 0x76, 0x8d, 0xc9, 0x1c);
 
- /* Photon formats */
+/* Photon formats */
 DEFINE_GUID(GUID_PKPixelFormat64bppRGBAFixedPoint, 0x6fddc324, 0x4e03, 0x4bfe, 0xb1, 0x85, 0x3d, 0x77, 0x76, 0x8d, 0xc9, 0x1d);
 DEFINE_GUID(GUID_PKPixelFormat64bppRGBFixedPoint, 0x6fddc324, 0x4e03, 0x4bfe, 0xb1, 0x85, 0x3d, 0x77, 0x76, 0x8d, 0xc9, 0x40);
 DEFINE_GUID(GUID_PKPixelFormat128bppRGBAFixedPoint, 0x6fddc324, 0x4e03, 0x4bfe, 0xb1, 0x85, 0x3d, 0x77, 0x76, 0x8d, 0xc9, 0x1e);
@@ -360,7 +360,7 @@ typedef struct tagPKCodecFactory
 {
     ERR (*CreateCodec)(const PKIID*, void**);
     ERR (*CreateDecoderFromFile)(const char*, PKImageDecode**);
-	ERR (*CreateDecoderFromStream)(struct WMPStream*, PKImageDecode**);
+    ERR (*CreateDecoderFromStream)(struct WMPStream*, PKImageDecode**);
     ERR (*CreateFormatConverter)(PKFormatConverter**);
 
     ERR (*Release)(PKCodecFactory**);
@@ -446,7 +446,7 @@ typedef struct tagPKImageEncode
     U32 cbPhotoshopMetadataByteCount;
     DESCRIPTIVEMETADATA sDescMetadata;
 
-	Bool bWMP;//for the encoder in decoding
+    Bool bWMP;//for the encoder in decoding
 
     struct
     {
@@ -471,10 +471,10 @@ typedef struct tagPKImageEncode
         struct WMPStream   *pPATempFile;
     } WMP;
 
-	struct
-	{
-		JxrTestWrapperInitializeInfo info;
-	} WRAPPER;
+    struct
+    {
+        JxrTestWrapperInitializeInfo info;
+    } WRAPPER;
 
 #ifdef __ANSI__
 #undef PKImageEncode
@@ -603,8 +603,10 @@ ERR PKCodecFactory_CreateDecoderFromFile(const char* szFilename, PKImageDecode**
 typedef struct tagPKFormatConverter
 {
     ERR (*Initialize)(PKFormatConverter*, PKImageDecode*, char *pExt, PKPixelFormatGUID);
-    ERR (*InitializeConvert)(PKFormatConverter* pFC, const PKPixelFormatGUID enPFFrom,
-                             char *pExt, PKPixelFormatGUID enPFTTo);
+    ERR (*InitializeConvert)(
+        PKFormatConverter* pFC, 
+        const PKPixelFormatGUID enPFFrom,
+        char *pExt, PKPixelFormatGUID enPFTTo);
 
     ERR (*GetPixelFormat)(PKFormatConverter*, PKPixelFormatGUID*);
     ERR (*GetSourcePixelFormat)(PKFormatConverter*, PKPixelFormatGUID*);
@@ -638,9 +640,10 @@ ERR PKFormatConverter_Convert(PKFormatConverter* pFC, const PKRect* pRect, U8* p
 ERR PKFormatConverter_Release(PKFormatConverter** ppFC);
 
 // Think of this as static member of PKFormatConverter "class"
-ERR PKFormatConverter_EnumConversions(const PKPixelFormatGUID *pguidSourcePF,
-                                      const U32 iIndex,
-                                      const PKPixelFormatGUID **ppguidTargetPF);
+ERR PKFormatConverter_EnumConversions(
+    const PKPixelFormatGUID *pguidSourcePF,
+    const U32 iIndex,
+    const PKPixelFormatGUID **ppguidTargetPF);
 
 ERR PKCodecFactory_CreateFormatConverter(PKFormatConverter** ppFConverter);
 

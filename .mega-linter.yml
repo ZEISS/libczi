@@ -1,0 +1,20 @@
+# SPDX-FileCopyrightText: 2023 Carl Zeiss Microscopy GmbH
+#
+# SPDX-License-Identifier: LGPL-3.0-or-later
+# Configuration file for MegaLinter
+# See all available variables at https://megalinter.io/configuration/ and in linters documentation
+
+APPLY_FIXES: none
+DISABLE:
+  - COPYPASTE # Comment to enable checks of excessive copy-pastes
+  - SPELL # Comment to enable checks of spelling mistakes
+DISABLE_ERRORS_LINTERS:
+  - MARKDOWN_MARKDOWN_LINK_CHECK # Make non-blocking due to network timeouts etc.
+C_CPPLINT_ARGUMENTS: --verbose=2
+CPP_CPPLINT_ARGUMENTS: --verbose=2
+SHOW_ELAPSED_TIME: true
+FILEIO_REPORTER: false
+UPDATED_SOURCES_REPORTER: false
+TEXT_REPORTER: true
+EMAIL_REPORTER: false
+VALIDATE_ALL_CODEBASE: true

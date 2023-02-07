@@ -7,6 +7,7 @@
 #include <memory>
 #include <cstdint>
 #include <functional>
+#include <map>
 #include <type_traits>
 #include "libCZI.h"
 
@@ -19,11 +20,11 @@ namespace libCZI
     {
         /// This gives the "raw" zstd compression level aka "ExplicitLevel" (type: int32). If value is out-of-range, it will be clipped.
         /// This parameter is used with "zstd0" and "zstd1" compression schemes.
-        ZSTD_RAWCOMPRESSIONLEVEL = 1,   
+        ZSTD_RAWCOMPRESSIONLEVEL = 1,
 
         /// Whether to do the "lo-hi-byte-packing" preprocessing (type: boolean).
         /// This parameter is used with the "zstd1" compression scheme only.
-        ZSTD_PREPROCESS_DOLOHIBYTEPACKING = 2 
+        ZSTD_PREPROCESS_DOLOHIBYTEPACKING = 2
     };
 
     /// Simple variant type used for the compression-parameters-property-bag.
@@ -46,7 +47,7 @@ namespace libCZI
         /// Constructor for initializing the 'int32' type.
         ///
         /// \param  v   The value to set the variant to.
-        CompressParameter(std::int32_t v)
+        explicit CompressParameter(std::int32_t v)
         {
             this->SetInt32(v);
         }
@@ -54,7 +55,7 @@ namespace libCZI
         /// Constructor for initializing the 'uint32' type.
         ///
         /// \param  v   The value to set the variant to.
-        CompressParameter(std::uint32_t v)
+        explicit CompressParameter(std::uint32_t v)
         {
             this->SetUInt32(v);
         }
@@ -62,7 +63,7 @@ namespace libCZI
         /// Constructor for initializing the 'bool' type.
         ///
         /// \param  v   The value to set the variant to.
-        CompressParameter(bool v)
+        explicit CompressParameter(bool v)
         {
             this->SetBoolean(v);
         }
@@ -282,13 +283,13 @@ namespace libCZI
         ///
         /// \returns    A shared pointer to an object representing and owning a block of memory.
         static std::shared_ptr<IMemoryBlock> CompressZStd0Alloc(
-            std::uint32_t sourceWidth, 
-            std::uint32_t sourceHeight, 
-            std::uint32_t sourceStride, 
-            libCZI::PixelType sourcePixeltype, 
-            const void* source, 
-            const std::function<void* (size_t)>& allocateTempBuffer, 
-            const std::function<void(void*)>& freeTempBuffer, 
+            std::uint32_t sourceWidth,
+            std::uint32_t sourceHeight,
+            std::uint32_t sourceStride,
+            libCZI::PixelType sourcePixeltype,
+            const void* source,
+            const std::function<void* (size_t)>& allocateTempBuffer,
+            const std::function<void(void*)>& freeTempBuffer,
             const ICompressParameters* parameters);
 
         /// Compress the specified bitmap in "zstd0"-format. This method will compress the specified source-bitmap according to the "ZEN-zstd0-scheme" to
@@ -318,13 +319,13 @@ namespace libCZI
         /// \returns    True if it succeeds, and in this case the argument 'sizeDestination' will contain the size actual used in the output buffer.
         ///             False is returned in the case that the output buffer size was insufficient.
         static bool CompressZStd0(
-            std::uint32_t sourceWidth, 
-            std::uint32_t sourceHeight, 
-            std::uint32_t sourceStride, 
-            libCZI::PixelType sourcePixeltype, 
-            const void* source, 
-            void* destination, 
-            size_t& sizeDestination, 
+            std::uint32_t sourceWidth,
+            std::uint32_t sourceHeight,
+            std::uint32_t sourceStride,
+            libCZI::PixelType sourcePixeltype,
+            const void* source,
+            void* destination,
+            size_t& sizeDestination,
             const ICompressParameters* parameters);
 
         /// Compress the specified bitmap in "zstd0"-format. This method will compress the specified source-bitmap according to the "ZEN-zstd0-scheme" to
@@ -351,11 +352,11 @@ namespace libCZI
         /// \returns    True if it succeeds, and in this case the argument 'sizeDestination' will contain the size actual used in the output buffer.
         ///             False is returned in the case that the output buffer size was insufficient.
         static std::shared_ptr<IMemoryBlock> CompressZStd0Alloc(
-            std::uint32_t sourceWidth, 
-            std::uint32_t sourceHeight, 
-            std::uint32_t sourceStride, 
-            libCZI::PixelType sourcePixeltype, 
-            const void* source, 
+            std::uint32_t sourceWidth,
+            std::uint32_t sourceHeight,
+            std::uint32_t sourceStride,
+            libCZI::PixelType sourcePixeltype,
+            const void* source,
             const ICompressParameters* parameters);
 
         /// Calculates the maximum size which might be required (for the output buffer) when calling into "CompressZStd0".
@@ -443,13 +444,13 @@ namespace libCZI
         /// \param          parameters                           Property bag containing parameters controlling the operation. This argument can be null, in which case default parameters are used.                       
         /// \returns    A shared pointer to an object representing and owning a block of memory.
         static std::shared_ptr<IMemoryBlock> CompressZStd1Alloc(
-            std::uint32_t sourceWidth, 
-            std::uint32_t sourceHeight, 
-            std::uint32_t sourceStride, 
-            libCZI::PixelType sourcePixeltype, 
-            const void* source, 
-            const std::function<void* (size_t)>& allocateTempBuffer, 
-            const std::function<void(void*)>& freeTempBuffer, 
+            std::uint32_t sourceWidth,
+            std::uint32_t sourceHeight,
+            std::uint32_t sourceStride,
+            libCZI::PixelType sourcePixeltype,
+            const void* source,
+            const std::function<void* (size_t)>& allocateTempBuffer,
+            const std::function<void(void*)>& freeTempBuffer,
             const ICompressParameters* parameters);
 
         /// Compress the specified bitmap in "zstd1"-format. This method will compress the specified source-bitmap according to the "ZEN-zstd1-scheme" to
@@ -478,13 +479,13 @@ namespace libCZI
         /// \returns        True if it succeeds, and in this case the argument 'sizeDestination' will contain the size actual used in the output buffer. 
         ///                 False is returned in the case that the output buffer size was insufficient.
         static bool CompressZStd1(
-            std::uint32_t sourceWidth, 
-            std::uint32_t sourceHeight, 
-            std::uint32_t sourceStride, 
-            libCZI::PixelType sourcePixeltype, 
-            const void* source, 
-            void* destination, 
-            size_t& sizeDestination, 
+            std::uint32_t sourceWidth,
+            std::uint32_t sourceHeight,
+            std::uint32_t sourceStride,
+            libCZI::PixelType sourcePixeltype,
+            const void* source,
+            void* destination,
+            size_t& sizeDestination,
             const ICompressParameters* parameters);
 
         /// Compress the specified bitmap in "zstd1"-format. This method will compress the specified source-bitmap according to the "ZEN-zstd1-scheme" to newly allocated memory,
@@ -509,11 +510,11 @@ namespace libCZI
         /// \param          parameters                           Property bag containing parameters controlling the operation. This argument can be null, in which case default parameters are used.
         /// \returns    A shared pointer to an object representing and owning a block of memory.    
         static std::shared_ptr<IMemoryBlock> CompressZStd1Alloc(
-            std::uint32_t sourceWidth, 
-            std::uint32_t sourceHeight, 
-            std::uint32_t sourceStride, 
-            libCZI::PixelType sourcePixeltype, 
-            const void* source, 
+            std::uint32_t sourceWidth,
+            std::uint32_t sourceHeight,
+            std::uint32_t sourceStride,
+            libCZI::PixelType sourcePixeltype,
+            const void* source,
             const ICompressParameters* parameters);
     };
 

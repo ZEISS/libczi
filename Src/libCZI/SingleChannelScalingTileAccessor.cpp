@@ -147,10 +147,10 @@ std::vector<int> CSingleChannelScalingTileAccessor::CreateSortByZoom(const std::
 
 std::vector<CSingleChannelScalingTileAccessor::SbInfo> CSingleChannelScalingTileAccessor::GetSubSet(const libCZI::IntRect& roi, const libCZI::IDimCoordinate* planeCoordinate, const std::vector<int>* allowedScenes)
 {
-	std::vector<SbInfo> sblks;
-	this->sbBlkRepository->EnumSubset(planeCoordinate, &roi, false,
-		[&](int idx, const SubBlockInfo& info)->bool
-	{
+    std::vector<SbInfo> sblks;
+    this->sbBlkRepository->EnumSubset(planeCoordinate, &roi, false,
+        [&](int idx, const SubBlockInfo& info)->bool
+        {
             if (allowedScenes != nullptr)
             {
                 int sIndex;
@@ -165,14 +165,14 @@ std::vector<CSingleChannelScalingTileAccessor::SbInfo> CSingleChannelScalingTile
                 }
             }
 
-		SbInfo sbinfo;
-		sbinfo.logicalRect = info.logicalRect;
-		sbinfo.physicalSize = info.physicalSize;
-		sbinfo.mIndex = info.mIndex;
-		sbinfo.index = idx;
-		sblks.push_back(sbinfo);
-		return true;
-	});
+    SbInfo sbinfo;
+    sbinfo.logicalRect = info.logicalRect;
+    sbinfo.physicalSize = info.physicalSize;
+    sbinfo.mIndex = info.mIndex;
+    sbinfo.index = idx;
+    sblks.push_back(sbinfo);
+    return true;
+        });
 
     return sblks;
 }
@@ -213,21 +213,21 @@ void CSingleChannelScalingTileAccessor::InternalGet(libCZI::IBitmapData* bmDest,
     }
 
 
-	if (scenesInvolved.size() <= 1)
-	{
+    if (scenesInvolved.size() <= 1)
+    {
         // we only have to deal with a single scene (or: the document does not include a scene-dimension at all), in this
         //  case we do not have group by scene and save some cycles
         auto sbSetsortedByZoom = this->GetSubSetFilteredBySceneSortedByZoom(roi, planeCoordinate, scenesInvolved);
-		this->Paint(bmDest, roi, sbSetsortedByZoom, zoom);
-	}
-	else
-	{
+        this->Paint(bmDest, roi, sbSetsortedByZoom, zoom);
+    }
+    else
+    {
         const auto sbSetSortedByZoomPerScene = this->GetSubSetSortedByZoomPerScene(scenesInvolved, roi, planeCoordinate);
-		for (const auto& it : sbSetSortedByZoomPerScene)
-		{
-			this->Paint(bmDest, roi, get<1>(it), zoom);
-		}
-	}
+        for (const auto& it : sbSetSortedByZoomPerScene)
+        {
+            this->Paint(bmDest, roi, get<1>(it), zoom);
+        }
+    }
 }
 
 void CSingleChannelScalingTileAccessor::Paint(libCZI::IBitmapData* bmDest, const libCZI::IntRect& roi, const SubSetSortedByZoom& sbSetSortedByZoom, float zoom)

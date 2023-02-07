@@ -47,10 +47,10 @@
 extern "C" {
 #endif 
 
-	/* version specific fixes to bring sal.h upto date */
+/* version specific fixes to bring sal.h upto date */
 #if __SAL_H_FULL_VER <= 140050727
 
-	/* Missing from RTM sal.h */
+/* Missing from RTM sal.h */
 #if !defined(__midl) && defined(_PREFAST_) && _MSC_VER >= 1000
 
 #define __inexpressible_readableTo(size)  __declspec("SAL_readableTo(inexpressibleCount('" SPECSTRINGIZE(size) "'))")
@@ -143,7 +143,7 @@ extern "C" {
 #define __deref_opt_inout_xcount_opt(size)                      __deref_inout_xcount_opt(size)              __exceptthat __maybenull
 #define __deref_opt_inout_xcount_part_opt(size,length)          __deref_inout_xcount_part_opt(size,length)  __exceptthat __maybenull
 #define __deref_opt_inout_xcount_full_opt(size)                 __deref_inout_xcount_full_opt(size)         __exceptthat __maybenull
-	/* Must protect redfinitions of macros to workaround rc.exe issues. */
+/* Must protect redfinitions of macros to workaround rc.exe issues. */
 #ifndef RC_INVOKED
 #undef __nullnullterminated
 #define __nullnullterminated __xcount("string terminated by two nulls")
@@ -152,9 +152,9 @@ extern "C" {
 #endif
 #endif  //__SAL_H_FULL_VER <= 140050727
 
-	/************************************************************************
-	New extensions to sal.h follow here.
-	*************************************************************************/
+/************************************************************************
+New extensions to sal.h follow here.
+*************************************************************************/
 
 #if (_MSC_VER >= 1000) && !defined(__midl) && defined(_PREFAST_)
 #define __file_parser(typ)                  __declspec("SAL_file_parser(function, " #typ ")")    
@@ -164,7 +164,7 @@ extern "C" {
 #define __class_code_content(typ)           __declspec("SAL_class_code_content(" #typ ")")
 #define __analysis_assert(e)                __assume(e)
 #define __analysis_hint(hint)               __declspec("SAL_analysisHint(" #hint ")")   
-	/* Internal defintions */
+/* Internal defintions */
 #define __inner_data_source(src_raw)        __declspec("SAL_untrusted_data_source(" src_raw ")")
 #define __inner_this_data_source(src_raw)   __declspec("SAL_untrusted_data_source_this(" src_raw ")")
 #define __inner_out_validated(typ_raw)      __declspec("SAL_post") __declspec("SAL_validated(" typ_raw ")") 
@@ -190,7 +190,7 @@ extern "C" {
 #define __class_code_content(typ)
 #define __analysis_assert(e)
 #define __analysis_hint(hint)
-	/* Internal defintions */
+/* Internal defintions */
 #define __inner_data_source(src_raw)
 #define __inner_this_data_source(src_raw)
 #define __inner_out_validated(typ_raw)
@@ -237,17 +237,13 @@ extern "C" {
 #define __struct_xcount(size)               __field_xcount(size)
 
 #if !defined(__out_awcount)
-#define __out_awcount(expr,size)            __pre __notnull \
-					    __byte_writableTo((expr) ? (size) : (size) * 2) \
-                                            __post __valid __refparam
+#define __out_awcount(expr,size)            __pre __notnull __byte_writableTo((expr) ? (size) : (size) * 2) __post __valid __refparam
 #endif
 #if !defined(__in_awcount)
-#define __in_awcount(expr,size)             __pre __valid \
-                                            __pre __deref __readonly \
-				            __byte_readableTo((expr) ? (size) : (size) * 2)
+#define __in_awcount(expr,size)             __pre __valid __pre __deref __readonly __byte_readableTo((expr) ? (size) : (size) * 2)
 #endif
 
-	/* integer related macros */
+/* integer related macros */
 #define __allocator                         __inner_allocator
 #define __bound                             __inner_bound
 #define __range(lb,ub)                      __inner_range(lb,ub)
@@ -261,7 +257,7 @@ extern "C" {
 #define __field_range(lb,ub)                __range(lb,ub)
 #define __field_data_source(src_sym)        __inner_data_source(#src_sym)
 
-	/* Pentraion review macros */
+/* Pentraion review macros */
 #define __in_data_source(src_sym)           __pre __inner_data_source(#src_sym)
 #define __out_data_source(src_sym)          __post __inner_data_source(#src_sym)
 #define __out_validated(typ_sym)            __inner_out_validated(#typ_sym)
@@ -281,20 +277,20 @@ extern "C" {
 #define __out_transfer_adt_prop(arg)        __post __$adt_transfer_prop(arg)
 #define __out_has_type_adt_props(typ)       __post __$adt_type_props(typ)
 
-	/* useful PFD related macros */
+/* useful PFD related macros */
 #define __possibly_notnulltermiated         __post __$possibly_notnulltermiated
 
 #if defined(_WINDOWS_)
-	/* Windows Internal */
+/* Windows Internal */
 #define __volatile                          __$volatile
 #define __nonvolatile                       __$nonvolatile
 #define __deref_volatile                    __deref __volatile
 #define __deref_nonvolatile                 __deref __nonvolatile
 #endif
 
-	/* declare stub functions for macros */
-	__inner_assume_validated_dec
-		__inner_assume_bound_dec
+/* declare stub functions for macros */
+__inner_assume_validated_dec
+__inner_assume_bound_dec
 
 #define __assume_validated(p) __inner_assume_validated(p)
 #define __assume_bound(i) __inner_assume_bound(i)
@@ -339,5 +335,3 @@ void __pfx_assume(int, const char *);
 #endif
 
 #endif //_WMSPECSTRING_H_
-
-

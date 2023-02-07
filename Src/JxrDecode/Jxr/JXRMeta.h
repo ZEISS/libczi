@@ -1,14 +1,14 @@
 //*@@@+++@@@@******************************************************************
 //
-// Copyright © Microsoft Corp.
+// Copyright Â© Microsoft Corp.
 // All rights reserved.
 // 
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are met:
 // 
-// • Redistributions of source code must retain the above copyright notice,
+// â€¢ Redistributions of source code must retain the above copyright notice,
 //   this list of conditions and the following disclaimer.
-// • Redistributions in binary form must reproduce the above copyright notice,
+// â€¢ Redistributions in binary form must reproduce the above copyright notice,
 //   this list of conditions and the following disclaimer in the documentation
 //   and/or other materials provided with the distribution.
 // 
@@ -227,12 +227,12 @@ EXTERN_C ERR WriteWmpDE(
 );
 
 
-EXTERN_C ERR ReadPropvar(__in_ecount(1) struct WMPStream* pWS,
-                         const __in_win U16 uType,
-                         const __in_win U32 uCount,
-                         const __in_win U32 uValue,
-                         __out_win DPKPROPVARIANT *pvar);
-
+EXTERN_C ERR ReadPropvar(
+    __in_ecount(1) struct WMPStream* pWS,
+    const __in_win U16 uType,
+    const __in_win U32 uCount,
+    const __in_win U32 uValue,
+    __out_win DPKPROPVARIANT* pvar);
 
 
 // read and write little endian words/dwords from a buffer on both big and little endian cpu's

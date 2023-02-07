@@ -29,7 +29,7 @@ std::vector<std::string> wrap(const char* text, size_t line_length/* = 72*/);
 const wchar_t* skipWhiteSpaceAndOneOfThese(const wchar_t* s, const wchar_t* charToSkipOnce);
 const char* skipWhiteSpaceAndOneOfThese(const char* s, const char* charsToSkipOnce);
 
-std::ostream& operator<<(std::ostream& os, const GUID& guid); 
+std::ostream& operator<<(std::ostream& os, const GUID& guid);
 
 bool TryParseGuid(const std::wstring& str, GUID* g);
 

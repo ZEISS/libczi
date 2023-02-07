@@ -1433,35 +1433,35 @@ ERR BlackWhite_Gray8(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cb
 {
     const I32 iHeight = pRect->Height;
     const I32 iWidth = pRect->Width;
-	Bool bBlackWhite = pFC->pDecoder->WMP.wmiSCP.bBlackWhite;
+    Bool bBlackWhite = pFC->pDecoder->WMP.wmiSCP.bBlackWhite;
     I32 y;
 
     // Stride is assumed to be same for src/dst
     for (y = iHeight - 1; y >= 0; y--)
     {
         I32 x;
-		I32 n;
+        I32 n;
         U8 *piDstPixel = (pb + cbStride*y);
         const U8 *piSrcPixel = (U8*)piDstPixel;
 
-		if (iWidth % 8 != 0)
-		{
-			const U8 v = piSrcPixel[iWidth / 8];
+        if (iWidth % 8 != 0)
+        {
+            const U8 v = piSrcPixel[iWidth / 8];
 
-			for (n = 0; n < iWidth % 8; n++)
-			{
-				piDstPixel[iWidth/8*8+n] = (((v >> (7 - n)) & 0x1) != 0) ^ bBlackWhite ? 0xFF : 0x00;
-			}
-		}
+            for (n = 0; n < iWidth % 8; n++)
+            {
+                piDstPixel[iWidth/8*8+n] = (((v >> (7 - n)) & 0x1) != 0) ^ bBlackWhite ? 0xFF : 0x00;
+            }
+        }
 
         for (x = iWidth / 8 - 1; x >= 0; x--)
         {
             const U8 v = piSrcPixel[x];
 
-			for (n = 0; n < 8; n++)
-			{
+            for (n = 0; n < 8; n++)
+            {
                 piDstPixel[8*x+n] = (((v >> (7 - n)) & 0x1) != 0) ^ bBlackWhite ? 0xFF : 0x00;
-			}
+            }
         }
     }
     
@@ -2141,8 +2141,8 @@ static PKPixelConverterInfo s_pcInfo[] = {
     {&GUID_PKPixelFormat32bppPRGBA, &GUID_PKPixelFormat32bppPBGRA, RGBA32_BGRA32}, // Fwd
     {&GUID_PKPixelFormat32bppPBGRA, &GUID_PKPixelFormat32bppPRGBA, BGRA32_RGBA32}, // Rev
 
-	// conversions to 8bppGray / 24bppRGB / 32bppRGBA
-	{&GUID_PKPixelFormatBlackWhite, &GUID_PKPixelFormat8bppGray, BlackWhite_Gray8},
+    // conversions to 8bppGray / 24bppRGB / 32bppRGBA
+    {&GUID_PKPixelFormatBlackWhite, &GUID_PKPixelFormat8bppGray, BlackWhite_Gray8},
     {&GUID_PKPixelFormat16bppGray, &GUID_PKPixelFormat8bppGray, Gray16_Gray8},
     {&GUID_PKPixelFormat48bppRGB, &GUID_PKPixelFormat24bppRGB, RGB48_RGB24},
     {&GUID_PKPixelFormat64bppRGBA, &GUID_PKPixelFormat32bppRGBA, RGBA64_RGBA32},
@@ -2178,13 +2178,13 @@ typedef struct tagPKPixelConverter2Info
 } PKPixelConverter2Info;
 
 static PKPixelConverter2Info s_pcInfo2[] = {
-	// This allows us to view an RGBA input file as RGB, for when we create a planar alpha file
-	{&GUID_PKPixelFormat128bppRGBFloat, &GUID_PKPixelFormat128bppRGBAFloat},
-	// 16- and 32-bpp RGB input files are given the "DontCare" GUID, so the next three 
-	// from/to combinations are ok, and allowed on encoding: 
-	{&GUID_PKPixelFormatDontCare, &GUID_PKPixelFormat16bppRGB555},
-	{&GUID_PKPixelFormatDontCare, &GUID_PKPixelFormat16bppRGB565},
-	{&GUID_PKPixelFormatDontCare, &GUID_PKPixelFormat32bppBGRA}
+    // This allows us to view an RGBA input file as RGB, for when we create a planar alpha file
+    {&GUID_PKPixelFormat128bppRGBFloat, &GUID_PKPixelFormat128bppRGBAFloat},
+    // 16- and 32-bpp RGB input files are given the "DontCare" GUID, so the next three 
+    // from/to combinations are ok, and allowed on encoding: 
+    {&GUID_PKPixelFormatDontCare, &GUID_PKPixelFormat16bppRGB555},
+    {&GUID_PKPixelFormatDontCare, &GUID_PKPixelFormat16bppRGB565},
+    {&GUID_PKPixelFormatDontCare, &GUID_PKPixelFormat32bppBGRA}
 };
 
 ERR PKFormatConverter_Initialize(PKFormatConverter* pFC, PKImageDecode* pID, char *pExt, PKPixelFormatGUID enPF)

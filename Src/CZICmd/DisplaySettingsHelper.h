@@ -80,9 +80,9 @@ public:
                 *data = libCZI::Utils::CalcSplineDataFromPoints(
                     (int)this->chDisplSettings.splinePoints.size(),
                     [&](int idx)->std::tuple<double, double>
-                {
-                    return this->chDisplSettings.splinePoints.at(idx);
-                });
+                    {
+                        return this->chDisplSettings.splinePoints.at(idx);
+                    });
             }
 
             return true;

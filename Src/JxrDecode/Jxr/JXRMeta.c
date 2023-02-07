@@ -308,10 +308,10 @@ ERR StreamCalcIFDSize(struct WMPStream* pWS, U32 uIFDOfs, U32 *pcbifd)
     *pcbifd = cbifd;
 
 Cleanup:
-	if (GetPosOK)
-	{
-		Call(pWS->SetPos(pWS, offCurPos));
-	}
+    if (GetPosOK)
+    {
+        Call(pWS->SetPos(pWS, offCurPos));
+    }
     return ( err );
 }
 
@@ -581,10 +581,10 @@ ERR StreamCopyIFD(struct WMPStream* pWS, U32 ofssrc, U8* pbdst, U32 cbdst, U32* 
     *pofsdst = ofsdstnextdata;
 
 Cleanup:
-	if (GetPosOK)
-	{
-		Call(pWS->SetPos(pWS, offCurPos));
-	}
+    if (GetPosOK)
+    {
+        Call(pWS->SetPos(pWS, offCurPos));
+    }
     return err;
 }
 
@@ -818,10 +818,10 @@ ERR WriteWmpDE(
                     Call(pWS->SetPos(pWS, pDE->uValueOrOffset));
                     Call(pWS->Write(pWS, pbData, pDE->uCount));
                     Call(pWS->SetPos(pWS, offPos));
-					if (pcbDataWrittenToOffset)
-					{
-						*pcbDataWrittenToOffset = pDE->uCount;
-					}
+                    if (pcbDataWrittenToOffset)
+                    {
+                        *pcbDataWrittenToOffset = pDE->uCount;
+                    }
                 }
             }
             break;

@@ -309,3 +309,4 @@ cmake-build-debug/
 /Src/.vscode
 /CMakeSettings.json
 /Src/Build/html
+megalinter-reports/

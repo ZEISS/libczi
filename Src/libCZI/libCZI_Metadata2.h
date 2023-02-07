@@ -6,97 +6,98 @@
 
 #include <cstdint>
 #include <string>
-
+#include <vector>
+#include <memory>
 #include "libCZI.h"
 
 namespace libCZI
 {
     /// Values that represent the type of a channel.
     /// This field (in a sense) has the highest precedence when determining/assigning
-    ///	the microscopy method how a channel was acquired. Usually, the AcquisitionMode-field
-    ///	is used to give an indication which microscopy method was used. But if this field
-    ///	"ChannelType" is present, it has higher precedence - i.e. it should be checked first.
+    /// the microscopy method how a channel was acquired. Usually, the AcquisitionMode-field
+    /// is used to give an indication which microscopy method was used. But if this field
+    /// "ChannelType" is present, it has higher precedence - i.e. it should be checked first.
     enum class DimensionChannelChannelType : std::uint8_t
     {
-        Heightmap,								///< This channel represents a heightmap. Note that additional restrictions apply when declaring a channel as heightmap.
-        PalHR,									///< Unknown denotation.
-        PalWidefield,							///< Unknown denotation.
-        SimHR,									///< Unknown denotation.
-        SimWidefield,							///< Unknown denotation.
-        SimDWF,									///< Unknown denotation.
-        AiryScanSum,							///< This channel contains a processed (combined) super-resolution from an Airy-scan-acquisition in draft quality.
-        AiryScanRawSr,							///< This channel contains the images of all sensors in the Airy-Scan-sensor-array.
-        AiryScanRaw,							///< This channel contains the images of all sensors in the Airy-Scan-sensor-array.
-        AiryScanSr,								///< This channel contains the (processed) super-resolution image.
-        AiryScanVp,								///< This channel contains the (processed) "virtual pinhole" image.
-        AiryScanMb,								///< This channel contains the (processed) "multi-beam" image.
-        AiryScanRingSheppardSum,				///< This channel contains the Sheppard-sum created from 4 fiber-rings.
-        OnlineUnmixing,							///< This channel contains the result of an online unmixing acquisition with a laser-scanning microscope.
-        Unspecified								///< Unspecified type.
+        Heightmap,                              ///< This channel represents a heightmap. Note that additional restrictions apply when declaring a channel as heightmap.
+        PalHR,                                  ///< Unknown denotation.
+        PalWidefield,                           ///< Unknown denotation.
+        SimHR,                                  ///< Unknown denotation.
+        SimWidefield,                           ///< Unknown denotation.
+        SimDWF,                                 ///< Unknown denotation.
+        AiryScanSum,                            ///< This channel contains a processed (combined) super-resolution from an Airy-scan-acquisition in draft quality.
+        AiryScanRawSr,                          ///< This channel contains the images of all sensors in the Airy-Scan-sensor-array.
+        AiryScanRaw,                            ///< This channel contains the images of all sensors in the Airy-Scan-sensor-array.
+        AiryScanSr,                             ///< This channel contains the (processed) super-resolution image.
+        AiryScanVp,                             ///< This channel contains the (processed) "virtual pinhole" image.
+        AiryScanMb,                             ///< This channel contains the (processed) "multi-beam" image.
+        AiryScanRingSheppardSum,                ///< This channel contains the Sheppard-sum created from 4 fiber-rings.
+        OnlineUnmixing,                         ///< This channel contains the result of an online unmixing acquisition with a laser-scanning microscope.
+        Unspecified                             ///< Unspecified type.
     };
 
     /// Values that represent the acquisition mode of a channel.
     /// The acquisition mode describes the type of microscopy performed for each channel.
     enum class DimensionChannelAcquisitionMode : std::uint8_t
     {
-        WideField,							///< The channel contains images from wide field microscopy.
-        LaserScanningConfocalMicroscopy,	///< The channel contains images from laser-scanning-confocal microscopy.
-        SpinningDiskConfocal,				///< The channel contains images from a confocal spinning-disk system.
-        SlitScanConfocal,					///< Unknown denotation.
-        MultiPhotonMicroscopy,				///< The channel contains images an image from a multi-photon-microscopy system.
-        StructuredIllumination,				///< The channel contains images from structured-illumination microscopy system.
-        SingleMoleculeImaging,				///< meaning unknown
-        TotalInternalReflection,			///< The channel contains images from a TIRF microscopy system.
-        FluorescenceLifetime,				///< Unknown denotation.
-        SpectralImaging,					///< Unknown denotation.
+        WideField,                          ///< The channel contains images from wide field microscopy.
+        LaserScanningConfocalMicroscopy,    ///< The channel contains images from laser-scanning-confocal microscopy.
+        SpinningDiskConfocal,               ///< The channel contains images from a confocal spinning-disk system.
+        SlitScanConfocal,                   ///< Unknown denotation.
+        MultiPhotonMicroscopy,              ///< The channel contains images an image from a multi-photon-microscopy system.
+        StructuredIllumination,             ///< The channel contains images from structured-illumination microscopy system.
+        SingleMoleculeImaging,              ///< meaning unknown
+        TotalInternalReflection,            ///< The channel contains images from a TIRF microscopy system.
+        FluorescenceLifetime,               ///< Unknown denotation.
+        SpectralImaging,                    ///< Unknown denotation.
         FluorescenceCorrelationSpectroscopy,///< Unknown denotation.
         NearFieldScanningOpticalMicroscopy, ///< Unknown denotation.
-        SecondHarmonicGenerationImaging,	///< The channel contains images from Second harmonic imaging microscopy (SHIM).
-        PALM,								///< The channel contains images from photo-activation localization microscopy.
-        STORM,								///< The channel contains images from stochastic optical reconstruction microscopy.
-        STED,								///< The channel contains images from stimulated emission depletion microscopy.
-        TIRF,								///< The channel contains images from total internal reflection fluorescence (TIRFM).
-        FSM,								///< The channel contains images from Fluorescence speckle microscopy.
-        LCM,								///< The channel contains images from laser capture micro dissection.
-        SPIM,								///< The channel contains images from selective-plane-illumination microscopy.
-        SEM,								///< The channel contains images from scanning electron microscopy.
-        FIB,								///< The channel contains images from focus ion beam microscopy.
-        FIB_SEM,							///< The channel contains images from focus ion beam and scanning electron microscopy.
-        ApertureCorrelation,				///< The channel contains image from aperture correlation (a specific application of Structured Illumination).
-        Other								///< Some other type of image formation.
+        SecondHarmonicGenerationImaging,    ///< The channel contains images from Second harmonic imaging microscopy (SHIM).
+        PALM,                               ///< The channel contains images from photo-activation localization microscopy.
+        STORM,                              ///< The channel contains images from stochastic optical reconstruction microscopy.
+        STED,                               ///< The channel contains images from stimulated emission depletion microscopy.
+        TIRF,                               ///< The channel contains images from total internal reflection fluorescence (TIRFM).
+        FSM,                                ///< The channel contains images from Fluorescence speckle microscopy.
+        LCM,                                ///< The channel contains images from laser capture micro dissection.
+        SPIM,                               ///< The channel contains images from selective-plane-illumination microscopy.
+        SEM,                                ///< The channel contains images from scanning electron microscopy.
+        FIB,                                ///< The channel contains images from focus ion beam microscopy.
+        FIB_SEM,                            ///< The channel contains images from focus ion beam and scanning electron microscopy.
+        ApertureCorrelation,                ///< The channel contains image from aperture correlation (a specific application of Structured Illumination).
+        Other                               ///< Some other type of image formation.
     };
 
     /// Values that represent the method of illumination used to acquire the channel.
     enum class DimensionChannelIlluminationType : std::uint8_t
     {
-        Transmitted,						///< Transmitted light was used.
-        Epifluorescence,					///< Objective was used to bring light to the specimen.
-        Oblique,							///< Oblique light was used.
-        NonLinear,							///< Unknown denotation.
-        Other								///< Some other type of illumination was used.
+        Transmitted,                        ///< Transmitted light was used.
+        Epifluorescence,                    ///< Objective was used to bring light to the specimen.
+        Oblique,                            ///< Oblique light was used.
+        NonLinear,                          ///< Unknown denotation.
+        Other                               ///< Some other type of illumination was used.
     };
 
     /// Values that represent a contrast method, a technique used to achieve contrast, for the images in a channel.
     enum class DimensionChannelContrastMethod : std::uint8_t
     {
-        Brightfield,				///< Bright filed micrsocopy was used.
-        Phase,						///< Unknown denotation.
-        DIC,						///< Differential Interference Contrast was used.
-        HoffmanModulation,			///< Hoffman Modulation Contrast (HMC) was used.
-        ObliqueIllumination,		///< Oblique illumination was used.
-        PolarizedLight,				///< Polarization microscopy was used.
-        Darkfield,					///< Dark Field Imaging was used.
-        Fluorescence,				///< Fluorescence microscopy was used.
-        MultiPhotonFluorescence,	///< Multi-photon excitation was employed.
-        Other						///< Some other contrast method was used.
+        Brightfield,                ///< Bright filed micrsocopy was used.
+        Phase,                      ///< Unknown denotation.
+        DIC,                        ///< Differential Interference Contrast was used.
+        HoffmanModulation,          ///< Hoffman Modulation Contrast (HMC) was used.
+        ObliqueIllumination,        ///< Oblique illumination was used.
+        PolarizedLight,             ///< Polarization microscopy was used.
+        Darkfield,                  ///< Dark Field Imaging was used.
+        Fluorescence,               ///< Fluorescence microscopy was used.
+        MultiPhotonFluorescence,    ///< Multi-photon excitation was employed.
+        Other                       ///< Some other contrast method was used.
     };
 
     /// Values that represent the pinhole geometry.
     enum class DimensionChannelPinholeGeometry : std::uint8_t
     {
-        Circular,		///< An enum constant representing a circular pinhole.
-        Rectangular,	///< An enum constant representing a rectangular pinhole.
-        Other			///< An enum constant representing "some other geometry".
+        Circular,       ///< An enum constant representing a circular pinhole.
+        Rectangular,    ///< An enum constant representing a rectangular pinhole.
+        Other           ///< An enum constant representing "some other geometry".
     };
 
     /// This struct represents either a single value or a range.
@@ -120,7 +121,7 @@ namespace libCZI
         enum class InformationType
         {
             SinglePeak, ///< An enum constant representing that a single peak is characterized.
-            Ranges		///< An enum constant representing that a set of ranges are used to characterize the spectrum.
+            Ranges      ///< An enum constant representing that a set of ranges are used to characterize the spectrum.
         };
 
         /// The type of information given.
@@ -345,7 +346,7 @@ namespace libCZI
         /// \returns The ratio.
         virtual std::shared_ptr<IDimensionChannelRatio> GetRatio() = 0;
 
-        virtual ~IDimensionChannelInfo() override = default;
+        ~IDimensionChannelInfo() override = default;
     };
 
     /// Information about the set of channels.
@@ -367,27 +368,27 @@ namespace libCZI
     /// Values that represent the binning mode of a detector.
     enum class ChannelDetectorSettingsBinning : std::uint8_t
     {
-        _1x1,	///< 1x1 pixels are used (i.e. no binning).
-        _2x2,	///< 2x2 pixels are used.
-        _4x4,	///< 4x4 pixels are used.
-        _8x8,	///< 8x8 pixels are used.
-        Other	///< Some other binning was used.
+        _1x1,   ///< 1x1 pixels are used (i.e. no binning).
+        _2x2,   ///< 2x2 pixels are used.
+        _4x4,   ///< 4x4 pixels are used.
+        _8x8,   ///< 8x8 pixels are used.
+        Other   ///< Some other binning was used.
     };
 
     /// Values that represent the behavior of the shutter.
     enum class ChannelDetectorSettingsShutter : std::uint8_t
     {
-        Rolling,	///< A rolling shutter mode was used.
-        Global,		///< A global shutter mode was used.
-        Other		///< Some other shutter mode was used.
+        Rolling,    ///< A rolling shutter mode was used.
+        Global,     ///< A global shutter mode was used.
+        Other       ///< Some other shutter mode was used.
     };
 
     /// Values that represent the detector processing mode.
     enum class ChannelDetectorCameraProcessingMode :std::uint8_t
     {
-        None,		///< No camera processing was used.
+        None,       ///< No camera processing was used.
         Widefield,  ///< Widefield processing mode was used.
-        Sectioned,	///< Sectioned processing mode was used.
+        Sectioned,  ///< Sectioned processing mode was used.
         RawDataMode ///< Raw data mode was used.
     };
 
@@ -482,7 +483,7 @@ namespace libCZI
         struct Polarization
         {
             bool stokesParameterValid[4];   ///< A boolean array, indicating whether the corresponding values are valid.
-            double stokesParameter[4];		///< The stokes parameters, for validity of a value check the corresponding boolean.
+            double stokesParameter[4];      ///< The stokes parameters, for validity of a value check the corresponding boolean.
         };
 
         /// Try to get the light source reference
@@ -543,7 +544,7 @@ namespace libCZI
         virtual ~IDimensionChannelLightSourcesSetting() = default;
     };
 
-        /// The light sources settings keyed by channel index.
+    /// The light sources settings keyed by channel index.
     class IDimensionChannelLightSourcesSettings
     {
     public:
@@ -588,12 +589,12 @@ namespace libCZI
     /// Values that represent the laser scanning mode.
     enum class DimensionChannelLaserScanScanningMode : std::uint8_t
     {
-        Frame,				///< An enum constant representing the frame scanning mode.
-        FastFrame,			///< An enum constant representing the fast frame scanning mode.
-        LineSequential,		///< An enum constant representing the line sequential scanning mode.
-        Line,				///< An enum constant representing the line scanning mode.
-        Spot,				///< An enum constant representing the spot scanning mode.
-        Other				///< An enum constant representing some other scanning mode was used.
+        Frame,              ///< An enum constant representing the frame scanning mode.
+        FastFrame,          ///< An enum constant representing the fast frame scanning mode.
+        LineSequential,     ///< An enum constant representing the line sequential scanning mode.
+        Line,               ///< An enum constant representing the line scanning mode.
+        Spot,               ///< An enum constant representing the spot scanning mode.
+        Other               ///< An enum constant representing some other scanning mode was used.
     };
 
     /// Values that represent the laser scan direction.
@@ -607,16 +608,16 @@ namespace libCZI
     enum class DimensionChannelLaserScanAveragingMethod : std::uint8_t
     {
         Mean,   ///< An enum constant representing the mean laser scan averaging method.
-        Sum,	///< An enum constant representing the sum laser scan averaging method.
-        Other	///< An enum constant representing that some other averaging method was used.
+        Sum,    ///< An enum constant representing the sum laser scan averaging method.
+        Other   ///< An enum constant representing that some other averaging method was used.
     };
 
     /// Values that represent the laser scan averaging mode.
     enum class DimensionChannelLaserScanAveragingMode : std::uint8_t
     {
         Frame,  ///< An enum constant representing the frame laser scan averaging mode.
-        Line,	///< An enum constant representing the line laser scan averaging mode.
-        Other	///< An enum constant representing that some other line laser scan averaging mode was used.
+        Line,   ///< An enum constant representing the line laser scan averaging mode.
+        Other   ///< An enum constant representing that some other line laser scan averaging mode was used.
     };
 
     /// Values that represent the channel laser scan laser attenuator state.
@@ -745,7 +746,7 @@ namespace libCZI
     {
         Gauss,  ///< An enum constant representing the Gauss beam type.
         Bessel, ///< An enum constant representing the Bessel beam type.
-        Other	///< An enum constant representing some other beam type.
+        Other   ///< An enum constant representing some other beam type.
     };
 
     class IInstrumentObjectiveSettings;
@@ -793,11 +794,11 @@ namespace libCZI
         /// Values that represent the medium.
         enum class Medium : std::uint8_t
         {
-            Air,			///< An enum constant representing the medium air.
-            Oil,			///< An enum constant representing the medium oil.
-            Water,			///< An enum constant representing the medium water.
-            Glycerol,		///< An enum constant representing the medium glycerol.
-            Other			///< An enum constant representing that some other medium was used.
+            Air,            ///< An enum constant representing the medium air.
+            Oil,            ///< An enum constant representing the medium oil.
+            Water,          ///< An enum constant representing the medium water.
+            Glycerol,       ///< An enum constant representing the medium glycerol.
+            Other           ///< An enum constant representing that some other medium was used.
         };
 
         /// Try to get reference to the objective.
@@ -986,7 +987,7 @@ namespace libCZI
         struct Vector
         {
             double x;   ///< The x coordinate.
-            double y;	///< The y coordinate.
+            double y;   ///< The y coordinate.
         };
 
         /// Try to get the illumination line in pixels.
@@ -1025,9 +1026,9 @@ namespace libCZI
         enum class Mode :std::uint8_t
         {
             SuperResolution,    ///< An enum constant representing the super resolution option.
-            VirtualPinhole,		///< An enum constant representing the virtual pinhole option.
-            MultiBeam,			///< An enum constant representing the multi beam option.
-            Off					///< An enum constant representing the off option.
+            VirtualPinhole,     ///< An enum constant representing the virtual pinhole option.
+            MultiBeam,          ///< An enum constant representing the multi beam option.
+            Off                 ///< An enum constant representing the off option.
         };
 
         /// Try to get the mode.
@@ -1078,34 +1079,34 @@ namespace libCZI
     public:
         /// The type of an online calculation where the channel is the destination.
         ///
-        ///		The following values are possible :
+        ///     The following values are possible :
         ///
-        ///		NoOnlineCalculation - The data channel receives raw scan data.
-        ///			OnlineRatio - (S1 + C1) / (S2 + C2) * C3 + C4
-        ///			OnlineSubtraction - (S1 * C1 - S2 * C3) / C2 + C4
-        ///			OnlineSubtractionRatio - (S1 - S2 * C1) / (S1 + S2 * C2) * C3 + C4
-        ///			OnlineHillFunction - C3 * (C4 / C5) * (S1 - C1) / (C2 - S2)
-        ///			OnlineReferenceRatio - (S1 - S2 + C1) / (S2 - C2) * C3 + C4
-        ///			OnlineLinearUnmixing - The Linear Unmixing processing.
+        ///     NoOnlineCalculation - The data channel receives raw scan data.
+        ///         OnlineRatio - (S1 + C1) / (S2 + C2) * C3 + C4
+        ///         OnlineSubtraction - (S1 * C1 - S2 * C3) / C2 + C4
+        ///         OnlineSubtractionRatio - (S1 - S2 * C1) / (S1 + S2 * C2) * C3 + C4
+        ///         OnlineHillFunction - C3 * (C4 / C5) * (S1 - C1) / (C2 - S2)
+        ///         OnlineReferenceRatio - (S1 - S2 + C1) / (S2 - C2) * C3 + C4
+        ///         OnlineLinearUnmixing - The Linear Unmixing processing.
         ///
-        ///			The operands and constants are :
+        ///         The operands and constants are :
         ///
-        ///		    S1 - Source1
-        ///			S2 - Source2
-        ///			C1 - RatioConstant1
-        ///			C2 - RatioConstant2
-        ///			C3 - RatioConstant3
-        ///			C4 - RatioConstant4
-        ///			C5 - RatioConstant5
+        ///         S1 - Source1
+        ///         S2 - Source2
+        ///         C1 - RatioConstant1
+        ///         C2 - RatioConstant2
+        ///         C3 - RatioConstant3
+        ///         C4 - RatioConstant4
+        ///         C5 - RatioConstant5
         enum class Type : std::uint8_t
         {
-            NoOnlineCalculation,		///< An enum constant representing the "no online calculation option".
-            OnlineRatio,				///< An enum constant representing the "online ratio calculation option".
-            OnlineSubtraction,			///< An enum constant representing the "online subtraction calculation option".
-            OnlineSubtractionRatio,		///< An enum constant representing the "online subtraction and ratio calculation option".
-            OnlineHillFunction,			///< An enum constant representing the "online Hill function calculation option".
-            OnlineReferenceRatio,		///< An enum constant representing the "online reference ratio calculation option".
-            OnlineLinearUnmixing		///< An enum constant representing the "online un-mixing calculation option".
+            NoOnlineCalculation,        ///< An enum constant representing the "no online calculation option".
+            OnlineRatio,                ///< An enum constant representing the "online ratio calculation option".
+            OnlineSubtraction,          ///< An enum constant representing the "online subtraction calculation option".
+            OnlineSubtractionRatio,     ///< An enum constant representing the "online subtraction and ratio calculation option".
+            OnlineHillFunction,         ///< An enum constant representing the "online Hill function calculation option".
+            OnlineReferenceRatio,       ///< An enum constant representing the "online reference ratio calculation option".
+            OnlineLinearUnmixing        ///< An enum constant representing the "online un-mixing calculation option".
         };
 
         /// Try to get the type.

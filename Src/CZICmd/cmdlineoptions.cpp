@@ -488,15 +488,15 @@ CCmdLineOptions::ParseResult CCmdLineOptions::Parse(int argc, char** argv)
     // specify the string-to-enum-mapping for "command"
     std::map<string, Command> map_string_to_command
     {
-        { "PrintInformation",					Command::PrintInformation },
-        { "ExtractSubBlock",					Command::ExtractSubBlock },
-        { "SingleChannelTileAccessor",			Command::SingleChannelTileAccessor },
-        { "ChannelComposite",					Command::ChannelComposite },
-        { "SingleChannelPyramidTileAccessor",	Command::SingleChannelPyramidTileAccessor },
+        { "PrintInformation",                   Command::PrintInformation },
+        { "ExtractSubBlock",                    Command::ExtractSubBlock },
+        { "SingleChannelTileAccessor",          Command::SingleChannelTileAccessor },
+        { "ChannelComposite",                   Command::ChannelComposite },
+        { "SingleChannelPyramidTileAccessor",   Command::SingleChannelPyramidTileAccessor },
         { "SingleChannelScalingTileAccessor",   Command::SingleChannelScalingTileAccessor },
-        { "ScalingChannelComposite",			Command::ScalingChannelComposite },
+        { "ScalingChannelComposite",            Command::ScalingChannelComposite },
         { "ExtractAttachment",                  Command::ExtractAttachment},
-        { "CreateCZI",							Command::CreateCZI },
+        { "CreateCZI",                          Command::CreateCZI },
     };
 
     const static PlaneCoordinateValidator plane_coordinate_validator;
@@ -548,28 +548,30 @@ CCmdLineOptions::ParseResult CCmdLineOptions::Parse(int argc, char** argv)
     string argument_generatorpixeltype;
     bool argument_versionflag = false;
 
+    // editorconfig-checker-disable
     cli_app.add_option("-c,--command", argument_command,
         R"(COMMAND can be one of 'PrintInformation', 'ExtractSubBlock', 'SingleChannelTileAccessor', 'ChannelComposite',
-    	   'SingleChannelPyramidTileAccessor', 'SingleChannelScalingTileAccessor', 'ScalingChannelComposite', 'ExtractAttachment' and 'CreateCZI'.
-    	   \N'PrintInformation' will print information about the CZI-file to the console. The argument 'info-level' can be used
-    	   to specify which information is to be printed.
-    	   \N'ExtractSubBlock' will write the bitmap contained in the specified sub-block to the OUTPUTFILE.
-    	   \N'ChannelComposite' will create a
-    	   channel-composite of the specified region and plane and apply display-settings to it. The resulting bitmap will be written
-    	   to the specified OUTPUTFILE.
-    	   \N'SingleChannelTileAccessor' will create a tile-composite (only from sub-blocks on pyramid-layer 0) of the specified region and plane.
-    	   The resulting bitmap will be written to the specified OUTPUTFILE.
-    	   \N'SingleChannelPyramidTileAccessor' adds to the previous command the ability to explictely address a specific pyramid-layer (which must
-    	   exist in the CZI-document).
-    	   \N'SingleChannelScalingTileAccessor' gets the specified region with an arbitrary zoom factor. It uses the pyramid-layers in the CZI-document
-    	   and scales the bitmap if neccessary. The resulting bitmap will be written to the specified OUTPUTFILE.
-    	   \N'ScalingChannelComposite' operates like the previous command, but in addition gets all channels and creates a multi-channel-composite from them
-    	   using display-settings.
-    	   \N'ExtractAttachment' allows to extract (and save to a file) the contents of attachments.)
-    	   \N'CreateCZI' is used to demonstrate the CZI-creation capabilities of libCZI.)")
+           'SingleChannelPyramidTileAccessor', 'SingleChannelScalingTileAccessor', 'ScalingChannelComposite', 'ExtractAttachment' and 'CreateCZI'.
+           \N'PrintInformation' will print information about the CZI-file to the console. The argument 'info-level' can be used
+           to specify which information is to be printed.
+           \N'ExtractSubBlock' will write the bitmap contained in the specified sub-block to the OUTPUTFILE.
+           \N'ChannelComposite' will create a
+           channel-composite of the specified region and plane and apply display-settings to it. The resulting bitmap will be written
+           to the specified OUTPUTFILE.
+           \N'SingleChannelTileAccessor' will create a tile-composite (only from sub-blocks on pyramid-layer 0) of the specified region and plane.
+           The resulting bitmap will be written to the specified OUTPUTFILE.
+           \N'SingleChannelPyramidTileAccessor' adds to the previous command the ability to explictely address a specific pyramid-layer (which must
+           exist in the CZI-document).
+           \N'SingleChannelScalingTileAccessor' gets the specified region with an arbitrary zoom factor. It uses the pyramid-layers in the CZI-document
+           and scales the bitmap if neccessary. The resulting bitmap will be written to the specified OUTPUTFILE.
+           \N'ScalingChannelComposite' operates like the previous command, but in addition gets all channels and creates a multi-channel-composite from them
+           using display-settings.
+           \N'ExtractAttachment' allows to extract (and save to a file) the contents of attachments.)
+           \N'CreateCZI' is used to demonstrate the CZI-creation capabilities of libCZI.)")
         ->default_val(Command::Invalid)
         ->option_text("COMMAND")
         ->transform(CLI::CheckedTransformer(map_string_to_command, CLI::ignore_case));
+    // editorconfig-checker-enable
     cli_app.add_option("-s,--source", argument_source_filename,
         "specifies the source CZI-file.")
         ->option_text("SOURCEFILE")
@@ -577,11 +579,14 @@ CCmdLineOptions::ParseResult CCmdLineOptions::Parse(int argc, char** argv)
     cli_app.add_option("-o,--output", argument_output_filename,
         "specifies the output-filename. A suffix will be appended to the name given here depending on the type of the file.")
         ->option_text("OUTPUTFILE");
+    // editorconfig-checker-disable
     cli_app.add_option("-p,--plane-coordinate", argument_plane_coordinate,
         R"(Uniquely select a 2D-plane from the document. It is given in the form [DimChar][number], where 'DimChar' specifies a dimension and 
            can be any of 'Z', 'C', 'T', 'R', 'I', 'H', 'V' or 'B'. 'number' is an integer. \nExamples: C1T3, C0T-2, C1T44Z15H1.)")
         ->option_text("PLANE-COORDINATE")
         ->check(plane_coordinate_validator);
+    // editorconfig-checker-enable
+    // editorconfig-checker-disable
     cli_app.add_option("-r,--rect", argument_rect,
         R"(Select a paraxial rectangular region as the region-of-interest. The coordinates may be given either absolute or relative. If using relative
             coordinates, they are relative to what is determined as the upper-left point in the document.\nRelative coordinates are specified with
@@ -589,6 +594,7 @@ CCmdLineOptions::ParseResult CCmdLineOptions::Parse(int argc, char** argv)
             \nExamples: rel(0, 0, 1024, 1024), rel(-100, -100, 500, 500), abs(-230, 100, 800, 800).)")
         ->option_text("ROI")
         ->check(region_of_interest_validator);
+    // editorconfig-checker-enable
     cli_app.add_option("-d,--display-settings", argument_display_settings,
         "Specifies the display-settings used for creating a channel-composite. The data is given in JSON-notation.")
         ->option_text("DISPLAYSETTINGS")
@@ -1899,7 +1905,7 @@ void CCmdLineOptions::PrintHelpBitmapGenerator()
         [&](int no, std::tuple<std::string, std::string, bool> name_explanation_isdefault) -> bool
         {
             maxLengthClassName = (std::max)(get<0>(name_explanation_isdefault).length(), maxLengthClassName);
-            return true;
+    return true;
         });
 
     ostringstream string_stream;
@@ -1907,9 +1913,9 @@ void CCmdLineOptions::PrintHelpBitmapGenerator()
         [&](int no, std::tuple<std::string, std::string, bool> name_explanation_isdefault) -> bool
         {
             string_stream << no + 1 << ": " << std::setw(maxLengthClassName) << std::left << get<0>(name_explanation_isdefault) << std::setw(0) <<
-                    (!get<2>(name_explanation_isdefault) ? "     " : " (*) ") << "\"" <<
-                    get<1>(name_explanation_isdefault) << "\"" << endl;
-            return true;
+            (!get<2>(name_explanation_isdefault) ? "     " : " (*) ") << "\"" <<
+        get<1>(name_explanation_isdefault) << "\"" << endl;
+    return true;
         });
 
     this->GetLog()->WriteLineStdOut(string_stream.str());

@@ -57,37 +57,37 @@ public:
 
     struct SubBlockData
     {
-        void*           ptrData;
-        std::uint64_t	dataSize;
-        void*           ptrAttachment;
-        std::uint32_t	attachmentSize;
-        void*           ptrMetadata;
-        std::uint32_t	metaDataSize;
+        void* ptrData;
+        std::uint64_t   dataSize;
+        void* ptrAttachment;
+        std::uint32_t   attachmentSize;
+        void* ptrMetadata;
+        std::uint32_t   metaDataSize;
 
-        int						compression;
-        int						pixelType;
-        libCZI::CDimCoordinate	coordinate;
-        libCZI::IntRect			logicalRect;
-        libCZI::IntSize			physicalSize;
-        int						mIndex;			// if not present, then this is int::max
+        int                     compression;
+        int                     pixelType;
+        libCZI::CDimCoordinate  coordinate;
+        libCZI::IntRect         logicalRect;
+        libCZI::IntSize         physicalSize;
+        int                     mIndex;         // if not present, then this is int::max
     };
 
     static SubBlockData ReadSubBlock(libCZI::IStream* str, std::uint64_t offset, const SubBlockStorageAllocate& allocateInfo);
 
     struct MetadataSegmentData
     {
-        void*           ptrXmlData;
-        std::uint64_t	xmlDataSize;
-        void*           ptrAttachment;
-        std::uint32_t	attachmentSize;
+        void* ptrXmlData;
+        std::uint64_t   xmlDataSize;
+        void* ptrAttachment;
+        std::uint32_t   attachmentSize;
     };
 
     static MetadataSegmentData ReadMetadataSegment(libCZI::IStream* str, std::uint64_t offset, const SubBlockStorageAllocate& allocateInfo);
 
     struct AttachmentData
     {
-        void*           ptrData;
-        std::uint64_t	dataSize;
+        void* ptrData;
+        std::uint64_t   dataSize;
     };
 
     static AttachmentData ReadAttachment(libCZI::IStream* str, std::uint64_t offset, const SubBlockStorageAllocate& allocateInfo);

@@ -305,8 +305,8 @@ TEST(Utilities, CallGetLibCZIBuildInformationAndCheckResultForPlausibility)
 
     // I guess it is safe to assume that at least one string must be non-empty
     ASSERT_FALSE(
-        build_information.compilerIdentification.empty() && 
+        build_information.compilerIdentification.empty() &&
         build_information.repositoryUrl.empty() &&
-        build_information.repositoryBranch.empty() && 
+        build_information.repositoryBranch.empty() &&
         build_information.repositoryTag.empty());
 }

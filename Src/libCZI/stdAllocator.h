@@ -5,21 +5,22 @@
 #pragma once
 
 #include <cstdint>
+#include <memory>
 
 class CHeapAllocator
 {
 public:
-	void*	Allocate(std::uint64_t size);
-	void	Free(void* ptr);
+    void* Allocate(std::uint64_t size);
+    void  Free(void* ptr);
 };
 
 class CSharedPtrAllocator
 {
 private:
-	std::shared_ptr<const void> shp;
+    std::shared_ptr<const void> shp;
 public:
-	explicit CSharedPtrAllocator(std::shared_ptr<const void> shp) :shp(shp) {}
+    explicit CSharedPtrAllocator(std::shared_ptr<const void> shp) :shp(shp) {}
 
-	void*	Allocate(std::uint64_t size) { return const_cast<void*>(this->shp.get()); }
-	void	Free(void* ptr) { this->shp.reset(); }
+    void* Allocate(std::uint64_t size) { return const_cast<void*>(this->shp.get()); }
+    void Free(void* ptr) { this->shp.reset(); }
 };

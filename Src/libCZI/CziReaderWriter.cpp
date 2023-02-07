@@ -367,7 +367,7 @@ void CCziReaderWriter::ReadCziStructure()
         if (excp.GetErrorCode() == LibCZICZIParseException::ErrorCode::NotEnoughData)
         {
             // this now means that the existing file did not contain a CZI-file-header, which let's us
-            // treat this file as "new" (so, there is no information we re-use)		
+            // treat this file as "new" (so, there is no information we re-use)     
             cziHeaderSuccessfullyRead = false;
         }
         else

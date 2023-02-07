@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: LGPL-3.0-or-later
 
 #include "stdafx.h"
+#include <utility>
 #include "BitmapOperations.h"
 #include "MD5Sum.h"
 #include "utilities.h"
@@ -24,7 +25,7 @@ using namespace std;
     ScopedBitmapLockerP lck{ bm };
 
     CMd5Sum md5sum;
-    size_t lineLength = bm->GetWidth() * (size_t)CziUtils::GetBytesPerPel(bm->GetPixelType());
+    size_t lineLength = bm->GetWidth() * static_cast<size_t>(CziUtils::GetBytesPerPel(bm->GetPixelType()));
 #if LIBCZI_ISBIGENDIANHOST
     if (CziUtils::IsPixelTypeEndianessAgnostic(bm->GetPixelType()))
     {
@@ -55,7 +56,7 @@ using namespace std;
 #endif
 
     md5sum.complete();
-    md5sum.getHash((char*)ptrHash);
+    md5sum.getHash(reinterpret_cast<char*>(ptrHash));
     return 16;
 }
 
@@ -266,7 +267,7 @@ using namespace std;
 {
     for (int y = 0; y < h; ++y)
     {
-        void* p = ((char*)ptr) + (y * ((ptrdiff_t)stride));
+        void* p = static_cast<char*>(ptr) + (y * static_cast<ptrdiff_t>(stride));
         memset(p, val, stride);
     }
 }
@@ -275,7 +276,7 @@ using namespace std;
 {
     for (int y = 0; y < h; ++y)
     {
-        std::uint16_t* p = (std::uint16_t*)(((char*)ptr) + (y * ((ptrdiff_t)stride)));
+        std::uint16_t* p = reinterpret_cast<std::uint16_t*>(static_cast<char*>(ptr) + (y * static_cast<ptrdiff_t>(stride)));
         for (int x = 0; x < w; ++x)
         {
             *(p + x) = val;
@@ -287,7 +288,7 @@ using namespace std;
 {
     for (int y = 0; y < h; ++y)
     {
-        std::uint8_t* p = (std::uint8_t*)(((char*)ptr) + (y * ((ptrdiff_t)stride)));
+        std::uint8_t* p = reinterpret_cast<std::uint8_t*>(static_cast<char*>(ptr) + (y * static_cast<ptrdiff_t>(stride)));
         for (int x = 0; x < w; ++x)
         {
             *(p + x * 3 + 0) = b;
@@ -301,7 +302,7 @@ void CBitmapOperations::Fill_Bgra32(int w, int h, void* ptr, int stride, std::ui
 {
     for (int y = 0; y < h; ++y)
     {
-        std::uint8_t* p = (std::uint8_t*)(((char*)ptr) + (y * ((ptrdiff_t)stride)));
+        std::uint8_t* p = reinterpret_cast<std::uint8_t*>(static_cast<char*>(ptr) + (y * static_cast<ptrdiff_t>(stride)));
         for (int x = 0; x < w; ++x)
         {
             *(p + x * 4 + 0) = b;
@@ -316,7 +317,7 @@ void CBitmapOperations::Fill_Bgra32(int w, int h, void* ptr, int stride, std::ui
 {
     for (int y = 0; y < h; ++y)
     {
-        std::uint16_t* p = (std::uint16_t*)(((char*)ptr) + (y * ((ptrdiff_t)stride)));
+        std::uint16_t* p = reinterpret_cast<std::uint16_t*>(static_cast<char*>(ptr) + (y * static_cast<ptrdiff_t>(stride)));
         for (int x = 0; x < w; ++x)
         {
             *(p + x * 3 + 0) = b;
@@ -330,7 +331,7 @@ void CBitmapOperations::Fill_Bgra32(int w, int h, void* ptr, int stride, std::ui
 {
     for (int y = 0; y < h; ++y)
     {
-        float* p = (float*)(((char*)ptr) + (y * ((ptrdiff_t)stride)));
+        float* p = reinterpret_cast<float*>(static_cast<char*>(ptr) + (y * static_cast<ptrdiff_t>(stride)));
         for (int x = 0; x < w; ++x)
         {
             *(p + x) = v;
@@ -342,7 +343,7 @@ void CBitmapOperations::Fill_Bgra32(int w, int h, void* ptr, int stride, std::ui
 {
     for (int y = 0; y < h; ++y)
     {
-        std::uint16_t* ptrLine = (std::uint16_t*)(((char*)ptr) + y * ((ptrdiff_t)stride));
+        std::uint16_t* ptrLine = reinterpret_cast<std::uint16_t*>(reinterpret_cast<char*>(ptr) + y * static_cast<ptrdiff_t>(stride));
         for (int x = 0; x < w; ++x)
         {
             std::swap(ptrLine[0], ptrLine[2]);
@@ -378,8 +379,8 @@ void CBitmapOperations::Fill_Bgra32(int w, int h, void* ptr, int stride, std::ui
     case PixelType::Gray16:
         for (uint32_t y = 0; y < height; ++y)
         {
-            const uint16_t* pSrc = (const uint16_t*)(((const char*)ptrSrc) + y * ((ptrdiff_t)srcStride));
-            uint16_t* pDst = (uint16_t*)(((char*)ptrDst) + y * ((ptrdiff_t)dstStride));
+            const uint16_t* pSrc = reinterpret_cast<const uint16_t*>(static_cast<const char*>(ptrSrc) + y * static_cast<ptrdiff_t>(srcStride));
+            uint16_t* pDst = reinterpret_cast<uint16_t*>(static_cast<char*>(ptrDst) + y * static_cast<ptrdiff_t>(dstStride));
             for (uint32_t x = 0; x < width; ++x)
             {
                 *(pDst + x) = ((*(pSrc + x)) << 8) | ((*(pSrc + x)) >> 8);
@@ -390,8 +391,8 @@ void CBitmapOperations::Fill_Bgra32(int w, int h, void* ptr, int stride, std::ui
     case PixelType::Bgr48:
         for (uint32_t y = 0; y < height; ++y)
         {
-            const uint16_t* pSrc = (const uint16_t*)(((const char*)ptrSrc) + y * ((ptrdiff_t)srcStride));
-            uint16_t* pDst = (uint16_t*)(((char*)ptrDst) + y * ((ptrdiff_t)dstStride));
+            const uint16_t* pSrc = reinterpret_cast<const uint16_t*>(static_cast<const char*>(ptrSrc) + y * static_cast<ptrdiff_t>(srcStride));
+            uint16_t* pDst = reinterpret_cast<uint16_t*>(static_cast<char*>(ptrDst) + y * static_cast<ptrdiff_t>(dstStride));
             for (uint32_t x = 0; x < 3 * width; ++x)
             {
                 *(pDst + x) = ((*(pSrc + x)) << 8) | ((*(pSrc + x)) >> 8);

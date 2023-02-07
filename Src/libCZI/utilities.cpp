@@ -75,16 +75,16 @@ tString trimImpl(const tString& str, const tString& whitespace)
 {
     return l.size() == r.size()
         && equal(l.cbegin(), l.cend(), r.cbegin(),
-            [](std::string::value_type l1, std::string::value_type r1)
-            { return toupper(l1) == toupper(r1); });
+        [](std::string::value_type l1, std::string::value_type r1)
+        { return toupper(l1) == toupper(r1); });
 }
 
 /*static*/bool Utilities::icasecmp(const std::wstring& l, const std::wstring& r)
 {
     return l.size() == r.size()
         && equal(l.cbegin(), l.cend(), r.cbegin(),
-            [](std::wstring::value_type l1, std::wstring::value_type r1)
-            { return towupper(l1) == towupper(r1); });
+        [](std::wstring::value_type l1, std::wstring::value_type r1)
+        { return towupper(l1) == towupper(r1); });
 }
 
 /*static*/std::wstring Utilities::convertUtf8ToWchar_t(const char* sz)
@@ -186,12 +186,12 @@ tString trimImpl(const tString& str, const tString& whitespace)
             switch (i)
             {
             case 1: a = Utilities::HexCharToInt(static_cast<char>(str[i])); break;
-            case 2: a = (a << 4) + Utilities::HexCharToInt((char)str[i]); break;
+            case 2: a = (a << 4) + Utilities::HexCharToInt(static_cast<char>(str[i])); break;
             case 3: r = Utilities::HexCharToInt(static_cast<char>(str[i])); break;
             case 4: r = (r << 4) + Utilities::HexCharToInt(static_cast<char>(str[i])); break;
-            case 5: g = Utilities::HexCharToInt((char)str[i]); break;
+            case 5: g = Utilities::HexCharToInt(static_cast<char>(str[i])); break;
             case 6: g = (g << 4) + Utilities::HexCharToInt(static_cast<char>(str[i])); break;
-            case 7: b = Utilities::HexCharToInt((char)str[i]); break;
+            case 7: b = Utilities::HexCharToInt(static_cast<char>(str[i])); break;
             case 8: b = (b << 4) + Utilities::HexCharToInt(static_cast<char>(str[i])); break;
             }
         }

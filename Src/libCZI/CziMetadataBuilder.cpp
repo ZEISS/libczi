@@ -767,7 +767,7 @@ bool libCZI::XmlDateTime::IsValid() const
         [&](libCZI::DimensionIndex dim, int start, int size)->bool
         {
             MetadataUtils::WriteDimensionSize(builder, dim, size);
-            return true;
+    return true;
         });
 
     if (statistics.IsMIndexValid())
@@ -948,10 +948,10 @@ bool libCZI::XmlDateTime::IsValid() const
                 max_channel_index_in_display_settings = channel_index;
             }
 
-            return true;
+    return true;
         });
 
-    MetadataUtils::WriteDisplaySettings(builder, display_settings, 1+max_channel_index_in_display_settings);
+    MetadataUtils::WriteDisplaySettings(builder, display_settings, 1 + max_channel_index_in_display_settings);
 }
 
 static void WriteChannelDisplaySettings(const IChannelDisplaySetting* channel_display_setting, IXmlNodeRw* node)
@@ -1009,7 +1009,8 @@ static void WriteChannelDisplaySettings(const IChannelDisplaySetting* channel_di
 
     // remove existing "Channel"-nodes (if any)
     while (display_settings_channel_node->RemoveChild("Channel"))
-    {}
+    {
+    }
 
     for (int c = 0; c < channel_count; ++c)
     {
@@ -1083,4 +1084,3 @@ static void WriteChannelDisplaySettings(const IChannelDisplaySetting* channel_di
         throw invalid_argument("Invalid ValueType.");
     }
 }
-

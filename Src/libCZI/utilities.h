@@ -8,6 +8,7 @@
 #include <string>
 #include <cwctype>
 #include <functional>
+#include <vector>
 #include "libCZI_Pixels.h"
 
 class Utilities
@@ -146,10 +147,10 @@ protected:
 template <typename t>
 struct Nullable
 {
-    Nullable() :isValid(false) {};
+    Nullable() :isValid(false) {}
 
     bool isValid;
-    t	 value;
+    t    value;
 
     bool TryGet(t* p) const
     {

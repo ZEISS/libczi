@@ -373,10 +373,10 @@ ERR WriteContainerPre(
     //================
     // PFD
     assert (offPos <= OFFSET_OF_PFD); // otherwise stuff is overwritten
-	if (offPos < OFFSET_OF_PFD)
-	{
-		Call(pWS->Write(pWS, Zero, OFFSET_OF_PFD - offPos));
-	}
+    if (offPos < OFFSET_OF_PFD)
+    {
+        Call(pWS->Write(pWS, Zero, OFFSET_OF_PFD - offPos));
+    }
 
     offPos = (size_t)OFFSET_OF_PFD;
 
@@ -831,8 +831,8 @@ ERR PKImageEncode_EncodeContent_Encode(
     //================================
     for (i = 0; i < cLine; i += 16)
     {
-		Bool f420 = ( pIE->WMP.wmiI.cfColorFormat == YUV_420 || 
-					  (pIE->WMP.wmiSCP.bYUVData && pIE->WMP.wmiSCP.cfColorFormat==YUV_420) );
+        Bool f420 = ( pIE->WMP.wmiI.cfColorFormat == YUV_420 || 
+                      (pIE->WMP.wmiSCP.bYUVData && pIE->WMP.wmiSCP.cfColorFormat==YUV_420) );
         CWMImageBufferInfo wmiBI = { 0 };
         wmiBI.pv = pbPixels + cbStride * i / (f420 ? 2 : 1);
         wmiBI.cLine = MIN(16, cLine - i);
@@ -1521,7 +1521,7 @@ ERR PKImageEncode_Create_WMP(PKImageEncode** ppIE)
     pIE->Transcode = PKImageEncode_Transcode_WMP;
     pIE->CreateNewFrame = PKImageEncode_CreateNewFrame_WMP;
     pIE->Release = PKImageEncode_Release_WMP;
-	pIE->bWMP = TRUE; 
+    pIE->bWMP = TRUE; 
 
 Cleanup:
     return err;
@@ -1944,11 +1944,11 @@ ERR PKImageDecode_Copy_WMP(
 #endif // REENTRANT_MODE
 
     cThumbnailScale = 1;
-	if (pID->WMP.wmiI.cThumbnailWidth > 0)
-	{
-		while(cThumbnailScale * pID->WMP.wmiI.cThumbnailWidth < pID->uWidth)
-			cThumbnailScale <<= 1;
-	}
+    if (pID->WMP.wmiI.cThumbnailWidth > 0)
+    {
+        while(cThumbnailScale * pID->WMP.wmiI.cThumbnailWidth < pID->uWidth)
+            cThumbnailScale <<= 1;
+    }
     // note the following implementation can't handle fractional linesperMBRow limiting
     // us to >= 1/256 thumbnail which is unfortunate, but all the PS plugin needs is 1/256
     // and I didn't care to get into floating point or a bunch of conditional tests or

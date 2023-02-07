@@ -10,5 +10,5 @@
 // set the _WIN32_WINNT macro to the platform you wish to support before including SDKDDKVer.h.
 
 #if defined(_WIN32)||defined(_WIN64)
- #include <SDKDDKVer.h>
+#include <SDKDDKVer.h>
 #endif

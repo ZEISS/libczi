@@ -93,7 +93,7 @@ void CNullBitmapWrapper::Clear(const ColorSpecification& color)
     return this->pixeltype;
 }
 
-/*virtual*/libCZI::IntSize	CNullBitmapWrapper::GetSize() const
+/*virtual*/libCZI::IntSize  CNullBitmapWrapper::GetSize() const
 {
     return libCZI::IntSize{ this->width, this->height };
 }
@@ -116,81 +116,81 @@ void CNullBitmapWrapper::CopyMonochromeBitmap(int posX, int posY, const void* pt
 {
     switch (this->pixeltype)
     {
-        case libCZI::PixelType::Bgr24:
+    case libCZI::PixelType::Bgr24:
+    {
+        struct SetPixelBgr24
         {
-            struct SetPixelBgr24
+        private:
+            const ColorSpecification& color;
+        public:
+            SetPixelBgr24(const ColorSpecification& color) :color(color) {}
+            void setPixel(std::uint8_t* ptr)
             {
-            private:
-                const ColorSpecification& color;
-            public:
-                SetPixelBgr24(const ColorSpecification& color):color(color) {}
-                void setPixel(std::uint8_t* ptr)
-                {
-                    *(ptr + 0) = this->color.Bgr24.b;
-                    *(ptr + 1) = this->color.Bgr24.g;
-                    *(ptr + 2) = this->color.Bgr24.r;
-                }
-            } setPixelBgr24(color);
+                *(ptr + 0) = this->color.Bgr24.b;
+                *(ptr + 1) = this->color.Bgr24.g;
+                *(ptr + 2) = this->color.Bgr24.r;
+            }
+        } setPixelBgr24(color);
 
-            this->InternalCopyMonochromeBitmap<SetPixelBgr24, 3>(posX, posY, ptrData, stride, width, height, setPixelBgr24);
-            break;
-        }
-        case libCZI::PixelType::Bgr48:
+        this->InternalCopyMonochromeBitmap<SetPixelBgr24, 3>(posX, posY, ptrData, stride, width, height, setPixelBgr24);
+        break;
+    }
+    case libCZI::PixelType::Bgr48:
+    {
+        struct SetPixelBgr48
         {
-            struct SetPixelBgr48
+        private:
+            const ColorSpecification& color;
+        public:
+            SetPixelBgr48(const ColorSpecification& color) :color(color) {}
+            void setPixel(std::uint8_t* ptr)
             {
-            private:
-                const ColorSpecification& color;
-            public:
-                SetPixelBgr48(const ColorSpecification& color) :color(color) {}
-                void setPixel(std::uint8_t* ptr)
-                {
-                    auto ptrUshort = reinterpret_cast<uint16_t*>(ptr);
-                    *(ptrUshort + 0) = this->color.Bgr48.b;
-                    *(ptrUshort + 1) = this->color.Bgr48.g;
-                    *(ptrUshort + 2) = this->color.Bgr48.r;
-                }
-            } setPixelBgr48(color);
+                auto ptrUshort = reinterpret_cast<uint16_t*>(ptr);
+                *(ptrUshort + 0) = this->color.Bgr48.b;
+                *(ptrUshort + 1) = this->color.Bgr48.g;
+                *(ptrUshort + 2) = this->color.Bgr48.r;
+            }
+        } setPixelBgr48(color);
 
-            this->InternalCopyMonochromeBitmap<SetPixelBgr48, 6>(posX, posY, ptrData, stride, width, height, setPixelBgr48);
-            break;
-        }
-        case libCZI::PixelType::Gray8:
+        this->InternalCopyMonochromeBitmap<SetPixelBgr48, 6>(posX, posY, ptrData, stride, width, height, setPixelBgr48);
+        break;
+    }
+    case libCZI::PixelType::Gray8:
+    {
+        struct SetPixelGray8
         {
-            struct SetPixelGray8
+        private:
+            const ColorSpecification& color;
+        public:
+            SetPixelGray8(const ColorSpecification& color) :color(color) {}
+            void setPixel(std::uint8_t* ptr)
             {
-            private:
-                const ColorSpecification& color;
-            public:
-                SetPixelGray8(const ColorSpecification& color) :color(color) {}
-                void setPixel(std::uint8_t* ptr)
-                {
-                    *ptr  = this->color.Gray8.value;
-                }
-            } setPixelGray8(color);
+                *ptr = this->color.Gray8.value;
+            }
+        } setPixelGray8(color);
 
-            this->InternalCopyMonochromeBitmap<SetPixelGray8, 1>(posX, posY, ptrData, stride, width, height, setPixelGray8);
-            break;
-        }
-        case libCZI::PixelType::Gray16:
+        this->InternalCopyMonochromeBitmap<SetPixelGray8, 1>(posX, posY, ptrData, stride, width, height, setPixelGray8);
+        break;
+    }
+    case libCZI::PixelType::Gray16:
+    {
+        struct SetPixelGray16
         {
-            struct SetPixelGray16
+        private:
+            const ColorSpecification& color;
+        public:
+            SetPixelGray16(const ColorSpecification& color) :color(color) {}
+            void setPixel(std::uint8_t* ptr)
             {
-            private:
-                const ColorSpecification& color;
-            public:
-                SetPixelGray16(const ColorSpecification& color) :color(color) {}
-                void setPixel(std::uint8_t* ptr)
-                {
-                    *reinterpret_cast<uint16_t*>(ptr) = this->color.Gray16.value;
-                }
-            } setPixelGray16(color);
+                *reinterpret_cast<uint16_t*>(ptr) = this->color.Gray16.value;
+            }
+        } setPixelGray16(color);
 
-            this->InternalCopyMonochromeBitmap<SetPixelGray16, 2>(posX, posY, ptrData, stride, width, height, setPixelGray16);
-            break;
-        }
+        this->InternalCopyMonochromeBitmap<SetPixelGray16, 2>(posX, posY, ptrData, stride, width, height, setPixelGray16);
+        break;
+    }
 
-        default: throw std::runtime_error("not implemented");
+    default: throw std::runtime_error("not implemented");
     }
 }
 
