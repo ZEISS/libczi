@@ -211,3 +211,4 @@ CBitmapGenNull::CBitmapGenNull()
     auto bm = std::make_shared<CNullBitmapWrapper>(pixeltype, width, height);
     bm->Clear();
     return bm;
+}
