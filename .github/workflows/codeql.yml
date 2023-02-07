@@ -7,7 +7,7 @@ on:
     # The branches below must be a subset of the branches above
     branches: ["main"]
   schedule:
-    - cron: '22 16 * * 4'
+    - cron: "22 16 * * 4"
 
 jobs:
   analyze:
@@ -21,7 +21,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        language: ['cpp']
+        language: ["cpp"]
         # Learn more about CodeQL language support at https://aka.ms/codeql-docs/language-support
 
     steps:
