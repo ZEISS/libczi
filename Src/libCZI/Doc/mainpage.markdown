@@ -34,6 +34,9 @@ Versioning of libCZI
 
 For libCZI the [semantic versioning scheme 2.0](https://semver.org/) is to be applied. The version number is defined in the top-level CMakeList.txt file [here](https://github.com/ZEISS/libczi/blob/main/CMakeLists.txt#L4).
 This is the only place where the version number is defined. When making changes, this version number needs to be updated accordingly.
+For determining whether a change is a breaking one, the source code level is decisive; i.e. not binary compatibility (of the resulting static or dynamic library) is to be considered, but the case
+of re-compiling with the changed sources.
+A borderline case are maybe changes in the CMake-files - here the best judgement is to be applied whether a change in the compilation result will occur.
 
 Note that the number defined in the [project](https://cmake.org/cmake/help/latest/command/project.html#command:project) statement allows for four numbers: <tt><major>.<minor>.<patch>.<tweak></tt>. 
 The number for <tt><tweak></tt> has no semantic meaning.
