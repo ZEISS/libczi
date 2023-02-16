@@ -117,7 +117,7 @@ using namespace Eigen;
 
     // TODO: since the points are sorted for x (I'd think so...) we should be able to use a binary search here?
     int index = 0;
-    double xPos_for_foundIndex;
+    double xPos_for_foundIndex = 0;
     for (int i = 0; i < pointsCnt; i++)
     {
         double xPos_i;

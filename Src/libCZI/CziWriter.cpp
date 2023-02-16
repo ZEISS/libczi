@@ -586,7 +586,7 @@ void libCZI::ICziWriter::SyncAddSubBlock(const AddSubBlockInfoStridedBitmap& add
 
     uint64_t bytesWritten;
     uint64_t totalBytesWritten = 0;
-    auto msHeaderAllocatedSize = ms.header.AllocatedSize;   // need to save this information before (potentially) changing the byte-order
+    const auto msHeaderAllocatedSize = ms.header.AllocatedSize;   // need to save this information before (potentially) changing the byte-order
 
     ConvertToHostByteOrder::Convert(&ms);
     info.writeFunc(metadataSegmentPos, &ms, sizeof(ms), &bytesWritten, "MetadataSegment");
@@ -606,7 +606,7 @@ void libCZI::ICziWriter::SyncAddSubBlock(const AddSubBlockInfoStridedBitmap& add
 
     if (totalBytesWritten < msHeaderAllocatedSize + sizeof(SegmentHeader))
     {
-        totalBytesWritten += CWriterUtils::WriteZeroes(info.writeFunc, metadataSegmentPos + totalBytesWritten, msHeaderAllocatedSize + sizeof(SegmentHeader) - totalBytesWritten);
+        CWriterUtils::WriteZeroes(info.writeFunc, metadataSegmentPos + totalBytesWritten, msHeaderAllocatedSize + sizeof(SegmentHeader) - totalBytesWritten);
     }
 
     return make_tuple(metadataSegmentPos, static_cast<std::uint64_t>(msHeaderAllocatedSize));
