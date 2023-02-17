@@ -54,7 +54,7 @@ void libCZI::ICziWriter::SyncAddSubBlock(const libCZI::AddSubBlockInfoLinewiseBi
 {
     AddSubBlockInfo addSbInfo(addSbInfoLinewise);
 
-    size_t stride = addSbInfoLinewise.physicalWidth * CziUtils::GetBytesPerPel(addSbInfoLinewise.PixelType);
+    size_t stride = addSbInfoLinewise.physicalWidth * (size_t)CziUtils::GetBytesPerPel(addSbInfoLinewise.PixelType);
     addSbInfo.sizeData = addSbInfoLinewise.physicalHeight * stride;
     auto linesCnt = addSbInfoLinewise.physicalHeight;
     addSbInfo.getData = [&](int callCnt, size_t offset, const void*& ptr, size_t& size)->bool
@@ -699,7 +699,6 @@ void libCZI::ICziWriter::SyncAddSubBlock(const AddSubBlockInfoStridedBitmap& add
     uint64_t attchmDirPos;
     // if we have already written a subblock-directory-segment (possibly a reservation), then we check here if the existing
     // segment is large enough, and if so we write our data into this segment
-    //if (this->attachmentDirectorySegment.GetAllocatedSize() >= attchmntDirSegment.header.UsedSize)
     if (int64_t(info.sizeExistingSegmentPos) >= attchmntDirSegment.header.UsedSize)
     {
         attchmDirPos = info.existingSegmentPos;// this->attachmentDirectorySegment.GetFilePos();

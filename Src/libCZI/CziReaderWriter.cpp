@@ -33,7 +33,7 @@ struct ReplaceHelper
     int key;
     ICziReaderWriter* t;
     ReplaceHelper(int key, ICziReaderWriter* t)
-        :key(key), t(t) {};
+        :key(key), t(t) {}
 
     void operator()(const AddSubBlockInfo& addSbBlkInfo) const
     {
