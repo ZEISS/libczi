@@ -231,7 +231,7 @@ static double CalcSplineValue(double x, const std::vector<libCZI::IDisplaySettin
 /// </summary>
 /// <remarks>
 /// The Toe Slope adjustment uses a slightly adjusted version of the gamma function to evaluate the display image.
-/// The adjusted version has the advantage that its slope at the origin, i.e. for x = 0, doesn't equal infinity.
+/// The adjusted version has the advantage that its slope at the origin, i.e. for x = 0, does not equal infinity.
 /// The formula for this looks like y = ((ax + 1)**G - 1) / ((a + 1)**G - 1), where the parameter "a" depends on the gamma value.
 /// Additionally, we choose the slope of 1/(G**3) for x = 0. 
 /// This yields the iteration formula that is used in the method:
@@ -242,8 +242,8 @@ static double CalcSplineValue(double x, const std::vector<libCZI::IDisplaySettin
 template <typename tFloat>
 tFloat GetParameterForToeSlopeAdjustment(tFloat gamma)
 {
-    const double GammaTolerance = static_cast<tFloat>(0.0001);
-    if (abs(gamma - 0.5) < GammaTolerance)
+    const tFloat GammaTolerance = static_cast<tFloat>(0.0001);
+    if (abs(gamma - static_cast<tFloat>(0.5)) < GammaTolerance)
     {
         return 224;
     }
