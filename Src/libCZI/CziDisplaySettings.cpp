@@ -25,7 +25,7 @@ public:
         for (; *szString != L'\0';)
         {
             double x, y;
-            x = std::stof(szString, &charsParsed);
+            x = std::stod(szString, &charsParsed);
             szString += charsParsed;
 
             // now, skip whitespace and exactly one comma
@@ -47,7 +47,7 @@ public:
                 throw std::invalid_argument("invalid syntax");
             }
 
-            y = std::stof(szString, &charsParsed);
+            y = std::stod(szString, &charsParsed);
             szString += charsParsed;
 
             splinePts.push_back({ x,y });
