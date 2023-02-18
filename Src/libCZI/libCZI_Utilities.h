@@ -55,7 +55,7 @@ namespace libCZI
         /// \return The count of bytes that were written to in ptrHash as the MD5SUM-hash (always 16).
         static int CalcMd5SumHash(const void* ptrData, size_t sizeData, std::uint8_t* ptrHash, int hashSize);
 
-        /// Creates an 8-bit look-up table from the specifed splines.
+        /// Creates an 8-bit look-up table from the specified splines.
         /// A spline is sampled between \c blackPoint and \c whitePoint (i. e. points left of \c blackPoint are set to 0
         /// and right of \c whitePoint are set to 1). 
         /// \param tableElementCnt Number of points to sample - the result will have as many samples as specified here.
@@ -183,7 +183,7 @@ namespace libCZI
         static std::string DimBoundsToString(const libCZI::IDimBounds* bounds);
 
         /// Create an index-set object from a string representation. The string is a list of intervals,
-        /// seperated by comma (','). It can be of the form "5", "17", "3-5", "-3-5". The string
+        /// separated by comma (','). It can be of the form "5", "17", "3-5", "-3-5". The string
         /// "inf" (meaning 'infinity') is recognized in order to express "all numbers up to" or "all numbers after"
         /// , e. g. "-inf-4" or "5-inf".
         /// In case of an invalid string, an LibCZIStringParseException exception is thrown.
