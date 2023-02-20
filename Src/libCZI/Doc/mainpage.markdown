@@ -38,8 +38,8 @@ For determining whether a change is a breaking one, the source code level is dec
 of re-compiling with the changed sources.
 A borderline case are maybe changes in the CMake-files - here the best judgement is to be applied whether a change in the compilation result will occur.
 
-Note that the number defined in the [project](https://cmake.org/cmake/help/latest/command/project.html#command:project) statement allows for four numbers: <tt><major>.<minor>.<patch>.<tweak></tt>. 
-The number for <tt><tweak></tt> has no semantic meaning.
+Note that the number defined in the [project](https://cmake.org/cmake/help/latest/command/project.html#command:project) statement allows for four numbers: <tt>\<major\>.\<minor\>.\<patch\>.\<tweak\></tt>. 
+The number for <tt>\<tweak\></tt> has no semantic meaning.
 
 
 CZI in a nutshell

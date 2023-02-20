@@ -149,12 +149,12 @@ void CSbBlkStatisticsUpdater::UpdateStatistics(const CCziSubBlockDirectoryBase::
     auto it = this->pyramidStatistics.scenePyramidStatistics.find(sceneIndex);
     if (it != this->pyramidStatistics.scenePyramidStatistics.end())
     {
-        this->UpdatePyramidLayerStatistics(it->second, pli);
+        CSbBlkStatisticsUpdater::UpdatePyramidLayerStatistics(it->second, pli);
     }
     else
     {
         std::vector<PyramidStatistics::PyramidLayerStatistics> vecPs;
-        this->UpdatePyramidLayerStatistics(vecPs, pli);
+        CSbBlkStatisticsUpdater::UpdatePyramidLayerStatistics(vecPs, pli);
         this->pyramidStatistics.scenePyramidStatistics.insert(std::pair<int, std::vector<PyramidStatistics::PyramidLayerStatistics>>(sceneIndex, vecPs));
     }
 

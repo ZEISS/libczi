@@ -214,7 +214,7 @@ using namespace libCZI;
     }
     catch (const std::exception&)
     {
-        std::throw_with_nested(LibCZIIOException("Error reading FileHeaderSegement", offset + sizeof(attachmentDirSegment), attachmentEntriesSize));
+        std::throw_with_nested(LibCZIIOException("Error reading FileHeaderSegment", offset + sizeof(attachmentDirSegment), attachmentEntriesSize));
     }
 
     if (bytesRead != attachmentEntriesSize)
@@ -378,7 +378,7 @@ using namespace libCZI;
         }
         catch (const std::exception&)
         {
-            std::throw_with_nested(LibCZIIOException("Error reading FileHeaderSegement", offset + lengthSubblockSegmentData + sizeof(SegmentHeader), subBlckSegment.data.MetadataSize));
+            std::throw_with_nested(LibCZIIOException("Error reading FileHeaderSegment", offset + lengthSubblockSegmentData + sizeof(SegmentHeader), subBlckSegment.data.MetadataSize));
         }
 
         if (bytesRead != subBlckSegment.data.MetadataSize)
@@ -395,7 +395,7 @@ using namespace libCZI;
         }
         catch (const std::exception&)
         {
-            std::throw_with_nested(LibCZIIOException("Error reading FileHeaderSegement", offset + lengthSubblockSegmentData + sizeof(SegmentHeader) + subBlckSegment.data.MetadataSize, subBlckSegment.data.DataSize));
+            std::throw_with_nested(LibCZIIOException("Error reading FileHeaderSegment", offset + lengthSubblockSegmentData + sizeof(SegmentHeader) + subBlckSegment.data.MetadataSize, subBlckSegment.data.DataSize));
         }
 
         if (bytesRead != subBlckSegment.data.DataSize)
@@ -412,7 +412,7 @@ using namespace libCZI;
         }
         catch (const std::exception&)
         {
-            std::throw_with_nested(LibCZIIOException("Error reading FileHeaderSegement", offset + lengthSubblockSegmentData + sizeof(SegmentHeader) + subBlckSegment.data.MetadataSize + subBlckSegment.data.DataSize, subBlckSegment.data.AttachmentSize));
+            std::throw_with_nested(LibCZIIOException("Error reading FileHeaderSegment", offset + lengthSubblockSegmentData + sizeof(SegmentHeader) + subBlckSegment.data.MetadataSize + subBlckSegment.data.DataSize, subBlckSegment.data.AttachmentSize));
         }
 
         if (bytesRead != subBlckSegment.data.AttachmentSize)
@@ -467,7 +467,7 @@ using namespace libCZI;
         }
         catch (const std::exception&)
         {
-            std::throw_with_nested(LibCZIIOException("Error reading AttachmentSegement", offset + 256 + sizeof(SegmentHeader), attchmntSegment.data.DataSize));
+            std::throw_with_nested(LibCZIIOException("Error reading AttachmentSegment", offset + 256 + sizeof(SegmentHeader), attchmntSegment.data.DataSize));
         }
 
         if (bytesRead != attchmntSegment.data.DataSize)
@@ -566,7 +566,7 @@ using namespace libCZI;
     }
     catch (const std::exception&)
     {
-        std::throw_with_nested(LibCZIIOException("Error reading MetaDataSegement", offset, sizeof(metadataSegment)));
+        std::throw_with_nested(LibCZIIOException("Error reading MetaDataSegment", offset, sizeof(metadataSegment)));
     }
 
     if (bytesRead != sizeof(metadataSegment))
@@ -593,7 +593,7 @@ using namespace libCZI;
         }
         catch (const std::exception&)
         {
-            std::throw_with_nested(LibCZIIOException("Error reading MetaDataSegement", offset + sizeof(metadataSegment), metadataSegment.data.XmlSize));
+            std::throw_with_nested(LibCZIIOException("Error reading MetaDataSegment", offset + sizeof(metadataSegment), metadataSegment.data.XmlSize));
         }
 
         if (bytesRead != metadataSegment.data.XmlSize)
@@ -610,7 +610,7 @@ using namespace libCZI;
         }
         catch (const std::exception&)
         {
-            std::throw_with_nested(LibCZIIOException("Error reading MetaDataSegement", offset + sizeof(metadataSegment) + metadataSegment.data.XmlSize, metadataSegment.data.AttachmentSize));
+            std::throw_with_nested(LibCZIIOException("Error reading MetaDataSegment", offset + sizeof(metadataSegment) + metadataSegment.data.XmlSize, metadataSegment.data.AttachmentSize));
         }
 
         if (bytesRead != metadataSegment.data.AttachmentSize)

@@ -107,33 +107,6 @@ using namespace Eigen;
     return splineCoefficients;
 }
 
-/*static*/double CSplines::CalculateSplineValue(double xPosition, int pointsCnt, const std::function<void(int index, double* x)>& getPoint, const  std::vector<Coefficients>& coefficients)
-{
-    // the polynomial number is always 4 in our case
-    if (pointsCnt >= 4 + 2)
-    {
-        throw invalid_argument("The number of point intervals exceeds the polynomial number.");
-    }
-
-    // TODO: since the points are sorted for x (I'd think so...) we should be able to use a binary search here?
-    int index = 0;
-    double xPos_for_foundIndex;
-    for (int i = 0; i < pointsCnt; i++)
-    {
-        double xPos_i;
-        getPoint(i, &xPos_i);
-        if (xPosition >= xPos_i)
-        {
-            index = i;
-            xPos_for_foundIndex = xPos_i;
-        }
-    }
-
-    xPosition -= xPos_for_foundIndex;
-
-    return CalculateSplineValue(xPosition, coefficients.at(index));
-}
-
 /*static*/double CSplines::CalculateSplineValue(double xPosition, const CSplines::Coefficients& coeffs)
 {
     constexpr int n = 4;    // cubic spline, polynomial number is 4
