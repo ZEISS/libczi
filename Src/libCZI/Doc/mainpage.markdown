@@ -26,7 +26,7 @@ The code is written in C++11 and (so far) has been successfully compiled with
 
 It is intended to be easily portable to other platforms.   
 
-It aims to be thread-safe (by most [definitions](https://en.wikipedia.org/wiki/Thread_safety)) - which isn't too surprising since it only allows read-only functionality.
+It aims to be thread-safe (by most [definitions](https://en.wikipedia.org/wiki/Thread_safety)).
 The library itself does not leverage multithreading, but it is designed for being used in a multithreaded environment.
 
 Versioning of libCZI
