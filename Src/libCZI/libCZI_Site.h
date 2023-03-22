@@ -89,7 +89,7 @@ namespace libCZI
         virtual std::shared_ptr<IDecoder> GetDecoder(ImageDecoderType type, const char* arguments) = 0;
 
         /// Creates a bitmap object. All internal bitmap allocations are done with this method, and overloading
-        /// this method allows to use a externally controlled memory management to be injected.
+        /// this method allows to use an externally controlled memory management to be injected.
         ///
         /// \param pixeltype    The pixeltype of the newly allocated bitmap.
         /// \param width        The width of the newly allocated bitmap.
