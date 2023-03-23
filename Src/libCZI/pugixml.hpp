@@ -1,10 +1,10 @@
-// SPDX-FileCopyrightText: 2006-2019 Arseny Kapoulkine
+// SPDX-FileCopyrightText: 2006-2022 Arseny Kapoulkine
 //
 // SPDX-License-Identifier: MIT
 /**
- * pugixml parser - version 1.10
+ * pugixml parser - version 1.13
  * --------------------------------------------------------
- * Copyright (C) 2006-2019, by Arseny Kapoulkine (arseny.kapoulkine@gmail.com)
+ * Copyright (C) 2006-2022, by Arseny Kapoulkine (arseny.kapoulkine@gmail.com)
  * Report bugs and download new versions at https://pugixml.org/
  *
  * This library is distributed under the MIT License. See notice at the end
@@ -14,10 +14,10 @@
  * Copyright (C) 2003, by Kristen Wegner (kristen@tima.net)
  */
 
+ // Define version macro; evaluates to major * 1000 + minor * 10 + patch so that it's safe to use in less-than comparisons
+ // Note: pugixml used major * 100 + minor * 10 + patch format up until 1.9 (which had version identifier 190); starting from pugixml 1.10, the minor version number is two digits
 #ifndef PUGIXML_VERSION
-// Define version macro; evaluates to major * 1000 + minor * 10 + patch so that it's safe to use in less-than comparisons
-// Note: pugixml used major * 100 + minor * 10 + patch format up until 1.9 (which had version identifier 190); starting from pugixml 1.10, the minor version number is two digits
-#	define PUGIXML_VERSION 1100
+#	define PUGIXML_VERSION 1130 // 1.13
 #endif
 
 // Include user configuration file (this can define various configuration macros)
@@ -111,6 +111,17 @@
 #		define PUGIXML_OVERRIDE override
 #	else
 #		define PUGIXML_OVERRIDE
+#	endif
+#endif
+
+// If C++ is 2011 or higher, use 'nullptr'
+#ifndef PUGIXML_NULL
+#	if __cplusplus >= 201103
+#		define PUGIXML_NULL nullptr
+#	elif defined(_MSC_VER) && _MSC_VER >= 1600
+#		define PUGIXML_NULL nullptr
+#	else
+#		define PUGIXML_NULL 0
 #	endif
 #endif
 
@@ -306,6 +317,8 @@ namespace pugi
         It begin() const { return _begin; }
         It end() const { return _end; }
 
+        bool empty() const { return _begin == _end; }
+
     private:
         It _begin, _end;
     };
@@ -408,6 +421,7 @@ namespace pugi
 
         // Set attribute name/value (returns false if attribute is empty or there is not enough memory)
         bool set_name(const char_t* rhs);
+        bool set_value(const char_t* rhs, size_t sz);
         bool set_value(const char_t* rhs);
 
         // Set attribute value with type conversion (numbers are converted to strings, boolean is converted to "true"/"false")
@@ -542,6 +556,7 @@ namespace pugi
 
         // Set node name/value (returns false if node is empty, there is not enough memory, or node can not have name/value)
         bool set_name(const char_t* rhs);
+        bool set_value(const char_t* rhs, size_t sz);
         bool set_value(const char_t* rhs);
 
         // Add attribute with specified name. Returns added attribute, or empty attribute on errors.
@@ -664,15 +679,15 @@ namespace pugi
 
 #ifndef PUGIXML_NO_XPATH
         // Select single node by evaluating XPath query. Returns first node from the resulting node set.
-        xpath_node select_node(const char_t* query, xpath_variable_set* variables = 0) const;
+        xpath_node select_node(const char_t* query, xpath_variable_set* variables = PUGIXML_NULL) const;
         xpath_node select_node(const xpath_query& query) const;
 
         // Select node set by evaluating XPath query
-        xpath_node_set select_nodes(const char_t* query, xpath_variable_set* variables = 0) const;
+        xpath_node_set select_nodes(const char_t* query, xpath_variable_set* variables = PUGIXML_NULL) const;
         xpath_node_set select_nodes(const xpath_query& query) const;
 
         // (deprecated: use select_node instead) Select single node by evaluating XPath query.
-        PUGIXML_DEPRECATED xpath_node select_single_node(const char_t* query, xpath_variable_set* variables = 0) const;
+        PUGIXML_DEPRECATED xpath_node select_single_node(const char_t* query, xpath_variable_set* variables = PUGIXML_NULL) const;
         PUGIXML_DEPRECATED xpath_node select_single_node(const xpath_query& query) const;
 
 #endif
@@ -700,8 +715,11 @@ namespace pugi
 
         // Range-based for support
         xml_object_range<xml_node_iterator> children() const;
-        xml_object_range<xml_named_node_iterator> children(const char_t* name) const;
         xml_object_range<xml_attribute_iterator> attributes() const;
+
+        // Range-based for support for all children with the specified name
+        // Note: name pointer must have a longer lifetime than the returned object; be careful with passing temporaries!
+        xml_object_range<xml_named_node_iterator> children(const char_t* name) const;
 
         // Get node offset in parsed file/string (in char_t units) for debugging purposes
         ptrdiff_t offset_debug() const;
@@ -767,6 +785,7 @@ namespace pugi
         bool as_bool(bool def = false) const;
 
         // Set text (returns false if object is empty or there is not enough memory)
+        bool set(const char_t* rhs, size_t sz);
         bool set(const char_t* rhs);
 
         // Set text with type conversion (numbers are converted to strings, boolean is converted to "true"/"false")
@@ -845,10 +864,10 @@ namespace pugi
         xml_node& operator*() const;
         xml_node* operator->() const;
 
-        const xml_node_iterator& operator++();
+        xml_node_iterator& operator++();
         xml_node_iterator operator++(int);
 
-        const xml_node_iterator& operator--();
+        xml_node_iterator& operator--();
         xml_node_iterator operator--(int);
     };
 
@@ -887,10 +906,10 @@ namespace pugi
         xml_attribute& operator*() const;
         xml_attribute* operator->() const;
 
-        const xml_attribute_iterator& operator++();
+        xml_attribute_iterator& operator++();
         xml_attribute_iterator operator++(int);
 
-        const xml_attribute_iterator& operator--();
+        xml_attribute_iterator& operator--();
         xml_attribute_iterator operator--(int);
     };
 
@@ -914,6 +933,7 @@ namespace pugi
         xml_named_node_iterator();
 
         // Construct an iterator which points to the specified node
+        // Note: name pointer is stored in the iterator and must have a longer lifetime than iterator itself
         xml_named_node_iterator(const xml_node& node, const char_t* name);
 
         // Iterator operators
@@ -923,10 +943,10 @@ namespace pugi
         xml_node& operator*() const;
         xml_node* operator->() const;
 
-        const xml_named_node_iterator& operator++();
+        xml_named_node_iterator& operator++();
         xml_named_node_iterator operator++(int);
 
-        const xml_named_node_iterator& operator--();
+        xml_named_node_iterator& operator--();
         xml_named_node_iterator operator--(int);
 
     private:
@@ -1215,7 +1235,7 @@ namespace pugi
     public:
         // Construct a compiled object from XPath expression.
         // If PUGIXML_NO_EXCEPTIONS is not defined, throws xpath_exception on compilation errors.
-        explicit xpath_query(const char_t* query, xpath_variable_set* variables = 0);
+        explicit xpath_query(const char_t* query, xpath_variable_set* variables = PUGIXML_NULL);
 
         // Constructor
         xpath_query();
@@ -1468,7 +1488,7 @@ namespace std
 #endif
 
 /**
- * Copyright (c) 2006-2019 Arseny Kapoulkine
+ * Copyright (c) 2006-2022 Arseny Kapoulkine
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
