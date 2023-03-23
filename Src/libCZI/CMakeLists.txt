@@ -215,7 +215,7 @@ else()
   FetchContent_Declare(
     zstd
     GIT_REPOSITORY https://github.com/facebook/zstd.git
-    GIT_TAG "v1.5.2"
+    GIT_TAG "v1.5.4"
   )
 
   if(NOT zstd_POPULATED)
