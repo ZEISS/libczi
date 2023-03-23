@@ -40,7 +40,7 @@
 #	include <string>
 #endif
 
- // For placement new
+// For placement new
 #include <new>
 
 #ifdef _MSC_VER
