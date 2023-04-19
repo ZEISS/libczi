@@ -158,6 +158,10 @@ namespace libCZI
             /// If any of R, G or B is NaN, then the background is not cleared.
             RgbFloatColor   backGroundColor;
 
+            /// If true, then the tiles are sorted by their M-index (tile with highest M-index will be 'on top').
+            /// Otherwise the Z-order is arbitrary.
+            bool sortByM;
+
             /// If true, then a one-pixel wide boundary will be drawn around 
             /// each tile (in black color).
             bool drawTileBorder;
@@ -169,6 +173,7 @@ namespace libCZI
             void Clear()
             {
                 this->drawTileBorder = false;
+                this->sortByM = true;
                 this->backGroundColor.r = this->backGroundColor.g = this->backGroundColor.b = std::numeric_limits<float>::quiet_NaN();
                 this->sceneFilter.reset();
             }
@@ -232,6 +237,10 @@ namespace libCZI
             /// If any of R, G or B is NaN, then the background is not cleared.
             RgbFloatColor   backGroundColor;
 
+            /// If true, then the tiles are sorted by their M-index (tile with highest M-index will be 'on top').
+            /// Otherwise the Z-order is arbitrary.
+            bool sortByM;
+
             /// If true, then a one-pixel wide boundary will be drawn around 
             /// each tile (in black color).
             bool drawTileBorder;
@@ -244,6 +253,7 @@ namespace libCZI
             void Clear()
             {
                 this->drawTileBorder = false;
+                this->sortByM = true;
                 this->backGroundColor.r = this->backGroundColor.g = this->backGroundColor.b = std::numeric_limits<float>::quiet_NaN();
                 this->sceneFilter.reset();
             }

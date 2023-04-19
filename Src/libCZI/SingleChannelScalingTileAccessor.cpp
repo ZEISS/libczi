@@ -125,14 +125,10 @@ int CSingleChannelScalingTileAccessor::GetIdxOf1stSubBlockWithZoomGreater(const 
 /// the items sorted by their "zoom"-factor. (A zoom of "1" means that the subblock is on layer-0). Subblocks of
 /// a higher pyramid-layer are at the end of the list.
 /// </summary>
-/// <remarks>	
-/// TODO: within a pyramid-layer, the subblocks should be sorted according to their M-index. The problem is (once again...)
-/// to define a "pyramid-layer". Since, currently, only layer-0 may have overlapping tiles, it is only relevant for layer-0,
-/// and layer-0 can be easily defined by physical_size==logical_size.
-/// </remarks>
 /// <param name="sbBlks">	The vector of subblock-infos for which to create the sorted indices. </param>
+/// <param name="sortByM">	Whether to sort the subblocks by their zoom level AND the M-Index or only by zoom level. </param>
 /// <returns>	A vector with indices which give the subblocks sorted by their zoom (biggest zoom first). </returns>
-std::vector<int> CSingleChannelScalingTileAccessor::CreateSortByZoom(const std::vector<SbInfo>& sbBlks)
+std::vector<int> CSingleChannelScalingTileAccessor::CreateSortByZoom(const std::vector<SbInfo>& sbBlks, bool sortByM)
 {
     std::vector<int> byZoom;
     byZoom.reserve(sbBlks.size());
@@ -141,7 +137,7 @@ std::vector<int> CSingleChannelScalingTileAccessor::CreateSortByZoom(const std::
         byZoom.emplace_back(static_cast<int>(i));
     }
 
-    std::sort(byZoom.begin(), byZoom.end(), [&](const int i1, const int i2)->bool {return sbBlks.at(i1).GetZoom() < sbBlks.at(i2).GetZoom(); });
+    std::sort(byZoom.begin(), byZoom.end(), [&](const int i1, const int i2)->bool {return sbBlks.at(i1).GetZoom() < sbBlks.at(i2).GetZoom() || (sortByM && sbBlks.at(i1).GetZoom() == sbBlks.at(i2).GetZoom() && sbBlks.at(i1).mIndex < sbBlks.at(i2).mIndex); });
     return byZoom;
 }
 
@@ -217,12 +213,12 @@ void CSingleChannelScalingTileAccessor::InternalGet(libCZI::IBitmapData* bmDest,
     {
         // we only have to deal with a single scene (or: the document does not include a scene-dimension at all), in this
         //  case we do not have group by scene and save some cycles
-        auto sbSetsortedByZoom = this->GetSubSetFilteredBySceneSortedByZoom(roi, planeCoordinate, scenesInvolved);
+        auto sbSetsortedByZoom = this->GetSubSetFilteredBySceneSortedByZoom(roi, planeCoordinate, scenesInvolved, options.sortByM);
         this->Paint(bmDest, roi, sbSetsortedByZoom, zoom);
     }
     else
     {
-        const auto sbSetSortedByZoomPerScene = this->GetSubSetSortedByZoomPerScene(scenesInvolved, roi, planeCoordinate);
+        const auto sbSetSortedByZoomPerScene = this->GetSubSetSortedByZoomPerScene(scenesInvolved, roi, planeCoordinate, options.sortByM);
         for (const auto& it : sbSetSortedByZoomPerScene)
         {
             this->Paint(bmDest, roi, get<1>(it), zoom);
@@ -304,16 +300,17 @@ std::vector<int> CSingleChannelScalingTileAccessor::DetermineInvolvedScenes(cons
 /// <param name="roi">              The region-of-interest rectangle. </param>
 /// <param name="planeCoordinate">  The plane coordinate. </param>
 /// <param name="allowedScenes">    The list of allowed scenes. </param>
+/// <param name="sortByM">          Whether to sort the subblocks by their zoom level AND the M-Index or only by zoom level. </param>
 /// <returns>   The subset of subblocks filtered by the specified conditions, sorted by their zoom. </returns>
-CSingleChannelScalingTileAccessor::SubSetSortedByZoom CSingleChannelScalingTileAccessor::GetSubSetFilteredBySceneSortedByZoom(const libCZI::IntRect& roi, const libCZI::IDimCoordinate* planeCoordinate, const std::vector<int>& allowedScenes)
+CSingleChannelScalingTileAccessor::SubSetSortedByZoom CSingleChannelScalingTileAccessor::GetSubSetFilteredBySceneSortedByZoom(const libCZI::IntRect& roi, const libCZI::IDimCoordinate* planeCoordinate, const std::vector<int>& allowedScenes, bool sortByM)
 {
     SubSetSortedByZoom result;
     result.subBlocks = this->GetSubSet(roi, planeCoordinate, &allowedScenes);
-    result.sortedByZoom = this->CreateSortByZoom(result.subBlocks);
+    result.sortedByZoom = this->CreateSortByZoom(result.subBlocks, sortByM);
     return result;
 }
 
-std::vector<std::tuple<int, CSingleChannelScalingTileAccessor::SubSetSortedByZoom>> CSingleChannelScalingTileAccessor::GetSubSetSortedByZoomPerScene(const vector<int>& scenes, const libCZI::IntRect& roi, const libCZI::IDimCoordinate* planeCoordinate)
+std::vector<std::tuple<int, CSingleChannelScalingTileAccessor::SubSetSortedByZoom>> CSingleChannelScalingTileAccessor::GetSubSetSortedByZoomPerScene(const vector<int>& scenes, const libCZI::IntRect& roi, const libCZI::IDimCoordinate* planeCoordinate, bool sortByM)
 {
     std::vector<std::tuple<int, CSingleChannelScalingTileAccessor::SubSetSortedByZoom>> result;
     CDimCoordinate coord(planeCoordinate);
@@ -326,7 +323,7 @@ std::vector<std::tuple<int, CSingleChannelScalingTileAccessor::SubSetSortedByZoo
         //       I guess the natural thing would be to consider only the specified scene
         coord.Set(DimensionIndex::S, sceneIdx);
         sbset.subBlocks = this->GetSubSet(roi, &coord, nullptr);
-        sbset.sortedByZoom = this->CreateSortByZoom(sbset.subBlocks);
+        sbset.sortedByZoom = this->CreateSortByZoom(sbset.subBlocks, sortByM);
         result.emplace_back(make_tuple(sceneIdx, sbset));
     }
 

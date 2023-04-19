@@ -57,7 +57,7 @@ void CSingleChannelPyramidLevelTileAccessor::InternalGet(libCZI::IBitmapData* pD
     this->CheckPlaneCoordinates(planeCoordinate);
     Clear(pDest, options.backGroundColor);
     const auto sizeBitmap = pDest->GetSize();
-    const auto subSet = GetSubBlocksSubset(IntRect{ xPos,yPos,static_cast<int>(sizeBitmap.w) * sizeOfPixelOnLayer0,static_cast<int>(sizeBitmap.h) * sizeOfPixelOnLayer0 }, planeCoordinate, pyramidInfo, options.sceneFilter.get());
+    const auto subSet = GetSubBlocksSubset(IntRect{ xPos,yPos,static_cast<int>(sizeBitmap.w) * sizeOfPixelOnLayer0,static_cast<int>(sizeBitmap.h) * sizeOfPixelOnLayer0 }, planeCoordinate, pyramidInfo, options.sceneFilter.get(), options.sortByM);
     if (subSet.empty())
     {	// no subblocks were found in the requested plane/ROI, so there is nothing to do
         return;
@@ -182,7 +182,7 @@ int CSingleChannelPyramidLevelTileAccessor::CalcPyramidLayerNo(const libCZI::Int
     return layerNo;
 }
 
-std::vector<CSingleChannelPyramidLevelTileAccessor::SbInfo> CSingleChannelPyramidLevelTileAccessor::GetSubBlocksSubset(const libCZI::IntRect& roi, const libCZI::IDimCoordinate* planeCoordinate, const PyramidLayerInfo& pyramidInfo, const libCZI::IIndexSet* sceneFilter)
+std::vector<CSingleChannelPyramidLevelTileAccessor::SbInfo> CSingleChannelPyramidLevelTileAccessor::GetSubBlocksSubset(const libCZI::IntRect& roi, const libCZI::IDimCoordinate* planeCoordinate, const PyramidLayerInfo& pyramidInfo, const libCZI::IIndexSet* sceneFilter, bool sortByM)
 {
     std::vector<CSingleChannelPyramidLevelTileAccessor::SbInfo> sblks;
     this->GetAllSubBlocks(roi, planeCoordinate, sceneFilter,
@@ -190,7 +190,11 @@ std::vector<CSingleChannelPyramidLevelTileAccessor::SbInfo> CSingleChannelPyrami
         {
             sblks.emplace_back(info);
         });
-
+    if (sortByM)
+    {
+        // sort ascending-by-M-index (-> lowest M-index first, highest last)
+        std::sort(sblks.begin(), sblks.end(), [](const CSingleChannelPyramidLevelTileAccessor::SbInfo& i1, const CSingleChannelPyramidLevelTileAccessor::SbInfo& i2)->bool {return i1.mIndex < i2.mIndex; });
+    }
     return sblks;
 }
 
