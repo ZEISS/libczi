@@ -137,7 +137,41 @@ std::vector<int> CSingleChannelScalingTileAccessor::CreateSortByZoom(const std::
         byZoom.emplace_back(static_cast<int>(i));
     }
 
-    std::sort(byZoom.begin(), byZoom.end(), [&](const int i1, const int i2)->bool {return sbBlks.at(i1).GetZoom() < sbBlks.at(i2).GetZoom() || (sortByM && sbBlks.at(i1).GetZoom() == sbBlks.at(i2).GetZoom() && sbBlks.at(i1).mIndex < sbBlks.at(i2).mIndex); });
+    if (sortByM)
+    {
+        std::sort(
+            byZoom.begin(),
+            byZoom.end(),
+            [&](const int i1, const int i2)->bool
+            {
+                const auto& sb1 = sbBlks.at(i1);
+                const auto& sb2 = sbBlks.at(i2);
+                const auto zoom1 = sb1.GetZoom();
+                const auto zoom2 = sb2.GetZoom();
+                if (zoom1 < zoom2)
+                {
+                    return true;
+                }
+                else if (zoom1 > zoom2 ||
+                            sb1.logicalRect.w != sb1.physicalSize.w ||  // if the logical rect is not the same as the physical size, then the subblock is not on layer-0
+                            sb1.logicalRect.h != sb1.physicalSize.h ||  // and we want to apply the "sorting by M-index" only for layer-0
+                            sb2.logicalRect.w != sb2.physicalSize.w ||
+                            sb2.logicalRect.h != sb2.physicalSize.h)
+                {
+                    return false;
+                }
+
+                // an invalid mIndex should go before a valid one (just to have a deterministic sorting) - and "invalid mIndex" is represented by both maximum int and minimum int
+                const int mIndex1 = Utils::IsValidMindex(sb1.mIndex) ? sb1.mIndex : (numeric_limits<int>::min)();
+                const int mIndex2 = Utils::IsValidMindex(sb2.mIndex) ? sb2.mIndex : (numeric_limits<int>::min)();
+
+                return mIndex1 < mIndex2;
+            });
+    }
+    else
+    {
+        std::sort(byZoom.begin(), byZoom.end(), [&](const int i1, const int i2)->bool {return sbBlks.at(i1).GetZoom() < sbBlks.at(i2).GetZoom(); });
+    }
     return byZoom;
 }
 

@@ -95,7 +95,13 @@ std::vector<CSingleChannelTileAccessor::IndexAndM> CSingleChannelTileAccessor::G
     if (sortByM == true)
     {
         // sort ascending-by-M-index (-> lowest M-index first, highest last)
-        std::sort(subBlocksSet.begin(), subBlocksSet.end(), [](const IndexAndM& i1, const IndexAndM& i2)->bool {return i1.mIndex < i2.mIndex; });
+        std::sort(subBlocksSet.begin(), subBlocksSet.end(), [](const IndexAndM& i1, const IndexAndM& i2)->bool
+            {
+                // an invalid mIndex should go before a valid one (just to have a deterministic sorting) - and "invalid mIndex" is represented by both maximum int and minimum int
+                const int mIndex1 = Utils::IsValidMindex(i1.mIndex) ? i1.mIndex : (numeric_limits<int>::min)();
+                const int mIndex2 = Utils::IsValidMindex(i2.mIndex) ? i2.mIndex : (numeric_limits<int>::min)();
+                return mIndex1 < mIndex2;
+            });
     }
 
     return subBlocksSet;

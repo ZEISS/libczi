@@ -193,7 +193,13 @@ std::vector<CSingleChannelPyramidLevelTileAccessor::SbInfo> CSingleChannelPyrami
     if (sortByM)
     {
         // sort ascending-by-M-index (-> lowest M-index first, highest last)
-        std::sort(sblks.begin(), sblks.end(), [](const CSingleChannelPyramidLevelTileAccessor::SbInfo& i1, const CSingleChannelPyramidLevelTileAccessor::SbInfo& i2)->bool {return i1.mIndex < i2.mIndex; });
+        std::sort(sblks.begin(), sblks.end(), [](const CSingleChannelPyramidLevelTileAccessor::SbInfo& i1, const CSingleChannelPyramidLevelTileAccessor::SbInfo& i2)->bool
+            {
+                // an invalid mIndex should go before a valid one (just to have a deterministic sorting) - and "invalid mIndex" is represented by both maximum int and minimum int
+                const int mIndex1 = Utils::IsValidMindex(i1.mIndex) ? i1.mIndex : (numeric_limits<int>::min)();
+                const int mIndex2 = Utils::IsValidMindex(i2.mIndex) ? i2.mIndex : (numeric_limits<int>::min)();
+                return mIndex1 < mIndex2;
+            });
     }
     return sblks;
 }
