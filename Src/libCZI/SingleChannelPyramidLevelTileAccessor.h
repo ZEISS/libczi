@@ -45,7 +45,7 @@ private:
 
     std::map<int, SbByLayer> CalcByLayer(const std::vector<SbInfo>& sbinfo, int minificationFactor);
 
-    std::vector<SbInfo> GetSubBlocksSubset(const libCZI::IntRect& roi, const libCZI::IDimCoordinate* planeCoordinate, const PyramidLayerInfo& pyramidInfo, const libCZI::IIndexSet* sceneFilter);
+    std::vector<SbInfo> GetSubBlocksSubset(const libCZI::IntRect& roi, const libCZI::IDimCoordinate* planeCoordinate, const PyramidLayerInfo& pyramidInfo, const libCZI::IIndexSet* sceneFilter, bool sortByM);
 
     void GetAllSubBlocks(const libCZI::IntRect& roi, const libCZI::IDimCoordinate* planeCoordinate, const libCZI::IIndexSet* sceneFilter, const std::function<void(const SbInfo& info)>& appender) const;
 
