@@ -191,7 +191,7 @@ namespace libCZI
         };
 
         /// Gets the tile composite of the specified plane and the specified ROI and the specified pyramid-layer.
-        /// The pixeltype is determined by examing the first subblock found in the
+        /// The pixeltype is determined by examining the first subblock found in the
         /// specified plane (which is an arbitrary subblock). A newly allocated
         /// bitmap is returned.
         /// \param roi             The ROI.
@@ -267,8 +267,8 @@ namespace libCZI
         /// \return The size of the composite created by this accessor (for these parameters).
         virtual libCZI::IntSize CalcSize(const libCZI::IntRect& roi, float zoom) const = 0;
 
-        /// Gets the scaled tile composite of the specified plane and the specified ROI with the specifed zoom factor.\n
-        /// The pixeltype is determined by examing the first subblock found in the
+        /// Gets the scaled tile composite of the specified plane and the specified ROI with the specified zoom factor.\n
+        /// The pixeltype is determined by examining the first subblock found in the
         /// specified plane (which is an arbitrary subblock). A newly allocated
         /// bitmap is returned.
         /// \param roi             The ROI.
@@ -278,7 +278,7 @@ namespace libCZI
         /// \return A std::shared_ptr&lt;libCZI::IBitmapData&gt;
         virtual std::shared_ptr<libCZI::IBitmapData> Get(const libCZI::IntRect& roi, const libCZI::IDimCoordinate* planeCoordinate, float zoom, const libCZI::ISingleChannelScalingTileAccessor::Options* pOptions) = 0;
 
-        /// Gets the scaled tile composite of the specified plane and the specified ROI with the specifed zoom factor.
+        /// Gets the scaled tile composite of the specified plane and the specified ROI with the specified zoom factor.
         /// \param pixeltype       The pixeltype (of the destination bitmap).
         /// \param roi             The ROI.
         /// \param planeCoordinate The plane coordinate.

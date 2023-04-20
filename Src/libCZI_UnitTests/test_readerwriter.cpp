@@ -277,7 +277,7 @@ TEST(CziReaderWriter, ReaderWriter1)
                 indexOfModifiedSbBlk = index;
                 ++callCnt;
             }
-    return true;
+            return true;
         });
 
     EXPECT_TRUE(callCnt == 1 && indexOfModifiedSbBlk >= 0) << "not the expected result";
@@ -408,8 +408,8 @@ TEST(CziReaderWriter, ReaderWriter2)
                 return true;
             }
 
-    success = false;
-    return false;
+            success = false;
+            return false;
         });
 
     EXPECT_TRUE(success && allReceived) << "did not behave as expected";
@@ -434,7 +434,7 @@ TEST(CziReaderWriter, ReaderWriter3)
                 return false;
             }
 
-    return true;
+            return true;
         });
 
     EXPECT_TRUE(idxAttachment >= 0) << "did not behave as expected";
@@ -534,8 +534,8 @@ TEST(CziReaderWriter, ReaderWriter3)
                 return true;
             }
 
-    success = false;
-    return false;
+            success = false;
+            return false;
         });
 
     allReceived = true;
@@ -564,7 +564,7 @@ TEST(CziReaderWriter, ReaderWriter4)
                 return false;
             }
 
-    return true;
+            return true;
         });
 
     EXPECT_TRUE(idxAttachment >= 0) << "did not behave as expected";
@@ -616,7 +616,7 @@ TEST(CziReaderWriter, ReaderWriter4)
                 indexOfModifiedAttchmnt = index;
             }
 
-    return true;
+            return true;
         });
 
     EXPECT_TRUE(indexOfModifiedAttchmnt >= 0) << "not the expected result";
