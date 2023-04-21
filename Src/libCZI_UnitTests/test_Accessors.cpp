@@ -26,7 +26,7 @@ static tuple<shared_ptr<void>, size_t> CreateTestCziDocumentAndGetAsBlob(const a
 
     auto spWriterInfo = make_shared<CCziWriterInfo >(
         GUID{ 0x1234567,0x89ab,0xcdef,{ 1,2,3,4,5,6,7,8 } },
-        CDimBounds{ { DimensionIndex::C,0,1 } },	// set a bounds C
+        CDimBounds{ { DimensionIndex::C, 0, 1 } },	// set a bounds C
         0, 2);	// set a bounds M : 0<=m<=2
     writer->Create(outStream, spWriterInfo);
 
@@ -193,7 +193,7 @@ TEST_P(ZOrderAndResultGray8Fixture, CreateDocumentAndUseSingleChannelPyramidLaye
     const auto reader = CreateCZIReader();
     reader->Open(memory_stream);
     const auto accessor = reader->CreateSingleChannelPyramidLayerTileAccessor();
-    CDimCoordinate plane_coordinate{ {DimensionIndex::C, 0} };
+    const CDimCoordinate plane_coordinate{ {DimensionIndex::C, 0} };
     ISingleChannelPyramidLayerTileAccessor::Options options;
     options.Clear();
 
@@ -314,7 +314,7 @@ TEST(Accessor, CreateDocumentAndUseSingleChannelPyramidLayerTileAccessorWithAndC
     const auto reader = CreateCZIReader();
     reader->Open(memory_stream);
     const auto accessor = reader->CreateSingleChannelPyramidLayerTileAccessor();
-    CDimCoordinate plane_coordinate{ {DimensionIndex::C, 0} };
+    const CDimCoordinate plane_coordinate{ {DimensionIndex::C, 0} };
     ISingleChannelPyramidLayerTileAccessor::Options options;
     options.Clear();
     options.sortByM = false;
