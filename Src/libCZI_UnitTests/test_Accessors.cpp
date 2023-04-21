@@ -4,6 +4,8 @@
 
 #include "pch.h"
 #include <array>
+#include <tuple>
+#include <memory>
 #include "inc_libCZI.h"
 #include "MemOutputStream.h"
 #include "utils.h"
@@ -12,20 +14,13 @@
 using namespace libCZI;
 using namespace std;
 
-struct ZOrderAndResultGray8Fixture : public testing::TestWithParam<tuple<int, int, int, array<uint8_t, 4>>> { };
-
-TEST_P(ZOrderAndResultGray8Fixture, CreateDocumentAndUseSingleChannelScalingTileAccessorAndCheckResult)
+/// Creates a synthetic CZI document and returns it as a blob. This is used by unit-tests below.
+///
+/// \param  m_indices_for_subblocks The m-indices for the three subblocks which are created and added to the document.
+///
+/// \returns A blob containing the synthetic CZI document.
+static tuple<shared_ptr<void>, size_t> CreateTestCziDocumentAndGetAsBlob(const array<int, 3>& m_indices_for_subblocks)
 {
-    // We create a document with 3 subblocks, where the M-index (of each subblock) is given by the test parameters.
-    // The subblocks are 2x1 pixels, and the pixel values are 42 for the 1st, 45 for the second, and 47 for the third
-    // 1st subblock is at (0,0), 2nd at (0,1) and 3rd at (0,2).
-    // Then we use a single-channel scaling tile accessor to get the tile composite of size 4x1 pixels at (0,0) and check the result.
-    // When doing the tile composite, the M-index is to give the z-order - so depending on the M-index, we expect a different result,
-    // which is then checked.
-
-    const auto parameters = GetParam();
-
-    // arrange
     auto writer = CreateCZIWriter();
     auto outStream = make_shared<CMemOutputStream>(0);
 
@@ -40,7 +35,7 @@ TEST_P(ZOrderAndResultGray8Fixture, CreateDocumentAndUseSingleChannelScalingTile
     addSbBlkInfo.Clear();
     addSbBlkInfo.coordinate.Set(DimensionIndex::C, 0);
     addSbBlkInfo.mIndexValid = true;
-    addSbBlkInfo.mIndex = get<0>(parameters);
+    addSbBlkInfo.mIndex = m_indices_for_subblocks[0];
     addSbBlkInfo.x = 0;
     addSbBlkInfo.y = 0;
     addSbBlkInfo.logicalWidth = bitmap->GetWidth();
@@ -59,7 +54,7 @@ TEST_P(ZOrderAndResultGray8Fixture, CreateDocumentAndUseSingleChannelScalingTile
     addSbBlkInfo.Clear();
     addSbBlkInfo.coordinate.Set(DimensionIndex::C, 0);
     addSbBlkInfo.mIndexValid = true;
-    addSbBlkInfo.mIndex = get<1>(parameters);
+    addSbBlkInfo.mIndex = m_indices_for_subblocks[1];
     addSbBlkInfo.x = 1;
     addSbBlkInfo.y = 0;
     addSbBlkInfo.logicalWidth = bitmap->GetWidth();
@@ -78,7 +73,7 @@ TEST_P(ZOrderAndResultGray8Fixture, CreateDocumentAndUseSingleChannelScalingTile
     addSbBlkInfo.Clear();
     addSbBlkInfo.coordinate.Set(DimensionIndex::C, 0);
     addSbBlkInfo.mIndexValid = true;
-    addSbBlkInfo.mIndex = get<2>(parameters);
+    addSbBlkInfo.mIndex = m_indices_for_subblocks[2];
     addSbBlkInfo.x = 2;
     addSbBlkInfo.y = 0;
     addSbBlkInfo.logicalWidth = bitmap->GetWidth();
@@ -106,23 +101,107 @@ TEST_P(ZOrderAndResultGray8Fixture, CreateDocumentAndUseSingleChannelScalingTile
     writer->Close();
     writer.reset();
 
-    size_t czi_document_size;
+    size_t czi_document_size = 0;
     shared_ptr<void> czi_document_data = outStream->GetCopy(&czi_document_size);
-    outStream.reset();
+    return make_tuple(czi_document_data, czi_document_size);
+}
 
-    auto memory_stream = make_shared<CMemInputOutputStream>(czi_document_data.get(), czi_document_size);
-    auto reader = CreateCZIReader();
+struct ZOrderAndResultGray8Fixture : public testing::TestWithParam<tuple<int, int, int, array<uint8_t, 4>>> { };
+
+TEST_P(ZOrderAndResultGray8Fixture, CreateDocumentAndUseSingleChannelScalingTileAccessorAndCheckResult)
+{
+    // We create a document with 3 subblocks, where the M-index (of each subblock) is given by the test parameters.
+    // The subblocks are 2x1 pixels, and the pixel values are 42 for the 1st, 45 for the second, and 47 for the third
+    // 1st subblock is at (0,0), 2nd at (0,1) and 3rd at (0,2).
+    // Then we use a single-channel scaling tile accessor to get the tile composite of size 4x1 pixels at (0,0) and check the result.
+    // When doing the tile composite, the M-index is to give the z-order - so depending on the M-index, we expect a different result,
+    // which is then checked.
+
+    const auto parameters = GetParam();
+
+    // arrange
+    auto czi_document_as_blob = CreateTestCziDocumentAndGetAsBlob(array<int, 3>{ get<0>(parameters), get<1>(parameters), get<2>(parameters) });
+    const auto memory_stream = make_shared<CMemInputOutputStream>(get<0>(czi_document_as_blob).get(), get<1>(czi_document_as_blob));
+    const auto reader = CreateCZIReader();
     reader->Open(memory_stream);
-    auto accessor = reader->CreateSingleChannelScalingTileAccessor();
-    CDimCoordinate plane_coordinate{ {DimensionIndex::C, 0} };
+    const auto accessor = reader->CreateSingleChannelScalingTileAccessor();
+    const CDimCoordinate plane_coordinate{ {DimensionIndex::C, 0} };
     ISingleChannelScalingTileAccessor::Options options;
     options.Clear();
 
     // act
-    auto composite_bitmap = accessor->Get(PixelType::Gray8, IntRect{ 0,0,4,1 }, &plane_coordinate, 1.f, &options);
+    const auto composite_bitmap = accessor->Get(PixelType::Gray8, IntRect{ 0,0,4,1 }, &plane_coordinate, 1.f, &options);
 
     // assert
-    ScopedBitmapLockerSP lock_info_bitmap{ composite_bitmap };
+    const ScopedBitmapLockerSP lock_info_bitmap{ composite_bitmap };
+    const uint8_t* p = static_cast<const uint8_t*>(lock_info_bitmap.ptrDataRoi);
+    const auto& expected = get<3>(parameters);
+    EXPECT_EQ(p[0], expected[0]);
+    EXPECT_EQ(p[1], expected[1]);
+    EXPECT_EQ(p[2], expected[2]);
+    EXPECT_EQ(p[3], expected[3]);
+}
+
+TEST_P(ZOrderAndResultGray8Fixture, CreateDocumentAndUseSingleChannelTileAccessorAndCheckResult)
+{
+    // We create a document with 3 subblocks, where the M-index (of each subblock) is given by the test parameters.
+    // The subblocks are 2x1 pixels, and the pixel values are 42 for the 1st, 45 for the second, and 47 for the third
+    // 1st subblock is at (0,0), 2nd at (0,1) and 3rd at (0,2).
+    // Then we use a single-channel tile accessor to get the tile composite of size 4x1 pixels at (0,0) and check the result.
+    // When doing the tile composite, the M-index is to give the z-order - so depending on the M-index, we expect a different result,
+    // which is then checked.
+
+    const auto parameters = GetParam();
+
+    // arrange
+    auto czi_document_as_blob = CreateTestCziDocumentAndGetAsBlob(array<int, 3>{ get<0>(parameters), get<1>(parameters), get<2>(parameters) });
+    const auto memory_stream = make_shared<CMemInputOutputStream>(get<0>(czi_document_as_blob).get(), get<1>(czi_document_as_blob));
+    const auto reader = CreateCZIReader();
+    reader->Open(memory_stream);
+    const auto accessor = reader->CreateSingleChannelTileAccessor();
+    const CDimCoordinate plane_coordinate{ {DimensionIndex::C, 0} };
+    ISingleChannelTileAccessor::Options options;
+    options.Clear();
+
+    // act
+    const auto composite_bitmap = accessor->Get(PixelType::Gray8, IntRect{ 0,0,4,1 }, &plane_coordinate, &options);
+
+    // assert
+    const ScopedBitmapLockerSP lock_info_bitmap{ composite_bitmap };
+    const uint8_t* p = static_cast<const uint8_t*>(lock_info_bitmap.ptrDataRoi);
+    const auto& expected = get<3>(parameters);
+    EXPECT_EQ(p[0], expected[0]);
+    EXPECT_EQ(p[1], expected[1]);
+    EXPECT_EQ(p[2], expected[2]);
+    EXPECT_EQ(p[3], expected[3]);
+}
+
+TEST_P(ZOrderAndResultGray8Fixture, CreateDocumentAndUseSingleChannelPyramidLayerTileAccessorAndCheckResult)
+{
+    // We create a document with 3 subblocks, where the M-index (of each subblock) is given by the test parameters.
+    // The subblocks are 2x1 pixels, and the pixel values are 42 for the 1st, 45 for the second, and 47 for the third
+    // 1st subblock is at (0,0), 2nd at (0,1) and 3rd at (0,2).
+    // Then we use a pyramid-layer tile accessor to get the tile composite of size 4x1 pixels at (0,0) and check the result.
+    // When doing the tile composite, the M-index is to give the z-order - so depending on the M-index, we expect a different result,
+    // which is then checked.
+
+    const auto parameters = GetParam();
+
+    // arrange
+    auto czi_document_as_blob = CreateTestCziDocumentAndGetAsBlob(array<int, 3>{ get<0>(parameters), get<1>(parameters), get<2>(parameters) });
+    const auto memory_stream = make_shared<CMemInputOutputStream>(get<0>(czi_document_as_blob).get(), get<1>(czi_document_as_blob));
+    const auto reader = CreateCZIReader();
+    reader->Open(memory_stream);
+    const auto accessor = reader->CreateSingleChannelPyramidLayerTileAccessor();
+    CDimCoordinate plane_coordinate{ {DimensionIndex::C, 0} };
+    ISingleChannelPyramidLayerTileAccessor::Options options;
+    options.Clear();
+
+    // act
+    const auto composite_bitmap = accessor->Get(PixelType::Gray8, IntRect{ 0,0,4,1 }, &plane_coordinate, ISingleChannelPyramidLayerTileAccessor::PyramidLayerInfo{ 2,0 }, &options);
+
+    // assert
+    const ScopedBitmapLockerSP lock_info_bitmap{ composite_bitmap };
     const uint8_t* p = static_cast<const uint8_t*>(lock_info_bitmap.ptrDataRoi);
     const auto& expected = get<3>(parameters);
     EXPECT_EQ(p[0], expected[0]);
