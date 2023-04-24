@@ -10,7 +10,7 @@
 /**
  * \brief	Creates a testing bitmap with the given width, height and the pixel type.
  *			The function throws exception if unsupported pixel type is selected.
- * \param	pixelType	The pixel type. Supports either PixelType::Gray8, PixelType::Gray16,
+ * \param	pixeltype	The pixel type. Supports either PixelType::Gray8, PixelType::Gray16,
  *						PixelType::Bgr24 or PixelType::Bgr48. All other types are not supported.
  *						The function throws exception if other pixel type is selected.
  * \param	width		The width of bitmap image in pixels.
@@ -23,7 +23,7 @@ std::shared_ptr<libCZI::IBitmapData> CreateTestBitmap(libCZI::PixelType pixeltyp
 /**
  * \brief	Creates a testing bitmap with random pixel values. The image has given width, height and the pixel type.
  *			The function throws exception if unsupported pixel type is selected.
- * \param	pixelType	The pixel type. Supports either PixelType::Gray8, PixelType::Gray16,
+ * \param	pixeltype	The pixel type. Supports either PixelType::Gray8, PixelType::Gray16,
  *						PixelType::Bgr24 or PixelType::Bgr48. All other types are not supported.
  *						The function throws exception if other pixel type is selected.
  * \param	width		The width of bitmap image in pixels.
@@ -33,6 +33,9 @@ std::shared_ptr<libCZI::IBitmapData> CreateTestBitmap(libCZI::PixelType pixeltyp
  *			failed to allocated memory for the image.
  */
 std::shared_ptr<libCZI::IBitmapData> CreateRandomBitmap(libCZI::PixelType pixeltype, std::uint32_t width, std::uint32_t height);
+
+
+std::shared_ptr<libCZI::IBitmapData> CreateGray8BitmapAndFill(std::uint32_t width, std::uint32_t height, uint8_t value);
 
 /**
  * \brief	Creates an object with Zeiss logo bitmap image, which has fixed size of image width, height and pixel types

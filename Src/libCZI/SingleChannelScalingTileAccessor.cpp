@@ -262,8 +262,8 @@ void CSingleChannelScalingTileAccessor::InternalGet(libCZI::IBitmapData* bmDest,
 
 void CSingleChannelScalingTileAccessor::Paint(libCZI::IBitmapData* bmDest, const libCZI::IntRect& roi, const SubSetSortedByZoom& sbSetSortedByZoom, float zoom)
 {
-    const int idxOf1stSSubBlockOfZoomGreater = this->GetIdxOf1stSubBlockWithZoomGreater(sbSetSortedByZoom.subBlocks, sbSetSortedByZoom.sortedByZoom, zoom);
-    if (idxOf1stSSubBlockOfZoomGreater < 0)
+    const int idxOf1stSubBlockOfZoomGreater = this->GetIdxOf1stSubBlockWithZoomGreater(sbSetSortedByZoom.subBlocks, sbSetSortedByZoom.sortedByZoom, zoom);
+    if (idxOf1stSubBlockOfZoomGreater < 0)
     {
         // this means that we would need to overzoom (i.e. the requested zoom is less than the lowest level we find in the subblock-repository)
         // TODO: this requires special consideration, for the time being -> bail out
@@ -274,7 +274,7 @@ void CSingleChannelScalingTileAccessor::Paint(libCZI::IBitmapData* bmDest, const
     }
 
     std::vector<int>::const_iterator it = sbSetSortedByZoom.sortedByZoom.cbegin();
-    std::advance(it, idxOf1stSSubBlockOfZoomGreater);
+    std::advance(it, idxOf1stSubBlockOfZoomGreater);
 
     const float startZoom = sbSetSortedByZoom.subBlocks.at(*it).GetZoom();
 
