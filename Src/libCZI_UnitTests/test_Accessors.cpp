@@ -419,11 +419,11 @@ TEST(Accessor, CreateDocumentAndEnsurePixelAccuracyWithScalingAccessor)
     
     // ok, we now expect that composite-bitmap is all black, except for a rectangle of size 761x2449 at (0,2671) which has the pixel-value 0x2a
     const ScopedBitmapLockerSP lock_info_bitmap{ composite_bitmap };
-    for (int y = 0; y < 5121; ++y)
+    for (size_t y = 0; y < 5121; ++y)
     {
-        for (int x = 0; x < 5121; ++x)
+        for (size_t x = 0; x < 5121; ++x)
         {
-            uint8_t expected_value = (x >= 0 && x < 761 && y >= 2671 && y < 2671 + 2449) ? 0x2a : 0;
+            uint8_t expected_value = (x < 761 && y >= 2671 && y < 2671 + 2449) ? 0x2a : 0;
             const uint8_t* p = static_cast<const uint8_t*>(lock_info_bitmap.ptrDataRoi) + y * lock_info_bitmap.stride + x;
             if (*p != expected_value)
             {
