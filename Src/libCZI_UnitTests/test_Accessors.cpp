@@ -427,7 +427,7 @@ TEST(Accessor, CreateDocumentAndEnsurePixelAccuracyWithScalingAccessor)
             const uint8_t* p = static_cast<const uint8_t*>(lock_info_bitmap.ptrDataRoi) + y * lock_info_bitmap.stride + x;
             if (*p != expected_value)
             {
-                FAIL() << "resulting bitmap is incorrect (at x=" << x << " y=" << y << '.';
+                FAIL() << "resulting bitmap is incorrect (at x=" << x << " y=" << y << ").";
             }
         }
     }
