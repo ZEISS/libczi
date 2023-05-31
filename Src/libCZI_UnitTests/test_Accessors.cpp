@@ -393,7 +393,7 @@ TEST(Accessor, CreateDocumentAndEnsurePixelAccuracyWithScalingAccessor)
 {
     // arrange
 
-    // we now create a document which characteristics which have been "problematic" - in this case the composition
+    // we now create a document with characteristics which have been "problematic" - in this case the composition
     //  result was not pixel-accurate (despite the zoom being exactly 1)
     auto czi_document_as_blob = CreateCziWhichWasFoundProblematicWrtPixelAccuracyAndGetAsBlob();
 
