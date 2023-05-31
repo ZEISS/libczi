@@ -416,8 +416,10 @@ TEST(Accessor, CreateDocumentAndEnsurePixelAccuracyWithScalingAccessor)
         &options);
 
     // assert
-    
+
     // ok, we now expect that composite-bitmap is all black, except for a rectangle of size 761x2449 at (0,2671) which has the pixel-value 0x2a
+    ASSERT_EQ(composite_bitmap->GetWidth(), 5121);
+    ASSERT_EQ(composite_bitmap->GetHeight(), 5121);
     const ScopedBitmapLockerSP lock_info_bitmap{ composite_bitmap };
     for (size_t y = 0; y < 5121; ++y)
     {
@@ -428,6 +430,67 @@ TEST(Accessor, CreateDocumentAndEnsurePixelAccuracyWithScalingAccessor)
             if (*p != expected_value)
             {
                 FAIL() << "resulting bitmap is incorrect (at x=" << x << " y=" << y << ").";
+            }
+        }
+    }
+
+    SUCCEED();
+}
+
+TEST(Accessor, CreateDocumentAndExerciseScalingAccessorAllowingForInaccuracy)
+{
+    // in this test, we use the same CZI-document as before, but we use a zoom not exactly equal to 1.0, 
+    // and when checking the result, we allow for some inaccuracy (due to the zoom not being exactly 1.0)
+
+    // arrange
+
+    // we now create a document with characteristics which have been "problematic" - in this case the composition
+    //  result was not pixel-accurate (despite the zoom being exactly 1)
+    auto czi_document_as_blob = CreateCziWhichWasFoundProblematicWrtPixelAccuracyAndGetAsBlob();
+
+    const auto memory_stream = make_shared<CMemInputOutputStream>(get<0>(czi_document_as_blob).get(), get<1>(czi_document_as_blob));
+    const auto reader = CreateCZIReader();
+    reader->Open(memory_stream);
+
+    const auto accessor = reader->CreateSingleChannelScalingTileAccessor();
+    const CDimCoordinate plane_coordinate{ {DimensionIndex::C, 0} };
+    ISingleChannelScalingTileAccessor::Options options;
+    options.Clear();
+    options.backGroundColor = RgbFloatColor{ 0,0,0 };   // request to have background cleared with black
+
+    // act
+    constexpr float zoom = 1 - numeric_limits<float>::epsilon();    // use a zoom a tiny bit less than 1
+    IntSize resulting_size = accessor->CalcSize(IntRect{ 0,0,5121,5121 }, zoom);
+    const auto composite_bitmap = accessor->Get(
+        PixelType::Gray8,
+        IntRect{ 0,0,5121,5121 },
+        &plane_coordinate,
+        1 - numeric_limits<float>::epsilon(),
+        &options);
+
+    // assert
+
+    EXPECT_EQ(composite_bitmap->GetWidth(), resulting_size.w);
+    EXPECT_EQ(composite_bitmap->GetHeight(), resulting_size.h);
+    // ok, we now expect that composite-bitmap is all black, except for a rectangle of size 761x2449 at (0,2671) which has the pixel-value 0x2a
+    ASSERT_TRUE(composite_bitmap->GetWidth() == 5121 || composite_bitmap->GetWidth() == 5120);
+    ASSERT_TRUE(composite_bitmap->GetHeight() == 5121 || composite_bitmap->GetHeight() == 5120);
+    const ScopedBitmapLockerSP lock_info_bitmap{ composite_bitmap };
+    for (size_t y = 0; y < composite_bitmap->GetHeight(); ++y)
+    {
+        for (size_t x = 0; x < composite_bitmap->GetWidth(); ++x)
+        {
+            uint8_t expected_value = (x < 761 && y >= 2671 && y < 2671 + 2449) ? 0x2a : 0;
+
+            // allow both values for the exact borders of the subblock, i.e. allow for the bitmap to be one pixel smaller on the edges
+            bool inaccuracy_allowed = ((y == 2670 || y == 2671 || y == 2670 + 2449 || y == 2671 + 2449) && (x < 760));
+            const uint8_t* p = static_cast<const uint8_t*>(lock_info_bitmap.ptrDataRoi) + y * lock_info_bitmap.stride + x;
+            if (*p != expected_value)
+            {
+                if (!inaccuracy_allowed || *p != 0)
+                {
+                    FAIL() << "resulting bitmap is incorrect (at x=" << x << " y=" << y << ").";
+                }
             }
         }
     }
