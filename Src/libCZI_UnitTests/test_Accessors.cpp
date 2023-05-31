@@ -106,6 +106,60 @@ static tuple<shared_ptr<void>, size_t> CreateTestCziDocumentAndGetAsBlob(const a
     return make_tuple(czi_document_data, czi_document_size);
 }
 
+/// Creates a "special" CZI which was found problematic wrt pixel accuracy - it contains a single subblock
+/// at position (0,2671) and size (761,2449). The subblock is of pixel type gray8, and it contains
+/// the value 0x2a for all pixels.
+///
+/// \returns A blob containing a CZI document.
+static tuple<shared_ptr<void>, size_t> CreateCziWhichWasFoundProblematicWrtPixelAccuracyAndGetAsBlob()
+{
+    auto writer = CreateCZIWriter();
+    auto outStream = make_shared<CMemOutputStream>(0);
+
+    auto spWriterInfo = make_shared<CCziWriterInfo >(
+        GUID{ 0x1234567,0x89ab,0xcdef,{ 1,2,3,4,5,6,7,8 } },
+        CDimBounds{ { DimensionIndex::C, 0, 1 } },	// set a bounds C
+        0, 0);	// set a bounds M : 0<=m<=0
+    writer->Create(outStream, spWriterInfo);
+
+    auto bitmap = CreateGray8BitmapAndFill(761, 2449, 0x2a);
+    AddSubBlockInfoStridedBitmap addSbBlkInfo;
+    addSbBlkInfo.Clear();
+    addSbBlkInfo.coordinate.Set(DimensionIndex::C, 0);
+    addSbBlkInfo.mIndexValid = true;
+    addSbBlkInfo.mIndex = 0;
+    addSbBlkInfo.x = 0;
+    addSbBlkInfo.y = 2671;
+    addSbBlkInfo.logicalWidth = bitmap->GetWidth();
+    addSbBlkInfo.logicalHeight = bitmap->GetHeight();
+    addSbBlkInfo.physicalWidth = bitmap->GetWidth();
+    addSbBlkInfo.physicalHeight = bitmap->GetHeight();
+    addSbBlkInfo.PixelType = bitmap->GetPixelType();
+    {
+        ScopedBitmapLockerSP lock_info_bitmap{ bitmap };
+        addSbBlkInfo.ptrBitmap = lock_info_bitmap.ptrDataRoi;
+        addSbBlkInfo.strideBitmap = lock_info_bitmap.stride;
+        writer->SyncAddSubBlock(addSbBlkInfo);
+    }
+
+    PrepareMetadataInfo prepare_metadata_info;
+    auto metaDataBuilder = writer->GetPreparedMetadata(prepare_metadata_info);
+    WriteMetadataInfo write_metadata_info;
+    write_metadata_info.Clear();
+    const auto& strMetadata = metaDataBuilder->GetXml();
+    write_metadata_info.szMetadata = strMetadata.c_str();
+    write_metadata_info.szMetadataSize = strMetadata.size() + 1;
+    write_metadata_info.ptrAttachment = nullptr;
+    write_metadata_info.attachmentSize = 0;
+    writer->SyncWriteMetadata(write_metadata_info);
+    writer->Close();
+    writer.reset();
+
+    size_t czi_document_size = 0;
+    shared_ptr<void> czi_document_data = outStream->GetCopy(&czi_document_size);
+    return make_tuple(czi_document_data, czi_document_size);
+}
+
 struct ZOrderAndResultGray8Fixture : public testing::TestWithParam<tuple<int, int, int, array<uint8_t, 4>>> { };
 
 TEST_P(ZOrderAndResultGray8Fixture, CreateDocumentAndUseSingleChannelScalingTileAccessorWithSortByMAndCheckResult)
@@ -333,4 +387,50 @@ TEST(Accessor, CreateDocumentAndUseSingleChannelPyramidLayerTileAccessorWithAndC
                 memcmp(p, &expected_variant2, sizeof(expected_variant2)) == 0 ||
                 memcmp(p, &expected_variant3, sizeof(expected_variant3)) == 0 ||
                 memcmp(p, &expected_variant4, sizeof(expected_variant4)) == 0);
+}
+
+TEST(Accessor, CreateDocumentAndEnsurePixelAccuracyWithScalingAccessor)
+{
+    // arrange
+
+    // we now create a document which characteristics which have been "problematic" - in this case the composition
+    //  result was not pixel-accurate (despite the zoom being exactly 1)
+    auto czi_document_as_blob = CreateCziWhichWasFoundProblematicWrtPixelAccuracyAndGetAsBlob();
+
+    const auto memory_stream = make_shared<CMemInputOutputStream>(get<0>(czi_document_as_blob).get(), get<1>(czi_document_as_blob));
+    const auto reader = CreateCZIReader();
+    reader->Open(memory_stream);
+
+    const auto accessor = reader->CreateSingleChannelScalingTileAccessor();
+    const CDimCoordinate plane_coordinate{ {DimensionIndex::C, 0} };
+    ISingleChannelScalingTileAccessor::Options options;
+    options.Clear();
+    options.backGroundColor = RgbFloatColor{ 0,0,0 };   // request to have background cleared with black
+
+    // act
+    const auto composite_bitmap = accessor->Get(
+        PixelType::Gray8,
+        IntRect{ 0,0,5121,5121 },
+        &plane_coordinate,
+        1,
+        &options);
+
+    // assert
+    
+    // ok, we now expect that composite-bitmap is all black, except for a rectangle of size 761x2449 at (0,2671) which has the pixel-value 0x2a
+    const ScopedBitmapLockerSP lock_info_bitmap{ composite_bitmap };
+    for (int y = 0; y < 5121; ++y)
+    {
+        for (int x = 0; x < 5121; ++x)
+        {
+            uint8_t expected_value = (x >= 0 && x < 761 && y >= 2671 && y < 2671 + 2449) ? 0x2a : 0;
+            const uint8_t* p = static_cast<const uint8_t*>(lock_info_bitmap.ptrDataRoi) + y * lock_info_bitmap.stride + x;
+            if (*p != expected_value)
+            {
+                FAIL() << "resulting bitmap is incorrect (at x=" << x << " y=" << y << '.';
+            }
+        }
+    }
+
+    SUCCEED();
 }
