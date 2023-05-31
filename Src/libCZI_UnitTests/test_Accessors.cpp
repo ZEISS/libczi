@@ -465,7 +465,7 @@ TEST(Accessor, CreateDocumentAndExerciseScalingAccessorAllowingForInaccuracy)
         PixelType::Gray8,
         IntRect{ 0,0,5121,5121 },
         &plane_coordinate,
-        1 - numeric_limits<float>::epsilon(),
+        zoom,
         &options);
 
     // assert
