@@ -300,7 +300,7 @@ TEST(MetadataBuilder, MetadataUtils3)
                 return offsets[i];
             }
 
-    return std::numeric_limits<double>::quiet_NaN();
+            return std::numeric_limits<double>::quiet_NaN();
         });
 
     auto xml = mdBldr->GetXml(true);
@@ -466,8 +466,8 @@ TEST(MetadataBuilder, MetadataUtils7)
                 wasOk = true;
             }
 
-    callCnt++;
-    return true;
+            callCnt++;
+            return true;
         });
 
     EXPECT_TRUE(wasOk && callCnt == 1) << "Incorrect result";
@@ -849,4 +849,62 @@ TEST(MetadataBuilder, RemoveAttribute)
         u8"  </Metadata>\n"
         u8"</ImageDocument>\n";
     EXPECT_STREQ(expected_result2, xml.c_str()) << "Incorrect result";
+}
+
+TEST(MetadataBuilder, WriteDisplaySettingsWithTintingModeNoneAndCheckResult)
+{
+    // set tinting mode to none and expect to find <ColorMode>None</ColorMode> in the xml
+    const auto metadata_builder = libCZI::CreateMetadataBuilder();
+
+    DisplaySettingsPOD display_settings;
+    ChannelDisplaySettingsPOD channel_display_settings;
+    channel_display_settings.Clear();
+    channel_display_settings.isEnabled = true;
+    channel_display_settings.tintingMode = IDisplaySettings::TintingMode::None;
+    channel_display_settings.tintingColor = Rgb8Color{ 0xff,0,0 };
+    channel_display_settings.blackPoint = 0.3f;
+    channel_display_settings.whitePoint = 0.8f;
+    display_settings.channelDisplaySettings[0] = channel_display_settings;  // set the channel-display-settings for channel 0
+
+    MetadataUtils::WriteDisplaySettings(metadata_builder.get(), DisplaySettingsPOD::CreateIDisplaySettingSp(display_settings).get(), 1);
+
+    auto xml = metadata_builder->GetXml(true);
+
+    const auto node = metadata_builder->GetRootNode()->GetChildNodeReadonly("Metadata/DisplaySetting/Channels/Channel/ColorMode");
+    ASSERT_TRUE(node != nullptr);
+    wstring color_mode_element;
+    EXPECT_TRUE(node->TryGetValue(&color_mode_element));
+    EXPECT_STREQ(L"None", color_mode_element.c_str()) << "Incorrect result";
+}
+
+TEST(MetadataBuilder, WriteDisplaySettingsWithTintingModeColorAndCheckResult)
+{
+    // set tinting mode to "color" and expect to find <ColorMode>Color</ColorMode> in the xml (and the specified color)
+    const auto metadata_builder = libCZI::CreateMetadataBuilder();
+
+    DisplaySettingsPOD display_settings;
+    ChannelDisplaySettingsPOD channel_display_settings;
+    channel_display_settings.Clear();
+    channel_display_settings.isEnabled = true;
+    channel_display_settings.tintingMode = IDisplaySettings::TintingMode::Color;
+    channel_display_settings.tintingColor = Rgb8Color{ 0xff,0,0 };
+    channel_display_settings.blackPoint = 0.3f;
+    channel_display_settings.whitePoint = 0.8f;
+    display_settings.channelDisplaySettings[0] = channel_display_settings;  // set the channel-display-settings for channel 0
+
+    MetadataUtils::WriteDisplaySettings(metadata_builder.get(), DisplaySettingsPOD::CreateIDisplaySettingSp(display_settings).get(), 1);
+
+    auto xml = metadata_builder->GetXml(true);
+
+    auto node = metadata_builder->GetRootNode()->GetChildNodeReadonly("Metadata/DisplaySetting/Channels/Channel/ColorMode");
+    ASSERT_TRUE(node != nullptr);
+    wstring color_mode_element;
+    EXPECT_TRUE(node->TryGetValue(&color_mode_element));
+    EXPECT_STREQ(L"Color", color_mode_element.c_str()) << "Incorrect result";
+
+    node = metadata_builder->GetRootNode()->GetChildNodeReadonly("Metadata/DisplaySetting/Channels/Channel/Color");
+    ASSERT_TRUE(node != nullptr);
+    wstring color_element;
+    EXPECT_TRUE(node->TryGetValue(&color_element));
+    EXPECT_STREQ(L"#FFFF0000", color_element.c_str()) << "Incorrect result";
 }

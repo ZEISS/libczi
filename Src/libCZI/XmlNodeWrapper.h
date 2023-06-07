@@ -132,7 +132,7 @@ public: // interface IXmlNodeRead
 
         for (size_t i = 1; i < tokens.size(); ++i)
         {
-            node = GetChildElementNodeWithAttributes(node, tokens[i].c_str());
+            node = GetChildElementNodeWithAttributes(node, tokens[i]);
             if (!node)
             {
                 return nullptr;

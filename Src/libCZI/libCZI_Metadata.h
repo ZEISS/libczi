@@ -1065,7 +1065,7 @@ namespace libCZI
         /// \return The metadata (UTF8-encoded XML).
         virtual std::string GetXml(bool withIndent = false) = 0;
 
-        virtual ~ICziMetadataBuilder() {}
+        virtual ~ICziMetadataBuilder() = default;
     };
 
     /// Variant for CustomValue.
