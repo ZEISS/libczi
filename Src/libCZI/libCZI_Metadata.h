@@ -583,7 +583,7 @@ namespace libCZI
         /// \param [out] gamma If non-null and applicable, the gamma will be returned.
         ///
         /// \return True if the corresponding channel uses gradation curve mode <tt>Gamma</tt> (and a value for gamma is available), false otherwise.
-        virtual bool    TryGetGamma(float* gamma)const = 0;
+        virtual bool    TryGetGamma(float* gamma) const = 0;
 
         /// Attempts to get spline control points - this will only be available if gradation curve mode is <tt>Spline</tt>.
         /// \remark

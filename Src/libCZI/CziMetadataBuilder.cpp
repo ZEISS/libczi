@@ -962,6 +962,11 @@ static void WriteChannelDisplaySettings(const IChannelDisplaySetting* channel_di
     if (channel_display_setting->TryGetTintingColorRgb8(&tinting_color))
     {
         node->GetOrCreateChildNode("Color")->SetValue(Utilities::Rgb8ColorToString(tinting_color));
+        node->GetOrCreateChildNode("ColorMode")->SetValue("Color"); // instruct to use 'tinting'
+    }
+    else
+    {
+        node->GetOrCreateChildNode("ColorMode")->SetValue("None"); // instruct to 'disable tinting'
     }
 
     float black_point, white_point;
