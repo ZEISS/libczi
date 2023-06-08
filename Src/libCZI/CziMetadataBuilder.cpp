@@ -109,42 +109,13 @@ pugi::xml_node CNodeWrapper::GetChildNodePathMustExist(const char* path)
 
 /*virtual*/std::shared_ptr<IXmlNodeRead> CNodeWrapper::GetChildNodeReadonly(const char* path)
 {
-    /*auto p = Utilities::convertUtf8ToWchar_t(path);
-    vector<std::wstring> tokens;
-    Utilities::Tokenize(p, tokens, L"/");
-    if (tokens.empty())
-    {
-        throw LibCZIMetadataBuilderException("invalid path", LibCZIMetadataBuilderException::ErrorType::InvalidPath);
-    }
-
-    if (any_of(tokens.cbegin(), tokens.cend(), [](const wstring& str) {return str.empty(); }))
-    {
-        throw LibCZIMetadataBuilderException("invalid path", LibCZIMetadataBuilderException::ErrorType::InvalidPath);
-    }
-
-    auto node = XmlPathSpecifierUtilities<MetadataBuilderXmlNodeWrapperThrowExcp>::GetChildElementNodeWithAttributes(this->node, tokens[0]);
-    if (!node)
-    {
-        return nullptr;
-    }
-
-    for (size_t i = 1; i < tokens.size(); ++i)
-    {
-        node = XmlPathSpecifierUtilities<MetadataBuilderXmlNodeWrapperThrowExcp>::GetChildElementNodeWithAttributes(node, tokens[i]);
-        if (!node)
-        {
-            return nullptr;
-        }
-
-    return std::make_shared<XmlNodeWrapperReadonly<CCZiMetadataBuilder, MetadataBuilderXmlNodeWrapperThrowExcp> >(this->builderRef, node.internal_object());
-    }*/
-    auto child_node = this->GetChildNodePathMustExist(path);
+    const auto child_node = this->GetChildNodePathMustExist(path);
     if (!child_node)
     {
         return nullptr;
     }
 
-    return std::make_shared<XmlNodeWrapperReadonly<CCZiMetadataBuilder, MetadataBuilderXmlNodeWrapperThrowExcp> >(this->builderRef, child_node.internal_object());
+    return std::make_shared<XmlNodeWrapperReadonly<CCZiMetadataBuilder, MetadataBuilderXmlNodeWrapperThrowExcp>>(this->builderRef, child_node.internal_object());
 }
 
 /*virtual*/void CNodeWrapper::EnumChildren(const std::function<bool(std::shared_ptr<IXmlNodeRead>)>& enumChildren)
@@ -154,7 +125,7 @@ pugi::xml_node CNodeWrapper::GetChildNodePathMustExist(const char* path)
         if (childNode.type() == pugi::xml_node_type::node_element)
         {
             bool b = enumChildren(
-                std::make_shared<XmlNodeWrapperReadonly<CCZiMetadataBuilder, MetadataBuilderXmlNodeWrapperThrowExcp> >(this->builderRef, childNode.internal_object()));
+                std::make_shared<XmlNodeWrapperReadonly<CCZiMetadataBuilder, MetadataBuilderXmlNodeWrapperThrowExcp>>(this->builderRef, childNode.internal_object()));
             if (!b)
             {
                 break;

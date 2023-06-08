@@ -787,7 +787,7 @@ namespace libCZI
         /// Gets a child node for the specified path/attribute specification if it
         /// exists. Otherwise, a nullptr is returned. 
         /// The path is specified as node-names separated by slashes.
-        /// At path "A/B/C" selects a node-structure like this
+        /// A path "A/B/C" selects a node-structure like this
         /// \code{.unparsed}
         /// <A>
         ///   <B>
@@ -897,7 +897,7 @@ namespace libCZI
     {
     public:
         /// Gets or create a child node. The path is specified as node-names separated by slashes.
-        /// At path "A/B/C" selects (or creates) a node-structure like this
+        /// A path "A/B/C" selects (or creates) a node-structure like this
         /// \code{.unparsed}
         /// <A>
         ///   <B>
@@ -920,7 +920,7 @@ namespace libCZI
         virtual std::shared_ptr<IXmlNodeRw> GetOrCreateChildNode(const char* path) = 0;
 
         /// Gets an existing child node. The path is specified as node-names separated by slashes.
-        /// At path "A/B/C" selects (or creates) a node-structure like this
+        /// A path "A/B/C" selects (or creates) a node-structure like this
         /// \code{.unparsed}
         /// <A>
         ///   <B>
