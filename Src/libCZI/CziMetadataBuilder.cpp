@@ -120,12 +120,12 @@ pugi::xml_node CNodeWrapper::GetChildNodePathMustExist(const char* path)
 
 /*virtual*/void CNodeWrapper::EnumChildren(const std::function<bool(std::shared_ptr<IXmlNodeRead>)>& enumChildren)
 {
-    for (pugi::xml_node childNode = this->node.first_child(); childNode; childNode = childNode.next_sibling())
+    for (pugi::xml_node child_node = this->node.first_child(); child_node; child_node = child_node.next_sibling())
     {
-        if (childNode.type() == pugi::xml_node_type::node_element)
+        if (child_node.type() == pugi::xml_node_type::node_element)
         {
-            bool b = enumChildren(
-                std::make_shared<XmlNodeWrapperReadonly<CCZiMetadataBuilder, MetadataBuilderXmlNodeWrapperThrowExcp>>(this->builderRef, childNode.internal_object()));
+            const bool b = enumChildren(
+                std::make_shared<XmlNodeWrapperReadonly<CCZiMetadataBuilder, MetadataBuilderXmlNodeWrapperThrowExcp>>(this->builderRef, child_node.internal_object()));
             if (!b)
             {
                 break;
