@@ -74,7 +74,7 @@ using namespace std;
     return false;
 }
 
-/*virtual*/std::shared_ptr<IXmlNodeRead> CNodeWrapper::GetChildNodeReadonly(const char* path)
+pugi::xml_node CNodeWrapper::GetChildNodePathMustExist(const char* path)
 {
     auto p = Utilities::convertUtf8ToWchar_t(path);
     vector<std::wstring> tokens;
@@ -89,7 +89,40 @@ using namespace std;
         throw LibCZIMetadataBuilderException("invalid path", LibCZIMetadataBuilderException::ErrorType::InvalidPath);
     }
 
-    auto node = this->GetOrCreateChildElementNodeWithAttributes(tokens[0], false);
+    auto node = XmlPathSpecifierUtilities<MetadataBuilderXmlNodeWrapperThrowExcp>::GetChildElementNodeWithAttributes(this->node, tokens[0]);
+    if (!node)
+    {
+        return {};
+    }
+
+    for (size_t i = 1; i < tokens.size(); ++i)
+    {
+        node = XmlPathSpecifierUtilities<MetadataBuilderXmlNodeWrapperThrowExcp>::GetChildElementNodeWithAttributes(node, tokens[i]);
+        if (!node)
+        {
+            return {};
+        }
+    }
+
+    return node;
+}
+
+/*virtual*/std::shared_ptr<IXmlNodeRead> CNodeWrapper::GetChildNodeReadonly(const char* path)
+{
+    /*auto p = Utilities::convertUtf8ToWchar_t(path);
+    vector<std::wstring> tokens;
+    Utilities::Tokenize(p, tokens, L"/");
+    if (tokens.empty())
+    {
+        throw LibCZIMetadataBuilderException("invalid path", LibCZIMetadataBuilderException::ErrorType::InvalidPath);
+    }
+
+    if (any_of(tokens.cbegin(), tokens.cend(), [](const wstring& str) {return str.empty(); }))
+    {
+        throw LibCZIMetadataBuilderException("invalid path", LibCZIMetadataBuilderException::ErrorType::InvalidPath);
+    }
+
+    auto node = XmlPathSpecifierUtilities<MetadataBuilderXmlNodeWrapperThrowExcp>::GetChildElementNodeWithAttributes(this->node, tokens[0]);
     if (!node)
     {
         return nullptr;
@@ -97,14 +130,21 @@ using namespace std;
 
     for (size_t i = 1; i < tokens.size(); ++i)
     {
-        node = CNodeWrapper::GetOrCreateChildElementNodeWithAttributes(node, tokens[i].c_str(), false);
+        node = XmlPathSpecifierUtilities<MetadataBuilderXmlNodeWrapperThrowExcp>::GetChildElementNodeWithAttributes(node, tokens[i]);
         if (!node)
         {
             return nullptr;
         }
-    }
 
     return std::make_shared<XmlNodeWrapperReadonly<CCZiMetadataBuilder, MetadataBuilderXmlNodeWrapperThrowExcp> >(this->builderRef, node.internal_object());
+    }*/
+    auto child_node = this->GetChildNodePathMustExist(path);
+    if (!child_node)
+    {
+        return nullptr;
+    }
+
+    return std::make_shared<XmlNodeWrapperReadonly<CCZiMetadataBuilder, MetadataBuilderXmlNodeWrapperThrowExcp> >(this->builderRef, child_node.internal_object());
 }
 
 /*virtual*/void CNodeWrapper::EnumChildren(const std::function<bool(std::shared_ptr<IXmlNodeRead>)>& enumChildren)
@@ -130,12 +170,19 @@ using namespace std;
 
 /*virtual*/std::shared_ptr<IXmlNodeRw> CNodeWrapper::GetOrCreateChildNode(const char* path)
 {
-    return this->GetOrCreateChildNode(path, true);
+    return this->GetOrCreateChildNodeInternal(path/*, true*/);
 }
 
 /*virtual*/std::shared_ptr<IXmlNodeRw> CNodeWrapper::GetChildNode(const char* path)
 {
-    return this->GetOrCreateChildNode(path, false);
+    //return this->GetOrCreateChildNode(path, false);
+    const auto child_node = this->GetChildNodePathMustExist(path);
+    if (!child_node)
+    {
+        return nullptr;
+    }
+
+    return std::make_shared<CNodeWrapper>(this->builderRef, child_node.internal_object());
 }
 
 /*virtual*/void CNodeWrapper::SetValue(const char* str)
@@ -217,7 +264,7 @@ using namespace std;
 
 //--------------------------------------------------------------------------------------
 
-std::shared_ptr<IXmlNodeRw> CNodeWrapper::GetOrCreateChildNode(const char* path, bool allowCreation)
+std::shared_ptr<IXmlNodeRw> CNodeWrapper::GetOrCreateChildNodeInternal(const char* path/*, bool allowCreation*/)
 {
     auto p = Utilities::convertUtf8ToWchar_t(path);
 
@@ -233,7 +280,7 @@ std::shared_ptr<IXmlNodeRw> CNodeWrapper::GetOrCreateChildNode(const char* path,
         throw LibCZIMetadataBuilderException("invalid path", LibCZIMetadataBuilderException::ErrorType::InvalidPath);
     }
 
-    auto node = this->GetOrCreateChildElementNodeWithAttributes(tokens[0], allowCreation);
+    auto node = this->GetOrCreateChildElementNodeWithAttributes(this->node, tokens[0]/*, allowCreation*/);
     if (!node)
     {
         return nullptr;
@@ -241,7 +288,7 @@ std::shared_ptr<IXmlNodeRw> CNodeWrapper::GetOrCreateChildNode(const char* path,
 
     for (size_t i = 1; i < tokens.size(); ++i)
     {
-        node = CNodeWrapper::GetOrCreateChildElementNodeWithAttributes(node, tokens[i].c_str(), allowCreation);
+        node = CNodeWrapper::GetOrCreateChildElementNodeWithAttributes(node, tokens[i].c_str()/*, allowCreation*/);
         if (!node)
         {
             return nullptr;
@@ -288,12 +335,12 @@ pugi::xml_node CNodeWrapper::GetOrCreatePcDataChild()
     attribute.set_value(Utilities::convertUtf8ToWchar_t(value).c_str());
 }
 
-pugi::xml_node CNodeWrapper::GetOrCreateChildElementNodeWithAttributes(const std::wstring& str, bool allowCreation)
-{
-    return CNodeWrapper::GetOrCreateChildElementNodeWithAttributes(this->node, str, allowCreation);
-}
+//pugi::xml_node CNodeWrapper::GetOrCreateChildElementNodeWithAttributes(const std::wstring& str/*, bool allowCreation*/)
+//{
+//    return CNodeWrapper::GetOrCreateChildElementNodeWithAttributes(this->node, str/*, allowCreation*/);
+//}
 
-/*static*/pugi::xml_node CNodeWrapper::GetOrCreateChildElementNodeWithAttributes(pugi::xml_node& node, const std::wstring& str, bool allowCreation)
+/*static*/pugi::xml_node CNodeWrapper::GetOrCreateChildElementNodeWithAttributes(pugi::xml_node& node, const std::wstring& str/*, bool allowCreation*/)
 {
     std::wregex nodenameWihtAttribregex(LR"(([^\[\]]+)(\[([^\[\]]*)\])?)");
     std::wsmatch pieces_match;
@@ -308,12 +355,12 @@ pugi::xml_node CNodeWrapper::GetOrCreateChildElementNodeWithAttributes(const std
                 if (pieces_match[2].matched == false && pieces_match[3].matched == false)
                 {
                     // we only got a name ( not followed by [Id=abc] )
-                    return GetOrCreateChildElementNode(node, nodeName.c_str(), allowCreation);
+                    return GetOrCreateChildElementNode(node, nodeName.c_str()/*, allowCreation*/);
                 }
                 else if (pieces_match[2].matched == true && pieces_match[3].matched == true)
                 {
                     const auto attribValuePairs = CNodeWrapper::ParseAttributes(pieces_match[3]);
-                    return GetOrCreateChildElementNodeWithAttributes(node, nodeName, attribValuePairs, allowCreation);
+                    return GetOrCreateChildElementNodeWithAttributes(node, nodeName, attribValuePairs/*, allowCreation*/);
                 }
             }
         }
@@ -322,12 +369,12 @@ pugi::xml_node CNodeWrapper::GetOrCreateChildElementNodeWithAttributes(const std
     throw LibCZIMetadataBuilderException("invalid path", LibCZIMetadataBuilderException::ErrorType::InvalidPath);
 }
 
-pugi::xml_node CNodeWrapper::GetOrCreateChildElementNode(const wchar_t* sz, bool allowCreation)
+pugi::xml_node CNodeWrapper::GetOrCreateChildElementNode(const wchar_t* sz/*, bool allowCreation*/)
 {
-    return CNodeWrapper::GetOrCreateChildElementNode(this->node, sz, allowCreation);
+    return CNodeWrapper::GetOrCreateChildElementNode(this->node, sz/*, allowCreation*/);
 }
 
-/*static*/pugi::xml_node CNodeWrapper::GetOrCreateChildElementNodeWithAttributes(pugi::xml_node& node, const std::wstring& str, const std::map<std::wstring, std::wstring>& attribs, bool allowCreation)
+/*static*/pugi::xml_node CNodeWrapper::GetOrCreateChildElementNodeWithAttributes(pugi::xml_node& node, const std::wstring& str, const std::map<std::wstring, std::wstring>& attribs/*, bool allowCreation*/)
 {
     struct find_element_node_and_attributes
     {
@@ -371,10 +418,10 @@ pugi::xml_node CNodeWrapper::GetOrCreateChildElementNode(const wchar_t* sz, bool
     auto c = node.find_child(find_element_node_and_attributes{ str.c_str(), attribs });
     if (!c)
     {
-        if (!allowCreation)
-        {
-            return xml_node();
-        }
+        //if (!allowCreation)
+        //{
+        //    return xml_node();
+        //}
 
         auto newNode = node.append_child(str.c_str());
         for (auto it = attribs.cbegin(); it != attribs.cend(); ++it)
@@ -388,7 +435,7 @@ pugi::xml_node CNodeWrapper::GetOrCreateChildElementNode(const wchar_t* sz, bool
     return c;
 }
 
-/*static*/pugi::xml_node CNodeWrapper::GetOrCreateChildElementNode(pugi::xml_node& node, const wchar_t* sz, bool allowCreation)
+/*static*/pugi::xml_node CNodeWrapper::GetOrCreateChildElementNode(pugi::xml_node& node, const wchar_t* sz/*, bool allowCreation*/)
 {
     struct find_element_node
     {
@@ -408,10 +455,10 @@ pugi::xml_node CNodeWrapper::GetOrCreateChildElementNode(const wchar_t* sz, bool
     auto c = node.find_child(find_element_node{ sz });
     if (!c)
     {
-        if (!allowCreation)
+        /*if (!allowCreation)
         {
             return xml_node();
-        }
+        }*/
 
         return node.append_child(sz);
     }
@@ -767,7 +814,7 @@ bool libCZI::XmlDateTime::IsValid() const
         [&](libCZI::DimensionIndex dim, int start, int size)->bool
         {
             MetadataUtils::WriteDimensionSize(builder, dim, size);
-    return true;
+            return true;
         });
 
     if (statistics.IsMIndexValid())
@@ -948,7 +995,7 @@ bool libCZI::XmlDateTime::IsValid() const
                 max_channel_index_in_display_settings = channel_index;
             }
 
-    return true;
+            return true;
         });
 
     MetadataUtils::WriteDisplaySettings(builder, display_settings, 1 + max_channel_index_in_display_settings);

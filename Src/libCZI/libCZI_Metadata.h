@@ -787,7 +787,7 @@ namespace libCZI
         /// Gets a child node for the specified path/attribute specification if it
         /// exists. Otherwise, a nullptr is returned. 
         /// The path is specified as node-names separated by slashes.
-        /// At path "A/B/C" selects (or creates) a node-structure like this
+        /// At path "A/B/C" selects a node-structure like this
         /// \code{.unparsed}
         /// <A>
         ///   <B>
@@ -805,6 +805,19 @@ namespace libCZI
         ///   </B>
         /// </A>
         /// \endcode
+        /// It is also possible to specify a number inside the square brackets, which indicates that the
+        /// n-th element is to be selected. This index is zero-based.
+        /// In this example     
+        /// \code{.unparsed}
+        /// <A>
+        ///   <B Id="ab" Name="xy">
+        ///     <C Id="first"></C>
+        ///     <C Id="second"></C>
+        ///     <C Id="third"></C>
+        ///   </B>
+        /// </A>
+        /// \endcode
+        /// the path "A/B/C[1]" will select the second node of name 'C'.        
         /// \param path The path  (in UTF8-encoding).
         /// \return Either the requested node if it exists or nullptr.
         virtual std::shared_ptr<IXmlNodeRead> GetChildNodeReadonly(const char* path) = 0;
@@ -850,7 +863,7 @@ namespace libCZI
         /// \returns True if it succeeds, false if it fails.
         bool TryGetValueAsBool(bool* p);
 
-        virtual ~IXmlNodeRead() {}
+        virtual ~IXmlNodeRead() = default;
     };
 
     /// Representation of the CZI-metadata.
@@ -874,7 +887,7 @@ namespace libCZI
         /// \return The "document information".
         virtual std::shared_ptr<libCZI::ICziMultiDimensionDocumentInfo> GetDocumentInfo() = 0;
 
-        virtual ~ICziMetadata() {}
+        virtual ~ICziMetadata() = default;
     };
 
     class IXmlNodeRw;
@@ -925,6 +938,19 @@ namespace libCZI
         ///   </B>
         /// </A>
         /// \endcode
+        /// It is also possible to specify a number inside the square brackets, which indicates that the
+        /// n-th element is to be selected. This index is zero-based.
+        /// In this example
+        /// \code{.unparsed}
+        /// <A>
+        ///   <B Id="ab" Name="xy">
+        ///     <C Id="first"></C>
+        ///     <C Id="second"></C>
+        ///     <C Id="third"></C>
+        ///   </B>
+        /// </A>
+        /// \endcode
+        /// the path "A/B/C[1]" will select the second node of name 'C'.
         /// \param path The path (in UTF8-encoding).
         /// \return The existing node conforming to the path if it exists, null otherwise.
         virtual std::shared_ptr<IXmlNodeRw> GetChildNode(const char* path) = 0;
