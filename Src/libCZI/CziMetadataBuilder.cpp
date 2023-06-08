@@ -141,7 +141,7 @@ pugi::xml_node CNodeWrapper::GetChildNodePathMustExist(const char* path)
 
 /*virtual*/std::shared_ptr<IXmlNodeRw> CNodeWrapper::GetOrCreateChildNode(const char* path)
 {
-    return this->GetOrCreateChildNodeInternal(path/*, true*/);
+    return this->GetOrCreateChildNodeInternal(path);
 }
 
 /*virtual*/std::shared_ptr<IXmlNodeRw> CNodeWrapper::GetChildNode(const char* path)
@@ -339,7 +339,7 @@ pugi::xml_node CNodeWrapper::GetOrCreateChildElementNode(const wchar_t* sz)
     return CNodeWrapper::GetOrCreateChildElementNode(this->node, sz);
 }
 
-/*static*/pugi::xml_node CNodeWrapper::GetOrCreateChildElementNodeWithAttributes(pugi::xml_node& node, const std::wstring& str, const std::map<std::wstring, std::wstring>& attribs/*, bool allowCreation*/)
+/*static*/pugi::xml_node CNodeWrapper::GetOrCreateChildElementNodeWithAttributes(pugi::xml_node& node, const std::wstring& str, const std::map<std::wstring, std::wstring>& attribs)
 {
     struct find_element_node_and_attributes
     {
