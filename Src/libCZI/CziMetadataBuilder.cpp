@@ -146,7 +146,6 @@ pugi::xml_node CNodeWrapper::GetChildNodePathMustExist(const char* path)
 
 /*virtual*/std::shared_ptr<IXmlNodeRw> CNodeWrapper::GetChildNode(const char* path)
 {
-    //return this->GetOrCreateChildNode(path, false);
     const auto child_node = this->GetChildNodePathMustExist(path);
     if (!child_node)
     {
