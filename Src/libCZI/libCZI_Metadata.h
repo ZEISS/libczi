@@ -743,7 +743,7 @@ namespace libCZI
         /// \return The display settings object.
         virtual std::shared_ptr<IDisplaySettings> GetDisplaySettings() const = 0;
 
-        virtual ~ICziMultiDimensionDocumentInfo() {}
+        virtual ~ICziMultiDimensionDocumentInfo() = default;
 
         /// Gets a vector with all dimensions (found in metadata).
         /// \return The vector containing all dimensions.
