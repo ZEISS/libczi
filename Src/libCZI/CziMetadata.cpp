@@ -186,7 +186,7 @@ bool IXmlNodeRead::TryGetValueAsUInt32(std::uint32_t* p)
                 throw out_of_range("value was out-of-range");
             }
 
-            return (uint32_t)v;
+            return static_cast<uint32_t>(v);
         }
     };
 

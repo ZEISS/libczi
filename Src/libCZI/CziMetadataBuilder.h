@@ -73,15 +73,12 @@ public:
     bool RemoveChild(const char* name) override;
     bool RemoveAttribute(const char* name) override;
 private:
-    std::shared_ptr<IXmlNodeRw> GetOrCreateChildNode(const char* path, bool allowCreation);
-    pugi::xml_node GetOrCreateChildElementNode(const wchar_t* sz, bool allowCreation);
-    static pugi::xml_node GetOrCreateChildElementNode(pugi::xml_node& node, const wchar_t* sz, bool allowCreation);
-
-    pugi::xml_node GetOrCreateChildElementNodeWithAttributes(const std::wstring& str, bool allowCreation);
-    static pugi::xml_node GetOrCreateChildElementNodeWithAttributes(pugi::xml_node& node, const std::wstring& str, bool allowCreation);
-
-    static pugi::xml_node GetOrCreateChildElementNodeWithAttributes(pugi::xml_node& node, const std::wstring& str, const std::map<std::wstring, std::wstring>& attribs, bool allowCreation);
-
+    pugi::xml_node GetChildNodePathMustExist(const char* path);
+    std::shared_ptr<IXmlNodeRw> GetOrCreateChildNodeInternal(const char* path);
+    pugi::xml_node GetOrCreateChildElementNode(const wchar_t* sz);
+    static pugi::xml_node GetOrCreateChildElementNode(pugi::xml_node& node, const wchar_t* sz);
+    static pugi::xml_node GetOrCreateChildElementNodeWithAttributes(pugi::xml_node& node, const std::wstring& str);
+    static pugi::xml_node GetOrCreateChildElementNodeWithAttributes(pugi::xml_node& node, const std::wstring& str, const std::map<std::wstring, std::wstring>& attribs);
     static std::map<std::wstring, std::wstring> ParseAttributes(const std::wstring& str);
 
     void ThrowIfCannotSetValue();

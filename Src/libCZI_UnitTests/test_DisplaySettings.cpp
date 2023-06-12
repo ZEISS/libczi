@@ -196,7 +196,7 @@ TEST(DisplaySettings, WriteDisplaySettingsToDocumentAndReadFromThereAndCompare)
     EXPECT_NEAR(white_point_from_document, 0.4f, 1e-8f);
 }
 
-TEST(DisplaySettings, WriteDisplaySettingsWithGradionCurveGammaAndSplineToDocumentAndReadFromThereAndCompare)
+TEST(DisplaySettings, WriteDisplaySettingsWithGradationCurveGammaAndSplineToDocumentAndReadFromThereAndCompare)
 {
     // what happens here:
     // - we are creating a simple 2-channel-CZI-document, add two subblocks 

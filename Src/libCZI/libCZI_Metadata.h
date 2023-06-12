@@ -583,7 +583,7 @@ namespace libCZI
         /// \param [out] gamma If non-null and applicable, the gamma will be returned.
         ///
         /// \return True if the corresponding channel uses gradation curve mode <tt>Gamma</tt> (and a value for gamma is available), false otherwise.
-        virtual bool    TryGetGamma(float* gamma)const = 0;
+        virtual bool    TryGetGamma(float* gamma) const = 0;
 
         /// Attempts to get spline control points - this will only be available if gradation curve mode is <tt>Spline</tt>.
         /// \remark
@@ -743,7 +743,7 @@ namespace libCZI
         /// \return The display settings object.
         virtual std::shared_ptr<IDisplaySettings> GetDisplaySettings() const = 0;
 
-        virtual ~ICziMultiDimensionDocumentInfo() {}
+        virtual ~ICziMultiDimensionDocumentInfo() = default;
 
         /// Gets a vector with all dimensions (found in metadata).
         /// \return The vector containing all dimensions.
@@ -787,7 +787,7 @@ namespace libCZI
         /// Gets a child node for the specified path/attribute specification if it
         /// exists. Otherwise, a nullptr is returned. 
         /// The path is specified as node-names separated by slashes.
-        /// At path "A/B/C" selects (or creates) a node-structure like this
+        /// A path "A/B/C" selects a node-structure like this
         /// \code{.unparsed}
         /// <A>
         ///   <B>
@@ -805,6 +805,19 @@ namespace libCZI
         ///   </B>
         /// </A>
         /// \endcode
+        /// It is also possible to specify a number inside the square brackets, which indicates that the
+        /// n-th element is to be selected. This index is zero-based.
+        /// In this example     
+        /// \code{.unparsed}
+        /// <A>
+        ///   <B Id="ab" Name="xy">
+        ///     <C Id="first"></C>
+        ///     <C Id="second"></C>
+        ///     <C Id="third"></C>
+        ///   </B>
+        /// </A>
+        /// \endcode
+        /// the path "A/B/C[1]" will select the second node of name 'C'.        
         /// \param path The path  (in UTF8-encoding).
         /// \return Either the requested node if it exists or nullptr.
         virtual std::shared_ptr<IXmlNodeRead> GetChildNodeReadonly(const char* path) = 0;
@@ -850,7 +863,7 @@ namespace libCZI
         /// \returns True if it succeeds, false if it fails.
         bool TryGetValueAsBool(bool* p);
 
-        virtual ~IXmlNodeRead() {}
+        virtual ~IXmlNodeRead() = default;
     };
 
     /// Representation of the CZI-metadata.
@@ -874,7 +887,7 @@ namespace libCZI
         /// \return The "document information".
         virtual std::shared_ptr<libCZI::ICziMultiDimensionDocumentInfo> GetDocumentInfo() = 0;
 
-        virtual ~ICziMetadata() {}
+        virtual ~ICziMetadata() = default;
     };
 
     class IXmlNodeRw;
@@ -884,7 +897,7 @@ namespace libCZI
     {
     public:
         /// Gets or create a child node. The path is specified as node-names separated by slashes.
-        /// At path "A/B/C" selects (or creates) a node-structure like this
+        /// A path "A/B/C" selects (or creates) a node-structure like this
         /// \code{.unparsed}
         /// <A>
         ///   <B>
@@ -907,7 +920,7 @@ namespace libCZI
         virtual std::shared_ptr<IXmlNodeRw> GetOrCreateChildNode(const char* path) = 0;
 
         /// Gets an existing child node. The path is specified as node-names separated by slashes.
-        /// At path "A/B/C" selects (or creates) a node-structure like this
+        /// A path "A/B/C" selects (or creates) a node-structure like this
         /// \code{.unparsed}
         /// <A>
         ///   <B>
@@ -925,6 +938,19 @@ namespace libCZI
         ///   </B>
         /// </A>
         /// \endcode
+        /// It is also possible to specify a number inside the square brackets, which indicates that the
+        /// n-th element is to be selected. This index is zero-based.
+        /// In this example
+        /// \code{.unparsed}
+        /// <A>
+        ///   <B Id="ab" Name="xy">
+        ///     <C Id="first"></C>
+        ///     <C Id="second"></C>
+        ///     <C Id="third"></C>
+        ///   </B>
+        /// </A>
+        /// \endcode
+        /// the path "A/B/C[1]" will select the second node of name 'C'.
         /// \param path The path (in UTF8-encoding).
         /// \return The existing node conforming to the path if it exists, null otherwise.
         virtual std::shared_ptr<IXmlNodeRw> GetChildNode(const char* path) = 0;
@@ -1065,7 +1091,7 @@ namespace libCZI
         /// \return The metadata (UTF8-encoded XML).
         virtual std::string GetXml(bool withIndent = false) = 0;
 
-        virtual ~ICziMetadataBuilder() {}
+        virtual ~ICziMetadataBuilder() = default;
     };
 
     /// Variant for CustomValue.
