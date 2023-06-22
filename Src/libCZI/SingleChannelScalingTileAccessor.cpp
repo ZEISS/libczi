@@ -66,7 +66,10 @@ CSingleChannelScalingTileAccessor::CSingleChannelScalingTileAccessor(std::shared
 }
 
 void CSingleChannelScalingTileAccessor::ScaleBlt(libCZI::IBitmapData* bmDest, float zoom, const libCZI::IntRect& roi, const SbInfo& sbInfo)
-{
+{ 
+    // calculate the intersection of the subblock (logical rect) and the destination
+    const auto intersect = Utilities::Intersect(sbInfo.logicalRect, roi);
+    
     // In order not to run into trouble with floating point precision, if the scale is exactly 1, we refrain from using the scaling operation
     //  and do instead a simple copy operation. This should ensure a pixel-accurate result if zoom is exactly 1.
     if (zoom == 1)
@@ -75,28 +78,27 @@ void CSingleChannelScalingTileAccessor::ScaleBlt(libCZI::IBitmapData* bmDest, fl
         const auto source = sb->CreateBitmap();
         ScopedBitmapLockerSP srcLck{ source };
         ScopedBitmapLockerP dstLck{ bmDest };
-        CBitmapOperations::CopyOffsetedInfo info;
-        info.xOffset = sbInfo.logicalRect.x;
-        info.yOffset = sbInfo.logicalRect.y;
-        info.srcPixelType = source->GetPixelType();
-        info.srcPtr = srcLck.ptrDataRoi;
-        info.srcStride = srcLck.stride;
-        info.srcWidth = source->GetWidth();
-        info.srcHeight = source->GetHeight();
-        info.dstPixelType = bmDest->GetPixelType();
-        info.dstPtr = dstLck.ptrDataRoi;
-        info.dstStride = dstLck.stride;
-        info.dstWidth = bmDest->GetWidth();
-        info.dstHeight = bmDest->GetHeight();
-        info.drawTileBorder = false;
-
-        CBitmapOperations::CopyOffseted(info);
+        
+        IntRect srcRoi{ intersect.x - sbInfo.logicalRect.x, intersect.y - sbInfo.logicalRect.y, intersect.x + intersect.w - sbInfo.logicalRect.x, intersect.y + intersect.h - sbInfo.logicalRect.y };
+        IntRect dstRoi{ intersect.x - roi.x, intersect.y - roi.y, srcRoi.w, srcRoi.h };
+        
+        const void* ptrSource = static_cast<char*>(srcLck.ptrDataRoi) + srcRoi.y * static_cast<size_t>(srcLck.stride) + srcRoi.x * static_cast<size_t>(CziUtils::GetBytesPerPel(source->GetPixelType()));
+        void* ptrDest = static_cast<char*>(dstLck.ptrDataRoi) + dstRoi.y * static_cast<size_t>(dstLck.stride) + dstRoi.x * static_cast<size_t>(CziUtils::GetBytesPerPel(bmDest->GetPixelType()));
+        
+        CBitmapOperations::Copy(
+            source->GetPixelType(), 
+            ptrSource, 
+            srcLck.stride,
+            bmDest->GetPixelType(), 
+            ptrDest, 
+            dstLck.stride,
+            intersect.w, 
+            intersect.h,
+            false
+        );
     }
     else
     {
-        // calculate the intersection of the subblock (logical rect) and the destination
-        const auto intersect = Utilities::Intersect(sbInfo.logicalRect, roi);
-
         const double roiSrcTopLeftX = double(intersect.x - sbInfo.logicalRect.x) / sbInfo.logicalRect.w;
         const double roiSrcTopLeftY = double(intersect.y - sbInfo.logicalRect.y) / sbInfo.logicalRect.h;
         const double roiSrcBttmRightX = double(intersect.x + intersect.w - sbInfo.logicalRect.x) / sbInfo.logicalRect.w;
