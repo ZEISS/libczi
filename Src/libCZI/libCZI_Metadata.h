@@ -486,39 +486,7 @@ namespace libCZI
             LookUpTableExplicit = 2,    ///< (NOT YET IMPLEMENTED) There is an explicit look-up-table specified.
             LookUpTableWellKnown = 3    ///< (NOT YET IMPLEMENTED) We are using a "well-known" look-up-table, and it is identified by its name (which is a string).
         };
-
-
-        /// This enum specifies the "pixel-type" if the image is bgr - how many bits does the rgb image have.
-        /// \remark
-        /// This is only used when "GetTintingMode" is "None", if the channel needs to be identified as a composite bgr channel.
-        enum class PixelType : std::uint8_t
-        {
-            Unspecified = 0,    ///< None - This is not an bgr image.
-            Bgr24 = 1,          ///< This is a 24 bit bgr composite channel.
-            Bgr48 = 2,          ///< This is a 48 bit bgr composite channel.
-            Bgr96float = 3      ///< This is a 96 bit bgr composite channel.
-        };
-
-        /// Converts the Pixel Type enum into a string, to be used to write to xml.
-        ///
-        /// \param pixelType The pixel type enum. 
-        ///
-        /// \return The pixel type as string.
-        static std::string pixelTypeEnumToString(PixelType pixelType) {
-            static std::map<PixelType, std::string> enumMap = {
-                {PixelType::Bgr24, "Bgr24"},
-                {PixelType::Bgr48, "Bgr48"},
-                {PixelType::Bgr96float, "Bgr96float"},
-                {PixelType::Unspecified, ""}
-            };
-
-            auto it = enumMap.find(pixelType);
-            if (it == enumMap.end())
-                return enumMap[PixelType::Unspecified];
-
-            return it->second;
-        }
-
+        
         /// The coefficients of a cubic spline defined by \f$a\,x^3 + b\,x^2 + c\,x + d =y\f$.
         struct CubicSplineCoefficients
         {
@@ -591,13 +559,6 @@ namespace libCZI
         /// \return The weight.
         virtual float   GetWeight() const = 0;
 
-        /// Gets the pixel type of the channel (for composite bgr channels).
-        ///
-        /// \param [out] pPixelType If tinting is disabled for the corresponding channel, then (if non-null) will receive the pixel-type.
-        ///
-        /// \return True if tinting is disabled for the corresponding channel (and in this case <tt>pPixelType</tt> will be set), false otherwise (and <tt>pPixelType</tt> will not be set).
-        virtual bool    TryGetPixelType(IDisplaySettings::PixelType* pPixelType) const = 0;
-
         /// Attempts to get the RGB24-tinting color for the corresponding channel. If tinting is not enabled, then
         /// this method will return false.
         ///
@@ -665,9 +626,6 @@ namespace libCZI
         /// The tinting mode.
         IDisplaySettings::TintingMode tintingMode;
 
-        /// The image pixel type.
-        IDisplaySettings::PixelType pixelType;
-
         /// The tinting color (only valid if tinting mode == Color).
         libCZI::Rgb8Color tintingColor;
 
@@ -703,7 +661,6 @@ namespace libCZI
         {
             this->isEnabled = false;
             this->tintingMode = IDisplaySettings::TintingMode::None;
-            this->pixelType = IDisplaySettings::PixelType::Unspecified;
             this->blackPoint = 0;
             this->whitePoint = 1;
             this->gradationCurveMode = IDisplaySettings::GradationCurveMode::Linear;

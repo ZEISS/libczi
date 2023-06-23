@@ -22,7 +22,6 @@ public:
 public: // interface IChannelDisplaySetting
     bool GetIsEnabled() const override;
     float GetWeight() const override;
-    bool TryGetPixelType(libCZI::IDisplaySettings::PixelType* pPixelType) const override;
     bool TryGetTintingColorRgb8(libCZI::Rgb8Color* pColor) const override;
     void GetBlackWhitePoint(float* pBlack, float* pWhite) const override;
     libCZI::IDisplaySettings::GradationCurveMode GetGradationCurveMode() const override;

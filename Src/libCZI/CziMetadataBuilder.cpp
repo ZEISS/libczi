@@ -955,7 +955,7 @@ bool libCZI::XmlDateTime::IsValid() const
     MetadataUtils::WriteDisplaySettings(builder, display_settings, 1 + max_channel_index_in_display_settings);
 }
 
-static void WriteChannelDisplaySettings(const IChannelDisplaySetting* channel_display_setting, IXmlNodeRw* node)
+static void WriteChannelDisplaySettings(const IChannelDisplaySetting* channel_display_setting, IXmlNodeRw* node, const wstring& pixel_type = L"")
 {
     node->GetOrCreateChildNode("IsSelected")->SetValueBool(channel_display_setting->GetIsEnabled());
 
@@ -968,11 +968,11 @@ static void WriteChannelDisplaySettings(const IChannelDisplaySetting* channel_di
     else
     {
         node->GetOrCreateChildNode("ColorMode")->SetValue("None"); // instruct to 'disable tinting'
-        IDisplaySettings::PixelType pixel_type = IDisplaySettings::PixelType::Unspecified;
-        channel_display_setting->TryGetPixelType(&pixel_type);
-        if (pixel_type != IDisplaySettings::PixelType::Unspecified)
+
+        // For non tinted image, provide 'PixelType' in channel metadata to support arivis.
+        if (!pixel_type.empty())
         {
-            node->GetOrCreateChildNode("PixelType")->SetValue(IDisplaySettings::pixelTypeEnumToString(pixel_type));
+            node->GetOrCreateChildNode("PixelType")->SetValue(pixel_type);
         }
     }
 
@@ -1030,7 +1030,11 @@ static void WriteChannelDisplaySettings(const IChannelDisplaySetting* channel_di
         auto channel_node = display_settings_channel_node->AppendChildNode("Channel");
         if (channel_display_settings)
         {
-            WriteChannelDisplaySettings(channel_display_settings.get(), channel_node.get());
+            const auto image_channel_node = builder->GetRootNode()->GetChildNode("Metadata/Information/Image/Dimensions/Channels/Channel[" + std::to_string(c) + "]/PixelType");
+            wstring channel_pixel_type;
+            image_channel_node->TryGetValue(&channel_pixel_type);
+
+            WriteChannelDisplaySettings(channel_display_settings.get(), channel_node.get(), channel_pixel_type);
         }
     }
 }
