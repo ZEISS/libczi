@@ -67,6 +67,9 @@ CSingleChannelScalingTileAccessor::CSingleChannelScalingTileAccessor(std::shared
 
 void CSingleChannelScalingTileAccessor::ScaleBlt(libCZI::IBitmapData* bmDest, float zoom, const libCZI::IntRect& roi, const SbInfo& sbInfo)
 {
+    // calculate the intersection of the subblock (logical rect) and the destination
+    const auto intersect = Utilities::Intersect(sbInfo.logicalRect, roi);
+
     // In order not to run into trouble with floating point precision, if the scale is exactly 1, we refrain from using the scaling operation
     //  and do instead a simple copy operation. This should ensure a pixel-accurate result if zoom is exactly 1.
     if (zoom == 1)
@@ -76,8 +79,8 @@ void CSingleChannelScalingTileAccessor::ScaleBlt(libCZI::IBitmapData* bmDest, fl
         ScopedBitmapLockerSP srcLck{ source };
         ScopedBitmapLockerP dstLck{ bmDest };
         CBitmapOperations::CopyOffsetedInfo info;
-        info.xOffset = sbInfo.logicalRect.x;
-        info.yOffset = sbInfo.logicalRect.y;
+        info.xOffset = sbInfo.logicalRect.x - intersect.x;
+        info.yOffset = sbInfo.logicalRect.y - intersect.y;
         info.srcPixelType = source->GetPixelType();
         info.srcPtr = srcLck.ptrDataRoi;
         info.srcStride = srcLck.stride;
@@ -94,8 +97,8 @@ void CSingleChannelScalingTileAccessor::ScaleBlt(libCZI::IBitmapData* bmDest, fl
     }
     else
     {
-        // calculate the intersection of the subblock (logical rect) and the destination
-        const auto intersect = Utilities::Intersect(sbInfo.logicalRect, roi);
+        //// calculate the intersection of the subblock (logical rect) and the destination
+        //const auto intersect = Utilities::Intersect(sbInfo.logicalRect, roi);
 
         const double roiSrcTopLeftX = double(intersect.x - sbInfo.logicalRect.x) / sbInfo.logicalRect.w;
         const double roiSrcTopLeftY = double(intersect.y - sbInfo.logicalRect.y) / sbInfo.logicalRect.h;
@@ -223,13 +226,13 @@ std::vector<CSingleChannelScalingTileAccessor::SbInfo> CSingleChannelScalingTile
                 }
             }
 
-    SbInfo sbinfo;
-    sbinfo.logicalRect = info.logicalRect;
-    sbinfo.physicalSize = info.physicalSize;
-    sbinfo.mIndex = info.mIndex;
-    sbinfo.index = idx;
-    sblks.push_back(sbinfo);
-    return true;
+            SbInfo sbinfo;
+            sbinfo.logicalRect = info.logicalRect;
+            sbinfo.physicalSize = info.physicalSize;
+            sbinfo.mIndex = info.mIndex;
+            sbinfo.index = idx;
+            sblks.push_back(sbinfo);
+            return true;
         });
 
     return sblks;
