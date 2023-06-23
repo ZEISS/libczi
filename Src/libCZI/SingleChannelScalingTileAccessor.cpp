@@ -67,9 +67,6 @@ CSingleChannelScalingTileAccessor::CSingleChannelScalingTileAccessor(std::shared
 
 void CSingleChannelScalingTileAccessor::ScaleBlt(libCZI::IBitmapData* bmDest, float zoom, const libCZI::IntRect& roi, const SbInfo& sbInfo)
 {
-    // calculate the intersection of the subblock (logical rect) and the destination
-    const auto intersect = Utilities::Intersect(sbInfo.logicalRect, roi);
-
     const auto sb = this->sbBlkRepository->ReadSubBlock(sbInfo.index);
     if (GetSite()->IsEnabled(LOGLEVEL_CHATTYINFORMATION))
     {
@@ -87,8 +84,8 @@ void CSingleChannelScalingTileAccessor::ScaleBlt(libCZI::IBitmapData* bmDest, fl
         ScopedBitmapLockerSP srcLck{ source };
         ScopedBitmapLockerP dstLck{ bmDest };
         CBitmapOperations::CopyOffsetedInfo info;
-        info.xOffset = sbInfo.logicalRect.x - intersect.x;
-        info.yOffset = sbInfo.logicalRect.y - intersect.y;
+        info.xOffset = sbInfo.logicalRect.x - roi.x;
+        info.yOffset = sbInfo.logicalRect.y - roi.y;
         info.srcPixelType = source->GetPixelType();
         info.srcPtr = srcLck.ptrDataRoi;
         info.srcStride = srcLck.stride;
@@ -105,6 +102,9 @@ void CSingleChannelScalingTileAccessor::ScaleBlt(libCZI::IBitmapData* bmDest, fl
     }
     else
     {
+        // calculate the intersection of the subblock (logical rect) and the destination
+        const auto intersect = Utilities::Intersect(sbInfo.logicalRect, roi);
+
         const double roiSrcTopLeftX = double(intersect.x - sbInfo.logicalRect.x) / sbInfo.logicalRect.w;
         const double roiSrcTopLeftY = double(intersect.y - sbInfo.logicalRect.y) / sbInfo.logicalRect.h;
         const double roiSrcBttmRightX = double(intersect.x + intersect.w - sbInfo.logicalRect.x) / sbInfo.logicalRect.w;
