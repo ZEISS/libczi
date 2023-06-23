@@ -110,8 +110,8 @@ public:
         [&](int chIdx)->bool
         {
             auto chDisplaySetting = disp->GetChannelDisplaySettings(chIdx);
-    IChannelDisplaySetting::Clone(chDisplaySetting.get(), pod.channelDisplaySettings[chIdx]);
-    return true;
+            IChannelDisplaySetting::Clone(chDisplaySetting.get(), pod.channelDisplaySettings[chIdx]);
+            return true;
         });
 }
 
@@ -152,10 +152,15 @@ public:
     if (disp->TryGetTintingColorRgb8(&pod.tintingColor))
     {
         pod.tintingMode = IDisplaySettings::TintingMode::Color;
+        pod.pixelType = IDisplaySettings::PixelType::Unspecified;
     }
     else
     {
         pod.tintingMode = IDisplaySettings::TintingMode::None;
+        if (!disp->TryGetPixelType(&pod.pixelType))
+        {
+            pod.pixelType = IDisplaySettings::PixelType::Unspecified;
+        }
     }
 }
 
@@ -171,6 +176,21 @@ bool CChannelDisplaySettingsOnPod::GetIsEnabled() const /*override*/
 float CChannelDisplaySettingsOnPod::GetWeight() const /*override*/
 {
     return this->cdsPod.weight;
+}
+
+bool CChannelDisplaySettingsOnPod::TryGetPixelType(IDisplaySettings::PixelType* pPixelType) const /*override*/
+{
+    if (this->cdsPod.tintingMode == IDisplaySettings::TintingMode::None)
+    {
+        if (pPixelType != nullptr)
+        {
+            *pPixelType = this->cdsPod.pixelType;
+        }
+
+        return true;
+    }
+
+    return false;
 }
 
 bool CChannelDisplaySettingsOnPod::TryGetTintingColorRgb8(libCZI::Rgb8Color* pColor) const /*override*/
@@ -318,6 +338,35 @@ bool CChannelDisplaySettingsOnPod::TryGetSplineData(std::vector<libCZI::IDisplay
             }
         }
 
+        if (chDsplSetting.tintingMode == IDisplaySettings::TintingMode::None)
+        {
+            subNode = ch.child(L"PixelType");
+            if (!subNode.empty())
+            {
+                auto s = Utilities::Trim(subNode.text().as_string());
+                if (Utilities::icasecmp(s, L"bgr24"))
+                {
+                    chDsplSetting.pixelType = IDisplaySettings::PixelType::Bgr24;
+                }
+                else if (Utilities::icasecmp(s, L"bgr48"))
+                {
+                    chDsplSetting.pixelType = IDisplaySettings::PixelType::Bgr48;
+                }
+                else if (Utilities::icasecmp(s, L"bgr96float"))
+                {
+                    chDsplSetting.pixelType = IDisplaySettings::PixelType::Bgr96float;
+                }
+                else
+                {
+                    chDsplSetting.pixelType = IDisplaySettings::PixelType::Unspecified;
+                }
+            }
+        }
+        else
+        {
+            chDsplSetting.pixelType = IDisplaySettings::PixelType::Unspecified;
+        }
+
         subNode = ch.child(L"Color");
         chDsplSetting.tintingColor.r = chDsplSetting.tintingColor.g = chDsplSetting.tintingColor.b = 0xff;
         if (!subNode.empty())
@@ -396,7 +445,7 @@ bool CChannelDisplaySettingsOnPod::TryGetSplineData(std::vector<libCZI::IDisplay
                 return true;
             }
 
-    return false;
+            return false;
         });
 }
 

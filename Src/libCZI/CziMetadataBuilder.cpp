@@ -968,6 +968,12 @@ static void WriteChannelDisplaySettings(const IChannelDisplaySetting* channel_di
     else
     {
         node->GetOrCreateChildNode("ColorMode")->SetValue("None"); // instruct to 'disable tinting'
+        IDisplaySettings::PixelType pixel_type = IDisplaySettings::PixelType::Unspecified;
+        channel_display_setting->TryGetPixelType(&pixel_type);
+        if (pixel_type != IDisplaySettings::PixelType::Unspecified)
+        {
+            node->GetOrCreateChildNode("PixelType")->SetValue(IDisplaySettings::pixelTypeEnumToString(pixel_type));
+        }
     }
 
     float black_point, white_point;
