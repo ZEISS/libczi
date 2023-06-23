@@ -1,0 +1,1 @@
+cmd='C:/Users/jbohl/AppData/Local/JetBrains/Toolbox/apps/CLion/ch-0/231.8770.66/bin/cmake/win/x64/bin/cmake.exe;-DEIGEN_BUILD_PKGCONFIG=OFF;-DBUILD_TESTING=OFF;-GNinja;<SOURCE_DIR><SOURCE_SUBDIR>'

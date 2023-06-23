@@ -1,0 +1,79 @@
+{
+	"backtraceGraph" : 
+	{
+		"commands" : 
+		[
+			"install"
+		],
+		"files" : 
+		[
+			"cmake-build-debug-mingw---latest/_deps/zstd-src/build/cmake/lib/CMakeLists.txt"
+		],
+		"nodes" : 
+		[
+			{
+				"file" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 154,
+				"parent" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 157,
+				"parent" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 163,
+				"parent" : 0
+			}
+		]
+	},
+	"installers" : 
+	[
+		{
+			"backtrace" : 1,
+			"component" : "Unspecified",
+			"destination" : "lib/pkgconfig",
+			"paths" : 
+			[
+				"cmake-build-debug-mingw---latest/_deps/zstd-build/lib/libzstd.pc"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 2,
+			"component" : "Unspecified",
+			"destination" : "include",
+			"paths" : 
+			[
+				"cmake-build-debug-mingw---latest/_deps/zstd-src/build/cmake/../../lib/zstd.h",
+				"cmake-build-debug-mingw---latest/_deps/zstd-src/build/cmake/../../lib/zdict.h",
+				"cmake-build-debug-mingw---latest/_deps/zstd-src/build/cmake/../../lib/zstd_errors.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 3,
+			"component" : "Unspecified",
+			"destination" : "lib",
+			"paths" : 
+			[
+				"_deps/zstd-build/lib/libzstd.a"
+			],
+			"targetId" : "libzstd_static::@ce257b546cf505c1d048",
+			"targetIndex" : 38,
+			"type" : "target"
+		}
+	],
+	"paths" : 
+	{
+		"build" : "_deps/zstd-build/lib",
+		"source" : "cmake-build-debug-mingw---latest/_deps/zstd-src/build/cmake/lib"
+	}
+}

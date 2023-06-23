@@ -1,0 +1,595 @@
+{
+	"artifacts" : 
+	[
+		{
+			"path" : "Src/JxrDecode/CMakeFiles/JxrDecodeStatic.dir/./JxrDecode.cpp.obj"
+		},
+		{
+			"path" : "Src/JxrDecode/CMakeFiles/JxrDecodeStatic.dir/./stdafx.cpp.obj"
+		},
+		{
+			"path" : "Src/JxrDecode/CMakeFiles/JxrDecodeStatic.dir/./Jxr/adapthuff.c.obj"
+		},
+		{
+			"path" : "Src/JxrDecode/CMakeFiles/JxrDecodeStatic.dir/./Jxr/decode.c.obj"
+		},
+		{
+			"path" : "Src/JxrDecode/CMakeFiles/JxrDecodeStatic.dir/./Jxr/encode.c.obj"
+		},
+		{
+			"path" : "Src/JxrDecode/CMakeFiles/JxrDecodeStatic.dir/./Jxr/image.c.obj"
+		},
+		{
+			"path" : "Src/JxrDecode/CMakeFiles/JxrDecodeStatic.dir/./Jxr/JXRGlue.c.obj"
+		},
+		{
+			"path" : "Src/JxrDecode/CMakeFiles/JxrDecodeStatic.dir/./Jxr/JXRGlueJxr.c.obj"
+		},
+		{
+			"path" : "Src/JxrDecode/CMakeFiles/JxrDecodeStatic.dir/./Jxr/JXRGluePFC.c.obj"
+		},
+		{
+			"path" : "Src/JxrDecode/CMakeFiles/JxrDecodeStatic.dir/./Jxr/JXRMeta.c.obj"
+		},
+		{
+			"path" : "Src/JxrDecode/CMakeFiles/JxrDecodeStatic.dir/./Jxr/JXRTest.c.obj"
+		},
+		{
+			"path" : "Src/JxrDecode/CMakeFiles/JxrDecodeStatic.dir/./Jxr/JXRTestBmp.c.obj"
+		},
+		{
+			"path" : "Src/JxrDecode/CMakeFiles/JxrDecodeStatic.dir/./Jxr/JXRTestHdr.c.obj"
+		},
+		{
+			"path" : "Src/JxrDecode/CMakeFiles/JxrDecodeStatic.dir/./Jxr/JXRTestPnm.c.obj"
+		},
+		{
+			"path" : "Src/JxrDecode/CMakeFiles/JxrDecodeStatic.dir/./Jxr/JXRTestTif.c.obj"
+		},
+		{
+			"path" : "Src/JxrDecode/CMakeFiles/JxrDecodeStatic.dir/./Jxr/JXRTestWrapper.c.obj"
+		},
+		{
+			"path" : "Src/JxrDecode/CMakeFiles/JxrDecodeStatic.dir/./Jxr/JXRTestYUV.c.obj"
+		},
+		{
+			"path" : "Src/JxrDecode/CMakeFiles/JxrDecodeStatic.dir/./Jxr/JXRTranscode.c.obj"
+		},
+		{
+			"path" : "Src/JxrDecode/CMakeFiles/JxrDecodeStatic.dir/./Jxr/perfTimerANSI.c.obj"
+		},
+		{
+			"path" : "Src/JxrDecode/CMakeFiles/JxrDecodeStatic.dir/./Jxr/postprocess.c.obj"
+		},
+		{
+			"path" : "Src/JxrDecode/CMakeFiles/JxrDecodeStatic.dir/./Jxr/segdec.c.obj"
+		},
+		{
+			"path" : "Src/JxrDecode/CMakeFiles/JxrDecodeStatic.dir/./Jxr/segenc.c.obj"
+		},
+		{
+			"path" : "Src/JxrDecode/CMakeFiles/JxrDecodeStatic.dir/./Jxr/strcodec.c.obj"
+		},
+		{
+			"path" : "Src/JxrDecode/CMakeFiles/JxrDecodeStatic.dir/./Jxr/strdec.c.obj"
+		},
+		{
+			"path" : "Src/JxrDecode/CMakeFiles/JxrDecodeStatic.dir/./Jxr/strdec_x86.c.obj"
+		},
+		{
+			"path" : "Src/JxrDecode/CMakeFiles/JxrDecodeStatic.dir/./Jxr/strenc.c.obj"
+		},
+		{
+			"path" : "Src/JxrDecode/CMakeFiles/JxrDecodeStatic.dir/./Jxr/strenc_x86.c.obj"
+		},
+		{
+			"path" : "Src/JxrDecode/CMakeFiles/JxrDecodeStatic.dir/./Jxr/strFwdTransform.c.obj"
+		},
+		{
+			"path" : "Src/JxrDecode/CMakeFiles/JxrDecodeStatic.dir/./Jxr/strInvTransform.c.obj"
+		},
+		{
+			"path" : "Src/JxrDecode/CMakeFiles/JxrDecodeStatic.dir/./Jxr/strPredQuant.c.obj"
+		},
+		{
+			"path" : "Src/JxrDecode/CMakeFiles/JxrDecodeStatic.dir/./Jxr/strPredQuantDec.c.obj"
+		},
+		{
+			"path" : "Src/JxrDecode/CMakeFiles/JxrDecodeStatic.dir/./Jxr/strPredQuantEnc.c.obj"
+		},
+		{
+			"path" : "Src/JxrDecode/CMakeFiles/JxrDecodeStatic.dir/./Jxr/strTransform.c.obj"
+		}
+	],
+	"backtrace" : 1,
+	"backtraceGraph" : 
+	{
+		"commands" : 
+		[
+			"add_library",
+			"set_target_properties"
+		],
+		"files" : 
+		[
+			"Src/JxrDecode/CMakeLists.txt"
+		],
+		"nodes" : 
+		[
+			{
+				"file" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 7,
+				"parent" : 0
+			},
+			{
+				"command" : 1,
+				"file" : 0,
+				"line" : 64,
+				"parent" : 0
+			}
+		]
+	},
+	"compileGroups" : 
+	[
+		{
+			"compileCommandFragments" : 
+			[
+				{
+					"fragment" : "-g -fdiagnostics-color=always"
+				},
+				{
+					"fragment" : "-std=gnu++11"
+				}
+			],
+			"language" : "CXX",
+			"languageStandard" : 
+			{
+				"backtraces" : 
+				[
+					2
+				],
+				"standard" : "11"
+			},
+			"sourceIndexes" : 
+			[
+				0,
+				1
+			]
+		},
+		{
+			"compileCommandFragments" : 
+			[
+				{
+					"fragment" : "-g -fdiagnostics-color=always"
+				}
+			],
+			"language" : "C",
+			"sourceIndexes" : 
+			[
+				5,
+				6,
+				7,
+				8,
+				9,
+				10,
+				11,
+				12,
+				13,
+				14,
+				15,
+				16,
+				17,
+				18,
+				19,
+				20,
+				21,
+				22,
+				23,
+				24,
+				25,
+				26,
+				27,
+				28,
+				29,
+				30,
+				31,
+				32,
+				33,
+				34,
+				35
+			]
+		}
+	],
+	"id" : "JxrDecodeStatic::@c6170898979fd439b003",
+	"name" : "JxrDecodeStatic",
+	"paths" : 
+	{
+		"build" : "Src/JxrDecode",
+		"source" : "Src/JxrDecode"
+	},
+	"sourceGroups" : 
+	[
+		{
+			"name" : "Source Files",
+			"sourceIndexes" : 
+			[
+				0,
+				1,
+				5,
+				6,
+				7,
+				8,
+				9,
+				10,
+				11,
+				12,
+				13,
+				14,
+				15,
+				16,
+				17,
+				18,
+				19,
+				20,
+				21,
+				22,
+				23,
+				24,
+				25,
+				26,
+				27,
+				28,
+				29,
+				30,
+				31,
+				32,
+				33,
+				34,
+				35
+			]
+		},
+		{
+			"name" : "Header Files",
+			"sourceIndexes" : 
+			[
+				2,
+				3,
+				4,
+				36,
+				37,
+				38,
+				39,
+				40,
+				41,
+				42,
+				43,
+				44,
+				45,
+				46,
+				47,
+				48,
+				49,
+				50,
+				51,
+				52,
+				53,
+				54
+			]
+		}
+	],
+	"sources" : 
+	[
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "Src/JxrDecode/JxrDecode.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "Src/JxrDecode/stdafx.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "Src/JxrDecode/JxrDecode.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 1,
+			"path" : "Src/JxrDecode/stdafx.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 1,
+			"path" : "Src/JxrDecode/targetver.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 1,
+			"path" : "Src/JxrDecode/Jxr/adapthuff.c",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 1,
+			"path" : "Src/JxrDecode/Jxr/decode.c",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 1,
+			"path" : "Src/JxrDecode/Jxr/encode.c",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 1,
+			"path" : "Src/JxrDecode/Jxr/image.c",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 1,
+			"path" : "Src/JxrDecode/Jxr/JXRGlue.c",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 1,
+			"path" : "Src/JxrDecode/Jxr/JXRGlueJxr.c",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 1,
+			"path" : "Src/JxrDecode/Jxr/JXRGluePFC.c",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 1,
+			"path" : "Src/JxrDecode/Jxr/JXRMeta.c",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 1,
+			"path" : "Src/JxrDecode/Jxr/JXRTest.c",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 1,
+			"path" : "Src/JxrDecode/Jxr/JXRTestBmp.c",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 1,
+			"path" : "Src/JxrDecode/Jxr/JXRTestHdr.c",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 1,
+			"path" : "Src/JxrDecode/Jxr/JXRTestPnm.c",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 1,
+			"path" : "Src/JxrDecode/Jxr/JXRTestTif.c",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 1,
+			"path" : "Src/JxrDecode/Jxr/JXRTestWrapper.c",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 1,
+			"path" : "Src/JxrDecode/Jxr/JXRTestYUV.c",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 1,
+			"path" : "Src/JxrDecode/Jxr/JXRTranscode.c",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 1,
+			"path" : "Src/JxrDecode/Jxr/perfTimerANSI.c",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 1,
+			"path" : "Src/JxrDecode/Jxr/postprocess.c",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 1,
+			"path" : "Src/JxrDecode/Jxr/segdec.c",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 1,
+			"path" : "Src/JxrDecode/Jxr/segenc.c",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 1,
+			"path" : "Src/JxrDecode/Jxr/strcodec.c",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 1,
+			"path" : "Src/JxrDecode/Jxr/strdec.c",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 1,
+			"path" : "Src/JxrDecode/Jxr/strdec_x86.c",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 1,
+			"path" : "Src/JxrDecode/Jxr/strenc.c",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 1,
+			"path" : "Src/JxrDecode/Jxr/strenc_x86.c",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 1,
+			"path" : "Src/JxrDecode/Jxr/strFwdTransform.c",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 1,
+			"path" : "Src/JxrDecode/Jxr/strInvTransform.c",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 1,
+			"path" : "Src/JxrDecode/Jxr/strPredQuant.c",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 1,
+			"path" : "Src/JxrDecode/Jxr/strPredQuantDec.c",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 1,
+			"path" : "Src/JxrDecode/Jxr/strPredQuantEnc.c",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 1,
+			"path" : "Src/JxrDecode/Jxr/strTransform.c",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "Src/JxrDecode/Jxr/common.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 1,
+			"path" : "Src/JxrDecode/Jxr/decode.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 1,
+			"path" : "Src/JxrDecode/Jxr/encode.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 1,
+			"path" : "Src/JxrDecode/Jxr/JXRGlue.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 1,
+			"path" : "Src/JxrDecode/Jxr/JXRMeta.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 1,
+			"path" : "Src/JxrDecode/Jxr/JXRTest.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 1,
+			"path" : "Src/JxrDecode/Jxr/JXRTestWrapper.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 1,
+			"path" : "Src/JxrDecode/Jxr/perfTimer.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 1,
+			"path" : "Src/JxrDecode/Jxr/strcodec.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 1,
+			"path" : "Src/JxrDecode/Jxr/strTransform.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 1,
+			"path" : "Src/JxrDecode/Jxr/windowsmediaphoto.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 1,
+			"path" : "Src/JxrDecode/Jxr/_x86/_x86.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 1,
+			"path" : "Src/JxrDecode/Jxr/priv_guiddef.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 1,
+			"path" : "Src/JxrDecode/Jxr/wmsal.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 1,
+			"path" : "Src/JxrDecode/Jxr/wmspecstring.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 1,
+			"path" : "Src/JxrDecode/Jxr/wmspecstrings_adt.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 1,
+			"path" : "Src/JxrDecode/Jxr/wmspecstrings_strict.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 1,
+			"path" : "Src/JxrDecode/Jxr/wmspecstrings_undef.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 1,
+			"path" : "Src/JxrDecode/Jxr/jxr_defines.h",
+			"sourceGroupIndex" : 1
+		}
+	],
+	"type" : "OBJECT_LIBRARY"
+}

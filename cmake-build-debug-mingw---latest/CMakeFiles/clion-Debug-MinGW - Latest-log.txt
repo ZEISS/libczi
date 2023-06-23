@@ -1,0 +1,114 @@
+C:\Users\jbohl\AppData\Local\JetBrains\Toolbox\apps\CLion\ch-0\231.8770.66\bin\cmake\win\x64\bin\cmake.exe -DCMAKE_BUILD_TYPE=Debug -DCMAKE_MAKE_PROGRAM=C:/Users/jbohl/AppData/Local/JetBrains/Toolbox/apps/CLion/ch-0/231.8770.66/bin/ninja/win/x64/ninja.exe -G Ninja -S D:\dev\Github\libczi-zeiss-ptahmose -B D:\dev\Github\libczi-zeiss-ptahmose\cmake-build-debug-mingw---latest
+-- The C compiler identification is GNU 12.2.0
+-- The CXX compiler identification is GNU 12.2.0
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Check for working C compiler: D:/SW/mingw64/bin/gcc.exe - skipped
+-- Detecting C compile features
+-- Detecting C compile features - done
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: D:/SW/mingw64/bin/c++.exe - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- 
+-- 
+-- Checking large files support...
+-- 
+-- Result of checking large files support: supported with WinAPI
+-- Performing Test _UNALIGNED_ACCESS_RESULT
+-- Performing Test _UNALIGNED_ACCESS_RESULT - Success
+Read/write to unaligned addresses is OK.
+identified a little-endian platform
+-- Looking for C++ include endian.h
+-- Looking for C++ include endian.h - not found
+check for endian.h -> not found
+-- Looking for aligned_alloc
+-- Looking for aligned_alloc - not found
+-- Looking for _aligned_malloc
+-- Looking for _aligned_malloc - found
+-- Looking for open
+-- Looking for open - found
+-- Looking for pread
+-- Looking for pread - not found
+-- Looking for pwrite
+-- Looking for pwrite - not found
+check for open -> found ; check for pread -> not found ; check for pwrite -> not found
+-- Looking for _mm256_storeu2_m128i
+-- Looking for _mm256_storeu2_m128i - not found
+-- Looking for include file arm_neon.h
+-- Looking for include file arm_neon.h - not found
+-- Fetching zstd...
+-- The ASM compiler identification is GNU
+-- Found assembler: D:/SW/mingw64/bin/gcc.exe
+-- ZSTD VERSION: 1.5.4
+-- Performing Test C_FLAG_WALL
+-- Performing Test C_FLAG_WALL - Success
+-- Performing Test CXX_FLAG_WALL
+-- Performing Test CXX_FLAG_WALL - Success
+-- Performing Test C_FLAG_WEXTRA
+-- Performing Test C_FLAG_WEXTRA - Success
+-- Performing Test CXX_FLAG_WEXTRA
+-- Performing Test CXX_FLAG_WEXTRA - Success
+-- Performing Test C_FLAG_WUNDEF
+-- Performing Test C_FLAG_WUNDEF - Success
+-- Performing Test CXX_FLAG_WUNDEF
+-- Performing Test CXX_FLAG_WUNDEF - Success
+-- Performing Test C_FLAG_WSHADOW
+-- Performing Test C_FLAG_WSHADOW - Success
+-- Performing Test CXX_FLAG_WSHADOW
+-- Performing Test CXX_FLAG_WSHADOW - Success
+-- Performing Test C_FLAG_WCAST_ALIGN
+-- Performing Test C_FLAG_WCAST_ALIGN - Success
+-- Performing Test CXX_FLAG_WCAST_ALIGN
+-- Performing Test CXX_FLAG_WCAST_ALIGN - Success
+-- Performing Test C_FLAG_WCAST_QUAL
+-- Performing Test C_FLAG_WCAST_QUAL - Success
+-- Performing Test CXX_FLAG_WCAST_QUAL
+-- Performing Test CXX_FLAG_WCAST_QUAL - Success
+-- Performing Test C_FLAG_WSTRICT_PROTOTYPES
+-- Performing Test C_FLAG_WSTRICT_PROTOTYPES - Success
+-- Performing Test C_FLAG_DDEBUGLEVEL_1
+-- Performing Test C_FLAG_DDEBUGLEVEL_1 - Success
+-- Performing Test CXX_FLAG_DDEBUGLEVEL_1
+-- Performing Test CXX_FLAG_DDEBUGLEVEL_1 - Success
+-- Performing Test LD_FLAG_Z_NOEXECSTACK
+-- Performing Test LD_FLAG_Z_NOEXECSTACK - Failed
+-- Performing Test C_FLAG_QUNUSED_ARGUMENTS
+-- Performing Test C_FLAG_QUNUSED_ARGUMENTS - Failed
+-- Performing Test CXX_FLAG_QUNUSED_ARGUMENTS
+-- Performing Test CXX_FLAG_QUNUSED_ARGUMENTS - Failed
+-- Performing Test C_FLAG_WA_NOEXECSTACK
+-- Performing Test C_FLAG_WA_NOEXECSTACK - Failed
+-- Performing Test CXX_FLAG_WA_NOEXECSTACK
+-- Performing Test CXX_FLAG_WA_NOEXECSTACK - Failed
+-- CMAKE_INSTALL_PREFIX: C:/Program Files (x86)/libCZI
+-- CMAKE_INSTALL_LIBDIR: lib
+-- ZSTD_LEGACY_SUPPORT defined!
+-- ZSTD_MULTITHREAD_SUPPORT is enabled
+CMake Deprecation Warning at CMakeLists.txt:5 (cmake_minimum_required):
+  Compatibility with CMake < 2.8.12 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value or use a ...<max> suffix to tell
+  CMake that the project does not need compatibility with older versions.
+
+
+-- Configuring done
+-- Generating done
+-- Build files have been written to: D:/dev/Github/libczi-zeiss-ptahmose/cmake-build-debug-mingw---latest/Src/libCZI_UnitTests/googletest-download
+[1/9] Creating directories for 'googletest'
+[2/9] Performing download step (git clone) for 'googletest'
+Cloning into 'googletest-src'...
+HEAD is now at 58d77fa8 Updates the version number in CMakeLists.txt to 1.12.1 (#3919)
+[3/9] Performing update step for 'googletest'
+[4/9] No patch step for 'googletest'
+[5/9] No configure step for 'googletest'
+[6/9] No build step for 'googletest'
+[7/9] No install step for 'googletest'
+[8/9] No test step for 'googletest'
+[9/9] Completed 'googletest'
+-- Found Python: C:/Users/jbohl/AppData/Local/Programs/Python/Python311/python.exe (found version "3.11.3") found components: Interpreter 
+-- Configuring done
+-- Generating done
+-- Build files have been written to: D:/dev/Github/libczi-zeiss-ptahmose/cmake-build-debug-mingw---latest

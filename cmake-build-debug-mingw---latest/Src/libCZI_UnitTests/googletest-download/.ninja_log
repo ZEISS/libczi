@@ -1,0 +1,21 @@
+# ninja log v5
+0	32	7079714822937917	googletest-prefix/src/googletest-stamp/googletest-mkdir	70d40e82ed55da7
+0	32	7079714822937917	D:/dev/Github/libczi-zeiss-ptahmose/cmake-build-debug-mingw---latest/Src/libCZI_UnitTests/googletest-download/googletest-prefix/src/googletest-stamp/googletest-mkdir	70d40e82ed55da7
+33	2304	7079714845656994	googletest-prefix/src/googletest-stamp/googletest-download	44a15dc6f3996692
+33	2304	7079714845656994	D:/dev/Github/libczi-zeiss-ptahmose/cmake-build-debug-mingw---latest/Src/libCZI_UnitTests/googletest-download/googletest-prefix/src/googletest-stamp/googletest-download	44a15dc6f3996692
+2304	2391	0	googletest-prefix/src/googletest-stamp/googletest-update	ccd926bddac3a836
+2304	2391	0	D:/dev/Github/libczi-zeiss-ptahmose/cmake-build-debug-mingw---latest/Src/libCZI_UnitTests/googletest-download/googletest-prefix/src/googletest-stamp/googletest-update	ccd926bddac3a836
+2392	2479	7079714846882420	googletest-prefix/src/googletest-stamp/googletest-patch	554fd7b5512cd743
+2392	2479	7079714846882420	D:/dev/Github/libczi-zeiss-ptahmose/cmake-build-debug-mingw---latest/Src/libCZI_UnitTests/googletest-download/googletest-prefix/src/googletest-stamp/googletest-patch	554fd7b5512cd743
+2479	2525	7079714847787341	googletest-prefix/src/googletest-stamp/googletest-configure	e266e025b1589e33
+2479	2525	7079714847787341	D:/dev/Github/libczi-zeiss-ptahmose/cmake-build-debug-mingw---latest/Src/libCZI_UnitTests/googletest-download/googletest-prefix/src/googletest-stamp/googletest-configure	e266e025b1589e33
+2525	2564	7079714848239684	googletest-prefix/src/googletest-stamp/googletest-build	5cee2d81b9c04a11
+2525	2564	7079714848239684	D:/dev/Github/libczi-zeiss-ptahmose/cmake-build-debug-mingw---latest/Src/libCZI_UnitTests/googletest-download/googletest-prefix/src/googletest-stamp/googletest-build	5cee2d81b9c04a11
+2564	2600	7079714848610832	googletest-prefix/src/googletest-stamp/googletest-install	2e8c588efe25f705
+2564	2600	7079714848610832	D:/dev/Github/libczi-zeiss-ptahmose/cmake-build-debug-mingw---latest/Src/libCZI_UnitTests/googletest-download/googletest-prefix/src/googletest-stamp/googletest-install	2e8c588efe25f705
+2600	2632	7079714848933063	googletest-prefix/src/googletest-stamp/googletest-test	7581aaafb6b380af
+2600	2632	7079714848933063	D:/dev/Github/libczi-zeiss-ptahmose/cmake-build-debug-mingw---latest/Src/libCZI_UnitTests/googletest-download/googletest-prefix/src/googletest-stamp/googletest-test	7581aaafb6b380af
+2632	2678	7079714849387203	CMakeFiles/googletest-complete	4d90497e3e04b488
+2632	2678	7079714849387203	googletest-prefix/src/googletest-stamp/googletest-done	4d90497e3e04b488
+2632	2678	7079714849387203	D:/dev/Github/libczi-zeiss-ptahmose/cmake-build-debug-mingw---latest/Src/libCZI_UnitTests/googletest-download/CMakeFiles/googletest-complete	4d90497e3e04b488
+2632	2678	7079714849387203	D:/dev/Github/libczi-zeiss-ptahmose/cmake-build-debug-mingw---latest/Src/libCZI_UnitTests/googletest-download/googletest-prefix/src/googletest-stamp/googletest-done	4d90497e3e04b488

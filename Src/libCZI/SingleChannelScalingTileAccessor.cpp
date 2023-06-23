@@ -83,7 +83,7 @@ void CSingleChannelScalingTileAccessor::ScaleBlt(libCZI::IBitmapData* bmDest, fl
     {
         ScopedBitmapLockerSP srcLck{ source };
         ScopedBitmapLockerP dstLck{ bmDest };
-        CBitmapOperations::CopyOffsetedInfo info;
+        CBitmapOperations::CopyWithOffsetInfo info;
         info.xOffset = sbInfo.logicalRect.x - roi.x;
         info.yOffset = sbInfo.logicalRect.y - roi.y;
         info.srcPixelType = source->GetPixelType();
@@ -98,7 +98,7 @@ void CSingleChannelScalingTileAccessor::ScaleBlt(libCZI::IBitmapData* bmDest, fl
         info.dstHeight = bmDest->GetHeight();
         info.drawTileBorder = false;
 
-        CBitmapOperations::CopyOffseted(info);
+        CBitmapOperations::CopyWithOffset(info);
     }
     else
     {

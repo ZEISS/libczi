@@ -1,0 +1,3 @@
+D:/dev/Github/libczi-zeiss-ptahmose/cmake-build-debug-mingw---latest/_deps/zstd-subbuild/CMakeFiles/zstd-populate.dir
+D:/dev/Github/libczi-zeiss-ptahmose/cmake-build-debug-mingw---latest/_deps/zstd-subbuild/CMakeFiles/edit_cache.dir
+D:/dev/Github/libczi-zeiss-ptahmose/cmake-build-debug-mingw---latest/_deps/zstd-subbuild/CMakeFiles/rebuild_cache.dir

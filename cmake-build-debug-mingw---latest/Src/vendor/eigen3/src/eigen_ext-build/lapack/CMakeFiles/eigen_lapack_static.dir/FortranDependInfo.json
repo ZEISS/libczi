@@ -1,0 +1,21 @@
+{
+	"bmi-installation" : null,
+	"compiler-id" : "GNU",
+	"config" : "Release",
+	"cxx-modules" : {},
+	"dir-cur-bld" : "D:/dev/Github/libczi-zeiss-ptahmose/cmake-build-debug-mingw---latest/Src/vendor/eigen3/src/eigen_ext-build/lapack",
+	"dir-cur-src" : "D:/dev/Github/libczi-zeiss-ptahmose/cmake-build-debug-mingw---latest/Src/vendor/eigen3/src/eigen_ext/lapack",
+	"dir-top-bld" : "D:/dev/Github/libczi-zeiss-ptahmose/cmake-build-debug-mingw---latest/Src/vendor/eigen3/src/eigen_ext-build",
+	"dir-top-src" : "D:/dev/Github/libczi-zeiss-ptahmose/cmake-build-debug-mingw---latest/Src/vendor/eigen3/src/eigen_ext",
+	"exports" : [],
+	"include-dirs" : 
+	[
+		"D:\\dev\\Github\\libczi-zeiss-ptahmose\\cmake-build-debug-mingw---latest\\Src\\vendor\\eigen3\\src\\eigen_ext",
+		"D:\\dev\\Github\\libczi-zeiss-ptahmose\\cmake-build-debug-mingw---latest\\Src\\vendor\\eigen3\\src\\eigen_ext\\lapack\\..\\blas"
+	],
+	"language" : "Fortran",
+	"linked-target-dirs" : [],
+	"module-dir" : "D:/dev/Github/libczi-zeiss-ptahmose/cmake-build-debug-mingw---latest/Src/vendor/eigen3/src/eigen_ext-build/lapack",
+	"submodule-ext" : ".smod",
+	"submodule-sep" : "@"
+}

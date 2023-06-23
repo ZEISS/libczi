@@ -156,7 +156,7 @@ using namespace std;
     throw std::logic_error("It seems that this conversion is not implemented...");
 }
 
-/*static*/void CBitmapOperations::CopyOffseted(const CopyOffsetedInfo& info)
+/*static*/void CBitmapOperations::CopyWithOffset(const CopyWithOffsetInfo& info)
 {
     const IntRect srcRect = IntRect{ info.xOffset,info.yOffset,info.srcWidth,info.srcHeight };
     const IntRect dstRect = IntRect{ 0,0,info.dstWidth,info.dstHeight };

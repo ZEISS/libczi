@@ -1,0 +1,735 @@
+{
+	"archive" : {},
+	"artifacts" : 
+	[
+		{
+			"path" : "_deps/zstd-build/lib/libzstd.a"
+		}
+	],
+	"backtrace" : 1,
+	"backtraceGraph" : 
+	{
+		"commands" : 
+		[
+			"add_library",
+			"install",
+			"add_definitions",
+			"set_property",
+			"include_directories"
+		],
+		"files" : 
+		[
+			"cmake-build-debug-mingw---latest/_deps/zstd-src/build/cmake/lib/CMakeLists.txt",
+			"cmake-build-debug-mingw---latest/_deps/zstd-src/build/cmake/CMakeLists.txt"
+		],
+		"nodes" : 
+		[
+			{
+				"file" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 99,
+				"parent" : 0
+			},
+			{
+				"command" : 1,
+				"file" : 0,
+				"line" : 163,
+				"parent" : 0
+			},
+			{
+				"file" : 1
+			},
+			{
+				"command" : 2,
+				"file" : 1,
+				"line" : 74,
+				"parent" : 3
+			},
+			{
+				"command" : 2,
+				"file" : 1,
+				"line" : 92,
+				"parent" : 3
+			},
+			{
+				"command" : 3,
+				"file" : 0,
+				"line" : 102,
+				"parent" : 0
+			},
+			{
+				"command" : 4,
+				"file" : 0,
+				"line" : 21,
+				"parent" : 0
+			},
+			{
+				"command" : 4,
+				"file" : 0,
+				"line" : 53,
+				"parent" : 0
+			}
+		]
+	},
+	"compileGroups" : 
+	[
+		{
+			"compileCommandFragments" : 
+			[
+				{
+					"fragment" : " -Wall -Wextra -Wundef -Wshadow -Wcast-align -Wcast-qual -Wstrict-prototypes -DDEBUGLEVEL=1 -g -fdiagnostics-color=always"
+				}
+			],
+			"defines" : 
+			[
+				{
+					"backtrace" : 4,
+					"define" : "XXH_NAMESPACE=ZSTD_"
+				},
+				{
+					"backtrace" : 5,
+					"define" : "ZSTD_LEGACY_SUPPORT=5"
+				},
+				{
+					"backtrace" : 6,
+					"define" : "ZSTD_MULTITHREAD"
+				}
+			],
+			"includes" : 
+			[
+				{
+					"path" : "D:/dev/Github/libczi-zeiss-ptahmose/cmake-build-debug-mingw---latest/_deps/zstd-build/lib"
+				},
+				{
+					"path" : "D:/dev/Github/libczi-zeiss-ptahmose/cmake-build-debug-mingw---latest/_deps/zstd-src/build/cmake/lib"
+				},
+				{
+					"backtrace" : 7,
+					"path" : "D:/dev/Github/libczi-zeiss-ptahmose/cmake-build-debug-mingw---latest/_deps/zstd-src/build/cmake/../../lib"
+				},
+				{
+					"backtrace" : 7,
+					"path" : "D:/dev/Github/libczi-zeiss-ptahmose/cmake-build-debug-mingw---latest/_deps/zstd-src/build/cmake/../../lib/common"
+				},
+				{
+					"backtrace" : 8,
+					"path" : "D:/dev/Github/libczi-zeiss-ptahmose/cmake-build-debug-mingw---latest/_deps/zstd-src/build/cmake/../../lib/legacy"
+				}
+			],
+			"language" : "C",
+			"sourceIndexes" : 
+			[
+				0,
+				1,
+				2,
+				3,
+				4,
+				5,
+				6,
+				7,
+				8,
+				9,
+				10,
+				11,
+				12,
+				13,
+				14,
+				15,
+				16,
+				17,
+				18,
+				19,
+				20,
+				21,
+				22,
+				23,
+				24,
+				25,
+				26,
+				27,
+				28,
+				29,
+				30,
+				31,
+				32,
+				33,
+				34,
+				35,
+				36
+			]
+		}
+	],
+	"id" : "libzstd_static::@ce257b546cf505c1d048",
+	"install" : 
+	{
+		"destinations" : 
+		[
+			{
+				"backtrace" : 2,
+				"path" : "lib"
+			}
+		],
+		"prefix" : 
+		{
+			"path" : "C:/Program Files (x86)/libCZI"
+		}
+	},
+	"name" : "libzstd_static",
+	"nameOnDisk" : "libzstd.a",
+	"paths" : 
+	{
+		"build" : "_deps/zstd-build/lib",
+		"source" : "cmake-build-debug-mingw---latest/_deps/zstd-src/build/cmake/lib"
+	},
+	"sourceGroups" : 
+	[
+		{
+			"name" : "Source Files",
+			"sourceIndexes" : 
+			[
+				0,
+				1,
+				2,
+				3,
+				4,
+				5,
+				6,
+				7,
+				8,
+				9,
+				10,
+				11,
+				12,
+				13,
+				14,
+				15,
+				16,
+				17,
+				18,
+				19,
+				20,
+				21,
+				23,
+				24,
+				25,
+				26,
+				27,
+				28,
+				29,
+				30,
+				31,
+				32,
+				33,
+				34,
+				35,
+				36
+			]
+		},
+		{
+			"name" : "",
+			"sourceIndexes" : 
+			[
+				22
+			]
+		},
+		{
+			"name" : "Header Files",
+			"sourceIndexes" : 
+			[
+				37,
+				38,
+				39,
+				40,
+				41,
+				42,
+				43,
+				44,
+				45,
+				46,
+				47,
+				48,
+				49,
+				50,
+				51,
+				52,
+				53,
+				54,
+				55,
+				56,
+				57,
+				58,
+				59,
+				60,
+				61,
+				62,
+				63,
+				64,
+				65,
+				66,
+				67,
+				68,
+				69,
+				70,
+				71,
+				72,
+				73,
+				74,
+				75,
+				76,
+				77,
+				78,
+				79,
+				80
+			]
+		}
+	],
+	"sources" : 
+	[
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "cmake-build-debug-mingw---latest/_deps/zstd-src/lib/common/debug.c",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "cmake-build-debug-mingw---latest/_deps/zstd-src/lib/common/entropy_common.c",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "cmake-build-debug-mingw---latest/_deps/zstd-src/lib/common/error_private.c",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "cmake-build-debug-mingw---latest/_deps/zstd-src/lib/common/fse_decompress.c",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "cmake-build-debug-mingw---latest/_deps/zstd-src/lib/common/pool.c",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "cmake-build-debug-mingw---latest/_deps/zstd-src/lib/common/threading.c",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "cmake-build-debug-mingw---latest/_deps/zstd-src/lib/common/xxhash.c",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "cmake-build-debug-mingw---latest/_deps/zstd-src/lib/common/zstd_common.c",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "cmake-build-debug-mingw---latest/_deps/zstd-src/lib/compress/fse_compress.c",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "cmake-build-debug-mingw---latest/_deps/zstd-src/lib/compress/hist.c",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "cmake-build-debug-mingw---latest/_deps/zstd-src/lib/compress/huf_compress.c",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "cmake-build-debug-mingw---latest/_deps/zstd-src/lib/compress/zstd_compress.c",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "cmake-build-debug-mingw---latest/_deps/zstd-src/lib/compress/zstd_compress_literals.c",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "cmake-build-debug-mingw---latest/_deps/zstd-src/lib/compress/zstd_compress_sequences.c",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "cmake-build-debug-mingw---latest/_deps/zstd-src/lib/compress/zstd_compress_superblock.c",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "cmake-build-debug-mingw---latest/_deps/zstd-src/lib/compress/zstd_double_fast.c",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "cmake-build-debug-mingw---latest/_deps/zstd-src/lib/compress/zstd_fast.c",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "cmake-build-debug-mingw---latest/_deps/zstd-src/lib/compress/zstd_lazy.c",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "cmake-build-debug-mingw---latest/_deps/zstd-src/lib/compress/zstd_ldm.c",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "cmake-build-debug-mingw---latest/_deps/zstd-src/lib/compress/zstd_opt.c",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "cmake-build-debug-mingw---latest/_deps/zstd-src/lib/compress/zstdmt_compress.c",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "cmake-build-debug-mingw---latest/_deps/zstd-src/lib/decompress/huf_decompress.c",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "cmake-build-debug-mingw---latest/_deps/zstd-src/lib/decompress/huf_decompress_amd64.S",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "cmake-build-debug-mingw---latest/_deps/zstd-src/lib/decompress/zstd_ddict.c",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "cmake-build-debug-mingw---latest/_deps/zstd-src/lib/decompress/zstd_decompress.c",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "cmake-build-debug-mingw---latest/_deps/zstd-src/lib/decompress/zstd_decompress_block.c",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "cmake-build-debug-mingw---latest/_deps/zstd-src/lib/dictBuilder/cover.c",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "cmake-build-debug-mingw---latest/_deps/zstd-src/lib/dictBuilder/divsufsort.c",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "cmake-build-debug-mingw---latest/_deps/zstd-src/lib/dictBuilder/fastcover.c",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "cmake-build-debug-mingw---latest/_deps/zstd-src/lib/dictBuilder/zdict.c",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "cmake-build-debug-mingw---latest/_deps/zstd-src/lib/legacy/zstd_v01.c",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "cmake-build-debug-mingw---latest/_deps/zstd-src/lib/legacy/zstd_v02.c",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "cmake-build-debug-mingw---latest/_deps/zstd-src/lib/legacy/zstd_v03.c",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "cmake-build-debug-mingw---latest/_deps/zstd-src/lib/legacy/zstd_v04.c",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "cmake-build-debug-mingw---latest/_deps/zstd-src/lib/legacy/zstd_v05.c",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "cmake-build-debug-mingw---latest/_deps/zstd-src/lib/legacy/zstd_v06.c",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "cmake-build-debug-mingw---latest/_deps/zstd-src/lib/legacy/zstd_v07.c",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "cmake-build-debug-mingw---latest/_deps/zstd-src/lib/zstd.h",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 1,
+			"path" : "cmake-build-debug-mingw---latest/_deps/zstd-src/lib/common/bits.h",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 1,
+			"path" : "cmake-build-debug-mingw---latest/_deps/zstd-src/lib/common/bitstream.h",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 1,
+			"path" : "cmake-build-debug-mingw---latest/_deps/zstd-src/lib/common/compiler.h",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 1,
+			"path" : "cmake-build-debug-mingw---latest/_deps/zstd-src/lib/common/cpu.h",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 1,
+			"path" : "cmake-build-debug-mingw---latest/_deps/zstd-src/lib/common/debug.h",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 1,
+			"path" : "cmake-build-debug-mingw---latest/_deps/zstd-src/lib/common/error_private.h",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 1,
+			"path" : "cmake-build-debug-mingw---latest/_deps/zstd-src/lib/common/fse.h",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 1,
+			"path" : "cmake-build-debug-mingw---latest/_deps/zstd-src/lib/common/huf.h",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 1,
+			"path" : "cmake-build-debug-mingw---latest/_deps/zstd-src/lib/common/mem.h",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 1,
+			"path" : "cmake-build-debug-mingw---latest/_deps/zstd-src/lib/common/pool.h",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 1,
+			"path" : "cmake-build-debug-mingw---latest/_deps/zstd-src/lib/common/portability_macros.h",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 1,
+			"path" : "cmake-build-debug-mingw---latest/_deps/zstd-src/lib/common/threading.h",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 1,
+			"path" : "cmake-build-debug-mingw---latest/_deps/zstd-src/lib/common/xxhash.h",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 1,
+			"path" : "cmake-build-debug-mingw---latest/_deps/zstd-src/lib/common/zstd_deps.h",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 1,
+			"path" : "cmake-build-debug-mingw---latest/_deps/zstd-src/lib/common/zstd_internal.h",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 1,
+			"path" : "cmake-build-debug-mingw---latest/_deps/zstd-src/lib/common/zstd_trace.h",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 1,
+			"path" : "cmake-build-debug-mingw---latest/_deps/zstd-src/lib/compress/clevels.h",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 1,
+			"path" : "cmake-build-debug-mingw---latest/_deps/zstd-src/lib/compress/hist.h",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 1,
+			"path" : "cmake-build-debug-mingw---latest/_deps/zstd-src/lib/compress/zstd_compress_internal.h",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 1,
+			"path" : "cmake-build-debug-mingw---latest/_deps/zstd-src/lib/compress/zstd_compress_literals.h",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 1,
+			"path" : "cmake-build-debug-mingw---latest/_deps/zstd-src/lib/compress/zstd_compress_sequences.h",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 1,
+			"path" : "cmake-build-debug-mingw---latest/_deps/zstd-src/lib/compress/zstd_compress_superblock.h",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 1,
+			"path" : "cmake-build-debug-mingw---latest/_deps/zstd-src/lib/compress/zstd_cwksp.h",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 1,
+			"path" : "cmake-build-debug-mingw---latest/_deps/zstd-src/lib/compress/zstd_double_fast.h",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 1,
+			"path" : "cmake-build-debug-mingw---latest/_deps/zstd-src/lib/compress/zstd_fast.h",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 1,
+			"path" : "cmake-build-debug-mingw---latest/_deps/zstd-src/lib/compress/zstd_lazy.h",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 1,
+			"path" : "cmake-build-debug-mingw---latest/_deps/zstd-src/lib/compress/zstd_ldm.h",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 1,
+			"path" : "cmake-build-debug-mingw---latest/_deps/zstd-src/lib/compress/zstd_ldm_geartab.h",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 1,
+			"path" : "cmake-build-debug-mingw---latest/_deps/zstd-src/lib/compress/zstd_opt.h",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 1,
+			"path" : "cmake-build-debug-mingw---latest/_deps/zstd-src/lib/compress/zstdmt_compress.h",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 1,
+			"path" : "cmake-build-debug-mingw---latest/_deps/zstd-src/lib/decompress/zstd_ddict.h",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 1,
+			"path" : "cmake-build-debug-mingw---latest/_deps/zstd-src/lib/decompress/zstd_decompress_block.h",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 1,
+			"path" : "cmake-build-debug-mingw---latest/_deps/zstd-src/lib/decompress/zstd_decompress_internal.h",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 1,
+			"path" : "cmake-build-debug-mingw---latest/_deps/zstd-src/lib/dictBuilder/cover.h",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 1,
+			"path" : "cmake-build-debug-mingw---latest/_deps/zstd-src/lib/dictBuilder/divsufsort.h",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 1,
+			"path" : "cmake-build-debug-mingw---latest/_deps/zstd-src/lib/legacy/zstd_legacy.h",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 1,
+			"path" : "cmake-build-debug-mingw---latest/_deps/zstd-src/lib/legacy/zstd_v01.h",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 1,
+			"path" : "cmake-build-debug-mingw---latest/_deps/zstd-src/lib/legacy/zstd_v02.h",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 1,
+			"path" : "cmake-build-debug-mingw---latest/_deps/zstd-src/lib/legacy/zstd_v03.h",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 1,
+			"path" : "cmake-build-debug-mingw---latest/_deps/zstd-src/lib/legacy/zstd_v04.h",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 1,
+			"path" : "cmake-build-debug-mingw---latest/_deps/zstd-src/lib/legacy/zstd_v05.h",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 1,
+			"path" : "cmake-build-debug-mingw---latest/_deps/zstd-src/lib/legacy/zstd_v06.h",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 1,
+			"path" : "cmake-build-debug-mingw---latest/_deps/zstd-src/lib/legacy/zstd_v07.h",
+			"sourceGroupIndex" : 2
+		}
+	],
+	"type" : "STATIC_LIBRARY"
+}
