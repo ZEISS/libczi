@@ -614,7 +614,7 @@ TEST(Accessor, CreateDocumentAndExerciseScalingAccessorAllowingForInaccuracy)
     SUCCEED();
 }
 
-TEST(Accessor, CreateDocumentAndCheckSingleChannelScalingAccessor)
+TEST(Accessor, CreateDocumentAndCheckSingleChannelScalingAccessor1)
 {
     // arrange
 
