@@ -363,6 +363,46 @@ inline void CBitmapOperations::Copy<libCZI::PixelType::Bgr24, libCZI::PixelType:
 {
     Copy<libCZI::PixelType::Bgr24, libCZI::PixelType::Bgr48, CConvBgr24ToBgr48>(CConvBgr24ToBgr48(), srcPtr, srcStride, dstPtr, dstStride, width, height, drawTileBorder);
 }
+template <>
+inline void CBitmapOperations::Copy<libCZI::PixelType::Gray16, libCZI::PixelType::Gray8>(const void* srcPtr, int srcStride, void* dstPtr, int dstStride, int width, int height, bool drawTileBorder)
+{
+    Copy<libCZI::PixelType::Gray16, libCZI::PixelType::Gray8, CConvGray16ToGray8>(CConvGray16ToGray8(), srcPtr, srcStride, dstPtr, dstStride, width, height, drawTileBorder);
+}
+template <>
+inline void CBitmapOperations::Copy<libCZI::PixelType::Gray16, libCZI::PixelType::Gray32Float>(const void* srcPtr, int srcStride, void* dstPtr, int dstStride, int width, int height, bool drawTileBorder)
+{
+    Copy<libCZI::PixelType::Gray16, libCZI::PixelType::Gray32Float, CConvGray16ToGray32Float>(CConvGray16ToGray32Float(), srcPtr, srcStride, dstPtr, dstStride, width, height, drawTileBorder);
+}
+template <>
+inline void CBitmapOperations::Copy<libCZI::PixelType::Gray16, libCZI::PixelType::Bgr24>(const void* srcPtr, int srcStride, void* dstPtr, int dstStride, int width, int height, bool drawTileBorder)
+{
+    Copy<libCZI::PixelType::Gray16, libCZI::PixelType::Bgr24, CConvGray16ToBgr24>(CConvGray16ToBgr24(), srcPtr, srcStride, dstPtr, dstStride, width, height, drawTileBorder);
+}
+template <>
+inline void CBitmapOperations::Copy<libCZI::PixelType::Gray16, libCZI::PixelType::Bgr48>(const void* srcPtr, int srcStride, void* dstPtr, int dstStride, int width, int height, bool drawTileBorder)
+{
+    Copy<libCZI::PixelType::Gray16, libCZI::PixelType::Bgr48, CConvGray16ToBgr48>(CConvGray16ToBgr48(), srcPtr, srcStride, dstPtr, dstStride, width, height, drawTileBorder);
+}
+template <>
+inline void CBitmapOperations::Copy<libCZI::PixelType::Bgr48, libCZI::PixelType::Gray8>(const void* srcPtr, int srcStride, void* dstPtr, int dstStride, int width, int height, bool drawTileBorder)
+{
+    Copy<libCZI::PixelType::Bgr48, libCZI::PixelType::Gray8, CConvBgr48ToGray8>(CConvBgr48ToGray8(), srcPtr, srcStride, dstPtr, dstStride, width, height, drawTileBorder);
+}
+template <>
+inline void CBitmapOperations::Copy<libCZI::PixelType::Bgr48, libCZI::PixelType::Gray16>(const void* srcPtr, int srcStride, void* dstPtr, int dstStride, int width, int height, bool drawTileBorder)
+{
+    Copy<libCZI::PixelType::Bgr48, libCZI::PixelType::Gray16, CConvBgr48ToGray16>(CConvBgr48ToGray16(), srcPtr, srcStride, dstPtr, dstStride, width, height, drawTileBorder);
+}
+template <>
+inline void CBitmapOperations::Copy<libCZI::PixelType::Bgr48, libCZI::PixelType::Gray32Float>(const void* srcPtr, int srcStride, void* dstPtr, int dstStride, int width, int height, bool drawTileBorder)
+{
+    Copy<libCZI::PixelType::Bgr48, libCZI::PixelType::Gray32Float, CConvBgr48ToGray32Float>(CConvBgr48ToGray32Float(), srcPtr, srcStride, dstPtr, dstStride, width, height, drawTileBorder);
+}
+template <>
+inline void CBitmapOperations::Copy<libCZI::PixelType::Bgr48, libCZI::PixelType::Bgr24>(const void* srcPtr, int srcStride, void* dstPtr, int dstStride, int width, int height, bool drawTileBorder)
+{
+    Copy<libCZI::PixelType::Bgr48, libCZI::PixelType::Bgr24, CConvBgr48ToBgr24>(CConvBgr48ToBgr24(), srcPtr, srcStride, dstPtr, dstStride, width, height, drawTileBorder);
+}
 
 //------------------------------------------------------------------------------------------------------------
 

@@ -89,13 +89,21 @@ using namespace std;
     case PixelType::Gray16:
         switch (dstPixelType)
         {
-        case PixelType::Gray8:break;
+        case PixelType::Gray8:
+            Copy<PixelType::Gray16, PixelType::Gray8>(srcPtr, srcStride, dstPtr, dstStride, width, height, drawTileBorder);
+            return;
         case PixelType::Gray16:
             Copy<PixelType::Gray16, PixelType::Gray16>(srcPtr, srcStride, dstPtr, dstStride, width, height, drawTileBorder);
             return;
-        case PixelType::Gray32Float:break;
-        case PixelType::Bgr24:break;
-        case PixelType::Bgr48:break;
+        case PixelType::Gray32Float:
+            Copy<PixelType::Gray16, PixelType::Gray32Float>(srcPtr, srcStride, dstPtr, dstStride, width, height, drawTileBorder);
+            return;
+        case PixelType::Bgr24:
+            Copy<PixelType::Gray16, PixelType::Bgr24>(srcPtr, srcStride, dstPtr, dstStride, width, height, drawTileBorder);
+            return;
+        case PixelType::Bgr48:
+            Copy<PixelType::Gray16, PixelType::Bgr48>(srcPtr, srcStride, dstPtr, dstStride, width, height, drawTileBorder);
+            return;
         default:break;
         }
         break;
@@ -139,10 +147,18 @@ using namespace std;
     case PixelType::Bgr48:
         switch (dstPixelType)
         {
-        case PixelType::Gray8:break;
-        case PixelType::Gray16:break;
-        case PixelType::Gray32Float:break;
-        case PixelType::Bgr24:break;
+        case PixelType::Gray8:
+            Copy<PixelType::Bgr48, PixelType::Gray8>(srcPtr, srcStride, dstPtr, dstStride, width, height, drawTileBorder);
+            return;
+        case PixelType::Gray16:
+            Copy<PixelType::Bgr48, PixelType::Gray16>(srcPtr, srcStride, dstPtr, dstStride, width, height, drawTileBorder);
+            return;
+        case PixelType::Gray32Float:
+            Copy<PixelType::Bgr48, PixelType::Gray32Float>(srcPtr, srcStride, dstPtr, dstStride, width, height, drawTileBorder);
+            return;
+        case PixelType::Bgr24:
+            Copy<PixelType::Bgr48, PixelType::Bgr24>(srcPtr, srcStride, dstPtr, dstStride, width, height, drawTileBorder);
+            return;
         case PixelType::Bgr48:
             Copy<PixelType::Bgr48, PixelType::Bgr48>(srcPtr, srcStride, dstPtr, dstStride, width, height, drawTileBorder);
             return;
