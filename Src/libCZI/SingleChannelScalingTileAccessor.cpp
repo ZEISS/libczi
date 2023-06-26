@@ -67,17 +67,25 @@ CSingleChannelScalingTileAccessor::CSingleChannelScalingTileAccessor(std::shared
 
 void CSingleChannelScalingTileAccessor::ScaleBlt(libCZI::IBitmapData* bmDest, float zoom, const libCZI::IntRect& roi, const SbInfo& sbInfo)
 {
+    const auto sb = this->sbBlkRepository->ReadSubBlock(sbInfo.index);
+    if (GetSite()->IsEnabled(LOGLEVEL_CHATTYINFORMATION))
+    {
+        stringstream ss;
+        ss << "   bounds: " << Utils::DimCoordinateToString(&sb->GetSubBlockInfo().coordinate);
+        GetSite()->Log(LOGLEVEL_CHATTYINFORMATION, ss);
+    }
+
+    const auto source = sb->CreateBitmap();
+
     // In order not to run into trouble with floating point precision, if the scale is exactly 1, we refrain from using the scaling operation
     //  and do instead a simple copy operation. This should ensure a pixel-accurate result if zoom is exactly 1.
     if (zoom == 1)
     {
-        const auto sb = this->sbBlkRepository->ReadSubBlock(sbInfo.index);
-        const auto source = sb->CreateBitmap();
         ScopedBitmapLockerSP srcLck{ source };
         ScopedBitmapLockerP dstLck{ bmDest };
-        CBitmapOperations::CopyOffsetedInfo info;
-        info.xOffset = sbInfo.logicalRect.x;
-        info.yOffset = sbInfo.logicalRect.y;
+        CBitmapOperations::CopyWithOffsetInfo info;
+        info.xOffset = sbInfo.logicalRect.x - roi.x;
+        info.yOffset = sbInfo.logicalRect.y - roi.y;
         info.srcPixelType = source->GetPixelType();
         info.srcPtr = srcLck.ptrDataRoi;
         info.srcStride = srcLck.stride;
@@ -90,13 +98,13 @@ void CSingleChannelScalingTileAccessor::ScaleBlt(libCZI::IBitmapData* bmDest, fl
         info.dstHeight = bmDest->GetHeight();
         info.drawTileBorder = false;
 
-        CBitmapOperations::CopyOffseted(info);
+        CBitmapOperations::CopyWithOffset(info);
     }
     else
     {
         // calculate the intersection of the subblock (logical rect) and the destination
         const auto intersect = Utilities::Intersect(sbInfo.logicalRect, roi);
-
+    
         const double roiSrcTopLeftX = double(intersect.x - sbInfo.logicalRect.x) / sbInfo.logicalRect.w;
         const double roiSrcTopLeftY = double(intersect.y - sbInfo.logicalRect.y) / sbInfo.logicalRect.h;
         const double roiSrcBttmRightX = double(intersect.x + intersect.w - sbInfo.logicalRect.x) / sbInfo.logicalRect.w;
@@ -120,17 +128,7 @@ void CSingleChannelScalingTileAccessor::ScaleBlt(libCZI::IBitmapData* bmDest, fl
         dstRoi.w *= bmDest->GetWidth();
         dstRoi.h *= bmDest->GetHeight();
 
-        const auto sb = this->sbBlkRepository->ReadSubBlock(sbInfo.index);
-        if (GetSite()->IsEnabled(LOGLEVEL_CHATTYINFORMATION))
-        {
-            stringstream ss;
-            ss << "   bounds: " << Utils::DimCoordinateToString(&sb->GetSubBlockInfo().coordinate);
-            GetSite()->Log(LOGLEVEL_CHATTYINFORMATION, ss);
-        }
-
-        const auto spBm = sb->CreateBitmap();
-
-        CBitmapOperations::NNResize(spBm.get(), bmDest, srcRoi, dstRoi);
+        CBitmapOperations::NNResize(source.get(), bmDest, srcRoi, dstRoi);
     }
 }
 
@@ -223,13 +221,13 @@ std::vector<CSingleChannelScalingTileAccessor::SbInfo> CSingleChannelScalingTile
                 }
             }
 
-    SbInfo sbinfo;
-    sbinfo.logicalRect = info.logicalRect;
-    sbinfo.physicalSize = info.physicalSize;
-    sbinfo.mIndex = info.mIndex;
-    sbinfo.index = idx;
-    sblks.push_back(sbinfo);
-    return true;
+            SbInfo sbinfo;
+            sbinfo.logicalRect = info.logicalRect;
+            sbinfo.physicalSize = info.physicalSize;
+            sbinfo.mIndex = info.mIndex;
+            sbinfo.index = idx;
+            sblks.push_back(sbinfo);
+            return true;
         });
 
     return sblks;
