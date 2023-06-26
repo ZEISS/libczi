@@ -160,6 +160,122 @@ static tuple<shared_ptr<void>, size_t> CreateCziWhichWasFoundProblematicWrtPixel
     return make_tuple(czi_document_data, czi_document_size);
 }
 
+/// Creates a CZI with four subblock of size 2x2 of pixeltype "Gray8" in a mosaic arrangement. The arrangement is as follows:
+/// +--+--+
+/// |0 |1 |
+/// |  |  |
+/// +--+--+
+/// |2 |3 |
+/// |  |  |
+/// +--+--+
+/// Subblock 0 contains the value 0x1, subblock 1 contains the value 0x2, subblock 2 contains the value 0x3 and subblock 3 contains the value 0x4.
+/// \returns    A blob containing a CZI document.
+static tuple<shared_ptr<void>, size_t> CreateCziWithFourSubblockInMosaicArragengement()
+{
+    auto writer = CreateCZIWriter();
+    auto outStream = make_shared<CMemOutputStream>(0);
+
+    auto spWriterInfo = make_shared<CCziWriterInfo >(
+        GUID{ 0x1234567,0x89ab,0xcdef,{ 1,2,3,4,5,6,7,8 } },
+        CDimBounds{ { DimensionIndex::C, 0, 1 } },	// set a bounds for C
+        0, 3);	// set a bounds M : 0<=m<=0
+    writer->Create(outStream, spWriterInfo);
+
+    auto bitmap = CreateGray8BitmapAndFill(2, 2, 0x1);
+    AddSubBlockInfoStridedBitmap addSbBlkInfo;
+    addSbBlkInfo.Clear();
+    addSbBlkInfo.coordinate.Set(DimensionIndex::C, 0);
+    addSbBlkInfo.mIndexValid = true;
+    addSbBlkInfo.mIndex = 0;
+    addSbBlkInfo.x = 0;
+    addSbBlkInfo.y = 0;
+    addSbBlkInfo.logicalWidth = bitmap->GetWidth();
+    addSbBlkInfo.logicalHeight = bitmap->GetHeight();
+    addSbBlkInfo.physicalWidth = bitmap->GetWidth();
+    addSbBlkInfo.physicalHeight = bitmap->GetHeight();
+    addSbBlkInfo.PixelType = bitmap->GetPixelType();
+    {
+        ScopedBitmapLockerSP lock_info_bitmap{ bitmap };
+        addSbBlkInfo.ptrBitmap = lock_info_bitmap.ptrDataRoi;
+        addSbBlkInfo.strideBitmap = lock_info_bitmap.stride;
+        writer->SyncAddSubBlock(addSbBlkInfo);
+    }
+
+    bitmap = CreateGray8BitmapAndFill(2, 2, 0x2);
+    addSbBlkInfo.Clear();
+    addSbBlkInfo.coordinate.Set(DimensionIndex::C, 0);
+    addSbBlkInfo.mIndexValid = true;
+    addSbBlkInfo.mIndex = 1;
+    addSbBlkInfo.x = 2;
+    addSbBlkInfo.y = 0;
+    addSbBlkInfo.logicalWidth = bitmap->GetWidth();
+    addSbBlkInfo.logicalHeight = bitmap->GetHeight();
+    addSbBlkInfo.physicalWidth = bitmap->GetWidth();
+    addSbBlkInfo.physicalHeight = bitmap->GetHeight();
+    addSbBlkInfo.PixelType = bitmap->GetPixelType();
+    {
+        ScopedBitmapLockerSP lock_info_bitmap{ bitmap };
+        addSbBlkInfo.ptrBitmap = lock_info_bitmap.ptrDataRoi;
+        addSbBlkInfo.strideBitmap = lock_info_bitmap.stride;
+        writer->SyncAddSubBlock(addSbBlkInfo);
+    }
+
+    bitmap = CreateGray8BitmapAndFill(2, 2, 0x3);
+    addSbBlkInfo.Clear();
+    addSbBlkInfo.coordinate.Set(DimensionIndex::C, 0);
+    addSbBlkInfo.mIndexValid = true;
+    addSbBlkInfo.mIndex = 2;
+    addSbBlkInfo.x = 0;
+    addSbBlkInfo.y = 2;
+    addSbBlkInfo.logicalWidth = bitmap->GetWidth();
+    addSbBlkInfo.logicalHeight = bitmap->GetHeight();
+    addSbBlkInfo.physicalWidth = bitmap->GetWidth();
+    addSbBlkInfo.physicalHeight = bitmap->GetHeight();
+    addSbBlkInfo.PixelType = bitmap->GetPixelType();
+    {
+        ScopedBitmapLockerSP lock_info_bitmap{ bitmap };
+        addSbBlkInfo.ptrBitmap = lock_info_bitmap.ptrDataRoi;
+        addSbBlkInfo.strideBitmap = lock_info_bitmap.stride;
+        writer->SyncAddSubBlock(addSbBlkInfo);
+    }
+
+    bitmap = CreateGray8BitmapAndFill(2, 2, 0x4);
+    addSbBlkInfo.Clear();
+    addSbBlkInfo.coordinate.Set(DimensionIndex::C, 0);
+    addSbBlkInfo.mIndexValid = true;
+    addSbBlkInfo.mIndex = 3;
+    addSbBlkInfo.x = 2;
+    addSbBlkInfo.y = 2;
+    addSbBlkInfo.logicalWidth = bitmap->GetWidth();
+    addSbBlkInfo.logicalHeight = bitmap->GetHeight();
+    addSbBlkInfo.physicalWidth = bitmap->GetWidth();
+    addSbBlkInfo.physicalHeight = bitmap->GetHeight();
+    addSbBlkInfo.PixelType = bitmap->GetPixelType();
+    {
+        ScopedBitmapLockerSP lock_info_bitmap{ bitmap };
+        addSbBlkInfo.ptrBitmap = lock_info_bitmap.ptrDataRoi;
+        addSbBlkInfo.strideBitmap = lock_info_bitmap.stride;
+        writer->SyncAddSubBlock(addSbBlkInfo);
+    }
+
+    PrepareMetadataInfo prepare_metadata_info;
+    auto metaDataBuilder = writer->GetPreparedMetadata(prepare_metadata_info);
+    WriteMetadataInfo write_metadata_info;
+    write_metadata_info.Clear();
+    const auto& strMetadata = metaDataBuilder->GetXml();
+    write_metadata_info.szMetadata = strMetadata.c_str();
+    write_metadata_info.szMetadataSize = strMetadata.size() + 1;
+    write_metadata_info.ptrAttachment = nullptr;
+    write_metadata_info.attachmentSize = 0;
+    writer->SyncWriteMetadata(write_metadata_info);
+    writer->Close();
+    writer.reset();
+
+    size_t czi_document_size = 0;
+    shared_ptr<void> czi_document_data = outStream->GetCopy(&czi_document_size);
+    return make_tuple(czi_document_data, czi_document_size);
+}
+
 struct ZOrderAndResultGray8Fixture : public testing::TestWithParam<tuple<int, int, int, array<uint8_t, 4>>> { };
 
 TEST_P(ZOrderAndResultGray8Fixture, CreateDocumentAndUseSingleChannelScalingTileAccessorWithSortByMAndCheckResult)
@@ -252,7 +368,7 @@ TEST_P(ZOrderAndResultGray8Fixture, CreateDocumentAndUseSingleChannelPyramidLaye
     options.Clear();
 
     // act
-    const auto composite_bitmap = accessor->Get(PixelType::Gray8, IntRect{ 0,0,4,1 }, &plane_coordinate, ISingleChannelPyramidLayerTileAccessor::PyramidLayerInfo{ 2,0 }, &options);
+    const auto composite_bitmap = accessor->Get(PixelType::Gray8, IntRect{ 0,0,4,1 }, &plane_coordinate, ISingleChannelPyramidLayerTileAccessor::PyramidLayerInfo{ 2, 0 }, & options);
 
     // assert
     const ScopedBitmapLockerSP lock_info_bitmap{ composite_bitmap };
@@ -374,7 +490,7 @@ TEST(Accessor, CreateDocumentAndUseSingleChannelPyramidLayerTileAccessorWithAndC
     options.sortByM = false;
 
     // act
-    const auto composite_bitmap = accessor->Get(PixelType::Gray8, IntRect{ 0,0,4,1 }, &plane_coordinate, ISingleChannelPyramidLayerTileAccessor::PyramidLayerInfo{ 2,0 }, &options);
+    const auto composite_bitmap = accessor->Get(PixelType::Gray8, IntRect{ 0,0,4,1 }, &plane_coordinate, ISingleChannelPyramidLayerTileAccessor::PyramidLayerInfo{ 2, 0 }, & options);
 
     // assert
     const ScopedBitmapLockerSP lock_info_bitmap{ composite_bitmap };
@@ -496,4 +612,61 @@ TEST(Accessor, CreateDocumentAndExerciseScalingAccessorAllowingForInaccuracy)
     }
 
     SUCCEED();
+}
+
+TEST(Accessor, CreateDocumentAndCheckSingleChannelScalingAccessor1)
+{
+    // arrange
+
+    // We create a CZI-document with four subblocks, each of size 2x2, and arranged as a mosaic like this:
+    //
+    // +--+--+
+    // |0 |1 |
+    // |  |  |
+    // +--+--+
+    // |2 |3 |
+    // |  |  |
+    // +--+--+
+    //
+    // We then request a tile-composite bitmap of size 2x2 for the ROI (1,1,2,2), and expect to find the
+    // following pixel values in the resulting bitmap:
+    // +-+-+
+    // |1|2|
+    // |3|4|
+    // +-+-+
+    auto czi_document_as_blob = CreateCziWithFourSubblockInMosaicArragengement();
+
+    const auto memory_stream = make_shared<CMemInputOutputStream>(get<0>(czi_document_as_blob).get(), get<1>(czi_document_as_blob));
+    const auto reader = CreateCZIReader();
+    reader->Open(memory_stream);
+
+    const auto accessor = reader->CreateSingleChannelScalingTileAccessor();
+    const CDimCoordinate plane_coordinate{ {DimensionIndex::C, 0} };
+    ISingleChannelScalingTileAccessor::Options options;
+    options.Clear();
+    options.backGroundColor = RgbFloatColor{ 0,0,0 };   // request to have background cleared with black
+
+    // act
+    const auto composite_bitmap = accessor->Get(
+        PixelType::Gray8,
+        IntRect{ 1,1,2,2 },
+        &plane_coordinate,
+        1,
+        &options);
+
+    // assert
+
+    // ok, we now expect that composite-bitmap is all black, except for a rectangle of size 761x2449 at (0,2671) which has the pixel-value 0x2a
+    ASSERT_EQ(composite_bitmap->GetWidth(), 2);
+    ASSERT_EQ(composite_bitmap->GetHeight(), 2);
+    const ScopedBitmapLockerSP lock_info_bitmap{ composite_bitmap };
+    const uint8_t pixel_x0_y0 = *(static_cast<const uint8_t*>(lock_info_bitmap.ptrDataRoi) + 0);
+    const uint8_t pixel_x1_y0 = *(static_cast<const uint8_t*>(lock_info_bitmap.ptrDataRoi) + 1);
+    const uint8_t pixel_x0_y1 = *(static_cast<const uint8_t*>(lock_info_bitmap.ptrDataRoi) + static_cast<size_t>(1) * lock_info_bitmap.stride + 0);
+    const uint8_t pixel_x1_y1 = *(static_cast<const uint8_t*>(lock_info_bitmap.ptrDataRoi) + static_cast<size_t>(1) * lock_info_bitmap.stride + 1);
+
+    EXPECT_EQ(pixel_x0_y0, 1);
+    EXPECT_EQ(pixel_x1_y0, 2);
+    EXPECT_EQ(pixel_x0_y1, 3);
+    EXPECT_EQ(pixel_x1_y1, 4);
 }

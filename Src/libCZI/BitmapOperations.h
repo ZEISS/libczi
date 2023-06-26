@@ -36,25 +36,27 @@ public:
     template <typename tFlt>
     static void NNScale2(libCZI::PixelType tSrcPixelType, libCZI::PixelType tDstPixelType, const NNResizeInfo2<tFlt>& resizeInfo);
 
-    struct CopyOffsetedInfo
+    /// This structure gathers the information needed to copy a source bitmap into
+    /// a destination bitmap at a specified offset.
+    struct CopyWithOffsetInfo
     {
-        int xOffset;
-        int yOffset;
-        libCZI::PixelType srcPixelType;
-        const void* srcPtr;
-        int srcStride;
-        int srcWidth;
-        int srcHeight;
-        libCZI::PixelType dstPixelType;
-        void* dstPtr;
-        int dstStride;
-        int dstWidth;
-        int dstHeight;
+        int xOffset;                        ///< The offset in x direction where the source bitmap is to be placed in the destination bitmap.
+        int yOffset;                        ///< The offset in x direction where the source bitmap is to be placed in the destination bitmap.
+        libCZI::PixelType srcPixelType;     ///< The pixel type of the source bitmap.
+        const void* srcPtr;                 ///< Pointer to the source bitmap.
+        int srcStride;                      ///< The stride of the source bitmap in bytes.
+        int srcWidth;                       ///< The width of the source bitmap in pixels.
+        int srcHeight;                      ///< The height of the source bitmap in pixels.
+        libCZI::PixelType dstPixelType;     ///< The pixel type of the destination bitmap.
+        void* dstPtr;                       ///< Pointer to the destination bitmap.
+        int dstStride;                      ///< The stride of the destination bitmap in bytes.
+        int dstWidth;                       ///< The width of the destination bitmap in pixels.
+        int dstHeight;                      ///< The height of the destination bitmap in pixels.
 
-        bool drawTileBorder;
+        bool drawTileBorder;                ///< If true, a one-pixel wide border is drawn around the copied source bitmap.
     };
 
-    static void CopyOffseted(const CopyOffsetedInfo& info);
+    static void CopyWithOffset(const CopyWithOffsetInfo& info);
     static void Copy(libCZI::PixelType srcPixelType, const void* srcPtr, int srcStride, libCZI::PixelType dstPixelType, void* dstPtr, int dstStride, int width, int height, bool drawTileBorder);
 
     template <libCZI::PixelType tSrcPixelType, libCZI::PixelType tDstPixelType>
