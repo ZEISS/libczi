@@ -1371,7 +1371,8 @@ namespace libCZI
         /// "Metadata/DisplaySetting/Channels", they are removed (before adding new content).
         /// \param [in] builder             The metadata-builder object.
         /// \param      display_settings    The display settings.
-        static void WriteDisplaySettings(libCZI::ICziMetadataBuilder* builder, const libCZI::IDisplaySettings* display_settings);
+        /// \param      channel_pixel_type  The map of the channel and its corresponding pixel type.
+        static void WriteDisplaySettings(libCZI::ICziMetadataBuilder* builder, const libCZI::IDisplaySettings* display_settings, const std::map<int, PixelType>* channel_pixel_type = nullptr);
 
         /// Helper function which writes the specified display-settings into the specified metadata-builder. The display-settings
         /// XML-metadata-node will have as many channel-items as specified with the argument 'channel_count'.
@@ -1380,7 +1381,8 @@ namespace libCZI
         /// \param [in] builder             The metadata-builder object.
         /// \param      display_settings    The display settings.
         /// \param      channel_count       The number of channels (which are constructed in the display-settings XML-metadata).
-        static void WriteDisplaySettings(libCZI::ICziMetadataBuilder* builder, const libCZI::IDisplaySettings* display_settings, int channel_count);
+        /// \param      channel_pixel_type  The map of the channel and its corresponding pixel type.
+        static void WriteDisplaySettings(libCZI::ICziMetadataBuilder* builder, const libCZI::IDisplaySettings* display_settings, int channel_count, const std::map<int, PixelType>* channel_pixel_type = nullptr);
     };
 }
 

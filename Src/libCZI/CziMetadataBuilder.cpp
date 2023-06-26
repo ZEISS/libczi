@@ -572,7 +572,7 @@ CCZiMetadataBuilder::CCZiMetadataBuilder(const wchar_t* rootNodeName, const std:
 
 /*static*/void CMetadataPrepareHelper::FillImagePixelType(libCZI::ICziMetadataBuilder* builder, libCZI::PixelType pxlType)
 {
-    string pixelTypeString;;
+    string pixelTypeString;
     if (CMetadataPrepareHelper::TryConvertToXmlMetadataPixelTypeString(pxlType, pixelTypeString))
     {
         auto node = builder->GetRootNode()->GetOrCreateChildNode("Metadata/Information/Image/PixelType");
@@ -937,7 +937,7 @@ bool libCZI::XmlDateTime::IsValid() const
     }
 }
 
-/*static*/void libCZI::MetadataUtils::WriteDisplaySettings(libCZI::ICziMetadataBuilder* builder, const libCZI::IDisplaySettings* display_settings)
+/*static*/void libCZI::MetadataUtils::WriteDisplaySettings(libCZI::ICziMetadataBuilder* builder, const libCZI::IDisplaySettings* display_settings, const std::map<int, PixelType>* channel_pixel_type)
 {
     // we determine the highest channel-number that we find in the display-settings object
     int max_channel_index_in_display_settings = 0;
@@ -952,10 +952,10 @@ bool libCZI::XmlDateTime::IsValid() const
             return true;
         });
 
-    MetadataUtils::WriteDisplaySettings(builder, display_settings, 1 + max_channel_index_in_display_settings);
+    MetadataUtils::WriteDisplaySettings(builder, display_settings, 1 + max_channel_index_in_display_settings, channel_pixel_type);
 }
 
-static void WriteChannelDisplaySettings(const IChannelDisplaySetting* channel_display_setting, IXmlNodeRw* node, const wstring& pixel_type = L"")
+static void WriteChannelDisplaySettings(const IChannelDisplaySetting* channel_display_setting, IXmlNodeRw* node, const string& pixel_type = "")
 {
     node->GetOrCreateChildNode("IsSelected")->SetValueBool(channel_display_setting->GetIsEnabled());
 
@@ -1015,7 +1015,7 @@ static void WriteChannelDisplaySettings(const IChannelDisplaySetting* channel_di
     }
 }
 
-/*static*/void libCZI::MetadataUtils::WriteDisplaySettings(libCZI::ICziMetadataBuilder* builder, const libCZI::IDisplaySettings* display_settings, int channel_count)
+/*static*/void libCZI::MetadataUtils::WriteDisplaySettings(libCZI::ICziMetadataBuilder* builder, const libCZI::IDisplaySettings* display_settings, int channel_count, const std::map<int, PixelType>* channel_pixel_type)
 {
     const auto display_settings_channel_node = builder->GetRootNode()->GetOrCreateChildNode("Metadata/DisplaySetting/Channels");
 
@@ -1030,11 +1030,14 @@ static void WriteChannelDisplaySettings(const IChannelDisplaySetting* channel_di
         auto channel_node = display_settings_channel_node->AppendChildNode("Channel");
         if (channel_display_settings)
         {
-            const auto image_channel_node = builder->GetRootNode()->GetChildNode("Metadata/Information/Image/Dimensions/Channels/Channel[" + std::to_string(c) + "]/PixelType");
-            wstring channel_pixel_type;
-            image_channel_node->TryGetValue(&channel_pixel_type);
-
-            WriteChannelDisplaySettings(channel_display_settings.get(), channel_node.get(), channel_pixel_type);
+            string pixel_type_string = "";
+            if (channel_pixel_type != nullptr && channel_pixel_type->find(c) != channel_pixel_type->end())
+            {
+                PixelType pixel_type = channel_pixel_type->at(c);
+                CMetadataPrepareHelper::TryConvertToXmlMetadataPixelTypeString(pixel_type, pixel_type_string);
+            }
+           
+            WriteChannelDisplaySettings(channel_display_settings.get(), channel_node.get(), pixel_type_string);
         }
     }
 }
