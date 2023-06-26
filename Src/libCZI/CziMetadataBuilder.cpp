@@ -955,7 +955,7 @@ bool libCZI::XmlDateTime::IsValid() const
     MetadataUtils::WriteDisplaySettings(builder, display_settings, 1 + max_channel_index_in_display_settings, channel_pixel_type);
 }
 
-static void WriteChannelDisplaySettings(const IChannelDisplaySetting* channel_display_setting, IXmlNodeRw* node, const string& pixel_type = "")
+static void WriteChannelDisplaySettings(const IChannelDisplaySetting* channel_display_setting, IXmlNodeRw* node, const string& pixel_type)
 {
     node->GetOrCreateChildNode("IsSelected")->SetValueBool(channel_display_setting->GetIsEnabled());
 
@@ -969,7 +969,9 @@ static void WriteChannelDisplaySettings(const IChannelDisplaySetting* channel_di
     {
         node->GetOrCreateChildNode("ColorMode")->SetValue("None"); // instruct to 'disable tinting'
 
-        // For non tinted image, provide 'PixelType' in channel metadata to support arivis.
+        // For a non-tinted channel, we will add a 'PixelType'-node and put the pixel-type into it (if given),
+        //  this is done to support ARIVIS-CZI-reader which expects to find this node (although it is relying on
+        //  'undocumented behavior' here).
         if (!pixel_type.empty())
         {
             node->GetOrCreateChildNode("PixelType")->SetValue(pixel_type);
@@ -1030,10 +1032,10 @@ static void WriteChannelDisplaySettings(const IChannelDisplaySetting* channel_di
         auto channel_node = display_settings_channel_node->AppendChildNode("Channel");
         if (channel_display_settings)
         {
-            string pixel_type_string = "";
+            string pixel_type_string;
             if (channel_pixel_type != nullptr && channel_pixel_type->find(c) != channel_pixel_type->end())
             {
-                PixelType pixel_type = channel_pixel_type->at(c);
+                const PixelType pixel_type = channel_pixel_type->at(c);
                 CMetadataPrepareHelper::TryConvertToXmlMetadataPixelTypeString(pixel_type, pixel_type_string);
             }
            
