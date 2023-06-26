@@ -1038,7 +1038,7 @@ static void WriteChannelDisplaySettings(const IChannelDisplaySetting* channel_di
                 const PixelType pixel_type = channel_pixel_type->at(c);
                 CMetadataPrepareHelper::TryConvertToXmlMetadataPixelTypeString(pixel_type, pixel_type_string);
             }
-           
+
             WriteChannelDisplaySettings(channel_display_settings.get(), channel_node.get(), pixel_type_string);
         }
     }
