@@ -486,7 +486,7 @@ namespace libCZI
             LookUpTableExplicit = 2,    ///< (NOT YET IMPLEMENTED) There is an explicit look-up-table specified.
             LookUpTableWellKnown = 3    ///< (NOT YET IMPLEMENTED) We are using a "well-known" look-up-table, and it is identified by its name (which is a string).
         };
-
+        
         /// The coefficients of a cubic spline defined by \f$a\,x^3 + b\,x^2 + c\,x + d =y\f$.
         struct CubicSplineCoefficients
         {
@@ -1369,18 +1369,24 @@ namespace libCZI
         /// XML-metadata-node will have as many channel-items as the highest channel-number found in the display-settings object.
         /// If there are nodes with name "Channel" existing (prior to calling this function) under the node
         /// "Metadata/DisplaySetting/Channels", they are removed (before adding new content).
+        /// The argument 'channel_pixel_type' is optional. If it is specified, the pixel-type of the channel is written into the
+        /// display-settings XML-metadata-node. This is not a mandatory piece of information, but was found to be useful in some cases.
         /// \param [in] builder             The metadata-builder object.
         /// \param      display_settings    The display settings.
-        static void WriteDisplaySettings(libCZI::ICziMetadataBuilder* builder, const libCZI::IDisplaySettings* display_settings);
+        /// \param      channel_pixel_type  The map of the channel and its corresponding pixel type.
+        static void WriteDisplaySettings(libCZI::ICziMetadataBuilder* builder, const libCZI::IDisplaySettings* display_settings, const std::map<int, PixelType>* channel_pixel_type = nullptr);
 
         /// Helper function which writes the specified display-settings into the specified metadata-builder. The display-settings
         /// XML-metadata-node will have as many channel-items as specified with the argument 'channel_count'.
         /// If there are nodes with name "Channel" existing (prior to calling this function) under the node
         /// "Metadata/DisplaySetting/Channels", they are removed (before adding new content).
+        /// The argument 'channel_pixel_type' is optional. If it is specified, the pixel-type of the channel is written into the
+        /// display-settings XML-metadata-node. This is not a mandatory piece of information, but was found to be useful in some cases.
         /// \param [in] builder             The metadata-builder object.
         /// \param      display_settings    The display settings.
         /// \param      channel_count       The number of channels (which are constructed in the display-settings XML-metadata).
-        static void WriteDisplaySettings(libCZI::ICziMetadataBuilder* builder, const libCZI::IDisplaySettings* display_settings, int channel_count);
+        /// \param      channel_pixel_type  The map of the channel and its corresponding pixel type.
+        static void WriteDisplaySettings(libCZI::ICziMetadataBuilder* builder, const libCZI::IDisplaySettings* display_settings, int channel_count, const std::map<int, PixelType>* channel_pixel_type = nullptr);
     };
 }
 

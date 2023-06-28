@@ -110,8 +110,8 @@ public:
         [&](int chIdx)->bool
         {
             auto chDisplaySetting = disp->GetChannelDisplaySettings(chIdx);
-    IChannelDisplaySetting::Clone(chDisplaySetting.get(), pod.channelDisplaySettings[chIdx]);
-    return true;
+            IChannelDisplaySetting::Clone(chDisplaySetting.get(), pod.channelDisplaySettings[chIdx]);
+            return true;
         });
 }
 
@@ -396,7 +396,7 @@ bool CChannelDisplaySettingsOnPod::TryGetSplineData(std::vector<libCZI::IDisplay
                 return true;
             }
 
-    return false;
+            return false;
         });
 }
 

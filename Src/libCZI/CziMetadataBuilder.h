@@ -108,8 +108,8 @@ public:
         const PixelTypeForChannelIndexStatistic& pixelTypeForChannel,
         std::function<std::tuple<std::string, std::tuple<bool, std::string>>(int channelIdx)> getIdAndName);
 
+    static bool TryConvertToXmlMetadataPixelTypeString(libCZI::PixelType pxlType, std::string& str);
 
 private:
-    static bool TryConvertToXmlMetadataPixelTypeString(libCZI::PixelType pxlType, std::string& str);
     static void FillImagePixelType(libCZI::ICziMetadataBuilder* builder, libCZI::PixelType pxlType);
 };
