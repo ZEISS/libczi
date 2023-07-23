@@ -27,6 +27,27 @@
 //*@@@---@@@@******************************************************************
 #pragma once
 
+//================================================================
+#include "JXRGlue.h"
+#ifdef __cplusplus
+extern "C" {
+#endif
+    typedef struct tagPKIIDInfo
+    {
+        const char* szExt;
+        const PKIID* pIIDEnc;
+        const PKIID* pIIDDec;
+    } PKIIDInfo;
+ERR GetTestEncodeIID(const char* szExt, const PKIID** ppIID);
+ERR PKTestFactory_CreateCodec(const PKIID* iid, void** ppv);
+#ifdef __cplusplus
+}
+#endif
+//================================================================
+
+
+
+#if false
 #include "JXRGlue.h"
 #include "JXRTestWrapper.h"
 
@@ -165,3 +186,4 @@ ERR PKTestDecode_Create(PKTestDecode** ppID);
 } // extern "C"
 #endif
 
+#endif 

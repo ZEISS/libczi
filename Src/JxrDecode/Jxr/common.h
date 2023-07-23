@@ -124,8 +124,8 @@ Void Adapt (CAdaptiveHuffman *pAdHuff, Bool bFixedTables);
 Void AdaptFixed (CAdaptiveHuffman *pAdHuff);
 Void AdaptDiscriminant (CAdaptiveHuffman *pAdHuff);
 
-#ifndef _PREFAST_
-#pragma warning(disable:4068)
-#endif
+////#ifndef _PREFAST_
+////#pragma warning(disable:4068)
+////#endif
 
 #endif  // WMI_COMMON_H

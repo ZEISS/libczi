@@ -7,7 +7,8 @@
 #include <memory>
 #include "JxrDecode.h"
 #include "Jxr/JXRTest.h"
-#include "Jxr/JXRTestWrapper.h"
+//#include "Jxr/JXRTestWrapper.h"
+#include "Jxr/JXRGlue.h"
 
 using namespace JxrDecode;
 

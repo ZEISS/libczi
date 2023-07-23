@@ -32,12 +32,12 @@
 #include "strcodec.h"
 #include "common.h"
 
-#ifdef MEM_TRACE
-#define TRACE_MALLOC    1
-#define TRACE_NEW       0
-#define TRACE_HEAP      0
-#include "memtrace.h"
-#endif
+////#ifdef MEM_TRACE
+////#define TRACE_MALLOC    1
+////#define TRACE_NEW       0
+////#define TRACE_HEAP      0
+////#include "memtrace.h"
+////#endif
 
 /*************************************************************************
     Context allocation

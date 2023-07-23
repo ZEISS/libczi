@@ -25,6 +25,9 @@
 // POSSIBILITY OF SUCH DAMAGE.
 //
 //*@@@---@@@@******************************************************************
+
+#if false
+
 #ifndef ANSI
 #define _CRT_SECURE_NO_WARNINGS
 #endif// ANSI
@@ -329,3 +332,5 @@ Cleanup:
     return err;
 }
 
+
+#endif

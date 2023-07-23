@@ -28,13 +28,6 @@
 
 #include "strcodec.h"
 
-#ifdef MEM_TRACE
-#define TRACE_MALLOC    1
-#define TRACE_NEW       0
-#define TRACE_HEAP      0
-#include "memtrace.h"
-#endif
-
 // Huffman lookup tables
 static const short g4HuffLookupTable[40] = {
   19,19,19,19,27,27,27,27,10,10,10,10,10,10,10,10,
@@ -127,9 +120,7 @@ static const short g12HuffLookupTable[5][56] = {{
 **********************************************************************/
 Void Clean (CAdaptiveHuffman *pAdHuff)
 {
-    if (pAdHuff == NULL)
-        return;
-    free (pAdHuff);
+    free(pAdHuff);
 }
 
 CAdaptiveHuffman *Allocate (Int iNSymbols, CODINGMODE cm)
@@ -407,8 +398,8 @@ static const Int g12DeltaTable[] = {
 /**********************************************************************
   Adapt fixed length codes based on discriminant
 **********************************************************************/
-static const Int THRESHOLD = 8;
-static const Int MEMORY = 8;
+const Int THRESHOLD = 8;
+const Int MEMORY = 8;
  
 Void AdaptDiscriminant (CAdaptiveHuffman *pAdHuff)
 {

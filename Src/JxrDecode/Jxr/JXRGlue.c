@@ -255,9 +255,7 @@ Cleanup:
 
 const PKPixelFormatGUID* GetPixelFormatFromHash(const U8 uPFHash)
 {
-    int i;
-
-    for (i = 0; i < sizeof2(pixelInfo); i++)
+    for (int i = 0; i < sizeof2(pixelInfo); i++)
     {
         if (pixelInfo[i].pGUIDPixFmt->Data4[7] == uPFHash)
             return pixelInfo[i].pGUIDPixFmt;
@@ -284,10 +282,9 @@ static ERR GetIIDInfo(const char* szExt, const PKIIDInfo** ppInfo)
         {".wdp", &IID_PKImageUnsupported, &IID_PKImageWmpDecode},
         {".hdp", &IID_PKImageUnsupported, &IID_PKImageWmpDecode},
     };
-    size_t i = 0;
 
     *ppInfo = NULL;
-    for (i = 0; i < sizeof2(iidInfo); ++i)
+    for (size_t i = 0; i < sizeof2(iidInfo); ++i)
     {
         if (0 == PKStrnicmp(szExt, iidInfo[i].szExt, strlen(iidInfo[i].szExt)))
         {

@@ -27,6 +27,187 @@
 //*@@@---@@@@******************************************************************
 
 #include "JXRTest.h"
+#include "JXRTestWrapper.h"
+//EXTERN_C const PKIID IID_PKImageBmpDecode;
+const PKIID IID_PKImageBmpDecode = 202;
+const PKIID IID_PKImageEncodeWrapper = 109;
+static ERR GetTestInfo(const char* szExt, const PKIIDInfo** ppInfo)
+{
+    ERR err = WMP_errSuccess;
+
+    static PKIIDInfo iidInfo[] = {
+        {"wrapper", &IID_PKImageEncodeWrapper, /*don't care/not used*/&IID_PKImageBmpDecode },
+ /*       {".bmp", &IID_PKImageBmpEncode, &IID_PKImageBmpDecode},
+        {".ppm", &IID_PKImagePnmEncode, &IID_PKImagePnmDecode},
+        {".pgm", &IID_PKImagePnmEncode, &IID_PKImagePnmDecode},
+        {".pnm", &IID_PKImagePnmEncode, &IID_PKImagePnmDecode},
+        {".pfm", &IID_PKImagePnmEncode, &IID_PKImagePnmDecode},
+        {".tif", &IID_PKImageTifEncode, &IID_PKImageTifDecode},
+        {".hdr", &IID_PKImageHdrEncode, &IID_PKImageHdrDecode},
+        {".iyuv", &IID_PKImageIyuvEncode, &IID_PKImageIyuvDecode},
+        {".yuv422", &IID_PKImageYuv422Encode, &IID_PKImageYuv422Decode},
+        {".yuv444", &IID_PKImageYuv444Encode, &IID_PKImageYuv444Decode},*/
+    };
+    size_t i = 0;
+
+    *ppInfo = NULL;
+    for (i = 0; i < sizeof2(iidInfo); ++i)
+    {
+        if (0 == PKStrnicmp(szExt, iidInfo[i].szExt, strlen(iidInfo[i].szExt)))
+        {
+            *ppInfo = &iidInfo[i];
+            goto Cleanup;
+        }
+    }
+
+    Call(WMP_errUnsupportedFormat);
+
+Cleanup:
+    return err;
+}
+
+ERR GetTestEncodeIID(const char* szExt, const PKIID** ppIID)
+{
+    ERR err = WMP_errSuccess;
+
+    const PKIIDInfo* pInfo = NULL;
+
+    Call(GetTestInfo(szExt, &pInfo));
+    *ppIID = pInfo->pIIDEnc;
+
+Cleanup:
+    return err;
+}
+
+//ERR PKImageEncode_Initialize_Wrapper(struct tagPKImageEncode* pIE, struct WMPStream* stream, void* vp, size_t size);
+//ERR PKImageEncode_Create_Wrapper(struct tagPKImageEncode** ppIE);
+//ERR PKImageEncode_WritePixels_Wrapper(
+//struct PKImageEncode* pIE,
+//U32 cLine,
+//U8* pbPixel,
+//U32 cbStride);
+ERR PKImageEncode_Initialize_Wrapper(PKImageEncode* pIE, struct WMPStream* stream, void* vp, size_t size)
+{
+    if (size != sizeof(JxrTestWrapperInitializeInfo))
+    {
+        return WMP_errInvalidArgument;
+    }
+
+    JxrTestWrapperInitializeInfo* ptrInfo = (JxrTestWrapperInitializeInfo*)vp;
+    pIE->WRAPPER.info = *ptrInfo;
+    return WMP_errSuccess;
+}
+
+ERR PKImageEncode_WritePixels_Wrapper(
+    PKImageEncode* pIE,
+    U32 cLine,
+    U8* pbPixel,
+    U32 cbStride)
+{
+    pIE->WRAPPER.info.pfnPutData(
+        pIE->guidPixFormat,
+        pIE->uWidth,
+        pIE->uHeight,
+        cLine,
+        pbPixel,
+        cbStride,
+        pIE->WRAPPER.info.userParamPutData);
+    return WMP_errSuccess;
+}
+
+ERR PKImageEncode_Create_Wrapper(PKImageEncode** ppIE)
+{
+    ERR err = WMP_errSuccess;
+
+    PKImageEncode* pIE = NULL;
+
+    Call(PKImageEncode_Create(ppIE));
+
+    pIE = *ppIE;
+    pIE->Initialize = PKImageEncode_Initialize_Wrapper;
+    pIE->WritePixels = PKImageEncode_WritePixels_Wrapper;
+
+Cleanup:
+    return err;
+}
+
+
+ERR PKTestFactory_CreateCodec(const PKIID* iid, void** ppv)
+{
+    ERR err = WMP_errSuccess;
+
+    /*if (IID_PKImageBmpEncode == *iid)
+    {
+        Call(PKImageEncode_Create_BMP((PKImageEncode**)ppv));
+    }
+    else if (IID_PKImagePnmEncode == *iid)
+    {
+        Call(PKImageEncode_Create_PNM((PKImageEncode**)ppv));
+    }
+    else if (IID_PKImageTifEncode == *iid)
+    {
+        Call(PKImageEncode_Create_TIF((PKImageEncode**)ppv));
+    }
+    else if (IID_PKImageHdrEncode == *iid)
+    {
+        Call(PKImageEncode_Create_HDR((PKImageEncode**)ppv));
+    }
+    else if (IID_PKImageIyuvEncode == *iid)
+    {
+        Call(PKImageEncode_Create_IYUV((PKImageEncode**)ppv));
+    }
+    else if (IID_PKImageYuv422Encode == *iid)
+    {
+        Call(PKImageEncode_Create_YUV422((PKImageEncode**)ppv));
+    }
+    else if (IID_PKImageYuv444Encode == *iid)
+    {
+        Call(PKImageEncode_Create_YUV444((PKImageEncode**)ppv));
+    }
+    else */if (IID_PKImageEncodeWrapper == *iid)
+    {
+        Call(PKImageEncode_Create_Wrapper((PKImageEncode**)ppv));
+    }
+    /*
+    else if (IID_PKImageBmpDecode == *iid)
+    {
+        Call(PKImageDecode_Create_BMP((PKTestDecode**)ppv));
+    }
+    else if (IID_PKImagePnmDecode == *iid)
+    {
+        Call(PKImageDecode_Create_PNM((PKTestDecode**)ppv));
+    }
+    else if (IID_PKImageTifDecode == *iid)
+    {
+        Call(PKImageDecode_Create_TIF((PKTestDecode**)ppv));
+    }
+    else if (IID_PKImageHdrDecode == *iid)
+    {
+        Call(PKImageDecode_Create_HDR((PKTestDecode**)ppv));
+    }
+    else if (IID_PKImageIyuvDecode == *iid)
+    {
+        Call(PKImageDecode_Create_IYUV((PKTestDecode**)ppv));
+    }
+    else if (IID_PKImageYuv422Decode == *iid)
+    {
+        Call(PKImageDecode_Create_YUV422((PKTestDecode**)ppv));
+    }
+    else if (IID_PKImageYuv444Decode == *iid)
+    {
+        Call(PKImageDecode_Create_YUV444((PKTestDecode**)ppv));
+    }*/
+
+    else
+    {
+        Call(WMP_errUnsupportedFormat);
+    }
+
+Cleanup:
+    return err;
+}
+
+#if false
 
 //================================================================
 const PKIID IID_PKImagePnmEncode = 102;
@@ -319,3 +500,4 @@ ERR PKTestDecode_Create(
 Cleanup:
     return err;
 }
+#endif

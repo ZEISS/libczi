@@ -25,6 +25,9 @@
 // POSSIBILITY OF SUCH DAMAGE.
 //
 //*@@@---@@@@******************************************************************
+
+#if false
+
 #include <stdlib.h>
 #include <string.h>
 
@@ -398,3 +401,4 @@ Cleanup:
     return err;
 }
 
+#endif
