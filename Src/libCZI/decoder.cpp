@@ -5,6 +5,7 @@
 #include "stdafx.h"
 #include "decoder.h"
 #include "../JxrDecode/JxrDecode.h"
+#include "../JxrDecode/JxrDecode2.h"
 #include "bitmapData.h"
 #include "stdAllocator.h"
 #include "BitmapOperations.h"
@@ -18,7 +19,60 @@ using namespace std;
     return make_shared<CJxrLibDecoder>(JxrDecode::Initialize());
 }
 
-/*virtual*/std::shared_ptr<libCZI::IBitmapData> CJxrLibDecoder::Decode(const void* ptrData, size_t size, libCZI::PixelType pixelType, uint32_t width, uint32_t height)
+std::shared_ptr<libCZI::IBitmapData> CJxrLibDecoder::Decode(const void* ptrData, size_t size, libCZI::PixelType pixelType, uint32_t width, uint32_t height)
+{
+    std::shared_ptr<IBitmapData> bm;
+    JxrDecode2 decoder2;
+    decoder2.Decode(nullptr,
+        ptrData,
+        size,
+        nullptr,
+        [&](JxrDecode2::PixelFormat pixFmt, std::uint32_t  width, std::uint32_t  height, std::uint32_t linesCount, const void* ptrData, std::uint32_t stride)->void
+            {
+              /*  if (GetSite()->IsEnabled(LOGLEVEL_CHATTYINFORMATION))
+                {
+                    stringstream ss; ss << "JxrDecode: decode done - pixelfmt=" << JxrDecode::PixelFormatAsInformalString(pixFmt) << " width=" << width << " height=" << height << " linesCount=" << linesCount << " stride=" << stride;
+                    GetSite()->Log(LOGLEVEL_CHATTYINFORMATION, ss.str());
+                }*/
+
+                // TODO: it seems feasible to directly decode to the buffer (saving us the copy)
+                PixelType px_type;
+                switch (pixFmt)
+                {
+                case JxrDecode2::PixelFormat::_24bppBGR: px_type = PixelType::Bgr24; break;
+                case JxrDecode2::PixelFormat::_8bppGray: px_type = PixelType::Gray8; break;
+                case JxrDecode2::PixelFormat::_48bppRGB: px_type = PixelType::Bgr48; break;
+                case JxrDecode2::PixelFormat::_16bppGray: px_type = PixelType::Gray16; break;
+                case JxrDecode2::PixelFormat::_32bppGrayFloat: px_type = PixelType::Gray32Float; break;
+                default: throw std::logic_error("need to look into these formats...");
+                }
+
+                bm = GetSite()->CreateBitmap(px_type, width, height);
+                auto bmLckInfo = ScopedBitmapLockerSP(bm);
+                if (bmLckInfo.stride != stride)
+                {
+                    for (uint32_t i = 0; i < linesCount; ++i)
+                    {
+                        memcpy(static_cast<char*>(bmLckInfo.ptrDataRoi) + i * bmLckInfo.stride, static_cast<const char*>(ptrData) + i * stride, stride);
+                    }
+                }
+                else
+                {
+                    memcpy(bmLckInfo.ptrDataRoi, ptrData, static_cast<size_t>(stride) * linesCount);
+                }
+
+                // since BGR48 is not available as output, we need to convert (#36)
+                if (px_type == PixelType::Bgr48)
+                {
+                    CBitmapOperations::RGB48ToBGR48(width, height, (uint16_t*)bmLckInfo.ptrDataRoi, bmLckInfo.stride);
+                }
+            }
+        );
+
+    return bm;
+}
+
+std::shared_ptr<libCZI::IBitmapData> CJxrLibDecoder::Decode2(const void* ptrData, size_t size, libCZI::PixelType pixelType, uint32_t width, uint32_t height)
 {
     std::shared_ptr<IBitmapData> bm;
 

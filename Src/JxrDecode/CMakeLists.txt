@@ -11,13 +11,13 @@ add_library(JxrDecodeStatic OBJECT
 							stdafx.h 
 							targetver.h 
 							Jxr/adapthuff.c 
-							Jxr/decode.c 
+							#Jxr/decode.c 
 							Jxr/encode.c 
 							Jxr/image.c 
-							Jxr/JXRGlue.c 
-							Jxr/JXRGlueJxr.c 
+							#Jxr/JXRGlue.c 
+							#Jxr/JXRGlueJxr.c 
 							Jxr/JXRGluePFC.c 
-							Jxr/JXRMeta.c 
+							#Jxr/JXRMeta.c 
 							Jxr/JXRTest.c 
 							Jxr/JXRTestBmp.c 
 							Jxr/JXRTestHdr.c 
@@ -28,38 +28,64 @@ add_library(JxrDecodeStatic OBJECT
 							Jxr/JXRTranscode.c 
 							Jxr/perfTimerANSI.c 
 							Jxr/postprocess.c 
-							Jxr/segdec.c 
+							#Jxr/segdec.c 
 							Jxr/segenc.c 
-							Jxr/strcodec.c 
-							Jxr/strdec.c 
+							#Jxr/strcodec.c 
+							#Jxr/strdec.c 
 							Jxr/strdec_x86.c 
 							Jxr/strenc.c 
 							Jxr/strenc_x86.c 
 							Jxr/strFwdTransform.c 
-							Jxr/strInvTransform.c 
+							#Jxr/strInvTransform.c 
 							Jxr/strPredQuant.c 
-							Jxr/strPredQuantDec.c 
+							#Jxr/strPredQuantDec.c 
 							Jxr/strPredQuantEnc.c 
 							Jxr/strTransform.c 
-							Jxr/common.h 
-							Jxr/decode.h 
+							#Jxr/common.h 
+							#Jxr/decode.h 
 							Jxr/encode.h 
-							Jxr/JXRGlue.h 
-							Jxr/JXRMeta.h 
+							#Jxr/JXRGlue.h 
+							#Jxr/JXRMeta.h 
 							Jxr/JXRTest.h 
 							Jxr/JXRTestWrapper.h 
 							Jxr/perfTimer.h 
-							Jxr/strcodec.h 
-							Jxr/strTransform.h 
-							Jxr/windowsmediaphoto.h 
+							#Jxr/strcodec.h 
+							#Jxr/strTransform.h 
+							#Jxr/windowsmediaphoto.h 
 							Jxr/_x86/_x86.h 
 							Jxr/priv_guiddef.h 
 							Jxr/wmsal.h 
-							Jxr/wmspecstring.h 
-							Jxr/wmspecstrings_adt.h 
+							#Jxr/wmspecstring.h 
+							#Jxr/wmspecstrings_adt.h 
 							Jxr/wmspecstrings_strict.h 
 							Jxr/wmspecstrings_undef.h 
-							Jxr/jxr_defines.h)
+							Jxr/jxr_defines.h 
+
+							"JxrDecode2.h"
+							"JxrDecode2.cpp"
+
+							"jxrlib/common/include/guiddef.h" 
+							"jxrlib/common/include/wmspecstring.h" 
+							"jxrlib/common/include/wmspecstrings_adt.h" 
+
+							"jxrlib/image/decode/decode.c" 
+							"jxrlib/image/decode/decode.h" 
+							"jxrlib/image/decode/segdec.c" 
+							"jxrlib/image/decode/strdec.c" 
+							"jxrlib/image/decode/strInvTransform.c"
+							"jxrlib/image/decode/strPredQuantDec.c"
+
+							"jxrlib/image/sys/strcodec.h" 
+							"jxrlib/image/sys/strcodec.c"
+							"jxrlib/image/sys/windowsmediaphoto.h" 
+							"jxrlib/image/sys/common.h" 
+							"jxrlib/image/sys/strTransform.h"  
+							
+							"jxrlib/jxrgluelib/JXRGlue.h"
+							"jxrlib/jxrgluelib/JXRGlue.c" 
+							"jxrlib/jxrgluelib/JXRGlueJxr.c"
+							"jxrlib/jxrgluelib/JXRMeta.h"
+							"jxrlib/jxrgluelib/JXRMeta.c"   )
 
 set_target_properties(JxrDecodeStatic PROPERTIES CXX_STANDARD 11)
 

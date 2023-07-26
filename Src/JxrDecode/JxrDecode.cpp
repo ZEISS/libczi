@@ -6,9 +6,10 @@
 #include <sstream>
 #include <memory>
 #include "JxrDecode.h"
-#include "Jxr/JXRTest.h"
+//#include "Jxr/JXRTest.h"
 //#include "Jxr/JXRTestWrapper.h"
-#include "Jxr/JXRGlue.h"
+//#include "Jxr/JXRGlue.h"
+#include "jxrlib/jxrgluelib/JXRGlue.h"
 
 using namespace JxrDecode;
 
@@ -21,7 +22,7 @@ ERR WmpDecAppCreateEncoderFromExt(
         PKImageEncode** ppIE)
 {
         ERR err = WMP_errSuccess;
-        const PKIID* pIID = NULL;
+/*        const PKIID* pIID = NULL;
 
         //UNREFERENCED_PARAMETER(pCFactory);
 
@@ -30,7 +31,7 @@ ERR WmpDecAppCreateEncoderFromExt(
 
         // Create encoder
         PKTestFactory_CreateCodec(pIID, reinterpret_cast<void**>(ppIE));
-
+        */
         //Cleanup:
         return err;
 }
@@ -333,12 +334,12 @@ void JxrDecode::Decode(codecHandle h, const WMPDECAPPARGS* decArgs, const void* 
         if (Failed(err)) { ThrowError("WmpDecAppCreateEncoderFromExt failed", err); }
         std::unique_ptr<PKImageEncode, void(*)(PKImageEncode*)> upEncoder(pEncoder, [](PKImageEncode* p)->void {p->Release(&p); });
 
-        struct tagJxrTestWrapperInitializeInfo wrapperInfo;
+        /*struct tagJxrTestWrapperInitializeInfo wrapperInfo;
         wrapperInfo.userParamPutData = &deliverData;
         wrapperInfo.pfnPutData = DeliverData;
 
         err = upEncoder->Initialize(upEncoder.get(), nullptr, &wrapperInfo, sizeof(wrapperInfo));
-        if (Failed(err)) { ThrowError("Encoder::Initialize failed", err); }
+*/        if (Failed(err)) { ThrowError("Encoder::Initialize failed", err); }
         err = upEncoder->SetPixelFormat(upEncoder.get(), args_guidPixFormat);
         if (Failed(err)) { ThrowError("SetPixelFormat failed", err); }
         upEncoder->WMP.wmiSCP.bBlackWhite = upDecoder->WMP.wmiSCP.bBlackWhite;
