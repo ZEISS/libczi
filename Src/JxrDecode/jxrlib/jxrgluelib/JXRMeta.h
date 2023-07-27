@@ -28,7 +28,7 @@
 #pragma once
 
 //#include <windowsmediaphoto.h>
-#include "../image/sys/Windowsmediaphoto.h"
+#include "../image/sys/windowsmediaphoto.h"
 #ifndef WIN32
 //#include <wmspecstring.h>
 #include "../common/include/wmspecstring.h"

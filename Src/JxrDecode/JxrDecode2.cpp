@@ -18,10 +18,10 @@ void JxrDecode2::Decode(
     //if (Failed(err)) { ThrowError("PKCreateFactory failed", err); }
     std::unique_ptr<PKFactory, void(*)(PKFactory*)> upFactory(pFactory, [](PKFactory* p)->void {p->Release(&p); });
 
-    PKCodecFactory* pCodecFactory = NULL;
+    /*PKCodecFactory* pCodecFactory = NULL;
     err = PKCreateCodecFactory(&pCodecFactory, WMP_SDK_VERSION);
     //if (Failed(err)) { ThrowError("PKCreateCodecFactory failed", err); }
-    std::unique_ptr<PKCodecFactory, void(*)(PKCodecFactory*)> upCodecFactory(pCodecFactory, [](PKCodecFactory* p)->void {p->Release(&p); });
+    std::unique_ptr<PKCodecFactory, void(*)(PKCodecFactory*)> upCodecFactory(pCodecFactory, [](PKCodecFactory* p)->void {p->Release(&p); });*/
 
     /*  const PKIID* pIID = NULL;
 
@@ -30,10 +30,12 @@ void JxrDecode2::Decode(
       std::unique_ptr<PKImageDecode, void(*)(PKImageDecode*)> upDecoder(pDecoder, [](PKImageDecode* p)->void {p->Release(&p); });*/
 
     WMPStream* pStream;
-    err = pFactory->CreateStreamFromMemory(&pStream, const_cast<void*>(ptrData), size);
+    err = CreateWS_Memory(&pStream, const_cast<void*>(ptrData), size);
+    //err = pFactory->CreateStreamFromMemory(&pStream, const_cast<void*>(ptrData), size);
 
     PKImageDecode* pDecoder;
-    upCodecFactory->CreateDecoderFromStream(pStream, &pDecoder);
+    //upCodecFactory->CreateDecoderFromStream(pStream, &pDecoder);
+    PKCodecFactory_CreateDecoderFromStream(pStream, &pDecoder);
     std::unique_ptr<PKImageDecode, void(*)(PKImageDecode*)> upDecoder(pDecoder, [](PKImageDecode* p)->void {p->Release(&p); });
 
 

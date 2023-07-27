@@ -587,6 +587,7 @@ extern "C" {
 
     ERR PKImageDecode_Create(PKImageDecode** ppID);
     ERR PKCodecFactory_CreateDecoderFromFile(const char* szFilename, PKImageDecode** ppDecoder);
+    ERR PKCodecFactory_CreateDecoderFromStream(struct WMPStream* pStream, PKImageDecode** ppDecoder);
 
     //================================================================
     typedef struct tagPKFormatConverter
