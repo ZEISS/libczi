@@ -36,6 +36,9 @@
 #define TRACE_HEAP      0
 #include "memtrace.h"
 #endif
+#if JXRDECODE_HAS_BUILTIN_BSWAP32
+#include <byteswap.h>
+#endif
 #if JXRDECODE_HAS_BYTESWAP_IN_STDLIB
  #include <stdlib.h>
 #endif
