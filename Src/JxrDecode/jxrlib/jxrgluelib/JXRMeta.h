@@ -29,10 +29,10 @@
 
 //#include <windowsmediaphoto.h>
 #include "../image/sys/windowsmediaphoto.h"
-#ifndef WIN32
-//#include <wmspecstring.h>
-#include "../common/include/wmspecstring.h"
-#endif
+//#ifndef WIN32
+////#include <wmspecstring.h>
+//#include "../common/include/wmspecstring.h"
+//#endif
 
 #ifndef UNREFERENCED_PARAMETER
 #define UNREFERENCED_PARAMETER(P) { (P) = (P); }

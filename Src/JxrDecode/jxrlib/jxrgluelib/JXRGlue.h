@@ -40,12 +40,12 @@ extern "C" {
 #define PK_SDK_VERSION 0x0101
 
 #define sizeof2(array) (sizeof(array)/sizeof(*(array)))
-#ifndef max
-#define max(a,b) ((a) > (b) ? (a) : (b))
-#endif
-#ifndef min
-#define min(b,a) ((a) < (b) ? (a) : (b))
-#endif
+//#ifndef max
+//#define max(a,b) ((a) > (b) ? (a) : (b))
+//#endif
+//#ifndef min
+//#define min(b,a) ((a) < (b) ? (a) : (b))
+//#endif
 //#ifdef __ANSI__
 #define STRCPY_SAFE(pszDest, cbDest, pszSrc)    (strncpy((pszDest), (pszSrc), (cbDest)) == (pszDest) ? 0 : 1)
 //#else
@@ -298,24 +298,24 @@ extern "C" {
 
 
     //================================================================
-#ifdef __ANSI__
-    struct tagPKFactory;
-    struct tagPKCodecFactory;
-    struct tagPKImageDecode;
-    struct tagPKImageEncode;
-    struct tagPKFormatConverter;
-#define PKFactory           struct tagPKFactory
-#define PKCodecFactory      struct tagPKCodecFactory
-#define PKImageDecode       struct tagPKImageDecode
-#define PKImageEncode       struct tagPKImageEncode
-#define PKFormatConverter   struct tagPKFormatConverter
-#else // __ANSI__
+//#ifdef __ANSI__
+//    struct tagPKFactory;
+//    struct tagPKCodecFactory;
+//    struct tagPKImageDecode;
+//    struct tagPKImageEncode;
+//    struct tagPKFormatConverter;
+//#define PKFactory           struct tagPKFactory
+//#define PKCodecFactory      struct tagPKCodecFactory
+//#define PKImageDecode       struct tagPKImageDecode
+//#define PKImageEncode       struct tagPKImageEncode
+//#define PKFormatConverter   struct tagPKFormatConverter
+//#else // __ANSI__
     typedef struct tagPKFactory PKFactory;
     typedef struct tagPKCodecFactory PKCodecFactory;
     typedef struct tagPKImageDecode PKImageDecode;
     typedef struct tagPKImageEncode PKImageEncode;
     typedef struct tagPKFormatConverter PKFormatConverter;
-#endif // __ANSI__
+//#endif // __ANSI__
     //================================================================
     typedef struct tagPKStream
     {
@@ -336,9 +336,9 @@ extern "C" {
         ERR(*CreateStreamFromMemory)(struct WMPStream**, void*, size_t);
 
         ERR(*Release)(PKFactory**);
-#ifdef __ANSI__
-#undef PKFactory
-#endif // __ANSI__
+//#ifdef __ANSI__
+//#undef PKFactory
+//#endif // __ANSI__
     } PKFactory;
 
     //----------------------------------------------------------------
@@ -358,9 +358,9 @@ extern "C" {
         ERR(*CreateFormatConverter)(PKFormatConverter**);
 
         ERR(*Release)(PKCodecFactory**);
-#ifdef __ANSI__
-#undef PKCodecFactory
-#endif // __ANSI__
+//#ifdef __ANSI__
+//#undef PKCodecFactory
+//#endif // __ANSI__
     } PKCodecFactory;
 
     //----------------------------------------------------------------
@@ -465,9 +465,9 @@ extern "C" {
             struct WMPStream* pPATempFile;
         } WMP;
 
-#ifdef __ANSI__
-#undef PKImageEncode
-#endif // __ANSI__
+//#ifdef __ANSI__
+//#undef PKImageEncode
+//#endif // __ANSI__
     } PKImageEncode;
 
     //----------------------------------------------------------------
@@ -560,9 +560,9 @@ extern "C" {
             DESCRIPTIVEMETADATA sDescMetadata;
         } WMP;
 
-#ifdef __ANSI__
-#undef PKImageDecode
-#endif // __ANSI__
+//#ifdef __ANSI__
+//#undef PKImageDecode
+//#endif // __ANSI__
     } PKImageDecode;
 
     //----------------------------------------------------------------
@@ -608,9 +608,9 @@ extern "C" {
 
         PKImageDecode* pDecoder;
         PKPixelFormatGUID enPixelFormat;
-#ifdef __ANSI__
-#undef PKFormatConverter
-#endif // __ANSI__
+//#ifdef __ANSI__
+//#undef PKFormatConverter
+//#endif // __ANSI__
     } PKFormatConverter;
 
     //----------------------------------------------------------------

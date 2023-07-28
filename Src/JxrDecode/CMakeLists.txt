@@ -65,8 +65,8 @@ add_library(JxrDecodeStatic OBJECT
 							"JxrDecode2.cpp"
 
 							"jxrlib/common/include/guiddef.h" 
-							"jxrlib/common/include/wmspecstring.h" 
-							"jxrlib/common/include/wmspecstrings_adt.h" 
+							#"jxrlib/common/include/wmspecstring.h" 
+							#"jxrlib/common/include/wmspecstrings_adt.h" 
 
 							"jxrlib/image/decode/decode.c" 
 							"jxrlib/image/decode/decode.h" 
