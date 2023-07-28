@@ -409,7 +409,7 @@ static _FORCEINLINE PixelI forwardHalf(PixelI hHalf)
 //================================================================
 // Color Conversion 
 // functions to get image data from input buffer
-// this inlcudes necessary color conversion and boundary padding
+// this includes necessary color conversion and boundary padding
 //================================================================
 #define _CC(r, g, b) (b -= r, r += ((b + 1) >> 1) - g, g += ((r + 0) >> 1))
 #define _CC_CMYK(c, m, y, k) (y -= c, c += ((y + 1) >> 1) - m, m += (c >> 1) - k, k += ((m + 1) >> 1))
@@ -420,6 +420,7 @@ const size_t MAX_MEMORY_SIZE_IN_WORDS = 64 << 20; // 1 << 20 \approx 1 million
 
 Int StrIOEncInit(CWMImageStrCodec* pSC)
 {
+#if false   // TODO TODO TODO
     pSC->m_param.bIndexTable = !(pSC->WMISCP.bfBitstreamFormat == SPATIAL && pSC->WMISCP.cNumOfSliceMinus1H + pSC->WMISCP.cNumOfSliceMinus1V == 0);
     if (allocateBitIOInfo(pSC) != ICERR_OK) {
         return ICERR_ERROR;
@@ -497,7 +498,7 @@ Int StrIOEncInit(CWMImageStrCodec* pSC)
             attachISWrite(pSC->m_ppBitIO[i], pSC->ppWStream[i]);
         }
     }
-
+#endif
     return ICERR_OK;
 }
 

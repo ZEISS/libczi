@@ -281,12 +281,12 @@ ERR CreateWS_File(struct WMPStream** ppWS, const char* szFilename, const char* s
     pWS->SetPos = SetPosWS_File;
     pWS->GetPos = GetPosWS_File;
 
-#ifdef WIN32
-    FailIf(0 != fopen_s(&pWS->state.file.pFile, szFilename, szMode), WMP_errFileIO);
-#else
+//#ifdef WIN32
+//    FailIf(0 != fopen_s(&pWS->state.file.pFile, szFilename, szMode), WMP_errFileIO);
+//#else
     pWS->state.file.pFile = fopen(szFilename, szMode);
     FailIf(NULL == pWS->state.file.pFile, WMP_errFileIO);
-#endif
+//#endif
 
 Cleanup:
     return err;

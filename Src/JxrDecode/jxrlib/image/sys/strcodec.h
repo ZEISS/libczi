@@ -28,6 +28,7 @@
 #pragma once
 
 #include <stddef.h>
+#include <stdint.h>
 
 #include "windowsmediaphoto.h"
 #include "common.h"
@@ -38,6 +39,7 @@
 #endif
 
 //================================================================
+/*
 #ifdef ENABLE_OPTIMIZATIONS
 #if defined(WIN32) && !defined(_WIN64)
 #define WMP_OPT_SSE2
@@ -53,35 +55,50 @@
 
 #endif
 #endif // ENABLE_OPTIMIZATIONS
+*/
 
 //================================================================
 //#ifdef WIN32
+/*
 #if defined(WIN32) && !defined(UNDER_CE)   // WIN32 seems to be defined always in VS2005 for ARM platform
 #define PLATFORM_X86
 #include "..\x86\x86.h"
 #endif
+*/
 
 #ifndef UNREFERENCED_PARAMETER
 #define UNREFERENCED_PARAMETER(P) { (P) = (P); }
 #endif // UNREFERENCED_PARAMETER
 
+/*
 #ifdef UNDER_CE
 #define PLATFORM_WCE
 #include "arm.h"
 #endif
+*/
 
+/*
 #ifdef __ANSI__
 #define PLATFORM_ANSI
 #include "ansi.h"
 #endif
+*/
+
+#include "ansi.h"
+
+typedef uintptr_t UINTPTR_T;
+typedef intptr_t INTPTR_T;
 
 //================================================================
 
+typedef uint64_t U64;
+#if false
 #ifdef PLATFORM_ANSI
 typedef unsigned long long U64;
 #else // PLATFORM_ANSI
 typedef unsigned __int64 U64;
 #endif // PLATFORM_ANSI
+#endif
 
 //================================================================
 #define MARKERCOUNT (PACKETLENGTH * 2)
@@ -449,11 +466,11 @@ typedef struct CWMImageStrCodec {
 
     struct WMPStream** ppWStream;
 
-#ifdef WIN32
-    TCHAR** ppTempFile;
-#else
+//#ifdef WIN32
+//    TCHAR** ppTempFile;
+//#else
     char** ppTempFile;
-#endif
+//#endif
 
     // interleaved alpha support - linked structure for Alpha channel
     struct CWMImageStrCodec* m_pNextSC;

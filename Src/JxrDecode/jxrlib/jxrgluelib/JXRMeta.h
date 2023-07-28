@@ -108,10 +108,10 @@
 #define WMP_valWMPhotoID WMP_valCompression
 
 
-#ifdef WIN32
-#define __in_win    __in
-#define __out_win   __out
-#endif
+//#ifdef WIN32
+//#define __in_win    __in
+//#define __out_win   __out
+//#endif
 
 
 //================================================================
@@ -230,10 +230,10 @@ EXTERN_C ERR WriteWmpDE(
 
 
 EXTERN_C ERR ReadPropvar(__in_ecount(1) struct WMPStream* pWS,
-                         const __in_win U16 uType,
-                         const __in_win U32 uCount,
-                         const __in_win U32 uValue,
-                         __out_win DPKPROPVARIANT* pvar);
+                         const /*__in_win*/ U16 uType,
+                         const /*__in_win*/ U32 uCount,
+                         const /*__in_win */U32 uValue,
+                         /*__out_win */DPKPROPVARIANT* pvar);
 
 
 

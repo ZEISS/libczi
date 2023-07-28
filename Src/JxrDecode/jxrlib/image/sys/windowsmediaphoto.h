@@ -34,6 +34,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdint.h>
 
 #if defined(__cplusplus) && !defined(EXTERN_C)
 #define EXTERN_C extern "C"
@@ -48,17 +49,17 @@ typedef int Bool;
 typedef char Char;
 typedef double Double;
 typedef int Int;
-typedef signed char I8;
-typedef short I16; // 16 bit int
-typedef int I32;
-typedef long Long;
-typedef unsigned char  PixelC;
-typedef int PixelI;
-typedef unsigned int UInt;
-typedef unsigned long ULong;
-typedef unsigned char U8; // 8 bit uint
-typedef unsigned short U16;
-typedef unsigned int U32; // 32 bit uint
+typedef int8_t I8;// signed char I8;
+typedef int16_t I16;// short I16; // 16 bit int
+typedef int32_t I32;// int I32;
+typedef int32_t Long;// long Long;
+typedef uint8_t PixelC;//unsigned char  PixelC;
+typedef int32_t PixelI;// int PixelI;
+typedef uint32_t UInt;// unsigned int UInt;
+typedef uint32_t ULong;// unsigned long ULong;
+typedef uint8_t U8;// unsigned char U8; // 8 bit uint
+typedef uint16_t U16;// unsigned short U16;
+typedef uint32_t U32;// unsigned int U32; // 32 bit uint
 typedef void Void;
 
 typedef void* CTXSTRCODEC;

@@ -93,13 +93,14 @@ add_library(JxrDecodeStatic OBJECT
 							"jxrlib/image/sys/image.c"
 							"jxrlib/image/sys/adapthuff.c"
 							"jxrlib/image/sys/strPredQuant.c"
+							"jxrlib/image/sys/ansi.h"
 							
 							"jxrlib/jxrgluelib/JXRGlue.h"
 							"jxrlib/jxrgluelib/JXRGlue.c" 
 							"jxrlib/jxrgluelib/JXRGlueJxr.c"
 							"jxrlib/jxrgluelib/JXRMeta.h"
 							"jxrlib/jxrgluelib/JXRMeta.c"         
-							"jxrlib/jxrgluelib/JXRGluePFC.c"    )
+							"jxrlib/jxrgluelib/JXRGluePFC.c")
 
 
 # prepare the configuration-file "JxrDecode_Config.h"

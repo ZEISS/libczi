@@ -26,6 +26,8 @@
 //
 //*@@@---@@@@******************************************************************
 
+
+#if false
 #ifndef _WMSPECSTRING_H_
 #define _WMSPECSTRING_H_
 
@@ -340,3 +342,4 @@ void __pfx_assume(int, const char*);
 
 #endif //_WMSPECSTRING_H_
 
+#endif

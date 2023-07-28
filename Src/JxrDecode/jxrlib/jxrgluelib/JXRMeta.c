@@ -667,8 +667,8 @@ Cleanup:
 
 
 ERR ReadBinaryData(__in_ecount(1) struct WMPStream* pWS,
-                   const __in_win U32 uCount,
-                   const __in_win U32 uValue,
+                   const /*__in_win*/ U32 uCount,
+                   const /*__in_win*/ U32 uValue,
                    U8** ppbData)
 {
     ERR err = WMP_errSuccess;
@@ -704,10 +704,10 @@ Cleanup:
 
 
 ERR ReadPropvar(__in_ecount(1) struct WMPStream* pWS,
-                const __in_win U16 uType,
-                const __in_win U32 uCount,
-                const __in_win U32 uValue,
-                __out_win DPKPROPVARIANT* pvar)
+                const /*__in_win */U16 uType,
+                const /*__in_win */U32 uCount,
+                const /*__in_win */U32 uValue,
+                /*__out_win */DPKPROPVARIANT* pvar)
 {
     ERR err = WMP_errSuccess;
     // U8 *pbData = NULL;
