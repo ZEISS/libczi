@@ -588,9 +588,9 @@ Cleanup:
 
 //================================================================
 ERR GetUShort(
-    /*__in_ecount(1)*/ struct WMPStream* pWS,
+    struct WMPStream* pWS,
     size_t offPos,
-    /*__out_ecount(1)*/ U16* puValue)
+    U16* puValue)
 {
     ERR err = WMP_errSuccess;
     U8  cVal;
@@ -606,7 +606,7 @@ Cleanup:
 }
 
 ERR PutUShort(
-    /*__in_ecount(1)*/ struct WMPStream* pWS,
+    struct WMPStream* pWS,
     size_t offPos,
     U16 uValue)
 {
@@ -623,9 +623,9 @@ Cleanup:
 }
 
 ERR GetULong(
-    /*__in_ecount(1)*/ struct WMPStream* pWS,
+    struct WMPStream* pWS,
     size_t offPos,
-    /*__out_ecount(1)*/ U32* puValue)
+    U32* puValue)
 {
     ERR err = WMP_errSuccess;
     U8  cVal;
@@ -645,7 +645,7 @@ Cleanup:
 }
 
 ERR PutULong(
-    /*__in_ecount(1)*/ struct WMPStream* pWS,
+    struct WMPStream* pWS,
     size_t offPos,
     U32 uValue)
 {
@@ -666,9 +666,9 @@ Cleanup:
 }
 
 
-ERR ReadBinaryData(/*__in_ecount(1)*/ struct WMPStream* pWS,
-                   const /*__in_win*/ U32 uCount,
-                   const /*__in_win*/ U32 uValue,
+ERR ReadBinaryData(struct WMPStream* pWS,
+                   const U32 uCount,
+                   const U32 uValue,
                    U8** ppbData)
 {
     ERR err = WMP_errSuccess;
@@ -704,10 +704,10 @@ Cleanup:
 
 
 ERR ReadPropvar(/*__in_ecount(1)*/ struct WMPStream* pWS,
-                const /*__in_win */U16 uType,
-                const /*__in_win */U32 uCount,
-                const /*__in_win */U32 uValue,
-                /*__out_win */DPKPROPVARIANT* pvar)
+                const U16 uType,
+                const U32 uCount,
+                const U32 uValue,
+                DPKPROPVARIANT* pvar)
 {
     ERR err = WMP_errSuccess;
     // U8 *pbData = NULL;
@@ -902,4 +902,3 @@ Cleanup:
     *pOffPos = offPos;
     return err;
 }
-

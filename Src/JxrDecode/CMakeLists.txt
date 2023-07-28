@@ -4,6 +4,9 @@
 
 # build "JxrDecode" as an "object library" (cf. https://cmake.org/cmake/help/v3.0/command/add_library.html) -> we want it to be merged into the
 #   static libCIZ-library
+
+include(CheckSymbolExists)
+
 add_library(JxrDecodeStatic OBJECT 
 							JxrDecode.cpp 
 							##stdafx.cpp 
@@ -114,6 +117,27 @@ if (CRASH_ON_UNALIGNED_ACCESS)
 else()
   set (jxrdecode_CrashOnUnalignedIntegers 0)
 endif()
+# c.f. https://stackoverflow.com/questions/41770887/cross-platform-definition-of-byteswap-uint64-and-byteswap-ulong
+check_symbol_exists("__builtin_bswap32" "" jxrdecode_Has_builtin_bswap32)
+message("jxrdecode_Has_builtin_bswap32 = ${jxrdecode_Has_builtin_bswap32}.")
+if (NOT jxrdecode_Has_builtin_bswap32)
+	check_symbol_exists(_byteswap_ulong "stdlib.h" jxrdecode_Has_byteswap_long_in_stdlib)
+	message("jxrdecode_Has_byteswap_long_in_stdlib = ${jxrdecode_Has_byteswap_long_in_stdlib}.")
+	if (NOT jxrdecode_Has_byteswap_long_in_stdlib)
+	  check_symbol_exists(bswap32 "sys/endian.h" jxrdecode_Has_bswap_long_in_sys_endian)
+	endif()
+endif()
+
+if (NOT jxrdecode_Has_builtin_bswap32)
+	set (jxrdecode_Has_builtin_bswap32 0)
+endif()
+if (NOT jxrdecode_Has_byteswap_long_in_stdlib)
+  set (jxrdecode_Has_byteswap_long_in_stdlib 0)
+endif()
+if (NOT jxrdecode_Has_bswap_long_in_sys_endian)
+  set (jxrdecode_Has_bswap_long_in_sys_endian 0)
+endif()
+
 configure_file (
   "${CMAKE_CURRENT_SOURCE_DIR}/JxrDecode_Config.h.in"
   "${CMAKE_CURRENT_BINARY_DIR}/JxrDecode_Config.h"

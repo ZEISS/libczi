@@ -28,12 +28,19 @@
 
 #include "../sys/strcodec.h"
 #include "decode.h"
+#include <JxrDecode_Config.h>
 
 #ifdef MEM_TRACE
 #define TRACE_MALLOC    1
 #define TRACE_NEW       0
 #define TRACE_HEAP      0
 #include "memtrace.h"
+#endif
+#if JXRDECODE_HAS_BYTESWAP_IN_STDLIB
+ #include <stdlib.h>
+#endif
+#if JXRDECODE_HAS_BSWAP_LONG_IN_SYS_ENDIAN
+ #include <sys/endian.h>
 #endif
 
 extern const int dctIndex[3][16];
@@ -54,20 +61,54 @@ static Int DecodeSignificantAbsLevel(struct CAdaptiveHuffman* pAHexpt, BitIOInfo
 //================================================================
 static U32 _FORCEINLINE _load4(void* pv)
 {
-#ifdef _BIG__ENDIAN_
-    return (*(U32*)pv);
-#else // _BIG__ENDIAN_
-#if defined(_M_IA64) || defined(_ARM_)
-    U32  v;
-    v = ((U16*)pv)[0];
-    v |= ((U32)((U16*)pv)[1]) << 16;
-    return _byteswap_ulong(v);
-#else // _M_IA64
+#if JXRDECODE_ISBIGENDIANHOST
+    // on a big-endian host, we have nothing to do, so just load the value
+    #if JXRDECODE_SIGBUS_ON_UNALIGNEDINTEGERS
+        U32 v;
+        memcpy(&v, pv, 4);
+        return v;
+    #else
+        return (*(U32*)pv);
+    #endif
+#else // JXRDECODE_ISBIGENDIANHOST
+    // on a little endian machine, we need to swap the bytes
     U32 v;
-    memcpy(&v, pv, sizeof(U32));
-    return _byteswap_ulong(v);
-#endif // _M_IA64
-#endif // _BIG__ENDIAN_
+    #if JXRDECODE_SIGBUS_ON_UNALIGNEDINTEGERS
+        memcpy(&v, pv, 4);
+    #else
+        v = (*(U32*)pv);
+    #endif
+
+    // ...and use the appropriate byte-swapping function
+    #if JXRDECODE_HAS_BUILTIN_BSWAP32
+        return __builtin_bswap32(v);
+    #elif JXRDECODE_HAS_BYTESWAP_IN_STDLIB
+        return _byteswap_ulong(v);
+    #elif JXRDECODE_HAS_BSWAP_LONG_IN_SYS_ENDIAN
+        return bswap_32(v);
+    #else
+        return (((v & 0xff000000u) >> 24) |
+                ((v & 0x00ff0000u) >> 8) |
+                ((v & 0x0000ff00u) << 8) |
+                ((v & 0x000000ffu) << 24));
+    #endif
+#endif
+
+
+//#ifdef _BIG__ENDIAN_
+//    return (*(U32*)pv);
+//#else // _BIG__ENDIAN_
+//#if defined(_M_IA64) || defined(_ARM_)
+//    U32  v;
+//    v = ((U16*)pv)[0];
+//    v |= ((U32)((U16*)pv)[1]) << 16;
+//    return _byteswap_ulong(v);
+//#else // _M_IA64
+//    U32 v;
+//    memcpy(&v, pv, sizeof(U32));
+//    return _byteswap_ulong(v);
+//#endif // _M_IA64
+//#endif // _BIG__ENDIAN_
 }
 
 static _FORCEINLINE U32 _peekBit16(BitIOInfo* pIO, U32 cBits)

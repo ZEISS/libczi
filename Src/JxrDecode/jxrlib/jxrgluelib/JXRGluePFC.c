@@ -2345,4 +2345,3 @@ ERR PKFormatConverter_Release(PKFormatConverter** ppFC)
 Cleanup:
     return err;
 }
-

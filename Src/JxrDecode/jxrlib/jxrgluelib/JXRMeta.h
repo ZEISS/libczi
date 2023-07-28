@@ -27,12 +27,7 @@
 //*@@@---@@@@******************************************************************
 #pragma once
 
-//#include <windowsmediaphoto.h>
 #include "../image/sys/windowsmediaphoto.h"
-//#ifndef WIN32
-////#include <wmspecstring.h>
-//#include "../common/include/wmspecstring.h"
-//#endif
 
 #ifndef UNREFERENCED_PARAMETER
 #define UNREFERENCED_PARAMETER(P) { (P) = (P); }
@@ -106,12 +101,6 @@
 
 #define WMP_valCompression 0xbc
 #define WMP_valWMPhotoID WMP_valCompression
-
-
-//#ifdef WIN32
-//#define __in_win    __in
-//#define __out_win   __out
-//#endif
 
 
 //================================================================
@@ -197,43 +186,43 @@ typedef struct tagWmpDEMisc
 
 //================================================================
 EXTERN_C ERR GetUShort(
-   /* __in_ecount(1)*/ struct WMPStream* pWS,
+    struct WMPStream* pWS,
     size_t offPos,
-    /*__out_ecount(1)*/ U16* puValue
+    U16* puValue
 );
 
 EXTERN_C ERR PutUShort(
-    /*__in_ecount(1)*/ struct WMPStream* pWS,
+    struct WMPStream* pWS,
     size_t offPos,
     U16 uValue
 );
 
 EXTERN_C ERR GetULong(
-    /*__in_ecount(1)*/ struct WMPStream* pWS,
+    struct WMPStream* pWS,
     size_t offPos,
-    /*__out_ecount(1)*/ U32* puValue
+    U32* puValue
 );
 
 EXTERN_C ERR PutULong(
-    /*__in_ecount(1)*/ struct WMPStream* pWS,
+    struct WMPStream* pWS,
     size_t offPos,
     U32 uValue
 );
 
 EXTERN_C ERR WriteWmpDE(
-    /*__in_ecount(1)*/ struct WMPStream* pWS,
+    struct WMPStream* pWS,
     size_t* pOffPos,
-    const /*__in_ecount(1)*/ WmpDE* pDE,
+    const WmpDE* pDE,
     const U8* pbData,
     U32* pcbDataWrittenToOffset
 );
 
 
-EXTERN_C ERR ReadPropvar(/*__in_ecount(1)*/ struct WMPStream* pWS,
-                         const /*__in_win*/ U16 uType,
-                         const /*__in_win*/ U32 uCount,
-                         const /*__in_win */U32 uValue,
-                         /*__out_win */DPKPROPVARIANT* pvar);
+EXTERN_C ERR ReadPropvar(struct WMPStream* pWS,
+                         const U16 uType,
+                         const U32 uCount,
+                         const U32 uValue,
+                         DPKPROPVARIANT* pvar);
 
 
 

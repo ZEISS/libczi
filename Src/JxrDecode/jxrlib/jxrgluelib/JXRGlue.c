@@ -972,4 +972,3 @@ ERR PKImageDecode_Create(
 Cleanup:
     return err;
 }
-
