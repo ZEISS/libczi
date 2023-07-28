@@ -197,39 +197,39 @@ typedef struct tagWmpDEMisc
 
 //================================================================
 EXTERN_C ERR GetUShort(
-    __in_ecount(1) struct WMPStream* pWS,
+   /* __in_ecount(1)*/ struct WMPStream* pWS,
     size_t offPos,
-    __out_ecount(1) U16* puValue
+    /*__out_ecount(1)*/ U16* puValue
 );
 
 EXTERN_C ERR PutUShort(
-    __in_ecount(1) struct WMPStream* pWS,
+    /*__in_ecount(1)*/ struct WMPStream* pWS,
     size_t offPos,
     U16 uValue
 );
 
 EXTERN_C ERR GetULong(
-    __in_ecount(1) struct WMPStream* pWS,
+    /*__in_ecount(1)*/ struct WMPStream* pWS,
     size_t offPos,
-    __out_ecount(1) U32* puValue
+    /*__out_ecount(1)*/ U32* puValue
 );
 
 EXTERN_C ERR PutULong(
-    __in_ecount(1) struct WMPStream* pWS,
+    /*__in_ecount(1)*/ struct WMPStream* pWS,
     size_t offPos,
     U32 uValue
 );
 
 EXTERN_C ERR WriteWmpDE(
-    __in_ecount(1) struct WMPStream* pWS,
+    /*__in_ecount(1)*/ struct WMPStream* pWS,
     size_t* pOffPos,
-    const __in_ecount(1) WmpDE* pDE,
+    const /*__in_ecount(1)*/ WmpDE* pDE,
     const U8* pbData,
     U32* pcbDataWrittenToOffset
 );
 
 
-EXTERN_C ERR ReadPropvar(__in_ecount(1) struct WMPStream* pWS,
+EXTERN_C ERR ReadPropvar(/*__in_ecount(1)*/ struct WMPStream* pWS,
                          const /*__in_win*/ U16 uType,
                          const /*__in_win*/ U32 uCount,
                          const /*__in_win */U32 uValue,
