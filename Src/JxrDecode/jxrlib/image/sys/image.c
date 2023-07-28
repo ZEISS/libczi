@@ -38,13 +38,13 @@
 #include <stdlib.h>
 #include <string.h>
 
-#if !(defined(__ANSI__))
-// Desktop
-#include <windows.h>
-#else
-// ANSI
-#include <time.h>
-#endif  
+//#if !(defined(__ANSI__))
+//// Desktop
+//#include <windows.h>
+//#else
+//// ANSI
+//#include <time.h>
+//#endif
 
 Int grgiZigzagInv4x4_lowpass[] = {
     0, 1, 4, 5, 2, 8, 6, 9,

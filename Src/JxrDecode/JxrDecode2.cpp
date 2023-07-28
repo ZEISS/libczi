@@ -2,7 +2,7 @@
 #include <memory>
 #include "jxrlib/jxrgluelib/JXRGlue.h"
 
-#include "jxrlib/image/sys/Windowsmediaphoto.h"
+#include "jxrlib/image/sys/windowsmediaphoto.h"
 
 void JxrDecode2::Decode(
            codecHandle h,

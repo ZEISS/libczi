@@ -588,9 +588,9 @@ Cleanup:
 
 //================================================================
 ERR GetUShort(
-    __in_ecount(1) struct WMPStream* pWS,
+    /*__in_ecount(1)*/ struct WMPStream* pWS,
     size_t offPos,
-    __out_ecount(1) U16* puValue)
+    /*__out_ecount(1)*/ U16* puValue)
 {
     ERR err = WMP_errSuccess;
     U8  cVal;
@@ -606,7 +606,7 @@ Cleanup:
 }
 
 ERR PutUShort(
-    __in_ecount(1) struct WMPStream* pWS,
+    /*__in_ecount(1)*/ struct WMPStream* pWS,
     size_t offPos,
     U16 uValue)
 {
@@ -623,9 +623,9 @@ Cleanup:
 }
 
 ERR GetULong(
-    __in_ecount(1) struct WMPStream* pWS,
+    /*__in_ecount(1)*/ struct WMPStream* pWS,
     size_t offPos,
-    __out_ecount(1) U32* puValue)
+    /*__out_ecount(1)*/ U32* puValue)
 {
     ERR err = WMP_errSuccess;
     U8  cVal;
@@ -645,7 +645,7 @@ Cleanup:
 }
 
 ERR PutULong(
-    __in_ecount(1) struct WMPStream* pWS,
+    /*__in_ecount(1)*/ struct WMPStream* pWS,
     size_t offPos,
     U32 uValue)
 {
@@ -666,7 +666,7 @@ Cleanup:
 }
 
 
-ERR ReadBinaryData(__in_ecount(1) struct WMPStream* pWS,
+ERR ReadBinaryData(/*__in_ecount(1)*/ struct WMPStream* pWS,
                    const /*__in_win*/ U32 uCount,
                    const /*__in_win*/ U32 uValue,
                    U8** ppbData)
@@ -703,7 +703,7 @@ Cleanup:
 }
 
 
-ERR ReadPropvar(__in_ecount(1) struct WMPStream* pWS,
+ERR ReadPropvar(/*__in_ecount(1)*/ struct WMPStream* pWS,
                 const /*__in_win */U16 uType,
                 const /*__in_win */U32 uCount,
                 const /*__in_win */U32 uValue,
@@ -765,9 +765,9 @@ Cleanup:
 
 
 ERR WriteWmpDE(
-    __in_ecount(1) struct WMPStream* pWS,
+    /*__in_ecount(1)*/ struct WMPStream* pWS,
     size_t* pOffPos,
-    const __in_ecount(1) WmpDE* pDE,
+    const/*__in_ecount(1)*/ WmpDE* pDE,
     const U8* pbData,
     U32* pcbDataWrittenToOffset)
 {

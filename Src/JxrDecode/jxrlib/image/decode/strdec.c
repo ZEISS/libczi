@@ -1,14 +1,14 @@
 //*@@@+++@@@@******************************************************************
 //
-// Copyright © Microsoft Corp.
+// Copyright ï¿½ Microsoft Corp.
 // All rights reserved.
 // 
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are met:
 // 
-// • Redistributions of source code must retain the above copyright notice,
+// ï¿½ Redistributions of source code must retain the above copyright notice,
 //   this list of conditions and the following disclaimer.
-// • Redistributions in binary form must reproduce the above copyright notice,
+// ï¿½ Redistributions in binary form must reproduce the above copyright notice,
 //   this list of conditions and the following disclaimer in the documentation
 //   and/or other materials provided with the distribution.
 // 
@@ -443,7 +443,15 @@ static _FORCEINLINE void inverseConvertRGBE(PixelI iFr, PixelI iFg, PixelI iFb, 
     inverseConvert(iFg, pG, &pG_E);
     inverseConvert(iFb, pB, &pB_E);
 
-    *pE = max(max(pR_E, pG_E), pB_E);
+    if (pR_E > pG_E)
+    {
+        *pE = pR_E > pB_E ? pR_E : pB_E;
+    }
+    else
+    {
+        *pE = pG_E > pB_E ? pG_E : pB_E;
+    }
+    /**pE = max(max(pR_E, pG_E), pB_E);*/
 
     if (*pE > pR_E) {
         iShift = (*pE - pR_E);
