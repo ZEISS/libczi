@@ -6,60 +6,60 @@
 #   static libCIZ-library
 add_library(JxrDecodeStatic OBJECT 
 							JxrDecode.cpp 
-							stdafx.cpp 
-							JxrDecode.h 
-							stdafx.h 
-							targetver.h 
-							Jxr/adapthuff.c 
+							##stdafx.cpp 
+							##JxrDecode.h 
+							##stdafx.h 
+							##targetver.h 
+							##Jxr/adapthuff.c 
 							#Jxr/decode.c 
-							Jxr/encode.c 
-							Jxr/image.c 
+							##Jxr/encode.c 
+							##Jxr/image.c 
 							#Jxr/JXRGlue.c 
 							#Jxr/JXRGlueJxr.c 
-							Jxr/JXRGluePFC.c 
+							##Jxr/JXRGluePFC.c 
 							#Jxr/JXRMeta.c 
-							Jxr/JXRTest.c 
-							Jxr/JXRTestBmp.c 
-							Jxr/JXRTestHdr.c 
-							Jxr/JXRTestPnm.c 
-							Jxr/JXRTestTif.c 
-							Jxr/JXRTestWrapper.c 
-							Jxr/JXRTestYUV.c 
-							Jxr/JXRTranscode.c 
-							Jxr/perfTimerANSI.c 
-							Jxr/postprocess.c 
+							##Jxr/JXRTest.c 
+							##Jxr/JXRTestBmp.c 
+							##Jxr/JXRTestHdr.c 
+							##Jxr/JXRTestPnm.c 
+							##Jxr/JXRTestTif.c 
+							##Jxr/JXRTestWrapper.c 
+							##Jxr/JXRTestYUV.c 
+							##Jxr/JXRTranscode.c 
+							##Jxr/perfTimerANSI.c 
+							##Jxr/postprocess.c 
 							#Jxr/segdec.c 
-							Jxr/segenc.c 
+							##Jxr/segenc.c 
 							#Jxr/strcodec.c 
 							#Jxr/strdec.c 
-							Jxr/strdec_x86.c 
-							Jxr/strenc.c 
-							Jxr/strenc_x86.c 
-							Jxr/strFwdTransform.c 
+							##Jxr/strdec_x86.c 
+							##Jxr/strenc.c 
+							##Jxr/strenc_x86.c 
+							##Jxr/strFwdTransform.c 
 							#Jxr/strInvTransform.c 
-							Jxr/strPredQuant.c 
+							##Jxr/strPredQuant.c 
 							#Jxr/strPredQuantDec.c 
-							Jxr/strPredQuantEnc.c 
-							Jxr/strTransform.c 
+							##Jxr/strPredQuantEnc.c 
+							##Jxr/strTransform.c 
 							#Jxr/common.h 
 							#Jxr/decode.h 
-							Jxr/encode.h 
+							##Jxr/encode.h 
 							#Jxr/JXRGlue.h 
 							#Jxr/JXRMeta.h 
-							Jxr/JXRTest.h 
-							Jxr/JXRTestWrapper.h 
-							Jxr/perfTimer.h 
+							##Jxr/JXRTest.h 
+							##Jxr/JXRTestWrapper.h 
+							##Jxr/perfTimer.h 
 							#Jxr/strcodec.h 
 							#Jxr/strTransform.h 
 							#Jxr/windowsmediaphoto.h 
-							Jxr/_x86/_x86.h 
-							Jxr/priv_guiddef.h 
-							Jxr/wmsal.h 
+							##Jxr/_x86/_x86.h 
+							##Jxr/priv_guiddef.h 
+							##Jxr/wmsal.h 
 							#Jxr/wmspecstring.h 
 							#Jxr/wmspecstrings_adt.h 
-							Jxr/wmspecstrings_strict.h 
-							Jxr/wmspecstrings_undef.h 
-							Jxr/jxr_defines.h 
+							##Jxr/wmspecstrings_strict.h 
+							##Jxr/wmspecstrings_undef.h 
+							##Jxr/jxr_defines.h 
 
 							"JxrDecode2.h"
 							"JxrDecode2.cpp"
@@ -74,18 +74,28 @@ add_library(JxrDecodeStatic OBJECT
 							"jxrlib/image/decode/strdec.c" 
 							"jxrlib/image/decode/strInvTransform.c"
 							"jxrlib/image/decode/strPredQuantDec.c"
+							"jxrlib/image/decode/postprocess.c"
+
+							"jxrlib/image/encode/strenc.c" 
+							"jxrlib/image/encode/encode.h" 
+							"jxrlib/image/encode/encode.c"
 
 							"jxrlib/image/sys/strcodec.h" 
 							"jxrlib/image/sys/strcodec.c"
 							"jxrlib/image/sys/windowsmediaphoto.h" 
 							"jxrlib/image/sys/common.h" 
-							"jxrlib/image/sys/strTransform.h"  
+							"jxrlib/image/sys/strTransform.h"
+							"jxrlib/image/sys/strTransform.c"
+							"jxrlib/image/sys/image.c"
+							"jxrlib/image/sys/adapthuff.c"
+							"jxrlib/image/sys/strPredQuant.c"
 							
 							"jxrlib/jxrgluelib/JXRGlue.h"
 							"jxrlib/jxrgluelib/JXRGlue.c" 
 							"jxrlib/jxrgluelib/JXRGlueJxr.c"
 							"jxrlib/jxrgluelib/JXRMeta.h"
-							"jxrlib/jxrgluelib/JXRMeta.c"   )
+							"jxrlib/jxrgluelib/JXRMeta.c"         
+							"jxrlib/jxrgluelib/JXRGluePFC.c"  "jxrlib/image/encode/segenc.c" "jxrlib/image/encode/strFwdTransform.c" "jxrlib/image/encode/strPredQuantEnc.c" "jxrlib/image/decode/JXRTranscode.c")
 
 set_target_properties(JxrDecodeStatic PROPERTIES CXX_STANDARD 11)
 
