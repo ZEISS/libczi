@@ -6,6 +6,7 @@
 #   static libCIZ-library
 
 include(CheckSymbolExists)
+include(CheckFunctionExists)
 
 add_library(JxrDecodeStatic OBJECT 
 							JxrDecode.cpp 
@@ -118,7 +119,7 @@ else()
   set (jxrdecode_CrashOnUnalignedIntegers 0)
 endif()
 # c.f. https://stackoverflow.com/questions/41770887/cross-platform-definition-of-byteswap-uint64-and-byteswap-ulong
-check_symbol_exists(__builtin_bswap32 "byteswap.h" jxrdecode_Has_builtin_bswap32)
+check_function_exists(__builtin_bswap32  jxrdecode_Has_builtin_bswap32)
 message("jxrdecode_Has_builtin_bswap32 = ${jxrdecode_Has_builtin_bswap32}.")
 if (NOT jxrdecode_Has_builtin_bswap32)
 	check_symbol_exists(_byteswap_ulong "stdlib.h" jxrdecode_Has_byteswap_long_in_stdlib)
