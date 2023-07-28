@@ -1,0 +1,13 @@
+// SPDX-FileCopyrightText: 2017-2022 Carl Zeiss Microscopy GmbH
+//
+// SPDX-License-Identifier: LGPL-3.0-or-later
+
+#pragma once
+
+// if the host system is a big-endian system, this is "1", otherwise 0
+#define JXRDECODE_ISBIGENDIANHOST @jxrdecode_ISBIGENDIANHOST@
+
+// whether the processor can load integers from an unaligned address, if this
+//  is 1 it means that we cannot load an integer from an unaligned address (we'd
+//  get a bus-error if we try), 0 means that the CPU can load from unaligned addresses
+#define JXRDECODE_SIGBUS_ON_UNALIGNEDINTEGERS @jxrdecode_CrashOnUnalignedIntegers@

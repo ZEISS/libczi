@@ -75,10 +75,14 @@ add_library(JxrDecodeStatic OBJECT
 							"jxrlib/image/decode/strInvTransform.c"
 							"jxrlib/image/decode/strPredQuantDec.c"
 							"jxrlib/image/decode/postprocess.c"
+							"jxrlib/image/decode/JXRTranscode.c"
 
 							"jxrlib/image/encode/strenc.c" 
 							"jxrlib/image/encode/encode.h" 
 							"jxrlib/image/encode/encode.c"
+							"jxrlib/image/encode/segenc.c"
+							"jxrlib/image/encode/strFwdTransform.c" 
+							"jxrlib/image/encode/strPredQuantEnc.c"
 
 							"jxrlib/image/sys/strcodec.h" 
 							"jxrlib/image/sys/strcodec.c"
@@ -95,13 +99,32 @@ add_library(JxrDecodeStatic OBJECT
 							"jxrlib/jxrgluelib/JXRGlueJxr.c"
 							"jxrlib/jxrgluelib/JXRMeta.h"
 							"jxrlib/jxrgluelib/JXRMeta.c"         
-							"jxrlib/jxrgluelib/JXRGluePFC.c"  "jxrlib/image/encode/segenc.c" "jxrlib/image/encode/strFwdTransform.c" "jxrlib/image/encode/strPredQuantEnc.c" "jxrlib/image/decode/JXRTranscode.c")
+							"jxrlib/jxrgluelib/JXRGluePFC.c"    )
+
+
+# prepare the configuration-file "JxrDecode_Config.h"
+if (IS_BIG_ENDIAN)
+ set(jxrdecode_ISBIGENDIANHOST 1)
+else()
+ set(jxrdecode_ISBIGENDIANHOST 0)
+endif()
+if (CRASH_ON_UNALIGNED_ACCESS)
+  set (jxrdecode_CrashOnUnalignedIntegers 1)
+else()
+  set (jxrdecode_CrashOnUnalignedIntegers 0)
+endif()
+configure_file (
+  "${CMAKE_CURRENT_SOURCE_DIR}/JxrDecode_Config.h.in"
+  "${CMAKE_CURRENT_BINARY_DIR}/JxrDecode_Config.h"
+  ESCAPE_QUOTES @ONLY)
+target_include_directories(JxrDecodeStatic PRIVATE  "${CMAKE_CURRENT_BINARY_DIR}") # for JxrDecode_Config.h to be found
 
 set_target_properties(JxrDecodeStatic PROPERTIES CXX_STANDARD 11)
 
 # shared libraries need PIC
 set_property(TARGET JxrDecodeStatic PROPERTY POSITION_INDEPENDENT_CODE ON)
 
+#[[
 if (IS_BIG_ENDIAN)
  target_compile_definitions(JxrDecodeStatic PRIVATE _BIG__ENDIAN_)
 endif(IS_BIG_ENDIAN)
@@ -109,3 +132,4 @@ endif(IS_BIG_ENDIAN)
 if (CRASH_ON_UNALIGNED_ACCESS)
 	target_compile_definitions(JxrDecodeStatic PRIVATE _NO_UNALIGNED_LOAD_)
 endif()
+]]#
