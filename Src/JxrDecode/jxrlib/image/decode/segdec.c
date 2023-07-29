@@ -366,7 +366,7 @@ static Void DecodeCBP(CWMImageStrCodec* pSC, CCodingContext* pContext)
         pAHexpt[7-8] == <lev | continuous> condition on SRn no use
 *************************************************************************/
 
-Int _FORCEINLINE DecodeSignificantRun(Int iMaxRun, struct CAdaptiveHuffman* pAHexpt, BitIOInfo* pIO)
+static Int _FORCEINLINE DecodeSignificantRun(Int iMaxRun, struct CAdaptiveHuffman* pAHexpt, BitIOInfo* pIO)
 {
     Int iIndex;
     static const Int aRemap[] = { 1,2,3,5,7,   1,2,3,5,7,   /*1,2,3,4,6,  */1,2,3,4,5 };
