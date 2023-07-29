@@ -26,7 +26,17 @@
 //
 //*@@@---@@@@******************************************************************
 #include "strcodec.h"
+#include <JxrDecode_Config.h>
 //#include "perfTimer.h"
+#if JXRDECODE_HAS_BUILTIN_BSWAP32
+#include <byteswap.h>
+#endif
+#if JXRDECODE_HAS_BYTESWAP_IN_STDLIB
+#include <stdlib.h>
+#endif
+#if JXRDECODE_HAS_BSWAP_LONG_IN_SYS_ENDIAN
+#include <sys/endian.h>
+#endif
 
 #ifdef MEM_TRACE
 #define TRACE_MALLOC    1
@@ -664,7 +674,7 @@ ERR detach_SB(SimpleBitIO* pSB)
 //================================================================
 // Memory access functions
 //================================================================
-#if (defined(WIN32) && !defined(UNDER_CE)) || (defined(UNDER_CE) && defined(_ARM_))
+/*#if (defined(WIN32) && !defined(UNDER_CE)) || (defined(UNDER_CE) && defined(_ARM_))
 // WinCE ARM and Desktop x86
 #else
 // other platform
@@ -683,10 +693,30 @@ U32 _byteswap_ulong(U32 bits)
 }
 #endif // _MSC_VER
 #endif // _BIG__ENDIAN_
+#endif*/
+#if JXRDECODE_ISBIGENDIANHOST
+#define jxr_byteswap_ulong(x)  (x)
+#else
+    U32 jxr_byteswap_ulong(U32 bits)
+    {
+        #if JXRDECODE_HAS_BUILTIN_BSWAP32
+        return __builtin_bswap32(bits);
+        #elif JXRDECODE_HAS_BYTESWAP_IN_STDLIB
+        return _byteswap_ulong(bits);
+        #elif JXRDECODE_HAS_BSWAP_LONG_IN_SYS_ENDIAN
+        return bswap_32(v);
+        #else
+        return (((bits & 0xff000000u) >> 24) |
+            ((bits & 0x00ff0000u) >> 8) |
+            ((bits & 0x0000ff00u) << 8) |
+            ((bits & 0x000000ffu) << 24));
+        #endif
+    }
 #endif
 
 U32 load4BE(void* pv)
 {
+    /*
 #ifdef _BIG__ENDIAN_
     return (*(U32*)pv);
 #else // _BIG__ENDIAN_
@@ -701,15 +731,56 @@ U32 load4BE(void* pv)
     return _byteswap_ulong(v);
 #endif // _M_IA64
 #endif // _BIG__ENDIAN_
+    */
+#if JXRDECODE_ISBIGENDIANHOST
+    // on a big-endian host, we have nothing to do, so just load the value
+#if JXRDECODE_SIGBUS_ON_UNALIGNEDINTEGERS
+    U32 v;
+    memcpy(&v, pv, 4);
+    return v;
+#else
+    return (*(U32*)pv);
+#endif
+#else // JXRDECODE_ISBIGENDIANHOST
+    // on a little endian machine, we need to swap the bytes
+    U32 v;
+#if JXRDECODE_SIGBUS_ON_UNALIGNEDINTEGERS
+    memcpy(&v, pv, 4);
+#else
+    v = (*(U32*)pv);
+#endif
+
+    // ...and use the appropriate byte-swapping function
+#if JXRDECODE_HAS_BUILTIN_BSWAP32
+    return __builtin_bswap32(v);
+#elif JXRDECODE_HAS_BYTESWAP_IN_STDLIB
+    return _byteswap_ulong(v);
+#elif JXRDECODE_HAS_BSWAP_LONG_IN_SYS_ENDIAN
+    return bswap_32(v);
+#else
+    return (((v & 0xff000000u) >> 24) |
+        ((v & 0x00ff0000u) >> 8) |
+        ((v & 0x0000ff00u) << 8) |
+        ((v & 0x000000ffu) << 24));
+#endif
+#endif
 }
 
 #define LOAD16 load4BE
 
+/*
 #ifdef _BIG__ENDIAN_
 #define WRITESWAP_ENDIAN(a) ((a)>>16)
 #else // _BIG__ENDIAN_
 #define WRITESWAP_ENDIAN(a)	_byteswap_ulong(a)
 #endif // _BIG__ENDIAN_
+*/
+#if JXRDECODE_ISBIGENDIANHOST
+ #define WRITESWAP_ENDIAN(a) ((a)>>16)
+#else
+ #define WRITESWAP_ENDIAN(a) jxr_byteswap_ulong(a)
+#endif
+
 
 //================================================================
 // Bit I/O functions 

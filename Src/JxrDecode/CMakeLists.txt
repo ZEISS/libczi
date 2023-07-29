@@ -119,8 +119,7 @@ else()
   set (jxrdecode_CrashOnUnalignedIntegers 0)
 endif()
 # c.f. https://stackoverflow.com/questions/41770887/cross-platform-definition-of-byteswap-uint64-and-byteswap-ulong
-set (CMAKE_REQUIRED_INCLUDES byteswap.h)
-#check_function_exists(__builtin_bswap32  jxrdecode_Has_builtin_bswap32)
+# not exactly sure why check_symbol_exists() does not work here, but it does not for me - so we do it the hard way and try to compile a test program
 check_c_source_compiles(
 		"#include <byteswap.h>
 		 int main() {__builtin_bswap32(0x12345678);}"
