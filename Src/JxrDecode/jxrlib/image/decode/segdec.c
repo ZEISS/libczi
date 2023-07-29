@@ -45,14 +45,7 @@ extern const int blkOffset[16];
 extern const int blkOffsetUV[4];
 static Int DecodeSignificantAbsLevel(struct CAdaptiveHuffman* pAHexpt, BitIOInfo* pIO);
 
-//#undef X86OPT_INLINE
-
-//#ifdef X86OPT_INLINE
-//#define _FORCEINLINE __forceinline
-//#else // X86OPT_INLINE
-//#define _FORCEINLINE
-//#endif // X86OPT_INLINE
-#define _FORCEINLINE __forceinline
+#define _FORCEINLINE inline
 
 //================================================================
 // Memory access functions
@@ -405,13 +398,8 @@ Int _FORCEINLINE DecodeSignificantRun(Int iMaxRun, struct CAdaptiveHuffman* pAHe
     return iRun;
 }
 
-#ifndef X86OPT_INLINE
-static Void DecodeFirstIndex(Int* pIndex, struct CAdaptiveHuffman* pAHexpt,
+static _FORCEINLINE Void DecodeFirstIndex(Int* pIndex, struct CAdaptiveHuffman* pAHexpt,
     BitIOInfo* pIO)
-#else
-static __forceinline Void DecodeFirstIndex(Int* pIndex, struct CAdaptiveHuffman* pAHexpt,
-    BitIOInfo* pIO)
-#endif
 {
     Int iIndex;
     iIndex = getHuff(pAHexpt->m_hufDecTable, pIO);
@@ -420,13 +408,8 @@ static __forceinline Void DecodeFirstIndex(Int* pIndex, struct CAdaptiveHuffman*
     *pIndex = iIndex;
 }
 
-#ifndef X86OPT_INLINE
-static Void DecodeIndex(Int* pIndex, Int iLoc, struct CAdaptiveHuffman* pAHexpt,
-    BitIOInfo* pIO)
-#else
-static __forceinline Void DecodeIndex(Int* pIndex, Int iLoc,
+static _FORCEINLINE Void DecodeIndex(Int* pIndex, Int iLoc,
     struct CAdaptiveHuffman* pAHexpt, BitIOInfo* pIO)
-#endif
 {
     Int iIndex;
     if (iLoc < 15) {
@@ -752,7 +735,7 @@ static _FORCEINLINE Int DecodeCoeffs(CWMImageStrCodec* pSC, CCodingContext* pCon
 /*************************************************************************
     DecodeSignificantAbsLevel
 *************************************************************************/
-static __forceinline Int DecodeSignificantAbsLevel(struct CAdaptiveHuffman* pAHexpt, BitIOInfo* pIO)
+static _FORCEINLINE Int DecodeSignificantAbsLevel(struct CAdaptiveHuffman* pAHexpt, BitIOInfo* pIO)
 {
     UInt iIndex;
     Int iFixed, iLevel;
