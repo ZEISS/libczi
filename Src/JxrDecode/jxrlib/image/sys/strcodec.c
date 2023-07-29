@@ -674,26 +674,6 @@ ERR detach_SB(SimpleBitIO* pSB)
 //================================================================
 // Memory access functions
 //================================================================
-/*#if (defined(WIN32) && !defined(UNDER_CE)) || (defined(UNDER_CE) && defined(_ARM_))
-// WinCE ARM and Desktop x86
-#else
-// other platform
-#ifdef _BIG__ENDIAN_
-#define _byteswap_ulong(x)  (x)
-#else // _BIG__ENDIAN_
-#if _MSC_VER < 1924
-U32 _byteswap_ulong(U32 bits)
-{
-    U32 r = (bits & 0xffu) << 24;
-    r |= (bits << 8) & 0xff0000u;
-    r |= ((bits >> 8) & 0xff00u);
-    r |= ((bits >> 24) & 0xffu);
-
-    return r;
-}
-#endif // _MSC_VER
-#endif // _BIG__ENDIAN_
-#endif*/
 #if JXRDECODE_ISBIGENDIANHOST
 #define jxr_byteswap_ulong(x)  (x)
 #else
@@ -716,22 +696,6 @@ U32 _byteswap_ulong(U32 bits)
 
 U32 load4BE(void* pv)
 {
-    /*
-#ifdef _BIG__ENDIAN_
-    return (*(U32*)pv);
-#else // _BIG__ENDIAN_
-#if defined(_M_IA64) || defined(_ARM_)
-    U32  v;
-    v = ((U16*)pv)[0];
-    v |= ((U32)((U16*)pv)[1]) << 16;
-    return _byteswap_ulong(v);
-#else // _M_IA64
-    U32 v;
-    memcpy(&v, pv, sizeof(U32));
-    return _byteswap_ulong(v);
-#endif // _M_IA64
-#endif // _BIG__ENDIAN_
-    */
 #if JXRDECODE_ISBIGENDIANHOST
     // on a big-endian host, we have nothing to do, so just load the value
 #if JXRDECODE_SIGBUS_ON_UNALIGNEDINTEGERS
@@ -768,13 +732,6 @@ U32 load4BE(void* pv)
 
 #define LOAD16 load4BE
 
-/*
-#ifdef _BIG__ENDIAN_
-#define WRITESWAP_ENDIAN(a) ((a)>>16)
-#else // _BIG__ENDIAN_
-#define WRITESWAP_ENDIAN(a)	_byteswap_ulong(a)
-#endif // _BIG__ENDIAN_
-*/
 #if JXRDECODE_ISBIGENDIANHOST
  #define WRITESWAP_ENDIAN(a) ((a)>>16)
 #else
@@ -984,7 +941,6 @@ U8 dquantBits(U8 cQP)
     return (cQP < 2 ? 0 : (cQP < 4 ? 1 : (cQP < 6 ? 2 : (cQP < 10 ? 3 : 4))));
 }
 
-#ifndef ARMOPT_BITIO
 U32 peekBit16(BitIOInfo* pIO, U32 cBits)
 {
     PEEKBIT16(pIO, cBits);
@@ -1049,7 +1005,6 @@ U32 flushToByte(BitIOInfo* pIO)
 {
     return flushBit16(pIO, (16 - pIO->cBitsUsed) & 7);
 }
-#endif  // ARMOPT_BITIO
 
 //----------------------------------------------------------------
 Void putBit16z(BitIOInfo* pIO, U32 uiBits, U32 cBits)
@@ -1136,7 +1091,6 @@ U32 getPosRead(BitIOInfo* pIO)
 //================================================================
 // Block I/O functions
 //================================================================
-#ifndef ARMOPT_BITIO
 ERR attachISRead(BitIOInfo* pIO, struct WMPStream* pWS, CWMImageStrCodec* pSC)
 {
     UNREFERENCED_PARAMETER(pSC);
@@ -1146,10 +1100,8 @@ ERR attachISRead(BitIOInfo* pIO, struct WMPStream* pWS, CWMImageStrCodec* pSC)
     pIO->pbStart = (U8*)pIO - PACKETLENGTH * 2;
     pIO->pbCurrent = pIO->pbStart;
 
-    //PERFTIMER_STOP(pSC->m_fMeasurePerf, pSC->m_ptEncDecPerf);
     pWS->SetPos(pWS, pIO->offRef);
     pWS->Read(pWS, pIO->pbStart, PACKETLENGTH * 2);
-    //PERFTIMER_START(pSC->m_fMeasurePerf, pSC->m_ptEncDecPerf);
     pIO->offRef += PACKETLENGTH * 2;
 
     pIO->uiAccumulator = load4BE(pIO->pbStart);
@@ -1172,13 +1124,11 @@ ERR readIS(CWMImageStrCodec* pSC, BitIOInfo* pIO)
     {
         struct WMPStream* pWS = pIO->pWS;
 
-        //PERFTIMER_STOP(pSC->m_fMeasurePerf, pSC->m_ptEncDecPerf);
         //Call(0 != pIO->pWS->Read(pIO->pWS, pIO->pbStart, PACKETLENGTH));
         // TODO: add error checking code
         pWS->SetPos(pWS, pIO->offRef);
         pWS->Read(pWS, pIO->pbStart, PACKETLENGTH);
         pIO->offRef += PACKETLENGTH;
-        //PERFTIMER_START(pSC->m_fMeasurePerf, pSC->m_ptEncDecPerf);
 
         // make shadow copy for first 4B
         pIO->uiShadow = *(U32*)pIO->pbStart;
@@ -1211,7 +1161,6 @@ ERR detachISRead(CWMImageStrCodec* pSC, BitIOInfo* pIO)
 Cleanup:
     return err;
 }
-#endif  // ARMOPT_BITIO
 
 //----------------------------------------------------------------
 ERR attachISWrite(BitIOInfo* pIO, struct WMPStream* pWS)
@@ -1260,9 +1209,7 @@ ERR detachISWrite(CWMImageStrCodec* pSC, BitIOInfo* pIO)
     assert(0 == (pIO->cBitsUsed % 8));
     Call(writeIS_L1(pSC, pIO));
 
-    //PERFTIMER_STOP(pSC->m_fMeasurePerf, pSC->m_ptEncDecPerf);
     err = pIO->pWS->Write(pIO->pWS, pIO->pbStart, pIO->pbCurrent + pIO->cBitsUsed / 8 - pIO->pbStart);
-    //PERFTIMER_START(pSC->m_fMeasurePerf, pSC->m_ptEncDecPerf);
     Call(err);
 
     pIO->pWS = NULL;
@@ -1270,59 +1217,3 @@ Cleanup:
     return err;
 }
 
-#if false
-//=========================
-// Performance Measurement
-//=========================
-#ifndef DISABLE_PERF_MEASUREMENT
-
-void OutputIndivPerfTimer(struct PERFTIMERSTATE* pPerfTimer,
-    char* pszTimerName,
-    char* pszDescription,
-    float fltMegaPixels)
-{
-    //PERFTIMERRESULTS    rResults;
-    Bool                fResult;
-
-    fResult = FALSE;
-    printf("%s (%s): ", pszTimerName, pszDescription);
-    if (pPerfTimer)
-    {
-        fResult = PerfTimerGetResults(pPerfTimer, &rResults);
-        if (fResult)
-        {
-            printf("%.3f milliseconds, %.6f MP/sec\n", (float)rResults.iElapsedTime / 1000000,
-                1000000000 * fltMegaPixels / rResults.iElapsedTime);
-            if (rResults.iZeroTimeIntervals > 0)
-            {
-                printf("   *** WARNING: %d time intervals were measured as zero. "
-                    "This perf timer has insufficient precision!\n\n",
-                    (int)rResults.iZeroTimeIntervals);
-            }
-        }
-    }
-    if (FALSE == fResult)
-        printf("Results not available!\n");
-}
-
-
-void OutputPerfTimerReport(CWMImageStrCodec* pState)
-{
-    float               fltMegaPixels;
-
-    assert(pState->m_fMeasurePerf);
-
-    printf("***************************************************************************\n");
-    printf("* Perf Report\n");
-    printf("***************************************************************************\n\n");
-
-    fltMegaPixels = (float)pState->WMII.cWidth * pState->WMII.cHeight / 1000000;
-    printf("Image Width = %d, Height = %d, total MegaPixels = %.1f MP\n",
-        (int)pState->WMII.cWidth, (int)pState->WMII.cHeight, fltMegaPixels);
-
-    OutputIndivPerfTimer(pState->m_ptEncDecPerf, "m_ptEncDecPerf", "excl I/O", fltMegaPixels);
-    OutputIndivPerfTimer(pState->m_ptEndToEndPerf, "m_ptEndToEndPerf", "incl I/O", fltMegaPixels);
-}
-
-#endif // DISABLE_PERF_MEASUREMENT
-#endif  // false

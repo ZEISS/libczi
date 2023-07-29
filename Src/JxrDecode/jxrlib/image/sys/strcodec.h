@@ -33,56 +33,13 @@
 #include "windowsmediaphoto.h"
 #include "common.h"
 
-// added for Xcode PK universal binary
-#ifdef __ppc__
-#define _BIG__ENDIAN_
-#endif
+//================================================================
 
 //================================================================
-/*
-#ifdef ENABLE_OPTIMIZATIONS
-#if defined(WIN32) && !defined(_WIN64)
-#define WMP_OPT_SSE2
-
-#define WMP_OPT_CC_ENC
-//#define WMP_OPT_TRFM_ENC
-//#define WMP_OPT_QT
-
-#define WMP_OPT_CC_DEC
-#define WMP_OPT_TRFM_DEC
-
-#define X86OPT_INLINE
-
-#endif
-#endif // ENABLE_OPTIMIZATIONS
-*/
-
-//================================================================
-//#ifdef WIN32
-/*
-#if defined(WIN32) && !defined(UNDER_CE)   // WIN32 seems to be defined always in VS2005 for ARM platform
-#define PLATFORM_X86
-#include "..\x86\x86.h"
-#endif
-*/
 
 #ifndef UNREFERENCED_PARAMETER
 #define UNREFERENCED_PARAMETER(P) { (P) = (P); }
 #endif // UNREFERENCED_PARAMETER
-
-/*
-#ifdef UNDER_CE
-#define PLATFORM_WCE
-#include "arm.h"
-#endif
-*/
-
-/*
-#ifdef __ANSI__
-#define PLATFORM_ANSI
-#include "ansi.h"
-#endif
-*/
 
 #include "ansi.h"
 
@@ -92,13 +49,6 @@ typedef intptr_t INTPTR_T;
 //================================================================
 
 typedef uint64_t U64;
-#if false
-#ifdef PLATFORM_ANSI
-typedef unsigned long long U64;
-#else // PLATFORM_ANSI
-typedef unsigned __int64 U64;
-#endif // PLATFORM_ANSI
-#endif
 
 //================================================================
 #define MARKERCOUNT (PACKETLENGTH * 2)
@@ -184,18 +134,12 @@ typedef struct tagBitIOInfo
 
     U32 uiAccumulator;  // 32bit acc as bit field cache
     U32 cBitsUsed;  // # of bits used of acc, [0,16)
-#ifdef ARMOPT_BITIO
-    U32 cBitsUnused;  // # of bits remain unused in acc, [0,32]
-#endif
 
     I32 iMask;  // mask used simulate pointer wrap around
 
     U8* pbStart;    // start pointer
-#ifndef ARMOPT_BITIO
+
     U8* pbCurrent;  // current pointer
-#else
-    U32* pbCurrent;  // current pointer
-#endif
 
     struct WMPStream* pWS;  // pointer to WMPStream
     size_t offRef;  // reference offset on IStream,
@@ -333,9 +277,6 @@ struct tagPostProcInfo {
 };
 
 typedef struct CWMImageStrCodec {
-#ifdef ARMOPT_COLORCONVERSION_C
-    CWMImageStrInvCCParam InvCCParam;
-#endif
 
     size_t cbStruct;
 
@@ -479,14 +420,6 @@ typedef struct CWMImageStrCodec {
     //================================
     // Perf Timers
     //================================
-#if false    
-#ifndef DISABLE_PERF_MEASUREMENT
-    Bool            m_fMeasurePerf;
-    struct PERFTIMERSTATE* m_ptEndToEndPerf;   // Measures from Init to Term, including I/O
-    struct PERFTIMERSTATE* m_ptEncDecPerf;     // Measures time spent in ImageStrEncEncode/ImageStrDecDecode, excluding I/O
-#endif // DISABLE_PERF_MEASUREMENT
-#endif
-
     // postproc information for 2 MB rows: 0(previous row) 1(current row)
     struct tagPostProcInfo* pPostProcInfo[MAX_CHANNELS][2];
 } CWMImageStrCodec;
@@ -525,7 +458,6 @@ Void advanceOneMBRow(CWMImageStrCodec*);
 Int allocateBitIOInfo(CWMImageStrCodec*);
 Int setBitIOPointers(CWMImageStrCodec* pSC);
 
-#ifndef ARMOPT_BITIO
 U32 peekBit16(BitIOInfo* pIO, U32 cBits);
 U32 flushBit16(BitIOInfo* pIO, U32 cBits);
 U32 getBit16(BitIOInfo* pIO, U32 cBits);
@@ -533,7 +465,6 @@ U32 getBool16(BitIOInfo* pIO);
 I32 getBit16s(BitIOInfo* pIO, U32 cBits);
 U32 getBit32(BitIOInfo* pIO, U32 cBits);
 U32 flushToByte(BitIOInfo* pIO);
-#endif  // ARMOPT_BITIO
 
 Void putBit16z(BitIOInfo* pIO, U32 uiBits, U32 cBits);
 Void putBit16(BitIOInfo* pIO, U32 uiBits, U32 cBits);
@@ -546,9 +477,7 @@ U32 getSizeWrite(BitIOInfo* pIO);
 U32 getPosRead(BitIOInfo* pIO);
 
 // safe function, solely for the convenience of test code
-#ifndef ARMOPT_BITIO
 U32 getBit16_S(CWMImageStrCodec* pSC, BitIOInfo* pIO, U32 cBits);
-#endif  // ARMOPT_BITIO
 
 //================================================================
 // packet I/O
@@ -661,20 +590,6 @@ Void useLPQuantizer(CWMImageStrCodec*, size_t, size_t);
 Void formatQuantizer(CWMIQuantizer* pQuantizer[MAX_CHANNELS], U8, size_t, size_t, Bool, Bool);
 U8 dquantBits(U8);
 
-#ifdef ARMOPT_BITIO
-#define peekBit16   peekBits
-#define flushBit16  flushBits
-#define getBit16    getBits
-#define getBit32    getBits
-#define getBit16s   getBitsS
-#define getBool16(pIO) getBits(pIO, 1)   
-
-U32 peekBits(BitIOInfo* pIO, U32 cBits);
-void flushBits(BitIOInfo* pIO, U32 cBits);
-U32 getBits(BitIOInfo* pIO, U32 cBits);
-U32 getBitsS(BitIOInfo* pIO, U32 cBits);
-void flushToByte(BitIOInfo* pIO);
-#endif // ARMOPT_BITIO
 
 /*************************************************************************
     Bitio defines
@@ -691,6 +606,3 @@ void flushToByte(BitIOInfo* pIO);
     pIO->cBitsUsed &= 16 - 1;\
     pIO->uiAccumulator = LOAD16(pIO->pbCurrent) << pIO->cBitsUsed;\
     return 0;
-//    pIO->uiAccumulator = LOAD16(pIO->pbCurrent) & ((U32)(-1) >> pIO->cBitsUsed);\
-
-void OutputPerfTimerReport(CWMImageStrCodec* pState);

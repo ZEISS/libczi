@@ -30,12 +30,6 @@
 #include "decode.h"
 #include <JxrDecode_Config.h>
 
-#ifdef MEM_TRACE
-#define TRACE_MALLOC    1
-#define TRACE_NEW       0
-#define TRACE_HEAP      0
-#include "memtrace.h"
-#endif
 #if JXRDECODE_HAS_BUILTIN_BSWAP32
 #include <byteswap.h>
 #endif
@@ -53,11 +47,12 @@ static Int DecodeSignificantAbsLevel(struct CAdaptiveHuffman* pAHexpt, BitIOInfo
 
 //#undef X86OPT_INLINE
 
-#ifdef X86OPT_INLINE
+//#ifdef X86OPT_INLINE
+//#define _FORCEINLINE __forceinline
+//#else // X86OPT_INLINE
+//#define _FORCEINLINE
+//#endif // X86OPT_INLINE
 #define _FORCEINLINE __forceinline
-#else // X86OPT_INLINE
-#define _FORCEINLINE
-#endif // X86OPT_INLINE
 
 //================================================================
 // Memory access functions
@@ -96,22 +91,6 @@ static U32 _FORCEINLINE _load4(void* pv)
                 ((v & 0x000000ffu) << 24));
     #endif
 #endif
-
-
-//#ifdef _BIG__ENDIAN_
-//    return (*(U32*)pv);
-//#else // _BIG__ENDIAN_
-//#if defined(_M_IA64) || defined(_ARM_)
-//    U32  v;
-//    v = ((U16*)pv)[0];
-//    v |= ((U32)((U16*)pv)[1]) << 16;
-//    return _byteswap_ulong(v);
-//#else // _M_IA64
-//    U32 v;
-//    memcpy(&v, pv, sizeof(U32));
-//    return _byteswap_ulong(v);
-//#endif // _M_IA64
-//#endif // _BIG__ENDIAN_
 }
 
 static _FORCEINLINE U32 _peekBit16(BitIOInfo* pIO, U32 cBits)
@@ -153,7 +132,6 @@ Int getHuff(const short* pDecodeTable, BitIOInfo* pIO)
     return (iSymbolHuff);
 }
 
-#if 1
 static _FORCEINLINE U32 _getBool16(BitIOInfo* pIO)
 {
     U32 uiRet = pIO->uiAccumulator >> 31;//_peekBit16(pIO, 1);
@@ -187,10 +165,6 @@ static _FORCEINLINE I32 _getSign(BitIOInfo* pIO)
 
     return uiRet;
 }
-#else
-#define _getBool16(x)   _getBit16((x),1)
-#define _getSign(x)   (-_getBit16((x),1))
-#endif
 
 /** this function returns cBits if zero is read, or a signed value if first cBits are not all zero **/
 static _FORCEINLINE I32 _getBit16s(BitIOInfo* pIO, U32 cBits)
@@ -778,11 +752,7 @@ static _FORCEINLINE Int DecodeCoeffs(CWMImageStrCodec* pSC, CCodingContext* pCon
 /*************************************************************************
     DecodeSignificantAbsLevel
 *************************************************************************/
-#ifndef X86OPT_INLINE
-static Int DecodeSignificantAbsLevel(struct CAdaptiveHuffman* pAHexpt, BitIOInfo* pIO)
-#else
 static __forceinline Int DecodeSignificantAbsLevel(struct CAdaptiveHuffman* pAHexpt, BitIOInfo* pIO)
-#endif
 {
     UInt iIndex;
     Int iFixed, iLevel;
@@ -837,9 +807,8 @@ Int DecodeMacroblockLowpass(CWMImageStrCodec* pSC, CCodingContext* pContext,
     Int aRLCoeffs[32], iNumNonzero = 0, iIndex = 0;
     Int aLaplacianMean[2] = { 0, 0 }, * pLM = aLaplacianMean;
     Int iChannel, iCBP = 0;
-#ifndef ARMOPT_BITIO    // ARM opt always uses 32-bit version of getBits
     U32(*getBits)(BitIOInfo * pIO, U32 cBits) = _getBit16;
-#endif
+
     CWMIMBInfo* pMBInfo = &pSC->MBInfo;
     I32* aDC[MAX_CHANNELS];
 
@@ -905,11 +874,9 @@ Int DecodeMacroblockLowpass(CWMImageStrCodec* pSC, CCodingContext* pContext,
             iCBP |= (getBits(pIO, 1) << iChannel);
     }
 
-#ifndef ARMOPT_BITIO    // ARM opt always uses 32-bit version of getBits
     if (pContext->m_aModelLP.m_iFlcBits[0] > 14 || pContext->m_aModelLP.m_iFlcBits[1] > 14) {
         getBits = getBit32;
     }
-#endif
 
     for (iChannel = 0; iChannel < iFullPlanes; iChannel++) {
         PixelI* pCoeffs = aDC[iChannel];
