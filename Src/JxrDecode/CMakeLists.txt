@@ -143,6 +143,12 @@ if (NOT jxrdecode_Has_bswap_long_in_sys_endian)
   set (jxrdecode_Has_bswap_long_in_sys_endian 0)
 endif()
 
+check_symbol_exists(_rotl "stdlib.h" jxrdecode_Has_rotl)
+message("jxrdecode_Has_rotl = ${jxrdecode_Has_rotl}.")
+if (NOT jxrdecode_Has_rotl)
+	set (jxrdecode_Has_rotl 0)
+endif()
+
 configure_file (
   "${CMAKE_CURRENT_SOURCE_DIR}/JxrDecode_Config.h.in"
   "${CMAKE_CURRENT_BINARY_DIR}/JxrDecode_Config.h"
