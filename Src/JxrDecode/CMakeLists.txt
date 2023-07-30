@@ -143,10 +143,16 @@ if (NOT jxrdecode_Has_bswap_long_in_sys_endian)
   set (jxrdecode_Has_bswap_long_in_sys_endian 0)
 endif()
 
-check_symbol_exists(_rotl "stdlib.h" jxrdecode_Has_rotl)
-message("jxrdecode_Has_rotl = ${jxrdecode_Has_rotl}.")
-if (NOT jxrdecode_Has_rotl)
-	set (jxrdecode_Has_rotl 0)
+check_symbol_exists(_rotl "stdlib.h" jxrdecode_Has_rotl_with_stdlib)
+message("jxrdecode_Has_rotl_with_stdlib = ${jxrdecode_Has_rotl_with_stdlib}.")
+if (NOT jxrdecode_Has_rotl_with_stdlib)
+	set (jxrdecode_Has_rotl_with_stdlib 0)
+endif()
+
+check_symbol_exists(_rotl "x86intrin.h" jxrdecode_Has_rotl_with_x86intrin)
+message("jxrdecode_Has_rotl_with_x86intrin= ${jxrdecode_Has_rotl_with_x86intrin}.")
+if (NOT jxrdecode_Has_rotl_with_x86intrin)
+	set (jxrdecode_Has_rotl_with_x86intrin 0)
 endif()
 
 configure_file (
