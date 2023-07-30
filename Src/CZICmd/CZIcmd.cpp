@@ -62,6 +62,7 @@ public:
 int main(int argc, char** _argv)
 {
 #if defined(WIN32ENV)
+    CoInitialize(NULL);
     CommandlineArgsWindowsHelper args_helper;
 #endif
 #if defined(LINUXENV)

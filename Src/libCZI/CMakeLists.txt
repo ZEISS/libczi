@@ -215,13 +215,15 @@ else()
   FetchContent_Declare(
     zstd
     GIT_REPOSITORY https://github.com/facebook/zstd.git
-    GIT_TAG "v1.5.2"
+    GIT_TAG "v1.5.5"
   )
 
   if(NOT zstd_POPULATED)
     message(STATUS "Fetching zstd...")
     set(ZSTD_BUILD_PROGRAMS  OFF CACHE BOOL "" FORCE)
     set(ZSTD_BUILD_SHARED    OFF CACHE BOOL "" FORCE)
+    set(ZSTD_BUILD_TESTS     OFF CACHE BOOL "" FORCE)
+    set(ZSTD_BUILD_CONTRIB   OFF CACHE BOOL "" FORCE)
 
     FetchContent_Populate(zstd)
 

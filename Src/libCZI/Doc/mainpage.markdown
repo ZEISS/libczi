@@ -26,7 +26,7 @@ The code is written in C++11 and (so far) has been successfully compiled with
 
 It is intended to be easily portable to other platforms.   
 
-It aims to be thread-safe (by most [definitions](https://en.wikipedia.org/wiki/Thread_safety)) - which isn't too surprising since it only allows read-only functionality.
+It aims to be thread-safe (by most [definitions](https://en.wikipedia.org/wiki/Thread_safety)).
 The library itself does not leverage multithreading, but it is designed for being used in a multithreaded environment.
 
 Versioning of libCZI
@@ -38,8 +38,8 @@ For determining whether a change is a breaking one, the source code level is dec
 of re-compiling with the changed sources.
 A borderline case are maybe changes in the CMake-files - here the best judgement is to be applied whether a change in the compilation result will occur.
 
-Note that the number defined in the [project](https://cmake.org/cmake/help/latest/command/project.html#command:project) statement allows for four numbers: <tt><major>.<minor>.<patch>.<tweak></tt>. 
-The number for <tt><tweak></tt> has no semantic meaning.
+Note that the number defined in the [project](https://cmake.org/cmake/help/latest/command/project.html#command:project) statement allows for four numbers: <tt>\<major\>.\<minor\>.\<patch\>.\<tweak\></tt>. 
+The number for <tt>\<tweak\></tt> has no semantic meaning.
 
 
 CZI in a nutshell

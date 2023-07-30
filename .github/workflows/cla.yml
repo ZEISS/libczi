@@ -11,6 +11,9 @@ on:
       - labeled
       - unlabeled
 
+permissions:
+  contents: read
+
 jobs:
   # Based on https://stackoverflow.com/questions/71502652/prevent-merging-of-branch-conditionally-based-on-label
   fail-for-no-cla:

@@ -663,3 +663,75 @@ TEST(MetadataReading, DimensionInfoAtrribute1Test)
     ASSERT_TRUE(b);
     EXPECT_EQ(id.compare(L"Channel:1"), 0);
 }
+
+TEST(MetadataReading, AccessNodeWithIndexTest)
+{
+    auto mockMdSegment = make_shared<MockMetadataSegment>();
+    auto md = CreateMetaFromMetadataSegment(mockMdSegment.get());
+
+    EXPECT_TRUE(md->IsXmlValid()) << "Expected valid XML.";
+
+    auto node = md->GetChildNodeReadonly("ImageDocument/Metadata/DisplaySetting/Channels/Channel[0]");
+    ASSERT_TRUE(node);
+    wstring id;
+    wstring name;
+    EXPECT_TRUE(node->TryGetAttribute(L"Id", &id));
+    EXPECT_TRUE(node->TryGetAttribute(L"Name", &name));
+    EXPECT_EQ(id.compare(L"Channel:1"), 0);
+    EXPECT_EQ(name.compare(L"DAPI"), 0);
+
+    node = md->GetChildNodeReadonly("ImageDocument/Metadata/DisplaySetting/Channels/Channel[1]");
+    ASSERT_TRUE(node);
+    EXPECT_TRUE(node->TryGetAttribute(L"Id", &id));
+    EXPECT_TRUE(node->TryGetAttribute(L"Name", &name));
+    EXPECT_EQ(id.compare(L"Channel:2"), 0);
+    EXPECT_EQ(name.compare(L"QD655"), 0);
+
+    node = md->GetChildNodeReadonly("ImageDocument/Metadata/DisplaySetting/Channels/Channel[2]");
+    ASSERT_TRUE(node);
+    EXPECT_TRUE(node->TryGetAttribute(L"Id", &id));
+    EXPECT_TRUE(node->TryGetAttribute(L"Name", &name));
+    EXPECT_EQ(id.compare(L"Channel:3"), 0);
+    EXPECT_EQ(name.compare(L"QD605"), 0);
+
+    node = md->GetChildNodeReadonly("ImageDocument/Metadata/DisplaySetting/Channels/Channel[3]");
+    ASSERT_TRUE(node);
+    EXPECT_TRUE(node->TryGetAttribute(L"Id", &id));
+    EXPECT_TRUE(node->TryGetAttribute(L"Name", &name));
+    EXPECT_EQ(id.compare(L"Channel:4"), 0);
+    EXPECT_EQ(name.compare(L"QD705"), 0);
+
+    node = md->GetChildNodeReadonly("ImageDocument/Metadata/DisplaySetting/Channels/Channel[4]");
+    ASSERT_TRUE(node);
+    EXPECT_TRUE(node->TryGetAttribute(L"Id", &id));
+    EXPECT_TRUE(node->TryGetAttribute(L"Name", &name));
+    EXPECT_EQ(id.compare(L"Channel:5"), 0);
+    EXPECT_EQ(name.compare(L"QD565"), 0);
+}
+
+TEST(MetadataReading, AccessNodeWithInvalidIndexAndExpectExceptionTest)
+{
+    auto mockMdSegment = make_shared<MockMetadataSegment>();
+    auto md = CreateMetaFromMetadataSegment(mockMdSegment.get());
+
+    EXPECT_TRUE(md->IsXmlValid()) << "Expected valid XML.";
+
+    EXPECT_THROW(
+        md->GetChildNodeReadonly("ImageDocument/Metadata/DisplaySetting/Channels/Channel[5]"),
+        libCZI::LibCZIMetadataException);
+    EXPECT_THROW(
+        md->GetChildNodeReadonly("ImageDocument/Metadata/DisplaySetting/Channels/Channel[4958123987]"),
+        libCZI::LibCZIMetadataException);
+    EXPECT_THROW(
+        md->GetChildNodeReadonly("ImageDocument/Metadata/DisplaySetting/Channels/Channel[495812394234234587]"),
+        libCZI::LibCZIMetadataException);
+    EXPECT_THROW(
+        md->GetChildNodeReadonly("ImageDocument/Metadata/DisplaySetting/Channels/Channel[2 3]"),
+        libCZI::LibCZIMetadataException);
+    EXPECT_THROW(
+        md->GetChildNodeReadonly("ImageDocument/Metadata/DisplaySetting/Channels/Channel[+3]"),
+        libCZI::LibCZIMetadataException);
+    EXPECT_THROW(
+        md->GetChildNodeReadonly("ImageDocument/Metadata/DisplaySetting/Channels/Channel[-3]"),
+        libCZI::LibCZIMetadataException);
+}

@@ -13,7 +13,7 @@ using namespace libCZI;
 {
     ScopedBitmapLockerP srcLck{ source };
     ScopedBitmapLockerP dstLck{ dest };
-    CBitmapOperations::CopyOffsetedInfo info;
+    CBitmapOperations::CopyWithOffsetInfo info;
     info.xOffset = x;
     info.yOffset = y;
     info.srcPixelType = source->GetPixelType();
@@ -30,7 +30,7 @@ using namespace libCZI;
 
     info.drawTileBorder = drawTileBorder;
 
-    CBitmapOperations::CopyOffseted(info);
+    CBitmapOperations::CopyWithOffset(info);
 }
 
 /*-----------------------------------------------------------------------------------------------*/

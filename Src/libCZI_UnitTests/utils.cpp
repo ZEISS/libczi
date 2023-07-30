@@ -306,6 +306,20 @@ std::shared_ptr<libCZI::IBitmapData> CreateTestBitmap(libCZI::PixelType pixeltyp
     return bm;
 }
 
+std::shared_ptr<libCZI::IBitmapData> CreateGray8BitmapAndFill(std::uint32_t width, std::uint32_t height, uint8_t value)
+{
+    auto bm = make_shared<CMemBitmapWrapper>(PixelType::Gray8, width, height);
+    ScopedBitmapLockerSP lckBm{ bm };
+    uint8_t* data = reinterpret_cast<uint8_t*>(lckBm.ptrDataRoi);
+    for (uint32_t y = 0; y < height; ++y)
+    {
+        uint8_t* dst = data + (static_cast<size_t>(lckBm.stride) * y);
+        memset(dst, value, width);
+    }
+
+    return bm;
+}
+
 std::shared_ptr<libCZI::IBitmapData> CreateRandomBitmap(libCZI::PixelType pixeltype, std::uint32_t width, std::uint32_t height)
 {
     ::srand(::time(nullptr));

@@ -74,7 +74,7 @@ using namespace std;
     return false;
 }
 
-/*virtual*/std::shared_ptr<IXmlNodeRead> CNodeWrapper::GetChildNodeReadonly(const char* path)
+pugi::xml_node CNodeWrapper::GetChildNodePathMustExist(const char* path)
 {
     auto p = Utilities::convertUtf8ToWchar_t(path);
     vector<std::wstring> tokens;
@@ -89,32 +89,43 @@ using namespace std;
         throw LibCZIMetadataBuilderException("invalid path", LibCZIMetadataBuilderException::ErrorType::InvalidPath);
     }
 
-    auto node = this->GetOrCreateChildElementNodeWithAttributes(tokens[0], false);
+    auto node = XmlPathSpecifierUtilities<MetadataBuilderXmlNodeWrapperThrowExcp>::GetChildElementNodeWithAttributes(this->node, tokens[0]);
     if (!node)
     {
-        return nullptr;
+        return {};
     }
 
     for (size_t i = 1; i < tokens.size(); ++i)
     {
-        node = CNodeWrapper::GetOrCreateChildElementNodeWithAttributes(node, tokens[i].c_str(), false);
+        node = XmlPathSpecifierUtilities<MetadataBuilderXmlNodeWrapperThrowExcp>::GetChildElementNodeWithAttributes(node, tokens[i]);
         if (!node)
         {
-            return nullptr;
+            return {};
         }
     }
 
-    return std::make_shared<XmlNodeWrapperReadonly<CCZiMetadataBuilder, MetadataBuilderXmlNodeWrapperThrowExcp> >(this->builderRef, node.internal_object());
+    return node;
+}
+
+/*virtual*/std::shared_ptr<IXmlNodeRead> CNodeWrapper::GetChildNodeReadonly(const char* path)
+{
+    const auto child_node = this->GetChildNodePathMustExist(path);
+    if (!child_node)
+    {
+        return nullptr;
+    }
+
+    return std::make_shared<XmlNodeWrapperReadonly<CCZiMetadataBuilder, MetadataBuilderXmlNodeWrapperThrowExcp>>(this->builderRef, child_node.internal_object());
 }
 
 /*virtual*/void CNodeWrapper::EnumChildren(const std::function<bool(std::shared_ptr<IXmlNodeRead>)>& enumChildren)
 {
-    for (pugi::xml_node childNode = this->node.first_child(); childNode; childNode = childNode.next_sibling())
+    for (pugi::xml_node child_node = this->node.first_child(); child_node; child_node = child_node.next_sibling())
     {
-        if (childNode.type() == pugi::xml_node_type::node_element)
+        if (child_node.type() == pugi::xml_node_type::node_element)
         {
-            bool b = enumChildren(
-                std::make_shared<XmlNodeWrapperReadonly<CCZiMetadataBuilder, MetadataBuilderXmlNodeWrapperThrowExcp> >(this->builderRef, childNode.internal_object()));
+            const bool b = enumChildren(
+                std::make_shared<XmlNodeWrapperReadonly<CCZiMetadataBuilder, MetadataBuilderXmlNodeWrapperThrowExcp>>(this->builderRef, child_node.internal_object()));
             if (!b)
             {
                 break;
@@ -130,12 +141,18 @@ using namespace std;
 
 /*virtual*/std::shared_ptr<IXmlNodeRw> CNodeWrapper::GetOrCreateChildNode(const char* path)
 {
-    return this->GetOrCreateChildNode(path, true);
+    return this->GetOrCreateChildNodeInternal(path);
 }
 
 /*virtual*/std::shared_ptr<IXmlNodeRw> CNodeWrapper::GetChildNode(const char* path)
 {
-    return this->GetOrCreateChildNode(path, false);
+    const auto child_node = this->GetChildNodePathMustExist(path);
+    if (!child_node)
+    {
+        return nullptr;
+    }
+
+    return std::make_shared<CNodeWrapper>(this->builderRef, child_node.internal_object());
 }
 
 /*virtual*/void CNodeWrapper::SetValue(const char* str)
@@ -217,7 +234,7 @@ using namespace std;
 
 //--------------------------------------------------------------------------------------
 
-std::shared_ptr<IXmlNodeRw> CNodeWrapper::GetOrCreateChildNode(const char* path, bool allowCreation)
+std::shared_ptr<IXmlNodeRw> CNodeWrapper::GetOrCreateChildNodeInternal(const char* path)
 {
     auto p = Utilities::convertUtf8ToWchar_t(path);
 
@@ -233,7 +250,7 @@ std::shared_ptr<IXmlNodeRw> CNodeWrapper::GetOrCreateChildNode(const char* path,
         throw LibCZIMetadataBuilderException("invalid path", LibCZIMetadataBuilderException::ErrorType::InvalidPath);
     }
 
-    auto node = this->GetOrCreateChildElementNodeWithAttributes(tokens[0], allowCreation);
+    auto node = this->GetOrCreateChildElementNodeWithAttributes(this->node, tokens[0]);
     if (!node)
     {
         return nullptr;
@@ -241,7 +258,7 @@ std::shared_ptr<IXmlNodeRw> CNodeWrapper::GetOrCreateChildNode(const char* path,
 
     for (size_t i = 1; i < tokens.size(); ++i)
     {
-        node = CNodeWrapper::GetOrCreateChildElementNodeWithAttributes(node, tokens[i].c_str(), allowCreation);
+        node = CNodeWrapper::GetOrCreateChildElementNodeWithAttributes(node, tokens[i]);
         if (!node)
         {
             return nullptr;
@@ -288,12 +305,7 @@ pugi::xml_node CNodeWrapper::GetOrCreatePcDataChild()
     attribute.set_value(Utilities::convertUtf8ToWchar_t(value).c_str());
 }
 
-pugi::xml_node CNodeWrapper::GetOrCreateChildElementNodeWithAttributes(const std::wstring& str, bool allowCreation)
-{
-    return CNodeWrapper::GetOrCreateChildElementNodeWithAttributes(this->node, str, allowCreation);
-}
-
-/*static*/pugi::xml_node CNodeWrapper::GetOrCreateChildElementNodeWithAttributes(pugi::xml_node& node, const std::wstring& str, bool allowCreation)
+/*static*/pugi::xml_node CNodeWrapper::GetOrCreateChildElementNodeWithAttributes(pugi::xml_node& node, const std::wstring& str)
 {
     std::wregex nodenameWihtAttribregex(LR"(([^\[\]]+)(\[([^\[\]]*)\])?)");
     std::wsmatch pieces_match;
@@ -308,12 +320,12 @@ pugi::xml_node CNodeWrapper::GetOrCreateChildElementNodeWithAttributes(const std
                 if (pieces_match[2].matched == false && pieces_match[3].matched == false)
                 {
                     // we only got a name ( not followed by [Id=abc] )
-                    return GetOrCreateChildElementNode(node, nodeName.c_str(), allowCreation);
+                    return GetOrCreateChildElementNode(node, nodeName.c_str());
                 }
                 else if (pieces_match[2].matched == true && pieces_match[3].matched == true)
                 {
                     const auto attribValuePairs = CNodeWrapper::ParseAttributes(pieces_match[3]);
-                    return GetOrCreateChildElementNodeWithAttributes(node, nodeName, attribValuePairs, allowCreation);
+                    return GetOrCreateChildElementNodeWithAttributes(node, nodeName, attribValuePairs);
                 }
             }
         }
@@ -322,12 +334,12 @@ pugi::xml_node CNodeWrapper::GetOrCreateChildElementNodeWithAttributes(const std
     throw LibCZIMetadataBuilderException("invalid path", LibCZIMetadataBuilderException::ErrorType::InvalidPath);
 }
 
-pugi::xml_node CNodeWrapper::GetOrCreateChildElementNode(const wchar_t* sz, bool allowCreation)
+pugi::xml_node CNodeWrapper::GetOrCreateChildElementNode(const wchar_t* sz)
 {
-    return CNodeWrapper::GetOrCreateChildElementNode(this->node, sz, allowCreation);
+    return CNodeWrapper::GetOrCreateChildElementNode(this->node, sz);
 }
 
-/*static*/pugi::xml_node CNodeWrapper::GetOrCreateChildElementNodeWithAttributes(pugi::xml_node& node, const std::wstring& str, const std::map<std::wstring, std::wstring>& attribs, bool allowCreation)
+/*static*/pugi::xml_node CNodeWrapper::GetOrCreateChildElementNodeWithAttributes(pugi::xml_node& node, const std::wstring& str, const std::map<std::wstring, std::wstring>& attribs)
 {
     struct find_element_node_and_attributes
     {
@@ -371,11 +383,6 @@ pugi::xml_node CNodeWrapper::GetOrCreateChildElementNode(const wchar_t* sz, bool
     auto c = node.find_child(find_element_node_and_attributes{ str.c_str(), attribs });
     if (!c)
     {
-        if (!allowCreation)
-        {
-            return xml_node();
-        }
-
         auto newNode = node.append_child(str.c_str());
         for (auto it = attribs.cbegin(); it != attribs.cend(); ++it)
         {
@@ -388,7 +395,7 @@ pugi::xml_node CNodeWrapper::GetOrCreateChildElementNode(const wchar_t* sz, bool
     return c;
 }
 
-/*static*/pugi::xml_node CNodeWrapper::GetOrCreateChildElementNode(pugi::xml_node& node, const wchar_t* sz, bool allowCreation)
+/*static*/pugi::xml_node CNodeWrapper::GetOrCreateChildElementNode(pugi::xml_node& node, const wchar_t* sz)
 {
     struct find_element_node
     {
@@ -408,11 +415,6 @@ pugi::xml_node CNodeWrapper::GetOrCreateChildElementNode(const wchar_t* sz, bool
     auto c = node.find_child(find_element_node{ sz });
     if (!c)
     {
-        if (!allowCreation)
-        {
-            return xml_node();
-        }
-
         return node.append_child(sz);
     }
 
@@ -542,7 +544,7 @@ CCZiMetadataBuilder::CCZiMetadataBuilder(const wchar_t* rootNodeName, const std:
 
         s.append("]");
 
-        auto channelNode = root->GetOrCreateChildNode(s.c_str());
+        const auto channelNode = root->GetOrCreateChildNode(s.c_str());
 
         auto pxlTypeIterator = pixelTypeForChannel.GetChannelIndexPixelTypeMap().find(ch);
         if (pxlTypeIterator != pixelTypeForChannel.GetChannelIndexPixelTypeMap().end())
@@ -570,7 +572,7 @@ CCZiMetadataBuilder::CCZiMetadataBuilder(const wchar_t* rootNodeName, const std:
 
 /*static*/void CMetadataPrepareHelper::FillImagePixelType(libCZI::ICziMetadataBuilder* builder, libCZI::PixelType pxlType)
 {
-    string pixelTypeString;;
+    string pixelTypeString;
     if (CMetadataPrepareHelper::TryConvertToXmlMetadataPixelTypeString(pxlType, pixelTypeString))
     {
         auto node = builder->GetRootNode()->GetOrCreateChildNode("Metadata/Information/Image/PixelType");
@@ -611,7 +613,7 @@ CCZiMetadataBuilder::CCZiMetadataBuilder(const wchar_t* rootNodeName, const std:
         break;
     default:
         return false;
-    };
+    }
 
     return true;
 }
@@ -667,7 +669,6 @@ bool libCZI::XmlDateTime::IsValid() const
 /*static*/bool libCZI::XmlDateTime::TryParse(const char* sz, libCZI::XmlDateTime* ptrDateTime)
 {
     // cf. https://www.oreilly.com/library/view/regular-expressions-cookbook/9781449327453/ch04s07.html
-    //static const char* regexStr = "^(?<year>-?(?:[1-9][0-9]*)?[0-9]{4})-(?<month>1[0-2]|0[1-9])-(?<day>3[01]|0[1-9]|[12][0-9])T(?<hour>2[0-3]|[01][0-9]):(?<minute>[0-5][0-9]):(?<second>[0-5][0-9])(?<ms>\.[0-9]+)?(?<timezone>Z|[+-](?:2[0-3]|[01][0-9]):[0-5][0-9])?$";
     static const char* regexStr = R"((-?(?:[1-9][0-9]*)?[0-9]{4})-(1[0-2]|0[1-9])-(3[01]|0[1-9]|[12][0-9])T(2[0-3]|[01][0-9]):([0-5][0-9]):([0-5][0-9])(\.[0-9]+)?(Z|[+-](?:2[0-3]|[01][0-9]):[0-5][0-9])?)";
 
     auto str = Utilities::Trim(sz);
@@ -767,7 +768,7 @@ bool libCZI::XmlDateTime::IsValid() const
         [&](libCZI::DimensionIndex dim, int start, int size)->bool
         {
             MetadataUtils::WriteDimensionSize(builder, dim, size);
-    return true;
+            return true;
         });
 
     if (statistics.IsMIndexValid())
@@ -936,7 +937,7 @@ bool libCZI::XmlDateTime::IsValid() const
     }
 }
 
-/*static*/void libCZI::MetadataUtils::WriteDisplaySettings(libCZI::ICziMetadataBuilder* builder, const libCZI::IDisplaySettings* display_settings)
+/*static*/void libCZI::MetadataUtils::WriteDisplaySettings(libCZI::ICziMetadataBuilder* builder, const libCZI::IDisplaySettings* display_settings, const std::map<int, PixelType>* channel_pixel_type)
 {
     // we determine the highest channel-number that we find in the display-settings object
     int max_channel_index_in_display_settings = 0;
@@ -948,13 +949,13 @@ bool libCZI::XmlDateTime::IsValid() const
                 max_channel_index_in_display_settings = channel_index;
             }
 
-    return true;
+            return true;
         });
 
-    MetadataUtils::WriteDisplaySettings(builder, display_settings, 1 + max_channel_index_in_display_settings);
+    MetadataUtils::WriteDisplaySettings(builder, display_settings, 1 + max_channel_index_in_display_settings, channel_pixel_type);
 }
 
-static void WriteChannelDisplaySettings(const IChannelDisplaySetting* channel_display_setting, IXmlNodeRw* node)
+static void WriteChannelDisplaySettings(const IChannelDisplaySetting* channel_display_setting, IXmlNodeRw* node, const string& pixel_type)
 {
     node->GetOrCreateChildNode("IsSelected")->SetValueBool(channel_display_setting->GetIsEnabled());
 
@@ -962,6 +963,19 @@ static void WriteChannelDisplaySettings(const IChannelDisplaySetting* channel_di
     if (channel_display_setting->TryGetTintingColorRgb8(&tinting_color))
     {
         node->GetOrCreateChildNode("Color")->SetValue(Utilities::Rgb8ColorToString(tinting_color));
+        node->GetOrCreateChildNode("ColorMode")->SetValue("Color"); // instruct to use 'tinting'
+    }
+    else
+    {
+        node->GetOrCreateChildNode("ColorMode")->SetValue("None"); // instruct to 'disable tinting'
+
+        // For a non-tinted channel, we will add a 'PixelType'-node and put the pixel-type into it (if given),
+        //  this is done to support ARIVIS-CZI-reader which expects to find this node (although it is relying on
+        //  'undocumented behavior' here).
+        if (!pixel_type.empty())
+        {
+            node->GetOrCreateChildNode("PixelType")->SetValue(pixel_type);
+        }
     }
 
     float black_point, white_point;
@@ -1003,7 +1017,7 @@ static void WriteChannelDisplaySettings(const IChannelDisplaySetting* channel_di
     }
 }
 
-/*static*/void libCZI::MetadataUtils::WriteDisplaySettings(libCZI::ICziMetadataBuilder* builder, const libCZI::IDisplaySettings* display_settings, int channel_count)
+/*static*/void libCZI::MetadataUtils::WriteDisplaySettings(libCZI::ICziMetadataBuilder* builder, const libCZI::IDisplaySettings* display_settings, int channel_count, const std::map<int, PixelType>* channel_pixel_type)
 {
     const auto display_settings_channel_node = builder->GetRootNode()->GetOrCreateChildNode("Metadata/DisplaySetting/Channels");
 
@@ -1018,7 +1032,14 @@ static void WriteChannelDisplaySettings(const IChannelDisplaySetting* channel_di
         auto channel_node = display_settings_channel_node->AppendChildNode("Channel");
         if (channel_display_settings)
         {
-            WriteChannelDisplaySettings(channel_display_settings.get(), channel_node.get());
+            string pixel_type_string;
+            if (channel_pixel_type != nullptr && channel_pixel_type->find(c) != channel_pixel_type->end())
+            {
+                const PixelType pixel_type = channel_pixel_type->at(c);
+                CMetadataPrepareHelper::TryConvertToXmlMetadataPixelTypeString(pixel_type, pixel_type_string);
+            }
+
+            WriteChannelDisplaySettings(channel_display_settings.get(), channel_node.get(), pixel_type_string);
         }
     }
 }
