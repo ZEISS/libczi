@@ -16,3 +16,9 @@
 #define JXRDECODE_HAS_BUILTIN_BSWAP32 @jxrdecode_Has_builtin_bswap32@
 #define JXRDECODE_HAS_BYTESWAP_IN_STDLIB @jxrdecode_Has_byteswap_long_in_stdlib@
 #define JXRDECODE_HAS_BSWAP_LONG_IN_SYS_ENDIAN @jxrdecode_Has_bswap_long_in_sys_endian@
+
+// whether the "_rotl" function is available in the respective header file - here in <intrin.h>, which should be the case with MSVC
+#define JXRDECODE_HAS_ROTL_WITH_INTRIN_H @jxrdecode_Has_rotl_with_intrin@
+
+// whether the "_rotl" function is available in the respective header file - here in <x86intrin.h>, which should be the case with GCC
+#define JXRDECODE_HAS_ROTL_WITH_X86INTRIN_H @jxrdecode_Has_rotl_with_x86intrin@

@@ -54,13 +54,6 @@ typedef struct _GUID {
 #endif
 
 #define FAR
-/*#ifndef FAR
-#if defined(_WIN32) || defined(__ANSI__)
-#define FAR
-#else
-#define FAR _far
-#endif
-#endif*/
 
 #ifndef DECLSPEC_SELECTANY
 #if (_MSC_VER >= 1100)

@@ -31,13 +31,23 @@
 #include <JxrDecode_Config.h>
 
 #if JXRDECODE_HAS_BUILTIN_BSWAP32
-#include <byteswap.h>
+ #include <byteswap.h>
 #endif
 #if JXRDECODE_HAS_BYTESWAP_IN_STDLIB
  #include <stdlib.h>
 #endif
 #if JXRDECODE_HAS_BSWAP_LONG_IN_SYS_ENDIAN
  #include <sys/endian.h>
+#endif
+
+#if JXRDECODE_HAS_ROTL_WITH_INTRIN_H
+ #include <intrin.h>
+ #define CAN_USE_ROTL 1
+#elif JXRDECODE_HAS_ROTL_WITH_X86INTRIN_H
+ #include <x86intrin.h>
+ #define CAN_USE_ROTL 1
+#else
+ #define CAN_USE_ROTL 0
 #endif
 
 extern const int dctIndex[3][16];
@@ -940,16 +950,16 @@ Int DecodeMacroblockLowpass(CWMImageStrCodec* pSC, CCodingContext* pContext,
                 }
             }
             else {
-#ifdef WIN32
+#if CAN_USE_ROTL
                 const Int iMask = (1 << iModelBits) - 1;
-#endif // WIN32
+#endif // CAN_USE_ROTL
                 for (k = 1; k < 16; k++) {
-#ifdef WIN32
+#ifdef CAN_USE_ROTL
                     if (pCoeffs[k]) {
                         Int r1 = _rotl(pCoeffs[k], iModelBits);
                         pCoeffs[k] = (r1 ^ getBits(pIO, iModelBits)) - (r1 & iMask);
                     }
-#else // WIN32
+#else // CAN_USE_ROTL
                     if (pCoeffs[k] > 0) {
                         pCoeffs[k] <<= iModelBits;
                         pCoeffs[k] += getBits(pIO, iModelBits);
@@ -959,7 +969,7 @@ Int DecodeMacroblockLowpass(CWMImageStrCodec* pSC, CCodingContext* pContext,
                         pCoeffs[k] = -(-pCoeffs[k] << iModelBits);
                         pCoeffs[k] -= getBits(pIO, iModelBits);
                     }
-#endif // WIN32
+#endif // CAN_USE_ROTL
                     else {
                         //pCoeffs[k] = getBits (pIO, iModelBits);
                         //if (pCoeffs[k] && _getBool16 (pIO))
