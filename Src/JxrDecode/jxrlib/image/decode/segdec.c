@@ -1,14 +1,14 @@
 //*@@@+++@@@@******************************************************************
 //
-// Copyright © Microsoft Corp.
+// Copyright (C) Microsoft Corp.
 // All rights reserved.
 // 
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are met:
 // 
-// • Redistributions of source code must retain the above copyright notice,
+// * Redistributions of source code must retain the above copyright notice,
 //   this list of conditions and the following disclaimer.
-// • Redistributions in binary form must reproduce the above copyright notice,
+// * Redistributions in binary form must reproduce the above copyright notice,
 //   this list of conditions and the following disclaimer in the documentation
 //   and/or other materials provided with the distribution.
 // 
@@ -954,7 +954,7 @@ Int DecodeMacroblockLowpass(CWMImageStrCodec* pSC, CCodingContext* pContext,
                 const Int iMask = (1 << iModelBits) - 1;
 #endif // CAN_USE_ROTL
                 for (k = 1; k < 16; k++) {
-#ifdef CAN_USE_ROTL
+#if CAN_USE_ROTL
                     if (pCoeffs[k]) {
                         Int r1 = _rotl(pCoeffs[k], iModelBits);
                         pCoeffs[k] = (r1 ^ getBits(pIO, iModelBits)) - (r1 & iMask);
