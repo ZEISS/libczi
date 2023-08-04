@@ -246,7 +246,7 @@ Cleanup:
 }
 
 
-ERR StreamCalcIFDSize(struct WMPStream* pWS, U32 uIFDOfs, U32* pcbifd)
+ERR StreamCalcIFDSize(struct tagWMPStream* pWS, U32 uIFDOfs, U32* pcbifd)
 {
     ERR err = WMP_errSuccess;
     size_t offCurPos = 0;
@@ -471,7 +471,7 @@ Cleanup:
 // src IFD is little endian, arbitrary data arrangement
 // dst IFD is little endian, data arranged in tag order
 // dst IFD tags are ordered the same as src IFD so src IFD tags must be in order
-ERR StreamCopyIFD(struct WMPStream* pWS, U32 ofssrc, U8* pbdst, U32 cbdst, U32* pofsdst)
+ERR StreamCopyIFD(struct tagWMPStream* pWS, U32 ofssrc, U8* pbdst, U32 cbdst, U32* pofsdst)
 {
     ERR err = WMP_errSuccess;
     size_t offCurPos = 0;
@@ -588,7 +588,7 @@ Cleanup:
 
 //================================================================
 ERR GetUShort(
-    struct WMPStream* pWS,
+    struct tagWMPStream* pWS,
     size_t offPos,
     U16* puValue)
 {
@@ -606,7 +606,7 @@ Cleanup:
 }
 
 ERR PutUShort(
-    struct WMPStream* pWS,
+    struct tagWMPStream* pWS,
     size_t offPos,
     U16 uValue)
 {
@@ -623,7 +623,7 @@ Cleanup:
 }
 
 ERR GetULong(
-    struct WMPStream* pWS,
+    struct tagWMPStream* pWS,
     size_t offPos,
     U32* puValue)
 {
@@ -645,7 +645,7 @@ Cleanup:
 }
 
 ERR PutULong(
-    struct WMPStream* pWS,
+    struct tagWMPStream* pWS,
     size_t offPos,
     U32 uValue)
 {
@@ -666,7 +666,7 @@ Cleanup:
 }
 
 
-ERR ReadBinaryData(struct WMPStream* pWS,
+ERR ReadBinaryData(struct tagWMPStream* pWS,
                    const U32 uCount,
                    const U32 uValue,
                    U8** ppbData)
@@ -703,7 +703,7 @@ Cleanup:
 }
 
 
-ERR ReadPropvar(/*__in_ecount(1)*/ struct WMPStream* pWS,
+ERR ReadPropvar(/*__in_ecount(1)*/ struct tagWMPStream* pWS,
                 const U16 uType,
                 const U32 uCount,
                 const U32 uValue,
@@ -765,7 +765,7 @@ Cleanup:
 
 
 ERR WriteWmpDE(
-    /*__in_ecount(1)*/ struct WMPStream* pWS,
+    /*__in_ecount(1)*/ struct tagWMPStream* pWS,
     size_t* pOffPos,
     const/*__in_ecount(1)*/ WmpDE* pDE,
     const U8* pbData,

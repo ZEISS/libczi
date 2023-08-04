@@ -10,11 +10,11 @@
 using namespace libCZI;
 using namespace std;
 
-TEST(JxrDecode, Decode1)
+TEST(JxrDecode, DecodeBgr24)
 {
     auto dec = CJxrLibDecoder::Create();
     size_t sizeEncoded; int expectedWidth, expectedHeight;
-    auto ptrEncodedData = CTestImage::GetJpgXrCompressedImage(&sizeEncoded, &expectedWidth, &expectedHeight);
+    auto ptrEncodedData = CTestImage::GetJpgXrCompressedImage_Bgr24(&sizeEncoded, &expectedWidth, &expectedHeight);
     auto bmDecoded = dec->Decode(ptrEncodedData, sizeEncoded, libCZI::PixelType::Bgr24, expectedWidth, expectedHeight);
     EXPECT_EQ((uint32_t)expectedWidth, bmDecoded->GetWidth()) << "Width is expected to be equal";
     EXPECT_EQ((uint32_t)expectedHeight, bmDecoded->GetHeight()) << "Height is expected to be equal";
@@ -26,3 +26,21 @@ TEST(JxrDecode, Decode1)
     static const uint8_t expectedResult[16] = { 0x04,0x77,0x2f,0x32,0x2f,0x94,0x9b,0x07,0x0d,0x53,0xa5,0x24,0xea,0x64,0x5a,0x1a };
     EXPECT_TRUE(memcmp(hash, expectedResult, 16) == 0) << "Incorrect result";
 }
+
+TEST(JxrDecode, DecodeGray8)
+{
+    auto dec = CJxrLibDecoder::Create();
+    size_t sizeEncoded; int expectedWidth, expectedHeight;
+    auto ptrEncodedData = CTestImage::GetJpgXrCompressedImage_Gray8(&sizeEncoded, &expectedWidth, &expectedHeight);
+    auto bmDecoded = dec->Decode(ptrEncodedData, sizeEncoded, libCZI::PixelType::Gray8, expectedWidth, expectedHeight);
+    EXPECT_EQ((uint32_t)expectedWidth, bmDecoded->GetWidth()) << "Width is expected to be equal";
+    EXPECT_EQ((uint32_t)expectedHeight, bmDecoded->GetHeight()) << "Height is expected to be equal";
+    EXPECT_EQ(bmDecoded->GetPixelType(), PixelType::Gray8) << "Not the correct pixeltype.";
+
+    uint8_t hash[16] = { 0 };
+    Utils::CalcMd5SumHash(bmDecoded.get(), hash, sizeof(hash));
+
+    static const uint8_t expectedResult[16] = { 0x95, 0x4c, 0x70, 0x70, 0xae, 0xfb, 0x63, 0xc6, 0xc4, 0x0a, 0xb5, 0xec, 0xef, 0x73, 0x09, 0x8d };
+    EXPECT_TRUE(memcmp(hash, expectedResult, 16) == 0) << "Incorrect result";
+}
+

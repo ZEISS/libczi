@@ -436,9 +436,9 @@ Int StrIOEncInit(CWMImageStrCodec* pSC)
 #endif
         char* pFilename;
 
-        pSC->ppWStream = (struct WMPStream**)malloc(pSC->cNumBitIO * sizeof(struct WMPStream*));
+        pSC->ppWStream = (struct tagWMPStream**)malloc(pSC->cNumBitIO * sizeof(struct WMPStream*));
         if (pSC->ppWStream == NULL) return ICERR_ERROR;
-        memset(pSC->ppWStream, 0, pSC->cNumBitIO * sizeof(struct WMPStream*));
+        memset(pSC->ppWStream, 0, pSC->cNumBitIO * sizeof(struct tagWMPStream*));
 
         if (pSC->cmbHeight * pSC->cmbWidth * pSC->WMISCP.cChannel >= MAX_MEMORY_SIZE_IN_WORDS) {
 #ifdef _WINDOWS_
@@ -596,7 +596,7 @@ Int writeIndexTable(CWMImageStrCodec* pSC)
     return ICERR_OK;
 }
 
-Int copyTo(struct WMPStream* pSrc, struct WMPStream* pDst, size_t iBytes)
+Int copyTo(struct tagWMPStream* pSrc, struct tagWMPStream* pDst, size_t iBytes)
 {
     char pData[PACKETLENGTH];
 
@@ -669,7 +669,7 @@ Int StrIOEncTerm(CWMImageStrCodec* pSC)
 
     if (pSC->cNumBitIO > 0) {
         size_t i, j, k, l;
-        struct WMPStream* pDst = pSC->WMISCP.pWStream;
+        struct tagWMPStream* pDst = pSC->WMISCP.pWStream;
         size_t* pTable = pSC->pIndexTable;
 
         for (i = 0; i < pSC->cNumBitIO; i++) {

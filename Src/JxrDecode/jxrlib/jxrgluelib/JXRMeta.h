@@ -186,31 +186,31 @@ typedef struct tagWmpDEMisc
 
 //================================================================
 EXTERN_C ERR GetUShort(
-    struct WMPStream* pWS,
+    struct tagWMPStream* pWS,
     size_t offPos,
     U16* puValue
 );
 
 EXTERN_C ERR PutUShort(
-    struct WMPStream* pWS,
+    struct tagWMPStream* pWS,
     size_t offPos,
     U16 uValue
 );
 
 EXTERN_C ERR GetULong(
-    struct WMPStream* pWS,
+    struct tagWMPStream* pWS,
     size_t offPos,
     U32* puValue
 );
 
 EXTERN_C ERR PutULong(
-    struct WMPStream* pWS,
+    struct tagWMPStream* pWS,
     size_t offPos,
     U32 uValue
 );
 
 EXTERN_C ERR WriteWmpDE(
-    struct WMPStream* pWS,
+    struct tagWMPStream* pWS,
     size_t* pOffPos,
     const WmpDE* pDE,
     const U8* pbData,
@@ -218,7 +218,7 @@ EXTERN_C ERR WriteWmpDE(
 );
 
 
-EXTERN_C ERR ReadPropvar(struct WMPStream* pWS,
+EXTERN_C ERR ReadPropvar(struct tagWMPStream* pWS,
                          const U16 uType,
                          const U32 uCount,
                          const U32 uValue,
@@ -244,6 +244,6 @@ EXTERN_C ERR setbfdw(U8* pb, size_t cb, size_t ofs, U32 dw);
 EXTERN_C ERR setbfwbig(U8* pb, size_t cb, size_t ofs, U16 dw);
 EXTERN_C ERR setbfdwbig(U8* pb, size_t cb, size_t ofs, U32 dw);
 EXTERN_C ERR BufferCalcIFDSize(const U8* pb, size_t cb, U32 uIFDOfs, U8 endian, U32* pcbifd);
-EXTERN_C ERR StreamCalcIFDSize(struct WMPStream* pWS, U32 uIFDOfs, U32* pcbifd);
+EXTERN_C ERR StreamCalcIFDSize(struct tagWMPStream* pWS, U32 uIFDOfs, U32* pcbifd);
 EXTERN_C ERR BufferCopyIFD(const U8* pbsrc, U32 cbsrc, U32 ofssrc, U8 endian, U8* pbdest, U32 cbdest, U32* pofsdest);
-EXTERN_C ERR StreamCopyIFD(struct WMPStream* pWS, U32 ofssrc, U8* pbdest, U32 cbdest, U32* pofsdest);
+EXTERN_C ERR StreamCopyIFD(struct tagWMPStream* pWS, U32 ofssrc, U8* pbdest, U32 cbdest, U32* pofsdest);

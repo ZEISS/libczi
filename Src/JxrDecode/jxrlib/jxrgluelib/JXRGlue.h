@@ -310,8 +310,8 @@ extern "C" {
     {
         ERR(*CreateStream)(PKStream**);
 
-        ERR(*CreateStreamFromFilename)(struct WMPStream**, const char*, const char*);
-        ERR(*CreateStreamFromMemory)(struct WMPStream**, void*, size_t);
+        ERR(*CreateStreamFromFilename)(struct tagWMPStream**, const char*, const char*);
+        ERR(*CreateStreamFromMemory)(struct tagWMPStream**, void*, size_t);
 
         ERR(*Release)(PKFactory**);
     } PKFactory;
@@ -329,7 +329,7 @@ extern "C" {
         ERR(*CreateCodec)(const PKIID*, void**);
         ERR(*CreateDecoderFromFile)(const char*, PKImageDecode**);
         ERR(*CreateDecoderFromMemory)(char*, size_t, PKImageDecode**);
-        ERR(*CreateDecoderFromStream)(struct WMPStream*, PKImageDecode**);
+        ERR(*CreateDecoderFromStream)(struct tagWMPStream*, PKImageDecode**);
         ERR(*CreateFormatConverter)(PKFormatConverter**);
 
         ERR(*Release)(PKCodecFactory**);
@@ -355,7 +355,7 @@ extern "C" {
     typedef struct tagPKImageEncode
     {
         //ERR (*GetPixelFormat)(MILPixelFormat*));
-        ERR(*Initialize)(PKImageEncode*, struct WMPStream*, void*, size_t);
+        ERR(*Initialize)(PKImageEncode*, struct tagWMPStream*, void*, size_t);
         ERR(*Terminate)(PKImageEncode*);
 
         ERR(*SetPixelFormat)(PKImageEncode*, PKPixelFormatGUID);
@@ -370,7 +370,7 @@ extern "C" {
         ERR(*WriteSource)(PKImageEncode*, PKFormatConverter*, PKRect*);
 
         // Banded encode API - currently only implemented for WMP encoder
-        ERR(*WritePixelsBandedBegin)(PKImageEncode* pEncoder, struct WMPStream* pPlanarAlphaTempFile);
+        ERR(*WritePixelsBandedBegin)(PKImageEncode* pEncoder, struct tagWMPStream* pPlanarAlphaTempFile);
         ERR(*WritePixelsBanded)(PKImageEncode* pEncoder, U32 cLines, U8* pbPixels, U32 cbStride, Bool fLastCall);
         ERR(*WritePixelsBandedEnd)(PKImageEncode* pEncoder);
 #define TEMPFILE_COPYBUF_SIZE 8192  // Means when using tempfile for planar alpha banded encode, copy this many bytes at a time
@@ -381,7 +381,7 @@ extern "C" {
 
         ERR(*Release)(PKImageEncode**);
 
-        struct WMPStream* pStream;
+        struct tagWMPStream* pStream;
         size_t offStart;
 
         PKPixelFormatGUID guidPixFormat;
@@ -434,14 +434,14 @@ extern "C" {
 
             // Banded encode state variables
             BANDEDENCSTATE      eBandedEncState;
-            struct WMPStream* pPATempFile;
+            struct tagWMPStream* pPATempFile;
         } WMP;
     } PKImageEncode;
 
     //----------------------------------------------------------------
     ERR PKImageEncode_Create_WMP(PKImageEncode** ppIE);
 
-    ERR PKImageEncode_Initialize(PKImageEncode* pIE, struct WMPStream* pStream, void* pvParam, size_t cbParam);
+    ERR PKImageEncode_Initialize(PKImageEncode* pIE, struct tagWMPStream* pStream, void* pvParam, size_t cbParam);
     ERR PKImageEncode_Terminate(PKImageEncode* pIE);
     ERR PKImageEncode_SetPixelFormat(PKImageEncode* pIE, PKPixelFormatGUID enPixelFormat);
     ERR PKImageEncode_SetSize(PKImageEncode* pIE, I32 iWidth, I32 iHeight);
@@ -465,7 +465,7 @@ extern "C" {
     //================================================================
     typedef struct tagPKImageDecode
     {
-        ERR(*Initialize)(PKImageDecode*, struct WMPStream* pStream);
+        ERR(*Initialize)(PKImageDecode*, struct tagWMPStream* pStream);
 
         ERR(*GetPixelFormat)(PKImageDecode*, PKPixelFormatGUID*);
         ERR(*GetSize)(PKImageDecode*, I32*, I32*);
@@ -475,7 +475,7 @@ extern "C" {
         ERR(*GetDescriptiveMetadata)(PKImageDecode* pIE,
             DESCRIPTIVEMETADATA* pDescMetadata);
 
-        ERR(*GetRawStream)(PKImageDecode*, struct WMPStream**);
+        ERR(*GetRawStream)(PKImageDecode*, struct tagWMPStream**);
 
         ERR(*Copy)(PKImageDecode*, const PKRect*, U8*, U32);
 
@@ -484,7 +484,7 @@ extern "C" {
 
         ERR(*Release)(PKImageDecode**);
 
-        struct WMPStream* pStream;
+        struct tagWMPStream* pStream;
         Bool fStreamOwner;
         size_t offStart;
 
@@ -532,7 +532,7 @@ extern "C" {
     //----------------------------------------------------------------
     ERR PKImageDecode_Create_WMP(PKImageDecode** ppID);
 
-    ERR PKImageDecode_Initialize(PKImageDecode* pID, struct WMPStream* pStream);
+    ERR PKImageDecode_Initialize(PKImageDecode* pID, struct tagWMPStream* pStream);
     ERR PKImageDecode_GetPixelFormat(PKImageDecode* pID, PKPixelFormatGUID* pPF);
     ERR PKImageDecode_GetSize(PKImageDecode* pID, I32* piWidth, I32* piHeight);
     ERR PKImageDecode_GetResolution(PKImageDecode* pID, Float* pfrX, Float* pfrY);
@@ -551,7 +551,7 @@ extern "C" {
 
     ERR PKImageDecode_Create(PKImageDecode** ppID);
     ERR PKCodecFactory_CreateDecoderFromFile(const char* szFilename, PKImageDecode** ppDecoder);
-    ERR PKCodecFactory_CreateDecoderFromStream(struct WMPStream* pStream, PKImageDecode** ppDecoder);
+    ERR PKCodecFactory_CreateDecoderFromStream(struct tagWMPStream* pStream, PKImageDecode** ppDecoder);
 
     //================================================================
     typedef struct tagPKFormatConverter

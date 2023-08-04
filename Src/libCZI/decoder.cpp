@@ -39,11 +39,11 @@ std::shared_ptr<libCZI::IBitmapData> CJxrLibDecoder::Decode(const void* ptrData,
                 PixelType px_type;
                 switch (pixFmt)
                 {
-                case JxrDecode2::PixelFormat::_24bppBGR: px_type = PixelType::Bgr24; break;
-                case JxrDecode2::PixelFormat::_8bppGray: px_type = PixelType::Gray8; break;
-                case JxrDecode2::PixelFormat::_48bppRGB: px_type = PixelType::Bgr48; break;
-                case JxrDecode2::PixelFormat::_16bppGray: px_type = PixelType::Gray16; break;
-                case JxrDecode2::PixelFormat::_32bppGrayFloat: px_type = PixelType::Gray32Float; break;
+                case JxrDecode2::PixelFormat::kBgr24: px_type = PixelType::Bgr24; break;
+                case JxrDecode2::PixelFormat::kGray8: px_type = PixelType::Gray8; break;
+                case JxrDecode2::PixelFormat::kBgr48: px_type = PixelType::Bgr48; break;
+                case JxrDecode2::PixelFormat::kGray16: px_type = PixelType::Gray16; break;
+                //case JxrDecode2::PixelFormat::_32bppGrayFloat: px_type = PixelType::Gray32Float; break;
                 default: throw std::logic_error("need to look into these formats...");
                 }
 

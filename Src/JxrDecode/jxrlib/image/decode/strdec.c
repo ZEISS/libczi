@@ -219,7 +219,7 @@ Int readPackets(CWMImageStrCodec* pSC)
             for (k = 0; k < pSC->cNumBitIO; k++) {
                 if (pSC->ppWStream != NULL) { // new API
                     unsigned cBands = (pSC->WMISCP.bfBitstreamFormat == SPATIAL ? 1 : pSC->cSB);
-                    struct WMPStream** ppWS = pSC->ppWStream + (pSC->WMISCP.cNumOfSliceMinus1V + 1) * pSC->cTileRow * cBands
+                    struct tagWMPStream** ppWS = pSC->ppWStream + (pSC->WMISCP.cNumOfSliceMinus1V + 1) * pSC->cTileRow * cBands
                         + k / cBands * cBands + (k % cBands);
 
                     if (pSC->cTileRow > 0 && pSC->m_ppBitIO[k]->pWS != NULL)     // attached to the same packet of the tile on top
@@ -2954,7 +2954,7 @@ Int ReadWMIHeader(
     U32 i;
     ERR err = WMP_errSuccess;
     Bool bTilingPresent, bInscribed, bTileStretch, bAbbreviatedHeader;
-    struct WMPStream* pWS = pSCP->pWStream;
+    struct tagWMPStream* pWS = pSCP->pWStream;
 
     SimpleBitIO SB = { 0 };
     SimpleBitIO* pSB = &SB;

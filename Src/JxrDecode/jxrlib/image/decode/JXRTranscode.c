@@ -55,7 +55,7 @@ EXTERN_C Int WriteWMIHeader(CWMImageStrCodec*);
 EXTERN_C Int ReadImagePlaneHeader(CWMImageInfo*, CWMIStrCodecParam*, CCoreParameters*, SimpleBitIO*);
 EXTERN_C Int WriteImagePlaneHeader(CWMImageStrCodec*);
 EXTERN_C Int writeIndexTable(CWMImageStrCodec*);
-EXTERN_C Int copyTo(struct WMPStream*, struct WMPStream*, size_t);
+EXTERN_C Int copyTo(struct tagWMPStream*, struct tagWMPStream*, size_t);
 
 const static Bool bFlipV[O_MAX] = { FALSE, TRUE , FALSE, TRUE, TRUE , TRUE, FALSE, FALSE };
 const static Bool bFlipH[O_MAX] = { FALSE, FALSE, TRUE , TRUE, FALSE, TRUE, FALSE, TRUE };
@@ -471,7 +471,7 @@ Bool isTileExtraction(CWMImageStrCodec* pSC, CWMTranscodingParam* pParam)
     return FALSE;
 }
 
-Int WMPhotoTranscode(struct WMPStream* pStreamIn, struct WMPStream* pStreamOut, CWMTranscodingParam* pParam)
+Int WMPhotoTranscode(struct tagWMPStream* pStreamIn, struct tagWMPStream* pStreamOut, CWMTranscodingParam* pParam)
 {
     PixelI* pMBBuf, MBBufAlpha[256]; // shared buffer, decoder <=> encoder bridge
     PixelI* pFrameBuf = NULL, * pFrameBufAlpha = NULL;

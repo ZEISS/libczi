@@ -1269,7 +1269,7 @@ TEST(CziWriter, Writer13)
 
     size_t sizeCompressedBitmap;
     int widthCompressedBitmap, heightCompressedBitmap;
-    auto compressedBitmap = CTestImage::GetJpgXrCompressedImage(&sizeCompressedBitmap, &widthCompressedBitmap, &heightCompressedBitmap);
+    auto compressedBitmap = CTestImage::GetJpgXrCompressedImage_Bgr24(&sizeCompressedBitmap, &widthCompressedBitmap, &heightCompressedBitmap);
 
     AddSubBlockInfoMemPtr addSbBlkInfo;
     addSbBlkInfo.Clear();

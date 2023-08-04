@@ -211,7 +211,7 @@ ERR WriteDescMetadata(PKImageEncode* pIE,
 {
     ERR err = WMP_errSuccess;
     WmpDEMisc* pDEMisc = &pIE->WMP.wmiDEMisc;
-    struct WMPStream* pWS = pIE->pStream;
+    struct tagWMPStream* pWS = pIE->pStream;
     U32 uiMetadataOffsetSize = 0;
     U32 uiCount = 0;
     U32 uiDataWrittenToOffset = 0;
@@ -281,7 +281,7 @@ ERR WriteContainerPre(
 {
     ERR err = WMP_errSuccess;
     const U32 OFFSET_OF_PFD = 0x20;
-    struct WMPStream* pWS = pIE->pStream;
+    struct tagWMPStream* pWS = pIE->pStream;
     WmpDEMisc* pDEMisc = &pIE->WMP.wmiDEMisc;
     PKPixelInfo PI;
     size_t offPos = 0;
@@ -706,7 +706,7 @@ ERR WriteContainerPost(
 {
     ERR err = WMP_errSuccess;
 
-    struct WMPStream* pWS = pIE->pStream;
+    struct tagWMPStream* pWS = pIE->pStream;
     WmpDEMisc* pDEMisc = &pIE->WMP.wmiDEMisc;
     size_t offPos;
 
@@ -738,7 +738,7 @@ Cleanup:
 //================================================
 ERR PKImageEncode_Initialize_WMP(
     PKImageEncode* pIE,
-    struct WMPStream* pStream,
+    struct tagWMPStream* pStream,
     void* pvParam,
     size_t cbParam)
 {
@@ -1217,7 +1217,7 @@ Cleanup:
 }
 
 
-ERR PKImageEncode_WritePixelsBandedBegin_WMP(PKImageEncode* pIE, struct WMPStream* pPATempFile)
+ERR PKImageEncode_WritePixelsBandedBegin_WMP(PKImageEncode* pIE, struct tagWMPStream* pPATempFile)
 {
     ERR err = WMP_errSuccess;
 
@@ -1238,7 +1238,7 @@ ERR PKImageEncode_WritePixelsBanded_WMP(PKImageEncode* pIE, U32 cLine, U8* pbPix
     PKPixelInfo PI = { 0 };
     Bool fPI = FALSE;
     BANDEDENCSTATE eEncStateOrig = pIE->WMP.eBandedEncState;
-    struct WMPStream* pPATempFile = pIE->WMP.pPATempFile;
+    struct tagWMPStream* pPATempFile = pIE->WMP.pPATempFile;
 
     // Unless this is the last call, reject inputs which are not multiples of 16
     FailIf(!fLastCall && 0 != cLine % 16, WMP_errMustBeMultipleOf16LinesUntilLastCall);
@@ -1305,7 +1305,7 @@ Cleanup:
 ERR PKImageEncode_WritePixelsBandedEnd_WMP(PKImageEncode* pIE)
 {
     ERR err = WMP_errSuccess;
-    struct WMPStream* pMainStream = pIE->WMP.wmiSCP.pWStream;
+    struct tagWMPStream* pMainStream = pIE->WMP.wmiSCP.pWStream;
     size_t offAlpha;
 
     assert(BANDEDENCSTATE_ENCODING == pIE->WMP.eBandedEncState);
@@ -1319,7 +1319,7 @@ ERR PKImageEncode_WritePixelsBandedEnd_WMP(PKImageEncode* pIE)
     {
         size_t cbAlpha;
         size_t cbBytesCopied;
-        struct WMPStream* pAlphaStream = pIE->WMP.wmiSCP_Alpha.pWStream;
+        struct tagWMPStream* pAlphaStream = pIE->WMP.wmiSCP_Alpha.pWStream;
 
         assert(pAlphaStream != pMainStream); // Otherwise we didn't use a temp file
 
@@ -1370,8 +1370,8 @@ ERR PKImageEncode_Transcode_WMP(
     Bool fPlanarAlpha;
     PKPixelInfo PI;
 
-    struct WMPStream* pWSDec = NULL;
-    struct WMPStream* pWSEnc = pIE->pStream;
+    struct tagWMPStream* pWSDec = NULL;
+    struct tagWMPStream* pWSEnc = pIE->pStream;
 
     // pass through metadata
     Call(pID->GetPixelFormat(pID, &pixGUID));
@@ -1538,7 +1538,7 @@ ERR ParsePFDEntry(
     ERR err = WMP_errSuccess;
     ERR errTmp = WMP_errSuccess;
     PKPixelInfo PI;
-    struct WMPStream* pWS = pID->pStream;
+    struct tagWMPStream* pWS = pID->pStream;
     // size_t offPos = 0;
 
     union uf {
@@ -1760,7 +1760,7 @@ ERR ParsePFD(
     U16 cEntry)
 {
     ERR err = WMP_errSuccess;
-    struct WMPStream* pWS = pID->pStream;
+    struct tagWMPStream* pWS = pID->pStream;
     U16 i = 0;
 
     for (i = 0; i < cEntry; ++i)
@@ -1789,7 +1789,7 @@ ERR ReadContainer(
 {
     ERR err = WMP_errSuccess;
 
-    struct WMPStream* pWS = pID->pStream;
+    struct tagWMPStream* pWS = pID->pStream;
     size_t offPos = 0;
 
     char szSig[2] = { 0 };
@@ -1834,7 +1834,7 @@ Cleanup:
 //================================================
 ERR PKImageDecode_Initialize_WMP(
     PKImageDecode* pID,
-    struct WMPStream* pWS)
+    struct tagWMPStream* pWS)
 {
     ERR err = WMP_errSuccess;
 
@@ -1900,10 +1900,10 @@ ERR PKImageDecode_GetSize_WMP(
 
 ERR PKImageDecode_GetRawStream_WMP(
     PKImageDecode* pID,
-    struct WMPStream** ppWS)
+    struct tagWMPStream** ppWS)
 {
     ERR err = WMP_errSuccess;
-    struct WMPStream* pWS = pID->pStream;
+    struct tagWMPStream* pWS = pID->pStream;
 
     *ppWS = NULL;
     Call(pWS->SetPos(pWS, pID->WMP.wmiDEMisc.uImageOffset));
@@ -1928,7 +1928,7 @@ ERR PKImageDecode_Copy_WMP(
     U32 i, cMBRow;
     U32 cMBRowStart;
 #endif // REENTRANT_MODE
-    struct WMPStream* pWS = pID->pStream;
+    struct tagWMPStream* pWS = pID->pStream;
     U8 tempAlphaMode = 0;
     wmiBI.pv = pb;
     wmiBI.cLine = pRect->Height;
@@ -2153,7 +2153,7 @@ ERR PKImageDecode_GetMetadata_WMP(PKImageDecode* pID, U32 uOffset, U32 uByteCoun
 
     if (pbGot && uOffset)
     {
-        struct WMPStream* pWS = pID->pStream;
+        struct tagWMPStream* pWS = pID->pStream;
         size_t iCurrPos;
 
         FailIf(*pcbGot < uByteCount, WMP_errBufferOverflow);

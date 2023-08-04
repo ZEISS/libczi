@@ -273,10 +273,10 @@ ERR WMPFree(void** ppv)
 //================================================================
 // Streaming I/O functions
 //================================================================
-ERR CreateWS_File(struct WMPStream** ppWS, const char* szFilename, const char* szMode)
+ERR CreateWS_File(struct tagWMPStream** ppWS, const char* szFilename, const char* szMode)
 {
     ERR err = WMP_errSuccess;
-    struct WMPStream* pWS = NULL;
+    struct tagWMPStream* pWS = NULL;
 
     Call(WMPAlloc((void**)ppWS, sizeof(**ppWS)));
     pWS = *ppWS;
@@ -302,10 +302,10 @@ Cleanup:
     return err;
 }
 
-ERR CloseWS_File(struct WMPStream** ppWS)
+ERR CloseWS_File(struct tagWMPStream** ppWS)
 {
     ERR err = WMP_errSuccess;
-    struct WMPStream* pWS = *ppWS;
+    struct tagWMPStream* pWS = *ppWS;
 
     fclose(pWS->state.file.pFile);
     Call(WMPFree((void**)ppWS));
@@ -314,19 +314,19 @@ Cleanup:
     return err;
 }
 
-Bool EOSWS_File(struct WMPStream* pWS)
+Bool EOSWS_File(struct tagWMPStream* pWS)
 {
     return feof(pWS->state.file.pFile);
 }
 
-ERR ReadWS_File(struct WMPStream* pWS, void* pv, size_t cb)
+ERR ReadWS_File(struct tagWMPStream* pWS, void* pv, size_t cb)
 {
     // ERR err = WMP_errSuccess;
 
     return (fread(pv, cb, 1, pWS->state.file.pFile) == 1) ? WMP_errSuccess : WMP_errFileIO;
 }
 
-ERR WriteWS_File(struct WMPStream* pWS, const void* pv, size_t cb)
+ERR WriteWS_File(struct tagWMPStream* pWS, const void* pv, size_t cb)
 {
     ERR err = WMP_errSuccess;
 
@@ -339,7 +339,7 @@ Cleanup:
     return err;
 }
 
-ERR SetPosWS_File(struct WMPStream* pWS, size_t offPos)
+ERR SetPosWS_File(struct tagWMPStream* pWS, size_t offPos)
 {
     ERR err = WMP_errSuccess;
 
@@ -349,7 +349,7 @@ Cleanup:
     return err;
 }
 
-ERR GetPosWS_File(struct WMPStream* pWS, size_t* poffPos)
+ERR GetPosWS_File(struct tagWMPStream* pWS, size_t* poffPos)
 {
     ERR err = WMP_errSuccess;
     long lOff = 0;
@@ -362,10 +362,10 @@ Cleanup:
 }
 
 //----------------------------------------------------------------
-ERR CreateWS_Memory(struct WMPStream** ppWS, void* pv, size_t cb)
+ERR CreateWS_Memory(struct tagWMPStream** ppWS, void* pv, size_t cb)
 {
     ERR err = WMP_errSuccess;
-    struct WMPStream* pWS = NULL;
+    struct tagWMPStream* pWS = NULL;
 
     Call(WMPAlloc((void**)ppWS, sizeof(**ppWS)));
     pWS = *ppWS;
@@ -387,7 +387,7 @@ Cleanup:
     return err;
 }
 
-ERR CloseWS_Memory(struct WMPStream** ppWS)
+ERR CloseWS_Memory(struct tagWMPStream** ppWS)
 {
     ERR err = WMP_errSuccess;
 
@@ -397,12 +397,12 @@ Cleanup:
     return err;
 }
 
-Bool EOSWS_Memory(struct WMPStream* pWS)
+Bool EOSWS_Memory(struct tagWMPStream* pWS)
 {
     return pWS->state.buf.cbBuf <= pWS->state.buf.cbCur;
 }
 
-ERR ReadWS_Memory(struct WMPStream* pWS, void* pv, size_t cb)
+ERR ReadWS_Memory(struct tagWMPStream* pWS, void* pv, size_t cb)
 {
     ERR err = WMP_errSuccess;
 
@@ -423,7 +423,7 @@ Cleanup:
     return err;
 }
 
-ERR WriteWS_Memory(struct WMPStream* pWS, const void* pv, size_t cb)
+ERR WriteWS_Memory(struct tagWMPStream* pWS, const void* pv, size_t cb)
 {
     ERR err = WMP_errSuccess;
 
@@ -437,7 +437,7 @@ Cleanup:
     return err;
 }
 
-ERR SetPosWS_Memory(struct WMPStream* pWS, size_t offPos)
+ERR SetPosWS_Memory(struct tagWMPStream* pWS, size_t offPos)
 {
     ERR err = WMP_errSuccess;
 
@@ -450,7 +450,7 @@ ERR SetPosWS_Memory(struct WMPStream* pWS, size_t offPos)
     return err;
 }
 
-ERR GetPosWS_Memory(struct WMPStream* pWS, size_t* poffPos)
+ERR GetPosWS_Memory(struct tagWMPStream* pWS, size_t* poffPos)
 {
     *poffPos = pWS->state.buf.cbCur;
 
@@ -462,10 +462,10 @@ ERR GetPosWS_Memory(struct WMPStream* pWS, size_t* poffPos)
 // - for indefinite size, multiple stream out
 // - reads not supported in this mode
 //=================================================================
-ERR CreateWS_List(struct WMPStream** ppWS)
+ERR CreateWS_List(struct tagWMPStream** ppWS)
 {
     ERR err = WMP_errSuccess;
-    struct WMPStream* pWS = NULL;
+    struct tagWMPStream* pWS = NULL;
 
     Call(WMPAlloc((void**)ppWS, sizeof(**ppWS) + PACKETLENGTH + sizeof(void*)));
     pWS = *ppWS;
@@ -492,7 +492,7 @@ Cleanup:
     return err;
 }
 
-ERR CloseWS_List(struct WMPStream** ppWS)
+ERR CloseWS_List(struct tagWMPStream** ppWS)
 {
     ERR err = WMP_errSuccess;
 
@@ -513,7 +513,7 @@ Cleanup:
     return err;
 }
 
-ERR ReadWS_List(struct WMPStream* pWS, void* pv, size_t cb)
+ERR ReadWS_List(struct tagWMPStream* pWS, void* pv, size_t cb)
 {
     ERR err = WMP_errSuccess;
 
@@ -544,7 +544,7 @@ Cleanup:
     return err;
 }
 
-ERR WriteWS_List(struct WMPStream* pWS, const void* pv, size_t cb)
+ERR WriteWS_List(struct tagWMPStream* pWS, const void* pv, size_t cb)
 {
     ERR err = WMP_errSuccess;
 
@@ -578,7 +578,7 @@ Cleanup:
     return err;
 }
 
-ERR SetPosWS_List(struct WMPStream* pWS, size_t offPos)
+ERR SetPosWS_List(struct tagWMPStream* pWS, size_t offPos)
 {
     ERR err = WMP_errSuccess;
 
@@ -604,7 +604,7 @@ Cleanup:
     return err;
 }
 
-ERR GetPosWS_List(struct WMPStream* pWS, size_t* poffPos)
+ERR GetPosWS_List(struct tagWMPStream* pWS, size_t* poffPos)
 {
     *poffPos = pWS->state.buf.cbCur + PACKETLENGTH * pWS->state.buf.cbBufCount;
 
@@ -615,7 +615,7 @@ ERR GetPosWS_List(struct WMPStream* pWS, size_t* poffPos)
 // Simple BitIO access functions
 //================================================================
 // init SimpleBitIO
-ERR attach_SB(SimpleBitIO* pSB, struct WMPStream* pWS)
+ERR attach_SB(SimpleBitIO* pSB, struct tagWMPStream* pWS)
 {
     pSB->pWS = pWS;
     pSB->cbRead = 0;
@@ -1091,7 +1091,7 @@ U32 getPosRead(BitIOInfo* pIO)
 //================================================================
 // Block I/O functions
 //================================================================
-ERR attachISRead(BitIOInfo* pIO, struct WMPStream* pWS, CWMImageStrCodec* pSC)
+ERR attachISRead(BitIOInfo* pIO, struct tagWMPStream* pWS, CWMImageStrCodec* pSC)
 {
     UNREFERENCED_PARAMETER(pSC);
 
@@ -1122,7 +1122,7 @@ ERR readIS(CWMImageStrCodec* pSC, BitIOInfo* pIO)
 
     if (PACKET1(pIO->pbStart, pIO->pbCurrent, PACKETLENGTH))
     {
-        struct WMPStream* pWS = pIO->pWS;
+        struct tagWMPStream* pWS = pIO->pWS;
 
         //Call(0 != pIO->pWS->Read(pIO->pWS, pIO->pbStart, PACKETLENGTH));
         // TODO: add error checking code
@@ -1145,7 +1145,7 @@ ERR detachISRead(CWMImageStrCodec* pSC, BitIOInfo* pIO)
 {
     ERR err = WMP_errSuccess;
 
-    struct WMPStream* pWS = pIO->pWS;
+    struct tagWMPStream* pWS = pIO->pWS;
     size_t cbRemain = 0;
 
     // we can ONLY detach IStream at byte boundary
@@ -1163,7 +1163,7 @@ Cleanup:
 }
 
 //----------------------------------------------------------------
-ERR attachISWrite(BitIOInfo* pIO, struct WMPStream* pWS)
+ERR attachISWrite(BitIOInfo* pIO, struct tagWMPStream* pWS)
 {
     pWS->GetPos(pWS, &pIO->offRef);
 

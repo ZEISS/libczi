@@ -405,7 +405,7 @@ ERR PKCodecFactory_CreateDecoderFromFile(const char* szFilename, PKImageDecode**
     char* pExt = NULL;
     const PKIID* pIID = NULL;
 
-    struct WMPStream* pStream = NULL;
+    struct tagWMPStream* pStream = NULL;
     PKImageDecode* pDecoder = NULL;
 
     // get file extension
@@ -437,7 +437,7 @@ ERR PKCodecFactory_CreateDecoderFromMemory(char* inBuffer, size_t size, PKImageD
     char* pExt = ".jxr";
     const PKIID* pIID = NULL;
 
-    struct WMPStream* pStream = NULL;
+    struct tagWMPStream* pStream = NULL;
     PKImageDecode* pDecoder = NULL;
 
     // get decode PKIID
@@ -458,7 +458,7 @@ Cleanup:
     return err;
 }
 
-ERR PKCodecFactory_CreateDecoderFromStream(struct WMPStream* pStream, PKImageDecode** ppDecoder)
+ERR PKCodecFactory_CreateDecoderFromStream(struct tagWMPStream* pStream, PKImageDecode** ppDecoder)
 {
     ERR err = WMP_errSuccess;
 
@@ -532,7 +532,7 @@ Cleanup:
 //================================================================
 ERR PKImageEncode_Initialize(
     PKImageEncode* pIE,
-    struct WMPStream* pStream,
+    struct tagWMPStream* pStream,
     void* pvParam,
     size_t cbParam)
 {
@@ -686,7 +686,7 @@ Cleanup:
     return err;
 }
 
-ERR PKImageEncode_WritePixelsBandedBegin(PKImageEncode* pEncoder, struct WMPStream* pPATempFile)
+ERR PKImageEncode_WritePixelsBandedBegin(PKImageEncode* pEncoder, struct tagWMPStream* pPATempFile)
 {
     UNREFERENCED_PARAMETER(pEncoder);
     UNREFERENCED_PARAMETER(pPATempFile);
@@ -843,7 +843,7 @@ Cleanup:
 //================================================================
 ERR PKImageDecode_Initialize(
     PKImageDecode* pID,
-    struct WMPStream* pStream)
+    struct tagWMPStream* pStream)
 {
     ERR err = WMP_errSuccess;
 

@@ -106,7 +106,7 @@ typedef struct tagIOContext
             U8* pbPacket;   // packet pointer
             U8* pbCurrent;  // current pointer
 
-            struct WMPStream* pWS;    // pointer to WMPStream
+            struct tagWMPStream* pWS;    // pointer to WMPStream
             long offPacket; // byte offset into stream
 
             //ULARGE_INTEGER u64Acc; 
@@ -141,7 +141,7 @@ typedef struct tagBitIOInfo
 
     U8* pbCurrent;  // current pointer
 
-    struct WMPStream* pWS;  // pointer to WMPStream
+    struct tagWMPStream* pWS;  // pointer to WMPStream
     size_t offRef;  // reference offset on IStream,
     // for read, it moves along the stream
     // for write, it stays at the attach point
@@ -405,7 +405,7 @@ typedef struct CWMImageStrCodec {
     CWMIPredInfo* PredInfoPrevRow[MAX_CHANNELS];
     CWMIPredInfo* pPredInfoMemory;
 
-    struct WMPStream** ppWStream;
+    struct tagWMPStream** ppWStream;
 
 //#ifdef WIN32
 //    TCHAR** ppTempFile;
@@ -482,11 +482,11 @@ U32 getBit16_S(CWMImageStrCodec* pSC, BitIOInfo* pIO, U32 cBits);
 //================================================================
 // packet I/O
 //================================================================
-ERR attachISRead(BitIOInfo* pIO, struct WMPStream* pWS, CWMImageStrCodec* pSC);
+ERR attachISRead(BitIOInfo* pIO, struct tagWMPStream* pWS, CWMImageStrCodec* pSC);
 ERR readIS(CWMImageStrCodec* pSC, BitIOInfo* pIO);
 ERR detachISRead(CWMImageStrCodec* pSC, BitIOInfo* pIO);
 
-ERR attachISWrite(BitIOInfo* pIO, struct WMPStream* pWS);
+ERR attachISWrite(BitIOInfo* pIO, struct tagWMPStream* pWS);
 ERR writeIS(CWMImageStrCodec* pSC, BitIOInfo* pIO);
 ERR detachISWrite(CWMImageStrCodec* pSC, BitIOInfo* pIO);
 
@@ -506,50 +506,50 @@ Void postProcBlock(struct tagPostProcInfo* strPostProcInfo[MAX_CHANNELS][2], Pix
 //================================================================
 typedef struct tagSimpleBitIO
 {
-    struct WMPStream* pWS;
+    struct tagWMPStream* pWS;
     U32 cbRead;
     U8 bAccumulator;
     U32 cBitLeft;
 } SimpleBitIO;
 
-ERR attach_SB(SimpleBitIO* pSB, struct WMPStream* pWS);
+ERR attach_SB(SimpleBitIO* pSB, struct tagWMPStream* pWS);
 U32 getBit32_SB(SimpleBitIO* pSB, U32 cBits);
 Void flushToByte_SB(SimpleBitIO* pSB);
 U32 getByteRead_SB(SimpleBitIO* pSB);
 ERR detach_SB(SimpleBitIO* pSB);
 
 //----------------------------------------------------------------
-EXTERN_C Bool EOSWS_File(struct WMPStream* pWS);
+EXTERN_C Bool EOSWS_File(struct tagWMPStream* pWS);
 
-EXTERN_C ERR ReadWS_File(struct WMPStream* pWS, void* pv, size_t cb);
-EXTERN_C ERR WriteWS_File(struct WMPStream* pWS, const void* pv, size_t cb);
+EXTERN_C ERR ReadWS_File(struct tagWMPStream* pWS, void* pv, size_t cb);
+EXTERN_C ERR WriteWS_File(struct tagWMPStream* pWS, const void* pv, size_t cb);
 //EXTERN_C ERR GetLineWS_File(struct WMPStream* pWS, void* pv, size_t cb);
 
-EXTERN_C ERR SetPosWS_File(struct WMPStream* pWS, size_t offPos);
-EXTERN_C ERR GetPosWS_File(struct WMPStream* pWS, size_t* poffPos);
+EXTERN_C ERR SetPosWS_File(struct tagWMPStream* pWS, size_t offPos);
+EXTERN_C ERR GetPosWS_File(struct tagWMPStream* pWS, size_t* poffPos);
 
 //----------------------------------------------------------------
-EXTERN_C Bool EOSWS_Memory(struct WMPStream* pWS);
+EXTERN_C Bool EOSWS_Memory(struct tagWMPStream* pWS);
 
-EXTERN_C ERR ReadWS_Memory(struct WMPStream* pWS, void* pv, size_t cb);
-EXTERN_C ERR WriteWS_Memory(struct WMPStream* pWS, const void* pv, size_t cb);
-//EXTERN_C ERR GetLineWS_Memory(struct WMPStream* pWS, void* pv, size_t cb);
+EXTERN_C ERR ReadWS_Memory(struct tagWMPStream* pWS, void* pv, size_t cb);
+EXTERN_C ERR WriteWS_Memory(struct tagWMPStream* pWS, const void* pv, size_t cb);
+//EXTERN_C ERR GetLineWS_Memory(struct tagWMPStream* pWS, void* pv, size_t cb);
 
-EXTERN_C ERR SetPosWS_Memory(struct WMPStream* pWS, size_t offPos);
-EXTERN_C ERR GetPosWS_Memory(struct WMPStream* pWS, size_t* poffPos);
+EXTERN_C ERR SetPosWS_Memory(struct tagWMPStream* pWS, size_t offPos);
+EXTERN_C ERR GetPosWS_Memory(struct tagWMPStream* pWS, size_t* poffPos);
 
-//EXTERN_C ERR GetPtrWS_Memory(struct WMPStream* pWS, size_t align, U8** ppb);
+//EXTERN_C ERR GetPtrWS_Memory(struct tagWMPStream* pWS, size_t align, U8** ppb);
 //----------------------------------------------------------------
-EXTERN_C Bool EOSWS_List(struct WMPStream* pWS);
+EXTERN_C Bool EOSWS_List(struct tagWMPStream* pWS);
 
-EXTERN_C ERR ReadWS_List(struct WMPStream* pWS, void* pv, size_t cb);
-EXTERN_C ERR WriteWS_List(struct WMPStream* pWS, const void* pv, size_t cb);
+EXTERN_C ERR ReadWS_List(struct tagWMPStream* pWS, void* pv, size_t cb);
+EXTERN_C ERR WriteWS_List(struct tagWMPStream* pWS, const void* pv, size_t cb);
 
-EXTERN_C ERR SetPosWS_List(struct WMPStream* pWS, size_t offPos);
-EXTERN_C ERR GetPosWS_List(struct WMPStream* pWS, size_t* poffPos);
+EXTERN_C ERR SetPosWS_List(struct tagWMPStream* pWS, size_t offPos);
+EXTERN_C ERR GetPosWS_List(struct tagWMPStream* pWS, size_t* poffPos);
 
-EXTERN_C ERR CreateWS_List(struct WMPStream** ppWS);
-EXTERN_C ERR CloseWS_List(struct WMPStream** ppWS);
+EXTERN_C ERR CreateWS_List(struct tagWMPStream** ppWS);
+EXTERN_C ERR CloseWS_List(struct tagWMPStream** ppWS);
 
 /********************************************************************/
 // Stuff related to scale/spatial ordering

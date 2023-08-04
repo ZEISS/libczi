@@ -280,7 +280,7 @@ typedef long ERR;
 //================================================================
 // WMPStream interface
 //================================================================
-struct WMPStream
+typedef struct tagWMPStream
 {
     union
     {
@@ -302,23 +302,23 @@ struct WMPStream
 
     Bool fMem;
 
-    ERR(*Close)(struct WMPStream** pme);
+    ERR(*Close)(struct tagWMPStream** pme);
 
-    Bool(*EOS)(struct WMPStream* me);
+    Bool(*EOS)(struct tagWMPStream* me);
 
-    ERR(*Read)(struct WMPStream* me, void* pv, size_t cb);
-    ERR(*Write)(struct WMPStream* me, const void* pv, size_t cb);
-    //ERR (*GetLine)(struct WMPStream* me, void* pv, size_t cb);
+    ERR(*Read)(struct tagWMPStream* me, void* pv, size_t cb);
+    ERR(*Write)(struct tagWMPStream* me, const void* pv, size_t cb);
+    //ERR (*GetLine)(struct tagWMPStream* me, void* pv, size_t cb);
 
-    ERR(*SetPos)(struct WMPStream* me, size_t offPos);
-    ERR(*GetPos)(struct WMPStream* me, size_t* poffPos);
-};
+    ERR(*SetPos)(struct tagWMPStream* me, size_t offPos);
+    ERR(*GetPos)(struct tagWMPStream* me, size_t* poffPos);
+} WMPStream;
 
-EXTERN_C ERR CreateWS_File(struct WMPStream** ppWS, const char* szFilename, const char* szMode);
-EXTERN_C ERR CloseWS_File(struct WMPStream** ppWS);
+EXTERN_C ERR CreateWS_File(struct tagWMPStream** ppWS, const char* szFilename, const char* szMode);
+EXTERN_C ERR CloseWS_File(struct tagWMPStream** ppWS);
 
-EXTERN_C ERR CreateWS_Memory(struct WMPStream** ppWS, void* pv, size_t cb);
-EXTERN_C ERR CloseWS_Memory(struct WMPStream** ppWS);
+EXTERN_C ERR CreateWS_Memory(struct tagWMPStream** ppWS, void* pv, size_t cb);
+EXTERN_C ERR CloseWS_Memory(struct tagWMPStream** ppWS);
 
 
 //================================================================
@@ -380,7 +380,7 @@ typedef struct tagCWMIStrCodecParam {
     SUBBAND sbSubband;  // which subbands to keep
     U8  uiTrimFlexBits;
 
-    struct WMPStream* pWStream;
+    struct tagWMPStream* pWStream;
     size_t cbStream;
 
     // tiling info
@@ -485,8 +485,8 @@ typedef struct tagCWMTranscodingParam {
 } CWMTranscodingParam;
 
 EXTERN_C Int WMPhotoTranscode(
-    struct WMPStream* pStreamDec,   // input bitstrean
-    struct WMPStream* pStreamEnc,   // output bitstream
+    struct tagWMPStream* pStreamDec,   // input bitstrean
+    struct tagWMPStream* pStreamEnc,   // output bitstream
     CWMTranscodingParam* pParam     // transcoding parameters
 );
 

@@ -4,6 +4,10 @@
 
 #include "jxrlib/image/sys/windowsmediaphoto.h"
 
+using namespace std;
+
+static JxrDecode2::PixelFormat JxrPixelFormatGuidToEnum(const GUID& guid);
+
 void JxrDecode2::Decode(
            codecHandle h,
           // const WMPDECAPPARGS* decArgs,
@@ -13,11 +17,11 @@ void JxrDecode2::Decode(
            std::function<void(PixelFormat pixFmt, std::uint32_t  width, std::uint32_t  height, std::uint32_t linesCount, const void* ptrData, std::uint32_t stride)> deliverData)
 {
     ERR err;
-    PKFactory* pFactory = nullptr;
+    /*PKFactory* pFactory = nullptr;
     err = PKCreateFactory(&pFactory, PK_SDK_VERSION);
     //if (Failed(err)) { ThrowError("PKCreateFactory failed", err); }
     std::unique_ptr<PKFactory, void(*)(PKFactory*)> upFactory(pFactory, [](PKFactory* p)->void {p->Release(&p); });
-
+    */
     /*PKCodecFactory* pCodecFactory = NULL;
     err = PKCreateCodecFactory(&pCodecFactory, WMP_SDK_VERSION);
     //if (Failed(err)) { ThrowError("PKCreateCodecFactory failed", err); }
@@ -31,6 +35,8 @@ void JxrDecode2::Decode(
 
     WMPStream* pStream;
     err = CreateWS_Memory(&pStream, const_cast<void*>(ptrData), size);
+    //unique_ptr<WMPStream, void(*)(WMPStream*)> upStream(pStream, [](WMPStream* p)->void {p->Close(p); p->Release(p); });
+    unique_ptr<WMPStream, void(*)(WMPStream*)> upStream(pStream, [](WMPStream* p)->void {p->Close(&p);  });
     //err = pFactory->CreateStreamFromMemory(&pStream, const_cast<void*>(ptrData), size);
 
     PKImageDecode* pDecoder;
@@ -175,10 +181,33 @@ void JxrDecode2::Decode(
     rc.Width = width;
     rc.Height = height;
 
+    JxrDecode2::PixelFormat pixel_format = JxrPixelFormatGuidToEnum(pDecoder->guidPixFormat);
+
     void* pImage = malloc(width * height * bytes_per_pixel);
     upDecoder->Copy(upDecoder.get(), &rc, (U8*)pImage, width * bytes_per_pixel);
 
-    deliverData(JxrDecode2::PixelFormat::_24bppBGR, width, height, height, pImage, width * bytes_per_pixel);
+    deliverData(/*JxrDecode2::PixelFormat::_24bppBGR*/pixel_format, width, height, height, pImage, width * bytes_per_pixel);
     free(pImage);
 }
 
+JxrDecode2::PixelFormat JxrPixelFormatGuidToEnum(const GUID& guid)
+{
+    if (IsEqualGUID(guid, GUID_PKPixelFormat8bppGray))
+    {
+        return JxrDecode2::PixelFormat::kGray8;
+    }
+    else if (IsEqualGUID(guid, GUID_PKPixelFormat16bppGray))
+    {
+        return JxrDecode2::PixelFormat::kGray16;
+    }
+    else if (IsEqualGUID(guid, GUID_PKPixelFormat24bppBGR))
+    {
+        return JxrDecode2::PixelFormat::kBgr24;
+    }
+    else if (IsEqualGUID(guid, GUID_PKPixelFormat48bppRGB))
+    {
+        return JxrDecode2::PixelFormat::kBgr48;
+    }
+
+    return JxrDecode2::PixelFormat::kInvalid;
+}
