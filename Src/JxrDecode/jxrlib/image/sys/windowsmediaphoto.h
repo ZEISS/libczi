@@ -297,6 +297,15 @@ typedef struct tagWMPStream
             size_t cbBufCount;
         } buf;
 
+        struct tagWriteableHeapBased
+        {
+            U8* pbBuf;              // the buffer
+            size_t cbCur;           // the current position
+            size_t cbMax;           // the maximum position (i.e. similar to the file size)
+            size_t cbAllocatedSize; // the size of the allocated buffer
+            size_t cbGrowBy;        // the size to grow the buffer by when needed (if 0, then thr current allocated size if used)
+        } writeableHeapBased;
+
         void* pvObj;
     } state;
 
@@ -320,6 +329,9 @@ EXTERN_C ERR CloseWS_File(struct tagWMPStream** ppWS);
 EXTERN_C ERR CreateWS_Memory(struct tagWMPStream** ppWS, void* pv, size_t cb);
 EXTERN_C ERR CloseWS_Memory(struct tagWMPStream** ppWS);
 
+// create a write-only memory stream that allocates memory from the heap
+EXTERN_C ERR CreateWS_HeapBackedWriteableStream(struct tagWMPStream** ppWS, size_t cbInitial, size_t cbGrowBy);
+EXTERN_C ERR CloseWS_HeapBackedWriteableStream(struct tagWMPStream** ppWS);
 
 //================================================================
 // Enc/Dec data structure

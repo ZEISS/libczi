@@ -538,6 +538,11 @@ EXTERN_C ERR WriteWS_Memory(struct tagWMPStream* pWS, const void* pv, size_t cb)
 EXTERN_C ERR SetPosWS_Memory(struct tagWMPStream* pWS, size_t offPos);
 EXTERN_C ERR GetPosWS_Memory(struct tagWMPStream* pWS, size_t* poffPos);
 
+//----------------------------------------------------------------
+EXTERN_C ERR WriteWS_HeapBackedWriteableStream(struct tagWMPStream* pWS, const void* pv, size_t cb);
+EXTERN_C ERR SetPosWS_HeapBackedWriteableStream(struct tagWMPStream* pWS, size_t offPos);
+EXTERN_C ERR GetPosWS_HeapBackedWriteableStream(struct tagWMPStream* pWS, size_t* poffPos);
+
 //EXTERN_C ERR GetPtrWS_Memory(struct tagWMPStream* pWS, size_t align, U8** ppb);
 //----------------------------------------------------------------
 EXTERN_C Bool EOSWS_List(struct tagWMPStream* pWS);

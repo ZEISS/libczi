@@ -99,7 +99,8 @@ void JxrDecode2::Encode(
    // { &GUID_PKPixelFormat24bppBGR, 3, CF_RGB, BD_8, 24, PK_pixfmtBGR, 2, 3, 8, 1 },
 
     struct tagWMPStream* pEncodeStream = NULL;
-    CreateWS_File(&pEncodeStream, "C:\\temp\\test.jxr", "wb");
+    //CreateWS_File(&pEncodeStream, "C:\\temp\\test.jxr", "wb");
+    CreateWS_HeapBackedWriteableStream(&pEncodeStream, 1024, 0);
 
     err = pEncoder->Initialize(pEncoder, pEncodeStream, &codec_parameters, sizeof(codec_parameters));
 
