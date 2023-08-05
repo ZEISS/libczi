@@ -59,7 +59,12 @@ public:
            std::function<void(PixelFormat pixFmt, std::uint32_t  width, std::uint32_t  height, std::uint32_t linesCount, const void* ptrData, std::uint32_t stride)> deliverData);
 
     /// Decodes the specified data, giving an uncompressed bitmap.
-    /// The specified functor 'get_destination_func' will be called 
+    /// The course of action is as follows:
+    /// * The decoder will be initialized with the specified compressed data.  
+    /// * The characteristics of the compressed data will be determined - i.e the pixel type, width, height, etc. are determined.  
+    /// * The 'get_destination_func' is called, passing in the pixel type, width, and height.    
+    /// * The function should return a pointer to a buffer that can hold the uncompressed bitmap.
+    ///    The tuple it returns is the pixel type, the stride and the pointer to the buffer.
     ///
     /// \param  ptrData                 Information describing the pointer.
     /// \param  size                    The size.
@@ -68,4 +73,11 @@ public:
             const void* ptrData,
             size_t size,
             const std::function<std::tuple<JxrDecode2::PixelFormat, std::uint32_t, void*>(PixelFormat pixel_format, std::uint32_t  width, std::uint32_t  height)>& get_destination_func);
+
+    void Encode(
+            JxrDecode2::PixelFormat pixel_format,
+            std::uint32_t  width,
+            std::uint32_t  height,
+            std::uint32_t  stride,
+            const void* ptr_bitmap);
 };

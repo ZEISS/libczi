@@ -17,43 +17,99 @@ void JxrDecode2::Decode(
            size_t size,
            const std::function<std::tuple<JxrDecode2::PixelFormat, std::uint32_t, void*>(PixelFormat pixel_format, std::uint32_t  width, std::uint32_t  height)>& get_destination_func)
 {
+    if (ptrData == nullptr) { throw invalid_argument("ptrData"); }
+    if (size == 0) { throw invalid_argument("size"); }
+    if (!get_destination_func) { throw invalid_argument("get_destination_func"); }
+
     WMPStream* pStream;
     ERR err = CreateWS_Memory(&pStream, const_cast<void*>(ptrData), size);
-    if (Failed(err)) { ThrowError("CreateWS_Memory failed", err); }
-    unique_ptr<WMPStream, void(*)(WMPStream*)> upStream(pStream, [](WMPStream* p)->void {p->Close(&p);});
+    if (Failed(err)) { ThrowError("'CreateWS_Memory' failed", err); }
+    unique_ptr<WMPStream, void(*)(WMPStream*)> upStream(pStream, [](WMPStream* p)->void {p->Close(&p); });
 
     PKImageDecode* pDecoder;
     err = PKCodecFactory_CreateDecoderFromStream(pStream, &pDecoder);
-    if (Failed(err)) { ThrowError("PKCodecFactory_CreateDecoderFromStream failed", err); }
+    if (Failed(err)) { ThrowError("'PKCodecFactory_CreateDecoderFromStream' failed", err); }
     std::unique_ptr<PKImageDecode, void(*)(PKImageDecode*)> upDecoder(pDecoder, [](PKImageDecode* p)->void {p->Release(&p); });
 
-    U32 cFrame;
-    err = PKImageDecode_GetFrameCount(upDecoder.get(), &cFrame);
+    U32 frame_count;
+    err = upDecoder->GetFrameCount(upDecoder.get(), &frame_count);
+    if (Failed(err)) { ThrowError("'decoder::GetFrameCount' failed", err); }
+    if (frame_count != 1)
+    {
+        ostringstream string_stream;
+        string_stream << "Expecting to find a frame_count of 1, but found frame_count = ." << frame_count;
+        throw runtime_error(string_stream.str());
+    }
 
     I32 width, height;
-    PKImageDecode_GetSize(upDecoder.get(), &width, &height);
+    upDecoder->GetSize(upDecoder.get(), &width, &height);
+    if (Failed(err)) { ThrowError("'decoder::GetSize' failed", err); }
 
     PKPixelFormatGUID pixel_format_of_decoder;
-    PKImageDecode_GetPixelFormat(upDecoder.get(), &pixel_format_of_decoder);
+    upDecoder->GetPixelFormat(upDecoder.get(), &pixel_format_of_decoder);
+    if (Failed(err)) { ThrowError("'decoder::GetPixelFormat' failed", err); }
 
     const auto decode_info = get_destination_func(
-        JxrPixelFormatGuidToEnum(pixel_format_of_decoder), 
-        width, 
+        JxrPixelFormatGuidToEnum(pixel_format_of_decoder),
+        width,
         height);
 
-    PKRect rc;
-    rc.X = 0;
-    rc.Y = 0;
-    rc.Width = width;
-    rc.Height = height;
+    const PKRect rc{ 0, 0, width, height };
     err = upDecoder->Copy(
         upDecoder.get(),
         &rc,
         static_cast<U8*>(get<2>(decode_info)),
         get<1>(decode_info));
-    if (Failed(err)) { ThrowError("PKImageDecode_Copy failed", err); }
+    if (Failed(err)) { ThrowError("decoder::Copy failed", err); }
 }
 
+void JxrDecode2::Encode(
+           JxrDecode2::PixelFormat pixel_format,
+           std::uint32_t  width,
+           std::uint32_t  height,
+           std::uint32_t  stride,
+           const void* ptr_bitmap)
+{
+    ERR err;
+    PKImageEncode* pEncoder;
+    err = PKCodecFactory_CreateCodec(&IID_PKImageWmpEncode, (void**)&pEncoder);
+
+
+    CWMIStrCodecParam codec_parameters;
+    memset(&codec_parameters, 0, sizeof(codec_parameters));
+    //codec_parameters.guidPixFormat = GUID_PKPixelFormat24bppBGR;
+    codec_parameters.bVerbose = FALSE;
+    codec_parameters.cfColorFormat = YUV_444;
+    //    args->bFlagRGB_BGR = FALSE; //default BGR
+    codec_parameters.bdBitDepth = BD_LONG;
+    codec_parameters.bfBitstreamFormat = FREQUENCY;
+    codec_parameters.bProgressiveMode = TRUE;
+    codec_parameters.olOverlap = OL_ONE;
+    codec_parameters.cNumOfSliceMinus1H = codec_parameters.cNumOfSliceMinus1V = 0;
+    codec_parameters.sbSubband = SB_ALL;
+    codec_parameters.uAlphaMode = 0;
+    codec_parameters.uiDefaultQPIndex = 1;
+    codec_parameters.uiDefaultQPIndexAlpha = 1;
+    
+    //codec_parameters.fltImageQuality = 1.f;
+    //codec_parameters.bOverlapSet = 0;
+    //codec_parameters.bColorFormatSet = 0;
+
+
+   // { &GUID_PKPixelFormat24bppBGR, 3, CF_RGB, BD_8, 24, PK_pixfmtBGR, 2, 3, 8, 1 },
+
+    struct tagWMPStream* pEncodeStream = NULL;
+    CreateWS_File(&pEncodeStream, "C:\\temp\\test.jxr", "wb");
+
+    err = pEncoder->Initialize(pEncoder, pEncodeStream, &codec_parameters, sizeof(codec_parameters));
+
+    err = pEncoder->SetPixelFormat(pEncoder, GUID_PKPixelFormat24bppBGR);
+    err = pEncoder->SetSize(pEncoder, width, height);
+    err = pEncoder->SetResolution(pEncoder, 96.f, 96.f);
+
+    pEncoder->WritePixels(pEncoder, height, (U8*)ptr_bitmap, stride);
+    pEncodeStream->Close(&pEncodeStream);
+}
 
 void JxrDecode2::Decode(
            codecHandle h,
@@ -261,17 +317,17 @@ JxrDecode2::PixelFormat JxrPixelFormatGuidToEnum(const GUID& guid)
 
 void ThrowError(const char* error_message, ERR error_code)
 {
-    std::stringstream ss;
+    ostringstream string_stream;
     if (error_message != nullptr)
     {
-        ss << "Error in JXR-decoder -> \"" << error_message << "\" code:" << error_code << " (" << ERR_to_string(error_code) << ")";
+        string_stream << "Error in JXR-decoder -> \"" << error_message << "\" code:" << error_code << " (" << ERR_to_string(error_code) << ")";
     }
     else
     {
-        ss << "Error in JXR-decoder -> " << error_message << " (" << ERR_to_string(error_code) << ")";
+        string_stream << "Error in JXR-decoder -> " << error_message << " (" << ERR_to_string(error_code) << ")";
     }
 
-    throw std::runtime_error(ss.str());
+    throw runtime_error(string_stream.str());
 }
 
 const char* ERR_to_string(ERR error_code)

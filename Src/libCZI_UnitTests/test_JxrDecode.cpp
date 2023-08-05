@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: LGPL-3.0-or-later
 
 #include "pch.h"
+#include <cstdint>
 #include "inc_libCZI.h"
 #include "testImage.h"
 #include "../libCZI/decoder.h"
@@ -44,3 +45,37 @@ TEST(JxrDecode, DecodeGray8)
     EXPECT_TRUE(memcmp(hash, expectedResult, 16) == 0) << "Incorrect result";
 }
 
+TEST(JxrDecode, TryDecodeInvalidDataExpectException)
+{
+    // pass invalid data to decoder, and expect an exception
+    const auto dec = CJxrLibDecoder::Create();
+    size_t sizeEncoded = 2345;
+    unique_ptr<uint8_t> encoded_data(new uint8_t[sizeEncoded]);
+    for (size_t i = 0; i < sizeEncoded; i++)
+    {
+        encoded_data.get()[i] = static_cast<uint8_t>(i);
+    }
+
+    EXPECT_ANY_THROW(dec->Decode(encoded_data.get(), sizeEncoded, libCZI::PixelType::Invalid, 0, 0));
+}
+
+TEST(JxrDecode, TestEncoder)
+{
+    auto bitmap = CBitmapData<CHeapAllocator>::Create(PixelType::Bgr24, CTestImage::BGR24TESTIMAGE_WIDTH, CTestImage::BGR24TESTIMAGE_HEIGHT);
+    {
+        ScopedBitmapLockerSP lck{ bitmap };
+        CTestImage::CopyBgr24Image(lck.ptrDataRoi, bitmap->GetWidth(), bitmap->GetHeight(), lck.stride);
+    }
+
+    const auto codec = CJxrLibDecoder::Create();
+
+    {
+        ScopedBitmapLockerSP lck{ bitmap };
+        codec->Encode(
+            bitmap->GetPixelType(), 
+            bitmap->GetWidth(), 
+            bitmap->GetHeight(), 
+            lck.stride, 
+            lck.ptrDataRoi);
+    }
+}

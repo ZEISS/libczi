@@ -19,6 +19,18 @@ using namespace std;
     return make_shared<CJxrLibDecoder>(JxrDecode::Initialize());
 }
 
+void CJxrLibDecoder::Encode(libCZI::PixelType pixel_type, std::uint32_t width, std::uint32_t height, std::uint32_t stride, const void* ptrData)
+{
+    JxrDecode2 decoder2;
+    decoder2.Encode(
+        JxrDecode2::PixelFormat::kBgr24,
+        width,
+        height,
+        stride,
+        ptrData);
+    
+}
+
 std::shared_ptr<libCZI::IBitmapData> CJxrLibDecoder::Decode(const void* ptrData, size_t size, libCZI::PixelType pixelType, uint32_t width, uint32_t height)
 {
     std::shared_ptr<IBitmapData> bitmap;
@@ -29,8 +41,8 @@ std::shared_ptr<libCZI::IBitmapData> CJxrLibDecoder::Decode(const void* ptrData,
         decoder2.Decode(
             ptrData,
             size,
-            [&](JxrDecode2::PixelFormat pixel_format, std::uint32_t  width, std::uint32_t  height)
-            ->std::tuple<JxrDecode2::PixelFormat, std::uint32_t, void*>
+            [&](JxrDecode2::PixelFormat pixel_format, std::uint32_t width, std::uint32_t height)
+            -> tuple<JxrDecode2::PixelFormat, uint32_t, void*>
             {
                     PixelType px_type;
                     switch (pixel_format)
