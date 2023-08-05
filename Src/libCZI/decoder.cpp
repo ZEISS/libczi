@@ -21,6 +21,53 @@ using namespace std;
 
 std::shared_ptr<libCZI::IBitmapData> CJxrLibDecoder::Decode(const void* ptrData, size_t size, libCZI::PixelType pixelType, uint32_t width, uint32_t height)
 {
+    std::shared_ptr<IBitmapData> bitmap;
+    bool bitmap_is_locked = false;
+    JxrDecode2 decoder2;
+    try
+    {
+        decoder2.Decode(
+            ptrData,
+            size,
+            [&](JxrDecode2::PixelFormat pixel_format, std::uint32_t  width, std::uint32_t  height)
+            ->std::tuple<JxrDecode2::PixelFormat, std::uint32_t, void*>
+            {
+                    PixelType px_type;
+                    switch (pixel_format)
+                    {
+                    case JxrDecode2::PixelFormat::kBgr24: px_type = PixelType::Bgr24; break;
+                    case JxrDecode2::PixelFormat::kGray8: px_type = PixelType::Gray8; break;
+                    case JxrDecode2::PixelFormat::kBgr48: px_type = PixelType::Bgr48; break;
+                    case JxrDecode2::PixelFormat::kGray16: px_type = PixelType::Gray16; break;
+                        //case JxrDecode2::PixelFormat::_32bppGrayFloat: px_type = PixelType::Gray32Float; break;
+                    default: throw std::logic_error("need to look into these formats...");
+                    }
+
+                    bitmap = GetSite()->CreateBitmap(px_type, width, height);
+                    const auto lock_info = bitmap->Lock();
+                    bitmap_is_locked = true;
+                    return make_tuple(pixel_format, lock_info.stride, lock_info.ptrDataRoi);
+            });
+    }
+    catch (const std::exception& e)
+    {
+        GetSite()->Log(LOGLEVEL_ERROR, e.what());
+        if (bitmap_is_locked)
+        {
+            bitmap->Unlock();
+        }
+
+        throw;
+    }
+
+    bitmap->Unlock();
+
+    return bitmap;
+}
+
+#if false
+std::shared_ptr<libCZI::IBitmapData> CJxrLibDecoder::Decode(const void* ptrData, size_t size, libCZI::PixelType pixelType, uint32_t width, uint32_t height)
+{
     std::shared_ptr<IBitmapData> bm;
     JxrDecode2 decoder2;
     decoder2.Decode(nullptr,
@@ -71,6 +118,7 @@ std::shared_ptr<libCZI::IBitmapData> CJxrLibDecoder::Decode(const void* ptrData,
 
     return bm;
 }
+#endif
 
 std::shared_ptr<libCZI::IBitmapData> CJxrLibDecoder::Decode2(const void* ptrData, size_t size, libCZI::PixelType pixelType, uint32_t width, uint32_t height)
 {

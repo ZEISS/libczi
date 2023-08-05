@@ -58,8 +58,14 @@ public:
            const std::function<PixelFormat(PixelFormat, int width, int height)>& selectDestPixFmt,
            std::function<void(PixelFormat pixFmt, std::uint32_t  width, std::uint32_t  height, std::uint32_t linesCount, const void* ptrData, std::uint32_t stride)> deliverData);
 
+    /// Decodes the specified data, giving an uncompressed bitmap.
+    /// The specified functor 'get_destination_func' will be called 
+    ///
+    /// \param  ptrData                 Information describing the pointer.
+    /// \param  size                    The size.
+    /// \param  get_destination_func    The get destination function.
     void Decode(
             const void* ptrData,
             size_t size,
-            const std::function<std::tuple<JxrDecode2::PixelFormat, std::uint32_t, void*>(PixelFormat pixFmt, std::uint32_t  width, std::uint32_t  height)>& get_destination_func);
+            const std::function<std::tuple<JxrDecode2::PixelFormat, std::uint32_t, void*>(PixelFormat pixel_format, std::uint32_t  width, std::uint32_t  height)>& get_destination_func);
 };

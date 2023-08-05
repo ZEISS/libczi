@@ -1,5 +1,7 @@
 #include "JxrDecode2.h"
 #include <memory>
+#include <stdexcept> 
+#include <sstream>
 #include "jxrlib/jxrgluelib/JXRGlue.h"
 
 #include "jxrlib/image/sys/windowsmediaphoto.h"
@@ -7,6 +9,51 @@
 using namespace std;
 
 static JxrDecode2::PixelFormat JxrPixelFormatGuidToEnum(const GUID& guid);
+static void ThrowError(const char* error_message, ERR error_code);
+static const char* ERR_to_string(ERR error_code);
+
+void JxrDecode2::Decode(
+           const void* ptrData,
+           size_t size,
+           const std::function<std::tuple<JxrDecode2::PixelFormat, std::uint32_t, void*>(PixelFormat pixel_format, std::uint32_t  width, std::uint32_t  height)>& get_destination_func)
+{
+    WMPStream* pStream;
+    ERR err = CreateWS_Memory(&pStream, const_cast<void*>(ptrData), size);
+    if (Failed(err)) { ThrowError("CreateWS_Memory failed", err); }
+    unique_ptr<WMPStream, void(*)(WMPStream*)> upStream(pStream, [](WMPStream* p)->void {p->Close(&p);});
+
+    PKImageDecode* pDecoder;
+    err = PKCodecFactory_CreateDecoderFromStream(pStream, &pDecoder);
+    if (Failed(err)) { ThrowError("PKCodecFactory_CreateDecoderFromStream failed", err); }
+    std::unique_ptr<PKImageDecode, void(*)(PKImageDecode*)> upDecoder(pDecoder, [](PKImageDecode* p)->void {p->Release(&p); });
+
+    U32 cFrame;
+    err = PKImageDecode_GetFrameCount(upDecoder.get(), &cFrame);
+
+    I32 width, height;
+    PKImageDecode_GetSize(upDecoder.get(), &width, &height);
+
+    PKPixelFormatGUID pixel_format_of_decoder;
+    PKImageDecode_GetPixelFormat(upDecoder.get(), &pixel_format_of_decoder);
+
+    const auto decode_info = get_destination_func(
+        JxrPixelFormatGuidToEnum(pixel_format_of_decoder), 
+        width, 
+        height);
+
+    PKRect rc;
+    rc.X = 0;
+    rc.Y = 0;
+    rc.Width = width;
+    rc.Height = height;
+    err = upDecoder->Copy(
+        upDecoder.get(),
+        &rc,
+        static_cast<U8*>(get<2>(decode_info)),
+        get<1>(decode_info));
+    if (Failed(err)) { ThrowError("PKImageDecode_Copy failed", err); }
+}
+
 
 void JxrDecode2::Decode(
            codecHandle h,
@@ -210,4 +257,46 @@ JxrDecode2::PixelFormat JxrPixelFormatGuidToEnum(const GUID& guid)
     }
 
     return JxrDecode2::PixelFormat::kInvalid;
+}
+
+void ThrowError(const char* error_message, ERR error_code)
+{
+    std::stringstream ss;
+    if (error_message != nullptr)
+    {
+        ss << "Error in JXR-decoder -> \"" << error_message << "\" code:" << error_code << " (" << ERR_to_string(error_code) << ")";
+    }
+    else
+    {
+        ss << "Error in JXR-decoder -> " << error_message << " (" << ERR_to_string(error_code) << ")";
+    }
+
+    throw std::runtime_error(ss.str());
+}
+
+const char* ERR_to_string(ERR error_code)
+{
+    switch (error_code)
+    {
+    case WMP_errSuccess:return "WMP_errSuccess";
+    case WMP_errFail:return "WMP_errFail";
+    case WMP_errNotYetImplemented:return "WMP_errNotYetImplemented";
+    case WMP_errAbstractMethod:return "WMP_errAbstractMethod";
+    case WMP_errOutOfMemory:return "WMP_errOutOfMemory";
+    case WMP_errFileIO:return "WMP_errFileIO";
+    case WMP_errBufferOverflow:return "WMP_errBufferOverflow";
+    case WMP_errInvalidParameter:return "WMP_errInvalidParameter";
+    case WMP_errInvalidArgument:return "WMP_errInvalidArgument";
+    case WMP_errUnsupportedFormat:return "WMP_errUnsupportedFormat";
+    case WMP_errIncorrectCodecVersion:return "WMP_errIncorrectCodecVersion";
+    case WMP_errIndexNotFound:return "WMP_errIndexNotFound";
+    case WMP_errOutOfSequence:return "WMP_errOutOfSequence";
+    case WMP_errNotInitialized:return "WMP_errNotInitialized";
+    case WMP_errMustBeMultipleOf16LinesUntilLastCall:return "WMP_errMustBeMultipleOf16LinesUntilLastCall";
+    case WMP_errPlanarAlphaBandedEncRequiresTempFile:return "WMP_errPlanarAlphaBandedEncRequiresTempFile";
+    case WMP_errAlphaModeCannotBeTranscoded:return "WMP_errAlphaModeCannotBeTranscoded";
+    case WMP_errIncorrectCodecSubVersion:return "WMP_errIncorrectCodecSubVersion";
+    }
+
+    return "unknown";
 }
