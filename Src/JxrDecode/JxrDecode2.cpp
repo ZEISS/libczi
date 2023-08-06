@@ -63,11 +63,11 @@ void JxrDecode2::Decode(
     if (Failed(err)) { ThrowError("decoder::Copy failed", err); }
 }
 
-void JxrDecode2::Encode(
+JxrDecode2::CompressedData JxrDecode2::Encode(
            JxrDecode2::PixelFormat pixel_format,
-           std::uint32_t  width,
-           std::uint32_t  height,
-           std::uint32_t  stride,
+           std::uint32_t width,
+           std::uint32_t height,
+           std::uint32_t stride,
            const void* ptr_bitmap)
 {
     ERR err;
@@ -90,7 +90,7 @@ void JxrDecode2::Encode(
     codec_parameters.uAlphaMode = 0;
     codec_parameters.uiDefaultQPIndex = 1;
     codec_parameters.uiDefaultQPIndexAlpha = 1;
-    
+
     //codec_parameters.fltImageQuality = 1.f;
     //codec_parameters.bOverlapSet = 0;
     //codec_parameters.bColorFormatSet = 0;
@@ -109,7 +109,9 @@ void JxrDecode2::Encode(
     err = pEncoder->SetResolution(pEncoder, 96.f, 96.f);
 
     pEncoder->WritePixels(pEncoder, height, (U8*)ptr_bitmap, stride);
-    pEncodeStream->Close(&pEncodeStream);
+
+    return CompressedData(pEncodeStream);
+    //pEncodeStream->Close(&pEncodeStream);
 }
 
 void JxrDecode2::Decode(
@@ -356,4 +358,32 @@ const char* ERR_to_string(ERR error_code)
     }
 
     return "unknown";
+}
+
+JxrDecode2::CompressedData::~CompressedData()
+{
+    if (this->obj_handle_ != nullptr)
+    {
+        CloseWS_HeapBackedWriteableStream((struct tagWMPStream**)&this->obj_handle_);
+    }
+}
+
+void* JxrDecode2::CompressedData::GetMemory()
+{
+    void* data = nullptr;
+    GetWS_HeapBackedWriteableStreamBuffer(
+        (struct tagWMPStream*)this->obj_handle_,
+        &data,
+        nullptr);
+    return data;
+}
+
+size_t JxrDecode2::CompressedData::GetSize()
+{
+    size_t size = 0;
+    GetWS_HeapBackedWriteableStreamBuffer(
+        (struct tagWMPStream*)this->obj_handle_,
+        nullptr,
+        &size);
+    return size;
 }

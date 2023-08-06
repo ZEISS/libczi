@@ -1,6 +1,7 @@
 #pragma once
 
 #include <functional>
+#include <memory>
 #include <tuple>
 #include <cstdint>
 
@@ -50,6 +51,39 @@ public:
     
     typedef void* codecHandle;
 
+    /// This class is used to represent a blob containing the compressed data.
+    /// Note that it is movable but not copyable.
+    class CompressedData
+    {
+    private:
+        void* obj_handle_;
+    public:
+        CompressedData():obj_handle_(nullptr){};
+        CompressedData& operator=(CompressedData&& other)
+        {
+            // "other" is soon going to be destroyed, so we let it destroy our current resource instead and we take "other"'s current resource via swapping
+            std::swap(this->obj_handle_, other.obj_handle_);
+            return *this;
+        }
+        // move constructor, takes a rvalue reference &&
+        CompressedData(CompressedData&& other)
+        {
+            // we "steal" the resource from "other"
+            this->obj_handle_ = other.obj_handle_;
+            // "other" will soon be destroyed and its destructor will do nothing because we null out its resource here
+            other.obj_handle_ = nullptr;
+        }
+        CompressedData(const CompressedData&)=delete; // prevent copy constructor to be used
+        CompressedData& operator=(const CompressedData&)=delete; // prevent copy assignment to be used
+
+        void* GetMemory();
+        size_t GetSize();
+        ~CompressedData();
+    protected:
+        friend class JxrDecode2;
+        CompressedData(void* obj_handle):obj_handle_(obj_handle){};
+    };
+
     void Decode(
            codecHandle h,
           // const WMPDECAPPARGS* decArgs,
@@ -65,6 +99,11 @@ public:
     /// * The 'get_destination_func' is called, passing in the pixel type, width, and height.    
     /// * The function should return a pointer to a buffer that can hold the uncompressed bitmap.
     ///    The tuple it returns is the pixel type, the stride and the pointer to the buffer.
+    /// Notes:
+    /// * The decoder will call the 'get_destination_func' function only once, and the buffer must be valid  
+    ///   until the method returns.
+    /// * The 'get_destination_func' function may choose to throw an exception (if the memory cannot be allocated,  
+    ///   or the reported characteristics are determined to be invalid, etc). 
     ///
     /// \param  ptrData                 Information describing the pointer.
     /// \param  size                    The size.
@@ -74,7 +113,7 @@ public:
             size_t size,
             const std::function<std::tuple<JxrDecode2::PixelFormat, std::uint32_t, void*>(PixelFormat pixel_format, std::uint32_t  width, std::uint32_t  height)>& get_destination_func);
 
-    void Encode(
+    CompressedData Encode(
             JxrDecode2::PixelFormat pixel_format,
             std::uint32_t  width,
             std::uint32_t  height,

@@ -329,9 +329,23 @@ EXTERN_C ERR CloseWS_File(struct tagWMPStream** ppWS);
 EXTERN_C ERR CreateWS_Memory(struct tagWMPStream** ppWS, void* pv, size_t cb);
 EXTERN_C ERR CloseWS_Memory(struct tagWMPStream** ppWS);
 
-// create a write-only memory stream that allocates memory from the heap
+/// Create a write-only memory stream that allocates memory from the heap.
+///
+/// \param [out]    ppWS        If successful, the newly constructed object is placed here.
+/// \param          cbInitial   The initial size of the buffer in bytes.
+/// \param          cbGrowBy    If the buffer needs to be grown, it will be grown by a multiple of this number (in bytes).
+///                             If 0, then the buffer will be grown by the current size of the buffer.
+///
+/// \returns    An error code indicating success of failure.
 EXTERN_C ERR CreateWS_HeapBackedWriteableStream(struct tagWMPStream** ppWS, size_t cbInitial, size_t cbGrowBy);
 EXTERN_C ERR CloseWS_HeapBackedWriteableStream(struct tagWMPStream** ppWS);
+
+/// Gets (for a heap backed writeable stream buffer object) a pointer to the buffer and the size of the buffer.
+///
+/// \param [in] pWS         The heap backed writeable stream buffer object.
+/// \param [in,out] ppbBuf  If non-null, a pointer to the buffer will be placed here.
+/// \param [in,out] pcbBuf  If non-null, the size of the buffer (in bytes) will be placed here.
+EXTERN_C void GetWS_HeapBackedWriteableStreamBuffer(struct tagWMPStream* pWS, void** ppbBuf, size_t* pcbBuf);
 
 //================================================================
 // Enc/Dec data structure

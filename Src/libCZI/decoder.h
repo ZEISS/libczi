@@ -6,6 +6,7 @@
 
 #include <memory>
 #include "libCZI_Pixels.h"
+#include "libCZI_compress.h"
 #include "../JxrDecode/JxrDecode.h"
 #include "libCZI_Site.h"
 
@@ -24,5 +25,5 @@ public:
     std::shared_ptr<libCZI::IBitmapData> Decode(const void* ptrData, size_t size, libCZI::PixelType, std::uint32_t width, std::uint32_t height) override;
     std::shared_ptr<libCZI::IBitmapData> Decode2(const void* ptrData, size_t size, libCZI::PixelType, std::uint32_t width, std::uint32_t height);
 
-    void Encode(libCZI::PixelType pixel_type, std::uint32_t width, std::uint32_t height, std::uint32_t stride, const void* ptrData);
+    std::shared_ptr<libCZI::IMemoryBlock> Encode(libCZI::PixelType pixel_type, std::uint32_t width, std::uint32_t height, std::uint32_t stride, const void* ptrData);
 };

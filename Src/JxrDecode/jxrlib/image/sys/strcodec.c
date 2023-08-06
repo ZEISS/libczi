@@ -477,9 +477,9 @@ ERR CreateWS_HeapBackedWriteableStream(struct tagWMPStream** ppWS, size_t cbInit
     pWS->state.writeableHeapBased.pbBuf = (U8*)malloc(cbInitial);
 
     pWS->Close = CloseWS_HeapBackedWriteableStream;
-    pWS->EOS = NULL;// EOSWS_Memory;
+    pWS->EOS = EOSWS_HeapBackedWriteableStream;
 
-    pWS->Read = NULL;
+    pWS->Read = ReadWS_HeapBackedWriteableStream;
     pWS->Write = WriteWS_HeapBackedWriteableStream;
 
     pWS->SetPos = SetPosWS_HeapBackedWriteableStream;
@@ -512,14 +512,22 @@ static EnsureSize_HeapBackedWriteableStream(struct tagWMPStream* pWS, size_t siz
 
     if (pWS->state.writeableHeapBased.cbAllocatedSize < size_required)
     {
+        // determine in which chunk size to grow the buffer
         size_t increment = pWS->state.writeableHeapBased.cbGrowBy;
         if (increment == 0)
         {
+            // if no increment size is specified, grow by a multiple of the current size
             increment = pWS->state.writeableHeapBased.cbAllocatedSize;
         }
 
+        // how many additional bytes do we need - note that this is guaranteed to be > 0
+        size_t size_to_grow = size_required - pWS->state.writeableHeapBased.cbAllocatedSize;
+
+        // ...and calculate the new size (where we round up to a multiple of the increment size determined above)
         size_t cbNewSize = pWS->state.writeableHeapBased.cbAllocatedSize + 
-                            ((size_required - pWS->state.writeableHeapBased.cbAllocatedSize + increment -1)/increment)*increment;
+                            ((size_to_grow + increment -1) / increment) * increment;
+
+        // note that if realloc fails, the original buffer is left untouched
         void* pvNew = realloc(pWS->state.writeableHeapBased.pbBuf, cbNewSize);
 
         FailIf(NULL == pvNew, WMP_errOutOfMemory);
@@ -536,7 +544,7 @@ ERR WriteWS_HeapBackedWriteableStream(struct tagWMPStream* pWS, const void* pv, 
 {
     ERR err = WMP_errSuccess;
 
-    EnsureSize_HeapBackedWriteableStream(pWS, pWS->state.writeableHeapBased.cbCur + cb);
+    Call(EnsureSize_HeapBackedWriteableStream(pWS, pWS->state.writeableHeapBased.cbCur + cb));
 
     memcpy((U8*)pWS->state.pvObj + pWS->state.writeableHeapBased.cbCur, pv, cb);
     pWS->state.writeableHeapBased.cbCur += cb;
@@ -551,20 +559,45 @@ Cleanup:
 
 ERR SetPosWS_HeapBackedWriteableStream(struct tagWMPStream* pWS, size_t offPos)
 {
-    EnsureSize_HeapBackedWriteableStream(pWS, offPos);
+    ERR err = WMP_errSuccess;
+    Call(EnsureSize_HeapBackedWriteableStream(pWS, offPos));
     pWS->state.writeableHeapBased.cbCur = offPos;
     if (pWS->state.writeableHeapBased.cbCur > pWS->state.writeableHeapBased.cbMax)
     {
         pWS->state.writeableHeapBased.cbMax = pWS->state.writeableHeapBased.cbCur;
     }
 
-    return WMP_errSuccess;
+Cleanup:
+    return err;
 }
 
 ERR GetPosWS_HeapBackedWriteableStream(struct tagWMPStream* pWS, size_t* poffPos)
 {
     *poffPos = pWS->state.writeableHeapBased.cbCur;
     return WMP_errSuccess;
+}
+
+void GetWS_HeapBackedWriteableStreamBuffer(struct tagWMPStream* pWS, void** ppbBuf, size_t* pcbBuf)
+{
+    if (ppbBuf != NULL)
+    {
+        *ppbBuf = pWS->state.writeableHeapBased.pbBuf;
+    }
+
+    if (pcbBuf != NULL)
+    {
+        *pcbBuf = pWS->state.writeableHeapBased.cbMax;
+    }
+}
+
+Bool EOSWS_HeapBackedWriteableStream(struct tagWMPStream* pWS)
+{
+    return WMP_errAbstractMethod;
+}
+
+ERR ReadWS_HeapBackedWriteableStream(struct tagWMPStream* pWS, void* pv, size_t cb)
+{
+    return WMP_errAbstractMethod;
 }
 
 //=================================================================
