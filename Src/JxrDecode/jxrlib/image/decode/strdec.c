@@ -29,14 +29,6 @@
 #include "decode.h"
 #include "../sys/strTransform.h"
 #include <math.h>
-//#include "perfTimer.h"
-
-#ifdef MEM_TRACE
-#define TRACE_MALLOC    1
-#define TRACE_NEW       0
-#define TRACE_HEAP      0
-#include "memtrace.h"
-#endif
 
 #ifdef X86OPT_INLINE
 #define _FORCEINLINE __forceinline

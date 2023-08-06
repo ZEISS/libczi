@@ -40,13 +40,6 @@ Revision History:
 #include "../sys/strcodec.h"
 #include "decode.h"
 
-//#ifdef MEM_TRACE
-//#define TRACE_MALLOC    1
-//#define TRACE_NEW       0
-//#define TRACE_HEAP      0
-//#include "memtrace.h"
-//#endif
-
 /******************************************************************
 Free Adaptive Huffman Table
 ******************************************************************/
