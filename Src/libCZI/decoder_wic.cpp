@@ -8,7 +8,6 @@
 #include "BitmapOperations.h"
 #include <wincodec.h>
 
-//#include <atlbase.h>
 #include "Site.h"
 
 #pragma comment(lib, "Windowscodecs.lib")
@@ -40,19 +39,17 @@ static void ThrowIfFailed(const char* function, HRESULT hr)
 
 /*static*/std::shared_ptr<CWicJpgxrDecoder> CWicJpgxrDecoder::Create()
 {
-    //CComPtr<IWICImagingFactory> cpWicImagingFactor;
     IWICImagingFactory* wicImagingFactor;
-    HRESULT hr = CoCreateInstance(CLSID_WICImagingFactory, NULL, CLSCTX_INPROC_SERVER, IID_IWICImagingFactory, (LPVOID*)&wicImagingFactor);
+    HRESULT hr = CoCreateInstance(CLSID_WICImagingFactory, NULL, CLSCTX_INPROC_SERVER, IID_IWICImagingFactory, reinterpret_cast<LPVOID*>(&wicImagingFactor));
     if (hr == CO_E_NOTINITIALIZED)
     {
         // that's for sure a bit controversial (that we call this COM-initialization here, you better make sure
         // that the current thread is already initialized by the caller
         CoInitializeEx(NULL, COINIT_MULTITHREADED | COINIT_DISABLE_OLE1DDE);
-        hr = CoCreateInstance(CLSID_WICImagingFactory, NULL, CLSCTX_INPROC_SERVER, IID_IWICImagingFactory, (LPVOID*)&wicImagingFactor);
+        hr = CoCreateInstance(CLSID_WICImagingFactory, NULL, CLSCTX_INPROC_SERVER, IID_IWICImagingFactory, reinterpret_cast<LPVOID*>(&wicImagingFactor));
     }
 
     ThrowIfFailed("Creating WICImageFactory", hr);
-
     return make_shared<CWicJpgxrDecoder>(wicImagingFactor);
 }
 
@@ -234,14 +231,12 @@ static bool DeterminePixelType(const WICPixelFormatGUID& wicPxlFmt, GUID* destPi
     IWICStream* wicStream;
     HRESULT hr = this->pFactory->CreateStream(&wicStream/*cpWicStream*/);
     ThrowIfFailed("pFactory->CreateStream", hr);
-    //CComPtr<IWICStream> cpWicStream;
     unique_ptr<IWICStream, COMDeleter> up_wicStream(wicStream);
 
     // Initialize the stream with the memory pointer and size.
     hr = up_wicStream->InitializeFromMemory(static_cast<WICInProcPointer>(const_cast<void*>(ptrData)), static_cast<DWORD>(size));
     ThrowIfFailed("wicStream->InitializeFromMemory", hr);
 
-    //CComPtr<IWICBitmapDecoder> cpWicBitmapDecoder;
     IWICBitmapDecoder* wicBitmapDecoder;
     hr = this->pFactory->CreateDecoderFromStream(
         up_wicStream.get(),
@@ -251,9 +246,8 @@ static bool DeterminePixelType(const WICPixelFormatGUID& wicPxlFmt, GUID* destPi
     ThrowIfFailed("pFactory->CreateDecoderFromStream", hr);
     unique_ptr< IWICBitmapDecoder, COMDeleter> up_wicBitmapDecoder(wicBitmapDecoder);
 
-    //CComPtr<IWICBitmapFrameDecode> cpWicBitmapFrameDecode;
     IWICBitmapFrameDecode* wicBitmapFrameDecode;
-    hr = up_wicBitmapDecoder->GetFrame(0, /*&cpWicBitmapFrameDecode*/&wicBitmapFrameDecode);
+    hr = up_wicBitmapDecoder->GetFrame(0, &wicBitmapFrameDecode);
     ThrowIfFailed("wicBitmapDecoder->GetFrame", hr);
     unique_ptr<IWICBitmapFrameDecode, COMDeleter> up_wicBitmapFrameDecode(wicBitmapFrameDecode);
 
@@ -305,7 +299,6 @@ static bool DeterminePixelType(const WICPixelFormatGUID& wicPxlFmt, GUID* destPi
     }
     else
     {
-        //CComPtr<IWICFormatConverter> pFormatConverter;
         IWICFormatConverter* pFormatConverter;
         hr = this->pFactory->CreateFormatConverter(&pFormatConverter);
         ThrowIfFailed("pFactory->CreateFormatConverter", hr);
@@ -318,7 +311,7 @@ static bool DeterminePixelType(const WICPixelFormatGUID& wicPxlFmt, GUID* destPi
             WICBitmapPaletteTypeCustom);     // Palette translation type
         ThrowIfFailed("pFormatConverter->Initialize", hr);
         unique_ptr<IWICFormatConverter, COMDeleter> up_formatConverter(pFormatConverter);
-        hr = pFormatConverter->CopyPixels(NULL, bmLckInfo.stride, bmLckInfo.stride * sizeBitmap.h, (BYTE*)bmLckInfo.ptrDataRoi);
+        hr = pFormatConverter->CopyPixels(NULL, bmLckInfo.stride, bmLckInfo.stride * sizeBitmap.h, static_cast<BYTE*>(bmLckInfo.ptrDataRoi));
         ThrowIfFailed("pFormatConverter->CopyPixels", hr);
     }
 
