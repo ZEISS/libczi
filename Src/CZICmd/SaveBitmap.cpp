@@ -35,14 +35,12 @@ struct COMDeleter
 class CWicSaveBitmap :public ISaveBitmap
 {
 private:
-    //CComPtr<IWICImagingFactory> cpWicImagingFactory;
     unique_ptr<IWICImagingFactory, COMDeleter> cpWicImagingFactory;
 public:
     CWicSaveBitmap()
     {
         IWICImagingFactory* pWicImagingFactory;
-        HRESULT hr = CoCreateInstance(CLSID_WICImagingFactory, NULL, CLSCTX_INPROC_SERVER, IID_IWICImagingFactory, (LPVOID*)&pWicImagingFactory);
-        //HRESULT hr = CoCreateInstance(CLSID_WICImagingFactory, NULL, CLSCTX_INPROC_SERVER, IID_IWICImagingFactory, (LPVOID*)&this->cpWicImagingFactory);
+        const HRESULT hr = CoCreateInstance(CLSID_WICImagingFactory, NULL, CLSCTX_INPROC_SERVER, IID_IWICImagingFactory, reinterpret_cast<LPVOID*>(&pWicImagingFactory));
         ThrowIfFailed("Creating WICImageFactory", hr);
         this->cpWicImagingFactory = unique_ptr<IWICImagingFactory, COMDeleter>(pWicImagingFactory);
     }
@@ -78,12 +76,11 @@ public:
 private:
     void SaveWithWIC(const wchar_t* filename, const GUID encoder, const WICPixelFormatGUID& wicPixelFmt, libCZI::IBitmapData* bitmap)
     {
-        //CComPtr<IWICStream> stream;
         IWICStream* stream;
         // Create a stream for the encoder
         HRESULT hr = this->cpWicImagingFactory->CreateStream(&stream);
         ThrowIfFailed("IWICImagingFactory::CreateStream", hr);
-        unique_ptr<IWICStream, COMDeleter> up_stream(stream);
+        const unique_ptr<IWICStream, COMDeleter> up_stream(stream);
 
         // Initialize the stream using the output file path
         hr = up_stream->InitializeFromFilename(filename, GENERIC_WRITE);
@@ -99,7 +96,6 @@ private:
     {
         // cf. http://msdn.microsoft.com/en-us/library/windows/desktop/ee719797(v=vs.85).aspx
 
-        //CComPtr<IWICBitmapEncoder> wicBitmapEncoder;
         IWICBitmapEncoder* wicBitmapEncoder;
         HRESULT hr = this->cpWicImagingFactory->CreateEncoder(
             encoder,
@@ -112,7 +108,6 @@ private:
         hr = wicBitmapEncoder->Initialize(destStream, WICBitmapEncoderNoCache);
         ThrowIfFailed("IWICBitmapEncoder::Initialize", hr);
 
-        //CComPtr<IWICBitmapFrameEncode> frameEncode;
         IWICBitmapFrameEncode* frameEncode;
         hr = wicBitmapEncoder->CreateNewFrame(&frameEncode, nullptr);
         ThrowIfFailed("IWICBitmapEncoder::CreateNewFrame", hr);
@@ -137,7 +132,7 @@ private:
             // TODO
         }
 
-        auto bitmapData = spBitmap->Lock();
+        const auto bitmapData = spBitmap->Lock();
         hr = frameEncode->WritePixels(spBitmap->GetHeight(), bitmapData.stride, spBitmap->GetHeight() * bitmapData.stride, static_cast<BYTE*>(bitmapData.ptrDataRoi));
         spBitmap->Unlock();
         ThrowIfFailed("IWICBitmapFrameEncode::WritePixels", hr);
