@@ -12,7 +12,6 @@
 //-----------------------------------------------------------------------------
 
 #if CZICMD_USE_WIC == 1
-//#include <atlbase.h>
 #include <memory>
 #include <wincodec.h>
 

@@ -234,7 +234,7 @@ static bool DeterminePixelType(const WICPixelFormatGUID& wicPxlFmt, GUID* destPi
     unique_ptr<IWICStream, COMDeleter> up_wicStream(wicStream);
 
     // Initialize the stream with the memory pointer and size.
-    hr = up_wicStream->InitializeFromMemory(static_cast<WICInProcPointer>(const_cast<void*>(ptrData)), static_cast<DWORD>(size));
+    hr = up_wicStream->InitializeFromMemory(static_cast<BYTE*>(const_cast<void*>(ptrData)), static_cast<DWORD>(size));
     ThrowIfFailed("wicStream->InitializeFromMemory", hr);
 
     IWICBitmapDecoder* wicBitmapDecoder;

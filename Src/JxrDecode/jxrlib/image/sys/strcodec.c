@@ -506,7 +506,7 @@ Cleanup:
     return err;
 }
 
-static EnsureSize_HeapBackedWriteableStream(struct tagWMPStream* pWS, size_t size_required)
+static ERR EnsureSize_HeapBackedWriteableStream(struct tagWMPStream* pWS, size_t size_required)
 {
     ERR err = WMP_errSuccess;
 
