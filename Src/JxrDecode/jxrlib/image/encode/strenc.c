@@ -418,12 +418,12 @@ static _FORCEINLINE PixelI forwardHalf(PixelI hHalf)
 // BitIOInfo init/term for encoding
 const size_t MAX_MEMORY_SIZE_IN_WORDS = 64 << 20; // 1 << 20 \approx 1 million
 
-#include <Windows.h>
-#define _WINDOWS_ 1
+//#include <Windows.h>
+//#define _WINDOWS_ 1
 
 Int StrIOEncInit(CWMImageStrCodec* pSC)
 {
-//#if false   // TODO TODO TODO
+#if false   // TODO TODO TODO
     pSC->m_param.bIndexTable = !(pSC->WMISCP.bfBitstreamFormat == SPATIAL && pSC->WMISCP.cNumOfSliceMinus1H + pSC->WMISCP.cNumOfSliceMinus1V == 0);
     if (allocateBitIOInfo(pSC) != ICERR_OK) {
         return ICERR_ERROR;
@@ -501,7 +501,7 @@ Int StrIOEncInit(CWMImageStrCodec* pSC)
             attachISWrite(pSC->m_ppBitIO[i], pSC->ppWStream[i]);
         }
     }
-//#endif
+#endif
     return ICERR_OK;
 }
 
