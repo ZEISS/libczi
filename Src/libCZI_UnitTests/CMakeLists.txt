@@ -17,8 +17,8 @@ FetchContent_MakeAvailable(googletest)
 
 
 ADD_EXECUTABLE(libCZI_UnitTests 
-										inc_libCZI.h              
-										pch.h                          
+										inc_libCZI.h
+										include_gtest.h
 										testImage.h                     
 										test_readerwriter.cpp
 										main.cpp                 
@@ -49,8 +49,7 @@ ADD_EXECUTABLE(libCZI_UnitTests
 										testImage1.cpp                 
 										test_multichannelcomposite.cpp  
 										utils.cpp
-					#					pch.cpp
-										testImage.cpp                  
+										testImage.cpp
 										test_reader.cpp                 
 										utils.h 
 										test_Accessors.cpp)
