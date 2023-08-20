@@ -296,14 +296,11 @@ __pycache__/
 
 # BEGIN additions to the stock .gitignore-file
 
-# exclude "cmake-directory"
-cmake-build-debug/
-
-
+# exclude "cmake-build-directory"
+/cmake-build-*/
 
 /build
 /Src/Build/VS
-/cmake-build-debug---wsl
 /out/Src/Build/Doxygen/
 /out/
 /Src/.vscode

@@ -2,7 +2,6 @@
 //
 // SPDX-License-Identifier: LGPL-3.0-or-later
 
-#include "pch.h"
 #include "utils.h"
 #include "../libCZI/bitmapData.h"
 
