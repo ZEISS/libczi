@@ -59,20 +59,22 @@ public:
         void* obj_handle_;
     public:
         CompressedData():obj_handle_(nullptr){};
-        CompressedData& operator=(CompressedData&& other)
+        CompressedData& operator=(CompressedData&& other) noexcept
         {
             // "other" is soon going to be destroyed, so we let it destroy our current resource instead and we take "other"'s current resource via swapping
             std::swap(this->obj_handle_, other.obj_handle_);
             return *this;
         }
+
         // move constructor, takes a rvalue reference &&
-        CompressedData(CompressedData&& other)
+        CompressedData(CompressedData&& other) noexcept
         {
             // we "steal" the resource from "other"
             this->obj_handle_ = other.obj_handle_;
             // "other" will soon be destroyed and its destructor will do nothing because we null out its resource here
             other.obj_handle_ = nullptr;
         }
+
         CompressedData(const CompressedData&)=delete; // prevent copy constructor to be used
         CompressedData& operator=(const CompressedData&)=delete; // prevent copy assignment to be used
 

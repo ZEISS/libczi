@@ -70,13 +70,10 @@ JxrDecode2::CompressedData JxrDecode2::Encode(
            std::uint32_t stride,
            const void* ptr_bitmap)
 {
-    ERR err;
     PKImageEncode* pEncoder;
-    err = PKCodecFactory_CreateCodec(&IID_PKImageWmpEncode, (void**)&pEncoder);
+    ERR err = PKCodecFactory_CreateCodec(&IID_PKImageWmpEncode, (void**)&pEncoder);
 
-
-    CWMIStrCodecParam codec_parameters;
-    memset(&codec_parameters, 0, sizeof(codec_parameters));
+    CWMIStrCodecParam codec_parameters = {};
     //codec_parameters.guidPixFormat = GUID_PKPixelFormat24bppBGR;
     codec_parameters.bVerbose = FALSE;
     codec_parameters.cfColorFormat = YUV_444;

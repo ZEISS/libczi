@@ -6,6 +6,7 @@
 #include <cstdint>
 #include "inc_libCZI.h"
 #include "testImage.h"
+#include "utils.h"
 #include "../libCZI/decoder.h"
 
 using namespace libCZI;
@@ -59,23 +60,39 @@ TEST(JxrDecode, TryDecodeInvalidDataExpectException)
     EXPECT_ANY_THROW(dec->Decode(encoded_data.get(), sizeEncoded, libCZI::PixelType::Invalid, 0, 0));
 }
 
-TEST(JxrDecode, TestEncoder)
+TEST(JxrDecode, CompressAndDecompressCheckForSameContent)
 {
-    auto bitmap = CBitmapData<CHeapAllocator>::Create(PixelType::Bgr24, CTestImage::BGR24TESTIMAGE_WIDTH, CTestImage::BGR24TESTIMAGE_HEIGHT);
+    const auto bitmap = CBitmapData<CHeapAllocator>::Create(PixelType::Bgr24, CTestImage::BGR24TESTIMAGE_WIDTH, CTestImage::BGR24TESTIMAGE_HEIGHT);
     {
-        ScopedBitmapLockerSP lck{ bitmap };
+        const ScopedBitmapLockerSP lck{ bitmap };
         CTestImage::CopyBgr24Image(lck.ptrDataRoi, bitmap->GetWidth(), bitmap->GetHeight(), lck.stride);
     }
 
     const auto codec = CJxrLibDecoder::Create();
+    shared_ptr<libCZI::IMemoryBlock> encodedData;
 
     {
-        ScopedBitmapLockerSP lck{ bitmap };
-        codec->Encode(
-            bitmap->GetPixelType(), 
-            bitmap->GetWidth(), 
-            bitmap->GetHeight(), 
-            lck.stride, 
+        const ScopedBitmapLockerSP lck{ bitmap };
+        encodedData = codec->Encode(
+            bitmap->GetPixelType(),
+            bitmap->GetWidth(),
+            bitmap->GetHeight(),
+            lck.stride,
             lck.ptrDataRoi);
     }
+
+    void* encoded_data_ptr = encodedData->GetPtr();
+    ASSERT_NE(encoded_data_ptr, nullptr) << "Encoded data is null.";
+    const size_t size_of_encoded_data = encodedData->GetSizeOfData();
+    ASSERT_LT(size_of_encoded_data, static_cast<size_t>(Utils::GetBytesPerPixel(bitmap->GetPixelType()) * bitmap->GetWidth() * bitmap->GetHeight())) <<
+        "Encoded data is too large (larger than the original data), which is unexpected.";
+
+    const auto bitmap_decoded = codec->Decode(
+        encodedData->GetPtr(),
+        encodedData->GetSizeOfData(),
+        libCZI::PixelType::Bgr24,
+        bitmap->GetWidth(),
+        bitmap->GetHeight());
+    const bool are_equal = AreBitmapDataEqual(bitmap, bitmap_decoded);
+    EXPECT_TRUE(are_equal) << "Original bitmap and encoded-decoded one are not identical.";
 }

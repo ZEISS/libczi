@@ -439,10 +439,10 @@ bool AreBitmapDataEqual(const std::shared_ptr<libCZI::IBitmapData>& bmp1, const 
             const uint8_t* bufBmp1 = reinterpret_cast<const uint8_t*>(lockBmp1.ptrDataRoi);
             const uint8_t* bufBmp2 = reinterpret_cast<const uint8_t*>(lockBmp2.ptrDataRoi);
 
-            uint32_t height = bmp1->GetHeight();
+            const uint32_t height = bmp1->GetHeight();
             size_t line = bmp1->GetWidth() * static_cast<size_t>(Utils::GetBytesPerPixel(bmp1->GetPixelType()));
-            uint32_t stride1 = lockBmp1.stride;
-            uint32_t stride2 = lockBmp2.stride;
+            const uint32_t stride1 = lockBmp1.stride;
+            const uint32_t stride2 = lockBmp2.stride;
 
             for (uint32_t i = 0; i < height; ++i)
             {
