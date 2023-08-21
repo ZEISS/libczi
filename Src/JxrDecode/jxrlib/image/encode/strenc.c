@@ -416,7 +416,7 @@ static _FORCEINLINE PixelI forwardHalf(PixelI hHalf)
 
 //================================================================
 // BitIOInfo init/term for encoding
-const size_t MAX_MEMORY_SIZE_IN_WORDS = 64 << 20; // 1 << 20 \approx 1 million
+//const size_t MAX_MEMORY_SIZE_IN_WORDS = 64 << 20; // 1 << 20 \approx 1 million
 
 //#include <Windows.h>
 //#define _WINDOWS_ 1
@@ -433,11 +433,11 @@ Int StrIOEncInit(CWMImageStrCodec* pSC)
 
     if (pSC->cNumBitIO > 0) {
         size_t i;
-#if defined(_WINDOWS_) || defined(UNDER_CE)  // tmpnam does not exist in VS2005 WinCE CRT
+/*#if defined(_WINDOWS_) || defined(UNDER_CE)  // tmpnam does not exist in VS2005 WinCE CRT
         TCHAR szPath[MAX_PATH];
         DWORD cSize, j, k;
 #endif
-        char* pFilename;
+        char* pFilename;*/
 
         pSC->ppWStream = (struct tagWMPStream**)malloc(pSC->cNumBitIO * sizeof(struct WMPStream*));
         if (pSC->ppWStream == NULL) return ICERR_ERROR;
@@ -706,7 +706,7 @@ Int StrIOEncTerm(CWMImageStrCodec* pSC)
             }
         }
 
-        if (pSC->cmbHeight * pSC->cmbWidth * pSC->WMISCP.cChannel >= MAX_MEMORY_SIZE_IN_WORDS) {
+        /*if (pSC->cmbHeight * pSC->cmbWidth * pSC->WMISCP.cChannel >= MAX_MEMORY_SIZE_IN_WORDS) {
             for (i = 0; i < pSC->cNumBitIO; i++) {
                 if (pSC->ppWStream && pSC->ppWStream[i]) {
                     if ((*(pSC->ppWStream + i))->state.file.pFile) {
@@ -732,7 +732,7 @@ Int StrIOEncTerm(CWMImageStrCodec* pSC)
             if (pSC->ppTempFile)
                 free(pSC->ppTempFile);
         }
-        else {
+        else*/ {
             for (i = 0; i < pSC->cNumBitIO; i++) {
                 if (pSC->ppWStream && pSC->ppWStream[i])
                     pSC->ppWStream[i]->Close(pSC->ppWStream + i);
