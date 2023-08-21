@@ -423,7 +423,7 @@ const size_t MAX_MEMORY_SIZE_IN_WORDS = 64 << 20; // 1 << 20 \approx 1 million
 
 Int StrIOEncInit(CWMImageStrCodec* pSC)
 {
-#if false   // TODO TODO TODO
+//#if false   // TODO TODO TODO
     pSC->m_param.bIndexTable = !(pSC->WMISCP.bfBitstreamFormat == SPATIAL && pSC->WMISCP.cNumOfSliceMinus1H + pSC->WMISCP.cNumOfSliceMinus1V == 0);
     if (allocateBitIOInfo(pSC) != ICERR_OK) {
         return ICERR_ERROR;
@@ -443,7 +443,7 @@ Int StrIOEncInit(CWMImageStrCodec* pSC)
         if (pSC->ppWStream == NULL) return ICERR_ERROR;
         memset(pSC->ppWStream, 0, pSC->cNumBitIO * sizeof(struct tagWMPStream*));
 
-        if (pSC->cmbHeight * pSC->cmbWidth * pSC->WMISCP.cChannel >= MAX_MEMORY_SIZE_IN_WORDS) {
+/*        if (pSC->cmbHeight * pSC->cmbWidth * pSC->WMISCP.cChannel >= MAX_MEMORY_SIZE_IN_WORDS) {
 #ifdef _WINDOWS_
             pSC->ppTempFile = (TCHAR**)malloc(pSC->cNumBitIO * sizeof(TCHAR*));
             if (pSC->ppTempFile == NULL) return ICERR_ERROR;
@@ -453,10 +453,10 @@ Int StrIOEncInit(CWMImageStrCodec* pSC)
             if (pSC->ppTempFile == NULL) return ICERR_ERROR;
             memset(pSC->ppTempFile, 0, pSC->cNumBitIO * sizeof(char*));
 #endif
-        }
+        }*/
 
         for (i = 0; i < pSC->cNumBitIO; i++) {
-            if (pSC->cmbHeight * pSC->cmbWidth * pSC->WMISCP.cChannel >= MAX_MEMORY_SIZE_IN_WORDS) {
+  /*          if (pSC->cmbHeight * pSC->cmbWidth * pSC->WMISCP.cChannel >= MAX_MEMORY_SIZE_IN_WORDS) {
 #if defined(_WINDOWS_) || defined(UNDER_CE)  // tmpnam does not exist in VS2005 WinCE CRT              
                 Bool bUnicode = sizeof(TCHAR) == 2;
                 pSC->ppTempFile[i] = (TCHAR*)malloc(MAX_PATH * sizeof(TCHAR));
@@ -495,13 +495,13 @@ Int StrIOEncInit(CWMImageStrCodec* pSC)
                 if (CreateWS_File(pSC->ppWStream + i, pFilename, "w+b") != ICERR_OK) return ICERR_ERROR;
 
             }
-            else {
+            else */{
                 if (CreateWS_List(pSC->ppWStream + i) != ICERR_OK) return ICERR_ERROR;
             }
             attachISWrite(pSC->m_ppBitIO[i], pSC->ppWStream[i]);
         }
     }
-#endif
+//#endif
     return ICERR_OK;
 }
 
