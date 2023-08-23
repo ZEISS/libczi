@@ -15,6 +15,7 @@ public:
         kBgr48,
         kGray8,
         kGray16,
+        _32bppGrayFloat,
         /*dontCare,
         _24bppBGR,
         _1bppBlackWhite,
@@ -120,5 +121,6 @@ public:
             std::uint32_t  width,
             std::uint32_t  height,
             std::uint32_t  stride,
-            const void* ptr_bitmap);
+            const void* ptr_bitmap,
+            float quality = 1.f);
 };

@@ -8,6 +8,7 @@
 
 using namespace std;
 
+static void ApplyQuality(float quality, JxrDecode2::PixelFormat pixel_format, std::uint32_t width, PKImageEncode* pEncoder);
 static JxrDecode2::PixelFormat JxrPixelFormatGuidToEnum(const GUID& guid);
 static void ThrowError(const char* error_message, ERR error_code);
 static const char* ERR_to_string(ERR error_code);
@@ -68,7 +69,8 @@ JxrDecode2::CompressedData JxrDecode2::Encode(
            std::uint32_t width,
            std::uint32_t height,
            std::uint32_t stride,
-           const void* ptr_bitmap)
+           const void* ptr_bitmap,
+           float quality/*=1.f*/)
 {
     PKImageEncode* pEncoder;
     ERR err = PKCodecFactory_CreateCodec(&IID_PKImageWmpEncode, (void**)&pEncoder);
@@ -86,6 +88,7 @@ JxrDecode2::CompressedData JxrDecode2::Encode(
     codec_parameters.sbSubband = SB_ALL;
     codec_parameters.uAlphaMode = 0;
     codec_parameters.uiDefaultQPIndex = 1;
+
     codec_parameters.uiDefaultQPIndexAlpha = 1;
 
     //codec_parameters.fltImageQuality = 1.f;
@@ -101,7 +104,27 @@ JxrDecode2::CompressedData JxrDecode2::Encode(
 
     err = pEncoder->Initialize(pEncoder, pEncodeStream, &codec_parameters, sizeof(codec_parameters));
 
-    err = pEncoder->SetPixelFormat(pEncoder, GUID_PKPixelFormat24bppBGR);
+    if (quality < 1.f)
+    {
+        ApplyQuality(quality, pixel_format, width, pEncoder);
+    }
+
+    switch (pixel_format)
+    {
+    case PixelFormat::kBgr24:
+        err = pEncoder->SetPixelFormat(pEncoder, GUID_PKPixelFormat24bppBGR);
+        break;
+    case PixelFormat::kGray8:
+        err = pEncoder->SetPixelFormat(pEncoder, GUID_PKPixelFormat8bppGray);
+        break;
+    case PixelFormat::kBgr48:
+        err = pEncoder->SetPixelFormat(pEncoder, GUID_PKPixelFormat48bppRGB);
+        break;
+    case PixelFormat::kGray16:
+        err = pEncoder->SetPixelFormat(pEncoder, GUID_PKPixelFormat16bppGray);
+        break;
+    }
+    //err = pEncoder->SetPixelFormat(pEncoder, GUID_PKPixelFormat24bppBGR);
     err = pEncoder->SetSize(pEncoder, width, height);
     err = pEncoder->SetResolution(pEncoder, 96.f, 96.f);
 
@@ -383,4 +406,180 @@ size_t JxrDecode2::CompressedData::GetSize()
         nullptr,
         &size);
     return size;
+}
+
+/*static*/void ApplyQuality(float quality, JxrDecode2::PixelFormat pixel_format, uint32_t width, PKImageEncode* pEncoder)
+{
+    // this is resembling the code from https://github.com/ptahmose/jxrlib/blob/f7521879862b9085318e814c6157490dd9dbbdb4/jxrencoderdecoder/JxrEncApp.c#L677C1-L738C10
+#if 1
+    // optimized for PSNR
+    static const int DPK_QPS_420[11][6] = {      // for 8 bit only
+        { 66, 65, 70, 72, 72, 77 },
+        { 59, 58, 63, 64, 63, 68 },
+        { 52, 51, 57, 56, 56, 61 },
+        { 48, 48, 54, 51, 50, 55 },
+        { 43, 44, 48, 46, 46, 49 },
+        { 37, 37, 42, 38, 38, 43 },
+        { 26, 28, 31, 27, 28, 31 },
+        { 16, 17, 22, 16, 17, 21 },
+        { 10, 11, 13, 10, 10, 13 },
+        {  5,  5,  6,  5,  5,  6 },
+        {  2,  2,  3,  2,  2,  2 }
+    };
+
+    static const int DPK_QPS_8[12][6] = {
+        { 67, 79, 86, 72, 90, 98 },
+        { 59, 74, 80, 64, 83, 89 },
+        { 53, 68, 75, 57, 76, 83 },
+        { 49, 64, 71, 53, 70, 77 },
+        { 45, 60, 67, 48, 67, 74 },
+        { 40, 56, 62, 42, 59, 66 },
+        { 33, 49, 55, 35, 51, 58 },
+        { 27, 44, 49, 28, 45, 50 },
+        { 20, 36, 42, 20, 38, 44 },
+        { 13, 27, 34, 13, 28, 34 },
+        {  7, 17, 21,  8, 17, 21 }, // Photoshop 100%
+        {  2,  5,  6,  2,  5,  6 }
+    };
+#else
+    // optimized for SSIM
+    static const int DPK_QPS_420[11][6] = {      // for 8 bit only
+        { 67, 77, 80, 75, 82, 86 },
+        { 58, 67, 71, 63, 74, 78 },
+        { 50, 60, 64, 54, 66, 69 },
+        { 46, 55, 59, 49, 60, 63 },
+        { 41, 48, 53, 43, 52, 56 },
+        { 35, 43, 48, 36, 44, 49 },
+        { 29, 37, 41, 30, 38, 41 },
+        { 22, 29, 33, 22, 29, 33 },
+        { 15, 20, 26, 14, 20, 25 },
+        {  9, 14, 18,  8, 14, 17 },
+        {  4,  6,  7,  3,  5,  5 }
+    };
+
+    static const int DPK_QPS_8[12][6] = {
+        { 67, 93, 98, 71, 98, 104 },
+        { 59, 83, 88, 61, 89,  95 },
+        { 50, 76, 81, 53, 85,  90 },
+        { 46, 71, 77, 47, 79,  85 },
+        { 41, 67, 71, 42, 75,  78 },
+        { 34, 59, 65, 35, 66,  72 },
+        { 30, 54, 60, 29, 60,  66 },
+        { 24, 48, 53, 22, 53,  58 },
+        { 18, 39, 45, 17, 43,  48 },
+        { 13, 34, 38, 11, 35,  38 },
+        {  8, 20, 24,  7, 22,  25 }, // Photoshop 100%
+        {  2,  5,  6,  2,  5,   6 }
+    };
+#endif
+
+    static const int DPK_QPS_16[11][6] = {
+        { 197, 203, 210, 202, 207, 213 },
+        { 174, 188, 193, 180, 189, 196 },
+        { 152, 167, 173, 156, 169, 174 },
+        { 135, 152, 157, 137, 153, 158 },
+        { 119, 137, 141, 119, 138, 142 },
+        { 102, 120, 125, 100, 120, 124 },
+        {  82,  98, 104,  79,  98, 103 },
+        {  60,  76,  81,  58,  76,  81 },
+        {  39,  52,  58,  36,  52,  58 },
+        {  16,  27,  33,  14,  27,  33 },
+        {   5,   8,   9,   4,   7,   8 }
+    };
+
+    static const int DPK_QPS_16f[11][6] = {
+        { 148, 177, 171, 165, 187, 191 },
+        { 133, 155, 153, 147, 172, 181 },
+        { 114, 133, 138, 130, 157, 167 },
+        {  97, 118, 120, 109, 137, 144 },
+        {  76,  98, 103,  85, 115, 121 },
+        {  63,  86,  91,  62,  96,  99 },
+        {  46,  68,  71,  43,  73,  75 },
+        {  29,  48,  52,  27,  48,  51 },
+        {  16,  30,  35,  14,  29,  34 },
+        {   8,  14,  17,   7,  13,  17 },
+        {   3,   5,   7,   3,   5,   6 }
+    };
+
+    static const int DPK_QPS_32f[11][6] = {
+        { 194, 206, 209, 204, 211, 217 },
+        { 175, 187, 196, 186, 193, 205 },
+        { 157, 170, 177, 167, 180, 190 },
+        { 133, 152, 156, 144, 163, 168 },
+        { 116, 138, 142, 117, 143, 148 },
+        {  98, 120, 123,  96, 123, 126 },
+        {  80,  99, 102,  78,  99, 102 },
+        {  65,  79,  84,  63,  79,  84 },
+        {  48,  61,  67,  45,  60,  66 },
+        {  27,  41,  46,  24,  40,  45 },
+        {   3,  22,  24,   2,  21,  22 }
+    };
+
+    //if (!args.bOverlapSet)
+    //{
+        // Image width must be at least 2 MB wide for subsampled chroma and two levels of overlap!
+    if (quality >= 0.5F || /*rect.Width*/width < 2 * MB_WIDTH_PIXEL)
+        pEncoder->WMP.wmiSCP.olOverlap = OL_ONE;
+    else
+        pEncoder->WMP.wmiSCP.olOverlap = OL_TWO;
+    //}
+
+    //if (!args.bColorFormatSet)
+    //{
+    if (quality >= 0.5F || /*PI.uBitsPerSample > 8*/(pixel_format == JxrDecode2::PixelFormat::kBgr48 || pixel_format == JxrDecode2::PixelFormat::kGray16))
+        pEncoder->WMP.wmiSCP.cfColorFormat = YUV_444;
+    else
+        pEncoder->WMP.wmiSCP.cfColorFormat = YUV_420;
+    //}
+
+    //if (PI.bdBitDepth == BD_1)
+    //{
+    //    pEncoder->WMP.wmiSCP.uiDefaultQPIndex = (U8)(8 - 5.0F *
+    //        quality/*args.fltImageQuality*/ + 0.5F);
+    //}
+    //else
+    {
+        // remap [0.8, 0.866, 0.933, 1.0] to [0.8, 0.9, 1.0, 1.1]
+        // to use 8-bit DPK QP table (0.933 == Photoshop JPEG 100)
+        int qi;
+        float qf;
+        const int* pQPs;
+        if (/*args.fltImageQuality*/quality > 0.8f && /*PI.bdBitDepth == BD_8*/
+            (pixel_format == JxrDecode2::PixelFormat::kBgr24 || pixel_format == JxrDecode2::PixelFormat::kGray8) &&
+            pEncoder->WMP.wmiSCP.cfColorFormat != YUV_420 &&
+            pEncoder->WMP.wmiSCP.cfColorFormat != YUV_422)
+            quality/*args.fltImageQuality*/ = 0.8f + (quality/*args.fltImageQuality*/ - 0.8f) * 1.5f;
+
+        qi = (int)(10.f * quality/*args.fltImageQuality*/);
+        qf = 10.f * quality/*args.fltImageQuality*/ - (float)qi;
+
+        /*pQPs =
+            (pEncoder->WMP.wmiSCP.cfColorFormat == YUV_420 ||
+             pEncoder->WMP.wmiSCP.cfColorFormat == YUV_422) ?
+            DPK_QPS_420[qi] :
+            (PI.bdBitDepth == BD_8 ? DPK_QPS_8[qi] :
+            (PI.bdBitDepth == BD_16 ? DPK_QPS_16[qi] :
+            (PI.bdBitDepth == BD_16F ? DPK_QPS_16f[qi] :
+            DPK_QPS_32f[qi])));*/
+        pQPs =
+            (pEncoder->WMP.wmiSCP.cfColorFormat == YUV_420 ||
+             pEncoder->WMP.wmiSCP.cfColorFormat == YUV_422) ?
+            DPK_QPS_420[qi] :
+            (pixel_format == JxrDecode2::PixelFormat::kBgr24 || pixel_format == JxrDecode2::PixelFormat::kGray8) ? DPK_QPS_8[qi] :
+            ((pixel_format == JxrDecode2::PixelFormat::kBgr48 || pixel_format == JxrDecode2::PixelFormat::kGray16) ? DPK_QPS_16[qi] :
+            (DPK_QPS_32f[qi]));
+
+        pEncoder->WMP.wmiSCP.uiDefaultQPIndex = (U8)(0.5f +
+                (float)pQPs[0] * (1.f - qf) + (float)(pQPs + 6)[0] * qf);
+        pEncoder->WMP.wmiSCP.uiDefaultQPIndexU = (U8)(0.5f +
+                (float)pQPs[1] * (1.f - qf) + (float)(pQPs + 6)[1] * qf);
+        pEncoder->WMP.wmiSCP.uiDefaultQPIndexV = (U8)(0.5f +
+                (float)pQPs[2] * (1.f - qf) + (float)(pQPs + 6)[2] * qf);
+        pEncoder->WMP.wmiSCP.uiDefaultQPIndexYHP = (U8)(0.5f +
+                (float)pQPs[3] * (1.f - qf) + (float)(pQPs + 6)[3] * qf);
+        pEncoder->WMP.wmiSCP.uiDefaultQPIndexUHP = (U8)(0.5f +
+                (float)pQPs[4] * (1.f - qf) + (float)(pQPs + 6)[4] * qf);
+        pEncoder->WMP.wmiSCP.uiDefaultQPIndexVHP = (U8)(0.5f +
+                (float)pQPs[5] * (1.f - qf) + (float)(pQPs + 6)[5] * qf);
+    }
 }

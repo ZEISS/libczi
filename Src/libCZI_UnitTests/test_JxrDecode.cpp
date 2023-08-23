@@ -60,7 +60,7 @@ TEST(JxrDecode, TryDecodeInvalidDataExpectException)
     EXPECT_ANY_THROW(dec->Decode(encoded_data.get(), sizeEncoded, libCZI::PixelType::Invalid, 0, 0));
 }
 
-TEST(JxrDecode, CompressAndDecompressCheckForSameContent)
+TEST(JxrDecode, CompressAndDecompressCheckForSameContent_Bgr24)
 {
     const auto bitmap = CBitmapData<CHeapAllocator>::Create(PixelType::Bgr24, CTestImage::BGR24TESTIMAGE_WIDTH, CTestImage::BGR24TESTIMAGE_HEIGHT);
     {
@@ -86,6 +86,96 @@ TEST(JxrDecode, CompressAndDecompressCheckForSameContent)
     const size_t size_of_encoded_data = encodedData->GetSizeOfData();
     ASSERT_LT(size_of_encoded_data, static_cast<size_t>(Utils::GetBytesPerPixel(bitmap->GetPixelType()) * bitmap->GetWidth() * bitmap->GetHeight())) <<
         "Encoded data is too large (larger than the original data), which is unexpected.";
+
+    const auto bitmap_decoded = codec->Decode(
+        encodedData->GetPtr(),
+        encodedData->GetSizeOfData(),
+        libCZI::PixelType::Bgr24,
+        bitmap->GetWidth(),
+        bitmap->GetHeight());
+    const bool are_equal = AreBitmapDataEqual(bitmap, bitmap_decoded);
+    EXPECT_TRUE(are_equal) << "Original bitmap and encoded-decoded one are not identical.";
+}
+
+TEST(JxrDecode, CompressAndDecompressCheckForSameContent_Gray8)
+{
+    const auto bitmap = CBitmapData<CHeapAllocator>::Create(PixelType::Gray8, CTestImage::BGR24TESTIMAGE_WIDTH, CTestImage::BGR24TESTIMAGE_HEIGHT);
+    {
+        const auto bitmap_bgr24 = CBitmapData<CHeapAllocator>::Create(PixelType::Bgr24, CTestImage::BGR24TESTIMAGE_WIDTH, CTestImage::BGR24TESTIMAGE_HEIGHT);
+        const ScopedBitmapLockerSP locked_bgr24{ bitmap_bgr24 };
+        const ScopedBitmapLockerSP locked_gray8{ bitmap };
+        CTestImage::CopyBgr24Image(locked_bgr24.ptrDataRoi, bitmap_bgr24->GetWidth(), bitmap_bgr24->GetHeight(), locked_bgr24.stride);
+        for (size_t y = 0;y<bitmap_bgr24->GetHeight();++y)
+        {
+            for (size_t x = 0;x<bitmap_bgr24->GetWidth();++x)
+            {
+                const auto bgr24_pixel = reinterpret_cast<const uint8_t*>(locked_bgr24.ptrDataRoi)[y * locked_bgr24.stride + x * 3];
+                auto gray8_pixel = reinterpret_cast<uint8_t*>(locked_gray8.ptrDataRoi)[y * locked_gray8.stride + x];
+                gray8_pixel = static_cast<uint8_t>(bgr24_pixel * 0.299 + bgr24_pixel * 0.587 + bgr24_pixel * 0.114);
+            }
+        }
+    }
+
+    const auto codec = CJxrLibDecoder::Create();
+    shared_ptr<libCZI::IMemoryBlock> encodedData;
+
+    {
+        const ScopedBitmapLockerSP lck{ bitmap };
+        encodedData = codec->Encode(
+            bitmap->GetPixelType(),
+            bitmap->GetWidth(),
+            bitmap->GetHeight(),
+            lck.stride,
+            lck.ptrDataRoi);
+    }
+
+    void* encoded_data_ptr = encodedData->GetPtr();
+    ASSERT_NE(encoded_data_ptr, nullptr) << "Encoded data is null.";
+    const size_t size_of_encoded_data = encodedData->GetSizeOfData();
+    ASSERT_LT(size_of_encoded_data, static_cast<size_t>(Utils::GetBytesPerPixel(bitmap->GetPixelType()) * bitmap->GetWidth() * bitmap->GetHeight())) <<
+        "Encoded data is too large (larger than the original data), which is unexpected.";
+
+    const auto bitmap_decoded = codec->Decode(
+        encodedData->GetPtr(),
+        encodedData->GetSizeOfData(),
+        libCZI::PixelType::Gray8,
+        bitmap->GetWidth(),
+        bitmap->GetHeight());
+    const bool are_equal = AreBitmapDataEqual(bitmap, bitmap_decoded);
+    EXPECT_TRUE(are_equal) << "Original bitmap and encoded-decoded one are not identical.";
+}
+
+TEST(JxrDecode, CompressAndDecompressCheckForSameContentQuality)
+{
+    const auto bitmap = CBitmapData<CHeapAllocator>::Create(PixelType::Bgr24, CTestImage::BGR24TESTIMAGE_WIDTH, CTestImage::BGR24TESTIMAGE_HEIGHT);
+    {
+        const ScopedBitmapLockerSP lck{ bitmap };
+        CTestImage::CopyBgr24Image(lck.ptrDataRoi, bitmap->GetWidth(), bitmap->GetHeight(), lck.stride);
+    }
+
+    const auto codec = CJxrLibDecoder::Create();
+    shared_ptr<libCZI::IMemoryBlock> encodedData;
+
+    {
+        const ScopedBitmapLockerSP lck{ bitmap };
+        encodedData = codec->Encode(
+            bitmap->GetPixelType(),
+            bitmap->GetWidth(),
+            bitmap->GetHeight(),
+            lck.stride,
+            lck.ptrDataRoi,
+            1.f);
+    }
+
+    void* encoded_data_ptr = encodedData->GetPtr();
+    ASSERT_NE(encoded_data_ptr, nullptr) << "Encoded data is null.";
+    const size_t size_of_encoded_data = encodedData->GetSizeOfData();
+    ASSERT_LT(size_of_encoded_data, static_cast<size_t>(Utils::GetBytesPerPixel(bitmap->GetPixelType()) * bitmap->GetWidth() * bitmap->GetHeight())) <<
+        "Encoded data is too large (larger than the original data), which is unexpected.";
+
+    FILE* fp = fopen("N:\\test.jxr", "wb");
+    fwrite(encoded_data_ptr, size_of_encoded_data, 1, fp);
+    fclose(fp);
 
     const auto bitmap_decoded = codec->Decode(
         encodedData->GetPtr(),
