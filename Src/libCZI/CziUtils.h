@@ -45,4 +45,4 @@ template <> constexpr std::uint8_t CziUtils::BytesPerPel<libCZI::PixelType::Bgra
 template <> constexpr std::uint8_t CziUtils::BytesPerPel<libCZI::PixelType::Gray32>() { return 4; }
 template <> constexpr std::uint8_t CziUtils::BytesPerPel<libCZI::PixelType::Bgr96Float>() { return 3 * 4; }
 template <> constexpr std::uint8_t CziUtils::BytesPerPel<libCZI::PixelType::Gray64ComplexFloat>() { return 2 * 8; }
-template <> constexpr std::uint8_t CziUtils::BytesPerPel<libCZI::PixelType::Bgr192ComplexFloat>() { return 48; }
+template <> constexpr std::uint8_t CziUtils::BytesPerPel<libCZI::PixelType::Bgr192ComplexFloat>() { return 24; }
