@@ -4,7 +4,7 @@
 
 #include "include_gtest.h"
 #include <cstdint>
-#include <random>
+#include <cstdlib>
 #include <memory>
 #include "inc_libCZI.h"
 #include "testImage.h"
@@ -207,8 +207,6 @@ TEST(JxrDecode, CompressNonLossyAndDecompressCheckForSameContent_Bgr48)
         const ScopedBitmapLockerSP locked_bgr48{ bitmap_bgr48 };
         CTestImage::CopyBgr24Image(locked_bgr24.ptrDataRoi, bitmap_bgr24->GetWidth(), bitmap_bgr24->GetHeight(), locked_bgr24.stride);
 
-        const mt19937 rng_engine{ static_cast<std::mt19937::result_type>(time(nullptr)) };
-        independent_bits_engine<default_random_engine, CHAR_BIT, unsigned short> random_bytes_engine(rng_engine);
         for (size_t y = 0; y < bitmap_bgr48->GetHeight(); ++y)
         {
             for (size_t x = 0; x < bitmap_bgr48->GetWidth(); ++x)
@@ -217,9 +215,9 @@ TEST(JxrDecode, CompressNonLossyAndDecompressCheckForSameContent_Bgr48)
                 const auto bgr48_pixel = reinterpret_cast<uint16_t*>(&static_cast<uint8_t*>(locked_bgr48.ptrDataRoi)[y * locked_bgr48.stride + 6 * x]);
 
                 // we fill the lower 8 bits with a random byte
-                bgr48_pixel[0] = static_cast<uint16_t>((static_cast<uint16_t>(bgr24_pixel[0]) << 8) | static_cast<uint8_t>(random_bytes_engine()));
-                bgr48_pixel[1] = static_cast<uint16_t>((static_cast<uint16_t>(bgr24_pixel[1]) << 8) | static_cast<uint8_t>(random_bytes_engine()));
-                bgr48_pixel[2] = static_cast<uint16_t>((static_cast<uint16_t>(bgr24_pixel[2]) << 8) | static_cast<uint8_t>(random_bytes_engine()));
+                bgr48_pixel[0] = static_cast<uint16_t>((static_cast<uint16_t>(bgr24_pixel[0]) << 8) | static_cast<uint8_t>(rand() & 0xff));
+                bgr48_pixel[1] = static_cast<uint16_t>((static_cast<uint16_t>(bgr24_pixel[1]) << 8) | static_cast<uint8_t>(rand() & 0xff));
+                bgr48_pixel[2] = static_cast<uint16_t>((static_cast<uint16_t>(bgr24_pixel[2]) << 8) | static_cast<uint8_t>(rand() & 0xff));
             }
         }
     }
