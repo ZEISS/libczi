@@ -6,6 +6,8 @@
 
 #include "inc_libCZI.h"
 #include "MemInputOutputStream.h"
+#include <tuple>
+#include <memory>
 
 /**
  * \brief	Creates a testing bitmap with the given width, height and the pixel type.
@@ -51,6 +53,8 @@ std::shared_ptr<libCZI::IBitmapData> GetZeissLogoBitmap(void);
  * \return	Returns true if bitmaps have same data.
  */
 bool AreBitmapDataEqual(const std::shared_ptr<libCZI::IBitmapData>& bmp1, const std::shared_ptr<libCZI::IBitmapData>& bmp2);
+
+std::tuple<float,float> CalculateMaxDifferenceMeanDifference(const std::shared_ptr<libCZI::IBitmapData>& bmp1, const std::shared_ptr<libCZI::IBitmapData>& bmp2);
 
 void WriteOutTestCzi(const char* testcaseName, const char* testname, const void* ptr, size_t size);
 

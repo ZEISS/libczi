@@ -34,6 +34,23 @@ public:
     }
 };
 
+static libCZI::PixelType PixelTypeFromJxrPixelFormat(JxrDecode2::PixelFormat pixel_format)
+{
+    switch (pixel_format)
+    {
+    case JxrDecode2::PixelFormat::kBgr24:
+        return PixelType::Bgr24;
+    case JxrDecode2::PixelFormat::kGray8:
+        return PixelType::Gray8;
+    case JxrDecode2::PixelFormat::kBgr48:
+        return PixelType::Bgr48;
+    case JxrDecode2::PixelFormat::kGray16:
+        return PixelType::Gray16;
+    default:
+        return PixelType::Invalid;
+    }
+}
+
 /*static*/std::shared_ptr<CJxrLibDecoder> CJxrLibDecoder::Create()
 {
     return make_shared<CJxrLibDecoder>(JxrDecode::Initialize());
@@ -88,18 +105,31 @@ std::shared_ptr<libCZI::IBitmapData> CJxrLibDecoder::Decode(const void* ptrData,
             [&](JxrDecode2::PixelFormat pixel_format, std::uint32_t width, std::uint32_t height)
             -> tuple<JxrDecode2::PixelFormat, uint32_t, void*>
             {
-                PixelType px_type;
-                switch (pixel_format)
+                const auto pixel_type_from_compressed_data = PixelTypeFromJxrPixelFormat(pixel_format);
+                if (pixel_type_from_compressed_data == PixelType::Invalid)
                 {
-                case JxrDecode2::PixelFormat::kBgr24: px_type = PixelType::Bgr24; break;
-                case JxrDecode2::PixelFormat::kGray8: px_type = PixelType::Gray8; break;
-                case JxrDecode2::PixelFormat::kBgr48: px_type = PixelType::Bgr48; break;
-                case JxrDecode2::PixelFormat::kGray16: px_type = PixelType::Gray16; break;
-                    //case JxrDecode2::PixelFormat::_32bppGrayFloat: px_type = PixelType::Gray32Float; break;
-                default: throw std::logic_error("need to look into these formats...");
+                    throw std::logic_error("unsupported pixel type");
                 }
 
-                bitmap = GetSite()->CreateBitmap(px_type, width, height);
+                if (pixel_type_from_compressed_data != pixelType)
+                {
+                    ostringstream ss;
+                    ss << "pixel type mismatch: expected \"" << Utils::PixelTypeToInformalString(pixelType) << "\", but got \"" << Utils::PixelTypeToInformalString(pixel_type_from_compressed_data) << "\"";
+                    throw std::logic_error(ss.str());
+                }
+
+                //PixelType px_type;
+                //switch (pixel_format)
+                //{
+                //case JxrDecode2::PixelFormat::kBgr24: px_type = PixelType::Bgr24; break;
+                //case JxrDecode2::PixelFormat::kGray8: px_type = PixelType::Gray8; break;
+                //case JxrDecode2::PixelFormat::kBgr48: px_type = PixelType::Bgr48; break;
+                //case JxrDecode2::PixelFormat::kGray16: px_type = PixelType::Gray16; break;
+                //    //case JxrDecode2::PixelFormat::_32bppGrayFloat: px_type = PixelType::Gray32Float; break;
+                //default: throw std::logic_error("need to look into these formats...");
+                //}
+
+                bitmap = GetSite()->CreateBitmap(pixel_type_from_compressed_data , width, height);
                 const auto lock_info = bitmap->Lock();
                 bitmap_is_locked = true;
                 return make_tuple(pixel_format, lock_info.stride, lock_info.ptrDataRoi);
