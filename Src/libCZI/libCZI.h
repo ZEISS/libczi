@@ -326,9 +326,9 @@ namespace libCZI
     /// Information about an attachment.
     struct AttachmentInfo
     {
-        libCZI::GUID        contentGuid;            ///< A Guid identifying the content of the attachment.
-        char        contentFileType[9];     ///< A null-terminated character array identifying the content of the attachment.
-        std::string name;                   ///< A string identifying the content of the attachment.
+        libCZI::GUID    contentGuid;            ///< A Guid identifying the content of the attachment.
+        char            contentFileType[9];     ///< A null-terminated character array identifying the content of the attachment.
+        std::string     name;                   ///< A string identifying the content of the attachment.
     };
 
     /// Representation of an attachment. An attachment is a binary blob, its inner structure is opaque.

@@ -6,8 +6,6 @@
 
 /*static*/bool CCziAttachmentsDirectoryBase::CompareForEquality_Id(const AttachmentEntry& a, const AttachmentEntry& b)
 {
-    //int r = memcmp(&a.ContentGuid, &b.ContentGuid, sizeof(GUID));
-    //if (r != 0)
     if (a.ContentGuid != b.ContentGuid)
     {
         return false;
@@ -90,7 +88,6 @@ bool CWriterCziAttachmentsDirectory::AttachmentEntriesCompare::operator()(const 
 {
     // we shall return true if a is considered to go before b in the strict weak ordering the function defines
     int r = a.ContentGuid.compare(b.ContentGuid);
-    //    int r = memcmp(&a.ContentGuid, &b.ContentGuid, sizeof(GUID));
     if (r < 0)
     {
         return true;
