@@ -308,8 +308,9 @@ ERR StreamCalcIFDSize(struct tagWMPStream* pWS, U32 uIFDOfs, U32* pcbifd)
     *pcbifd = cbifd;
 
 Cleanup:
-    if (GetPosOK)
+    if (GetPosOK) {
         Call(pWS->SetPos(pWS, offCurPos));
+    }
     return (err);
 }
 
@@ -579,8 +580,9 @@ ERR StreamCopyIFD(struct tagWMPStream* pWS, U32 ofssrc, U8* pbdst, U32 cbdst, U3
     *pofsdst = ofsdstnextdata;
 
 Cleanup:
-    if (GetPosOK)
+    if (GetPosOK) {
         Call(pWS->SetPos(pWS, offCurPos));
+    }
     return err;
 }
 
