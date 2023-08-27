@@ -987,25 +987,33 @@ Void freeTileInfo(CWMImageStrCodec* pSC)
 {
     size_t iTile;
 
-    if ((pSC->m_param.uQPMode & 1) != 0) // not DC uniform
+    if ((pSC->m_param.uQPMode & 1) != 0) {// not DC uniform
         for (iTile = 0; iTile <= pSC->WMISCP.cNumOfSliceMinus1V; iTile++)
             freeQuantizer(pSC->pTile[iTile].pQuantizerDC);
-    else
+    }
+    else {
         freeQuantizer(pSC->pTile[0].pQuantizerDC);
+    }
 
-    if (pSC->WMISCP.sbSubband != SB_DC_ONLY)
-        if ((pSC->m_param.uQPMode & 2) != 0) // not LP uniform
+    if (pSC->WMISCP.sbSubband != SB_DC_ONLY) {
+        if ((pSC->m_param.uQPMode & 2) != 0) {// not LP uniform
             for (iTile = 0; iTile <= pSC->WMISCP.cNumOfSliceMinus1V; iTile++)
                 freeQuantizer(pSC->pTile[iTile].pQuantizerLP);
-        else
+        }
+        else {
             freeQuantizer(pSC->pTile[0].pQuantizerLP);
+        }
+    }
 
-    if (pSC->WMISCP.sbSubband != SB_DC_ONLY && pSC->WMISCP.sbSubband != SB_NO_HIGHPASS)
-        if ((pSC->m_param.uQPMode & 4) != 0) // not HP uniform
+    if (pSC->WMISCP.sbSubband != SB_DC_ONLY && pSC->WMISCP.sbSubband != SB_NO_HIGHPASS) {
+        if ((pSC->m_param.uQPMode & 4) != 0) {// not HP uniform
             for (iTile = 0; iTile <= pSC->WMISCP.cNumOfSliceMinus1V; iTile++)
                 freeQuantizer(pSC->pTile[iTile].pQuantizerHP);
-        else
+        }
+        else {
             freeQuantizer(pSC->pTile[0].pQuantizerHP);
+        }
+    }
 
     if (pSC->pTile != NULL)
         free(pSC->pTile);
