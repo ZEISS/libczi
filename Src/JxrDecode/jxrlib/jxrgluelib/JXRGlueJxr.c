@@ -373,8 +373,9 @@ ERR WriteContainerPre(
     //================
     // PFD
     assert(offPos <= OFFSET_OF_PFD); // otherwise stuff is overwritten
-    if (offPos < OFFSET_OF_PFD)
+    if (offPos < OFFSET_OF_PFD) {
         Call(pWS->Write(pWS, Zero, OFFSET_OF_PFD - offPos));
+    }
     offPos = (size_t)OFFSET_OF_PFD;
 
     if (!pIE->WMP.bHasAlpha || pIE->WMP.wmiSCP.uAlphaMode != 2) //no planar alpha
