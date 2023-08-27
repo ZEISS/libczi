@@ -291,12 +291,12 @@ ERR CreateWS_File(struct tagWMPStream** ppWS, const char* szFilename, const char
     pWS->SetPos = SetPosWS_File;
     pWS->GetPos = GetPosWS_File;
 
-//#ifdef WIN32
-//    FailIf(0 != fopen_s(&pWS->state.file.pFile, szFilename, szMode), WMP_errFileIO);
-//#else
+    //#ifdef WIN32
+    //    FailIf(0 != fopen_s(&pWS->state.file.pFile, szFilename, szMode), WMP_errFileIO);
+    //#else
     pWS->state.file.pFile = fopen(szFilename, szMode);
     FailIf(NULL == pWS->state.file.pFile, WMP_errFileIO);
-//#endif
+    //#endif
 
 Cleanup:
     return err;
@@ -472,7 +472,7 @@ ERR CreateWS_HeapBackedWriteableStream(struct tagWMPStream** ppWS, size_t cbInit
 
     pWS->state.writeableHeapBased.cbCur = 0;
     pWS->state.writeableHeapBased.cbMax = 0;
-    pWS->state.writeableHeapBased.cbAllocatedSize= cbInitial;
+    pWS->state.writeableHeapBased.cbAllocatedSize = cbInitial;
     pWS->state.writeableHeapBased.cbGrowBy = cbGrowBy;
     pWS->state.writeableHeapBased.pbBuf = (U8*)malloc(cbInitial);
 
@@ -524,8 +524,8 @@ static ERR EnsureSize_HeapBackedWriteableStream(struct tagWMPStream* pWS, size_t
         size_t size_to_grow = size_required - pWS->state.writeableHeapBased.cbAllocatedSize;
 
         // ...and calculate the new size (where we round up to a multiple of the increment size determined above)
-        size_t cbNewSize = pWS->state.writeableHeapBased.cbAllocatedSize + 
-                            ((size_to_grow + increment -1) / increment) * increment;
+        size_t cbNewSize = pWS->state.writeableHeapBased.cbAllocatedSize +
+            ((size_to_grow + increment - 1) / increment) * increment;
 
         // note that if realloc fails, the original buffer is left untouched
         void* pvNew = realloc(pWS->state.writeableHeapBased.pbBuf, cbNewSize);
@@ -820,21 +820,21 @@ ERR detach_SB(SimpleBitIO* pSB)
 #if JXRDECODE_ISBIGENDIANHOST
 #define jxr_byteswap_ulong(x)  (x)
 #else
-    U32 jxr_byteswap_ulong(U32 bits)
-    {
-        #if JXRDECODE_HAS_BUILTIN_BSWAP32
-        return __builtin_bswap32(bits);
-        #elif JXRDECODE_HAS_BYTESWAP_IN_STDLIB
-        return _byteswap_ulong(bits);
-        #elif JXRDECODE_HAS_BSWAP_LONG_IN_SYS_ENDIAN
-        return bswap_32(v);
-        #else
-        return (((bits & 0xff000000u) >> 24) |
-            ((bits & 0x00ff0000u) >> 8) |
-            ((bits & 0x0000ff00u) << 8) |
-            ((bits & 0x000000ffu) << 24));
-        #endif
-    }
+U32 jxr_byteswap_ulong(U32 bits)
+{
+#if JXRDECODE_HAS_BUILTIN_BSWAP32
+    return __builtin_bswap32(bits);
+#elif JXRDECODE_HAS_BYTESWAP_IN_STDLIB
+    return _byteswap_ulong(bits);
+#elif JXRDECODE_HAS_BSWAP_LONG_IN_SYS_ENDIAN
+    return bswap_32(v);
+#else
+    return (((bits & 0xff000000u) >> 24) |
+        ((bits & 0x00ff0000u) >> 8) |
+        ((bits & 0x0000ff00u) << 8) |
+        ((bits & 0x000000ffu) << 24));
+#endif
+}
 #endif
 
 U32 load4BE(void* pv)
@@ -876,9 +876,9 @@ U32 load4BE(void* pv)
 #define LOAD16 load4BE
 
 #if JXRDECODE_ISBIGENDIANHOST
- #define WRITESWAP_ENDIAN(a) ((a)>>16)
+#define WRITESWAP_ENDIAN(a) ((a)>>16)
 #else
- #define WRITESWAP_ENDIAN(a) jxr_byteswap_ulong(a)
+#define WRITESWAP_ENDIAN(a) jxr_byteswap_ulong(a)
 #endif
 
 
@@ -1047,11 +1047,14 @@ Void formatQuantizer(CWMIQuantizer* pQuantizer[MAX_CHANNELS], U8 cChMode, size_t
     size_t iCh;
 
     for (iCh = 0; iCh < cCh; iCh++) {
-        if (iCh > 0)
-            if (cChMode == 0) // uniform
+        if (iCh > 0) {
+            if (cChMode == 0) {// uniform
                 pQuantizer[iCh][iPos] = pQuantizer[0][iPos];
-            else if (cChMode == 1) // mixed
+            }
+            else if (cChMode == 1) {// mixed
                 pQuantizer[iCh][iPos] = pQuantizer[1][iPos];
+            }
+        }
         remapQP(pQuantizer[iCh] + iPos, (iCh > 0 && bShiftedUV == TRUE) ? SHIFTZERO - 1 : SHIFTZERO, bScaledArith);
     }
 }
