@@ -8,6 +8,7 @@
 #include "CziUtils.h"
 
 #include <cmath>
+#include <cstring>
 #if defined(_DEBUG)
 #include <assert.h>
 #endif
