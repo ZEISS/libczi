@@ -139,7 +139,7 @@ tString trimImpl(const tString& str, const tString& whitespace)
     std::mt19937 rng;
     rng.seed(std::random_device()());
     uniform_int_distribution<uint32_t> distu32;
-    GUID g;
+    libCZI::GUID g;
     g.Data1 = distu32(rng);
     auto r = distu32(rng);
     g.Data2 = (uint16_t)r;
