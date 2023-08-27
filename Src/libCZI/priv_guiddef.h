@@ -1,3 +1,69 @@
+#pragma once
+
+
+#include <cstdint>
+
+namespace libCZI
+{
+    struct GUID
+    {
+        std::uint32_t Data1;
+        std::uint16_t Data2;
+        std::uint16_t Data3;
+        std::uint8_t  Data4[8];
+
+        bool operator==(const GUID& other) const
+        {
+            return this->Data1 == other.Data1 &&
+                this->Data2 == other.Data2 &&
+                this->Data3 == other.Data3 &&
+                this->Data4[0] == other.Data4[0] &&
+                this->Data4[1] == other.Data4[1] &&
+                this->Data4[2] == other.Data4[2] &&
+                this->Data4[3] == other.Data4[3] &&
+                this->Data4[4] == other.Data4[4] &&
+                this->Data4[5] == other.Data4[5] &&
+                this->Data4[6] == other.Data4[6] &&
+                this->Data4[7] == other.Data4[7];
+        }
+
+        bool operator!=(const GUID& other) const
+        {
+            return !(*this == other);
+        }
+
+        int compare(const GUID& other) const
+        {
+            if (this->Data1 != other.Data1)
+            {
+                return this->Data1 < other.Data1 ? -1 : 1;
+            }
+
+            if (this->Data2 != other.Data2)
+            {
+                return this->Data2 < other.Data2 ? -1 : 1;
+            }
+
+            if (this->Data3 != other.Data3)
+            {
+                return this->Data3 < other.Data3 ? -1 : 1;
+            }
+
+            for (int i = 0; i < 8; ++i)
+            {
+                if (this->Data4[i] != other.Data4[i])
+                {
+                    return this->Data4[i] < other.Data4[i] ? -1 : 1;
+                }
+            }
+
+            return 0;
+        }
+    };
+}
+
+
+#if false
 // SPDX-FileCopyrightText: Microsoft Corp.
 //
 // SPDX-License-Identifier: BSD-3-Clause
@@ -94,7 +160,7 @@ typedef struct _GUID {
     EXTERN_C const GUID FAR name
 #endif // INITGUID
 
-#define DEFINE_OLEGUID(name, l, w1, w2) DEFINE_GUID(name, l, w1, w2, 0xC0,0,0,0,0,0,0,0x46)
+//#define DEFINE_OLEGUID(name, l, w1, w2) DEFINE_GUID(name, l, w1, w2, 0xC0,0,0,0,0,0,0,0x46)
 
 #ifndef _GUIDDEF_H_
 #define _GUIDDEF_H_
@@ -233,3 +299,4 @@ __inline int operator!=(REFGUID guidOne, REFGUID guidOther)
 #endif  // __midl
 #endif  // _GUIDDEF_H_
 
+#endif

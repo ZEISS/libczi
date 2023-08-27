@@ -327,7 +327,7 @@ namespace libCZI
     /// Information about an attachment.
     struct AttachmentInfo
     {
-        GUID        contentGuid;            ///< A Guid identifying the content of the attachment.
+        libCZI::GUID        contentGuid;            ///< A Guid identifying the content of the attachment.
         char        contentFileType[9];     ///< A null-terminated character array identifying the content of the attachment.
         std::string name;                   ///< A string identifying the content of the attachment.
     };
@@ -612,7 +612,7 @@ namespace libCZI
     {
         ///< The file-GUID of the CZI. Note: CZI defines two GUIDs, this is the "FileGuid". Multi-file containers 
         /// (for which the other GUID "PrimaryFileGuid" is used) are not supported by libCZI currently.
-        GUID fileGuid;
+        libCZI::GUID fileGuid;
         int majorVersion;   ///< The major version.
         int minorVersion;   ///< The minor version.
     };

@@ -43,7 +43,7 @@ set(LIBCZISRCFILES
             SingleChannelTileAccessor.cpp
             SingleChannelTileCompositor.cpp
             splines.cpp
-            stdafx.cpp
+            #stdafx.cpp
             stdAllocator.cpp
             StreamImpl.cpp
             utilities.cpp
@@ -98,10 +98,10 @@ set(LIBCZISRCFILES
             SingleChannelTileCompositor.h
             Site.h
             splines.h
-            stdafx.h
+            #stdafx.h
             stdAllocator.h
             StreamImpl.h
-            targetver.h
+            #targetver.h
             utilities.h
             XmlNodeWrapper.h
             BitmapOperations.hpp

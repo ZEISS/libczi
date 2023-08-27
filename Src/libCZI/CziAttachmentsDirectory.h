@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: LGPL-3.0-or-later
 
 #pragma once
+#include "priv_guiddef.h"
 #include <functional>
 #include <vector>
 #include <set>
@@ -14,7 +15,7 @@ public:
     struct AttachmentEntry
     {
         std::int64_t FilePosition;
-        GUID ContentGuid;
+        libCZI::GUID ContentGuid;
         char ContentFileType[8];
         char Name[80];
     };

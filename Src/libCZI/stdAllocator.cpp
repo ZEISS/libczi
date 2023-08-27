@@ -6,6 +6,7 @@
 #include "stdAllocator.h"
 #include <limits>
 #include <cstdlib>
+#include <stdexcept>
 #include "libCZI_Config.h"
 
 constexpr int ALLOC_ALIGNMENT = 32;

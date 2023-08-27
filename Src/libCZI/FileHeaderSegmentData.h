@@ -11,7 +11,7 @@ class CFileHeaderSegmentData
 {
 private:
     int verMajor, verMinor;
-    GUID fileGuid;
+    libCZI::GUID fileGuid;
     std::uint64_t subBlockDirectoryPosition;
     std::uint64_t attachmentDirectoryPosition;
     std::uint64_t metadataPosition;
@@ -45,7 +45,7 @@ public:
     std::uint64_t GetSubBlockDirectoryPosition() const { return this->subBlockDirectoryPosition; }
     std::uint64_t GetAttachmentDirectoryPosition() const { return this->attachmentDirectoryPosition; }
     std::uint64_t GetMetadataPosition() const { return this->metadataPosition; }
-    GUID GetFileGuid()const { return this->fileGuid; }
+    libCZI::GUID GetFileGuid()const { return this->fileGuid; }
 
     bool GetIsSubBlockDirectoryPositionValid()const
     {
