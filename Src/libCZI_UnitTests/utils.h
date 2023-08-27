@@ -54,6 +54,13 @@ std::shared_ptr<libCZI::IBitmapData> GetZeissLogoBitmap(void);
  */
 bool AreBitmapDataEqual(const std::shared_ptr<libCZI::IBitmapData>& bmp1, const std::shared_ptr<libCZI::IBitmapData>& bmp2);
 
+/// Calculates the maximum difference and the mean difference of the pixel values of the two bitmaps.
+/// The two bitmaps must have the same size and pixel type, otherwise an exception is thrown.
+///
+/// \param  bmp1    The first bitmap.
+/// \param  bmp2    The second bitmap.
+///
+/// \returns    The maximum difference and the mean difference of the pixel values of the two bitmaps.
 std::tuple<float,float> CalculateMaxDifferenceMeanDifference(const std::shared_ptr<libCZI::IBitmapData>& bmp1, const std::shared_ptr<libCZI::IBitmapData>& bmp2);
 
 void WriteOutTestCzi(const char* testcaseName, const char* testname, const void* ptr, size_t size);

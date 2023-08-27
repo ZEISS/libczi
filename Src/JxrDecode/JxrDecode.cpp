@@ -2,6 +2,7 @@
 //
 // SPDX-License-Identifier: LGPL-3.0-or-later
 
+#if false
 #include <stdexcept> 
 #include <sstream>
 #include <memory>
@@ -421,3 +422,4 @@ const char* JxrDecode::PixelFormatAsInformalString(PixelFormat pfmt)
         default:return "unknwon";
         }
 }
+#endif

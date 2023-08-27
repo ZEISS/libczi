@@ -49,7 +49,7 @@ public:
 
         invalid*/
     };
-    
+
     typedef void* codecHandle;
 
     /// This class is used to represent a blob containing the compressed data.
@@ -59,7 +59,7 @@ public:
     private:
         void* obj_handle_;
     public:
-        CompressedData():obj_handle_(nullptr){};
+        CompressedData() :obj_handle_(nullptr) {} // default constructor
         CompressedData& operator=(CompressedData&& other) noexcept
         {
             // "other" is soon going to be destroyed, so we let it destroy our current resource instead and we take "other"'s current resource via swapping
@@ -76,15 +76,15 @@ public:
             other.obj_handle_ = nullptr;
         }
 
-        CompressedData(const CompressedData&)=delete; // prevent copy constructor to be used
-        CompressedData& operator=(const CompressedData&)=delete; // prevent copy assignment to be used
+        CompressedData(const CompressedData&) = delete; // prevent copy constructor to be used
+        CompressedData& operator=(const CompressedData&) = delete; // prevent copy assignment to be used
 
         void* GetMemory();
         size_t GetSize();
         ~CompressedData();
     protected:
         friend class JxrDecode2;
-        CompressedData(void* obj_handle):obj_handle_(obj_handle){};
+        CompressedData(void* obj_handle) :obj_handle_(obj_handle) {}
     };
 
     void Decode(

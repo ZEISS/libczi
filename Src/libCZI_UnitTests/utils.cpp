@@ -489,12 +489,6 @@ std::tuple<float, float> CalculateMaxDifferenceMeanDifference(const std::shared_
     ScopedBitmapLockerSP lockBmp1{ bmp1 };
     ScopedBitmapLockerSP lockBmp2{ bmp2 };
 
-    const uint8_t* bufBmp1 = reinterpret_cast<const uint8_t*>(lockBmp1.ptrDataRoi);
-    const uint8_t* bufBmp2 = reinterpret_cast<const uint8_t*>(lockBmp2.ptrDataRoi);
-
-    const uint32_t stride1 = lockBmp1.stride;
-    const uint32_t stride2 = lockBmp2.stride;
-
     for (uint32_t y = 0; y < bmp1->GetHeight(); ++y)
     {
         const uint8_t* bufBmp1 = reinterpret_cast<const uint8_t*>(lockBmp1.ptrDataRoi) + y * lockBmp1.stride;

@@ -53,7 +53,8 @@ static libCZI::PixelType PixelTypeFromJxrPixelFormat(JxrDecode2::PixelFormat pix
 
 /*static*/std::shared_ptr<CJxrLibDecoder> CJxrLibDecoder::Create()
 {
-    return make_shared<CJxrLibDecoder>(JxrDecode::Initialize());
+    //return make_shared<CJxrLibDecoder>(JxrDecode::Initialize());
+    return make_shared<CJxrLibDecoder>();
 }
 
 std::shared_ptr<libCZI::IMemoryBlock> CJxrLibDecoder::Encode(libCZI::PixelType pixel_type, std::uint32_t width, std::uint32_t height, std::uint32_t stride, const void* ptrData, float quality)
@@ -102,10 +103,10 @@ std::shared_ptr<libCZI::IBitmapData> CJxrLibDecoder::Decode(const void* ptrData,
         decoder2.Decode(
             ptrData,
             size,
-            [&](JxrDecode2::PixelFormat pixel_format, std::uint32_t width, std::uint32_t height)
+            [&](JxrDecode2::PixelFormat actual_pixel_format, std::uint32_t actual_width, std::uint32_t actual_height)
             -> tuple<JxrDecode2::PixelFormat, uint32_t, void*>
             {
-                const auto pixel_type_from_compressed_data = PixelTypeFromJxrPixelFormat(pixel_format);
+                const auto pixel_type_from_compressed_data = PixelTypeFromJxrPixelFormat(actual_pixel_format);
                 if (pixel_type_from_compressed_data == PixelType::Invalid)
                 {
                     throw std::logic_error("unsupported pixel type");
@@ -118,21 +119,10 @@ std::shared_ptr<libCZI::IBitmapData> CJxrLibDecoder::Decode(const void* ptrData,
                     throw std::logic_error(ss.str());
                 }
 
-                //PixelType px_type;
-                //switch (pixel_format)
-                //{
-                //case JxrDecode2::PixelFormat::kBgr24: px_type = PixelType::Bgr24; break;
-                //case JxrDecode2::PixelFormat::kGray8: px_type = PixelType::Gray8; break;
-                //case JxrDecode2::PixelFormat::kBgr48: px_type = PixelType::Bgr48; break;
-                //case JxrDecode2::PixelFormat::kGray16: px_type = PixelType::Gray16; break;
-                //    //case JxrDecode2::PixelFormat::_32bppGrayFloat: px_type = PixelType::Gray32Float; break;
-                //default: throw std::logic_error("need to look into these formats...");
-                //}
-
-                bitmap = GetSite()->CreateBitmap(pixel_type_from_compressed_data , width, height);
+                bitmap = GetSite()->CreateBitmap(pixel_type_from_compressed_data , actual_width, actual_height);
                 const auto lock_info = bitmap->Lock();
                 bitmap_is_locked = true;
-                return make_tuple(pixel_format, lock_info.stride, lock_info.ptrDataRoi);
+                return make_tuple(actual_pixel_format, lock_info.stride, lock_info.ptrDataRoi);
             });
     }
     catch (const std::exception& e)
@@ -206,6 +196,7 @@ std::shared_ptr<libCZI::IBitmapData> CJxrLibDecoder::Decode(const void* ptrData,
 }
 #endif
 
+#if false
 std::shared_ptr<libCZI::IBitmapData> CJxrLibDecoder::Decode2(const void* ptrData, size_t size, libCZI::PixelType pixelType, uint32_t width, uint32_t height)
 {
     std::shared_ptr<IBitmapData> bm;
@@ -384,3 +375,4 @@ std::shared_ptr<libCZI::IBitmapData> CJxrLibDecoder::Decode2(const void* ptrData
 
     return bm;
 }
+#endif

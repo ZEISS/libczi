@@ -4,6 +4,7 @@
 
 #pragma once
 
+#if false
 #include <cstdint>
 #include <functional>
 #include <string.h>
@@ -135,3 +136,4 @@ namespace JxrDecode
 
     void Destroy(codecHandle h);
 }
+#endif
