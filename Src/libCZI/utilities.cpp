@@ -2,12 +2,15 @@
 //
 // SPDX-License-Identifier: LGPL-3.0-or-later
 
-#include "stdafx.h"
 #include "utilities.h"
 #include <locale>
 #include <codecvt>
+#include <sstream>
 #if !defined(_WIN32)
 #include <random>
+#endif
+#if defined(_WIN32)
+#include <Windows.h>
 #endif
 #include "inc_libCZI_Config.h"
 #if LIBCZI_HAVE_ENDIAN_H
@@ -119,17 +122,23 @@ tString trimImpl(const tString& str, const tString& whitespace)
     }
 }
 
-/*static*/GUID Utilities::GenerateNewGuid()
+/*static*/libCZI::GUID Utilities::GenerateNewGuid()
 {
 #if defined(_WIN32)
-    GUID guid;
+    ::GUID guid;
     CoCreateGuid(&guid);
-    return guid;
+    libCZI::GUID guid_value
+    {
+        guid.Data1,
+            guid.Data2,
+            guid.Data3,
+        { guid.Data4[0],guid.Data4[1],guid.Data4[2],guid.Data4[3],guid.Data4[4],guid.Data4[5],guid.Data4[6],guid.Data4[7] }};
+    return guid_value;
 #else
     std::mt19937 rng;
     rng.seed(std::random_device()());
     uniform_int_distribution<uint32_t> distu32;
-    GUID g;
+    libCZI::GUID g;
     g.Data1 = distu32(rng);
     auto r = distu32(rng);
     g.Data2 = (uint16_t)r;
@@ -203,7 +212,7 @@ tString trimImpl(const tString& str, const tString& whitespace)
     return false;
 }
 
-/*static*/bool Utilities::IsGuidNull(const GUID& g)
+/*static*/bool Utilities::IsGuidNull(const libCZI::GUID& g)
 {
     return g.Data1 == 0 && g.Data2 == 0 && g.Data3 == 0 &&
         g.Data4[0] == 0 && g.Data4[1] == 0 && g.Data4[2] == 0 && g.Data4[3] == 0 &&
@@ -306,7 +315,7 @@ tString trimImpl(const tString& str, const tString& whitespace)
 #endif
 }
 
-/*static*/void Utilities::ConvertGuidToHostByteOrder(GUID* p)
+/*static*/void Utilities::ConvertGuidToHostByteOrder(libCZI::GUID* p)
 {
 #if LIBCZI_ISBIGENDIANHOST
     Utilities::ConvertInt32ToHostByteOrder((int32_t*)&(p->Data1));

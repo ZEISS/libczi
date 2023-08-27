@@ -8,6 +8,9 @@
 #include "libCZI.h"
 #include "inc_libCZI_Config.h"
 #include <fstream>
+#if defined(_WIN32)
+ #include <Windows.h>
+#endif
 
 /// <summary>   A simplistic stream implementation (based on C-runtime fopen). Note that this implementation is NOT thread-safe.</summary>
 class CSimpleStreamImpl : public libCZI::IStream

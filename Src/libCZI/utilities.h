@@ -10,6 +10,7 @@
 #include <functional>
 #include <vector>
 #include "libCZI_Pixels.h"
+#include "libCZI_Utilities.h"
 
 class Utilities
 {
@@ -119,14 +120,14 @@ public:
 
     static void Tokenize(const std::wstring& str, std::vector<std::wstring>& tokens, const std::wstring& delimiters = L" ");
 
-    static GUID GenerateNewGuid();
+    static libCZI::GUID GenerateNewGuid();
 
-    static bool IsGuidNull(const GUID& g);
+    static bool IsGuidNull(const libCZI::GUID& g);
 
     static void ConvertInt16ToHostByteOrder(std::int16_t* p);
     static void ConvertInt32ToHostByteOrder(std::int32_t* p);
     static void ConvertInt64ToHostByteOrder(std::int64_t* p);
-    static void ConvertGuidToHostByteOrder(GUID* p);
+    static void ConvertGuidToHostByteOrder(libCZI::GUID* p);
 
     static bool TryGetRgb8ColorFromString(const std::wstring& strXml, libCZI::Rgb8Color& color);
     static std::string Rgb8ColorToString(const libCZI::Rgb8Color& color);

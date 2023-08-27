@@ -2,7 +2,6 @@
 //
 // SPDX-License-Identifier: LGPL-3.0-or-later
 
-#include "stdafx.h"
 #if defined(_WIN32)
 #include "decoder_wic.h"
 #include "BitmapOperations.h"
