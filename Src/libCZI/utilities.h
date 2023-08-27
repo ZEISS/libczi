@@ -10,7 +10,7 @@
 #include <functional>
 #include <vector>
 #include "libCZI_Pixels.h"
-#include "priv_guiddef.h"
+#include "libCZI_Utilities.h"
 
 class Utilities
 {

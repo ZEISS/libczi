@@ -13,7 +13,6 @@
 
 #include "ImportExport.h"
 
-#include "priv_guiddef.h"
 #include "libCZI_exceptions.h"
 #include "libCZI_DimCoordinate.h"
 #include "libCZI_Pixels.h"

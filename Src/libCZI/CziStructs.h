@@ -4,8 +4,9 @@
 
 #pragma once
 
-#include "priv_guiddef.h"
+//#include "priv_guiddef.h"
 // TODO: we need a platform-independent replacement for GUID
+#include "libCZI_Utilities.h"
 
 #if !defined(__GNUC__)
 #include <pshpack2.h>
