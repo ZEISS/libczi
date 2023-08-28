@@ -1746,7 +1746,7 @@ ERR ParsePFDEntry(
             break;
 
         default:
-            fprintf(stderr, "Unrecognized WMPTag: %d(%#x), %d, %d, %#x" CRLF,
+            JxrLibLog(JXR_LOG_LEVEL_WARNING, "Unrecognized WMPTag: %d(%#x), %d, %d, %#x" CRLF,
                 (int)uTag, (int)uTag, (int)uType, (int)uCount, (int)uValue);
             break;
     }

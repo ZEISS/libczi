@@ -69,6 +69,8 @@ add_library(JxrDecodeStatic OBJECT
 							"JxrDecode2.cpp"
 
 							"jxrlib/common/include/guiddef.h" 
+							"jxrlib/common/include/log.h"
+							"jxrlib/common/src/log.c"
 							#"jxrlib/common/include/wmspecstring.h" 
 							#"jxrlib/common/include/wmspecstrings_adt.h" 
 
@@ -104,7 +106,7 @@ add_library(JxrDecodeStatic OBJECT
 							"jxrlib/jxrgluelib/JXRGlueJxr.c"
 							"jxrlib/jxrgluelib/JXRMeta.h"
 							"jxrlib/jxrgluelib/JXRMeta.c"         
-							"jxrlib/jxrgluelib/JXRGluePFC.c")
+							"jxrlib/jxrgluelib/JXRGluePFC.c" "jxrlib/common/include/log.h" "jxrlib/common/src/log.c")
 
 
 # prepare the configuration-file "JxrDecode_Config.h"

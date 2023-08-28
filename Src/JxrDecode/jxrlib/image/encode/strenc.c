@@ -28,15 +28,8 @@
 #include "../sys/strcodec.h"
 #include "encode.h"
 #include "../sys/strTransform.h"
+#include "../../common/include/log.h"
 #include <math.h>
-//#include "perfTimer.h"
-
-#ifdef MEM_TRACE
-#define TRACE_MALLOC    1
-#define TRACE_NEW       0
-#define TRACE_HEAP      0
-#include "memtrace.h"
-#endif
 
 #ifdef ADI_SYS_OPT
 extern char L1WW[];
@@ -628,30 +621,30 @@ Int StrIOEncTerm(CWMImageStrCodec* pSC)
     if (pSC->WMISCP.bVerbose) {
         U32 i, j;
 
-        printf("\n%d horizontal tiles:\n", pSC->WMISCP.cNumOfSliceMinus1H + 1);
+        JxrLibLog(JXR_LOG_LEVEL_INFO, "\n%d horizontal tiles:\n", pSC->WMISCP.cNumOfSliceMinus1H + 1);
         for (i = 0; i <= pSC->WMISCP.cNumOfSliceMinus1H; i++) {
-            printf("    offset of tile %d in MBs: %d\n", i, pSC->WMISCP.uiTileY[i]);
+            JxrLibLog(JXR_LOG_LEVEL_INFO, "    offset of tile %d in MBs: %d\n", i, pSC->WMISCP.uiTileY[i]);
         }
 
-        printf("\n%d vertical tiles:\n", pSC->WMISCP.cNumOfSliceMinus1V + 1);
+        JxrLibLog(JXR_LOG_LEVEL_INFO, "\n%d vertical tiles:\n", pSC->WMISCP.cNumOfSliceMinus1V + 1);
         for (i = 0; i <= pSC->WMISCP.cNumOfSliceMinus1V; i++) {
-            printf("    offset of tile %d in MBs: %d\n", i, pSC->WMISCP.uiTileX[i]);
+            JxrLibLog(JXR_LOG_LEVEL_INFO, "    offset of tile %d in MBs: %d\n", i, pSC->WMISCP.uiTileX[i]);
         }
 
         if (pSC->WMISCP.bfBitstreamFormat == SPATIAL) {
-            printf("\nSpatial order bitstream\n");
+            JxrLibLog(JXR_LOG_LEVEL_INFO, "\nSpatial order bitstream\n");
         }
         else {
-            printf("\nFrequency order bitstream\n");
+            JxrLibLog(JXR_LOG_LEVEL_INFO, "\nFrequency order bitstream\n");
         }
 
         if (!pSC->m_param.bIndexTable) {
-            printf("\nstreaming mode, no index table.\n");
+            JxrLibLog(JXR_LOG_LEVEL_INFO, "\nstreaming mode, no index table.\n");
         }
         else if (pSC->WMISCP.bfBitstreamFormat == SPATIAL) {
             for (j = 0; j <= pSC->WMISCP.cNumOfSliceMinus1H; j++) {
                 for (i = 0; i <= pSC->WMISCP.cNumOfSliceMinus1V; i++) {
-                    printf("bitstream size for tile (%d, %d): %d.\n", j, i, (int)pSC->pIndexTable[j * (pSC->WMISCP.cNumOfSliceMinus1V + 1) + i]);
+                    JxrLibLog(JXR_LOG_LEVEL_INFO, "bitstream size for tile (%d, %d): %d.\n", j, i, (int)pSC->pIndexTable[j * (pSC->WMISCP.cNumOfSliceMinus1V + 1) + i]);
                 }
             }
         }
@@ -659,7 +652,7 @@ Int StrIOEncTerm(CWMImageStrCodec* pSC)
             for (j = 0; j <= pSC->WMISCP.cNumOfSliceMinus1H; j++) {
                 for (i = 0; i <= pSC->WMISCP.cNumOfSliceMinus1V; i++) {
                     size_t* p = &pSC->pIndexTable[(j * (pSC->WMISCP.cNumOfSliceMinus1V + 1) + i) * 4];
-                    printf("bitstream size of (DC, LP, AC, FL) for tile (%d, %d): %d %d %d %d.\n", j, i,
+                    JxrLibLog(JXR_LOG_LEVEL_INFO, "bitstream size of (DC, LP, AC, FL) for tile (%d, %d): %d %d %d %d.\n", j, i,
                         (int)p[0], (int)p[1], (int)p[2], (int)p[3]);
                 }
             }
@@ -1190,12 +1183,12 @@ Int ValidateArgs(CWMImageInfo* pII, CWMIStrCodecParam* pSCP)
     Bool bTooNarrowTile = FALSE;
 
     if (pII->cWidth > (1 << 28) || pII->cHeight > (1 << 28) || pII->cWidth == 0 || pII->cHeight == 0) {
-        printf("Unsurpported image size!\n");
+        JxrLibLog(JXR_LOG_LEVEL_INFO, "Unsurpported image size!\n");
         return ICERR_ERROR; // unsurpported image size
     }
 
     if (((pSCP->cfColorFormat == YUV_420) || (pSCP->cfColorFormat == YUV_422)) && (pSCP->olOverlap == OL_TWO) && ((Int)(((U32)pII->cWidth + 15) >> 4) < 2)) {
-        printf("Image width must be at least 2 MB wide for subsampled chroma and two levels of overlap!\n");
+        JxrLibLog(JXR_LOG_LEVEL_INFO, "Image width must be at least 2 MB wide for subsampled chroma and two levels of overlap!\n");
         return ICERR_ERROR;
     }
 
@@ -1203,15 +1196,15 @@ Int ValidateArgs(CWMImageInfo* pII, CWMIStrCodecParam* pSCP)
         pSCP->sbSubband = SB_ALL;
 
     if (pII->bdBitDepth == BD_5 && (pII->cfColorFormat != CF_RGB || pII->cBitsPerUnit != 16 || pII->cLeadingPadding != 0)) {
-        printf("Unsupported BD_5 image format!\n");
+        JxrLibLog(JXR_LOG_LEVEL_INFO, "Unsupported BD_5 image format!\n");
         return ICERR_ERROR; // BD_5 must be compact RGB!
     }
     if (pII->bdBitDepth == BD_565 && (pII->cfColorFormat != CF_RGB || pII->cBitsPerUnit != 16 || pII->cLeadingPadding != 0)) {
-        printf("Unsupported BD_565 image format!\n");
+        JxrLibLog(JXR_LOG_LEVEL_INFO, "Unsupported BD_565 image format!\n");
         return ICERR_ERROR; // BD_5 must be compact RGB!
     }
     if (pII->bdBitDepth == BD_10 && (pII->cfColorFormat != CF_RGB || pII->cBitsPerUnit != 32 || pII->cLeadingPadding != 0)) {
-        printf("Unsupported BD_10 image format!\n");
+        JxrLibLog(JXR_LOG_LEVEL_INFO, "Unsupported BD_10 image format!\n");
         return ICERR_ERROR; // BD_10 must be compact RGB!
     }
 
@@ -1221,7 +1214,7 @@ Int ValidateArgs(CWMImageInfo* pII, CWMIStrCodecParam* pSCP)
 
     if (BD_1 == pII->bdBitDepth) { // binary image
         if (pII->cfColorFormat != Y_ONLY) {
-            printf("BD_1 image must be black-and white!\n");
+            JxrLibLog(JXR_LOG_LEVEL_INFO, "BD_1 image must be black-and white!\n");
             return ICERR_ERROR;
         }
         pSCP->cfColorFormat = Y_ONLY; // can only be black white
@@ -1234,13 +1227,13 @@ Int ValidateArgs(CWMImageInfo* pII, CWMIStrCodecParam* pSCP)
         || pII->bdBitDepth == BD_5 || pII->bdBitDepth == BD_10
         || pII->bdBitDepth == BD_1))
     {
-        printf("Alpha is not supported for this pixel format!\n");
+        JxrLibLog(JXR_LOG_LEVEL_INFO, "Alpha is not supported for this pixel format!\n");
         return ICERR_ERROR;
     }
 
     if ((pSCP->cfColorFormat == YUV_420 || pSCP->cfColorFormat == YUV_422) && (pII->bdBitDepth == BD_16F || pII->bdBitDepth == BD_32F || pII->cfColorFormat == CF_RGBE))
     {
-        printf("Float or RGBE images must be encoded with YUV 444!\n");
+        JxrLibLog(JXR_LOG_LEVEL_INFO, "Float or RGBE images must be encoded with YUV 444!\n");
         return ICERR_ERROR;
     }
 
@@ -1259,7 +1252,7 @@ Int ValidateArgs(CWMImageInfo* pII, CWMIStrCodecParam* pSCP)
             bTooNarrowTile = TRUE;
     }
     if (bTooNarrowTile) {
-        printf("Tile width must be at least 2 MB wide for hard tiles, subsampled chroma, and two levels of overlap!\n");
+        JxrLibLog(JXR_LOG_LEVEL_INFO, "Tile width must be at least 2 MB wide for hard tiles, subsampled chroma, and two levels of overlap!\n");
         return ICERR_ERROR;
     }
 

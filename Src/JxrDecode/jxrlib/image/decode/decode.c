@@ -39,6 +39,7 @@ Revision History:
 *******************************************************************************/
 #include "../sys/strcodec.h"
 #include "decode.h"
+#include "../../common/include/log.h"
 
 /******************************************************************
 Free Adaptive Huffman Table
@@ -94,7 +95,7 @@ ErrorExit:
     }
     *ppAdHuff = NULL;
     if (-1 == iMemStatus) {
-        printf("Insufficient memory to init decoder.\n");
+        JxrLibLog(JXR_LOG_LEVEL_ERROR, "Insufficient memory to init decoder.\n");
     }
     return ICERR_ERROR;
 }

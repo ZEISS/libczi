@@ -28,6 +28,7 @@
 #include "../sys/strcodec.h"
 #include "decode.h"
 #include "../sys/strTransform.h"
+#include "../../common/include/log.h"
 #include <math.h>
 
 #ifdef X86OPT_INLINE
@@ -2501,35 +2502,35 @@ Int StrIODecInit(CWMImageStrCodec* pSC)
     if (pSC->WMISCP.bVerbose) {
         U32 i, j;
 
-        printf("\n%d horizontal tiles:\n", pSC->WMISCP.cNumOfSliceMinus1H + 1);
+        JxrLibLog(JXR_LOG_LEVEL_INFO, "\n%d horizontal tiles:\n", pSC->WMISCP.cNumOfSliceMinus1H + 1);
         for (i = 0; i <= pSC->WMISCP.cNumOfSliceMinus1H; i++) {
-            printf("    offset of tile %d in MBs: %d\n", i, pSC->WMISCP.uiTileY[i]);
+            JxrLibLog(JXR_LOG_LEVEL_INFO, "    offset of tile %d in MBs: %d\n", i, pSC->WMISCP.uiTileY[i]);
         }
 
-        printf("\n%d vertical tiles:\n", pSC->WMISCP.cNumOfSliceMinus1V + 1);
+        JxrLibLog(JXR_LOG_LEVEL_INFO, "\n%d vertical tiles:\n", pSC->WMISCP.cNumOfSliceMinus1V + 1);
         for (i = 0; i <= pSC->WMISCP.cNumOfSliceMinus1V; i++) {
-            printf("    offset of tile %d in MBs: %d\n", i, pSC->WMISCP.uiTileX[i]);
+            JxrLibLog(JXR_LOG_LEVEL_INFO, "    offset of tile %d in MBs: %d\n", i, pSC->WMISCP.uiTileX[i]);
         }
 
         if (pSC->WMISCP.bfBitstreamFormat == SPATIAL) {
-            printf("\nSpatial order bitstream\n");
+            JxrLibLog(JXR_LOG_LEVEL_INFO, "\nSpatial order bitstream\n");
         }
         else {
-            printf("\nFrequency order bitstream\n");
+            JxrLibLog(JXR_LOG_LEVEL_INFO, "\nFrequency order bitstream\n");
         }
 
         if (!pSC->m_param.bIndexTable) {
-            printf("\nstreaming mode, no index table.\n");
+            JxrLibLog(JXR_LOG_LEVEL_INFO, "\nstreaming mode, no index table.\n");
         }
         else if (pSC->WMISCP.bfBitstreamFormat == SPATIAL) {
             for (j = 0; j <= pSC->WMISCP.cNumOfSliceMinus1H; j++) {
                 for (i = 0; i <= pSC->WMISCP.cNumOfSliceMinus1V; i++) {
                     size_t* p = &pSC->pIndexTable[j * (pSC->WMISCP.cNumOfSliceMinus1V + 1) + i];
                     if (i + j != pSC->WMISCP.cNumOfSliceMinus1H + pSC->WMISCP.cNumOfSliceMinus1V) {
-                        printf("bitstream size for tile (%d, %d): %d.\n", j, i, (int)(p[1] - p[0]));
+                        JxrLibLog(JXR_LOG_LEVEL_INFO, "bitstream size for tile (%d, %d): %d.\n", j, i, (int)(p[1] - p[0]));
                     }
                     else {
-                        printf("bitstream size for tile (%d, %d): unknown.\n", j, i);
+                        JxrLibLog(JXR_LOG_LEVEL_INFO, "bitstream size for tile (%d, %d): unknown.\n", j, i);
                     }
                 }
             }
@@ -2539,11 +2540,11 @@ Int StrIODecInit(CWMImageStrCodec* pSC)
                 for (i = 0; i <= pSC->WMISCP.cNumOfSliceMinus1V; i++) {
                     size_t* p = &pSC->pIndexTable[(j * (pSC->WMISCP.cNumOfSliceMinus1V + 1) + i) * 4];
                     if (i + j != pSC->WMISCP.cNumOfSliceMinus1H + pSC->WMISCP.cNumOfSliceMinus1V) {
-                        printf("bitstream size of (DC, LP, AC, FL) for tile (%d, %d): %d %d %d %d.\n", j, i,
+                        JxrLibLog(JXR_LOG_LEVEL_INFO, "bitstream size of (DC, LP, AC, FL) for tile (%d, %d): %d %d %d %d.\n", j, i,
                             (int)(p[1] - p[0]), (int)(p[2] - p[1]), (int)(p[3] - p[2]), (int)(p[4] - p[3]));
                     }
                     else {
-                        printf("bitstream size of (DC, LP, AC, FL) for tile (%d, %d): %d %d %d unknown.\n", j, i,
+                        JxrLibLog(JXR_LOG_LEVEL_INFO, "bitstream size of (DC, LP, AC, FL) for tile (%d, %d): %d %d %d unknown.\n", j, i,
                             (int)(p[1] - p[0]), (int)(p[2] - p[1]), (int)(p[3] - p[2]));
                     }
                 }

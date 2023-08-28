@@ -35,6 +35,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdint.h>
+#include "../../common/include/log.h"
 
 #if defined(__cplusplus) && !defined(EXTERN_C)
 #define EXTERN_C extern "C"
@@ -251,8 +252,8 @@ typedef long ERR;
 
 #if defined(_DEBUG) || defined(DBG)
 #define Report(err, szExp, szFile, nLine) \
-    fprintf(stderr, "FAILED: %ld=%s" CRLF, (err), (szExp)); \
-    fprintf(stderr, "        %s:%ld" CRLF, (szFile), (nLine));  \
+    JxrLibLog(JXR_LOG_LEVEL_ERROR, "FAILED: %ld=%s" CRLF, (err), (szExp)); \
+    JxrLibLog(JXR_LOG_LEVEL_ERROR, "        %s:%ld" CRLF, (szFile), (nLine));  \
 
 #else
 #define Report(err, szExp, szFile, lLine) err = err
@@ -539,4 +540,3 @@ EXTERN_C Int WMPhotoDetile(
 );
 
 #endif // WMI_WINDOWSMEDIAPHOTO_H
-

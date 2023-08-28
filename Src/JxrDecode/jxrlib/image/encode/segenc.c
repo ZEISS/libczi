@@ -26,17 +26,9 @@
 //
 //*@@@---@@@@******************************************************************
 
-#include <stdio.h>
 #include <stdlib.h>
 #include "../sys/strcodec.h"
 #include "encode.h"
-
-#ifdef MEM_TRACE
-#define TRACE_MALLOC    1
-#define TRACE_NEW       0
-#define TRACE_HEAP      0
-#include "memtrace.h"
-#endif
 
 /** local function definitions **/
 #ifdef X86OPT_INLINE

@@ -58,7 +58,7 @@ Int initPostProc(struct tagPostProcInfo* strPostProcInfo[MAX_CHANNELS][2], size_
     for (j = 0; j < iNumChannels; j++) {
         for (i = 0; i < 2; i++) {
             // 2 more are allocated to avoid boundary check
-            if (b32bit) // integer overlow/underflow check for 32-bit system
+            if (b32bit) // integer overflow/underflow check for 32-bit system
                 if ((((mbWidth + 2) >> 16) * sizeof(struct tagPostProcInfo)) & 0xffff0000)
                     return ICERR_ERROR;
             strPostProcInfo[j][i] = (struct tagPostProcInfo*)malloc((mbWidth + 2) * sizeof(struct tagPostProcInfo));
@@ -274,7 +274,7 @@ Void postProcBlock(struct tagPostProcInfo* strPostProcInfo[MAX_CHANNELS][2], Pix
                 }
             }
 
-            // two horizontally adjacent blocks have same texture and similiar DCs
+            // two horizontally adjacent blocks have same texture and similar DCs
             if (texture[j][i] + texture[j][i + 1] < 3 && abs(dc[j][i] - dc[j][i + 1]) <= threshold) {
                 // smooth vertical boundary |
                 pt = pc + 64;
