@@ -52,9 +52,9 @@ using namespace libCZI;
 {
     switch (i)
     {
-    case 0:  return CompressionMode::UnCompressed;
-    case 1:  return CompressionMode::Jpg;
-    case 4:  return CompressionMode::JpgXr;
+    case 0: return CompressionMode::UnCompressed;
+    case 1: return CompressionMode::Jpg;
+    case 4: return CompressionMode::JpgXr;
     case 5: return CompressionMode::Zstd0;
     case 6: return CompressionMode::Zstd1;
     default: return CompressionMode::Invalid;
@@ -92,7 +92,7 @@ using namespace libCZI;
     case PixelType::Bgr96Float:         return 12;
     case PixelType::Bgra32:             return 4;
     case PixelType::Gray64ComplexFloat: return 16;
-    case PixelType::Bgr192ComplexFloat: return 48;
+    case PixelType::Bgr192ComplexFloat: return 24;
     case PixelType::Gray32:             return 4;
     case PixelType::Gray64Float:        return 8;
     default: throw std::invalid_argument("illegal pixeltype");
