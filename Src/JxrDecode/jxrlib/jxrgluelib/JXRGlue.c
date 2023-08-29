@@ -575,12 +575,15 @@ ERR PKImageEncode_SetSize(
     I32 iWidth,
     I32 iHeight)
 {
-    ERR err = WMP_errSuccess;
+    if (iWidth > 0 && iHeight > 0)
+    {
+        pIE->uWidth = (U32)iWidth;
+        pIE->uHeight = (U32)iHeight;
 
-    pIE->uWidth = (U32)iWidth;
-    pIE->uHeight = (U32)iHeight;
+        return WMP_errSuccess;
+    }
 
-    return err;
+    return WMP_errInvalidParameter;
 }
 
 ERR PKImageEncode_SetResolution(

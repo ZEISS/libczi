@@ -341,9 +341,11 @@ TEST(JxrDecode, CompressLossyAndDecompressCheckForSimilarity_Gray8)
     ASSERT_LT(size_of_encoded_data, static_cast<size_t>(Utils::GetBytesPerPixel(bitmap->GetPixelType()) * bitmap->GetWidth() * bitmap->GetHeight())) <<
         "Encoded data is too large (larger than the original data), which is unexpected.";
 
-    /*FILE* fp = fopen("N:\\test.jxr", "wb");
-      fwrite(encoded_data_ptr, size_of_encoded_data, 1, fp);
-      fclose(fp);*/
+    /*
+    FILE* fp = fopen("N:\\test.jxr", "wb");
+    fwrite(encoded_data_ptr, size_of_encoded_data, 1, fp);
+    fclose(fp);
+    */
 
     const auto bitmap_decoded = codec->Decode(
         encodedData->GetPtr(),
@@ -353,4 +355,65 @@ TEST(JxrDecode, CompressLossyAndDecompressCheckForSimilarity_Gray8)
         bitmap->GetHeight());
     const auto max_difference_mean_difference = CalculateMaxDifferenceMeanDifference(bitmap, bitmap_decoded);
     EXPECT_TRUE(get<0>(max_difference_mean_difference) <= 5 && get<1>(max_difference_mean_difference) < 1) << "Original bitmap and encoded-decoded one are not identical.";
+}
+
+TEST(JxrDecode, CallEncoderWithInvalidArgumentsExpectException)
+{
+    const auto bitmap = CBitmapData<CHeapAllocator>::Create(PixelType::Gray8, 5, 5);
+    const auto codec = CJxrLibDecoder::Create();
+    EXPECT_THROW(
+        {
+            const ScopedBitmapLockerSP lck{ bitmap };
+            codec->Encode(
+                PixelType::Invalid,
+                bitmap->GetWidth(),
+                bitmap->GetHeight(),
+                lck.stride,
+                lck.ptrDataRoi);
+        },
+        exception);
+    EXPECT_THROW(
+        {
+            const ScopedBitmapLockerSP lck{ bitmap };
+            codec->Encode(
+                bitmap->GetPixelType(),
+                bitmap->GetWidth(),
+                bitmap->GetHeight(),
+                4,                      // invalid stride provided here
+                lck.ptrDataRoi);
+        },
+        exception);
+    EXPECT_THROW(
+        {
+            const ScopedBitmapLockerSP lck{ bitmap };
+            codec->Encode(
+                    bitmap->GetPixelType(),
+                    bitmap->GetWidth(),
+                    0,
+                    lck.stride,
+                    lck.ptrDataRoi);
+        },
+        exception);
+    EXPECT_THROW(
+        {
+            const ScopedBitmapLockerSP lck{ bitmap };
+            codec->Encode(
+                bitmap->GetPixelType(),
+                0,
+                bitmap->GetHeight(),
+                lck.stride,
+                lck.ptrDataRoi);
+        },
+        exception);
+    EXPECT_THROW(
+        {
+            const ScopedBitmapLockerSP lck{ bitmap };
+            codec->Encode(
+               bitmap->GetPixelType(),
+               bitmap->GetWidth(),
+               bitmap->GetHeight(),
+               lck.stride,
+               nullptr);
+        },
+        exception);
 }

@@ -1459,7 +1459,10 @@ ERR PKImageEncode_Release_WMP(
     ERR err = WMP_errSuccess;
 
     PKImageEncode* pIE = *ppIE;
-    pIE->pStream->Close(&pIE->pStream);
+    if (pIE->pStream != NULL)
+    {
+        pIE->pStream->Close(&pIE->pStream);
+    }
 
     PKFree((void**)&pIE->pbColorContext);
     pIE->cbColorContext = 0;

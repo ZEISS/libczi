@@ -4,10 +4,13 @@
 #include <memory>
 #include <tuple>
 #include <cstdint>
+#include <sstream>
 
+/// This class encapsulates the JXR codec.
 class JxrDecode2
 {
 public:
+    /// Values that represent the pixel formats supported by the codec.
     enum class PixelFormat
     {
         kInvalid,
@@ -16,38 +19,6 @@ public:
         kGray8,
         kGray16,
         kGray32Float,
-        /*dontCare,
-        _24bppBGR,
-        _1bppBlackWhite,
-        _8bppGray,
-        _16bppGray,
-        _16bppGrayFixedPoint,
-        _16bppGrayHalf,
-        _32bppGrayFixedPoint,
-        _32bppGrayFloat,
-        _24bppRGB,
-        _48bppRGB,
-        _48bppRGBFixedPoint,
-        _48bppRGBHalf,
-        _96bppRGBFixedPoint,
-        _128bppRGBFloat,
-        _32bppRGBE,
-        _32bppCMYK,
-        _64bppCMYK,
-        _32bppBGRA,
-        _64bppRGBA,
-        _64bppRGBAFixedPoint,
-        _64bppRGBAHalf,
-        _128bppRGBAFixedPoint,
-        _128bppRGBAFloat,
-        _16bppBGR555,
-        _16bppBGR565,
-        _32bppBGR101010,
-        _40bppCMYKA,
-        _80bppCMYKA,
-        _32bppBGR,
-
-        invalid*/
     };
 
     typedef void* codecHandle;
@@ -87,21 +58,23 @@ public:
         CompressedData(void* obj_handle) :obj_handle_(obj_handle) {}
     };
 
-    void Decode(
-           codecHandle h,
-          // const WMPDECAPPARGS* decArgs,
-           const void* ptrData,
-           size_t size,
-           const std::function<PixelFormat(PixelFormat, int width, int height)>& selectDestPixFmt,
-           std::function<void(PixelFormat pixFmt, std::uint32_t  width, std::uint32_t  height, std::uint32_t linesCount, const void* ptrData, std::uint32_t stride)> deliverData);
+    //void Decode(
+    //       codecHandle h,
+    //      // const WMPDECAPPARGS* decArgs,
+    //       const void* ptrData,
+    //       size_t size,
+    //       const std::function<PixelFormat(PixelFormat, int width, int height)>& selectDestPixFmt,
+    //       std::function<void(PixelFormat pixFmt, std::uint32_t  width, std::uint32_t  height, std::uint32_t linesCount, const void* ptrData, std::uint32_t stride)> deliverData);
 
     /// Decodes the specified data, giving an uncompressed bitmap.
     /// The course of action is as follows:
     /// * The decoder will be initialized with the specified compressed data.  
     /// * The characteristics of the compressed data will be determined - i.e the pixel type, width, height, etc. are determined.  
-    /// * The 'get_destination_func' is called, passing in the pixel type, width, and height.    
-    /// * The function should return a pointer to a buffer that can hold the uncompressed bitmap.
-    ///    The tuple it returns is the pixel type, the stride and the pointer to the buffer.
+    /// * The 'get_destination_func' is called, passing in the pixel type, width, and height (as determined in the step before).    
+    /// * The 'get_destination_func' function  now is to check whether it can receive the bitmap (as reported). If it cannot, it   
+    ///   must throw an exception (which will be propagated to the caller). Otherwise, it must return a tuple, containing
+    ///   a pointer to a buffer that can hold the uncompressed bitmap and the stride. This buffer must remain valid until the
+    ///   the function returns - either normally or by throwing an exception.
     /// Notes:
     /// * The decoder will call the 'get_destination_func' function only once, and the buffer must be valid  
     ///   until the method returns.
@@ -111,16 +84,19 @@ public:
     /// \param  ptrData                 Information describing the pointer.
     /// \param  size                    The size.
     /// \param  get_destination_func    The get destination function.
-    void Decode(
+    static void Decode(
             const void* ptrData,
             size_t size,
-            const std::function<std::tuple<JxrDecode2::PixelFormat, std::uint32_t, void*>(PixelFormat pixel_format, std::uint32_t  width, std::uint32_t  height)>& get_destination_func);
+            const std::function<std::tuple<void*/*destination_bitmap*/,std::uint32_t/*stride*/>(PixelFormat pixel_format, std::uint32_t  width, std::uint32_t  height)>& get_destination_func);
 
-    CompressedData Encode(
+    static CompressedData Encode(
             JxrDecode2::PixelFormat pixel_format,
             std::uint32_t  width,
             std::uint32_t  height,
             std::uint32_t  stride,
             const void* ptr_bitmap,
             float quality = 1.f);
+private:
+    static void ThrowJxrlibError(const std::string& message, int error_code);
+    [[noreturn]] static void ThrowJxrlibError(std::ostringstream& message, int error_code);
 };

@@ -82,8 +82,7 @@ std::shared_ptr<libCZI::IMemoryBlock> CJxrLibDecoder::Encode(libCZI::PixelType p
         throw std::logic_error("unsupported pixel type");
     }
 
-    JxrDecode2 decoder2;
-    auto compressed_data = decoder2.Encode(
+    auto compressed_data = JxrDecode2::Encode(
         jxrdecode_pixel_format,
         width,
         height,
@@ -98,14 +97,14 @@ std::shared_ptr<libCZI::IBitmapData> CJxrLibDecoder::Decode(const void* ptrData,
 {
     std::shared_ptr<IBitmapData> bitmap;
     bool bitmap_is_locked = false;
-    JxrDecode2 decoder2;
+
     try
     {
-        decoder2.Decode(
+        JxrDecode2::Decode(
             ptrData,
             size,
             [&](JxrDecode2::PixelFormat actual_pixel_format, std::uint32_t actual_width, std::uint32_t actual_height)
-            -> tuple<JxrDecode2::PixelFormat, uint32_t, void*>
+            -> tuple<void*, uint32_t>
             {
                 const auto pixel_type_from_compressed_data = PixelTypeFromJxrPixelFormat(actual_pixel_format);
                 if (pixel_type_from_compressed_data == PixelType::Invalid)
@@ -120,10 +119,17 @@ std::shared_ptr<libCZI::IBitmapData> CJxrLibDecoder::Decode(const void* ptrData,
                     throw std::logic_error(ss.str());
                 }
 
+                if (actual_width != width || actual_height != height)
+                {
+                    ostringstream ss;
+                    ss << "size mismatch: expected " << width << "x" << height << ", but got " << actual_width << "x" << actual_height;
+                    throw std::logic_error(ss.str());
+                }
+
                 bitmap = GetSite()->CreateBitmap(pixel_type_from_compressed_data , actual_width, actual_height);
                 const auto lock_info = bitmap->Lock();
                 bitmap_is_locked = true;
-                return make_tuple(actual_pixel_format, lock_info.stride, lock_info.ptrDataRoi);
+                return make_tuple(lock_info.ptrDataRoi, lock_info.stride);
             });
     }
     catch (const std::exception& e)
@@ -138,7 +144,6 @@ std::shared_ptr<libCZI::IBitmapData> CJxrLibDecoder::Decode(const void* ptrData,
     }
 
     bitmap->Unlock();
-
     return bitmap;
 }
 
