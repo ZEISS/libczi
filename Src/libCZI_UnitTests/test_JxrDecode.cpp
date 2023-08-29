@@ -417,3 +417,45 @@ TEST(JxrDecode, CallEncoderWithInvalidArgumentsExpectException)
         },
         exception);
 }
+
+TEST(JxrDecode, CallDecoderWithInvalidArgumentsExpectException)
+{
+    constexpr size_t ksize_of_encoded_data = 223;
+    const unique_ptr<void, decltype(&free)> encoded_data{ malloc(ksize_of_encoded_data), &free };
+    for (size_t i= 0; i < ksize_of_encoded_data; ++i)
+    {
+        static_cast<uint8_t*>(encoded_data.get())[i] = static_cast<uint8_t>(i);
+    }
+
+    const auto codec = CJxrLibDecoder::Create();
+    EXPECT_THROW(
+        {
+            codec->Decode(
+                encoded_data.get(),
+                ksize_of_encoded_data,
+                libCZI::PixelType::Gray8,
+                42,
+                42);
+        },
+        exception);
+    EXPECT_THROW(
+        {
+            codec->Decode(
+                nullptr,
+                ksize_of_encoded_data,
+                libCZI::PixelType::Gray8,
+                42,
+                42);
+        },
+        exception);
+    EXPECT_THROW(
+        {
+            codec->Decode(
+                encoded_data.get(),
+                0,
+                libCZI::PixelType::Gray8,
+                42,
+                42);
+        },
+        exception);
+}
