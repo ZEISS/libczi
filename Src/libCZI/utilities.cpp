@@ -6,6 +6,7 @@
 #include <locale>
 #include <codecvt>
 #include <sstream>
+#include <cstring>
 #if !defined(_WIN32)
 #include <random>
 #endif
