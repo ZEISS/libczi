@@ -618,9 +618,14 @@ namespace libCZI
     };
 
     /// This interface is used to represent the CZI-file.
-    class ICZIReader : public ISubBlockRepository, public ISubBlockRepositoryEx, public IAttachmentRepository
+    class LIBCZI_API ICZIReader : public ISubBlockRepository, public ISubBlockRepositoryEx, public IAttachmentRepository
     {
     public:
+        struct OpenOptions
+        {
+            bool lax_subblock_coordinate_checks{ true };
+        };
+
         /// Opens the specified stream and reads the global information from the CZI-document.
         /// The stream passed in will have its refcount incremented, a reference is held until Close
         /// is called (or the instance is destroyed).
@@ -628,7 +633,7 @@ namespace libCZI
         /// If this method is called twice, then an exception of type std::logic_error is thrown.
         ///
         /// \param stream The stream object.
-        virtual void Open(std::shared_ptr<IStream> stream) = 0;
+        virtual void Open(const std::shared_ptr<IStream>& stream, const OpenOptions* options = nullptr) = 0;
 
         /// Gets the file header information.
         /// \return The file header information.

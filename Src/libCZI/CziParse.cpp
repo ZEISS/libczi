@@ -57,15 +57,15 @@ using namespace libCZI;
     return fileHdr;
 }
 
-/*static*/CCziSubBlockDirectory CCZIParse::ReadSubBlockDirectory(libCZI::IStream* str, std::uint64_t offset)
+/*static*/CCziSubBlockDirectory CCZIParse::ReadSubBlockDirectory(libCZI::IStream* str, std::uint64_t offset, bool lax_subblock_coordinate_checks)
 {
     CCziSubBlockDirectory subBlkDir;
-    CCZIParse::ReadSubBlockDirectory(str, offset, subBlkDir);
+    CCZIParse::ReadSubBlockDirectory(str, offset, subBlkDir, lax_subblock_coordinate_checks);
     subBlkDir.AddingFinished();
     return subBlkDir;
 }
 
-/*static*/void CCZIParse::ReadSubBlockDirectory(libCZI::IStream* str, std::uint64_t offset, const std::function<void(const CCziSubBlockDirectoryBase::SubBlkEntry&)>& addFunc, SegmentSizes* segmentSizes /*= nullptr*/)
+/*static*/void CCZIParse::ReadSubBlockDirectory(libCZI::IStream* str, std::uint64_t offset, const std::function<void(const CCziSubBlockDirectoryBase::SubBlkEntry&)>& addFunc, bool lax_subblock_coordinate_checks, SegmentSizes* segmentSizes /*= nullptr*/)
 {
     SubBlockDirectorySegment subBlckDirSegment;
     std::uint64_t bytesRead;
@@ -152,14 +152,14 @@ using namespace libCZI;
             }
             else if (subBlkDirDV != nullptr)
             {
-                CCZIParse::AddEntryToSubBlockDirectory(subBlkDirDV, addFunc);
+                CCZIParse::AddEntryToSubBlockDirectory(subBlkDirDV, addFunc, lax_subblock_coordinate_checks);
             }
         });
 }
 
-/*static*/void CCZIParse::ReadSubBlockDirectory(libCZI::IStream* str, std::uint64_t offset, CCziSubBlockDirectory& subBlkDir)
+/*static*/void CCZIParse::ReadSubBlockDirectory(libCZI::IStream* str, std::uint64_t offset, CCziSubBlockDirectory& subBlkDir, bool lax_subblock_coordinate_checks)
 {
-    CCZIParse::ReadSubBlockDirectory(str, offset, [&](const CCziSubBlockDirectoryBase::SubBlkEntry& e)->void {subBlkDir.AddSubBlock(e); });
+    CCZIParse::ReadSubBlockDirectory(str, offset, [&](const CCziSubBlockDirectoryBase::SubBlkEntry& e)->void {subBlkDir.AddSubBlock(e); }, lax_subblock_coordinate_checks);
 }
 
 /*static*/CCziAttachmentsDirectory CCZIParse::ReadAttachmentsDirectory(libCZI::IStream* str, std::uint64_t offset)
@@ -518,7 +518,7 @@ using namespace libCZI;
     throw std::logic_error("not (yet) implemented");
 }
 
-/*static*/void CCZIParse::AddEntryToSubBlockDirectory(const SubBlockDirectoryEntryDV* subBlkDirDE, const std::function<void(const CCziSubBlockDirectoryBase::SubBlkEntry&)>& addFunc)
+/*static*/void CCZIParse::AddEntryToSubBlockDirectory(const SubBlockDirectoryEntryDV* subBlkDirDV, const std::function<void(const CCziSubBlockDirectoryBase::SubBlkEntry&)>& addFunc, bool lax_subblock_coordinate_checks)
 {
     CCziSubBlockDirectory::SubBlkEntry entry;
     entry.Invalidate();
@@ -526,45 +526,45 @@ using namespace libCZI;
     // TODO: - add consistency checks like dimension appears twice, X and Y are not present ...
     bool x_was_given = false;
     bool y_was_given = false;
-    for (int i = 0; i < subBlkDirDE->DimensionCount; ++i)
+    for (int i = 0; i < subBlkDirDV->DimensionCount; ++i)
     {
-        if (CCZIParse::IsXDimension(subBlkDirDE->DimensionEntries[i].Dimension, 4))
+        if (CCZIParse::IsXDimension(subBlkDirDV->DimensionEntries[i].Dimension, 4))
         {
-            entry.x = subBlkDirDE->DimensionEntries[i].Start;
-            entry.width = subBlkDirDE->DimensionEntries[i].Size;
-            entry.storedWidth = subBlkDirDE->DimensionEntries[i].StoredSize;
+            entry.x = subBlkDirDV->DimensionEntries[i].Start;
+            entry.width = subBlkDirDV->DimensionEntries[i].Size;
+            entry.storedWidth = subBlkDirDV->DimensionEntries[i].StoredSize;
             x_was_given = true;
         }
-        else if (CCZIParse::IsYDimension(subBlkDirDE->DimensionEntries[i].Dimension, 4))
+        else if (CCZIParse::IsYDimension(subBlkDirDV->DimensionEntries[i].Dimension, 4))
         {
-            entry.y = subBlkDirDE->DimensionEntries[i].Start;
-            entry.height = subBlkDirDE->DimensionEntries[i].Size;
-            entry.storedHeight = subBlkDirDE->DimensionEntries[i].StoredSize;
+            entry.y = subBlkDirDV->DimensionEntries[i].Start;
+            entry.height = subBlkDirDV->DimensionEntries[i].Size;
+            entry.storedHeight = subBlkDirDV->DimensionEntries[i].StoredSize;
             y_was_given = true;
         }
-        else if (CCZIParse::IsMDimension(subBlkDirDE->DimensionEntries[i].Dimension, 4))
+        else if (CCZIParse::IsMDimension(subBlkDirDV->DimensionEntries[i].Dimension, 4))
         {
-            entry.mIndex = subBlkDirDE->DimensionEntries[i].Start;
+            entry.mIndex = subBlkDirDV->DimensionEntries[i].Start;
         }
         else
         {
-            libCZI::DimensionIndex dim = CCZIParse::DimensionCharToDimensionIndex(subBlkDirDE->DimensionEntries[i].Dimension, 4);
-            entry.coordinate.Set(dim, subBlkDirDE->DimensionEntries[i].Start);
-            if (subBlkDirDE->DimensionEntries[i].Size != 1)
+            libCZI::DimensionIndex dim = CCZIParse::DimensionCharToDimensionIndex(subBlkDirDV->DimensionEntries[i].Dimension, 4);
+            entry.coordinate.Set(dim, subBlkDirDV->DimensionEntries[i].Start);
+            if (lax_subblock_coordinate_checks && subBlkDirDV->DimensionEntries[i].Size != 1)
             {
                 throw LibCZICZIParseException("size for dimension is not 1", LibCZICZIParseException::ErrorCode::CorruptedData);
             }
         }
     }
 
-    if (!x_was_given || !y_was_given)
+    if (lax_subblock_coordinate_checks && (!x_was_given || !y_was_given))
     {
         throw LibCZICZIParseException("X or Y was not given", LibCZICZIParseException::ErrorCode::CorruptedData);
     }
 
-    entry.FilePosition = subBlkDirDE->FilePosition;
-    entry.PixelType = subBlkDirDE->PixelType;
-    entry.Compression = subBlkDirDE->Compression;
+    entry.FilePosition = subBlkDirDV->FilePosition;
+    entry.PixelType = subBlkDirDV->PixelType;
+    entry.Compression = subBlkDirDV->Compression;
 
     addFunc(entry);
 }

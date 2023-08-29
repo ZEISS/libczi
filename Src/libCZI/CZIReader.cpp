@@ -23,15 +23,21 @@ CCZIReader::~CCZIReader()
 {
 }
 
-/*virtual */void CCZIReader::Open(std::shared_ptr<libCZI::IStream> stream)
+/*virtual */void CCZIReader::Open(const std::shared_ptr<libCZI::IStream>& stream, const ICZIReader::OpenOptions* options)
 {
     if (this->isOperational == true)
     {
         throw logic_error("CZIReader is already operational.");
     }
 
+    if (options == nullptr)
+    {
+        auto default_options = OpenOptions{};
+        return CCZIReader::Open(stream, &default_options);
+    }
+
     this->hdrSegmentData = CCZIParse::ReadFileHeaderSegmentData(stream.get());
-    this->subBlkDir = CCZIParse::ReadSubBlockDirectory(stream.get(), this->hdrSegmentData.GetSubBlockDirectoryPosition());
+    this->subBlkDir = CCZIParse::ReadSubBlockDirectory(stream.get(), this->hdrSegmentData.GetSubBlockDirectoryPosition(), options->lax_subblock_coordinate_checks);
     auto attachmentPos = this->hdrSegmentData.GetAttachmentDirectoryPosition();
     if (attachmentPos != 0)
     {
