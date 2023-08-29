@@ -524,6 +524,8 @@ using namespace libCZI;
     entry.Invalidate();
 
     // TODO: - add consistency checks like dimension appears twice, X and Y are not present ...
+    bool x_was_given = false;
+    bool y_was_given = false;
     for (int i = 0; i < subBlkDirDE->DimensionCount; ++i)
     {
         if (CCZIParse::IsXDimension(subBlkDirDE->DimensionEntries[i].Dimension, 4))
@@ -531,12 +533,14 @@ using namespace libCZI;
             entry.x = subBlkDirDE->DimensionEntries[i].Start;
             entry.width = subBlkDirDE->DimensionEntries[i].Size;
             entry.storedWidth = subBlkDirDE->DimensionEntries[i].StoredSize;
+            x_was_given = true;
         }
         else if (CCZIParse::IsYDimension(subBlkDirDE->DimensionEntries[i].Dimension, 4))
         {
             entry.y = subBlkDirDE->DimensionEntries[i].Start;
             entry.height = subBlkDirDE->DimensionEntries[i].Size;
             entry.storedHeight = subBlkDirDE->DimensionEntries[i].StoredSize;
+            y_was_given = true;
         }
         else if (CCZIParse::IsMDimension(subBlkDirDE->DimensionEntries[i].Dimension, 4))
         {
@@ -546,7 +550,16 @@ using namespace libCZI;
         {
             libCZI::DimensionIndex dim = CCZIParse::DimensionCharToDimensionIndex(subBlkDirDE->DimensionEntries[i].Dimension, 4);
             entry.coordinate.Set(dim, subBlkDirDE->DimensionEntries[i].Start);
+            if (subBlkDirDE->DimensionEntries[i].Size != 1)
+            {
+                throw LibCZICZIParseException("size for dimension is not 1", LibCZICZIParseException::ErrorCode::CorruptedData);
+            }
         }
+    }
+
+    if (!x_was_given || !y_was_given)
+    {
+        throw LibCZICZIParseException("X or Y was not given", LibCZICZIParseException::ErrorCode::CorruptedData);
     }
 
     entry.FilePosition = subBlkDirDE->FilePosition;
