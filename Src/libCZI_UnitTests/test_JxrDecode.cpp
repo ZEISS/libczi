@@ -198,6 +198,57 @@ TEST(JxrDecode, CompressNonLossyAndDecompressCheckForSameContent_Gray16)
     EXPECT_TRUE(are_equal) << "Original bitmap and encoded-decoded one are not identical.";
 }
 
+TEST(JxrDecode, CompressNonLossyAndDecompressCheckForSameContent_Gray32Float)
+{
+    const auto bitmap_gray32float = CBitmapData<CHeapAllocator>::Create(PixelType::Gray32Float, CTestImage::BGR24TESTIMAGE_WIDTH, CTestImage::BGR24TESTIMAGE_HEIGHT);
+    {
+        const auto bitmap_bgr24 = CBitmapData<CHeapAllocator>::Create(PixelType::Bgr24, CTestImage::BGR24TESTIMAGE_WIDTH, CTestImage::BGR24TESTIMAGE_HEIGHT);
+        const ScopedBitmapLockerSP locked_bgr24{ bitmap_bgr24 };
+        const ScopedBitmapLockerSP locked_gray16{ bitmap_gray32float };
+        CTestImage::CopyBgr24Image(locked_bgr24.ptrDataRoi, bitmap_bgr24->GetWidth(), bitmap_bgr24->GetHeight(), locked_bgr24.stride);
+        for (size_t y = 0; y < bitmap_bgr24->GetHeight(); ++y)
+        {
+            for (size_t x = 0; x < bitmap_bgr24->GetWidth(); ++x)
+            {
+                const auto bgr24_pixel = &static_cast<const uint8_t*>(locked_bgr24.ptrDataRoi)[y * locked_bgr24.stride + x * 3];
+                const auto gray32float_pixel = reinterpret_cast<float*>(&static_cast<uint8_t*>(locked_gray16.ptrDataRoi)[y * locked_gray16.stride + 4 * x]);
+                *gray32float_pixel =
+                    bgr24_pixel[0] * 0.299f +
+                    bgr24_pixel[1] * 0.587f +
+                    bgr24_pixel[2] * 0.114f;
+            }
+        }
+    }
+
+    const auto codec = CJxrLibDecoder::Create();
+    shared_ptr<libCZI::IMemoryBlock> encodedData;
+
+    {
+        const ScopedBitmapLockerSP lck{ bitmap_gray32float };
+        encodedData = codec->Encode(
+            bitmap_gray32float->GetPixelType(),
+            bitmap_gray32float->GetWidth(),
+            bitmap_gray32float->GetHeight(),
+            lck.stride,
+            lck.ptrDataRoi);
+    }
+
+    void* encoded_data_ptr = encodedData->GetPtr();
+    ASSERT_NE(encoded_data_ptr, nullptr) << "Encoded data is null.";
+    const size_t size_of_encoded_data = encodedData->GetSizeOfData();
+    ASSERT_LT(size_of_encoded_data, static_cast<size_t>(Utils::GetBytesPerPixel(bitmap_gray32float->GetPixelType()) * bitmap_gray32float->GetWidth() * bitmap_gray32float->GetHeight())) <<
+        "Encoded data is too large (larger than the original data), which is unexpected.";
+
+    const auto bitmap_decoded = codec->Decode(
+        encodedData->GetPtr(),
+        encodedData->GetSizeOfData(),
+        libCZI::PixelType::Gray32Float,
+        bitmap_gray32float->GetWidth(),
+        bitmap_gray32float->GetHeight());
+    const bool are_equal = CompareGrayFloat32Bitmaps(bitmap_gray32float, bitmap_decoded, 0.01f);
+    EXPECT_TRUE(are_equal) << "Original bitmap and encoded-decoded one are not identical.";
+}
+
 TEST(JxrDecode, CompressNonLossyAndDecompressCheckForSameContent_Bgr48)
 {
     const auto bitmap_bgr48 = CBitmapData<CHeapAllocator>::Create(PixelType::Bgr48, CTestImage::BGR24TESTIMAGE_WIDTH, CTestImage::BGR24TESTIMAGE_HEIGHT);

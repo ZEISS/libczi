@@ -427,7 +427,7 @@ bool AreBitmapDataEqual(const std::shared_ptr<libCZI::IBitmapData>& bmp1, const 
 {
     bool result = true;
 
-    if ((bmp1 != nullptr) && (bmp2 != nullptr))
+    if (bmp1 && bmp2)
     {
         if ((bmp1->GetHeight() == bmp2->GetHeight()) &&
             (bmp1->GetWidth() == bmp2->GetWidth()) &&
@@ -467,6 +467,32 @@ bool AreBitmapDataEqual(const std::shared_ptr<libCZI::IBitmapData>& bmp1, const 
     }
 
     return result;
+}
+
+bool CompareGrayFloat32Bitmaps(const std::shared_ptr<libCZI::IBitmapData>& bmp1, const std::shared_ptr<libCZI::IBitmapData>& bmp2, float max_difference)
+{
+    if (!bmp1 || !bmp2 || bmp1->GetWidth() != bmp2->GetWidth() || bmp1->GetHeight() != bmp2->GetHeight() || bmp1->GetPixelType() != bmp2->GetPixelType() || bmp1->GetPixelType() != PixelType::Gray32Float)
+    {
+        throw invalid_argument("Bitmaps must have the same size and pixel type, and must have pixeltype gray32float");
+    }
+
+    ScopedBitmapLockerSP lockBmp1{ bmp1 };
+    ScopedBitmapLockerSP lockBmp2{ bmp2 };
+
+    for (uint32_t y = 0; y < bmp1->GetHeight(); y++)
+    {
+        const float* bitmap_a = reinterpret_cast<const float*>(static_cast<const uint8_t*>(lockBmp1.ptrDataRoi) + static_cast<size_t>(y) * lockBmp1.stride);
+        const float* bitmap_b = reinterpret_cast<const float*>(static_cast<const uint8_t*>(lockBmp2.ptrDataRoi) + static_cast<size_t>(y) * lockBmp2.stride);
+        for (uint32_t x = 0; x < bmp1->GetWidth(); x++)
+        {
+            if (abs(bitmap_a[x] - bitmap_b[x]) > max_difference)
+            {
+                return false;
+            }
+        }
+    }
+
+    return true;
 }
 
 std::tuple<float, float> CalculateMaxDifferenceMeanDifference(const std::shared_ptr<libCZI::IBitmapData>& bmp1, const std::shared_ptr<libCZI::IBitmapData>& bmp2)

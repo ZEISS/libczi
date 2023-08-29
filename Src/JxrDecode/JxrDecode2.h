@@ -15,7 +15,7 @@ public:
         kBgr48,
         kGray8,
         kGray16,
-        _32bppGrayFloat,
+        kGray32Float,
         /*dontCare,
         _24bppBGR,
         _1bppBlackWhite,

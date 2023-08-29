@@ -123,6 +123,9 @@ JxrDecode2::CompressedData JxrDecode2::Encode(
     case PixelFormat::kGray16:
         err = pEncoder->SetPixelFormat(pEncoder, GUID_PKPixelFormat16bppGray);
         break;
+    case PixelFormat::kGray32Float:
+        err = pEncoder->SetPixelFormat(pEncoder, GUID_PKPixelFormat32bppGrayFloat);
+        break;
     }
     //err = pEncoder->SetPixelFormat(pEncoder, GUID_PKPixelFormat24bppBGR);
     err = pEncoder->SetSize(pEncoder, width, height);
@@ -333,6 +336,10 @@ JxrDecode2::PixelFormat JxrPixelFormatGuidToEnum(const GUID& guid)
     else if (IsEqualGUID(guid, GUID_PKPixelFormat48bppRGB))
     {
         return JxrDecode2::PixelFormat::kBgr48;
+    }
+    else if (IsEqualGUID(guid, GUID_PKPixelFormat32bppGrayFloat))
+    {
+        return JxrDecode2::PixelFormat::kGray32Float;
     }
 
     return JxrDecode2::PixelFormat::kInvalid;

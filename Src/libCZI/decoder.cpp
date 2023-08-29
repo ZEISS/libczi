@@ -45,6 +45,8 @@ static libCZI::PixelType PixelTypeFromJxrPixelFormat(JxrDecode2::PixelFormat pix
         return PixelType::Bgr48;
     case JxrDecode2::PixelFormat::kGray16:
         return PixelType::Gray16;
+    case JxrDecode2::PixelFormat::kGray32Float:
+        return PixelType::Gray32Float;
     default:
         return PixelType::Invalid;
     }
@@ -74,7 +76,7 @@ std::shared_ptr<libCZI::IMemoryBlock> CJxrLibDecoder::Encode(libCZI::PixelType p
         jxrdecode_pixel_format = JxrDecode2::PixelFormat::kGray16;
         break;
     case PixelType::Gray32Float:
-        jxrdecode_pixel_format = JxrDecode2::PixelFormat::_32bppGrayFloat;
+        jxrdecode_pixel_format = JxrDecode2::PixelFormat::kGray32Float;
         break;
     default:
         throw std::logic_error("unsupported pixel type");
