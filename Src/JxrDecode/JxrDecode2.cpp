@@ -9,8 +9,6 @@
 using namespace std;
 
 static void ApplyQuality(float quality, JxrDecode2::PixelFormat pixel_format, std::uint32_t width, PKImageEncode* pEncoder);
-static JxrDecode2::PixelFormat JxrPixelFormatGuidToEnum(const GUID& guid);
-static void ThrowError(const char* error_message, ERR error_code);
 
 static const char* ERR_to_string(ERR error_code)
 {

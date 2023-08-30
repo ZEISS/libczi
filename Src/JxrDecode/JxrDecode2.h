@@ -21,8 +21,6 @@ public:
         kGray32Float,
     };
 
-    typedef void* codecHandle;
-
     /// This class is used to represent a blob containing the compressed data.
     /// Note that it is movable but not copyable.
     class CompressedData
@@ -57,14 +55,6 @@ public:
         friend class JxrDecode2;
         CompressedData(void* obj_handle) :obj_handle_(obj_handle) {}
     };
-
-    //void Decode(
-    //       codecHandle h,
-    //      // const WMPDECAPPARGS* decArgs,
-    //       const void* ptrData,
-    //       size_t size,
-    //       const std::function<PixelFormat(PixelFormat, int width, int height)>& selectDestPixFmt,
-    //       std::function<void(PixelFormat pixFmt, std::uint32_t  width, std::uint32_t  height, std::uint32_t linesCount, const void* ptrData, std::uint32_t stride)> deliverData);
 
     /// Decodes the specified data, giving an uncompressed bitmap.
     /// The course of action is as follows:
