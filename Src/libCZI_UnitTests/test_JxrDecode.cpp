@@ -5,6 +5,7 @@
 #include "include_gtest.h"
 #include <cstdint>
 #include <cstdlib>
+#include  <array>
 #include <memory>
 #include "inc_libCZI.h"
 #include "testImage.h"
@@ -420,9 +421,9 @@ TEST(JxrDecode, CallEncoderWithInvalidArgumentsExpectException)
 
 TEST(JxrDecode, CallDecoderWithInvalidArgumentsExpectException)
 {
-    constexpr size_t ksize_of_encoded_data = 223;
-    const unique_ptr<void, decltype(&free)> encoded_data{ malloc(ksize_of_encoded_data), &free };
-    for (size_t i= 0; i < ksize_of_encoded_data; ++i)
+    constexpr size_t kSizeOfEncodedData = 223;
+    const unique_ptr<void, decltype(&free)> encoded_data{ malloc(kSizeOfEncodedData), &free };
+    for (size_t i = 0; i < kSizeOfEncodedData; ++i)
     {
         static_cast<uint8_t*>(encoded_data.get())[i] = static_cast<uint8_t>(i);
     }
@@ -432,7 +433,7 @@ TEST(JxrDecode, CallDecoderWithInvalidArgumentsExpectException)
         {
             codec->Decode(
                 encoded_data.get(),
-                ksize_of_encoded_data,
+                kSizeOfEncodedData,
                 libCZI::PixelType::Gray8,
                 42,
                 42);
@@ -442,7 +443,7 @@ TEST(JxrDecode, CallDecoderWithInvalidArgumentsExpectException)
         {
             codec->Decode(
                 nullptr,
-                ksize_of_encoded_data,
+                kSizeOfEncodedData,
                 libCZI::PixelType::Gray8,
                 42,
                 42);
@@ -458,4 +459,28 @@ TEST(JxrDecode, CallDecoderWithInvalidArgumentsExpectException)
                 42);
         },
         exception);
+}
+
+TEST(JxrDecode, CallDecoderExpectingADifferentBitmapTypeAndExpectException)
+{
+    size_t size_encoded_data;
+    int expected_width, expected_height;
+    const auto ptrEncodedData = CTestImage::GetJpgXrCompressedImage_Bgr24(&size_encoded_data, &expected_width, &expected_height);
+    const auto codec = CJxrLibDecoder::Create();
+
+    static constexpr array<PixelType, 4> kPixelTypesToTest = { PixelType::Gray8, PixelType::Gray16, PixelType::Bgr48, PixelType::Gray32Float };
+
+    for (const auto pixel_type : kPixelTypesToTest)
+    {
+        EXPECT_THROW(
+            {
+                codec->Decode(
+                    ptrEncodedData,
+                    size_encoded_data,
+                    pixel_type,
+                    expected_width,
+                    expected_height);
+            },
+            exception);
+    }
 }

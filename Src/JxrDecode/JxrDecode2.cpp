@@ -93,18 +93,37 @@ void JxrDecode2::Decode(
            size_t size,
            const std::function<std::tuple<void*, std::uint32_t>(PixelFormat pixel_format, std::uint32_t  width, std::uint32_t  height)>& get_destination_func)
 {
-    if (ptrData == nullptr) { throw invalid_argument("ptrData"); }
-    if (size == 0) { throw invalid_argument("size"); }
-    if (!get_destination_func) { throw invalid_argument("get_destination_func"); }
+    if (ptrData == nullptr)
+    {
+        throw invalid_argument("ptrData");
+    }
+
+    if (size == 0)
+    {
+        throw invalid_argument("size");
+    }
+
+    if (!get_destination_func)
+    {
+        throw invalid_argument("get_destination_func");
+    }
 
     WMPStream* pStream;
     ERR err = CreateWS_Memory(&pStream, const_cast<void*>(ptrData), size);
-    if (Failed(err)) { ThrowJxrlibError("'CreateWS_Memory' failed", err); }
+    if (Failed(err))
+    {
+        ThrowJxrlibError("'CreateWS_Memory' failed", err);
+    }
+
     unique_ptr<WMPStream, void(*)(WMPStream*)> upStream(pStream, [](WMPStream* p)->void {p->Close(&p); });
 
     PKImageDecode* pDecoder;
     err = PKCodecFactory_CreateDecoderFromStream(pStream, &pDecoder);
-    if (Failed(err)) { ThrowJxrlibError("'PKCodecFactory_CreateDecoderFromStream' failed", err); }
+    if (Failed(err))
+    {
+        ThrowJxrlibError("'PKCodecFactory_CreateDecoderFromStream' failed", err);
+    }
+
     std::unique_ptr<PKImageDecode, void(*)(PKImageDecode*)> upDecoder(pDecoder, [](PKImageDecode* p)->void {p->Release(&p); });
 
     U32 frame_count;
@@ -119,7 +138,10 @@ void JxrDecode2::Decode(
 
     I32 width, height;
     upDecoder->GetSize(upDecoder.get(), &width, &height);
-    if (Failed(err)) { ThrowJxrlibError("'decoder::GetSize' failed", err); }
+    if (Failed(err))
+    {
+        ThrowJxrlibError("'decoder::GetSize' failed", err);
+    }
 
     PKPixelFormatGUID pixel_format_of_decoder;
     upDecoder->GetPixelFormat(upDecoder.get(), &pixel_format_of_decoder);
@@ -170,7 +192,7 @@ void JxrDecode2::Decode(
     }
 
     unique_ptr<PKImageEncode, void(*)(PKImageEncode*)> upImageEncoder(
-        pImageEncoder, 
+        pImageEncoder,
         [](PKImageEncode* p)->void
         {
             // If we get here, we need to 'disassociate' the stream from the encoder,
@@ -480,23 +502,6 @@ void JxrDecode2::Decode(
 
     throw runtime_error(message.str());
 }
-
-
-void ThrowError(const char* error_message, ERR error_code)
-{
-    ostringstream string_stream;
-    if (error_message != nullptr)
-    {
-        string_stream << "Error in JXR-decoder -> \"" << error_message << "\" code:" << error_code << " (" << ERR_to_string(error_code) << ")";
-    }
-    else
-    {
-        string_stream << "Error in JXR-decoder -> " << error_message << " (" << ERR_to_string(error_code) << ")";
-    }
-
-    throw runtime_error(string_stream.str());
-}
-
 
 JxrDecode2::CompressedData::~CompressedData()
 {
