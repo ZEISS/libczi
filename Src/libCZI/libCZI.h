@@ -621,18 +621,34 @@ namespace libCZI
     class LIBCZI_API ICZIReader : public ISubBlockRepository, public ISubBlockRepositoryEx, public IAttachmentRepository
     {
     public:
-        struct OpenOptions
+        /// This structure gathers the settings for controlling the 'Open' operation of the CZIReader-class.
+        struct LIBCZI_API OpenOptions
         {
+            /// This option controls whether the lax parameter validation when parsing the dimension-entry of a subblock is to be used.
+            /// Previous versions of libCZI did not check whether certain values in the file have the expected value. If those values
+            /// are different than expected, this meant that libCZI would not be able to deal with the document properly.  
+            /// If lax checking of this is disabled, then Open will fail with a corresponding exception.
+            /// The default is to enable lax checking (for compatibility with previous libCZI-versions), but users are encouraged to
+            /// disable this for new code.
             bool lax_subblock_coordinate_checks{ true };
+
+            /// Sets the the default.
+            void SetDefault()
+            {
+                this->lax_subblock_coordinate_checks = true;
+            }
         };
 
-        /// Opens the specified stream and reads the global information from the CZI-document.
-        /// The stream passed in will have its refcount incremented, a reference is held until Close
-        /// is called (or the instance is destroyed).
+        /// Opens the specified stream and reads the global information from the CZI-document. The stream
+        /// passed in will have its refcount incremented, a reference is held until Close is called (or
+        /// the instance is destroyed).
+        /// 
         /// \remark
-        /// If this method is called twice, then an exception of type std::logic_error is thrown.
+        /// If this method is called twice (assuming successful return), then an exception of type std::logic_error is
+        /// thrown.
         ///
-        /// \param stream The stream object.
+        /// \param  stream  The stream object.
+        /// \param  options (Optional) Options for controlling the operation. If nullptr is given here, then the default settings are used.
         virtual void Open(const std::shared_ptr<IStream>& stream, const OpenOptions* options = nullptr) = 0;
 
         /// Gets the file header information.

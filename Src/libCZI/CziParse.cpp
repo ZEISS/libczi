@@ -523,7 +523,6 @@ using namespace libCZI;
     CCziSubBlockDirectory::SubBlkEntry entry;
     entry.Invalidate();
 
-    // TODO: - add consistency checks like dimension appears twice, X and Y are not present ...
     bool x_was_given = false;
     bool y_was_given = false;
     for (int i = 0; i < subBlkDirDV->DimensionCount; ++i)
@@ -545,21 +544,45 @@ using namespace libCZI;
         else if (CCZIParse::IsMDimension(subBlkDirDV->DimensionEntries[i].Dimension, 4))
         {
             entry.mIndex = subBlkDirDV->DimensionEntries[i].Start;
+            if (!lax_subblock_coordinate_checks && subBlkDirDV->DimensionEntries[i].Size != 1)
+            {
+                stringstream string_stream;
+                string_stream << "Size for dimension 'M' is expected to be 1, but found " << subBlkDirDV->DimensionEntries[i].Size << " (file-offset:" << subBlkDirDV->FilePosition << ").";
+                throw LibCZICZIParseException(string_stream.str().c_str(), LibCZICZIParseException::ErrorCode::NonConformingSubBlockDimensionEntry);
+            }
         }
         else
         {
             libCZI::DimensionIndex dim = CCZIParse::DimensionCharToDimensionIndex(subBlkDirDV->DimensionEntries[i].Dimension, 4);
             entry.coordinate.Set(dim, subBlkDirDV->DimensionEntries[i].Start);
-            if (lax_subblock_coordinate_checks && subBlkDirDV->DimensionEntries[i].Size != 1)
+            if (!lax_subblock_coordinate_checks && subBlkDirDV->DimensionEntries[i].Size != 1)
             {
-                throw LibCZICZIParseException("size for dimension is not 1", LibCZICZIParseException::ErrorCode::CorruptedData);
+                stringstream string_stream;
+                string_stream << "Size for dimension '" << Utils::DimensionToChar(dim) << "' is expected to be 1, but found " << subBlkDirDV->DimensionEntries[i].Size << " (file-offset:" << subBlkDirDV->FilePosition << ").";
+                throw LibCZICZIParseException(string_stream.str().c_str(), LibCZICZIParseException::ErrorCode::NonConformingSubBlockDimensionEntry);
             }
         }
     }
 
-    if (lax_subblock_coordinate_checks && (!x_was_given || !y_was_given))
+    if (!lax_subblock_coordinate_checks && (!x_was_given || !y_was_given))
     {
-        throw LibCZICZIParseException("X or Y was not given", LibCZICZIParseException::ErrorCode::CorruptedData);
+        stringstream string_stream;
+        string_stream << "No coordinate/size given for ";
+        if (!x_was_given && y_was_given)
+        {
+            string_stream << "'X'";
+        }
+        else if (!y_was_given && x_was_given)
+        {
+            string_stream << "'Y'";
+        }
+        else
+        {
+            string_stream << "'X' and 'Y'";
+        }
+
+        string_stream << " (file-offset:" << subBlkDirDV->FilePosition << ").";
+        throw LibCZICZIParseException(string_stream.str().c_str(), LibCZICZIParseException::ErrorCode::NonConformingSubBlockDimensionEntry);
     }
 
     entry.FilePosition = subBlkDirDV->FilePosition;
