@@ -54,7 +54,6 @@ TEST(CZIParse, ParseSubblockDirectoryWithSubblockWithoutXAndExpectException)
     EXPECT_THROW(CCZIParse::ReadSubBlockDirectory(memory_stream.get(), file_header_segment_data.GetSubBlockDirectoryPosition(), false), LibCZICZIParseException);
 }
 
-
 static const uint8_t czi_with_subblock_of_size_t2[2304] = {
     0x5A, 0x49, 0x53, 0x52, 0x41, 0x57, 0x46, 0x49, 0x4C, 0x45, 0x00, 0x00,
     0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
