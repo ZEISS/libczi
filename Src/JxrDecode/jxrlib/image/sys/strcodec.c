@@ -279,17 +279,12 @@ ERR CreateWS_File(struct tagWMPStream** ppWS, const char* szFilename, const char
 
     pWS->Read = ReadWS_File;
     pWS->Write = WriteWS_File;
-    //pWS->GetLine = GetLineWS_File;
 
     pWS->SetPos = SetPosWS_File;
     pWS->GetPos = GetPosWS_File;
 
-    //#ifdef WIN32
-    //    FailIf(0 != fopen_s(&pWS->state.file.pFile, szFilename, szMode), WMP_errFileIO);
-    //#else
     pWS->state.file.pFile = fopen(szFilename, szMode);
     FailIf(NULL == pWS->state.file.pFile, WMP_errFileIO);
-    //#endif
 
 Cleanup:
     return err;
@@ -314,8 +309,6 @@ Bool EOSWS_File(struct tagWMPStream* pWS)
 
 ERR ReadWS_File(struct tagWMPStream* pWS, void* pv, size_t cb)
 {
-    // ERR err = WMP_errSuccess;
-
     return (fread(pv, cb, 1, pWS->state.file.pFile) == 1) ? WMP_errSuccess : WMP_errFileIO;
 }
 
