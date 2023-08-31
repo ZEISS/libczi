@@ -396,6 +396,7 @@ void CCziReaderWriter::ReadCziStructure()
             {
                 this->sbBlkDirectory.AddSubBlock(e);
             },
+            true,
             &sbBlkDirSegmentSize);
 
         this->sbBlkDirectory.SetModified(false);

@@ -159,13 +159,13 @@ using namespace libCZI;
 
 /*static*/void CCZIParse::ReadSubBlockDirectory(libCZI::IStream* str, std::uint64_t offset, CCziSubBlockDirectory& subBlkDir, bool lax_subblock_coordinate_checks)
 {
-    CCZIParse::ReadSubBlockDirectory(str, offset, [&](const CCziSubBlockDirectoryBase::SubBlkEntry& e)->void {subBlkDir.AddSubBlock(e); }, lax_subblock_coordinate_checks);
+    CCZIParse::ReadSubBlockDirectory(str, offset, [&](const CCziSubBlockDirectoryBase::SubBlkEntry& e)->void {subBlkDir.AddSubBlock(e); }, lax_subblock_coordinate_checks, nullptr);
 }
 
 /*static*/CCziAttachmentsDirectory CCZIParse::ReadAttachmentsDirectory(libCZI::IStream* str, std::uint64_t offset)
 {
     CCziAttachmentsDirectory attDir;
-    CCZIParse::ReadAttachmentsDirectory(str, offset, [&](const CCziAttachmentsDirectoryBase::AttachmentEntry& ae)->void {attDir.AddAttachmentEntry(ae); });
+    CCZIParse::ReadAttachmentsDirectory(str, offset, [&](const CCziAttachmentsDirectoryBase::AttachmentEntry& ae)->void {attDir.AddAttachmentEntry(ae); }, nullptr);
     return attDir;
 }
 
