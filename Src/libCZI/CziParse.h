@@ -41,7 +41,19 @@ public:
     static FileHeaderSegmentData ReadFileHeaderSegment(libCZI::IStream* str);
     static CFileHeaderSegmentData ReadFileHeaderSegmentData(libCZI::IStream* str);
 
+    /// Parse the subblock-directory from the specified stream at the specified offset.
+    /// Historically, libCZI did not check whether the elements in the dimensions-entry-list had a size other than
+    /// "1" given (for all dimensions other than X and Y). We refer to this as "lax parsing". If the argument 
+    /// lax_subblock_coordinate_checks is true, then we check for those sizes to be as expected and otherwise
+    /// throw an exception.
+    ///
+    /// \param [in,out] str                            The stream to read from.
+    /// \param          offset                         The offset in the stream.
+    /// \param          lax_subblock_coordinate_checks True to do "lax subblock coordinate checking".
+    ///
+    /// \returns An in-memory representation of the subblock-directory.
     static CCziSubBlockDirectory ReadSubBlockDirectory(libCZI::IStream* str, std::uint64_t offset, bool lax_subblock_coordinate_checks);
+
     static CCziAttachmentsDirectory ReadAttachmentsDirectory(libCZI::IStream* str, std::uint64_t offset);
     static void ReadAttachmentsDirectory(libCZI::IStream* str, std::uint64_t offset, const std::function<void(const CCziAttachmentsDirectoryBase::AttachmentEntry&)>& addFunc, SegmentSizes* segmentSizes);
 

@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2023 Carl Zeiss Microscopy GmbH
+//
+// SPDX-License-Identifier: LGPL-3.0-or-later
+
 #include "pch.h"
 #include "MemInputOutputStream.h"
 #include "../libCZI/CziParse.h"
@@ -40,7 +44,7 @@ TEST(CZIParse, ParseSubblockDirectoryWithSubblockWithSizeMOf2AndExpectException)
 
 TEST(CZIParse, ParseSubblockDirectoryWithSubblockWithoutXAndExpectException)
 {
-    const auto memory_stream = make_shared<CMemInputOutputStream>(czi_with_subblock_of_size_m2, sizeof(czi_with_subblock_of_size_m2));
+    const auto memory_stream = make_shared<CMemInputOutputStream>(czi_with_subblock_without_x, sizeof(czi_with_subblock_without_x));
     auto file_header_segment_data = CCZIParse::ReadFileHeaderSegmentData(memory_stream.get());
 
     // if doing "lax dimension-entry-parsing", we expect no exception
