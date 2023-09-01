@@ -36,7 +36,7 @@ public:
     void EnumerateSubBlocksEx(const std::function<bool(int index, const libCZI::DirectorySubBlockInfo& info)>& funcEnum) override;
 
     // interface ICZIReader
-    void Open(std::shared_ptr<libCZI::IStream> stream) override;
+    void Open(const std::shared_ptr<libCZI::IStream>& stream, const ICZIReader::OpenOptions* options) override;
     libCZI::FileHeaderInfo GetFileHeaderInfo() override;
     std::shared_ptr<libCZI::IMetadataSegment> ReadMetadataSegment() override;
     std::shared_ptr<libCZI::IAccessor> CreateAccessor(libCZI::AccessorType accessorType) override;

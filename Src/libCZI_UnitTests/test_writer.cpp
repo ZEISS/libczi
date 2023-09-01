@@ -265,7 +265,7 @@ static void _testWriteReadCompressedImageZStd0(uint32_t width, uint32_t height, 
     {
         auto stream = CreateStreamFromMemory(buffer, sizeBuffer);
         CCZIReader reader;
-        reader.Open(stream);
+        reader.Open(stream, nullptr);
 
         std::shared_ptr<ISubBlock> sbBlkRead = reader.ReadSubBlock(0);
         size_t sizeBlock = 0;
@@ -392,7 +392,7 @@ static void _testWriteReadCompressedImageZStd1(uint32_t width, uint32_t height, 
     {
         auto stream = CreateStreamFromMemory(buffer, sizeBuffer);
         CCZIReader reader;
-        reader.Open(stream);
+        reader.Open(stream, nullptr);
 
         std::shared_ptr<ISubBlock> sbBlkRead = reader.ReadSubBlock(0);
         size_t sizeBlock = 0;

@@ -68,7 +68,8 @@ ADD_EXECUTABLE(libCZI_UnitTests
 										testImage.cpp                  
 										test_reader.cpp                 
 										utils.h 
-										test_Accessors.cpp)
+										test_Accessors.cpp 
+										test_CZIParse.cpp)
 
 # Now simply link against gtest or gtest_main as needed. Eg
 TARGET_LINK_LIBRARIES(libCZI_UnitTests

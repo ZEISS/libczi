@@ -23,15 +23,21 @@ CCZIReader::~CCZIReader()
 {
 }
 
-/*virtual */void CCZIReader::Open(std::shared_ptr<libCZI::IStream> stream)
+/*virtual */void CCZIReader::Open(const std::shared_ptr<libCZI::IStream>& stream, const ICZIReader::OpenOptions* options)
 {
     if (this->isOperational == true)
     {
         throw logic_error("CZIReader is already operational.");
     }
 
+    if (options == nullptr)
+    {
+        auto default_options = OpenOptions{};
+        return CCZIReader::Open(stream, &default_options);
+    }
+
     this->hdrSegmentData = CCZIParse::ReadFileHeaderSegmentData(stream.get());
-    this->subBlkDir = CCZIParse::ReadSubBlockDirectory(stream.get(), this->hdrSegmentData.GetSubBlockDirectoryPosition());
+    this->subBlkDir = CCZIParse::ReadSubBlockDirectory(stream.get(), this->hdrSegmentData.GetSubBlockDirectoryPosition(), options->lax_subblock_coordinate_checks);
     auto attachmentPos = this->hdrSegmentData.GetAttachmentDirectoryPosition();
     if (attachmentPos != 0)
     {
@@ -84,13 +90,13 @@ CCZIReader::~CCZIReader()
         [&](int index, const CCziSubBlockDirectory::SubBlkEntry& entry)->bool
         {
             SubBlockInfo info;
-    info.compressionModeRaw = entry.Compression;
-    info.pixelType = CziUtils::PixelTypeFromInt(entry.PixelType);
-    info.coordinate = entry.coordinate;
-    info.logicalRect = IntRect{ entry.x,entry.y,entry.width,entry.height };
-    info.physicalSize = IntSize{ (std::uint32_t)entry.storedWidth, (std::uint32_t)entry.storedHeight };
-    info.mIndex = entry.mIndex;
-    return funcEnum(index, info);
+            info.compressionModeRaw = entry.Compression;
+            info.pixelType = CziUtils::PixelTypeFromInt(entry.PixelType);
+            info.coordinate = entry.coordinate;
+            info.logicalRect = IntRect{ entry.x,entry.y,entry.width,entry.height };
+            info.physicalSize = IntSize{ (std::uint32_t)entry.storedWidth, (std::uint32_t)entry.storedHeight };
+            info.mIndex = entry.mIndex;
+            return funcEnum(index, info);
         });
 }
 
@@ -101,14 +107,14 @@ CCZIReader::~CCZIReader()
         [&](int index, const CCziSubBlockDirectory::SubBlkEntry& entry)->bool
         {
             DirectorySubBlockInfo info;
-    info.compressionModeRaw = entry.Compression;
-    info.pixelType = CziUtils::PixelTypeFromInt(entry.PixelType);
-    info.coordinate = entry.coordinate;
-    info.logicalRect = IntRect{ entry.x,entry.y,entry.width,entry.height };
-    info.physicalSize = IntSize{ (std::uint32_t)entry.storedWidth, (std::uint32_t)entry.storedHeight };
-    info.mIndex = entry.mIndex;
-    info.filePosition = entry.FilePosition;
-    return funcEnum(index, info);
+            info.compressionModeRaw = entry.Compression;
+            info.pixelType = CziUtils::PixelTypeFromInt(entry.PixelType);
+            info.coordinate = entry.coordinate;
+            info.logicalRect = IntRect{ entry.x,entry.y,entry.width,entry.height };
+            info.physicalSize = IntSize{ (std::uint32_t)entry.storedWidth, (std::uint32_t)entry.storedHeight };
+            info.mIndex = entry.mIndex;
+            info.filePosition = entry.FilePosition;
+            return funcEnum(index, info);
         });
 }
 
@@ -137,7 +143,7 @@ CCZIReader::~CCZIReader()
                 }
             }
 
-    return true;
+            return true;
         });
 }
 
@@ -169,8 +175,8 @@ CCZIReader::~CCZIReader()
             [&](int index, const SubBlockInfo& sbinfo)->bool
             {
                 info = sbinfo;
-        foundASubBlock = true;
-        return false;
+                foundASubBlock = true;
+                return false;
             });
     }
     else
@@ -179,14 +185,14 @@ CCZIReader::~CCZIReader()
             [&](int index, const SubBlockInfo& sbinfo)->bool
             {
                 int c;
-        if (sbinfo.coordinate.TryGetPosition(DimensionIndex::C, &c) == true && c == channelIndex)
-        {
-            info = sbinfo;
-            foundASubBlock = true;
-            return false;
-        }
+                if (sbinfo.coordinate.TryGetPosition(DimensionIndex::C, &c) == true && c == channelIndex)
+                {
+                    info = sbinfo;
+                    foundASubBlock = true;
+                    return false;
+                }
 
-        return true;
+                return true;
             });
     }
 
@@ -236,10 +242,10 @@ CCZIReader::~CCZIReader()
         [&](int index, const CCziAttachmentsDirectory::AttachmentEntry& ae)
         {
             ai.contentGuid = ae.ContentGuid;
-    memcpy(ai.contentFileType, ae.ContentFileType, sizeof(ae.ContentFileType));
-    ai.name = ae.Name;
-    bool b = funcEnum(index, ai);
-    return b;
+            memcpy(ai.contentFileType, ae.ContentFileType, sizeof(ae.ContentFileType));
+            ai.name = ae.Name;
+            bool b = funcEnum(index, ai);
+            return b;
         });
 }
 
@@ -263,7 +269,7 @@ CCZIReader::~CCZIReader()
                 }
             }
 
-    return true;
+            return true;
         });
 }
 
