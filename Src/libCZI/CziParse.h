@@ -24,24 +24,45 @@ public:
     static const std::uint8_t ATTACHMENTBLKMAGIC[16];
     static const std::uint8_t DELETEDSEGMENTMAGIC[16];
 public:
+    /// Options for parsing the subblock-directory are gathered in this struct.
+    /// The default value is to do "lax parsing".
     struct SubblockDirectoryParseOptions
     {
     private:
         enum class ParseFlags : std::uint8_t
         {
-            kDimensionXyMustBePresent = 0x00,
-            kDimensionOtherThanMMustHaveSizeOne = 0x01,
-            kDimensionMMustHaveSizeOne = 0x02,
+            kDimensionXyMustBePresent = 0,
+            kDimensionOtherThanMMustHaveSizeOne,
+            kDimensionMMustHaveSizeOneExceptForPyramidSubblocks,
+            kDimensionMMustHaveSizeOne,
 
-            kParseFlagsCount = 3
+            kParseFlagsCount
         };
         std::bitset<static_cast<std::underlying_type<ParseFlags>::type>(ParseFlags::kParseFlagsCount)> flags;
     public:
+        /// Require that for each subblock, the dimensions X and Y are present.
+        /// 
+        /// \param  enable  True to enable, false to disable.
         void SetDimensionXyMustBePresent(bool enable) { return this->SetFlag(ParseFlags::kDimensionXyMustBePresent, enable); }
+
+        /// Require that for each subblock the size (for all dimensions other than X, Y and M) is "1".
+        ///
+        /// \param  enable  True to enable, false to disable.
         void SetDimensionOtherThanMMustHaveSizeOne(bool enable) { return this->SetFlag(ParseFlags::kDimensionOtherThanMMustHaveSizeOne, enable); }
+
+        /// Require that for all subblocks that the size of dimension M is "1" except for pyramid subblocks.
+        ///
+        /// \param  enable  True to enable, false to disable.
+        void SetDimensionMMustHaveSizeOneExceptForPyramidSubblocks(bool enable) { return this->SetFlag(ParseFlags::kDimensionMMustHaveSizeOneExceptForPyramidSubblocks, enable); }
+
+        /// Require that for all subblocks that the size of dimension M is "1" (without exceptions).
+        ///
+        /// \param  enable  True to enable, false to disable.
         void SetDimensionMMustHaveSizeOne(bool enable) { return this->SetFlag(ParseFlags::kDimensionMMustHaveSizeOne, enable); }
+
         bool GetDimensionXyMustBePresent() const { return this->GetFlag(ParseFlags::kDimensionXyMustBePresent); }
         bool GetDimensionOtherThanMMustHaveSizeOne() const { return this->GetFlag(ParseFlags::kDimensionOtherThanMMustHaveSizeOne); }
+        bool GetDimensionMMustHaveSizeOneForPyramidSubblocks() const { return this->GetFlag(ParseFlags::kDimensionMMustHaveSizeOneExceptForPyramidSubblocks); }
         bool GetDimensionMMustHaveSizeOne() const { return this->GetFlag(ParseFlags::kDimensionMMustHaveSizeOne); }
         void SetLaxParsing()
         {

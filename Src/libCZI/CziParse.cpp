@@ -525,6 +525,8 @@ using namespace libCZI;
 
     bool x_was_given = false;
     bool y_was_given = false;
+    bool size_of_m_was_not_1 = false;       // we will note here whether size for M-dimension was not 1
+    int size_of_m_in_case_it_was_not_1 = 0; // ...and, if this is the case, we will note the size here
     for (int i = 0; i < subBlkDirDV->DimensionCount; ++i)
     {
         if (CCZIParse::IsXDimension(subBlkDirDV->DimensionEntries[i].Dimension, 4))
@@ -544,15 +546,23 @@ using namespace libCZI;
         else if (CCZIParse::IsMDimension(subBlkDirDV->DimensionEntries[i].Dimension, 4))
         {
             entry.mIndex = subBlkDirDV->DimensionEntries[i].Start;
-            if (options.GetDimensionMMustHaveSizeOne() && subBlkDirDV->DimensionEntries[i].Size != 1)
+            if (subBlkDirDV->DimensionEntries[i].Size != 1)
             {
-                // now, if this is a pyramid-tile, then we may choose to ignore the size (because there are files out there
-                //  which erroneously have a non-1 size for the M-dimension of a pyramid-tile, as some software used to
-                //  write it that way). If we ignore this error, then those files work perfectly fine.
-
-                stringstream string_stream;
-                string_stream << "Size for dimension 'M' is expected to be 1, but found " << subBlkDirDV->DimensionEntries[i].Size << " (file-offset:" << subBlkDirDV->FilePosition << ").";
-                throw LibCZICZIParseException(string_stream.str().c_str(), LibCZICZIParseException::ErrorCode::NonConformingSubBlockDimensionEntry);
+                if (options.GetDimensionMMustHaveSizeOne())
+                {
+                    // In this case we can immediately throw an exception (i.e. this options requires that the size of M is 1 for all subblocks).
+                    stringstream string_stream;
+                    string_stream << "Size for dimension 'M' is expected to be 1, but found " << subBlkDirDV->DimensionEntries[i].Size << " (file-offset:" << subBlkDirDV->FilePosition << ").";
+                    throw LibCZICZIParseException(string_stream.str().c_str(), LibCZICZIParseException::ErrorCode::NonConformingSubBlockDimensionEntry);
+                }
+                else
+                {
+                    // ...but, for the option "MMustHaveSizeOneExceptForPyramidSubblocks" we have to check first if this a pyramid-subblock,
+                    //  which means that we must have the information for X and Y first. We do not want to assume a specific order of the dimension
+                    //  entries here, so we just take not of this fact and check it later.
+                    size_of_m_was_not_1 = true;
+                    size_of_m_in_case_it_was_not_1 = subBlkDirDV->DimensionEntries[i].Size;
+                }
             }
         }
         else
@@ -587,6 +597,20 @@ using namespace libCZI;
 
         string_stream << " (file-offset:" << subBlkDirDV->FilePosition << ").";
         throw LibCZICZIParseException(string_stream.str().c_str(), LibCZICZIParseException::ErrorCode::NonConformingSubBlockDimensionEntry);
+    }
+
+    if (size_of_m_was_not_1 && options.GetDimensionMMustHaveSizeOneForPyramidSubblocks())
+    {
+        // Ok, so now check if this is a pyramid-subblock (and if so, we will ignore the error).
+        // In turns out that there are quite a few files out there which erroneously have a non-1 size for the M-dimension of a pyramid-tile, 
+        // as some software used to write it that way). If we ignore this error, then those files work perfectly fine.
+        if (entry.IsStoredSizeEqualLogicalSize())
+        {
+            // this is not a pyramid-subblock, so we throw the exception
+            stringstream string_stream;
+            string_stream << "Size for dimension 'M' for non-pyramid-subblock is expected to be 1, but found " << size_of_m_in_case_it_was_not_1 << " (file-offset:" << subBlkDirDV->FilePosition << ").";
+            throw LibCZICZIParseException(string_stream.str().c_str(), LibCZICZIParseException::ErrorCode::NonConformingSubBlockDimensionEntry);
+        }
     }
 
     entry.FilePosition = subBlkDirDV->FilePosition;

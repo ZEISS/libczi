@@ -55,6 +55,10 @@ TEST(CZIParse, ParseSubblockDirectoryWithSubblockWithSizeMOf2AndExpectException)
     // ...however, if we choose to ignore the sizeM-entry, we expect no exception
     parse_options.SetDimensionMMustHaveSizeOne(false);
     EXPECT_NO_THROW(CCZIParse::ReadSubBlockDirectory(memory_stream.get(), file_header_segment_data.GetSubBlockDirectoryPosition(), parse_options), LibCZICZIParseException);
+
+    // ...and, if we choose to ignore only pyramid-subblocks, we still expect an exception (since the subblock is not a pyramid-subblock)
+    parse_options.SetDimensionMMustHaveSizeOneExceptForPyramidSubblocks(true);
+    EXPECT_THROW(CCZIParse::ReadSubBlockDirectory(memory_stream.get(), file_header_segment_data.GetSubBlockDirectoryPosition(), parse_options), LibCZICZIParseException);
 }
 
 TEST(CZIParse, ParseSubblockDirectoryWithSubblockWithoutXAndExpectException)
