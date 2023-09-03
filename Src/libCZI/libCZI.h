@@ -632,6 +632,14 @@ namespace libCZI
             /// disable this for new code.
             bool lax_subblock_coordinate_checks{ true };
 
+            /// This option controls whether the size-M-attribute of a pyramid-subblocks is to be ignored (when parsing and validating
+            /// the dimension-entry of a subblock). This flag is only relevant if strict validation is enabled (i.e. lax_subblock_coordinate_checks
+            /// is 'false'). If lax_subblock_coordinate_checks is true, then this flag has no effect.
+            /// This is useful as some versions of software creating CZI-files used to write bogus values for size-M, and those files
+            /// would otherwise not be usable with strict validation enabled. If this bogus size-M is ignored, then the files can be used
+            /// without problems.
+            bool ignore_sizem_for_pyramid_subblocks{ false };   
+
             /// Sets the the default.
             void SetDefault()
             {

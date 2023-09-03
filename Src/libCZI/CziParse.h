@@ -5,6 +5,7 @@
 #pragma once
 
 #include <functional>
+#include <bitset>
 
 #include "CziSubBlockDirectory.h"
 #include "CziAttachmentsDirectory.h"
@@ -23,6 +24,42 @@ public:
     static const std::uint8_t ATTACHMENTBLKMAGIC[16];
     static const std::uint8_t DELETEDSEGMENTMAGIC[16];
 public:
+    struct SubblockDirectoryParseOptions
+    {
+    private:
+        enum class ParseFlags : std::uint8_t
+        {
+            kDimensionXyMustBePresent = 0x00,
+            kDimensionOtherThanMMustHaveSizeOne = 0x01,
+            kDimensionMMustHaveSizeOne = 0x02,
+
+            kParseFlagsCount = 3
+        };
+        std::bitset<static_cast<std::underlying_type<ParseFlags>::type>(ParseFlags::kParseFlagsCount)> flags;
+    public:
+        void SetDimensionXyMustBePresent(bool enable) { return this->SetFlag(ParseFlags::kDimensionXyMustBePresent, enable); }
+        void SetDimensionOtherThanMMustHaveSizeOne(bool enable) { return this->SetFlag(ParseFlags::kDimensionOtherThanMMustHaveSizeOne, enable); }
+        void SetDimensionMMustHaveSizeOne(bool enable) { return this->SetFlag(ParseFlags::kDimensionMMustHaveSizeOne, enable); }
+        bool GetDimensionXyMustBePresent() const { return this->GetFlag(ParseFlags::kDimensionXyMustBePresent); }
+        bool GetDimensionOtherThanMMustHaveSizeOne() const { return this->GetFlag(ParseFlags::kDimensionOtherThanMMustHaveSizeOne); }
+        bool GetDimensionMMustHaveSizeOne() const { return this->GetFlag(ParseFlags::kDimensionMMustHaveSizeOne); }
+        void SetLaxParsing()
+        {
+            this->SetDimensionXyMustBePresent(false);
+            this->SetDimensionOtherThanMMustHaveSizeOne(false);
+            this->SetDimensionMMustHaveSizeOne(false);
+        }
+        void SetStrictParsing()
+        {
+            this->SetDimensionXyMustBePresent(true);
+            this->SetDimensionOtherThanMMustHaveSizeOne(true);
+            this->SetDimensionMMustHaveSizeOne(true);
+        }
+    private:
+        void SetFlag(ParseFlags flag, bool enable);
+        bool GetFlag(ParseFlags flag) const;
+    };
+
     enum class SegmentType
     {
         SbBlkDirectory,
@@ -52,14 +89,14 @@ public:
     /// \param          lax_subblock_coordinate_checks True to do "lax subblock coordinate checking".
     ///
     /// \returns An in-memory representation of the subblock-directory.
-    static CCziSubBlockDirectory ReadSubBlockDirectory(libCZI::IStream* str, std::uint64_t offset, bool lax_subblock_coordinate_checks);
+    static CCziSubBlockDirectory ReadSubBlockDirectory(libCZI::IStream* str, std::uint64_t offset, const SubblockDirectoryParseOptions& options);
 
     static CCziAttachmentsDirectory ReadAttachmentsDirectory(libCZI::IStream* str, std::uint64_t offset);
     static void ReadAttachmentsDirectory(libCZI::IStream* str, std::uint64_t offset, const std::function<void(const CCziAttachmentsDirectoryBase::AttachmentEntry&)>& addFunc, SegmentSizes* segmentSizes);
 
-    static void ReadSubBlockDirectory(libCZI::IStream* str, std::uint64_t offset, CCziSubBlockDirectory& subBlkDir, bool lax_subblock_coordinate_checks);
+    static void ReadSubBlockDirectory(libCZI::IStream* str, std::uint64_t offset, CCziSubBlockDirectory& subBlkDir, const SubblockDirectoryParseOptions& options);
 
-    static void ReadSubBlockDirectory(libCZI::IStream* str, std::uint64_t offset, const std::function<void(const CCziSubBlockDirectoryBase::SubBlkEntry&)>& addFunc, bool lax_subblock_coordinate_checks, SegmentSizes* segmentSizes);
+    static void ReadSubBlockDirectory(libCZI::IStream* str, std::uint64_t offset, const std::function<void(const CCziSubBlockDirectoryBase::SubBlkEntry&)>& addFunc, const SubblockDirectoryParseOptions& options, SegmentSizes* segmentSizes);
 
     struct SubBlockStorageAllocate
     {
@@ -110,7 +147,7 @@ private:
     static void ParseThroughDirectoryEntries(int count, const std::function<void(int, void*)>& funcRead, const std::function<void(const SubBlockDirectoryEntryDE*, const SubBlockDirectoryEntryDV*)>& funcAddEntry);
 
     static void AddEntryToSubBlockDirectory(const SubBlockDirectoryEntryDE* subBlkDirDE, const std::function<void(const CCziSubBlockDirectoryBase::SubBlkEntry&)>& addFunc);
-    static void AddEntryToSubBlockDirectory(const SubBlockDirectoryEntryDV* subBlkDirDV, const std::function<void(const CCziSubBlockDirectoryBase::SubBlkEntry&)>& addFunc, bool lax_subblock_coordinate_checks);
+    static void AddEntryToSubBlockDirectory(const SubBlockDirectoryEntryDV* subBlkDirDV, const std::function<void(const CCziSubBlockDirectoryBase::SubBlkEntry&)>& addFunc, const SubblockDirectoryParseOptions& options);
 
     static libCZI::DimensionIndex DimensionCharToDimensionIndex(const char* ptr, size_t size);
     static bool IsMDimension(const char* ptr, size_t size);
