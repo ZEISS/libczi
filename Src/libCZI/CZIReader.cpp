@@ -18,11 +18,7 @@ using namespace libCZI;
 static CCZIParse::SubblockDirectoryParseOptions GetParseOptionsFromOpenOptions(const ICZIReader::OpenOptions& options)
 {
     CCZIParse::SubblockDirectoryParseOptions parse_options;
-    if (options.lax_subblock_coordinate_checks == true)
-    {
-        return parse_options;
-    }
-    else
+    if (options.lax_subblock_coordinate_checks == false)
     {
         parse_options.SetStrictParsing();
         if (options.ignore_sizem_for_pyramid_subblocks)
@@ -31,6 +27,8 @@ static CCZIParse::SubblockDirectoryParseOptions GetParseOptionsFromOpenOptions(c
             parse_options.SetDimensionMMustHaveSizeOneExceptForPyramidSubblocks(true);
         }
     }
+
+    return parse_options;
 }
 
 CCZIReader::CCZIReader() : isOperational(false)
