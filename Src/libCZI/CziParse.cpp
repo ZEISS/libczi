@@ -6,7 +6,7 @@
 #include "libCZI.h"
 #include "CziParse.h"
 #include "CziStructs.h"
-#include <assert.h>
+#include <cassert>
 #include <cstddef>
 #include "Site.h"
 
@@ -32,7 +32,7 @@ using namespace libCZI;
     }
     catch (const std::exception&)
     {
-        std::throw_with_nested(LibCZIIOException("Error reading FileHeaderSegement", 0, sizeof(fileHeaderSegment)));
+        std::throw_with_nested(LibCZIIOException("Error reading FileHeaderSegment", 0, sizeof(fileHeaderSegment)));
     }
 
     if (bytesRead != sizeof(fileHeaderSegment))
@@ -75,7 +75,7 @@ using namespace libCZI;
     }
     catch (const std::exception&)
     {
-        std::throw_with_nested(LibCZIIOException("Error reading SubBlkDirectorySegement", offset, sizeof(subBlckDirSegment)));
+        std::throw_with_nested(LibCZIIOException("Error reading SubBlkDirectorySegment", offset, sizeof(subBlckDirSegment)));
     }
 
     if (bytesRead != sizeof(subBlckDirSegment))
@@ -121,7 +121,7 @@ using namespace libCZI;
     }
     catch (const std::exception&)
     {
-        std::throw_with_nested(LibCZIIOException("Error reading FileHeaderSegement", offset + sizeof(subBlckDirSegment), subBlkDirSize));
+        std::throw_with_nested(LibCZIIOException("Error reading FileHeaderSegment", offset + sizeof(subBlckDirSegment), subBlkDirSize));
     }
 
     if (bytesRead != subBlkDirSize)
@@ -365,7 +365,7 @@ using namespace libCZI;
     // TODO: if subBlckSegment.data.DataSize > size_t (=4GB for 32Bit) then bail out gracefully
     auto deleter = [&](void* ptr) -> void {allocateInfo.free(ptr); };
     std::unique_ptr<void, decltype(deleter)> pMetadataBuffer(subBlckSegment.data.MetadataSize > 0 ? allocateInfo.alloc(subBlckSegment.data.MetadataSize) : nullptr, deleter);
-    std::unique_ptr<void, decltype(deleter)> pDataBuffer(subBlckSegment.data.DataSize > 0 ? allocateInfo.alloc((size_t)subBlckSegment.data.DataSize) : nullptr, deleter);
+    std::unique_ptr<void, decltype(deleter)> pDataBuffer(subBlckSegment.data.DataSize > 0 ? allocateInfo.alloc(static_cast<size_t>(subBlckSegment.data.DataSize)) : nullptr, deleter);
     std::unique_ptr<void, decltype(deleter)> pAttachmentBuffer(subBlckSegment.data.AttachmentSize > 0 ? allocateInfo.alloc(subBlckSegment.data.AttachmentSize) : nullptr, deleter);
 
     // TODO: now get the information from the SubBlockDirectoryEntryDV/DE structure, and figure out their size
@@ -457,7 +457,7 @@ using namespace libCZI;
 
     // TODO: if subBlckSegment.data.DataSize > size_t (=4GB for 32Bit) then bail out gracefully
     auto deleter = [&](void* ptr) -> void {allocateInfo.free(ptr); };
-    std::unique_ptr<void, decltype(deleter)> pAttchmntBuffer(attchmntSegment.data.DataSize > 0 ? allocateInfo.alloc((size_t)attchmntSegment.data.DataSize) : nullptr, deleter);
+    std::unique_ptr<void, decltype(deleter)> pAttchmntBuffer(attchmntSegment.data.DataSize > 0 ? allocateInfo.alloc(static_cast<size_t>(attchmntSegment.data.DataSize)) : nullptr, deleter);
 
     if (pAttchmntBuffer)
     {
@@ -648,7 +648,7 @@ using namespace libCZI;
     // TODO: perform consistency checks...
     auto deleter = [&](void* ptr) -> void {allocateInfo.free(ptr); };
     std::unique_ptr<void, decltype(deleter)> pXmlBuffer(metadataSegment.data.XmlSize > 0 ? allocateInfo.alloc(metadataSegment.data.XmlSize) : nullptr, deleter);
-    std::unique_ptr<void, decltype(deleter)> pAttachmentBuffer(metadataSegment.data.AttachmentSize > 0 ? allocateInfo.alloc((size_t)metadataSegment.data.AttachmentSize) : nullptr, deleter);
+    std::unique_ptr<void, decltype(deleter)> pAttachmentBuffer(metadataSegment.data.AttachmentSize > 0 ? allocateInfo.alloc(static_cast<size_t>(metadataSegment.data.AttachmentSize)) : nullptr, deleter);
     if (pXmlBuffer)
     {
         try

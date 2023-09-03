@@ -36,7 +36,7 @@ public:
             kDimensionMMustHaveSizeOneExceptForPyramidSubblocks,
             kDimensionMMustHaveSizeOne,
 
-            kParseFlagsCount
+            kParseFlagsCount    ///< The number of flags - this is not a flag itself, and it must be the last entry in the enum.
         };
         std::bitset<static_cast<std::underlying_type<ParseFlags>::type>(ParseFlags::kParseFlagsCount)> flags;
     public:
@@ -60,16 +60,36 @@ public:
         /// \param  enable  True to enable, false to disable.
         void SetDimensionMMustHaveSizeOne(bool enable) { return this->SetFlag(ParseFlags::kDimensionMMustHaveSizeOne, enable); }
 
+        /// Gets a boolean indicating whether to check that the dimensions X and Y are be present for each subblock.
+        ///
+        /// \returns    True if it is to be checked whether all subblocks have an X and Y dimension specified; false otherwise.
         bool GetDimensionXyMustBePresent() const { return this->GetFlag(ParseFlags::kDimensionXyMustBePresent); }
+
+        /// Gets a boolean indicating whether to check that the size of all dimensions other than X, Y and M is "1" for each subblock.
+        ///
+        /// \returns    True if it is to be checked that the size of all dimensions other than X, Y and M is "1" for each subblock; false otherwise.
         bool GetDimensionOtherThanMMustHaveSizeOne() const { return this->GetFlag(ParseFlags::kDimensionOtherThanMMustHaveSizeOne); }
+
+        /// Gets a boolean indicating whether to check that the size is "1" for dimension M for all non-pyramid-subblocks.
+        /// This flag is more specific than the flag "DimensionMMustHaveSizeOne".
+        ///
+        /// \returns    True if it is to be checked that the is "1" for dimension M for all non-pyramid-subblocks; false otherwise.
         bool GetDimensionMMustHaveSizeOneForPyramidSubblocks() const { return this->GetFlag(ParseFlags::kDimensionMMustHaveSizeOneExceptForPyramidSubblocks); }
+
+        /// Gets a boolean indicating whether to check that the size is "1" for dimension M for all subblocks.
+        ///
+        /// \returns    True if it is to be checked that the is "1" for dimension M for all subblocks; false otherwise.
         bool GetDimensionMMustHaveSizeOne() const { return this->GetFlag(ParseFlags::kDimensionMMustHaveSizeOne); }
+
+        /// Sets options to "lax parsing". This is the default.
         void SetLaxParsing()
         {
             this->SetDimensionXyMustBePresent(false);
             this->SetDimensionOtherThanMMustHaveSizeOne(false);
             this->SetDimensionMMustHaveSizeOne(false);
         }
+
+        /// Sets strict parsing - all options are enabled.
         void SetStrictParsing()
         {
             this->SetDimensionXyMustBePresent(true);
@@ -100,16 +120,16 @@ public:
     static CFileHeaderSegmentData ReadFileHeaderSegmentData(libCZI::IStream* str);
 
     /// Parse the subblock-directory from the specified stream at the specified offset.
-    /// Historically, libCZI did not check whether the elements in the dimensions-entry-list had a size other than
-    /// "1" given (for all dimensions other than X and Y). We refer to this as "lax parsing". If the argument 
-    /// lax_subblock_coordinate_checks is true, then we check for those sizes to be as expected and otherwise
-    /// throw an exception.
+    /// Historically, libCZI did not check whether the elements in the dimensions-entry-list had
+    /// a size other than "1" given (for all dimensions other than X and Y). We refer to this as
+    /// "lax parsing". If the argument lax_subblock_coordinate_checks is true, then we check for
+    /// those sizes to be as expected and otherwise throw an exception.
     ///
-    /// \param [in,out] str                            The stream to read from.
-    /// \param          offset                         The offset in the stream.
-    /// \param          lax_subblock_coordinate_checks True to do "lax subblock coordinate checking".
+    /// \param [in,out] str     The stream to read from.
+    /// \param          offset  The offset in the stream.
+    /// \param          options Options controlling the operation, allowing to choose various variants for parsing.
     ///
-    /// \returns An in-memory representation of the subblock-directory.
+    /// \returns    An in-memory representation of the subblock-directory.
     static CCziSubBlockDirectory ReadSubBlockDirectory(libCZI::IStream* str, std::uint64_t offset, const SubblockDirectoryParseOptions& options);
 
     static CCziAttachmentsDirectory ReadAttachmentsDirectory(libCZI::IStream* str, std::uint64_t offset);
