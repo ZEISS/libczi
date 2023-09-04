@@ -15,6 +15,23 @@
 using namespace std;
 using namespace libCZI;
 
+static CCZIParse::SubblockDirectoryParseOptions GetParseOptionsFromOpenOptions(const ICZIReader::OpenOptions& options)
+{
+    CCZIParse::SubblockDirectoryParseOptions parse_options;
+    if (options.lax_subblock_coordinate_checks == false)
+    {
+        parse_options.SetStrictParsing();
+        if (options.ignore_sizem_for_pyramid_subblocks)
+        {
+            // in this case we require only that non-pyramid-subblocks have a SizeM=1
+            parse_options.SetDimensionMMustHaveSizeOne(false);
+            parse_options.SetDimensionMMustHaveSizeOneExceptForPyramidSubblocks(true);
+        }
+    }
+
+    return parse_options;
+}
+
 CCZIReader::CCZIReader() : isOperational(false)
 {
 }
@@ -32,18 +49,18 @@ CCZIReader::~CCZIReader()
 
     if (options == nullptr)
     {
-        auto default_options = OpenOptions{};
+        const auto default_options = OpenOptions{};
         return CCZIReader::Open(stream, &default_options);
     }
 
     this->hdrSegmentData = CCZIParse::ReadFileHeaderSegmentData(stream.get());
-    this->subBlkDir = CCZIParse::ReadSubBlockDirectory(stream.get(), this->hdrSegmentData.GetSubBlockDirectoryPosition(), options->lax_subblock_coordinate_checks);
-    auto attachmentPos = this->hdrSegmentData.GetAttachmentDirectoryPosition();
+    this->subBlkDir = CCZIParse::ReadSubBlockDirectory(stream.get(), this->hdrSegmentData.GetSubBlockDirectoryPosition(), GetParseOptionsFromOpenOptions(*options));
+    const auto attachmentPos = this->hdrSegmentData.GetAttachmentDirectoryPosition();
     if (attachmentPos != 0)
     {
         // we should be operational without an attachment-directory as well I suppose.
         // TODO: how to determine whether there is "no attachment-directory" - is the check for 0 sufficient?
-        this->attachmentDir = std::move(CCZIParse::ReadAttachmentsDirectory(stream.get(), attachmentPos));
+        this->attachmentDir = CCZIParse::ReadAttachmentsDirectory(stream.get(), attachmentPos);
     }
 
     this->stream = stream;

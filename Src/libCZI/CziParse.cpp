@@ -6,7 +6,7 @@
 #include "libCZI.h"
 #include "CziParse.h"
 #include "CziStructs.h"
-#include <assert.h>
+#include <cassert>
 #include <cstddef>
 #include "Site.h"
 
@@ -32,7 +32,7 @@ using namespace libCZI;
     }
     catch (const std::exception&)
     {
-        std::throw_with_nested(LibCZIIOException("Error reading FileHeaderSegement", 0, sizeof(fileHeaderSegment)));
+        std::throw_with_nested(LibCZIIOException("Error reading FileHeaderSegment", 0, sizeof(fileHeaderSegment)));
     }
 
     if (bytesRead != sizeof(fileHeaderSegment))
@@ -57,15 +57,15 @@ using namespace libCZI;
     return fileHdr;
 }
 
-/*static*/CCziSubBlockDirectory CCZIParse::ReadSubBlockDirectory(libCZI::IStream* str, std::uint64_t offset, bool lax_subblock_coordinate_checks)
+/*static*/CCziSubBlockDirectory CCZIParse::ReadSubBlockDirectory(libCZI::IStream* str, std::uint64_t offset, const SubblockDirectoryParseOptions& options)
 {
     CCziSubBlockDirectory subBlkDir;
-    CCZIParse::ReadSubBlockDirectory(str, offset, subBlkDir, lax_subblock_coordinate_checks);
+    CCZIParse::ReadSubBlockDirectory(str, offset, subBlkDir, options);
     subBlkDir.AddingFinished();
     return subBlkDir;
 }
 
-/*static*/void CCZIParse::ReadSubBlockDirectory(libCZI::IStream* str, std::uint64_t offset, const std::function<void(const CCziSubBlockDirectoryBase::SubBlkEntry&)>& addFunc, bool lax_subblock_coordinate_checks, SegmentSizes* segmentSizes /*= nullptr*/)
+/*static*/void CCZIParse::ReadSubBlockDirectory(libCZI::IStream* str, std::uint64_t offset, const std::function<void(const CCziSubBlockDirectoryBase::SubBlkEntry&)>& addFunc, const SubblockDirectoryParseOptions& options, SegmentSizes* segmentSizes /*= nullptr*/)
 {
     SubBlockDirectorySegment subBlckDirSegment;
     std::uint64_t bytesRead;
@@ -75,7 +75,7 @@ using namespace libCZI;
     }
     catch (const std::exception&)
     {
-        std::throw_with_nested(LibCZIIOException("Error reading SubBlkDirectorySegement", offset, sizeof(subBlckDirSegment)));
+        std::throw_with_nested(LibCZIIOException("Error reading SubBlkDirectorySegment", offset, sizeof(subBlckDirSegment)));
     }
 
     if (bytesRead != sizeof(subBlckDirSegment))
@@ -121,7 +121,7 @@ using namespace libCZI;
     }
     catch (const std::exception&)
     {
-        std::throw_with_nested(LibCZIIOException("Error reading FileHeaderSegement", offset + sizeof(subBlckDirSegment), subBlkDirSize));
+        std::throw_with_nested(LibCZIIOException("Error reading FileHeaderSegment", offset + sizeof(subBlckDirSegment), subBlkDirSize));
     }
 
     if (bytesRead != subBlkDirSize)
@@ -152,14 +152,14 @@ using namespace libCZI;
             }
             else if (subBlkDirDV != nullptr)
             {
-                CCZIParse::AddEntryToSubBlockDirectory(subBlkDirDV, addFunc, lax_subblock_coordinate_checks);
+                CCZIParse::AddEntryToSubBlockDirectory(subBlkDirDV, addFunc, options);
             }
         });
 }
 
-/*static*/void CCZIParse::ReadSubBlockDirectory(libCZI::IStream* str, std::uint64_t offset, CCziSubBlockDirectory& subBlkDir, bool lax_subblock_coordinate_checks)
+/*static*/void CCZIParse::ReadSubBlockDirectory(libCZI::IStream* str, std::uint64_t offset, CCziSubBlockDirectory& subBlkDir, const SubblockDirectoryParseOptions& options)
 {
-    CCZIParse::ReadSubBlockDirectory(str, offset, [&](const CCziSubBlockDirectoryBase::SubBlkEntry& e)->void {subBlkDir.AddSubBlock(e); }, lax_subblock_coordinate_checks, nullptr);
+    CCZIParse::ReadSubBlockDirectory(str, offset, [&](const CCziSubBlockDirectoryBase::SubBlkEntry& e)->void {subBlkDir.AddSubBlock(e); }, options, nullptr);
 }
 
 /*static*/CCziAttachmentsDirectory CCZIParse::ReadAttachmentsDirectory(libCZI::IStream* str, std::uint64_t offset)
@@ -365,7 +365,7 @@ using namespace libCZI;
     // TODO: if subBlckSegment.data.DataSize > size_t (=4GB for 32Bit) then bail out gracefully
     auto deleter = [&](void* ptr) -> void {allocateInfo.free(ptr); };
     std::unique_ptr<void, decltype(deleter)> pMetadataBuffer(subBlckSegment.data.MetadataSize > 0 ? allocateInfo.alloc(subBlckSegment.data.MetadataSize) : nullptr, deleter);
-    std::unique_ptr<void, decltype(deleter)> pDataBuffer(subBlckSegment.data.DataSize > 0 ? allocateInfo.alloc((size_t)subBlckSegment.data.DataSize) : nullptr, deleter);
+    std::unique_ptr<void, decltype(deleter)> pDataBuffer(subBlckSegment.data.DataSize > 0 ? allocateInfo.alloc(static_cast<size_t>(subBlckSegment.data.DataSize)) : nullptr, deleter);
     std::unique_ptr<void, decltype(deleter)> pAttachmentBuffer(subBlckSegment.data.AttachmentSize > 0 ? allocateInfo.alloc(subBlckSegment.data.AttachmentSize) : nullptr, deleter);
 
     // TODO: now get the information from the SubBlockDirectoryEntryDV/DE structure, and figure out their size
@@ -457,7 +457,7 @@ using namespace libCZI;
 
     // TODO: if subBlckSegment.data.DataSize > size_t (=4GB for 32Bit) then bail out gracefully
     auto deleter = [&](void* ptr) -> void {allocateInfo.free(ptr); };
-    std::unique_ptr<void, decltype(deleter)> pAttchmntBuffer(attchmntSegment.data.DataSize > 0 ? allocateInfo.alloc((size_t)attchmntSegment.data.DataSize) : nullptr, deleter);
+    std::unique_ptr<void, decltype(deleter)> pAttchmntBuffer(attchmntSegment.data.DataSize > 0 ? allocateInfo.alloc(static_cast<size_t>(attchmntSegment.data.DataSize)) : nullptr, deleter);
 
     if (pAttchmntBuffer)
     {
@@ -492,7 +492,7 @@ using namespace libCZI;
         {
             SubBlockDirectoryEntryDV dv;
             dv.SchemaType[0] = schemaType[0]; dv.SchemaType[1] = schemaType[1];
-            funcRead(4 + 8 + 4 + 4 + 6 + 4, ((char*)&dv) + 2);
+            funcRead(4 + 8 + 4 + 4 + 6 + 4, reinterpret_cast<uint8_t*>(&dv) + 2);
             ConvertToHostByteOrder::Convert(&dv);
 
             int sizeToRead = dv.DimensionCount * sizeof(DimensionEntryDV);
@@ -518,13 +518,15 @@ using namespace libCZI;
     throw std::logic_error("not (yet) implemented");
 }
 
-/*static*/void CCZIParse::AddEntryToSubBlockDirectory(const SubBlockDirectoryEntryDV* subBlkDirDV, const std::function<void(const CCziSubBlockDirectoryBase::SubBlkEntry&)>& addFunc, bool lax_subblock_coordinate_checks)
+/*static*/void CCZIParse::AddEntryToSubBlockDirectory(const SubBlockDirectoryEntryDV* subBlkDirDV, const std::function<void(const CCziSubBlockDirectoryBase::SubBlkEntry&)>& addFunc, const SubblockDirectoryParseOptions& options)
 {
     CCziSubBlockDirectory::SubBlkEntry entry;
     entry.Invalidate();
 
     bool x_was_given = false;
     bool y_was_given = false;
+    bool size_of_m_was_not_1 = false;       // we will note here whether size for M-dimension was not 1
+    int size_of_m_in_case_it_was_not_1 = 0; // ...and, if this is the case, we will note the size here
     for (int i = 0; i < subBlkDirDV->DimensionCount; ++i)
     {
         if (CCZIParse::IsXDimension(subBlkDirDV->DimensionEntries[i].Dimension, 4))
@@ -544,18 +546,30 @@ using namespace libCZI;
         else if (CCZIParse::IsMDimension(subBlkDirDV->DimensionEntries[i].Dimension, 4))
         {
             entry.mIndex = subBlkDirDV->DimensionEntries[i].Start;
-            if (!lax_subblock_coordinate_checks && subBlkDirDV->DimensionEntries[i].Size != 1)
+            if (subBlkDirDV->DimensionEntries[i].Size != 1)
             {
-                stringstream string_stream;
-                string_stream << "Size for dimension 'M' is expected to be 1, but found " << subBlkDirDV->DimensionEntries[i].Size << " (file-offset:" << subBlkDirDV->FilePosition << ").";
-                throw LibCZICZIParseException(string_stream.str().c_str(), LibCZICZIParseException::ErrorCode::NonConformingSubBlockDimensionEntry);
+                if (options.GetDimensionMMustHaveSizeOne())
+                {
+                    // In this case we can immediately throw an exception (i.e. this options requires that the size of M is 1 for all subblocks).
+                    stringstream string_stream;
+                    string_stream << "Size for dimension 'M' is expected to be 1, but found " << subBlkDirDV->DimensionEntries[i].Size << " (file-offset:" << subBlkDirDV->FilePosition << ").";
+                    throw LibCZICZIParseException(string_stream.str().c_str(), LibCZICZIParseException::ErrorCode::NonConformingSubBlockDimensionEntry);
+                }
+                else
+                {
+                    // ...but, for the option "MMustHaveSizeOneExceptForPyramidSubblocks" we have to check first if this a pyramid-subblock,
+                    //  which means that we must have the information for X and Y first. We do not want to assume a specific order of the dimension
+                    //  entries here, so we just take not of this fact and check it later.
+                    size_of_m_was_not_1 = true;
+                    size_of_m_in_case_it_was_not_1 = subBlkDirDV->DimensionEntries[i].Size;
+                }
             }
         }
         else
         {
             libCZI::DimensionIndex dim = CCZIParse::DimensionCharToDimensionIndex(subBlkDirDV->DimensionEntries[i].Dimension, 4);
             entry.coordinate.Set(dim, subBlkDirDV->DimensionEntries[i].Start);
-            if (!lax_subblock_coordinate_checks && subBlkDirDV->DimensionEntries[i].Size != 1)
+            if (options.GetDimensionOtherThanMMustHaveSizeOne() && subBlkDirDV->DimensionEntries[i].Size != 1)
             {
                 stringstream string_stream;
                 string_stream << "Size for dimension '" << Utils::DimensionToChar(dim) << "' is expected to be 1, but found " << subBlkDirDV->DimensionEntries[i].Size << " (file-offset:" << subBlkDirDV->FilePosition << ").";
@@ -564,7 +578,7 @@ using namespace libCZI;
         }
     }
 
-    if (!lax_subblock_coordinate_checks && (!x_was_given || !y_was_given))
+    if (options.GetDimensionXyMustBePresent() && (!x_was_given || !y_was_given))
     {
         stringstream string_stream;
         string_stream << "No coordinate/size given for ";
@@ -583,6 +597,20 @@ using namespace libCZI;
 
         string_stream << " (file-offset:" << subBlkDirDV->FilePosition << ").";
         throw LibCZICZIParseException(string_stream.str().c_str(), LibCZICZIParseException::ErrorCode::NonConformingSubBlockDimensionEntry);
+    }
+
+    if (size_of_m_was_not_1 && options.GetDimensionMMustHaveSizeOneForPyramidSubblocks())
+    {
+        // Ok, so now check if this is a pyramid-subblock (and if so, we will ignore the error).
+        // In turns out that there are quite a few files out there which erroneously have a non-1 size for the M-dimension of a pyramid-tile, 
+        // as some software used to write it that way). If we ignore this error, then those files work perfectly fine.
+        if (entry.IsStoredSizeEqualLogicalSize())
+        {
+            // this is not a pyramid-subblock, so we throw the exception
+            stringstream string_stream;
+            string_stream << "Size for dimension 'M' for non-pyramid-subblock is expected to be 1, but found " << size_of_m_in_case_it_was_not_1 << " (file-offset:" << subBlkDirDV->FilePosition << ").";
+            throw LibCZICZIParseException(string_stream.str().c_str(), LibCZICZIParseException::ErrorCode::NonConformingSubBlockDimensionEntry);
+        }
     }
 
     entry.FilePosition = subBlkDirDV->FilePosition;
@@ -620,7 +648,7 @@ using namespace libCZI;
     // TODO: perform consistency checks...
     auto deleter = [&](void* ptr) -> void {allocateInfo.free(ptr); };
     std::unique_ptr<void, decltype(deleter)> pXmlBuffer(metadataSegment.data.XmlSize > 0 ? allocateInfo.alloc(metadataSegment.data.XmlSize) : nullptr, deleter);
-    std::unique_ptr<void, decltype(deleter)> pAttachmentBuffer(metadataSegment.data.AttachmentSize > 0 ? allocateInfo.alloc((size_t)metadataSegment.data.AttachmentSize) : nullptr, deleter);
+    std::unique_ptr<void, decltype(deleter)> pAttachmentBuffer(metadataSegment.data.AttachmentSize > 0 ? allocateInfo.alloc(static_cast<size_t>(metadataSegment.data.AttachmentSize)) : nullptr, deleter);
     if (pXmlBuffer)
     {
         try
@@ -854,4 +882,14 @@ using namespace libCZI;
     ConvertToHostByteOrder::Convert(&segmentHdr);
 
     return SegmentSizes{ segmentHdr.AllocatedSize,segmentHdr.UsedSize };
+}
+
+void CCZIParse::SubblockDirectoryParseOptions::SetFlag(ParseFlags flag, bool enable)
+{
+    this->flags.set(static_cast<std::underlying_type<ParseFlags>::type>(flag), enable);
+}
+
+bool CCZIParse::SubblockDirectoryParseOptions::GetFlag(ParseFlags flag)const
+{
+    return this->flags.test(static_cast<std::underlying_type<ParseFlags>::type>(flag));
 }
