@@ -23,7 +23,8 @@ static CCZIParse::SubblockDirectoryParseOptions GetParseOptionsFromOpenOptions(c
         parse_options.SetStrictParsing();
         if (options.ignore_sizem_for_pyramid_subblocks)
         {
-            parse_options.SetDimensionOtherThanMMustHaveSizeOne(false);
+            // in this case we require only that non-pyramid-subblocks have a SizeM=1
+            parse_options.SetDimensionMMustHaveSizeOne(false);
             parse_options.SetDimensionMMustHaveSizeOneExceptForPyramidSubblocks(true);
         }
     }
