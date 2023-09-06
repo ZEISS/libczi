@@ -134,6 +134,13 @@ namespace libCZI
         Zstd1 = 6           ///< The data contains a header, followed by a zstd-compressed block. 
     };
 
+    enum class PyramidType : std::uint8_t
+    {
+        None = 0,
+        SingleSubBlock= 1,
+        MultiSubBlock = 2
+    };
+
     /// Information about a locked bitmap - allowing direct access to the image data in memory.
     struct BitmapLockInfo
     {

@@ -231,6 +231,8 @@ namespace libCZI
         /// The M-index of the sub-block (if available). If not available, it has the value std::numeric_limits<int>::max() or std::numeric_limits<int>::min().
         int                     mIndex;
 
+        PyramidType             pyramidType;
+
         /// Calculate a zoom-factor from the physical- and logical size.
         /// \remark
         /// This calculation not really well-defined.
