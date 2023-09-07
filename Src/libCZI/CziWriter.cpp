@@ -267,10 +267,10 @@ void libCZI::ICziWriter::SyncAddSubBlock(const AddSubBlockInfoStridedBitmap& add
     ptr->SchemaType[0] = 'D';
     ptr->SchemaType[1] = 'V';
     ptr->PixelType = CziUtils::IntFromPixelType(addSbBlkInfo.PixelType);
-    ptr->_spare[0] = CziUtils::ByteFromPyramidType(addSbBlkInfo.pyramid_type);
     ptr->FilePosition = ptr->FilePart = 0;
     ptr->Compression = addSbBlkInfo.compressionModeRaw;
-    memset(ptr->_spare, 0, sizeof(ptr->_spare));
+    ptr->_spare[0] = CziUtils::ByteFromPyramidType(addSbBlkInfo.pyramid_type);
+    memset(ptr->_spare + 1, 0, sizeof(ptr->_spare) - 1);
     ptr->DimensionCount = CalcCountOfDimensionsEntriesInDirectoryEntryDV(addSbBlkInfo);
 
     // first X and Y
@@ -1181,8 +1181,8 @@ std::tuple<std::uint64_t, std::uint64_t>  CCziWriter::WriteCurrentAttachmentsDir
         {
             this->attachmentDirectory.EnumEntries([&](size_t index, const CCziAttachmentsDirectoryBase::AttachmentEntry& e)->bool
                 {
-                        f(index, e);
-                        return true;
+                    f(index, e);
+                    return true;
                 });
         };
     info.writeFunc = std::bind(&CCziWriter::WriteToOutputStream, this, placeholders::_1, placeholders::_2, placeholders::_3, placeholders::_4, placeholders::_5);
@@ -1222,8 +1222,8 @@ std::tuple<std::uint64_t, std::uint64_t> CCziWriter::WriteCurrentSubBlkDirectory
         {
             this->sbBlkDirectory.EnumEntries([&](size_t index, const CCziSubBlockDirectoryBase::SubBlkEntry& e)->bool
                 {
-                        f(index, e);
-                        return true;
+                    f(index, e);
+                    return true;
                 });
         };
     info.writeFunc = std::bind(&CCziWriter::WriteToOutputStream, this, placeholders::_1, placeholders::_2, placeholders::_3, placeholders::_4, placeholders::_5);
