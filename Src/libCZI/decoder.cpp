@@ -82,15 +82,44 @@ std::shared_ptr<libCZI::IMemoryBlock> CJxrLibDecoder::Encode(libCZI::PixelType p
         throw std::logic_error("unsupported pixel type");
     }
 
-    auto compressed_data = JxrDecode2::Encode(
-        jxrdecode_pixel_format,
-        width,
-        height,
-        stride,
-        ptrData,
-        quality);
+    // Unfortunately, the encoder does not support the pixelformat Bgr48, so we need to convert it to Rgb48
+    //  before passing it to the encoder (meaning: the resulting encoded data will be Rgb48, not Bgr48).
+    // TODO(JBL): would be nice if the encoder would support Bgr48 directly somehow
+    if (jxrdecode_pixel_format == JxrDecode2::PixelFormat::kBgr48)
+    {
+        // unfortunately, we have to make a temporary copy
+        const auto bitmap_rgb48 = GetSite()->CreateBitmap(PixelType::Bgr48, width, height);
 
-    return make_shared<MemoryBlockOnCompressedData>(std::move(compressed_data));
+        const ScopedBitmapLockerSP bmLck(bitmap_rgb48);
+        CBitmapOperations::CopySamePixelType<PixelType::Bgr48>(
+            ptrData,
+            stride,
+            bmLck.ptrDataRoi,
+            bmLck.stride,
+            width,
+            height,
+            false);
+        CBitmapOperations::RGB48ToBGR48(width, height, static_cast<uint16_t*>(bmLck.ptrDataRoi), bmLck.stride);
+        auto compressed_data = JxrDecode2::Encode(
+                                    jxrdecode_pixel_format,
+                                    width,
+                                    height,
+                                    bmLck.stride,
+                                    bmLck.ptrDataRoi,
+                                    quality);
+        return make_shared<MemoryBlockOnCompressedData>(std::move(compressed_data));
+    }
+    else
+    {
+        auto compressed_data = JxrDecode2::Encode(
+            jxrdecode_pixel_format,
+            width,
+            height,
+            stride,
+            ptrData,
+            quality);
+        return make_shared<MemoryBlockOnCompressedData>(std::move(compressed_data));
+    }
 }
 
 std::shared_ptr<libCZI::IBitmapData> CJxrLibDecoder::Decode(const void* ptrData, size_t size, libCZI::PixelType pixelType, uint32_t width, uint32_t height)
@@ -126,7 +155,7 @@ std::shared_ptr<libCZI::IBitmapData> CJxrLibDecoder::Decode(const void* ptrData,
                     throw std::logic_error(ss.str());
                 }
 
-                bitmap = GetSite()->CreateBitmap(pixel_type_from_compressed_data , actual_width, actual_height);
+                bitmap = GetSite()->CreateBitmap(pixel_type_from_compressed_data, actual_width, actual_height);
                 const auto lock_info = bitmap->Lock();
                 bitmap_is_locked = true;
                 return make_tuple(lock_info.ptrDataRoi, lock_info.stride);
@@ -144,6 +173,19 @@ std::shared_ptr<libCZI::IBitmapData> CJxrLibDecoder::Decode(const void* ptrData,
     }
 
     bitmap->Unlock();
+
+    // if the pixel type was "Rgb48", then we need to convert it to Bgr48 (which is what the rest of the code expects), and unfortunately
+    //  the decoder at this point does not allow to swap the channels, so we need to do it here
+    if (bitmap->GetPixelType() == PixelType::Bgr48)
+    {
+        const ScopedBitmapLockerSP bmLck(bitmap);
+        CBitmapOperations::RGB48ToBGR48(
+            bitmap->GetWidth(),
+            bitmap->GetHeight(),
+            static_cast<uint16_t*>(bmLck.ptrDataRoi),
+            bmLck.stride);
+    }
+
     return bitmap;
 }
 
@@ -352,7 +394,7 @@ std::shared_ptr<libCZI::IBitmapData> CJxrLibDecoder::Decode2(const void* ptrData
                 {
                     CBitmapOperations::RGB48ToBGR48(width, height, (uint16_t*)bmLckInfo.ptrDataRoi, bmLckInfo.stride);
                 }
-            });
+    });
     }
     catch (std::runtime_error& err)
     {
@@ -380,5 +422,5 @@ std::shared_ptr<libCZI::IBitmapData> CJxrLibDecoder::Decode2(const void* ptrData
     }
 
     return bm;
-}
+                }
 #endif

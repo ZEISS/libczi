@@ -13,12 +13,14 @@ public:
     /// Values that represent the pixel formats supported by the codec.
     enum class PixelFormat
     {
-        kInvalid,
-        kBgr24,
-        kBgr48,
-        kGray8,
-        kGray16,
-        kGray32Float,
+        kInvalid,       ///< An enum constant representing the invalid option
+        kBgr24,         ///< An enum constant representing the "BGR24" pixel type - 3 bytes per pixel, 8 bits per channel, in B-G-R order.
+        kBgr48,         ///< An enum constant representing the "BGR48" pixel type - 6 bytes per pixel, 16 bits per channel, in B-G-R order. Note that 
+                        ///< there BGR48 is not natively supported by the codec, so it is converted to RGB48. This happens transparently to the user,
+                        ///< but at this point there is a performance penalty.
+        kGray8,         ///< An enum constant representing the "GRAY8" pixel type - 1 byte per pixel, 8 bits per channel.
+        kGray16,        ///< An enum constant representing the "GRAY16" pixel type - 2 bytes per pixel, 16 bits per channel.
+        kGray32Float,   ///< An enum constant representing the "GRAY32Float" pixel type - 4 bytes per pixel, 32 bits per channel.
     };
 
     /// This class is used to represent a blob containing the compressed data.
@@ -77,7 +79,7 @@ public:
     static void Decode(
             const void* ptrData,
             size_t size,
-            const std::function<std::tuple<void*/*destination_bitmap*/,std::uint32_t/*stride*/>(PixelFormat pixel_format, std::uint32_t  width, std::uint32_t  height)>& get_destination_func);
+            const std::function<std::tuple<void*/*destination_bitmap*/, std::uint32_t/*stride*/>(PixelFormat pixel_format, std::uint32_t  width, std::uint32_t  height)>& get_destination_func);
 
     static CompressedData Encode(
             JxrDecode2::PixelFormat pixel_format,
