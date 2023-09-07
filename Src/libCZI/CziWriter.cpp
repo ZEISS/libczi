@@ -831,6 +831,7 @@ void libCZI::ICziWriter::SyncAddSubBlock(const AddSubBlockInfoStridedBitmap& add
     entry.PixelType = CziUtils::IntFromPixelType(addSbBlkInfo.PixelType);
     entry.FilePosition = 0;
     entry.Compression = addSbBlkInfo.compressionModeRaw;
+    entry.deprecated_pyramid_type = CziUtils::ByteFromPyramidType(addSbBlkInfo.pyramid_type);
     return entry;
 }
 
