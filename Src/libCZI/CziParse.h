@@ -82,6 +82,7 @@ public:
         libCZI::IntRect         logicalRect;
         libCZI::IntSize         physicalSize;
         int                     mIndex;         // if not present, then this is int::max
+        std::uint8_t            spare[6];   
     };
 
     static SubBlockData ReadSubBlock(libCZI::IStream* str, std::uint64_t offset, const SubBlockStorageAllocate& allocateInfo);

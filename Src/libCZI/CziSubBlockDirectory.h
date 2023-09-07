@@ -27,6 +27,7 @@ public:
         int PixelType;
         std::uint64_t FilePosition;
         int Compression;
+        std::uint8_t deprecated_pyramid_type;   // TOD(JBL)
 
         bool IsMIndexValid() const
         {

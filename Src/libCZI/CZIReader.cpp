@@ -96,6 +96,7 @@ CCZIReader::~CCZIReader()
             info.logicalRect = IntRect{ entry.x,entry.y,entry.width,entry.height };
             info.physicalSize = IntSize{ (std::uint32_t)entry.storedWidth, (std::uint32_t)entry.storedHeight };
             info.mIndex = entry.mIndex;
+            info.pyramidType = CziUtils::PyramidTypeFromByte(entry.deprecated_pyramid_type);
             return funcEnum(index, info);
         });
 }
@@ -113,6 +114,7 @@ CCZIReader::~CCZIReader()
             info.logicalRect = IntRect{ entry.x,entry.y,entry.width,entry.height };
             info.physicalSize = IntSize{ (std::uint32_t)entry.storedWidth, (std::uint32_t)entry.storedHeight };
             info.mIndex = entry.mIndex;
+            info.pyramidType = CziUtils::PyramidTypeFromByte(entry.deprecated_pyramid_type);
             info.filePosition = entry.FilePosition;
             return funcEnum(index, info);
         });
@@ -298,6 +300,7 @@ std::shared_ptr<ISubBlock> CCZIReader::ReadSubBlock(const CCziSubBlockDirectory:
     info.mIndex = subBlkData.mIndex;
     info.logicalRect = subBlkData.logicalRect;
     info.physicalSize = subBlkData.physicalSize;
+    info.pyramidType = CziUtils::PyramidTypeFromByte(subBlkData.spare[0]);
 
     return std::make_shared<CCziSubBlock>(info, subBlkData, free);
 }

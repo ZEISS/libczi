@@ -136,6 +136,7 @@ namespace libCZI
 
     enum class PyramidType : std::uint8_t
     {
+        Invalid = 0xff,
         None = 0,
         SingleSubBlock= 1,
         MultiSubBlock = 2

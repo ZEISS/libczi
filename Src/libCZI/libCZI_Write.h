@@ -190,6 +190,7 @@ namespace libCZI
         int physicalWidth;                  ///< The physical with of the subblock (in pixels).
         int physicalHeight;                 ///< The physical height of the subblock (in pixels).
         libCZI::PixelType PixelType;        ///< The pixel type of the subblock.
+        libCZI::PyramidType pyramid_type;   ///< TODO(JBL): 
 
         /// The compression-mode (applying to the subblock-data). If using a compressed format, the data
         /// passed in must be already compressed - the writer does _not_ perform the compression.
@@ -474,6 +475,7 @@ namespace libCZI
         this->physicalWidth = 0;
         this->physicalHeight = 0;
         this->PixelType = libCZI::PixelType::Invalid;
+        this->pyramid_type = libCZI::PyramidType::None;
         this->SetCompressionMode(CompressionMode::UnCompressed);
     }
 

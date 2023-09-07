@@ -231,6 +231,8 @@ namespace libCZI
         /// The M-index of the sub-block (if available). If not available, it has the value std::numeric_limits<int>::max() or std::numeric_limits<int>::min().
         int                     mIndex;
 
+        /// This field is deprecated or of questionable use. It identifies whether a pyramid tile covers multiple lower level tiles or just a single tile.
+        /// TOD(JBL): elaborate
         PyramidType             pyramidType;
 
         /// Calculate a zoom-factor from the physical- and logical size.

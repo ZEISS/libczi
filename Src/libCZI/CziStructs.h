@@ -179,8 +179,7 @@ struct PACKED SubBlockDirectoryEntryDV
     std::int64_t FilePosition;
     std::int32_t FilePart;
     std::int32_t Compression;
-    std::uint8_t deprecatedPyramidType;
-    std::uint8_t _spare[5];
+    std::uint8_t _spare[6];     // TODO(JBL): the first byte here is used as "pyramid-type" 
     std::int32_t DimensionCount;
 
     // max. allocation for ease of use (valid size = 32 + EntryCount * 20)

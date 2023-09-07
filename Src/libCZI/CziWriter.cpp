@@ -267,6 +267,7 @@ void libCZI::ICziWriter::SyncAddSubBlock(const AddSubBlockInfoStridedBitmap& add
     ptr->SchemaType[0] = 'D';
     ptr->SchemaType[1] = 'V';
     ptr->PixelType = CziUtils::IntFromPixelType(addSbBlkInfo.PixelType);
+    ptr->_spare[0] = CziUtils::ByteFromPyramidType(addSbBlkInfo.pyramid_type);
     ptr->FilePosition = ptr->FilePart = 0;
     ptr->Compression = addSbBlkInfo.compressionModeRaw;
     memset(ptr->_spare, 0, sizeof(ptr->_spare));
