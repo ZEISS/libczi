@@ -26,11 +26,15 @@ TEST(CZIParse, ParseSubblockDirectoryWithSubblockWithSizeTOf2AndExpectException)
     const auto memory_stream = make_shared<CMemInputOutputStream>(czi_with_subblock_of_size_t2, sizeof(czi_with_subblock_of_size_t2));
     auto file_header_segment_data = CCZIParse::ReadFileHeaderSegmentData(memory_stream.get());
 
+    CCZIParse::SubblockDirectoryParseOptions parse_options;
+
     // if doing "lax dimension-entry-parsing", we expect no exception
-    EXPECT_NO_THROW(CCZIParse::ReadSubBlockDirectory(memory_stream.get(), file_header_segment_data.GetSubBlockDirectoryPosition(), true));
+    parse_options.SetLaxParsing();
+    EXPECT_NO_THROW(CCZIParse::ReadSubBlockDirectory(memory_stream.get(), file_header_segment_data.GetSubBlockDirectoryPosition(), parse_options));
 
     // ...but, with strict parsing, we expect an exception
-    EXPECT_THROW(CCZIParse::ReadSubBlockDirectory(memory_stream.get(), file_header_segment_data.GetSubBlockDirectoryPosition(), false), LibCZICZIParseException);
+    parse_options.SetStrictParsing();
+    EXPECT_THROW(CCZIParse::ReadSubBlockDirectory(memory_stream.get(), file_header_segment_data.GetSubBlockDirectoryPosition(), parse_options), LibCZICZIParseException);
 }
 
 TEST(CZIParse, ParseSubblockDirectoryWithSubblockWithSizeMOf2AndExpectException)
@@ -38,11 +42,23 @@ TEST(CZIParse, ParseSubblockDirectoryWithSubblockWithSizeMOf2AndExpectException)
     const auto memory_stream = make_shared<CMemInputOutputStream>(czi_with_subblock_of_size_m2, sizeof(czi_with_subblock_of_size_m2));
     auto file_header_segment_data = CCZIParse::ReadFileHeaderSegmentData(memory_stream.get());
 
+    CCZIParse::SubblockDirectoryParseOptions parse_options;
+
     // if doing "lax dimension-entry-parsing", we expect no exception
-    EXPECT_NO_THROW(CCZIParse::ReadSubBlockDirectory(memory_stream.get(), file_header_segment_data.GetSubBlockDirectoryPosition(), true));
+    parse_options.SetLaxParsing();
+    EXPECT_NO_THROW(CCZIParse::ReadSubBlockDirectory(memory_stream.get(), file_header_segment_data.GetSubBlockDirectoryPosition(), parse_options));
 
     // ...but, with strict parsing, we expect an exception
-    EXPECT_THROW(CCZIParse::ReadSubBlockDirectory(memory_stream.get(), file_header_segment_data.GetSubBlockDirectoryPosition(), false), LibCZICZIParseException);
+    parse_options.SetStrictParsing();
+    EXPECT_THROW(CCZIParse::ReadSubBlockDirectory(memory_stream.get(), file_header_segment_data.GetSubBlockDirectoryPosition(), parse_options), LibCZICZIParseException);
+
+    // ...however, if we choose to ignore the sizeM-entry, we expect no exception
+    parse_options.SetDimensionMMustHaveSizeOne(false);
+    EXPECT_NO_THROW(CCZIParse::ReadSubBlockDirectory(memory_stream.get(), file_header_segment_data.GetSubBlockDirectoryPosition(), parse_options));
+
+    // ...and, if we choose to ignore only pyramid-subblocks, we still expect an exception (since the subblock is not a pyramid-subblock)
+    parse_options.SetDimensionMMustHaveSizeOneExceptForPyramidSubblocks(true);
+    EXPECT_THROW(CCZIParse::ReadSubBlockDirectory(memory_stream.get(), file_header_segment_data.GetSubBlockDirectoryPosition(), parse_options), LibCZICZIParseException);
 }
 
 TEST(CZIParse, ParseSubblockDirectoryWithSubblockWithoutXAndExpectException)
@@ -50,11 +66,15 @@ TEST(CZIParse, ParseSubblockDirectoryWithSubblockWithoutXAndExpectException)
     const auto memory_stream = make_shared<CMemInputOutputStream>(czi_with_subblock_without_x, sizeof(czi_with_subblock_without_x));
     auto file_header_segment_data = CCZIParse::ReadFileHeaderSegmentData(memory_stream.get());
 
+    CCZIParse::SubblockDirectoryParseOptions parse_options;
+
     // if doing "lax dimension-entry-parsing", we expect no exception
-    EXPECT_NO_THROW(CCZIParse::ReadSubBlockDirectory(memory_stream.get(), file_header_segment_data.GetSubBlockDirectoryPosition(), true));
+    parse_options.SetLaxParsing();
+    EXPECT_NO_THROW(CCZIParse::ReadSubBlockDirectory(memory_stream.get(), file_header_segment_data.GetSubBlockDirectoryPosition(), parse_options));
 
     // ...but, with strict parsing, we expect an exception
-    EXPECT_THROW(CCZIParse::ReadSubBlockDirectory(memory_stream.get(), file_header_segment_data.GetSubBlockDirectoryPosition(), false), LibCZICZIParseException);
+    parse_options.SetStrictParsing();
+    EXPECT_THROW(CCZIParse::ReadSubBlockDirectory(memory_stream.get(), file_header_segment_data.GetSubBlockDirectoryPosition(), parse_options), LibCZICZIParseException);
 }
 
 namespace
