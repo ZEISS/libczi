@@ -28,25 +28,25 @@ using namespace libCZI;
     return PixelType::Invalid;
 }
 
-/*static*/libCZI::PyramidType CziUtils::PyramidTypeFromByte(std::uint8_t byte)
+/*static*/libCZI::SubBlockPyramidType CziUtils::PyramidTypeFromByte(std::uint8_t byte)
 {
     switch (byte)
     {
-    case 0: return PyramidType::None;
-    case 1: return PyramidType::SingleSubBlock;
-    case 2: return PyramidType::MultiSubBlock;
+    case 0: return SubBlockPyramidType::None;
+    case 1: return SubBlockPyramidType::SingleSubBlock;
+    case 2: return SubBlockPyramidType::MultiSubBlock;
     }
 
-    return PyramidType::Invalid;
+    return SubBlockPyramidType::Invalid;
 }
 
-/*static*/std::uint8_t CziUtils::ByteFromPyramidType(libCZI::PyramidType pyramid_type)
+/*static*/std::uint8_t CziUtils::ByteFromPyramidType(libCZI::SubBlockPyramidType pyramid_type)
 {
     switch (pyramid_type)
     {
-    case PyramidType::None: return 0;
-    case PyramidType::SingleSubBlock: return 1;
-    case PyramidType::MultiSubBlock: return 2;
+    case SubBlockPyramidType::None: return 0;
+    case SubBlockPyramidType::SingleSubBlock: return 1;
+    case SubBlockPyramidType::MultiSubBlock: return 2;
     }
 
     return 0;

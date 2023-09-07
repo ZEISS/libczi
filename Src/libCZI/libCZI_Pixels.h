@@ -134,12 +134,15 @@ namespace libCZI
         Zstd1 = 6           ///< The data contains a header, followed by a zstd-compressed block. 
     };
 
-    enum class PyramidType : std::uint8_t
+    /// This enum is used in the context of a subblock to describe which "type of pyramid" is represented by the subblock.
+    /// The significance and importance of this enum is not yet fully understood, and seems questionable. It is not recommended
+    /// to make use of it at this point for any purposes.
+    enum class SubBlockPyramidType : std::uint8_t
     {
-        Invalid = 0xff,
-        None = 0,
-        SingleSubBlock= 1,
-        MultiSubBlock = 2
+        Invalid = 0xff,     ///< Invalid pyramid type.
+        None = 0,           ///< No pyramid (indicating that the subblock is not a pyramid subblock, but a layer-0 subblock).    
+        SingleSubBlock= 1,  ///< The subblock is a pyramid subblock, and it covers a single subblock of the lower layer (or: it is a minification of a single lower-layer-subblock).
+        MultiSubBlock = 2   ///< The subblock is a pyramid subblock, and it covers multiple subblocks of the lower layer.
     };
 
     /// Information about a locked bitmap - allowing direct access to the image data in memory.

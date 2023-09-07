@@ -92,7 +92,7 @@ namespace libCZI
         /// \return True if space (in bytes) for the metadata is to be reserved, false otherwise.
         virtual bool TryGetReservedSizeForMetadataSegment(size_t* size) const = 0;
 
-        virtual ~ICziWriterInfo() {}
+        virtual ~ICziWriterInfo() = default;
     };
 
     /// An implementation of the ICziWriterInfo-interface.
@@ -178,19 +178,23 @@ namespace libCZI
     struct LIBCZI_API AddSubBlockInfoBase
     {
         /// Default constructor
-        AddSubBlockInfoBase() { this->Clear(); }
+        AddSubBlockInfoBase() { this->AddSubBlockInfoBase::Clear(); }
 
-        libCZI::CDimCoordinate coordinate;  ///< The subblock's coordinate.
-        bool mIndexValid;                   ///< Whether the field 'mIndex' is valid;
-        int mIndex;                         ///< The M-index of the subblock.
-        int x;                              ///< The x-coordinate of the subblock.
-        int y;                              ///< The x-coordinate of the subblock.
-        int logicalWidth;                   ///< The logical with of the subblock (in pixels).
-        int logicalHeight;                  ///< The logical height of the subblock (in pixels).
-        int physicalWidth;                  ///< The physical with of the subblock (in pixels).
-        int physicalHeight;                 ///< The physical height of the subblock (in pixels).
-        libCZI::PixelType PixelType;        ///< The pixel type of the subblock.
-        libCZI::PyramidType pyramid_type;   ///< TODO(JBL): 
+        virtual ~AddSubBlockInfoBase() = default;
+
+        libCZI::CDimCoordinate coordinate;          ///< The subblock's coordinate.
+        bool mIndexValid;                           ///< Whether the field 'mIndex' is valid;
+        int mIndex;                                 ///< The M-index of the subblock.
+        int x;                                      ///< The x-coordinate of the subblock.
+        int y;                                      ///< The x-coordinate of the subblock.
+        int logicalWidth;                           ///< The logical with of the subblock (in pixels).
+        int logicalHeight;                          ///< The logical height of the subblock (in pixels).
+        int physicalWidth;                          ///< The physical with of the subblock (in pixels).
+        int physicalHeight;                         ///< The physical height of the subblock (in pixels).
+        libCZI::PixelType PixelType;                ///< The pixel type of the subblock.
+        libCZI::SubBlockPyramidType pyramid_type;   ///< The pyramid type of the subblock. The significance of this field
+                                                    ///< is unclear (and considered legacy). It is recommended to have this
+                                                    ///< field set to 'SubBlockPyramidType::None' (which is the value set as default).
 
         /// The compression-mode (applying to the subblock-data). If using a compressed format, the data
         /// passed in must be already compressed - the writer does _not_ perform the compression.
@@ -475,7 +479,7 @@ namespace libCZI
         this->physicalWidth = 0;
         this->physicalHeight = 0;
         this->PixelType = libCZI::PixelType::Invalid;
-        this->pyramid_type = libCZI::PyramidType::None;
+        this->pyramid_type = libCZI::SubBlockPyramidType::None;
         this->SetCompressionMode(CompressionMode::UnCompressed);
     }
 

@@ -268,7 +268,7 @@ CCZIReader::~CCZIReader()
         });
 }
 
-/*virtual*/void CCZIReader::EnumerateSubset(const char* contentFileType, const char* name, const std::function<bool(int index, const libCZI::AttachmentInfo& infi)>& funcEnum)
+/*virtual*/void CCZIReader::EnumerateSubset(const char* contentFileType, const char* name, const std::function<bool(int index, const libCZI::AttachmentInfo& info)>& funcEnum)
 {
     this->ThrowIfNotOperational();
     libCZI::AttachmentInfo ai;
