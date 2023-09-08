@@ -180,7 +180,7 @@ struct PACKED SubBlockDirectoryEntryDV
     std::int32_t FilePart;
     std::int32_t Compression;
 
-    /// _spare[0] seem to contain information the "pyramid-type", where valid valuea are
+    /// _spare[0] seems to contain information about the "pyramid-type", where valid values are
     /// 
     /// 0: None
     /// 1: SingleSubblock  
