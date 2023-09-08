@@ -332,8 +332,8 @@ void libCZI::ICziWriter::SyncAddSubBlock(const AddSubBlockInfoStridedBitmap& add
     ptr->FilePosition = entry.FilePosition;
     ptr->FilePart = 0;
     ptr->Compression = entry.Compression;
-    ptr->_spare[0] = entry.deprecated_pyramid_type;
-    memset(ptr->_spare + 1, 0, sizeof(ptr->_spare) - 1);
+    ptr->_spare[0] = entry.pyramid_type_from_spare;
+    memset(ptr->_spare + 1, 0, sizeof(ptr->_spare) - 1);    // skipping the pyramid-spare-byte we set above here
     ptr->DimensionCount = CalcCountOfDimensionsEntriesInDirectoryEntryDV(entry);
 
     // first X and Y
@@ -831,7 +831,7 @@ void libCZI::ICziWriter::SyncAddSubBlock(const AddSubBlockInfoStridedBitmap& add
     entry.PixelType = CziUtils::IntFromPixelType(addSbBlkInfo.PixelType);
     entry.FilePosition = 0;
     entry.Compression = addSbBlkInfo.compressionModeRaw;
-    entry.deprecated_pyramid_type = CziUtils::ByteFromPyramidType(addSbBlkInfo.pyramid_type);
+    entry.pyramid_type_from_spare = CziUtils::ByteFromPyramidType(addSbBlkInfo.pyramid_type);
     return entry;
 }
 

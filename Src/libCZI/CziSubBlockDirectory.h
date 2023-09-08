@@ -27,7 +27,7 @@ public:
         int PixelType;
         std::uint64_t FilePosition;
         int Compression;
-        std::uint8_t deprecated_pyramid_type;   // TOD(JBL)
+        std::uint8_t pyramid_type_from_spare;   ///< The field "pyramid-type" (from spare-bytes of the subblock-directory-entry)
 
         bool IsMIndexValid() const
         {

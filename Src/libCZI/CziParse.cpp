@@ -617,7 +617,7 @@ using namespace libCZI;
     entry.FilePosition = subBlkDirDV->FilePosition;
     entry.PixelType = subBlkDirDV->PixelType;
     entry.Compression = subBlkDirDV->Compression;
-    entry.deprecated_pyramid_type = subBlkDirDV->_spare[0]; // TODO(JBL)
+    entry.pyramid_type_from_spare = subBlkDirDV->_spare[0];
 
     addFunc(entry);
 }

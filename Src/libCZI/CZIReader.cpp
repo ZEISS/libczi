@@ -113,7 +113,7 @@ CCZIReader::~CCZIReader()
             info.logicalRect = IntRect{ entry.x,entry.y,entry.width,entry.height };
             info.physicalSize = IntSize{ (std::uint32_t)entry.storedWidth, (std::uint32_t)entry.storedHeight };
             info.mIndex = entry.mIndex;
-            info.pyramidType = CziUtils::PyramidTypeFromByte(entry.deprecated_pyramid_type);
+            info.pyramidType = CziUtils::PyramidTypeFromByte(entry.pyramid_type_from_spare);
             return funcEnum(index, info);
         });
 }
@@ -131,7 +131,7 @@ CCZIReader::~CCZIReader()
             info.logicalRect = IntRect{ entry.x,entry.y,entry.width,entry.height };
             info.physicalSize = IntSize{ (std::uint32_t)entry.storedWidth, (std::uint32_t)entry.storedHeight };
             info.mIndex = entry.mIndex;
-            info.pyramidType = CziUtils::PyramidTypeFromByte(entry.deprecated_pyramid_type);
+            info.pyramidType = CziUtils::PyramidTypeFromByte(entry.pyramid_type_from_spare);
             info.filePosition = entry.FilePosition;
             return funcEnum(index, info);
         });
