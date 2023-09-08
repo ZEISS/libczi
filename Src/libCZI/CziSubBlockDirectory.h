@@ -42,6 +42,7 @@ public:
         void Invalidate()
         {
             this->mIndex = this->x = this->y = this->width = this->height = this->storedWidth = this->storedHeight = (std::numeric_limits<int>::min)();
+            this->pyramid_type_from_spare = 0;
         }
     };
 

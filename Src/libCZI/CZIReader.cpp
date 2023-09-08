@@ -234,6 +234,7 @@ CCZIReader::~CCZIReader()
         info->logicalRect = IntRect{ entry.x,entry.y,entry.width,entry.height };
         info->physicalSize = IntSize{ static_cast<std::uint32_t>(entry.storedWidth), static_cast<std::uint32_t>(entry.storedHeight) };
         info->mIndex = entry.mIndex;
+        info->pyramidType = CziUtils::PyramidTypeFromByte(entry.pyramid_type_from_spare);
     }
 
     return true;
