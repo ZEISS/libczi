@@ -254,7 +254,7 @@ TEST(CziReaderWriter, ReaderWriter1)
     memcpy(pBuffer.get(), sblkdata.get(), sizeSbblkData);
     for (size_t i = 0; i < sizeSbblkData; ++i)
     {
-        ++* (static_cast<uint8_t*>(pBuffer.get()) + i);
+        ++*(static_cast<uint8_t*>(pBuffer.get()) + i);
     }
 
     addSbInfo.ptrData = pBuffer.get();
@@ -324,18 +324,18 @@ TEST(CziReaderWriter, ReaderWriter2)
 
     addSbInfo.sizeData = sizeSbblkData * 4;
     addSbInfo.getData = [&](int callCnt, size_t offset, const void*& ptr, size_t& size)->bool
-    {
-        // repeat every byte four times
-        auto byteNo = callCnt / 4;
-        if (size_t(byteNo) < sizeSbblkData)
         {
-            ptr = ((const uint8_t*)sblkdata.get()) + byteNo;
-            size = 1;
-            return true;
-        }
+            // repeat every byte four times
+            auto byteNo = callCnt / 4;
+            if (size_t(byteNo) < sizeSbblkData)
+            {
+                ptr = ((const uint8_t*)sblkdata.get()) + byteNo;
+                size = 1;
+                return true;
+            }
 
-        return false;
-    };
+            return false;
+        };
 
     rw->ReplaceSubBlock(0, addSbInfo);
 
@@ -1263,3 +1263,92 @@ TEST(CziReaderWriter, ReaderWriterEmpty3)
 
     EXPECT_TRUE(strcmp(xmlRead.c_str(), expectedResult) == 0) << "Incorrect result";
 }
+
+
+struct SparePyramidTypeFixture : public testing::TestWithParam<libCZI::SubBlockPyramidType> { };
+
+TEST_P(SparePyramidTypeFixture, ReaderWriterCheckDeprecatedSparePyramidType)
+{
+    const auto pyramid_type_used_for_test = GetParam();
+
+    auto writer = CreateCZIWriter();
+    auto outStream = make_shared<CMemOutputStream>(0);
+
+    auto spWriterInfo = make_shared<CCziWriterInfo >(
+        GUID{ 0x1234567,0x89ab,0xcdef,{ 1,2,3,4,5,6,7,8 } },
+        CDimBounds{ { DimensionIndex::C, 0, 1 } },	// set a bounds for C
+        0, 3);	// set a bounds M : 0<=m<=0
+    writer->Create(outStream, spWriterInfo);
+
+    auto bitmap = CreateGray8BitmapAndFill(2, 2, 0x1);
+    AddSubBlockInfoStridedBitmap addSbBlkInfo;
+    addSbBlkInfo.Clear();
+    addSbBlkInfo.coordinate.Set(DimensionIndex::C, 0);
+    addSbBlkInfo.mIndexValid = true;
+    addSbBlkInfo.mIndex = 0;
+    addSbBlkInfo.x = 0;
+    addSbBlkInfo.y = 0;
+    addSbBlkInfo.logicalWidth = bitmap->GetWidth();
+    addSbBlkInfo.logicalHeight = bitmap->GetHeight();
+    addSbBlkInfo.physicalWidth = bitmap->GetWidth();
+    addSbBlkInfo.physicalHeight = bitmap->GetHeight();
+    addSbBlkInfo.pyramid_type = pyramid_type_used_for_test;
+    addSbBlkInfo.PixelType = bitmap->GetPixelType();
+    {
+        ScopedBitmapLockerSP lock_info_bitmap{ bitmap };
+        addSbBlkInfo.ptrBitmap = lock_info_bitmap.ptrDataRoi;
+        addSbBlkInfo.strideBitmap = lock_info_bitmap.stride;
+        writer->SyncAddSubBlock(addSbBlkInfo);
+    }
+
+    PrepareMetadataInfo prepare_metadata_info;
+    auto metaDataBuilder = writer->GetPreparedMetadata(prepare_metadata_info);
+    WriteMetadataInfo write_metadata_info;
+    write_metadata_info.Clear();
+    const auto& strMetadata = metaDataBuilder->GetXml();
+    write_metadata_info.szMetadata = strMetadata.c_str();
+    write_metadata_info.szMetadataSize = strMetadata.size() + 1;
+    write_metadata_info.ptrAttachment = nullptr;
+    write_metadata_info.attachmentSize = 0;
+    writer->SyncWriteMetadata(write_metadata_info);
+    writer->Close();
+    writer.reset();
+
+    size_t czi_document_size = 0;
+    shared_ptr<void> czi_document_data = outStream->GetCopy(&czi_document_size);
+
+    const auto memory_stream = make_shared<CMemInputOutputStream>(czi_document_data.get(), czi_document_size);
+    const auto reader = CreateCZIReader();
+    reader->Open(memory_stream);
+
+    uint32_t call_count = 0;
+    bool subblock_looks_as_expected = false;
+    reader->EnumerateSubBlocks(
+        [&](int index, const SubBlockInfo& info)->bool
+        {
+            // we expect to find only one subblock, and this has to have the expected
+            //  "deprecated pyramid-type"
+            if (info.pyramidType == pyramid_type_used_for_test)
+            {
+                subblock_looks_as_expected = true;
+            }
+
+            ++call_count;
+            return true;
+        });
+
+    EXPECT_TRUE(call_count == 1 && subblock_looks_as_expected) << "document does not contain the expected subblock";
+
+    auto sub_block = reader->ReadSubBlock(0);
+    auto info = sub_block->GetSubBlockInfo();
+
+    EXPECT_TRUE(info.pyramidType == pyramid_type_used_for_test);
+}
+
+INSTANTIATE_TEST_SUITE_P(
+    CziReaderWriter,
+    SparePyramidTypeFixture,
+    testing::Values(
+        SubBlockPyramidType::None,
+        SubBlockPyramidType::SingleSubBlock,
+        SubBlockPyramidType::MultiSubBlock));
