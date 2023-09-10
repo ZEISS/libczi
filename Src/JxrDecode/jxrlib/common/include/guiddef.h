@@ -72,4 +72,15 @@ typedef struct _GUID {
     EXTERN_C const GUID name
 #endif // INITGUID
 
+/// Returns a non-zero value if the two GUIDs are equal, and zero otherwise.
+///
+/// \param  guid1   The first unique identifier to compare.
+/// \param  guid2   The second unique identifier to compare.
+///
+/// \returns    A non-zero value if the two GUIDs are equal, and zero otherwise.
+inline int IsEqualGUID(const GUID* guid1, const GUID* guid2)
+{
+       return !memcmp(&guid1, &guid2, sizeof(GUID));
+}
+
 #endif // GUID_DEFINED
