@@ -145,7 +145,7 @@ namespace libCZI
         }
     };
 
-    /// This interface is used for representing "compression parameters". It is a simply property bag.
+    /// This interface is used for representing "compression parameters". It is a simple property bag.
     /// Possible values for the key are defined in the "CompressionParameter" class.
     class LIBCZI_API ICompressParameters
     {

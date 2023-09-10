@@ -326,7 +326,7 @@ JxrDecode2::CompressedData::~CompressedData()
 {
     if (this->obj_handle_ != nullptr)
     {
-        CloseWS_HeapBackedWriteableStream((struct tagWMPStream**)&this->obj_handle_);
+        CloseWS_HeapBackedWriteableStream(reinterpret_cast<struct tagWMPStream**>(&this->obj_handle_));
     }
 }
 
@@ -511,17 +511,17 @@ size_t JxrDecode2::CompressedData::GetSize()
             ((pixel_format == JxrDecode2::PixelFormat::kBgr48 || pixel_format == JxrDecode2::PixelFormat::kGray16) ? DPK_QPS_16[qi] :
             (DPK_QPS_32f[qi]));
 
-        pEncoder->WMP.wmiSCP.uiDefaultQPIndex = (U8)(0.5f +
-                (float)pQPs[0] * (1.f - qf) + (float)(pQPs + 6)[0] * qf);
-        pEncoder->WMP.wmiSCP.uiDefaultQPIndexU = (U8)(0.5f +
-                (float)pQPs[1] * (1.f - qf) + (float)(pQPs + 6)[1] * qf);
-        pEncoder->WMP.wmiSCP.uiDefaultQPIndexV = (U8)(0.5f +
-                (float)pQPs[2] * (1.f - qf) + (float)(pQPs + 6)[2] * qf);
-        pEncoder->WMP.wmiSCP.uiDefaultQPIndexYHP = (U8)(0.5f +
-                (float)pQPs[3] * (1.f - qf) + (float)(pQPs + 6)[3] * qf);
-        pEncoder->WMP.wmiSCP.uiDefaultQPIndexUHP = (U8)(0.5f +
-                (float)pQPs[4] * (1.f - qf) + (float)(pQPs + 6)[4] * qf);
-        pEncoder->WMP.wmiSCP.uiDefaultQPIndexVHP = (U8)(0.5f +
-                (float)pQPs[5] * (1.f - qf) + (float)(pQPs + 6)[5] * qf);
+        pEncoder->WMP.wmiSCP.uiDefaultQPIndex = static_cast<U8>(0.5f +
+            static_cast<float>(pQPs[0]) * (1.f - qf) + static_cast<float>((pQPs + 6)[0]) * qf);
+        pEncoder->WMP.wmiSCP.uiDefaultQPIndexU = static_cast<U8>(0.5f +
+            static_cast<float>(pQPs[1]) * (1.f - qf) + static_cast<float>((pQPs + 6)[1]) * qf);
+        pEncoder->WMP.wmiSCP.uiDefaultQPIndexV = static_cast<U8>(0.5f +
+            static_cast<float>(pQPs[2]) * (1.f - qf) + static_cast<float>((pQPs + 6)[2]) * qf);
+        pEncoder->WMP.wmiSCP.uiDefaultQPIndexYHP = static_cast<U8>(0.5f +
+            static_cast<float>(pQPs[3]) * (1.f - qf) + static_cast<float>((pQPs + 6)[3]) * qf);
+        pEncoder->WMP.wmiSCP.uiDefaultQPIndexUHP = static_cast<U8>(0.5f +
+            static_cast<float>(pQPs[4]) * (1.f - qf) + static_cast<float>((pQPs + 6)[4]) * qf);
+        pEncoder->WMP.wmiSCP.uiDefaultQPIndexVHP = static_cast<U8>(0.5f +
+            static_cast<float>(pQPs[5]) * (1.f - qf) + static_cast<float>((pQPs + 6)[5]) * qf);
     }
 }
