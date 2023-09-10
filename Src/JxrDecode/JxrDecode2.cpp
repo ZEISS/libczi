@@ -10,6 +10,11 @@ using namespace std;
 
 static void ApplyQuality(float quality, JxrDecode2::PixelFormat pixel_format, std::uint32_t width, PKImageEncode* pEncoder);
 
+static bool IsEqualGUID(const GUID& guid1, const GUID& guid2)
+{
+       return memcmp(&guid1, &guid2, sizeof(GUID)) == 0;
+}
+
 static const char* ERR_to_string(ERR error_code)
 {
     switch (error_code)

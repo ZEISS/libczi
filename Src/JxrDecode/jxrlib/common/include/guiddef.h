@@ -42,7 +42,6 @@ typedef struct _GUID {
     unsigned short Data3;
     unsigned char  Data4[8];
 } GUID;
-#endif
 
 #ifndef DECLSPEC_SELECTANY
 #if (_MSC_VER >= 1100)
@@ -73,82 +72,4 @@ typedef struct _GUID {
     EXTERN_C const GUID name
 #endif // INITGUID
 
-//#if _MSC_VER < 1900
-//#define DEFINE_OLEGUID(name, l, w1, w2) DEFINE_GUID(name, l, w1, w2, 0xC0,0,0,0,0,0,0,0x46)
-//#endif
-
-#ifndef _GUIDDEF_H_
-#define _GUIDDEF_H_
-
-#ifndef __LPGUID_DEFINED__
-#define __LPGUID_DEFINED__
-typedef GUID* LPGUID;
-#endif
-
-#ifndef __LPCGUID_DEFINED__
-#define __LPCGUID_DEFINED__
-typedef const GUID* LPCGUID;
-#endif
-
-#ifndef __IID_DEFINED__
-#define __IID_DEFINED__
-
-typedef GUID IID;
-typedef IID* LPIID;
-#define IID_NULL            GUID_NULL
-#define IsEqualIID(riid1, riid2) IsEqualGUID(riid1, riid2)
-typedef GUID CLSID;
-typedef CLSID* LPCLSID;
-#define CLSID_NULL          GUID_NULL
-#define IsEqualCLSID(rclsid1, rclsid2) IsEqualGUID(rclsid1, rclsid2)
-typedef GUID FMTID;
-typedef FMTID* LPFMTID;
-#define FMTID_NULL          GUID_NULL
-#define IsEqualFMTID(rfmtid1, rfmtid2) IsEqualGUID(rfmtid1, rfmtid2)
-
-#define __MIDL_CONST const
-
-#ifndef _REFGUID_DEFINED
-#define _REFGUID_DEFINED
-#ifdef __cplusplus
-#define REFGUID const GUID &
-#else
-#define REFGUID const GUID * __MIDL_CONST
-#endif
-#endif
-
-#ifndef _REFIID_DEFINED
-#define _REFIID_DEFINED
-#ifdef __cplusplus
-#define REFIID const IID &
-#else
-#define REFIID const IID * __MIDL_CONST
-#endif
-#endif
-
-#ifndef _REFCLSID_DEFINED
-#define _REFCLSID_DEFINED
-#ifdef __cplusplus
-#define REFCLSID const IID &
-#else
-#define REFCLSID const IID * __MIDL_CONST
-#endif
-#endif
-
-#ifndef _REFFMTID_DEFINED
-#define _REFFMTID_DEFINED
-#ifdef __cplusplus
-#define REFFMTID const IID &
-#else
-#define REFFMTID const IID * __MIDL_CONST
-#endif
-#endif
-
-#endif // !__IID_DEFINED__
-
-__inline int IsEqualGUID(REFGUID rguid1, REFGUID rguid2)
-{
-    return !memcmp(&rguid1, &rguid2, sizeof(GUID));
-}
-
-#endif  // _GUIDDEF_H_
+#endif // GUID_DEFINED
