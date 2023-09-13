@@ -281,6 +281,7 @@ using namespace libCZI;
         sbd.compression = subBlckSegment.data.entryDV.Compression;
         sbd.pixelType = subBlckSegment.data.entryDV.PixelType;
         sbd.mIndex = (std::numeric_limits<int>::max)();
+        memcpy(sbd.spare, subBlckSegment.data.entryDV._spare, sizeof(sbd.spare));
 
         if (subBlckSegment.data.entryDV.DimensionCount > MAXDIMENSIONS)
         {
@@ -616,6 +617,7 @@ using namespace libCZI;
     entry.FilePosition = subBlkDirDV->FilePosition;
     entry.PixelType = subBlkDirDV->PixelType;
     entry.Compression = subBlkDirDV->Compression;
+    entry.pyramid_type_from_spare = subBlkDirDV->_spare[0];
 
     addFunc(entry);
 }

@@ -677,6 +677,7 @@ void CCziReaderWriter::WriteToOutputStream(std::uint64_t offset, const void* pv,
     info.mIndex = subBlkData.mIndex;
     info.logicalRect = subBlkData.logicalRect;
     info.physicalSize = subBlkData.physicalSize;
+    info.pyramidType = CziUtils::PyramidTypeFromByte(subBlkData.spare[0]);
 
     return std::make_shared<CCziSubBlock>(info, subBlkData, free);
 }
@@ -698,6 +699,7 @@ void CCziReaderWriter::WriteToOutputStream(std::uint64_t offset, const void* pv,
         info->logicalRect = IntRect{ entry.x,entry.y,entry.width,entry.height };
         info->physicalSize = IntSize{ static_cast<std::uint32_t>(entry.storedWidth), static_cast<std::uint32_t>(entry.storedHeight) };
         info->mIndex = entry.mIndex;
+        info->pyramidType = CziUtils::PyramidTypeFromByte(entry.pyramid_type_from_spare);
     }
 
     return true;

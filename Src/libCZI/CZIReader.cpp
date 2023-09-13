@@ -113,6 +113,7 @@ CCZIReader::~CCZIReader()
             info.logicalRect = IntRect{ entry.x,entry.y,entry.width,entry.height };
             info.physicalSize = IntSize{ (std::uint32_t)entry.storedWidth, (std::uint32_t)entry.storedHeight };
             info.mIndex = entry.mIndex;
+            info.pyramidType = CziUtils::PyramidTypeFromByte(entry.pyramid_type_from_spare);
             return funcEnum(index, info);
         });
 }
@@ -130,6 +131,7 @@ CCZIReader::~CCZIReader()
             info.logicalRect = IntRect{ entry.x,entry.y,entry.width,entry.height };
             info.physicalSize = IntSize{ (std::uint32_t)entry.storedWidth, (std::uint32_t)entry.storedHeight };
             info.mIndex = entry.mIndex;
+            info.pyramidType = CziUtils::PyramidTypeFromByte(entry.pyramid_type_from_spare);
             info.filePosition = entry.FilePosition;
             return funcEnum(index, info);
         });
@@ -232,6 +234,7 @@ CCZIReader::~CCZIReader()
         info->logicalRect = IntRect{ entry.x,entry.y,entry.width,entry.height };
         info->physicalSize = IntSize{ static_cast<std::uint32_t>(entry.storedWidth), static_cast<std::uint32_t>(entry.storedHeight) };
         info->mIndex = entry.mIndex;
+        info->pyramidType = CziUtils::PyramidTypeFromByte(entry.pyramid_type_from_spare);
     }
 
     return true;
@@ -266,7 +269,7 @@ CCZIReader::~CCZIReader()
         });
 }
 
-/*virtual*/void CCZIReader::EnumerateSubset(const char* contentFileType, const char* name, const std::function<bool(int index, const libCZI::AttachmentInfo& infi)>& funcEnum)
+/*virtual*/void CCZIReader::EnumerateSubset(const char* contentFileType, const char* name, const std::function<bool(int index, const libCZI::AttachmentInfo& info)>& funcEnum)
 {
     this->ThrowIfNotOperational();
     libCZI::AttachmentInfo ai;
@@ -315,6 +318,7 @@ std::shared_ptr<ISubBlock> CCZIReader::ReadSubBlock(const CCziSubBlockDirectory:
     info.mIndex = subBlkData.mIndex;
     info.logicalRect = subBlkData.logicalRect;
     info.physicalSize = subBlkData.physicalSize;
+    info.pyramidType = CziUtils::PyramidTypeFromByte(subBlkData.spare[0]);
 
     return std::make_shared<CCziSubBlock>(info, subBlkData, free);
 }

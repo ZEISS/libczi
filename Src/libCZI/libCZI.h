@@ -231,6 +231,10 @@ namespace libCZI
         /// The M-index of the sub-block (if available). If not available, it has the value std::numeric_limits<int>::max() or std::numeric_limits<int>::min().
         int                     mIndex;
 
+        /// This field indicates the "pyramid-type" of the sub-block. The significance and importance of this field is unclear, and is considered
+        /// legacy. It is recommended to ignore this field.
+        SubBlockPyramidType     pyramidType;
+
         /// Calculate a zoom-factor from the physical- and logical size.
         /// \remark
         /// This calculation not really well-defined.
@@ -351,7 +355,7 @@ namespace libCZI
         /// \return The raw data.
         virtual std::shared_ptr<const void> GetRawData(size_t* ptrSize) = 0;
 
-        virtual ~IAttachment() {}
+        virtual ~IAttachment() = default;
 
         /// A helper method used to cast the pointer to a specific type.
         /// \param [out] ptr     The pointer to the data is stored here.
@@ -595,7 +599,7 @@ namespace libCZI
         ///                 functor is true, the enumeration is continued, otherwise it is stopped.
         ///                 The first argument is the index of the attachment and the second is providing
         ///                 information about the attachment.
-        virtual void EnumerateSubset(const char* contentFileType, const char* name, const std::function<bool(int index, const AttachmentInfo& infi)>& funcEnum) = 0;
+        virtual void EnumerateSubset(const char* contentFileType, const char* name, const std::function<bool(int index, const AttachmentInfo& info)>& funcEnum) = 0;
 
         /// Reads the attachment identified by the specified index. If there is no attachment present (for
         /// the specified index) then an empty shared_ptr is returned. If a different kind of problem

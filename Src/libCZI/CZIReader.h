@@ -43,7 +43,7 @@ public:
     void Close() override;
 
     // interface IAttachmentRepository
-    void EnumerateAttachments(const std::function<bool(int index, const libCZI::AttachmentInfo& infi)>& funcEnum) override;
+    void EnumerateAttachments(const std::function<bool(int index, const libCZI::AttachmentInfo& info)>& funcEnum) override;
     void EnumerateSubset(const char* contentFileType, const char* name, const std::function<bool(int index, const libCZI::AttachmentInfo& infi)>& funcEnum) override;
     std::shared_ptr<libCZI::IAttachment> ReadAttachment(int index) override;
 

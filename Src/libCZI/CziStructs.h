@@ -179,7 +179,16 @@ struct PACKED SubBlockDirectoryEntryDV
     std::int64_t FilePosition;
     std::int32_t FilePart;
     std::int32_t Compression;
-    unsigned char _spare[6];
+
+    /// _spare[0] seems to contain information about the "pyramid-type", where valid values are
+    /// 
+    /// 0: None
+    /// 1: SingleSubblock  
+    /// 2: MultiSubblock  
+    /// 
+    /// The significance and importance of this field is unclear, and it seems of questionable use. It is
+    /// considered legacy and should not be used.
+    std::uint8_t _spare[6];
     std::int32_t DimensionCount;
 
     // max. allocation for ease of use (valid size = 32 + EntryCount * 20)
