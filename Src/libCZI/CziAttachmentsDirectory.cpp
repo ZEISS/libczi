@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "CziAttachmentsDirectory.h"
+#include <algorithm>
 
 /*static*/bool CCziAttachmentsDirectoryBase::CompareForEquality_Id(const AttachmentEntry& a, const AttachmentEntry& b)
 {
@@ -63,14 +64,19 @@ bool CCziAttachmentsDirectory::TryGetAttachment(int index, AttachmentEntry& entr
 
 bool CWriterCziAttachmentsDirectory::TryAddAttachment(const AttachmentEntry& entry)
 {
-    auto insert = this->attachments.insert(entry);
-    return insert.second;
+    if (std::find_if(this->attachments_.cbegin(), this->attachments_.cend(), [&entry](const AttachmentEntry& x) { return CompareForEquality_Id(x, entry); }) != this->attachments_.cend())
+    {
+        return false;
+    }
+
+    this->attachments_.push_back(entry);
+    return true;
 }
 
 bool CWriterCziAttachmentsDirectory::EnumEntries(const std::function<bool(int index, const AttachmentEntry&)>& func) const
 {
     int index = 0;
-    for (auto it = this->attachments.cbegin(); it != this->attachments.cend(); ++it)
+    for (auto it = this->attachments_.cbegin(); it != this->attachments_.cend(); ++it)
     {
         if (!func(index++, *it))
         {
@@ -83,39 +89,7 @@ bool CWriterCziAttachmentsDirectory::EnumEntries(const std::function<bool(int in
 
 int CWriterCziAttachmentsDirectory::GetAttachmentCount() const
 {
-    return (int)this->attachments.size();
-}
-
-bool CWriterCziAttachmentsDirectory::AttachmentEntriesCompare::operator()(const AttachmentEntry& a, const AttachmentEntry& b) const
-{
-    // we shall return true if a is considered to go before b in the strict weak ordering the function defines
-    int r = memcmp(&a.ContentGuid, &b.ContentGuid, sizeof(GUID));
-    if (r < 0)
-    {
-        return true;
-    }
-    else if (r > 0)
-    {
-        return false;
-    }
-
-    r = memcmp(&a.ContentFileType, &b.ContentFileType, sizeof(a.ContentFileType));
-    if (r < 0)
-    {
-        return true;
-    }
-    else if (r > 0)
-    {
-        return false;
-    }
-
-    r = memcmp(&a.Name, &b.Name, sizeof(a.Name));
-    if (r < 0)
-    {
-        return true;
-    }
-
-    return false;
+    return (int)this->attachments_.size();
 }
 
 //-----------------------------------------------------------------------------

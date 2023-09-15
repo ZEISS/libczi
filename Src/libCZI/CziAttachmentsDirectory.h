@@ -50,11 +50,7 @@ public:
     int GetAttachmentCount() const;
     bool EnumEntries(const std::function<bool(int index, const AttachmentEntry&)>& func) const;
 private:
-    struct AttachmentEntriesCompare {
-        bool operator() (const AttachmentEntry& a, const AttachmentEntry& b) const;
-    };
-
-    std::set<AttachmentEntry, AttachmentEntriesCompare> attachments;
+    std::vector<AttachmentEntry> attachments_;
 };
 
 class CReaderWriterCziAttachmentsDirectory : public CCziAttachmentsDirectoryBase
