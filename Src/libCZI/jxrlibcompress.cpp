@@ -13,9 +13,9 @@ using namespace std;
 class MemoryBlockOnCompressedData : public libCZI::IMemoryBlock
 {
 private:
-    mutable JxrDecode2::CompressedData compressed_data_;
+    mutable JxrDecode::CompressedData compressed_data_;
 public:
-    MemoryBlockOnCompressedData(JxrDecode2::CompressedData&& compressed_data)
+    MemoryBlockOnCompressedData(JxrDecode::CompressedData&& compressed_data)
         : compressed_data_(std::move(compressed_data))
     {}
 
@@ -38,23 +38,23 @@ public:
         const void* ptrData,
         const ICompressParameters* parameters)
 {
-    JxrDecode2::PixelFormat jxrdecode_pixel_format;
+    JxrDecode::PixelFormat jxrdecode_pixel_format;
     switch (pixel_type)
     {
     case PixelType::Bgr24:
-        jxrdecode_pixel_format = JxrDecode2::PixelFormat::kBgr24;
+        jxrdecode_pixel_format = JxrDecode::PixelFormat::kBgr24;
         break;
     case PixelType::Bgr48:
-        jxrdecode_pixel_format = JxrDecode2::PixelFormat::kBgr48;
+        jxrdecode_pixel_format = JxrDecode::PixelFormat::kBgr48;
         break;
     case PixelType::Gray8:
-        jxrdecode_pixel_format = JxrDecode2::PixelFormat::kGray8;
+        jxrdecode_pixel_format = JxrDecode::PixelFormat::kGray8;
         break;
     case PixelType::Gray16:
-        jxrdecode_pixel_format = JxrDecode2::PixelFormat::kGray16;
+        jxrdecode_pixel_format = JxrDecode::PixelFormat::kGray16;
         break;
     case PixelType::Gray32Float:
-        jxrdecode_pixel_format = JxrDecode2::PixelFormat::kGray32Float;
+        jxrdecode_pixel_format = JxrDecode::PixelFormat::kGray32Float;
         break;
     default:
         throw std::logic_error("unsupported pixel type");
@@ -75,7 +75,7 @@ public:
     // Unfortunately, the encoder does not support the pixel format Bgr48, so we need to convert it to Rgb48
     //  before passing it to the encoder (meaning: the resulting encoded data will be Rgb48, not Bgr48).
     // TODO(JBL): would be nice if the encoder would support Bgr48 directly somehow
-    if (jxrdecode_pixel_format == JxrDecode2::PixelFormat::kBgr48)
+    if (jxrdecode_pixel_format == JxrDecode::PixelFormat::kBgr48)
     {
         // unfortunately, we have to make a temporary copy
         const auto bitmap_rgb48 = GetSite()->CreateBitmap(PixelType::Bgr48, width, height);
@@ -90,7 +90,7 @@ public:
             height,
             false);
         CBitmapOperations::RGB48ToBGR48(width, height, static_cast<uint16_t*>(bmLck.ptrDataRoi), bmLck.stride);
-        auto compressed_data = JxrDecode2::Encode(
+        auto compressed_data = JxrDecode::Encode(
                                     jxrdecode_pixel_format,
                                     width,
                                     height,
@@ -101,7 +101,7 @@ public:
     }
     else
     {
-        auto compressed_data = JxrDecode2::Encode(
+        auto compressed_data = JxrDecode::Encode(
             jxrdecode_pixel_format,
             width,
             height,

@@ -12,39 +12,20 @@
 using namespace libCZI;
 using namespace std;
 
-//class MemoryBlockOnCompressedData : public libCZI::IMemoryBlock
-//{
-//private:
-//    mutable JxrDecode2::CompressedData compressed_data_;
-//public:
-//    MemoryBlockOnCompressedData(JxrDecode2::CompressedData&& compressed_data)
-//        : compressed_data_(std::move(compressed_data))
-//    {}
-//
-//    void* GetPtr() override
-//    {
-//        return this->compressed_data_.GetMemory();
-//    }
-//
-//    size_t GetSizeOfData() const override
-//    {
-//        return this->compressed_data_.GetSize();
-//    }
-//};
 
-static libCZI::PixelType PixelTypeFromJxrPixelFormat(JxrDecode2::PixelFormat pixel_format)
+static libCZI::PixelType PixelTypeFromJxrPixelFormat(JxrDecode::PixelFormat pixel_format)
 {
     switch (pixel_format)
     {
-    case JxrDecode2::PixelFormat::kBgr24:
+    case JxrDecode::PixelFormat::kBgr24:
         return PixelType::Bgr24;
-    case JxrDecode2::PixelFormat::kGray8:
+    case JxrDecode::PixelFormat::kGray8:
         return PixelType::Gray8;
-    case JxrDecode2::PixelFormat::kBgr48:
+    case JxrDecode::PixelFormat::kBgr48:
         return PixelType::Bgr48;
-    case JxrDecode2::PixelFormat::kGray16:
+    case JxrDecode::PixelFormat::kGray16:
         return PixelType::Gray16;
-    case JxrDecode2::PixelFormat::kGray32Float:
+    case JxrDecode::PixelFormat::kGray32Float:
         return PixelType::Gray32Float;
     default:
         return PixelType::Invalid;
@@ -59,23 +40,23 @@ static libCZI::PixelType PixelTypeFromJxrPixelFormat(JxrDecode2::PixelFormat pix
 
 /*std::shared_ptr<libCZI::IMemoryBlock> CJxrLibDecoder::Encode(libCZI::PixelType pixel_type, std::uint32_t width, std::uint32_t height, std::uint32_t stride, const void* ptrData, float quality)
 {
-    JxrDecode2::PixelFormat jxrdecode_pixel_format;
+    JxrDecode::PixelFormat jxrdecode_pixel_format;
     switch (pixel_type)
     {
     case PixelType::Bgr24:
-        jxrdecode_pixel_format = JxrDecode2::PixelFormat::kBgr24;
+        jxrdecode_pixel_format = JxrDecode::PixelFormat::kBgr24;
         break;
     case PixelType::Bgr48:
-        jxrdecode_pixel_format = JxrDecode2::PixelFormat::kBgr48;
+        jxrdecode_pixel_format = JxrDecode::PixelFormat::kBgr48;
         break;
     case PixelType::Gray8:
-        jxrdecode_pixel_format = JxrDecode2::PixelFormat::kGray8;
+        jxrdecode_pixel_format = JxrDecode::PixelFormat::kGray8;
         break;
     case PixelType::Gray16:
-        jxrdecode_pixel_format = JxrDecode2::PixelFormat::kGray16;
+        jxrdecode_pixel_format = JxrDecode::PixelFormat::kGray16;
         break;
     case PixelType::Gray32Float:
-        jxrdecode_pixel_format = JxrDecode2::PixelFormat::kGray32Float;
+        jxrdecode_pixel_format = JxrDecode::PixelFormat::kGray32Float;
         break;
     default:
         throw std::logic_error("unsupported pixel type");
@@ -84,7 +65,7 @@ static libCZI::PixelType PixelTypeFromJxrPixelFormat(JxrDecode2::PixelFormat pix
     // Unfortunately, the encoder does not support the pixelformat Bgr48, so we need to convert it to Rgb48
     //  before passing it to the encoder (meaning: the resulting encoded data will be Rgb48, not Bgr48).
     // TODO(JBL): would be nice if the encoder would support Bgr48 directly somehow
-    if (jxrdecode_pixel_format == JxrDecode2::PixelFormat::kBgr48)
+    if (jxrdecode_pixel_format == JxrDecode::PixelFormat::kBgr48)
     {
         // unfortunately, we have to make a temporary copy
         const auto bitmap_rgb48 = GetSite()->CreateBitmap(PixelType::Bgr48, width, height);
@@ -99,7 +80,7 @@ static libCZI::PixelType PixelTypeFromJxrPixelFormat(JxrDecode2::PixelFormat pix
             height,
             false);
         CBitmapOperations::RGB48ToBGR48(width, height, static_cast<uint16_t*>(bmLck.ptrDataRoi), bmLck.stride);
-        auto compressed_data = JxrDecode2::Encode(
+        auto compressed_data = JxrDecode::Encode(
                                     jxrdecode_pixel_format,
                                     width,
                                     height,
@@ -110,7 +91,7 @@ static libCZI::PixelType PixelTypeFromJxrPixelFormat(JxrDecode2::PixelFormat pix
     }
     else
     {
-        auto compressed_data = JxrDecode2::Encode(
+        auto compressed_data = JxrDecode::Encode(
             jxrdecode_pixel_format,
             width,
             height,
@@ -128,10 +109,10 @@ std::shared_ptr<libCZI::IBitmapData> CJxrLibDecoder::Decode(const void* ptrData,
 
     try
     {
-        JxrDecode2::Decode(
+        JxrDecode::Decode(
             ptrData,
             size,
-            [&](JxrDecode2::PixelFormat actual_pixel_format, std::uint32_t actual_width, std::uint32_t actual_height)
+            [&](JxrDecode::PixelFormat actual_pixel_format, std::uint32_t actual_width, std::uint32_t actual_height)
             -> tuple<void*, uint32_t>
             {
                 const auto pixel_type_from_compressed_data = PixelTypeFromJxrPixelFormat(actual_pixel_format);
@@ -192,12 +173,12 @@ std::shared_ptr<libCZI::IBitmapData> CJxrLibDecoder::Decode(const void* ptrData,
 std::shared_ptr<libCZI::IBitmapData> CJxrLibDecoder::Decode(const void* ptrData, size_t size, libCZI::PixelType pixelType, uint32_t width, uint32_t height)
 {
     std::shared_ptr<IBitmapData> bm;
-    JxrDecode2 decoder2;
+    JxrDecode decoder2;
     decoder2.Decode(nullptr,
         ptrData,
         size,
         nullptr,
-        [&](JxrDecode2::PixelFormat pixFmt, std::uint32_t  width, std::uint32_t  height, std::uint32_t linesCount, const void* ptrData, std::uint32_t stride)->void
+        [&](JxrDecode::PixelFormat pixFmt, std::uint32_t  width, std::uint32_t  height, std::uint32_t linesCount, const void* ptrData, std::uint32_t stride)->void
             {
                 /*  if (GetSite()->IsEnabled(LOGLEVEL_CHATTYINFORMATION))
                   {
@@ -209,11 +190,11 @@ std::shared_ptr<libCZI::IBitmapData> CJxrLibDecoder::Decode(const void* ptrData,
                 PixelType px_type;
                 switch (pixFmt)
                 {
-                case JxrDecode2::PixelFormat::kBgr24: px_type = PixelType::Bgr24; break;
-                case JxrDecode2::PixelFormat::kGray8: px_type = PixelType::Gray8; break;
-                case JxrDecode2::PixelFormat::kBgr48: px_type = PixelType::Bgr48; break;
-                case JxrDecode2::PixelFormat::kGray16: px_type = PixelType::Gray16; break;
-                    //case JxrDecode2::PixelFormat::_32bppGrayFloat: px_type = PixelType::Gray32Float; break;
+                case JxrDecode::PixelFormat::kBgr24: px_type = PixelType::Bgr24; break;
+                case JxrDecode::PixelFormat::kGray8: px_type = PixelType::Gray8; break;
+                case JxrDecode::PixelFormat::kBgr48: px_type = PixelType::Bgr48; break;
+                case JxrDecode::PixelFormat::kGray16: px_type = PixelType::Gray16; break;
+                    //case JxrDecode::PixelFormat::_32bppGrayFloat: px_type = PixelType::Gray32Float; break;
                 default: throw std::logic_error("need to look into these formats...");
                 }
 

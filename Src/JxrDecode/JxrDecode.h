@@ -7,7 +7,7 @@
 #include <sstream>
 
 /// This class encapsulates the JXR codec.
-class JxrDecode2
+class JxrDecode
 {
 public:
     /// Values that represent the pixel formats supported by the codec.
@@ -70,7 +70,7 @@ public:
 
         ~CompressedData();
     protected:
-        friend class JxrDecode2;
+        friend class JxrDecode;
         CompressedData(void* obj_handle) :obj_handle_(obj_handle) {}
     };
 
@@ -110,7 +110,7 @@ public:
     ///
     /// \returns                A CompressedData object containing the compressed data.
     static CompressedData Encode(
-            JxrDecode2::PixelFormat pixel_format,
+            JxrDecode::PixelFormat pixel_format,
             std::uint32_t  width,
             std::uint32_t  height,
             std::uint32_t  stride,

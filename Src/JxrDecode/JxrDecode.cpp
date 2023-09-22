@@ -8,7 +8,7 @@
 
 using namespace std;
 
-static void ApplyQuality(float quality, JxrDecode2::PixelFormat pixel_format, std::uint32_t width, PKImageEncode* pEncoder);
+static void ApplyQuality(float quality, JxrDecode::PixelFormat pixel_format, std::uint32_t width, PKImageEncode* pEncoder);
 
 static bool IsEqualGUID(const GUID& guid1, const GUID& guid2)
 {
@@ -42,30 +42,30 @@ static const char* ERR_to_string(ERR error_code)
     return nullptr;
 }
 
-static JxrDecode2::PixelFormat JxrPixelFormatGuidToEnum(const GUID& guid)
+static JxrDecode::PixelFormat JxrPixelFormatGuidToEnum(const GUID& guid)
 {
     if (IsEqualGUID(guid, GUID_PKPixelFormat8bppGray))
     {
-        return JxrDecode2::PixelFormat::kGray8;
+        return JxrDecode::PixelFormat::kGray8;
     }
     else if (IsEqualGUID(guid, GUID_PKPixelFormat16bppGray))
     {
-        return JxrDecode2::PixelFormat::kGray16;
+        return JxrDecode::PixelFormat::kGray16;
     }
     else if (IsEqualGUID(guid, GUID_PKPixelFormat24bppBGR))
     {
-        return JxrDecode2::PixelFormat::kBgr24;
+        return JxrDecode::PixelFormat::kBgr24;
     }
     else if (IsEqualGUID(guid, GUID_PKPixelFormat48bppRGB))
     {
-        return JxrDecode2::PixelFormat::kBgr48;
+        return JxrDecode::PixelFormat::kBgr48;
     }
     else if (IsEqualGUID(guid, GUID_PKPixelFormat32bppGrayFloat))
     {
-        return JxrDecode2::PixelFormat::kGray32Float;
+        return JxrDecode::PixelFormat::kGray32Float;
     }
 
-    return JxrDecode2::PixelFormat::kInvalid;
+    return JxrDecode::PixelFormat::kInvalid;
 }
 
 static void WriteGuidToStream(ostringstream& string_stream, const GUID& guid)
@@ -91,7 +91,7 @@ static void WriteGuidToStream(ostringstream& string_stream, const GUID& guid)
     string_stream << std::nouppercase;
 }
 
-void JxrDecode2::Decode(
+void JxrDecode::Decode(
            const void* ptrData,
            size_t size,
            const std::function<std::tuple<void*, std::uint32_t>(PixelFormat pixel_format, std::uint32_t  width, std::uint32_t  height)>& get_destination_func)
@@ -151,7 +151,7 @@ void JxrDecode2::Decode(
     if (Failed(err)) { ThrowJxrlibError("'decoder::GetPixelFormat' failed", err); }
 
     const auto jxrpixel_format = JxrPixelFormatGuidToEnum(pixel_format_of_decoder);
-    if (jxrpixel_format == JxrDecode2::PixelFormat::kInvalid)
+    if (jxrpixel_format == JxrDecode::PixelFormat::kInvalid)
     {
         ostringstream string_stream;
         string_stream << "Unsupported pixel format: {";
@@ -174,8 +174,8 @@ void JxrDecode2::Decode(
     if (Failed(err)) { ThrowJxrlibError("decoder::Copy failed", err); }
 }
 
-/*static*/JxrDecode2::CompressedData JxrDecode2::Encode(
-           JxrDecode2::PixelFormat pixel_format,
+/*static*/JxrDecode::CompressedData JxrDecode::Encode(
+           JxrDecode::PixelFormat pixel_format,
            std::uint32_t width,
            std::uint32_t height,
            std::uint32_t stride,
@@ -202,7 +202,7 @@ void JxrDecode2::Decode(
         throw invalid_argument("height");
     }
 
-    const auto bytes_per_pel = JxrDecode2::GetBytesPerPel(pixel_format);
+    const auto bytes_per_pel = JxrDecode::GetBytesPerPel(pixel_format);
     if (bytes_per_pel == 0xff)
     {
         throw invalid_argument("pixel_format");
@@ -330,13 +330,13 @@ void JxrDecode2::Decode(
     return { upEncodeStream.release() };
 }
 
-/*static*/void JxrDecode2::ThrowJxrlibError(const std::string& message, int error_code)
+/*static*/void JxrDecode::ThrowJxrlibError(const std::string& message, int error_code)
 {
     ostringstream string_stream(message);
-    JxrDecode2::ThrowJxrlibError(string_stream, error_code);
+    JxrDecode::ThrowJxrlibError(string_stream, error_code);
 }
 
-/*static*/void JxrDecode2::ThrowJxrlibError(std::ostringstream& message, int error_code)
+/*static*/void JxrDecode::ThrowJxrlibError(std::ostringstream& message, int error_code)
 {
     message << " - ERR=" << error_code;
     const char* error_code_string = ERR_to_string(error_code);
@@ -348,7 +348,7 @@ void JxrDecode2::Decode(
     throw runtime_error(message.str());
 }
 
-JxrDecode2::CompressedData::~CompressedData()
+JxrDecode::CompressedData::~CompressedData()
 {
     if (this->obj_handle_ != nullptr)
     {
@@ -356,7 +356,7 @@ JxrDecode2::CompressedData::~CompressedData()
     }
 }
 
-void* JxrDecode2::CompressedData::GetMemory()
+void* JxrDecode::CompressedData::GetMemory()
 {
     void* data = nullptr;
     GetWS_HeapBackedWriteableStreamBuffer(
@@ -366,7 +366,7 @@ void* JxrDecode2::CompressedData::GetMemory()
     return data;
 }
 
-size_t JxrDecode2::CompressedData::GetSize()
+size_t JxrDecode::CompressedData::GetSize()
 {
     size_t size = 0;
     GetWS_HeapBackedWriteableStreamBuffer(
@@ -376,7 +376,7 @@ size_t JxrDecode2::CompressedData::GetSize()
     return size;
 }
 
-/*static*/std::uint8_t JxrDecode2::GetBytesPerPel(PixelFormat pixel_format)
+/*static*/std::uint8_t JxrDecode::GetBytesPerPel(PixelFormat pixel_format)
 {
     switch (pixel_format)
     {
@@ -395,7 +395,7 @@ size_t JxrDecode2::CompressedData::GetSize()
     return 0xff;
 }
 
-/*static*/void ApplyQuality(float quality, JxrDecode2::PixelFormat pixel_format, uint32_t width, PKImageEncode* pEncoder)
+/*static*/void ApplyQuality(float quality, JxrDecode::PixelFormat pixel_format, uint32_t width, PKImageEncode* pEncoder)
 {
     // this is resembling the code from https://github.com/ptahmose/jxrlib/blob/f7521879862b9085318e814c6157490dd9dbbdb4/jxrencoderdecoder/JxrEncApp.c#L677C1-L738C10
 #if 1
@@ -513,7 +513,7 @@ size_t JxrDecode2::CompressedData::GetSize()
 
     //if (!args.bColorFormatSet)
     //{
-    if (quality >= 0.5F || /*PI.uBitsPerSample > 8*/(pixel_format == JxrDecode2::PixelFormat::kBgr48 || pixel_format == JxrDecode2::PixelFormat::kGray16))
+    if (quality >= 0.5F || /*PI.uBitsPerSample > 8*/(pixel_format == JxrDecode::PixelFormat::kBgr48 || pixel_format == JxrDecode::PixelFormat::kGray16))
         pEncoder->WMP.wmiSCP.cfColorFormat = YUV_444;
     else
         pEncoder->WMP.wmiSCP.cfColorFormat = YUV_420;
@@ -532,7 +532,7 @@ size_t JxrDecode2::CompressedData::GetSize()
         float qf;
         const int* pQPs;
         if (/*args.fltImageQuality*/quality > 0.8f && /*PI.bdBitDepth == BD_8*/
-            (pixel_format == JxrDecode2::PixelFormat::kBgr24 || pixel_format == JxrDecode2::PixelFormat::kGray8) &&
+            (pixel_format == JxrDecode::PixelFormat::kBgr24 || pixel_format == JxrDecode::PixelFormat::kGray8) &&
             pEncoder->WMP.wmiSCP.cfColorFormat != YUV_420 &&
             pEncoder->WMP.wmiSCP.cfColorFormat != YUV_422)
             quality/*args.fltImageQuality*/ = 0.8f + (quality/*args.fltImageQuality*/ - 0.8f) * 1.5f;
@@ -552,8 +552,8 @@ size_t JxrDecode2::CompressedData::GetSize()
             (pEncoder->WMP.wmiSCP.cfColorFormat == YUV_420 ||
              pEncoder->WMP.wmiSCP.cfColorFormat == YUV_422) ?
             DPK_QPS_420[qi] :
-            (pixel_format == JxrDecode2::PixelFormat::kBgr24 || pixel_format == JxrDecode2::PixelFormat::kGray8) ? DPK_QPS_8[qi] :
-            ((pixel_format == JxrDecode2::PixelFormat::kBgr48 || pixel_format == JxrDecode2::PixelFormat::kGray16) ? DPK_QPS_16[qi] :
+            (pixel_format == JxrDecode::PixelFormat::kBgr24 || pixel_format == JxrDecode::PixelFormat::kGray8) ? DPK_QPS_8[qi] :
+            ((pixel_format == JxrDecode::PixelFormat::kBgr48 || pixel_format == JxrDecode::PixelFormat::kGray16) ? DPK_QPS_16[qi] :
             (DPK_QPS_32f[qi]));
 
         pEncoder->WMP.wmiSCP.uiDefaultQPIndex = static_cast<U8>(0.5f +
