@@ -1,4 +1,4 @@
-#include "JxrDecode2.h"
+#include "JxrDecode.h"
 #include <memory>
 #include <stdexcept> 
 #include <sstream>

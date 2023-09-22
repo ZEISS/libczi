@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: LGPL-3.0-or-later
 
 #include "libCZI_compress.h"
-#include "../JxrDecode/JxrDecode2.h"
+#include "../JxrDecode/JxrDecode.h"
 #include "BitmapOperations.h"
 #include "Site.h"
 

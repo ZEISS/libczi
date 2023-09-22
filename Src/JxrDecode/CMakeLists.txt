@@ -9,8 +9,8 @@ include(CheckSymbolExists)
 include(CheckCSourceCompiles)
 
 add_library(JxrDecodeStatic OBJECT 
-							"JxrDecode2.h"
-							"JxrDecode2.cpp"
+							"JxrDecode.h"
+							"JxrDecode.cpp"
 
 							"jxrlib/common/include/guiddef.h" 
 							"jxrlib/common/include/log.h"

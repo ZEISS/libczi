@@ -22,6 +22,23 @@
 
 using namespace std;
 
+std::ostream& operator<<(std::ostream& os, const GUID& guid)
+{
+    os << std::hex << std::setfill('0')
+        << std::setw(8) << guid.Data1 << '-'
+        << std::setw(4) << guid.Data2 << '-'
+        << std::setw(4) << guid.Data3 << '-'
+        << std::setw(2) << static_cast<int>(guid.Data4[0])
+        << std::setw(2) << static_cast<int>(guid.Data4[1]) << '-'
+        << std::setw(2) << static_cast<int>(guid.Data4[2])
+        << std::setw(2) << static_cast<int>(guid.Data4[3])
+        << std::setw(2) << static_cast<int>(guid.Data4[4])
+        << std::setw(2) << static_cast<int>(guid.Data4[5])
+        << std::setw(2) << static_cast<int>(guid.Data4[6])
+        << std::setw(2) << static_cast<int>(guid.Data4[7]);
+    return os;
+}
+
 std::string convertToUtf8(const std::wstring& str)
 {
 #if defined(HAS_CODECVT)
@@ -325,7 +342,7 @@ const wchar_t* skipWhiteSpaceAndOneOfThese(const wchar_t* s, const wchar_t* char
     return s;
 }
 
-std::ostream& operator<<(std::ostream& os, const GUID& guid)
+std::ostream& operator<<(std::ostream& os, const libCZI::GUID& guid)
 {
     os << std::uppercase;
     os.width(8);
@@ -361,7 +378,7 @@ std::ostream& operator<<(std::ostream& os, const GUID& guid)
 /// \param [in,out] outGuid If non-null, the Guid will be put here if successful.
 ///
 /// \return True if it succeeds, false if it fails.
-bool TryParseGuid(const std::wstring& str, GUID* outGuid)
+bool TryParseGuid(const std::wstring& str, libCZI::GUID* outGuid)
 {
     auto strTrimmed = trim(str);
     if (strTrimmed.empty() || strTrimmed.length() < 2)
@@ -377,7 +394,7 @@ bool TryParseGuid(const std::wstring& str, GUID* outGuid)
     std::wregex guidRegex(LR"([0-9A-Fa-f]{8}[-]([0-9A-Fa-f]{4}[-]){3}[0-9A-Fa-f]{12})");
     if (std::regex_match(strTrimmed, guidRegex))
     {
-        GUID g;
+        libCZI::GUID g;
         uint32_t value;
         char sz[9];
         for (int i = 0; i < 8; ++i)

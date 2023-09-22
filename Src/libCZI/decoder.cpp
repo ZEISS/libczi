@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: LGPL-3.0-or-later
 
 #include "decoder.h"
-#include "../JxrDecode/JxrDecode2.h"
+#include "../JxrDecode/JxrDecode.h"
 #include "bitmapData.h"
 #include "stdAllocator.h"
 #include "BitmapOperations.h"

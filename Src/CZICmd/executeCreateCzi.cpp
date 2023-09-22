@@ -211,7 +211,7 @@ private:
     //        (3) ...both things are not really necessary from a technical point of view, however... consistency-
     //             checking I'd consider an important feature
 
-    auto spWriterInfo = make_shared<CCziWriterInfo>(options.GetIsFileGuidValid() ? options.GetFileGuid() : GUID{ 0,0,0,{ 0,0,0,0,0,0,0,0 } });
+    auto spWriterInfo = make_shared<CCziWriterInfo>(options.GetIsFileGuidValid() ? options.GetFileGuid() : libCZI::GUID{ 0,0,0,{ 0,0,0,0,0,0,0,0 } });
     //spWriterInfo->SetReservedSizeForMetadataSegment(true, 10 * 1024);
     //spWriterInfo->SetReservedSizeForSubBlockDirectory(true, 400);
     writer->Create(outStream, spWriterInfo);
