@@ -57,7 +57,8 @@ ADD_EXECUTABLE(libCZI_UnitTests
 										testImage.cpp
 										test_reader.cpp                 
 										utils.h 
-										test_Accessors.cpp)
+										test_Accessors.cpp 
+										test_CZIParse.cpp)
 
 TARGET_LINK_LIBRARIES(libCZI_UnitTests PRIVATE libCZIStatic GTest::gtest GTest::gmock)
 

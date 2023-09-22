@@ -27,6 +27,30 @@ using namespace libCZI;
     return PixelType::Invalid;
 }
 
+/*static*/libCZI::SubBlockPyramidType CziUtils::PyramidTypeFromByte(std::uint8_t byte)
+{
+    switch (byte)
+    {
+    case 0: return SubBlockPyramidType::None;
+    case 1: return SubBlockPyramidType::SingleSubBlock;
+    case 2: return SubBlockPyramidType::MultiSubBlock;
+    }
+
+    return SubBlockPyramidType::Invalid;
+}
+
+/*static*/std::uint8_t CziUtils::ByteFromPyramidType(libCZI::SubBlockPyramidType pyramid_type)
+{
+    switch (pyramid_type)
+    {
+    case SubBlockPyramidType::None: return 0;
+    case SubBlockPyramidType::SingleSubBlock: return 1;
+    case SubBlockPyramidType::MultiSubBlock: return 2;
+    }
+
+    return 0;
+}
+
 /*static*/int CziUtils::IntFromPixelType(libCZI::PixelType p)
 {
     switch (p)
@@ -51,9 +75,9 @@ using namespace libCZI;
 {
     switch (i)
     {
-    case 0:  return CompressionMode::UnCompressed;
-    case 1:  return CompressionMode::Jpg;
-    case 4:  return CompressionMode::JpgXr;
+    case 0: return CompressionMode::UnCompressed;
+    case 1: return CompressionMode::Jpg;
+    case 4: return CompressionMode::JpgXr;
     case 5: return CompressionMode::Zstd0;
     case 6: return CompressionMode::Zstd1;
     default: return CompressionMode::Invalid;
@@ -91,7 +115,7 @@ using namespace libCZI;
     case PixelType::Bgr96Float:         return 12;
     case PixelType::Bgra32:             return 4;
     case PixelType::Gray64ComplexFloat: return 16;
-    case PixelType::Bgr192ComplexFloat: return 48;
+    case PixelType::Bgr192ComplexFloat: return 24;
     case PixelType::Gray32:             return 4;
     case PixelType::Gray64Float:        return 8;
     default: throw std::invalid_argument("illegal pixeltype");

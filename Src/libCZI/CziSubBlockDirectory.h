@@ -27,6 +27,7 @@ public:
         int PixelType;
         std::uint64_t FilePosition;
         int Compression;
+        std::uint8_t pyramid_type_from_spare;   ///< The field "pyramid-type" (from spare-bytes of the subblock-directory-entry)
 
         bool IsMIndexValid() const
         {
@@ -41,6 +42,7 @@ public:
         void Invalidate()
         {
             this->mIndex = this->x = this->y = this->width = this->height = this->storedWidth = this->storedHeight = (std::numeric_limits<int>::min)();
+            this->pyramid_type_from_spare = 0;
         }
     };
 

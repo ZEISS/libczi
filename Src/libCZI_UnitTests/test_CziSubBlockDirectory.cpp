@@ -23,6 +23,7 @@ struct SubBlockEntryData
 static CCziSubBlockDirectory::SubBlkEntry SubBlkEntryFromSubBlockEntryData(const SubBlockEntryData* ptrData)
 {
     CCziSubBlockDirectory::SubBlkEntry entry;
+    entry.Invalidate();
     entry.coordinate = CDimCoordinate::Parse(ptrData->coordinate);
     entry.mIndex = ptrData->mIndex;
     entry.x = ptrData->x;
@@ -36,7 +37,6 @@ static CCziSubBlockDirectory::SubBlkEntry SubBlkEntryFromSubBlockEntryData(const
     entry.Compression = 1;
     return entry;
 }
-
 
 TEST(CziSubBlockDirectory, CziSubBlockDirectory1)
 {
