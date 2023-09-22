@@ -12,7 +12,7 @@ static void ApplyQuality(float quality, JxrDecode2::PixelFormat pixel_format, st
 
 static bool IsEqualGUID(const GUID& guid1, const GUID& guid2)
 {
-       return memcmp(&guid1, &guid2, sizeof(GUID)) == 0;
+    return memcmp(&guid1, &guid2, sizeof(GUID)) == 0;
 }
 
 static const char* ERR_to_string(ERR error_code)
@@ -187,6 +187,32 @@ void JxrDecode2::Decode(
         throw invalid_argument("ptr_bitmap");
     }
 
+    if (quality < 0.f || quality > 1.f)
+    {
+        throw invalid_argument("quality");
+    }
+
+    if (width == 0)
+    {
+        throw invalid_argument("width");
+    }
+
+    if (height == 0)
+    {
+        throw invalid_argument("height");
+    }
+
+    const auto bytes_per_pel = JxrDecode2::GetBytesPerPel(pixel_format);
+    if (bytes_per_pel == 0xff)
+    {
+        throw invalid_argument("pixel_format");
+    }
+
+    if (stride < width * bytes_per_pel)
+    {
+        throw invalid_argument("stride");
+    }
+
     PKImageEncode* pImageEncoder;
     ERR err = PKCodecFactory_CreateCodec(&IID_PKImageWmpEncode, reinterpret_cast<void**>(&pImageEncoder));
     if (Failed(err))
@@ -348,6 +374,25 @@ size_t JxrDecode2::CompressedData::GetSize()
         nullptr,
         &size);
     return size;
+}
+
+/*static*/std::uint8_t JxrDecode2::GetBytesPerPel(PixelFormat pixel_format)
+{
+    switch (pixel_format)
+    {
+    case PixelFormat::kBgr24:
+        return 3;
+    case PixelFormat::kBgr48:
+        return 6;
+    case PixelFormat::kGray8:
+        return 1;
+    case PixelFormat::kGray16:
+        return 2;
+    case PixelFormat::kGray32Float:
+        return 4;
+    }
+
+    return 0xff;
 }
 
 /*static*/void ApplyQuality(float quality, JxrDecode2::PixelFormat pixel_format, uint32_t width, PKImageEncode* pEncoder)

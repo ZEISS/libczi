@@ -31,6 +31,12 @@ public:
         void* obj_handle_;
     public:
         CompressedData() :obj_handle_(nullptr) {} // default constructor
+
+        /// This method moves a CompressedData object into the current object via swapping.
+        ///
+        /// \param other     The CompressedData object to move
+        ///
+        /// \returns         A reference to the current object after the move has been completed.
         CompressedData& operator=(CompressedData&& other) noexcept
         {
             // "other" is soon going to be destroyed, so we let it destroy our current resource instead and we take "other"'s current resource via swapping
@@ -38,7 +44,9 @@ public:
             return *this;
         }
 
-        // move constructor, takes a rvalue reference &&
+        /// This method moves a CompressedData object into the current object via swapping.
+        ///
+        /// \param other     The CompressedData object to move
         CompressedData(CompressedData&& other) noexcept
         {
             // we "steal" the resource from "other"
@@ -89,6 +97,18 @@ public:
             size_t size,
             const std::function<std::tuple<void*/*destination_bitmap*/, std::uint32_t/*stride*/>(PixelFormat pixel_format, std::uint32_t  width, std::uint32_t  height)>& get_destination_func);
 
+    /// Compresses the specified bitmap into the JXR (aka JPEG XR) format.
+    /// 
+    /// \param pixel_format     The pixel type.
+    /// \param width            The width of the bitmap in pixels.
+    /// \param height           The height of the bitmap in pixels.
+    /// \param stride           The stride of the bitmap in bytes.
+    /// \param ptr_bitmap       A pointer to the uncompressed bitmap data.
+    /// \param quality          A parameter that controls the quality of the compression. This is a number between 0 and 1,
+    ///                         and the higher the number, the better the quality. The default is 1. A value of 1 gives the best
+    ///                         possible quality which is loss-less.
+    ///
+    /// \returns                A CompressedData object containing the compressed data.
     static CompressedData Encode(
             JxrDecode2::PixelFormat pixel_format,
             std::uint32_t  width,
@@ -99,4 +119,5 @@ public:
 private:
     static void ThrowJxrlibError(const std::string& message, int error_code);
     [[noreturn]] static void ThrowJxrlibError(std::ostringstream& message, int error_code);
+    static std::uint8_t GetBytesPerPel(PixelFormat pixel_format);
 };

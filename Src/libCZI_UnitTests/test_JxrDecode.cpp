@@ -70,18 +70,18 @@ TEST(JxrDecode, CompressNonLossyAndDecompressCheckForSameContent_Bgr24)
         const ScopedBitmapLockerSP lck{ bitmap };
         CTestImage::CopyBgr24Image(lck.ptrDataRoi, bitmap->GetWidth(), bitmap->GetHeight(), lck.stride);
     }
-
-    const auto codec = CJxrLibDecoder::Create();
+    
     shared_ptr<libCZI::IMemoryBlock> encodedData;
 
     {
         const ScopedBitmapLockerSP lck{ bitmap };
-        encodedData = codec->Encode(
+        encodedData = JxrLibCompress::Compress(
             bitmap->GetPixelType(),
             bitmap->GetWidth(),
             bitmap->GetHeight(),
             lck.stride,
-            lck.ptrDataRoi);
+            lck.ptrDataRoi,
+            nullptr);
     }
 
     void* encoded_data_ptr = encodedData->GetPtr();
@@ -90,6 +90,7 @@ TEST(JxrDecode, CompressNonLossyAndDecompressCheckForSameContent_Bgr24)
     ASSERT_LT(size_of_encoded_data, static_cast<size_t>(Utils::GetBytesPerPixel(bitmap->GetPixelType()) * bitmap->GetWidth() * bitmap->GetHeight())) <<
         "Encoded data is too large (larger than the original data), which is unexpected.";
 
+    const auto codec = CJxrLibDecoder::Create();
     const auto bitmap_decoded = codec->Decode(
         encodedData->GetPtr(),
         encodedData->GetSizeOfData(),
@@ -119,17 +120,17 @@ TEST(JxrDecode, CompressNonLossyAndDecompressCheckForSameContent_Gray8)
         }
     }
 
-    const auto codec = CJxrLibDecoder::Create();
     shared_ptr<libCZI::IMemoryBlock> encodedData;
 
     {
         const ScopedBitmapLockerSP lck{ bitmap };
-        encodedData = codec->Encode(
+        encodedData = JxrLibCompress::Compress(
             bitmap->GetPixelType(),
             bitmap->GetWidth(),
             bitmap->GetHeight(),
             lck.stride,
-            lck.ptrDataRoi);
+            lck.ptrDataRoi,
+            nullptr);
     }
 
     void* encoded_data_ptr = encodedData->GetPtr();
@@ -138,6 +139,7 @@ TEST(JxrDecode, CompressNonLossyAndDecompressCheckForSameContent_Gray8)
     ASSERT_LT(size_of_encoded_data, static_cast<size_t>(Utils::GetBytesPerPixel(bitmap->GetPixelType()) * bitmap->GetWidth() * bitmap->GetHeight())) <<
         "Encoded data is too large (larger than the original data), which is unexpected.";
 
+    const auto codec = CJxrLibDecoder::Create();
     const auto bitmap_decoded = codec->Decode(
         encodedData->GetPtr(),
         encodedData->GetSizeOfData(),
@@ -170,17 +172,17 @@ TEST(JxrDecode, CompressNonLossyAndDecompressCheckForSameContent_Gray16)
         }
     }
 
-    const auto codec = CJxrLibDecoder::Create();
     shared_ptr<libCZI::IMemoryBlock> encodedData;
 
     {
         const ScopedBitmapLockerSP lck{ bitmap_gray16 };
-        encodedData = codec->Encode(
+        encodedData = JxrLibCompress::Compress(
             bitmap_gray16->GetPixelType(),
             bitmap_gray16->GetWidth(),
             bitmap_gray16->GetHeight(),
             lck.stride,
-            lck.ptrDataRoi);
+            lck.ptrDataRoi,
+            nullptr);
     }
 
     void* encoded_data_ptr = encodedData->GetPtr();
@@ -189,6 +191,7 @@ TEST(JxrDecode, CompressNonLossyAndDecompressCheckForSameContent_Gray16)
     ASSERT_LT(size_of_encoded_data, static_cast<size_t>(Utils::GetBytesPerPixel(bitmap_gray16->GetPixelType()) * bitmap_gray16->GetWidth() * bitmap_gray16->GetHeight())) <<
         "Encoded data is too large (larger than the original data), which is unexpected.";
 
+    const auto codec = CJxrLibDecoder::Create();
     const auto bitmap_decoded = codec->Decode(
         encodedData->GetPtr(),
         encodedData->GetSizeOfData(),
@@ -221,17 +224,17 @@ TEST(JxrDecode, CompressNonLossyAndDecompressCheckForSameContent_Gray32Float)
         }
     }
 
-    const auto codec = CJxrLibDecoder::Create();
     shared_ptr<libCZI::IMemoryBlock> encodedData;
 
     {
         const ScopedBitmapLockerSP lck{ bitmap_gray32float };
-        encodedData = codec->Encode(
+        encodedData = JxrLibCompress::Compress(
             bitmap_gray32float->GetPixelType(),
             bitmap_gray32float->GetWidth(),
             bitmap_gray32float->GetHeight(),
             lck.stride,
-            lck.ptrDataRoi);
+            lck.ptrDataRoi,
+            nullptr);
     }
 
     void* encoded_data_ptr = encodedData->GetPtr();
@@ -240,6 +243,7 @@ TEST(JxrDecode, CompressNonLossyAndDecompressCheckForSameContent_Gray32Float)
     ASSERT_LT(size_of_encoded_data, static_cast<size_t>(Utils::GetBytesPerPixel(bitmap_gray32float->GetPixelType()) * bitmap_gray32float->GetWidth() * bitmap_gray32float->GetHeight())) <<
         "Encoded data is too large (larger than the original data), which is unexpected.";
 
+    const auto codec = CJxrLibDecoder::Create();
     const auto bitmap_decoded = codec->Decode(
         encodedData->GetPtr(),
         encodedData->GetSizeOfData(),
@@ -274,17 +278,17 @@ TEST(JxrDecode, CompressNonLossyAndDecompressCheckForSameContent_Bgr48)
         }
     }
 
-    const auto codec = CJxrLibDecoder::Create();
     shared_ptr<libCZI::IMemoryBlock> encodedData;
 
     {
         const ScopedBitmapLockerSP lck{ bitmap_bgr48 };
-        encodedData = codec->Encode(
+        encodedData = JxrLibCompress::Compress(
             bitmap_bgr48->GetPixelType(),
             bitmap_bgr48->GetWidth(),
             bitmap_bgr48->GetHeight(),
             lck.stride,
-            lck.ptrDataRoi);
+            lck.ptrDataRoi,
+            nullptr);
     }
 
     void* encoded_data_ptr = encodedData->GetPtr();
@@ -293,6 +297,7 @@ TEST(JxrDecode, CompressNonLossyAndDecompressCheckForSameContent_Bgr48)
     ASSERT_LT(size_of_encoded_data, static_cast<size_t>(Utils::GetBytesPerPixel(bitmap_bgr48->GetPixelType()) * bitmap_bgr48->GetWidth() * bitmap_bgr48->GetHeight())) <<
         "Encoded data is too large (larger than the original data), which is unexpected.";
 
+    const auto codec = CJxrLibDecoder::Create();
     const auto bitmap_decoded = codec->Decode(
         encodedData->GetPtr(),
         encodedData->GetSizeOfData(),
@@ -322,18 +327,19 @@ TEST(JxrDecode, CompressLossyAndDecompressCheckForSimilarity_Gray8)
         }
     }
 
-    const auto codec = CJxrLibDecoder::Create();
     shared_ptr<libCZI::IMemoryBlock> encodedData;
 
     {
         const ScopedBitmapLockerSP lck{ bitmap };
-        encodedData = codec->Encode(
+        libCZI::CompressParametersOnMap params;
+        params.map[static_cast<int>(libCZI::CompressionParameterKey::JXRLIB_QUALITY)] = libCZI::CompressParameter(900u);
+        encodedData = JxrLibCompress::Compress(
             bitmap->GetPixelType(),
             bitmap->GetWidth(),
             bitmap->GetHeight(),
             lck.stride,
             lck.ptrDataRoi,
-            0.9f);
+            &params);
     }
 
     void* encoded_data_ptr = encodedData->GetPtr();
@@ -348,6 +354,7 @@ TEST(JxrDecode, CompressLossyAndDecompressCheckForSimilarity_Gray8)
     fclose(fp);
     */
 
+    const auto codec = CJxrLibDecoder::Create();
     const auto bitmap_decoded = codec->Decode(
         encodedData->GetPtr(),
         encodedData->GetSizeOfData(),
@@ -361,59 +368,64 @@ TEST(JxrDecode, CompressLossyAndDecompressCheckForSimilarity_Gray8)
 TEST(JxrDecode, CallEncoderWithInvalidArgumentsExpectException)
 {
     const auto bitmap = CBitmapData<CHeapAllocator>::Create(PixelType::Gray8, 5, 5);
-    const auto codec = CJxrLibDecoder::Create();
+    //const auto codec = CJxrLibDecoder::Create();
     EXPECT_THROW(
         {
             const ScopedBitmapLockerSP lck{ bitmap };
-            codec->Encode(
+            JxrLibCompress::Compress(
                 PixelType::Invalid,
                 bitmap->GetWidth(),
                 bitmap->GetHeight(),
                 lck.stride,
-                lck.ptrDataRoi);
+                lck.ptrDataRoi,
+                nullptr);
         },
         exception);
     EXPECT_THROW(
         {
             const ScopedBitmapLockerSP lck{ bitmap };
-            codec->Encode(
+            JxrLibCompress::Compress(
                 bitmap->GetPixelType(),
                 bitmap->GetWidth(),
                 bitmap->GetHeight(),
                 4,                      // invalid stride provided here
-                lck.ptrDataRoi);
+                lck.ptrDataRoi,
+                nullptr);
         },
         exception);
     EXPECT_THROW(
         {
             const ScopedBitmapLockerSP lck{ bitmap };
-            codec->Encode(
+            JxrLibCompress::Compress(
                     bitmap->GetPixelType(),
                     bitmap->GetWidth(),
                     0,
                     lck.stride,
-                    lck.ptrDataRoi);
+                    lck.ptrDataRoi,
+                    nullptr);
         },
         exception);
     EXPECT_THROW(
         {
             const ScopedBitmapLockerSP lck{ bitmap };
-            codec->Encode(
+            JxrLibCompress::Compress(
                 bitmap->GetPixelType(),
                 0,
                 bitmap->GetHeight(),
                 lck.stride,
-                lck.ptrDataRoi);
+                lck.ptrDataRoi,
+                nullptr);
         },
         exception);
     EXPECT_THROW(
         {
             const ScopedBitmapLockerSP lck{ bitmap };
-            codec->Encode(
+            JxrLibCompress::Compress(
                bitmap->GetPixelType(),
                bitmap->GetWidth(),
                bitmap->GetHeight(),
                lck.stride,
+               nullptr,
                nullptr);
         },
         exception);

@@ -24,7 +24,12 @@ namespace libCZI
 
         /// Whether to do the "lo-hi-byte-packing" preprocessing (type: boolean).
         /// This parameter is used with the "zstd1" compression scheme only.
-        ZSTD_PREPROCESS_DOLOHIBYTEPACKING = 2
+        ZSTD_PREPROCESS_DOLOHIBYTEPACKING = 2,
+
+        /// The quality parameter for the jxrlib encoder (type: uint32). The range is from 0 to 1000, where 1000
+        /// gives the best quality (i.e. loss-less compression). This parameter is used with the "jxrlib" compression scheme only.
+        /// If value is out-of-range, it will be clipped.
+        JXRLIB_QUALITY = 3,
     };
 
     /// Simple variant type used for the compression-parameters-property-bag.
@@ -505,7 +510,7 @@ namespace libCZI
         /// \param          sourceWidth                          Width of the source bitmap in pixels.
         /// \param          sourceHeight                         Height of the source bitmap in pixels.
         /// \param          sourceStride                         The stride of the source bitmap in bytes.
-        /// \param          sourcePixeltype                      The pixeltype of the source bitmap.
+        /// \param          sourcePixeltype                      The pixel type of the source bitmap.
         /// \param          source                               Pointer to the source bitmap.
         /// \param          parameters                           Property bag containing parameters controlling the operation. This argument can be null, in which case default parameters are used.
         /// \returns    A shared pointer to an object representing and owning a block of memory.    
@@ -515,6 +520,18 @@ namespace libCZI
             std::uint32_t sourceStride,
             libCZI::PixelType sourcePixeltype,
             const void* source,
+            const ICompressParameters* parameters);
+    };
+
+    class LIBCZI_API JxrLibCompress
+    {
+    public:
+        static std::shared_ptr<IMemoryBlock> Compress(
+            libCZI::PixelType pixel_type, 
+            std::uint32_t width, 
+            std::uint32_t height, 
+            std::uint32_t stride, 
+            const void* ptrData,
             const ICompressParameters* parameters);
     };
 

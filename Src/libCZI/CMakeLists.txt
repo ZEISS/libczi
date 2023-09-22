@@ -103,6 +103,7 @@ set(LIBCZISRCFILES
             BitmapOperations.hpp
             pugiconfig.hpp
             pugixml.hpp
+            jxrlibcompress.cpp
 )
 
 # prepare the configuration-file "libCZI_Config.h"

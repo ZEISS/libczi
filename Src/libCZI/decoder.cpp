@@ -3,7 +3,6 @@
 // SPDX-License-Identifier: LGPL-3.0-or-later
 
 #include "decoder.h"
-#include "../JxrDecode/JxrDecode.h"
 #include "../JxrDecode/JxrDecode2.h"
 #include "bitmapData.h"
 #include "stdAllocator.h"
@@ -13,25 +12,25 @@
 using namespace libCZI;
 using namespace std;
 
-class MemoryBlockOnCompressedData : public libCZI::IMemoryBlock
-{
-private:
-    mutable JxrDecode2::CompressedData compressed_data_;
-public:
-    MemoryBlockOnCompressedData(JxrDecode2::CompressedData&& compressed_data)
-        : compressed_data_(std::move(compressed_data))
-    {}
-
-    void* GetPtr() override
-    {
-        return this->compressed_data_.GetMemory();
-    }
-
-    size_t GetSizeOfData() const override
-    {
-        return this->compressed_data_.GetSize();
-    }
-};
+//class MemoryBlockOnCompressedData : public libCZI::IMemoryBlock
+//{
+//private:
+//    mutable JxrDecode2::CompressedData compressed_data_;
+//public:
+//    MemoryBlockOnCompressedData(JxrDecode2::CompressedData&& compressed_data)
+//        : compressed_data_(std::move(compressed_data))
+//    {}
+//
+//    void* GetPtr() override
+//    {
+//        return this->compressed_data_.GetMemory();
+//    }
+//
+//    size_t GetSizeOfData() const override
+//    {
+//        return this->compressed_data_.GetSize();
+//    }
+//};
 
 static libCZI::PixelType PixelTypeFromJxrPixelFormat(JxrDecode2::PixelFormat pixel_format)
 {
@@ -58,7 +57,7 @@ static libCZI::PixelType PixelTypeFromJxrPixelFormat(JxrDecode2::PixelFormat pix
     return make_shared<CJxrLibDecoder>();
 }
 
-std::shared_ptr<libCZI::IMemoryBlock> CJxrLibDecoder::Encode(libCZI::PixelType pixel_type, std::uint32_t width, std::uint32_t height, std::uint32_t stride, const void* ptrData, float quality)
+/*std::shared_ptr<libCZI::IMemoryBlock> CJxrLibDecoder::Encode(libCZI::PixelType pixel_type, std::uint32_t width, std::uint32_t height, std::uint32_t stride, const void* ptrData, float quality)
 {
     JxrDecode2::PixelFormat jxrdecode_pixel_format;
     switch (pixel_type)
@@ -120,7 +119,7 @@ std::shared_ptr<libCZI::IMemoryBlock> CJxrLibDecoder::Encode(libCZI::PixelType p
             quality);
         return make_shared<MemoryBlockOnCompressedData>(std::move(compressed_data));
     }
-}
+}*/
 
 std::shared_ptr<libCZI::IBitmapData> CJxrLibDecoder::Decode(const void* ptrData, size_t size, libCZI::PixelType pixelType, uint32_t width, uint32_t height)
 {
