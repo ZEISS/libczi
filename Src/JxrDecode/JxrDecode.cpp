@@ -14,7 +14,7 @@ using namespace std;
 
 static void ApplyQuality(float quality, JxrDecode::PixelFormat pixel_format, std::uint32_t width, PKImageEncode* pEncoder);
 
-static bool IsEqualGUID(const GUID& guid1, const GUID& guid2)
+static bool IsEqualGuid(const GUID& guid1, const GUID& guid2)
 {
     return IsEqualGUID(&guid1, &guid2) != 0;
 }
@@ -48,23 +48,23 @@ static const char* ERR_to_string(ERR error_code)
 
 static JxrDecode::PixelFormat JxrPixelFormatGuidToEnum(const GUID& guid)
 {
-    if (IsEqualGUID(guid, GUID_PKPixelFormat8bppGray))
+    if (IsEqualGuid(guid, GUID_PKPixelFormat8bppGray))
     {
         return JxrDecode::PixelFormat::kGray8;
     }
-    else if (IsEqualGUID(guid, GUID_PKPixelFormat16bppGray))
+    else if (IsEqualGuid(guid, GUID_PKPixelFormat16bppGray))
     {
         return JxrDecode::PixelFormat::kGray16;
     }
-    else if (IsEqualGUID(guid, GUID_PKPixelFormat24bppBGR))
+    else if (IsEqualGuid(guid, GUID_PKPixelFormat24bppBGR))
     {
         return JxrDecode::PixelFormat::kBgr24;
     }
-    else if (IsEqualGUID(guid, GUID_PKPixelFormat48bppRGB))
+    else if (IsEqualGuid(guid, GUID_PKPixelFormat48bppRGB))
     {
         return JxrDecode::PixelFormat::kBgr48;
     }
-    else if (IsEqualGUID(guid, GUID_PKPixelFormat32bppGrayFloat))
+    else if (IsEqualGuid(guid, GUID_PKPixelFormat32bppGrayFloat))
     {
         return JxrDecode::PixelFormat::kGray32Float;
     }
@@ -280,7 +280,7 @@ void JxrDecode::Decode(
         ApplyQuality(quality, pixel_format, width, upImageEncoder.get());
     }
 
-    switch (pixel_format)
+    switch (pixel_format)  // NOLINT(clang-diagnostic-switch-enum)
     {
     case PixelFormat::kBgr24:
         err = upImageEncoder->SetPixelFormat(upImageEncoder.get(), GUID_PKPixelFormat24bppBGR);
@@ -394,9 +394,9 @@ size_t JxrDecode::CompressedData::GetSize()
         return 2;
     case PixelFormat::kGray32Float:
         return 4;
+    default:
+        return 0xff;
     }
-
-    return 0xff;
 }
 
 /*static*/void ApplyQuality(float quality, JxrDecode::PixelFormat pixel_format, uint32_t width, PKImageEncode* pEncoder)
