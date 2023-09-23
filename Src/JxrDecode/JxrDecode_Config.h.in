@@ -15,7 +15,7 @@
 // whether the intrinsic "__builtin_bswap32" is available (in the header-file byteswap.h)
 #define JXRDECODE_HAS_BUILTIN_BSWAP32 @jxrdecode_Has_builtin_bswap32@
 
-// whether the function ""_byteswap_ulong" is available (in the header-file stdlib.h)
+// whether the function "_byteswap_ulong" is available (in the header-file stdlib.h)
 #define JXRDECODE_HAS_BYTESWAP_IN_STDLIB @jxrdecode_Has_byteswap_long_in_stdlib@
 
 // whether the function "bswap32" is available (in the header-file sys/endian.h)
