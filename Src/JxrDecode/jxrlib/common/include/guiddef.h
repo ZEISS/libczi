@@ -78,7 +78,7 @@ typedef struct _GUID {
 /// \param  guid2   The second unique identifier to compare.
 ///
 /// \returns    A non-zero value if the two GUIDs are equal, and zero otherwise.
-inline int IsEqualGUID(const GUID* guid1, const GUID* guid2)
+static inline int IsEqualGUID(const GUID* guid1, const GUID* guid2)
 {
        return !memcmp(guid1, guid2, sizeof(GUID));
 }
