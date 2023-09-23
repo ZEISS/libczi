@@ -175,7 +175,10 @@ void JxrDecode::Decode(
         &rc,
         static_cast<U8*>(get<0>(decode_info)),
         get<1>(decode_info));
-    if (Failed(err)) { ThrowJxrlibError("decoder::Copy failed", err); }
+    if (Failed(err))
+    {
+        ThrowJxrlibError("decoder::Copy failed", err);
+    }
 }
 
 /*static*/JxrDecode::CompressedData JxrDecode::Encode(
@@ -237,10 +240,8 @@ void JxrDecode::Decode(
         });
 
     CWMIStrCodecParam codec_parameters = {};
-    //codec_parameters.guidPixFormat = GUID_PKPixelFormat24bppBGR;
     codec_parameters.bVerbose = FALSE;
     codec_parameters.cfColorFormat = YUV_444;
-    //    args->bFlagRGB_BGR = FALSE; //default BGR
     codec_parameters.bdBitDepth = BD_LONG;
     codec_parameters.bfBitstreamFormat = FREQUENCY;
     codec_parameters.bProgressiveMode = TRUE;
@@ -249,18 +250,9 @@ void JxrDecode::Decode(
     codec_parameters.sbSubband = SB_ALL;
     codec_parameters.uAlphaMode = 0;
     codec_parameters.uiDefaultQPIndex = 1;
-
     codec_parameters.uiDefaultQPIndexAlpha = 1;
-
-    //codec_parameters.fltImageQuality = 1.f;
-    //codec_parameters.bOverlapSet = 0;
-    //codec_parameters.bColorFormatSet = 0;
-
-
-   // { &GUID_PKPixelFormat24bppBGR, 3, CF_RGB, BD_8, 24, PK_pixfmtBGR, 2, 3, 8, 1 },
-
-    struct tagWMPStream* pEncodeStream = NULL;
-    //CreateWS_File(&pEncodeStream, "C:\\temp\\test.jxr", "wb");
+     
+    struct tagWMPStream* pEncodeStream = nullptr;
     err = CreateWS_HeapBackedWriteableStream(&pEncodeStream, 1024, 0);
     if (Failed(err))
     {
@@ -310,7 +302,6 @@ void JxrDecode::Decode(
         ThrowJxrlibError("'PKImageEncode::SetPixelFormat' failed", err);
     }
 
-    //err = pEncoder->SetPixelFormat(pEncoder, GUID_PKPixelFormat24bppBGR);
     err = upImageEncoder->SetSize(upImageEncoder.get(), static_cast<I32>(width), static_cast<I32>(height));
     if (Failed(err))
     {
@@ -360,7 +351,7 @@ JxrDecode::CompressedData::~CompressedData()
     }
 }
 
-void* JxrDecode::CompressedData::GetMemory()
+void* JxrDecode::CompressedData::GetMemory() const
 {
     void* data = nullptr;
     GetWS_HeapBackedWriteableStreamBuffer(
@@ -370,7 +361,7 @@ void* JxrDecode::CompressedData::GetMemory()
     return data;
 }
 
-size_t JxrDecode::CompressedData::GetSize()
+size_t JxrDecode::CompressedData::GetSize() const
 {
     size_t size = 0;
     GetWS_HeapBackedWriteableStreamBuffer(
@@ -399,12 +390,20 @@ size_t JxrDecode::CompressedData::GetSize()
     }
 }
 
+/// Makes adjustments to the encoder object, based on the quality parameter. The quality parameter is expected to be a number between 0 and 1.
+///
+/// \param          quality         The quality (must be between 0 and 1).
+/// \param          pixel_format    The pixel format.
+/// \param          width           The width in pixels.
+/// \param [in,out] pEncoder        The encoder object (where the adjustments, according to the quality setting, are made).
 /*static*/void ApplyQuality(float quality, JxrDecode::PixelFormat pixel_format, uint32_t width, PKImageEncode* pEncoder)
 {
     // this is resembling the code from https://github.com/ptahmose/jxrlib/blob/f7521879862b9085318e814c6157490dd9dbbdb4/jxrencoderdecoder/JxrEncApp.c#L677C1-L738C10
+    // It has been tweaked to our more limited case (i.e. only 8 bit and 16 bit, and only 1 channel)
 #if 1
     // optimized for PSNR
-    static const int DPK_QPS_420[11][6] = {      // for 8 bit only
+    static const int DPK_QPS_420[11][6] =
+    {      // for 8 bit only
         { 66, 65, 70, 72, 72, 77 },
         { 59, 58, 63, 64, 63, 68 },
         { 52, 51, 57, 56, 56, 61 },
@@ -418,7 +417,8 @@ size_t JxrDecode::CompressedData::GetSize()
         {  2,  2,  3,  2,  2,  2 }
     };
 
-    static const int DPK_QPS_8[12][6] = {
+    static const int DPK_QPS_8[12][6] =
+    {
         { 67, 79, 86, 72, 90, 98 },
         { 59, 74, 80, 64, 83, 89 },
         { 53, 68, 75, 57, 76, 83 },
@@ -434,7 +434,8 @@ size_t JxrDecode::CompressedData::GetSize()
     };
 #else
     // optimized for SSIM
-    static const int DPK_QPS_420[11][6] = {      // for 8 bit only
+    static const int DPK_QPS_420[11][6] =
+    {      // for 8 bit only
         { 67, 77, 80, 75, 82, 86 },
         { 58, 67, 71, 63, 74, 78 },
         { 50, 60, 64, 54, 66, 69 },
@@ -448,7 +449,8 @@ size_t JxrDecode::CompressedData::GetSize()
         {  4,  6,  7,  3,  5,  5 }
     };
 
-    static const int DPK_QPS_8[12][6] = {
+    static const int DPK_QPS_8[12][6] =
+    {
         { 67, 93, 98, 71, 98, 104 },
         { 59, 83, 88, 61, 89,  95 },
         { 50, 76, 81, 53, 85,  90 },
@@ -464,7 +466,8 @@ size_t JxrDecode::CompressedData::GetSize()
     };
 #endif
 
-    static const int DPK_QPS_16[11][6] = {
+    static const int DPK_QPS_16[11][6] = 
+    {
         { 197, 203, 210, 202, 207, 213 },
         { 174, 188, 193, 180, 189, 196 },
         { 152, 167, 173, 156, 169, 174 },
@@ -478,7 +481,7 @@ size_t JxrDecode::CompressedData::GetSize()
         {   5,   8,   9,   4,   7,   8 }
     };
 
-    static const int DPK_QPS_16f[11][6] = {
+    /*static const int DPK_QPS_16f[11][6] = {
         { 148, 177, 171, 165, 187, 191 },
         { 133, 155, 153, 147, 172, 181 },
         { 114, 133, 138, 130, 157, 167 },
@@ -490,9 +493,10 @@ size_t JxrDecode::CompressedData::GetSize()
         {  16,  30,  35,  14,  29,  34 },
         {   8,  14,  17,   7,  13,  17 },
         {   3,   5,   7,   3,   5,   6 }
-    };
+    };*/
 
-    static const int DPK_QPS_32f[11][6] = {
+    static const int DPK_QPS_32f[11][6] = 
+    {
         { 194, 206, 209, 204, 211, 217 },
         { 175, 187, 196, 186, 193, 205 },
         { 157, 170, 177, 167, 180, 190 },
@@ -506,71 +510,57 @@ size_t JxrDecode::CompressedData::GetSize()
         {   3,  22,  24,   2,  21,  22 }
     };
 
-    //if (!args.bOverlapSet)
-    //{
-        // Image width must be at least 2 MB wide for subsampled chroma and two levels of overlap!
-    if (quality >= 0.5F || /*rect.Width*/width < 2 * MB_WIDTH_PIXEL)
-        pEncoder->WMP.wmiSCP.olOverlap = OL_ONE;
-    else
-        pEncoder->WMP.wmiSCP.olOverlap = OL_TWO;
-    //}
-
-    //if (!args.bColorFormatSet)
-    //{
-    if (quality >= 0.5F || /*PI.uBitsPerSample > 8*/(pixel_format == JxrDecode::PixelFormat::kBgr48 || pixel_format == JxrDecode::PixelFormat::kGray16))
-        pEncoder->WMP.wmiSCP.cfColorFormat = YUV_444;
-    else
-        pEncoder->WMP.wmiSCP.cfColorFormat = YUV_420;
-    //}
-
-    //if (PI.bdBitDepth == BD_1)
-    //{
-    //    pEncoder->WMP.wmiSCP.uiDefaultQPIndex = (U8)(8 - 5.0F *
-    //        quality/*args.fltImageQuality*/ + 0.5F);
-    //}
-    //else
+    // Image width must be at least 2 MB wide for subsampled chroma and two levels of overlap!
+    if (quality >= 0.5F || width < 2 * MB_WIDTH_PIXEL)
     {
-        // remap [0.8, 0.866, 0.933, 1.0] to [0.8, 0.9, 1.0, 1.1]
-        // to use 8-bit DPK QP table (0.933 == Photoshop JPEG 100)
-        int qi;
-        float qf;
-        const int* pQPs;
-        if (/*args.fltImageQuality*/quality > 0.8f && /*PI.bdBitDepth == BD_8*/
-            (pixel_format == JxrDecode::PixelFormat::kBgr24 || pixel_format == JxrDecode::PixelFormat::kGray8) &&
-            pEncoder->WMP.wmiSCP.cfColorFormat != YUV_420 &&
-            pEncoder->WMP.wmiSCP.cfColorFormat != YUV_422)
-            quality/*args.fltImageQuality*/ = 0.8f + (quality/*args.fltImageQuality*/ - 0.8f) * 1.5f;
-
-        qi = (int)(10.f * quality/*args.fltImageQuality*/);
-        qf = 10.f * quality/*args.fltImageQuality*/ - (float)qi;
-
-        /*pQPs =
-            (pEncoder->WMP.wmiSCP.cfColorFormat == YUV_420 ||
-             pEncoder->WMP.wmiSCP.cfColorFormat == YUV_422) ?
-            DPK_QPS_420[qi] :
-            (PI.bdBitDepth == BD_8 ? DPK_QPS_8[qi] :
-            (PI.bdBitDepth == BD_16 ? DPK_QPS_16[qi] :
-            (PI.bdBitDepth == BD_16F ? DPK_QPS_16f[qi] :
-            DPK_QPS_32f[qi])));*/
-        pQPs =
-            (pEncoder->WMP.wmiSCP.cfColorFormat == YUV_420 ||
-             pEncoder->WMP.wmiSCP.cfColorFormat == YUV_422) ?
-            DPK_QPS_420[qi] :
-            (pixel_format == JxrDecode::PixelFormat::kBgr24 || pixel_format == JxrDecode::PixelFormat::kGray8) ? DPK_QPS_8[qi] :
-            ((pixel_format == JxrDecode::PixelFormat::kBgr48 || pixel_format == JxrDecode::PixelFormat::kGray16) ? DPK_QPS_16[qi] :
-            (DPK_QPS_32f[qi]));
-
-        pEncoder->WMP.wmiSCP.uiDefaultQPIndex = static_cast<U8>(0.5f +
-            static_cast<float>(pQPs[0]) * (1.f - qf) + static_cast<float>((pQPs + 6)[0]) * qf);
-        pEncoder->WMP.wmiSCP.uiDefaultQPIndexU = static_cast<U8>(0.5f +
-            static_cast<float>(pQPs[1]) * (1.f - qf) + static_cast<float>((pQPs + 6)[1]) * qf);
-        pEncoder->WMP.wmiSCP.uiDefaultQPIndexV = static_cast<U8>(0.5f +
-            static_cast<float>(pQPs[2]) * (1.f - qf) + static_cast<float>((pQPs + 6)[2]) * qf);
-        pEncoder->WMP.wmiSCP.uiDefaultQPIndexYHP = static_cast<U8>(0.5f +
-            static_cast<float>(pQPs[3]) * (1.f - qf) + static_cast<float>((pQPs + 6)[3]) * qf);
-        pEncoder->WMP.wmiSCP.uiDefaultQPIndexUHP = static_cast<U8>(0.5f +
-            static_cast<float>(pQPs[4]) * (1.f - qf) + static_cast<float>((pQPs + 6)[4]) * qf);
-        pEncoder->WMP.wmiSCP.uiDefaultQPIndexVHP = static_cast<U8>(0.5f +
-            static_cast<float>(pQPs[5]) * (1.f - qf) + static_cast<float>((pQPs + 6)[5]) * qf);
+        pEncoder->WMP.wmiSCP.olOverlap = OL_ONE;
     }
+    else
+    {
+        pEncoder->WMP.wmiSCP.olOverlap = OL_TWO;
+    }
+
+    if (quality >= 0.5F || /*PI.uBitsPerSample > 8*/(pixel_format == JxrDecode::PixelFormat::kBgr48 || pixel_format == JxrDecode::PixelFormat::kGray16))
+    {
+        pEncoder->WMP.wmiSCP.cfColorFormat = YUV_444;
+    }
+    else
+    {
+        pEncoder->WMP.wmiSCP.cfColorFormat = YUV_420;
+    }
+
+    // remap [0.8, 0.866, 0.933, 1.0] to [0.8, 0.9, 1.0, 1.1]
+    // to use 8-bit DPK QP table (0.933 == Photoshop JPEG 100)
+
+    if (quality > 0.8f &&
+        (pixel_format == JxrDecode::PixelFormat::kBgr24 || pixel_format == JxrDecode::PixelFormat::kGray8) &&
+        pEncoder->WMP.wmiSCP.cfColorFormat != YUV_420 &&
+        pEncoder->WMP.wmiSCP.cfColorFormat != YUV_422)
+    {
+        quality = 0.8f + (quality - 0.8f) * 1.5f;
+    }
+
+    const int qi = static_cast<int>(10.f * quality);
+    const float qf = 10.f * quality - static_cast<float>(qi);
+
+    const int* pQPs =
+        (pEncoder->WMP.wmiSCP.cfColorFormat == YUV_420 ||
+         pEncoder->WMP.wmiSCP.cfColorFormat == YUV_422) ?
+        DPK_QPS_420[qi] :
+        (pixel_format == JxrDecode::PixelFormat::kBgr24 || pixel_format == JxrDecode::PixelFormat::kGray8) ? DPK_QPS_8[qi] :
+        ((pixel_format == JxrDecode::PixelFormat::kBgr48 || pixel_format == JxrDecode::PixelFormat::kGray16) ? DPK_QPS_16[qi] :
+        (DPK_QPS_32f[qi]));
+
+    pEncoder->WMP.wmiSCP.uiDefaultQPIndex = static_cast<U8>(0.5f +
+        static_cast<float>(pQPs[0]) * (1.f - qf) + static_cast<float>((pQPs + 6)[0]) * qf);
+    pEncoder->WMP.wmiSCP.uiDefaultQPIndexU = static_cast<U8>(0.5f +
+        static_cast<float>(pQPs[1]) * (1.f - qf) + static_cast<float>((pQPs + 6)[1]) * qf);
+    pEncoder->WMP.wmiSCP.uiDefaultQPIndexV = static_cast<U8>(0.5f +
+        static_cast<float>(pQPs[2]) * (1.f - qf) + static_cast<float>((pQPs + 6)[2]) * qf);
+    pEncoder->WMP.wmiSCP.uiDefaultQPIndexYHP = static_cast<U8>(0.5f +
+        static_cast<float>(pQPs[3]) * (1.f - qf) + static_cast<float>((pQPs + 6)[3]) * qf);
+    pEncoder->WMP.wmiSCP.uiDefaultQPIndexUHP = static_cast<U8>(0.5f +
+        static_cast<float>(pQPs[4]) * (1.f - qf) + static_cast<float>((pQPs + 6)[4]) * qf);
+    pEncoder->WMP.wmiSCP.uiDefaultQPIndexVHP = static_cast<U8>(0.5f +
+        static_cast<float>(pQPs[5]) * (1.f - qf) + static_cast<float>((pQPs + 6)[5]) * qf);
 }

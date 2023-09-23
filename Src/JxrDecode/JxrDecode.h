@@ -65,12 +65,12 @@ public:
         /// Gets a pointer to the memory representing the compressed data. The memory is owned by the object and will be freed when the object is destroyed.
         ///
         /// \returns    A pointer to the memory representing the compressed data.
-        void* GetMemory();
+        void* GetMemory() const;
 
         /// Gets the size of the compressed data in units of bytes.
         ///
         /// \returns    The size (in bytes).
-        size_t GetSize();
+        size_t GetSize() const;
 
         ~CompressedData();
     protected:
