@@ -1,4 +1,4 @@
-# SPDX-FileCopyrightText: 2017-2022 Carl Zeiss Microscopy GmbH
+# SPDX-FileCopyrightText: 2017-2023 Carl Zeiss Microscopy GmbH
 #
 # SPDX-License-Identifier: LGPL-3.0-or-later
 
@@ -115,12 +115,3 @@ set_target_properties(JxrDecodeStatic PROPERTIES CXX_STANDARD 11)
 # shared libraries need PIC
 set_property(TARGET JxrDecodeStatic PROPERTY POSITION_INDEPENDENT_CODE ON)
 
-#[[
-if (IS_BIG_ENDIAN)
- target_compile_definitions(JxrDecodeStatic PRIVATE _BIG__ENDIAN_)
-endif(IS_BIG_ENDIAN)
-
-if (CRASH_ON_UNALIGNED_ACCESS)
-	target_compile_definitions(JxrDecodeStatic PRIVATE _NO_UNALIGNED_LOAD_)
-endif()
-]]#

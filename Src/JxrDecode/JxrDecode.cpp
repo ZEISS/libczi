@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2023 Carl Zeiss Microscopy GmbH
+//
+// SPDX-License-Identifier: LGPL-3.0-or-later
+
 #include "JxrDecode.h"
 #include <memory>
 #include <stdexcept> 
@@ -12,7 +16,7 @@ static void ApplyQuality(float quality, JxrDecode::PixelFormat pixel_format, std
 
 static bool IsEqualGUID(const GUID& guid1, const GUID& guid2)
 {
-    return memcmp(&guid1, &guid2, sizeof(GUID)) == 0;
+    return IsEqualGUID(&guid1, &guid2) != 0;
 }
 
 static const char* ERR_to_string(ERR error_code)
