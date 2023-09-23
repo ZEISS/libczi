@@ -11,18 +11,8 @@
 
 class CJxrLibDecoder : public libCZI::IDecoder
 {
-private:
-//    JxrDecode::codecHandle handle;
 public:
     static std::shared_ptr<CJxrLibDecoder> Create();
 
-  /*  explicit CJxrLibDecoder(JxrDecode::codecHandle handle)
-        : handle(handle)
-    {}*/
-
-public:
     std::shared_ptr<libCZI::IBitmapData> Decode(const void* ptrData, size_t size, libCZI::PixelType, std::uint32_t width, std::uint32_t height) override;
-    //std::shared_ptr<libCZI::IBitmapData> Decode2(const void* ptrData, size_t size, libCZI::PixelType, std::uint32_t width, std::uint32_t height);
-
-   // std::shared_ptr<libCZI::IMemoryBlock> Encode(libCZI::PixelType pixel_type, std::uint32_t width, std::uint32_t height, std::uint32_t stride, const void* ptrData, float quality = 1.f);
 };
