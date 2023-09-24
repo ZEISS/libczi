@@ -14,7 +14,7 @@
 namespace libCZI
 {
     /// Values that represent well-known keys for the compression-parameters property bag. Note that
-    /// the property-bag API is modelled with an int as key, which is by intention in order to allow
+    /// the property-bag API is modeled with an int as key, which is by intention in order to allow
     /// for private keys.
     enum class CompressionParameterKey
     {
@@ -198,7 +198,7 @@ namespace libCZI
     };
 
     /// The functions found here deal with zstd-compression (the compression-part in particular).
-    /// TThose functions are rather low-level, and the common theme is - given a source bitmap, create a blob
+    /// Those functions are rather low-level, and the common theme is - given a source bitmap, create a blob
     /// (containing the compressed bitmap data) which is suitable to be placed in a subblock's data.
     /// Several overloads are provided, for performance critical scenarios we provide functions which write
     /// directly into caller-provided memory, and there are versions which use caller-provided functions for
@@ -523,9 +523,25 @@ namespace libCZI
             const ICompressParameters* parameters);
     };
 
+    /// The functions found here deal with JXR-compression - as implemented by jxrlib (the JPEG XR 
+    /// Image Codec reference implementation library released by Microsoft under BSD-2-Clause License).
+    /// Those functions are rather low-level, and the common theme is - given a source bitmap, create a blob
+    /// (containing the compressed bitmap data) which is suitable to be placed in a subblock's data.
     class LIBCZI_API JxrLibCompress
     {
     public:
+        /// Compress the specified bitmap in "JXR"-format. This method will compress the 
+        /// specified source-bitmap according to the "JXR-scheme" to a newly allocated block of memory.
+        /// Parameters controlling the operation are provided in an optional property bag.
+        ///
+        /// \param  pixel_type  The pixel type of the source bitmap.
+        /// \param  width       Width of the source bitmap in pixels.
+        /// \param  height      Height of the source bitmap in pixels.
+        /// \param  stride      The stride of the source bitmap in bytes.
+        /// \param  ptrData     Pointer to the source bitmap.
+        /// \param  parameters  Property bag containing parameters controlling the operation. This argument can be null, in which case default parameters are used.
+        ///
+        /// \returns    A shared pointer to an object representing and owning a block of memory, containing the JXR-compressed bitmap.
         static std::shared_ptr<IMemoryBlock> Compress(
             libCZI::PixelType pixel_type, 
             std::uint32_t width, 
