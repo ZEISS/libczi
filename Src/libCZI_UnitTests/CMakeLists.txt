@@ -36,7 +36,7 @@ ADD_EXECUTABLE(libCZI_UnitTests
 										test_StreamImplementations.cpp
 										MemInputOutputStream.h    
 										test_bitmapOperations.cpp      
-										test_JxrDecode.cpp              
+										test_JxrlibCodec.cpp              
 										test_Utilities.cpp
 										MemOutputStream.cpp       
 										test_CziSubBlockDirectory.cpp  

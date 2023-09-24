@@ -15,7 +15,7 @@
 using namespace libCZI;
 using namespace std;
 
-TEST(JxrDecode, DecodeBgr24)
+TEST(JxrlibCodec, DecodeBgr24)
 {
     const auto dec = CJxrLibDecoder::Create();
     size_t sizeEncoded; int expectedWidth, expectedHeight;
@@ -32,7 +32,7 @@ TEST(JxrDecode, DecodeBgr24)
     EXPECT_TRUE(memcmp(hash, expectedResult, 16) == 0) << "Incorrect result";
 }
 
-TEST(JxrDecode, DecodeGray8)
+TEST(JxrlibCodec, DecodeGray8)
 {
     const auto dec = CJxrLibDecoder::Create();
     size_t sizeEncoded; int expectedWidth, expectedHeight;
@@ -49,7 +49,7 @@ TEST(JxrDecode, DecodeGray8)
     EXPECT_TRUE(memcmp(hash, expectedResult, 16) == 0) << "Incorrect result";
 }
 
-TEST(JxrDecode, TryDecodeInvalidDataExpectException)
+TEST(JxrlibCodec, TryDecodeInvalidDataExpectException)
 {
     // pass invalid data to decoder, and expect an exception
     const auto dec = CJxrLibDecoder::Create();
@@ -63,7 +63,7 @@ TEST(JxrDecode, TryDecodeInvalidDataExpectException)
     EXPECT_ANY_THROW(dec->Decode(encoded_data.get(), sizeEncoded, libCZI::PixelType::Invalid, 0, 0));
 }
 
-TEST(JxrDecode, CompressNonLossyAndDecompressCheckForSameContent_Bgr24)
+TEST(JxrlibCodec, CompressNonLossyAndDecompressCheckForSameContent_Bgr24)
 {
     const auto bitmap = CBitmapData<CHeapAllocator>::Create(PixelType::Bgr24, CTestImage::BGR24TESTIMAGE_WIDTH, CTestImage::BGR24TESTIMAGE_HEIGHT);
     {
@@ -101,7 +101,7 @@ TEST(JxrDecode, CompressNonLossyAndDecompressCheckForSameContent_Bgr24)
     EXPECT_TRUE(are_equal) << "Original bitmap and encoded-decoded one are not identical.";
 }
 
-TEST(JxrDecode, CompressNonLossyAndDecompressCheckForSameContent_Gray8)
+TEST(JxrlibCodec, CompressNonLossyAndDecompressCheckForSameContent_Gray8)
 {
     const auto bitmap = CBitmapData<CHeapAllocator>::Create(PixelType::Gray8, CTestImage::BGR24TESTIMAGE_WIDTH, CTestImage::BGR24TESTIMAGE_HEIGHT);
     {
@@ -150,7 +150,7 @@ TEST(JxrDecode, CompressNonLossyAndDecompressCheckForSameContent_Gray8)
     EXPECT_TRUE(are_equal) << "Original bitmap and encoded-decoded one are not identical.";
 }
 
-TEST(JxrDecode, CompressNonLossyAndDecompressCheckForSameContent_Gray16)
+TEST(JxrlibCodec, CompressNonLossyAndDecompressCheckForSameContent_Gray16)
 {
     const auto bitmap_gray16 = CBitmapData<CHeapAllocator>::Create(PixelType::Gray16, CTestImage::BGR24TESTIMAGE_WIDTH, CTestImage::BGR24TESTIMAGE_HEIGHT);
     {
@@ -202,7 +202,7 @@ TEST(JxrDecode, CompressNonLossyAndDecompressCheckForSameContent_Gray16)
     EXPECT_TRUE(are_equal) << "Original bitmap and encoded-decoded one are not identical.";
 }
 
-TEST(JxrDecode, CompressNonLossyAndDecompressCheckForSameContent_Gray32Float)
+TEST(JxrlibCodec, CompressNonLossyAndDecompressCheckForSameContent_Gray32Float)
 {
     const auto bitmap_gray32float = CBitmapData<CHeapAllocator>::Create(PixelType::Gray32Float, CTestImage::BGR24TESTIMAGE_WIDTH, CTestImage::BGR24TESTIMAGE_HEIGHT);
     {
@@ -254,7 +254,7 @@ TEST(JxrDecode, CompressNonLossyAndDecompressCheckForSameContent_Gray32Float)
     EXPECT_TRUE(are_equal) << "Original bitmap and encoded-decoded one are not identical.";
 }
 
-TEST(JxrDecode, CompressNonLossyAndDecompressCheckForSameContent_Bgr48)
+TEST(JxrlibCodec, CompressNonLossyAndDecompressCheckForSameContent_Bgr48)
 {
     const auto bitmap_bgr48 = CBitmapData<CHeapAllocator>::Create(PixelType::Bgr48, CTestImage::BGR24TESTIMAGE_WIDTH, CTestImage::BGR24TESTIMAGE_HEIGHT);
     {
@@ -308,7 +308,7 @@ TEST(JxrDecode, CompressNonLossyAndDecompressCheckForSameContent_Bgr48)
     EXPECT_TRUE(are_equal) << "Original bitmap and encoded-decoded one are not identical.";
 }
 
-TEST(JxrDecode, CompressLossyAndDecompressCheckForSimilarity_Gray8)
+TEST(JxrlibCodec, CompressLossyAndDecompressCheckForSimilarity_Gray8)
 {
     const auto bitmap = CBitmapData<CHeapAllocator>::Create(PixelType::Gray8, CTestImage::BGR24TESTIMAGE_WIDTH, CTestImage::BGR24TESTIMAGE_HEIGHT);
     {
@@ -365,7 +365,7 @@ TEST(JxrDecode, CompressLossyAndDecompressCheckForSimilarity_Gray8)
     EXPECT_TRUE(get<0>(max_difference_mean_difference) <= 5 && get<1>(max_difference_mean_difference) < 1) << "Original bitmap and encoded-decoded one are not identical.";
 }
 
-TEST(JxrDecode, CallEncoderWithInvalidArgumentsExpectException)
+TEST(JxrlibCodec, CallEncoderWithInvalidArgumentsExpectException)
 {
     const auto bitmap = CBitmapData<CHeapAllocator>::Create(PixelType::Gray8, 5, 5);
     //const auto codec = CJxrLibDecoder::Create();
@@ -431,7 +431,7 @@ TEST(JxrDecode, CallEncoderWithInvalidArgumentsExpectException)
         exception);
 }
 
-TEST(JxrDecode, CallDecoderWithInvalidArgumentsExpectException)
+TEST(JxrlibCodec, CallDecoderWithInvalidArgumentsExpectException)
 {
     constexpr size_t kSizeOfEncodedData = 223;
     const unique_ptr<void, decltype(&free)> encoded_data{ malloc(kSizeOfEncodedData), &free };
@@ -473,7 +473,7 @@ TEST(JxrDecode, CallDecoderWithInvalidArgumentsExpectException)
         exception);
 }
 
-TEST(JxrDecode, CallDecoderExpectingADifferentBitmapTypeAndExpectException)
+TEST(JxrlibCodec, CallDecoderExpectingADifferentBitmapTypeAndExpectException)
 {
     size_t size_encoded_data;
     int expected_width, expected_height;
