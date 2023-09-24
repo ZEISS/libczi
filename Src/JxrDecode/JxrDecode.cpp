@@ -182,12 +182,12 @@ void JxrDecode::Decode(
 }
 
 /*static*/JxrDecode::CompressedData JxrDecode::Encode(
-           JxrDecode::PixelFormat pixel_format,
-           std::uint32_t width,
-           std::uint32_t height,
-           std::uint32_t stride,
-           const void* ptr_bitmap,
-           float quality/*=1.f*/)
+                    JxrDecode::PixelFormat pixel_format,
+                    std::uint32_t width,
+                    std::uint32_t height,
+                    std::uint32_t stride,
+                    const void* ptr_bitmap,
+                    float quality/*=1.f*/)
 {
     if (ptr_bitmap == nullptr)
     {
@@ -272,7 +272,7 @@ void JxrDecode::Decode(
         ApplyQuality(quality, pixel_format, width, upImageEncoder.get());
     }
 
-    switch (pixel_format)  // NOLINT(clang-diagnostic-switch-enum)
+    switch (pixel_format)
     {
     case PixelFormat::kBgr24:
         err = upImageEncoder->SetPixelFormat(upImageEncoder.get(), GUID_PKPixelFormat24bppBGR);

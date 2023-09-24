@@ -80,7 +80,7 @@ typedef struct _GUID {
 /// \returns    A non-zero value if the two GUIDs are equal, and zero otherwise.
 static inline int IsEqualGUID(const GUID* guid1, const GUID* guid2)
 {
-       return !memcmp(guid1, guid2, sizeof(GUID));
+    return !memcmp(guid1, guid2, sizeof(GUID));
 }
 
 #endif // GUID_DEFINED

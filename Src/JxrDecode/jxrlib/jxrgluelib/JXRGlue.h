@@ -557,8 +557,7 @@ extern "C" {
     typedef struct tagPKFormatConverter
     {
         ERR(*Initialize)(PKFormatConverter*, PKImageDecode*, char* pExt, PKPixelFormatGUID);
-        ERR(*InitializeConvert)(PKFormatConverter* pFC, const PKPixelFormatGUID enPFFrom,
-                                 char* pExt, PKPixelFormatGUID enPFTTo);
+        ERR(*InitializeConvert)(PKFormatConverter* pFC, const PKPixelFormatGUID enPFFrom, char* pExt, PKPixelFormatGUID enPFTTo);
 
         ERR(*GetPixelFormat)(PKFormatConverter*, PKPixelFormatGUID*);
         ERR(*GetSourcePixelFormat)(PKFormatConverter*, PKPixelFormatGUID*);
@@ -590,8 +589,8 @@ extern "C" {
 
     // Think of this as static member of PKFormatConverter "class"
     ERR PKFormatConverter_EnumConversions(const PKPixelFormatGUID* pguidSourcePF,
-                                          const U32 iIndex,
-                                          const PKPixelFormatGUID** ppguidTargetPF);
+                                            const U32 iIndex,
+                                            const PKPixelFormatGUID** ppguidTargetPF);
 
     ERR PKCodecFactory_CreateFormatConverter(PKFormatConverter** ppFConverter);
 

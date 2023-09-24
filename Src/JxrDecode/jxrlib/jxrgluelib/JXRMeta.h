@@ -219,10 +219,10 @@ EXTERN_C ERR WriteWmpDE(
 
 
 EXTERN_C ERR ReadPropvar(struct tagWMPStream* pWS,
-                         const U16 uType,
-                         const U32 uCount,
-                         const U32 uValue,
-                         DPKPROPVARIANT* pvar);
+                            const U16 uType,
+                            const U32 uCount,
+                            const U32 uValue,
+                            DPKPROPVARIANT* pvar);
 
 
 

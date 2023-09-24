@@ -81,7 +81,7 @@ typedef struct CAdaptiveHuffman
 
 
 /************************************************************************************
-  Context structures
+    Context structures
 ************************************************************************************/
 typedef struct CAdaptiveModel {
     Int     m_iFlcState[2];

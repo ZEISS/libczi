@@ -397,12 +397,12 @@ TEST(JxrDecode, CallEncoderWithInvalidArgumentsExpectException)
         {
             const ScopedBitmapLockerSP lck{ bitmap };
             JxrLibCompress::Compress(
-                    bitmap->GetPixelType(),
-                    bitmap->GetWidth(),
-                    0,
-                    lck.stride,
-                    lck.ptrDataRoi,
-                    nullptr);
+                bitmap->GetPixelType(),
+                bitmap->GetWidth(),
+                0,
+                lck.stride,
+                lck.ptrDataRoi,
+                nullptr);
         },
         exception);
     EXPECT_THROW(
@@ -421,12 +421,12 @@ TEST(JxrDecode, CallEncoderWithInvalidArgumentsExpectException)
         {
             const ScopedBitmapLockerSP lck{ bitmap };
             JxrLibCompress::Compress(
-               bitmap->GetPixelType(),
-               bitmap->GetWidth(),
-               bitmap->GetHeight(),
-               lck.stride,
-               nullptr,
-               nullptr);
+                bitmap->GetPixelType(),
+                bitmap->GetWidth(),
+                bitmap->GetHeight(),
+                lck.stride,
+                nullptr,
+                nullptr);
         },
         exception);
 }
