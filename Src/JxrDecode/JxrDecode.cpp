@@ -96,9 +96,9 @@ static void WriteGuidToStream(ostringstream& string_stream, const GUID& guid)
 }
 
 void JxrDecode::Decode(
-           const void* ptrData,
-           size_t size,
-           const std::function<std::tuple<void*, std::uint32_t>(PixelFormat pixel_format, std::uint32_t  width, std::uint32_t  height)>& get_destination_func)
+            const void* ptrData,
+            size_t size,
+            const std::function<std::tuple<void*, std::uint32_t>(PixelFormat pixel_format, std::uint32_t  width, std::uint32_t  height)>& get_destination_func)
 {
     if (ptrData == nullptr)
     {
@@ -251,7 +251,7 @@ void JxrDecode::Decode(
     codec_parameters.uAlphaMode = 0;
     codec_parameters.uiDefaultQPIndex = 1;
     codec_parameters.uiDefaultQPIndexAlpha = 1;
-     
+
     struct tagWMPStream* pEncodeStream = nullptr;
     err = CreateWS_HeapBackedWriteableStream(&pEncodeStream, 1024, 0);
     if (Failed(err))
@@ -466,7 +466,7 @@ size_t JxrDecode::CompressedData::GetSize() const
     };
 #endif
 
-    static const int DPK_QPS_16[11][6] = 
+    static const int DPK_QPS_16[11][6] =
     {
         { 197, 203, 210, 202, 207, 213 },
         { 174, 188, 193, 180, 189, 196 },
@@ -495,7 +495,7 @@ size_t JxrDecode::CompressedData::GetSize() const
         {   3,   5,   7,   3,   5,   6 }
     };*/
 
-    static const int DPK_QPS_32f[11][6] = 
+    static const int DPK_QPS_32f[11][6] =
     {
         { 194, 206, 209, 204, 211, 217 },
         { 175, 187, 196, 186, 193, 205 },
@@ -544,8 +544,7 @@ size_t JxrDecode::CompressedData::GetSize() const
     const float qf = 10.f * quality - static_cast<float>(qi);
 
     const int* pQPs =
-        (pEncoder->WMP.wmiSCP.cfColorFormat == YUV_420 ||
-         pEncoder->WMP.wmiSCP.cfColorFormat == YUV_422) ?
+        (pEncoder->WMP.wmiSCP.cfColorFormat == YUV_420 || pEncoder->WMP.wmiSCP.cfColorFormat == YUV_422) ?
         DPK_QPS_420[qi] :
         (pixel_format == JxrDecode::PixelFormat::kBgr24 || pixel_format == JxrDecode::PixelFormat::kGray8) ? DPK_QPS_8[qi] :
         ((pixel_format == JxrDecode::PixelFormat::kBgr48 || pixel_format == JxrDecode::PixelFormat::kGray16) ? DPK_QPS_16[qi] :
