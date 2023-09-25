@@ -38,8 +38,8 @@ TEST(JxrlibCodec, DecodeGray8)
     size_t sizeEncoded; int expectedWidth, expectedHeight;
     const auto ptrEncodedData = CTestImage::GetJpgXrCompressedImage_Gray8(&sizeEncoded, &expectedWidth, &expectedHeight);
     const auto bmDecoded = dec->Decode(ptrEncodedData, sizeEncoded, libCZI::PixelType::Gray8, expectedWidth, expectedHeight);
-    EXPECT_EQ((uint32_t)expectedWidth, bmDecoded->GetWidth()) << "Width is expected to be equal";
-    EXPECT_EQ((uint32_t)expectedHeight, bmDecoded->GetHeight()) << "Height is expected to be equal";
+    EXPECT_EQ(static_cast<uint32_t>(expectedWidth), bmDecoded->GetWidth()) << "Width is expected to be equal";
+    EXPECT_EQ(static_cast<uint32_t>(expectedHeight), bmDecoded->GetHeight()) << "Height is expected to be equal";
     EXPECT_EQ(bmDecoded->GetPixelType(), PixelType::Gray8) << "Not the correct pixeltype.";
 
     uint8_t hash[16] = { 0 };
@@ -54,7 +54,7 @@ TEST(JxrlibCodec, TryDecodeInvalidDataExpectException)
     // pass invalid data to decoder, and expect an exception
     const auto dec = CJxrLibDecoder::Create();
     constexpr size_t sizeEncoded = 2345;
-    const unique_ptr<uint8_t> encoded_data(new uint8_t[sizeEncoded]);
+    const unique_ptr<uint8_t[]> encoded_data(new uint8_t[sizeEncoded]);
     for (size_t i = 0; i < sizeEncoded; i++)
     {
         encoded_data.get()[i] = static_cast<uint8_t>(i);
