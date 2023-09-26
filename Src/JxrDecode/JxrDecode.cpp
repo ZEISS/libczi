@@ -115,10 +115,12 @@ void JxrDecode::Decode(
         throw invalid_argument("get_destination_func");
     }
 
-    WMPStream* pStream;
+    WMPStream* pStream = nullptr;
     ERR err = CreateWS_Memory(&pStream, const_cast<void*>(ptrData), size);
     if (Failed(err))
     {
+        // note: the call "CreateWS_Memory" cannot fail (or the only way it can fail is that the memory allocation fails),
+        //        so we do not have to release/free the stream object here.
         ThrowJxrlibError("'CreateWS_Memory' failed", err);
     }
 
@@ -128,6 +130,8 @@ void JxrDecode::Decode(
     err = PKCodecFactory_CreateDecoderFromStream(pStream, &pDecoder);
     if (Failed(err))
     {
+        // unfortunately, "PKCodecFactory_CreateDecoderFromStream" may fail leaving us with a partially constructed
+        //  decoder object, so we need to release/free the decoder object here.
         if (pDecoder != nullptr)
         {
             pDecoder->Release(&pDecoder);
@@ -136,6 +140,7 @@ void JxrDecode::Decode(
         ThrowJxrlibError("'PKCodecFactory_CreateDecoderFromStream' failed", err);
     }
 
+    // construct a smart pointer which will destroy the decoder object when it goes out of scope
     std::unique_ptr<PKImageDecode, void(*)(PKImageDecode*)> upDecoder(pDecoder, [](PKImageDecode* p)->void {p->Release(&p); });
 
     U32 frame_count;
