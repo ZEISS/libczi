@@ -124,10 +124,15 @@ void JxrDecode::Decode(
 
     unique_ptr<WMPStream, void(*)(WMPStream*)> upStream(pStream, [](WMPStream* p)->void {p->Close(&p); });
 
-    PKImageDecode* pDecoder;
+    PKImageDecode* pDecoder = nullptr;
     err = PKCodecFactory_CreateDecoderFromStream(pStream, &pDecoder);
     if (Failed(err))
     {
+        if (pDecoder != nullptr)
+        {
+            pDecoder->Release(&pDecoder);
+        }
+
         ThrowJxrlibError("'PKCodecFactory_CreateDecoderFromStream' failed", err);
     }
 
