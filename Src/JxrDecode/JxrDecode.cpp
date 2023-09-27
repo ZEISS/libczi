@@ -145,7 +145,11 @@ void JxrDecode::Decode(
 
     U32 frame_count;
     err = upDecoder->GetFrameCount(upDecoder.get(), &frame_count);
-    if (Failed(err)) { ThrowJxrlibError("'decoder::GetFrameCount' failed", err); }
+    if (Failed(err))
+    {
+        ThrowJxrlibError("'decoder::GetFrameCount' failed", err);
+    }
+
     if (frame_count != 1)
     {
         ostringstream string_stream;
@@ -162,7 +166,10 @@ void JxrDecode::Decode(
 
     PKPixelFormatGUID pixel_format_of_decoder;
     upDecoder->GetPixelFormat(upDecoder.get(), &pixel_format_of_decoder);
-    if (Failed(err)) { ThrowJxrlibError("'decoder::GetPixelFormat' failed", err); }
+    if (Failed(err))
+    {
+        ThrowJxrlibError("'decoder::GetPixelFormat' failed", err);
+    }
 
     const auto jxrpixel_format = JxrPixelFormatGuidToEnum(pixel_format_of_decoder);
     if (jxrpixel_format == JxrDecode::PixelFormat::kInvalid)
