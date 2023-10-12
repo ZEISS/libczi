@@ -64,9 +64,9 @@ bool CCziAttachmentsDirectory::TryGetAttachment(int index, AttachmentEntry& entr
 bool CWriterCziAttachmentsDirectory::TryAddAttachment(const AttachmentEntry& entry)
 {
     if (std::find_if(
-        this->attachments_.cbegin(), 
-        this->attachments_.cend(), 
-        [&entry](const AttachmentEntry& x) { return CCziAttachmentsDirectoryBase::CompareForEquality_Id(x, entry); }) != this->attachments_.cend())
+        this->attachments_.cbegin(),
+        this->attachments_.cend(),
+        [&entry](const AttachmentEntry& x)->bool { return CCziAttachmentsDirectoryBase::CompareForEquality_Id(x, entry); }) != this->attachments_.cend())
     {
         return false;
     }
@@ -177,9 +177,9 @@ bool CReaderWriterCziAttachmentsDirectory::TryRemoveAttachment(int key, Attachme
 bool CReaderWriterCziAttachmentsDirectory::TryAddAttachment(const AttachmentEntry& entry, int* key)
 {
     if (std::find_if(
-        this->attchmnts.cbegin(), 
-        this->attchmnts.cend(), 
-        [&entry](const auto& x) { return CCziAttachmentsDirectoryBase::CompareForEquality_Id(x.second, entry); }) != this->attchmnts.cend())
+        this->attchmnts.cbegin(),
+        this->attchmnts.cend(),
+        [&entry](const std::pair<int, AttachmentEntry>& x)->bool { return CCziAttachmentsDirectoryBase::CompareForEquality_Id(x.second, entry); }) != this->attchmnts.cend())
     {
         return false;
     }
