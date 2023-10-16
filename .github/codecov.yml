@@ -15,3 +15,9 @@ flag_management:
         informational: true
       - type: patch
         informational: true
+ignore:
+  - "Src/CZICmd"  # ignore folders and all its contents
+  - "Src/libCZI_UnitTests"
+  - "Src/libCZI/pugiconfig.hpp"   # exclude pugixml
+  - "Src/libCZI/pugixml.hpp"
+  - "Src/libCZI/pugixml.cpp"
