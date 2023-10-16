@@ -2,10 +2,10 @@
 //
 // SPDX-License-Identifier: LGPL-3.0-or-later
 
-#include "stdafx.h"
 #include "stdAllocator.h"
 #include <limits>
 #include <cstdlib>
+#include <stdexcept>
 #include "libCZI_Config.h"
 
 constexpr int ALLOC_ALIGNMENT = 32;
@@ -18,7 +18,9 @@ void* CHeapAllocator::Allocate(std::uint64_t size)
     }
 
 #if LIBCZI_HAVE_ALIGNED_ALLOC
-    return aligned_alloc(ALLOC_ALIGNMENT, size);
+    // Specification requires that 'size' is an integral multiple of 'alignment' (https://en.cppreference.com/w/cpp/memory/c/aligned_alloc),
+    // so we round up to the next multiple of 'alignment' here.
+    return aligned_alloc(ALLOC_ALIGNMENT, ((size+ALLOC_ALIGNMENT-1)/ALLOC_ALIGNMENT)*ALLOC_ALIGNMENT);
 #elif  LIBCZI_HAVE__ALIGNED_MALLOC
     return _aligned_malloc((size_t)size, ALLOC_ALIGNMENT);
 #else

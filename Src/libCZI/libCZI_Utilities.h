@@ -10,11 +10,85 @@
 #include <utility>
 #include <memory>
 #include <string>
+#include <cstdint>
 #include "libCZI_Metadata.h"
 #include "libCZI_Pixels.h"
 
 namespace libCZI
 {
+    /// \brief Represents a globally unique identifier (GUID) consisting of four unsigned 32-bit integers.
+    ///
+    /// The GUID is represented as a struct with 4 Data fields of different sizes, allowing it to be packed
+    /// more tightly than a 16-byte array. This implementation is compatible with the Microsoft GUID
+    /// definition, but it is not necessarily byte-swappable with it.
+    struct LIBCZI_API GUID
+    {
+        std::uint32_t Data1; ///< The first component of the GUID.
+        std::uint16_t Data2; ///< The second component of the GUID.
+        std::uint16_t Data3; ///< The third component of the GUID.
+        std::uint8_t  Data4[8]; ///< The fourth component of the GUID, represented as an array of 8 bytes.
+
+        /// \brief Provide an equality comparison operator between GUID objects.
+        ///
+        /// \param other The GUID object to compare with.
+        /// \return True if the GUID objects are equal, otherwise false.
+        bool operator==(const GUID& other) const
+        {
+            return this->Data1 == other.Data1 &&
+                this->Data2 == other.Data2 &&
+                this->Data3 == other.Data3 &&
+                this->Data4[0] == other.Data4[0] &&
+                this->Data4[1] == other.Data4[1] &&
+                this->Data4[2] == other.Data4[2] &&
+                this->Data4[3] == other.Data4[3] &&
+                this->Data4[4] == other.Data4[4] &&
+                this->Data4[5] == other.Data4[5] &&
+                this->Data4[6] == other.Data4[6] &&
+                this->Data4[7] == other.Data4[7];
+        }
+
+        /// \brief Provide an inequality comparison operator between GUID objects.
+        ///
+        /// \param other The GUID object to compare with.
+        /// \return True if the GUID objects are different, otherwise false.
+        bool operator!=(const GUID& other) const
+        {
+            return !(*this == other);
+        }
+
+        /// \brief Provide a method to lexically compare two GUID objects.
+        ///
+        /// \param other The GUID object to compare with.
+        /// \return An integer less than, equal to, or greater than 0 if this GUID is less than, equal to, or greater than the other GUID.
+        int compare(const GUID& other) const
+        {
+            if (this->Data1 != other.Data1)
+            {
+                return this->Data1 < other.Data1 ? -1 : 1;
+            }
+
+            if (this->Data2 != other.Data2)
+            {
+                return this->Data2 < other.Data2 ? -1 : 1;
+            }
+
+            if (this->Data3 != other.Data3)
+            {
+                return this->Data3 < other.Data3 ? -1 : 1;
+            }
+
+            for (int i = 0; i < 8; ++i)
+            {
+                if (this->Data4[i] != other.Data4[i])
+                {
+                    return this->Data4[i] < other.Data4[i] ? -1 : 1;
+                }
+            }
+
+            return 0;
+        }
+    };
+
     class ISubBlockRepository;
     class IDisplaySettings;
     class ICompressParameters;

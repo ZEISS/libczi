@@ -178,7 +178,7 @@ private:
     int fontHeight;
 
     bool newCziFileGuidValid;
-    GUID newCziFileGuid;
+    libCZI::GUID newCziFileGuid;
 
     std::string bitmapGeneratorClassName;
 
@@ -246,7 +246,7 @@ public:
     std::wstring GetFontNameOrFile() const { return this->fontnameOrFile; }
     int GetFontHeight() const { return this->fontHeight; }
     bool GetIsFileGuidValid()const { return this->newCziFileGuidValid; }
-    const GUID& GetFileGuid()const { return this->newCziFileGuid; }
+    const libCZI::GUID& GetFileGuid()const { return this->newCziFileGuid; }
     const std::string& GetBitmapGeneratorClassName()const { return this->bitmapGeneratorClassName; }
     const std::map<std::string, std::string>& GetSubBlockKeyValueMetadata()const { return this->sbBlkMetadataKeyValue; }
     bool GetHasSubBlockKeyValueMetadata()const { return this->sbBlkMetadataKeyValueValid; }
@@ -296,7 +296,7 @@ private:
     static bool TryParseCreateSize(const std::string& s, std::tuple<std::uint32_t, std::uint32_t>* size);
     static bool TryParseCreateTileInfo(const std::string& s, CreateTileInfo* create_tile_info);
     static bool TryParseFontHeight(const std::string& s, int* font_height);
-    static bool TryParseNewCziFileguid(const std::string& s, GUID* guid);
+    static bool TryParseNewCziFileguid(const std::string& s, libCZI::GUID* guid);
     static bool TryParseBitmapGenerator(const std::string& s, std::string* generator_class_name);
     static bool TryParseSubBlockMetadataKeyValue(const std::string& s, std::map<std::string, std::string>* subblock_metadata_property_bag);
     static bool TryParseCompressionOptions(const std::string& s, libCZI::Utils::CompressionOption* compression_option);

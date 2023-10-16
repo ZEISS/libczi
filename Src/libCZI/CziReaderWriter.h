@@ -57,7 +57,7 @@ private:
     void Finish();
 
     void ReadCziStructure();
-    GUID UpdateFileHeaderGuid();
+    libCZI::GUID UpdateFileHeaderGuid();
     void DetermineNextSubBlockOffset();
 
     std::tuple<bool, std::uint64_t, CCziSubBlockDirectoryBase::SubBlkEntry> ReplaceSubBlock(const libCZI::AddSubBlockInfo& addSubBlockInfo, const CCziSubBlockDirectoryBase::SubBlkEntry& subBlkEntry);

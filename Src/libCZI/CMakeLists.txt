@@ -43,7 +43,6 @@ set(LIBCZISRCFILES
             SingleChannelTileAccessor.cpp
             SingleChannelTileCompositor.cpp
             splines.cpp
-            stdafx.cpp
             stdAllocator.cpp
             StreamImpl.cpp
             utilities.cpp
@@ -90,7 +89,6 @@ set(LIBCZISRCFILES
             libCZI_Write.h
             MD5Sum.h
             MultiChannelCompositor.h
-            priv_guiddef.h
             SingleChannelAccessorBase.h
             SingleChannelPyramidLevelTileAccessor.h
             SingleChannelScalingTileAccessor.h
@@ -98,15 +96,14 @@ set(LIBCZISRCFILES
             SingleChannelTileCompositor.h
             Site.h
             splines.h
-            stdafx.h
             stdAllocator.h
             StreamImpl.h
-            targetver.h
             utilities.h
             XmlNodeWrapper.h
             BitmapOperations.hpp
             pugiconfig.hpp
             pugixml.hpp
+            jxrlibcompress.cpp
 )
 
 # prepare the configuration-file "libCZI_Config.h"
@@ -240,7 +237,7 @@ configure_file (
 #  Define headers for this library. PUBLIC headers are used for compiling the library, and will be added to consumers' build paths.
 set(libCZIPublicHeaders "ImportExport.h" "libCZI.h" "libCZI_Compositor.h" "libCZI_DimCoordinate.h" "libCZI_exceptions.h"
                "libCZI_Helpers.h" "libCZI_Metadata.h" "libCZI_Metadata2.h" "libCZI_Pixels.h" "libCZI_ReadWrite.h"
-               "libCZI_Site.h" "libCZI_Utilities.h" "libCZI_Write.h" "libCZI_compress.h" "priv_guiddef.h")
+               "libCZI_Site.h" "libCZI_Utilities.h" "libCZI_Write.h" "libCZI_compress.h")
 
 #
 #define the shared libCZI - library

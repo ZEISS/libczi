@@ -141,7 +141,7 @@ namespace libCZI
             this->lutStore.clear();
         }
 
-        void AddChannelSetting(int chIdx, const libCZI::IChannelDisplaySetting* chDsplSetting, std::function<libCZI::PixelType(int chIndex)> getPixelTypeForChannelIndex)
+        void AddChannelSetting(int chIdx, const libCZI::IChannelDisplaySetting* chDsplSetting, const std::function<libCZI::PixelType(int chIndex)>& getPixelTypeForChannelIndex)
         {
             // Note that we only add this channel IF IT IS ENABLED. If not, we DO NOT and MUST NOT call the 
             // "getPixelTypeForChannelIndex"-callback!
@@ -190,7 +190,7 @@ namespace libCZI
             this->activeChannels.push_back(chIdx);
         }
 
-        static int GetSizeForLUT(int chIdx, std::function<libCZI::PixelType(int chIndex)> getPixelTypeForChannelIndex)
+        static int GetSizeForLUT(int chIdx, const std::function<libCZI::PixelType(int chIndex)>& getPixelTypeForChannelIndex)
         {
             libCZI::PixelType  pxlType = getPixelTypeForChannelIndex(chIdx);
             switch (pxlType)

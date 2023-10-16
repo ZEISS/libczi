@@ -8,6 +8,7 @@
 #include <vector>
 #include "inc_libCZI.h"
 
+
 std::string convertToUtf8(const std::wstring& str);
 std::wstring convertUtf8ToUCS2(const std::string& str);
 
@@ -29,9 +30,9 @@ std::vector<std::string> wrap(const char* text, size_t line_length/* = 72*/);
 const wchar_t* skipWhiteSpaceAndOneOfThese(const wchar_t* s, const wchar_t* charToSkipOnce);
 const char* skipWhiteSpaceAndOneOfThese(const char* s, const char* charsToSkipOnce);
 
-std::ostream& operator<<(std::ostream& os, const GUID& guid);
+std::ostream& operator<<(std::ostream& os, const libCZI::GUID& guid);
 
-bool TryParseGuid(const std::wstring& str, GUID* g);
+bool TryParseGuid(const std::wstring& str, libCZI::GUID* g);
 
 /// This is an utility in order to implement a "scope guard" - an object that when gets out-of-scope is executing
 /// a functor which may implement any kind of clean-up - akin to a finally-clause in C#. C.f. https://www.heise.de/blog/C-Core-Guidelines-finally-in-C-4133759.html
