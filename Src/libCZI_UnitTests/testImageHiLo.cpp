@@ -2,7 +2,6 @@
 //
 // SPDX-License-Identifier: LGPL-3.0-or-later
 
-#include "pch.h"
 #include "testImage.h"
 
 /*static*/ const void* CTestImage::GetZStd1CompressedImageWithHiLoPacking(size_t* size, int* width, int* height)

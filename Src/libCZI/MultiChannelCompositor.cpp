@@ -2,8 +2,6 @@
 //
 // SPDX-License-Identifier: LGPL-3.0-or-later
 
-#include "stdafx.h"
-
 #include "MultiChannelCompositor.h"
 #include "libCZI_Utilities.h"
 #include <cmath>

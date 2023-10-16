@@ -2,7 +2,6 @@
 //
 // SPDX-License-Identifier: LGPL-3.0-or-later
 
-#include "stdafx.h"
 #include <limits>
 #include "CziMetadataDocumentInfo.h"
 #include "CziMetadataDocumentInfo2.h"
