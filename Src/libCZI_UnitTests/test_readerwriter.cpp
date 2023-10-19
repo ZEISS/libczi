@@ -1352,3 +1352,38 @@ INSTANTIATE_TEST_SUITE_P(
         SubBlockPyramidType::None,
         SubBlockPyramidType::SingleSubBlock,
         SubBlockPyramidType::MultiSubBlock));
+
+TEST(CziReaderWriter, TryAddingDuplicateAttachmentToCziReaderWriterAndExpectError)
+{
+    const auto in_out_stream = make_shared<CMemInputOutputStream>(0);
+    const auto reader_writer = CreateCZIReaderWriter();
+    reader_writer->Create(in_out_stream);
+
+    constexpr uint8_t data[] = { 1,2,3 };
+
+    AddAttachmentInfo add_attachment_info;
+    add_attachment_info.contentGuid = GUID{ 1, 2, 3, {4, 5, 6, 7, 8, 9, 10, 11} };
+    add_attachment_info.SetContentFileType("ABC");
+    add_attachment_info.SetName("Test");
+    add_attachment_info.ptrData = data;
+    add_attachment_info.dataSize = sizeof(data);
+    reader_writer->SyncAddAttachment(add_attachment_info);
+
+    // now, try to add it a second time
+    EXPECT_THROW(reader_writer->SyncAddAttachment(add_attachment_info), LibCZIException);
+
+    // a duplicate attachment means - same Guid, same name, same content-type,
+    //  so now let's try to add it with a different name (which should work)
+    add_attachment_info.SetName("Test2");
+    reader_writer->SyncAddAttachment(add_attachment_info);
+
+    // now with a different content-type (which should also work)
+    add_attachment_info.SetName("Test");
+    add_attachment_info.SetContentFileType("ABCD");
+    reader_writer->SyncAddAttachment(add_attachment_info);
+
+    // and finally with a different GUID
+    add_attachment_info.SetContentFileType("ABC");
+    add_attachment_info.contentGuid = GUID{ 111, 2, 3, {4, 5, 6, 7, 8, 9, 10, 11} };
+    reader_writer->SyncAddAttachment(add_attachment_info);
+}

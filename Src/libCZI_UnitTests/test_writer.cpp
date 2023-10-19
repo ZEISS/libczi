@@ -2122,17 +2122,16 @@ TEST(CziWriter, WriteReadCompressedZStd1ImageBrg48LowPacking)
     _testWriteReadCompressedImageZStd1LowPacking(61, 61, pixelType, 2, true);
 }
 
-TEST(CziWriter, TryAddingDuplicateAttachmentAndExpectError)
+TEST(CziWriter, TryAddingDuplicateAttachmentToCziWriterAndExpectError)
 {
-    auto writer = CreateCZIWriter();
-    auto outStream = make_shared<CMemOutputStream>(0);
+    const auto writer = CreateCZIWriter();
+    const auto output_stream = make_shared<CMemOutputStream>(0);
 
-    // GUID_NULL here means that a new Guid is created
     const auto czi_writer_info = std::make_shared<libCZI::CCziWriterInfo>(GUID{ 0, 0, 0, {0, 0, 0, 0, 0, 0, 0, 0} });
 
-    writer->Create(outStream, czi_writer_info);
+    writer->Create(output_stream, czi_writer_info);
 
-    uint8_t data[] = { 1,2,3 };
+    constexpr uint8_t data[] = { 1,2,3 };
 
     AddAttachmentInfo add_attachment_info;
     add_attachment_info.contentGuid = GUID{ 1, 2, 3, {4, 5, 6, 7, 8, 9, 10, 11} };
@@ -2141,4 +2140,7 @@ TEST(CziWriter, TryAddingDuplicateAttachmentAndExpectError)
     add_attachment_info.ptrData = data;
     add_attachment_info.dataSize = sizeof(data);
     writer->SyncAddAttachment(add_attachment_info);
+
+    // now, try to add it a second time
+    EXPECT_THROW(writer->SyncAddAttachment(add_attachment_info), LibCZIException);
 }
