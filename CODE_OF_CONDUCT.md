@@ -1,6 +1,6 @@
 # Contributor Covenant Code of Conduct
 
-This Code of Conduct complements the [ZEISS Social Media Netiquette](https://www.zeiss.com/corporate/int/legal-information/netiquette.html).
+This Code of Conduct complements the [ZEISS Social Media Netiquette](https://www.zeiss.com/corporate/en/legal-information/netiquette.html).
 
 ## Our Pledge
 
