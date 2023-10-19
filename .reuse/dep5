@@ -11,7 +11,7 @@ Files: cla_*.txt CMakeLists.txt CMakeSettings.json CODE_OF_CONDUCT.md CONTRIBUTI
 Copyright: 2017-2022 Carl Zeiss Microscopy GmbH
 License: LGPL-3.0-or-later
 
-Files: Src/JxrDecode/Jxr/*
+Files: Src/JxrDecode/jxrlib/*
 Copyright: Microsoft Corp.
 License: BSD-3-Clause
 

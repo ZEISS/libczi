@@ -1818,9 +1818,9 @@ std::shared_ptr<libCZI::IIndexSet> CCmdLineOptions::GetSceneIndexSet() const
     return CCmdLineOptions::TryParseInt32(s, font_height);
 }
 
-/*static*/bool CCmdLineOptions::TryParseNewCziFileguid(const std::string& s, GUID* guid)
+/*static*/bool CCmdLineOptions::TryParseNewCziFileguid(const std::string& s, libCZI::GUID* guid)
 {
-    GUID g;
+    libCZI::GUID g;
     bool b = TryParseGuid(convertUtf8ToUCS2(s), &g);
     if (!b)
     {

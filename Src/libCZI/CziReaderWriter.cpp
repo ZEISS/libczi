@@ -2,7 +2,6 @@
 //
 // SPDX-License-Identifier: LGPL-3.0-or-later
 
-#include "stdafx.h"
 #include "CziReaderWriter.h"
 #include "CziMetadataSegment.h"
 #include "libCZI_Utilities.h"
@@ -436,7 +435,7 @@ void CCziReaderWriter::ReadCziStructure()
         fhs.data.Major = 1;
         fhs.data.Minor = 0;
 
-        GUID fileGuid = this->info->GetFileGuid();
+        libCZI::GUID fileGuid = this->info->GetFileGuid();
         if (Utilities::IsGuidNull(fileGuid))
         {
             fileGuid = Utilities::GenerateNewGuid();
@@ -457,9 +456,9 @@ void CCziReaderWriter::ReadCziStructure()
     this->DetermineNextSubBlockOffset();
 }
 
-GUID CCziReaderWriter::UpdateFileHeaderGuid()
+libCZI::GUID CCziReaderWriter::UpdateFileHeaderGuid()
 {
-    GUID fileGuid = this->info->GetFileGuid();
+    libCZI::GUID fileGuid = this->info->GetFileGuid();
     if (Utilities::IsGuidNull(fileGuid))
     {
         fileGuid = Utilities::GenerateNewGuid();

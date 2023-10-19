@@ -4,7 +4,7 @@
 
 #pragma once
 
-// TODO: we need a platform-independent replacement for GUID
+#include "libCZI_Utilities.h"
 
 #if !defined(__GNUC__)
 #include <pshpack2.h>
@@ -50,7 +50,7 @@ typedef struct PACKED AttachmentInfo
     std::int64_t AllocatedSize;
     std::int64_t DataSize;
     std::int32_t FilePart;
-    GUID ContentGuid;
+    libCZI::GUID ContentGuid;
     char ContentFileType[8];
     char Name[80];
     //HANDLE FileHandle;
@@ -120,8 +120,8 @@ struct PACKED FileHeaderSegmentData
     std::int32_t Minor;
     std::int32_t _Reserved1;
     std::int32_t _Reserved2;
-    GUID PrimaryFileGuid;
-    GUID FileGuid;
+    libCZI::GUID PrimaryFileGuid;
+    libCZI::GUID FileGuid;
     std::int32_t FilePart;
     std::int64_t SubBlockDirectoryPosition;
     std::int64_t MetadataPosition;
@@ -211,7 +211,7 @@ struct PACKED AttachmentEntryA1
     unsigned char _spare[10];
     std::int64_t FilePosition;
     std::int32_t FilePart;
-    GUID ContentGuid;
+    libCZI::GUID ContentGuid;
     unsigned char ContentFileType[8];
     unsigned char Name[80];
 };

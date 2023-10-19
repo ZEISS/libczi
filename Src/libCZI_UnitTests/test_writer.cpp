@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: LGPL-3.0-or-later
 
-#include "pch.h"
+#include "include_gtest.h"
 #include "inc_libCZI.h"
 #include "MemOutputStream.h"
 #include "SegmentWalker.h"
@@ -1269,7 +1269,7 @@ TEST(CziWriter, Writer13)
 
     size_t sizeCompressedBitmap;
     int widthCompressedBitmap, heightCompressedBitmap;
-    auto compressedBitmap = CTestImage::GetJpgXrCompressedImage(&sizeCompressedBitmap, &widthCompressedBitmap, &heightCompressedBitmap);
+    auto compressedBitmap = CTestImage::GetJpgXrCompressedImage_Bgr24(&sizeCompressedBitmap, &widthCompressedBitmap, &heightCompressedBitmap);
 
     AddSubBlockInfoMemPtr addSbBlkInfo;
     addSbBlkInfo.Clear();

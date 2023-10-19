@@ -6,6 +6,8 @@
 
 #include "inc_libCZI.h"
 #include "MemInputOutputStream.h"
+#include <tuple>
+#include <memory>
 
 /**
  * \brief	Creates a testing bitmap with the given width, height and the pixel type.
@@ -51,6 +53,24 @@ std::shared_ptr<libCZI::IBitmapData> GetZeissLogoBitmap(void);
  * \return	Returns true if bitmaps have same data.
  */
 bool AreBitmapDataEqual(const std::shared_ptr<libCZI::IBitmapData>& bmp1, const std::shared_ptr<libCZI::IBitmapData>& bmp2);
+
+/// Compare two bitmaps which must both be of pixel-type  gray-float-32. The maximum allowed difference (per pixel) is given as a parameter.
+///
+/// \param  bmp1            The first bitmap.
+/// \param  bmp2            The second bitmap.
+/// \param  max_difference  The maximum difference.
+///
+/// \returns    True if both bitmaps are equal (i.e. the difference for all pixels is less than the specified value); false otherwise.
+bool CompareGrayFloat32Bitmaps(const std::shared_ptr<libCZI::IBitmapData>& bmp1, const std::shared_ptr<libCZI::IBitmapData>& bmp2, float max_difference);
+
+/// Calculates the maximum difference and the mean difference of the pixel values of the two bitmaps.
+/// The two bitmaps must have the same size and pixel type, otherwise an exception is thrown.
+///
+/// \param  bmp1    The first bitmap.
+/// \param  bmp2    The second bitmap.
+///
+/// \returns    The maximum difference and the mean difference of the pixel values of the two bitmaps.
+std::tuple<float,float> CalculateMaxDifferenceMeanDifference(const std::shared_ptr<libCZI::IBitmapData>& bmp1, const std::shared_ptr<libCZI::IBitmapData>& bmp2);
 
 void WriteOutTestCzi(const char* testcaseName, const char* testname, const void* ptr, size_t size);
 

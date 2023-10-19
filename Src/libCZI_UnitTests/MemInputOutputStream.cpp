@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: LGPL-3.0-or-later
 
-#include "pch.h"
+#include "include_gtest.h"
 #include "MemInputOutputStream.h"
 
 CMemInputOutputStream::CMemInputOutputStream(size_t initialSize) :ptr(nullptr), allocatedSize(initialSize), usedSize(0)

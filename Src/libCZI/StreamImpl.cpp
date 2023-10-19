@@ -2,7 +2,6 @@
 //
 // SPDX-License-Identifier: LGPL-3.0-or-later
 
-#include "stdafx.h"
 #include "StreamImpl.h"
 #include <cerrno>
 #include <sstream>
@@ -39,7 +38,7 @@ CSimpleStreamImpl::CSimpleStreamImpl(const wchar_t* filename)
         std::stringstream ss;
 #if (_WIN32)
         char errMsg[100];
-        strerror_s(errMsg, err);
+        strerror_s(errMsg, sizeof(errMsg), err);
         ss << "Error opening the file \"" << Utilities::convertWchar_tToUtf8(filename) << "\" -> errno=" << err << " (" << errMsg << ")";
 #else
         ss << "Error opening the file \"" << filename_utf8 << "\" -> errno=" << err << " (" << strerror(err) << ")";
@@ -381,7 +380,7 @@ CSimpleOutputStreamStreams::CSimpleOutputStreamStreams(const wchar_t* filename, 
         std::stringstream ss;
 #if (_WIN32)
         char errMsg[100];
-        strerror_s(errMsg, err);
+        strerror_s(errMsg, sizeof(char), err);
         ss << "Error opening the file \"" << Utilities::convertWchar_tToUtf8(filename) << "\" -> errno=" << err << " (" << errMsg << ")";
 #else
         ss << "Error opening the file \"" << filename_utf8 << "\" -> errno=" << err << " (" << strerror(err) << ")";
@@ -573,7 +572,7 @@ CSimpleInputOutputStreamImpl::CSimpleInputOutputStreamImpl(const wchar_t* filena
         std::stringstream ss;
 #if (_WIN32)
         char errMsg[100];
-        strerror_s(errMsg, err);
+        strerror_s(errMsg, sizeof(errMsg), err);
         ss << "Error opening the file \"" << Utilities::convertWchar_tToUtf8(filename) << "\" -> errno=" << err << " (" << errMsg << ")";
 #else
         ss << "Error opening the file \"" << filename_utf8 << "\" -> errno=" << err << " (" << strerror(err) << ")";

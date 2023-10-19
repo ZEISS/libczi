@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: LGPL-3.0-or-later
 
-#include "pch.h"
+#include "include_gtest.h"
 #include "inc_libCZI.h"
 
 using namespace libCZI;
@@ -521,15 +521,15 @@ TEST(MetadataBuilder, MetadataUtils11)
     auto mdBldr = CreateMetadataBuilder();
     map<string, CustomValueVariant> ValidCA = { {"Attr1", CustomValueVariant(1234)}, {"Attr2", CustomValueVariant(string("SomeStrings"))}, {"Attr3", CustomValueVariant(true)} , {"Attr4", CustomValueVariant(12.5f)}, {"Attr5", CustomValueVariant(22.5)} };
 
-    for (auto ValidIt = ValidCA.begin(); ValidIt != ValidCA.end(); ValidIt++)
+    for (auto valid_it = ValidCA.begin(); valid_it != ValidCA.end(); ++valid_it)
     {
-        auto key = ValidIt->first;
-        auto value = ValidIt->second;
+        auto key = valid_it->first;
+        auto value = valid_it->second;
 
         MetadataUtils::SetOrAddCustomKeyValuePair(mdBldr.get(), key, value);
     }
 
-    auto xml = mdBldr->GetXml(true);
+    const auto xml = mdBldr->GetXml(true);
 
     static const char* expectedResult =
         "<ImageDocument>\n"

@@ -2,7 +2,6 @@
 //
 // SPDX-License-Identifier: LGPL-3.0-or-later
 
-#include "stdafx.h"
 #include "CziMetadataBuilder.h"
 #include "utilities.h"
 #include <regex>
@@ -983,7 +982,7 @@ static void WriteChannelDisplaySettings(const IChannelDisplaySetting* channel_di
     node->GetOrCreateChildNode("Low")->SetValueFlt(black_point);
     node->GetOrCreateChildNode("High")->SetValueFlt(white_point);
 
-    auto gradation_curve_mode = channel_display_setting->GetGradationCurveMode();
+    const auto gradation_curve_mode = channel_display_setting->GetGradationCurveMode();
     if (gradation_curve_mode == IDisplaySettings::GradationCurveMode::Gamma)
     {
         float gamma;

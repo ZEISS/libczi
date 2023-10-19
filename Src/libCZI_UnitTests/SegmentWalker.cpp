@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: LGPL-3.0-or-later
 
-#include "pch.h"
+#include "include_gtest.h"
 #include "SegmentWalker.h"
 
 #if !defined(__GNUC__)
