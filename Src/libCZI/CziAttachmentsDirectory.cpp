@@ -4,6 +4,7 @@
 
 #include "CziAttachmentsDirectory.h"
 #include <algorithm>
+#include <cstring>
 
 /*static*/bool CCziAttachmentsDirectoryBase::CompareForEquality_Id(const AttachmentEntry& a, const AttachmentEntry& b)
 {
