@@ -532,6 +532,12 @@ bool CWriterCziSubBlockDirectory::SubBlkEntryCompare::operator()(const SubBlkEnt
         }
     }
 
+    // test - if everything is "equal" so far, then let's check the fileposition
+    if (a.FilePosition < b.FilePosition)
+    {
+        return true;
+    }
+
     return false;
 }
 
