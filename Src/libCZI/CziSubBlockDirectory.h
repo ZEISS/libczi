@@ -150,6 +150,7 @@ private:
     /// be parametrized.
     struct SubBlkEntryCompare
     {
+        SubBlkEntryCompare(bool include_file_position) : include_file_position_(include_file_position) {}
         bool include_file_position_{ false };
         bool operator() (const SubBlkEntry& a, const SubBlkEntry& b) const;
     };
