@@ -146,12 +146,15 @@ public:
     const libCZI::PyramidStatistics& GetPyramidStatistics() const;
     const PixelTypeForChannelIndexStatistic& GetPixelTypeForChannel() const;
 private:
+    /// Implementation of a "less-comparison" for SubBlkEntry objects, which can
+    /// be parametrized.
     struct SubBlkEntryCompare
     {
         bool include_file_position_{ false };
         bool operator() (const SubBlkEntry& a, const SubBlkEntry& b) const;
     };
 
+    /// This object is used to implement the "less-comparison" for the set.
     SubBlkEntryCompare subBlkEntryComparison;
 
     std::set<SubBlkEntry, SubBlkEntryCompare> subBlks;

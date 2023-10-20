@@ -472,7 +472,7 @@ bool CWriterCziSubBlockDirectory::SubBlkEntryCompare::operator()(const SubBlkEnt
     // 5th check: (only if the the property "include_file_position_" of the comparison-object is true)
     //            the file-position is compared   
 
-    // subblocks from a lower layer go before subblocks from an upper layer
+    // 1st check: subblocks from a lower layer go before subblocks from an upper layer
     float zoomA = Utils::CalcZoom(IntSize{ (std::uint32_t)a.width,(std::uint32_t)a.height }, IntSize{ (std::uint32_t)a.storedWidth,(std::uint32_t)a.storedHeight });
     float zoomB = Utils::CalcZoom(IntSize{ (std::uint32_t)b.width,(std::uint32_t)b.height }, IntSize{ (std::uint32_t)b.storedWidth,(std::uint32_t)b.storedHeight });
     if (fabs(zoomA - zoomB) > 0.0001)
@@ -485,6 +485,7 @@ bool CWriterCziSubBlockDirectory::SubBlkEntryCompare::operator()(const SubBlkEnt
         return false;
     }
 
+    // 2nd check: plane coordinates
     int r = Utils::Compare(&a.coordinate, &b.coordinate);
     if (r < 0)
     {
@@ -495,6 +496,7 @@ bool CWriterCziSubBlockDirectory::SubBlkEntryCompare::operator()(const SubBlkEnt
         return false;
     }
 
+    // 3rd check: m-index
     if (a.IsMIndexValid() == true && b.IsMIndexValid() == false)
     {
         return true;
@@ -517,6 +519,7 @@ bool CWriterCziSubBlockDirectory::SubBlkEntryCompare::operator()(const SubBlkEnt
         }
     }
 
+    // 4th check: the x-y-position
     if (a.IsMIndexValid() == false && b.IsMIndexValid() == false)
     {
         int v = a.x - b.x;
@@ -540,8 +543,9 @@ bool CWriterCziSubBlockDirectory::SubBlkEntryCompare::operator()(const SubBlkEnt
         }
     }
 
-    // If we are instructed to include the file-position, then a lower file-position
-    //  shoud go first
+    // 5th check: if we are instructed to include the file-position, then a lower file-position
+    //  shoud go first (otherwise - they are considered "equal" which means that we do not allow
+    //  to add a second one as it would be a duplicate).
     if (this->include_file_position_ && a.FilePosition < b.FilePosition)
     {
         return true;
