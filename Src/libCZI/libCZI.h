@@ -100,8 +100,12 @@ namespace libCZI
     /// \return The newly created CZI-reader.
     LIBCZI_API std::shared_ptr<ICZIReader> CreateCZIReader();
 
+    /// Options controlling the operation of a CZI-writer object. Those options are set at construction
+    /// time and cannot be mutated afterwards.
     struct CZIWriterOptions
     {
+        /// True if the writer should allow that duplicate subblocks are added. In general, it is
+        /// not recommended to bypass the check for duplicate subblocks.
         bool allow_duplicate_subblocks{ false };
     };
 
