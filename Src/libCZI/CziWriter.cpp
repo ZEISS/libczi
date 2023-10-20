@@ -883,7 +883,8 @@ CCziWriter::CziWriterInfoWrapper::CziWriterInfoWrapper(std::shared_ptr<libCZI::I
 CCziWriter::CCziWriter() : CCziWriter(CZIWriterOptions{})
 {}
 
-CCziWriter::CCziWriter(const libCZI::CZIWriterOptions& options) : sbBlkDirectory{options.allow_duplicate_subblocks}, nextSegmentPos(0)
+CCziWriter::CCziWriter(const libCZI::CZIWriterOptions& options) 
+    : cziWriterOptions(options), sbBlkDirectory{options.allow_duplicate_subblocks}, nextSegmentPos(0)
 {
 }
 
@@ -1006,7 +1007,7 @@ CCziWriter::~CCziWriter()
     this->ThrowIfNotOperational();
     this->Finish();
     this->nextSegmentPos = 0;
-    this->sbBlkDirectory = CWriterCziSubBlockDirectory{true};   // TODO
+    this->sbBlkDirectory = CWriterCziSubBlockDirectory{ this->cziWriterOptions.allow_duplicate_subblocks };
     this->attachmentDirectory = CWriterCziAttachmentsDirectory();
     this->metadataSegment.Invalidate();
     this->subBlockDirectorySegment.Invalidate();

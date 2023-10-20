@@ -223,6 +223,7 @@ private:
 class CCziWriter : public libCZI::ICziWriter
 {
 private:
+    libCZI::CZIWriterOptions cziWriterOptions;
     CWriterCziSubBlockDirectory sbBlkDirectory;
     CWriterCziAttachmentsDirectory attachmentDirectory;
     std::shared_ptr<libCZI::IOutputStream> stream;
