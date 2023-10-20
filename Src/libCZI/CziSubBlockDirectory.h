@@ -136,6 +136,8 @@ private:
     std::map<int, int> mapChannelIdxPixelType;
     PixelTypeForChannelIndexStatisticCreate pixelTypeForChannel;
 public:
+    CWriterCziSubBlockDirectory() = delete;
+    CWriterCziSubBlockDirectory(bool allow_duplicate_subblocks);
     bool TryAddSubBlock(const SubBlkEntry& entry);
 
     bool EnumEntries(const std::function<bool(size_t index, const SubBlkEntry&)>& func) const;
@@ -146,8 +148,11 @@ public:
 private:
     struct SubBlkEntryCompare
     {
+        bool include_file_position_;
         bool operator() (const SubBlkEntry& a, const SubBlkEntry& b) const;
     };
+
+    SubBlkEntryCompare subBlkEntryComparison_;
 
     std::set<SubBlkEntry, SubBlkEntryCompare> subBlks;
 };

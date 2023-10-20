@@ -247,6 +247,7 @@ private:
     };
 public:
     CCziWriter();
+    CCziWriter(const libCZI::CZIWriterOptions& options);
 
     void Create(std::shared_ptr<libCZI::IOutputStream> stream, std::shared_ptr<libCZI::ICziWriterInfo> info) override;
     ~CCziWriter() override;

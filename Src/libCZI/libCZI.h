@@ -100,9 +100,14 @@ namespace libCZI
     /// \return The newly created CZI-reader.
     LIBCZI_API std::shared_ptr<ICZIReader> CreateCZIReader();
 
+    struct CZIWriterOptions
+    {
+        bool allow_duplicate_subblocks{ false };
+    };
+
     /// Creates a new instance of the CZI-writer class.
     /// \return The newly created CZI-writer.
-    LIBCZI_API std::shared_ptr<ICziWriter> CreateCZIWriter();
+    LIBCZI_API std::shared_ptr<ICziWriter> CreateCZIWriter(const CZIWriterOptions* options = nullptr);
 
     /// Creates a new instance of the CZI-reader-writer class.
     /// \return The newly created CZI-reader-writer.

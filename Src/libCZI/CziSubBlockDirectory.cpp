@@ -441,6 +441,12 @@ bool PixelTypeForChannelIndexStatistic::TryGetPixelTypeForNoChannelIndex(int* pi
 
 //----------------------------------------------------------------------------------------------
 
+CWriterCziSubBlockDirectory::CWriterCziSubBlockDirectory(bool allow_duplicate_subblocks)
+    : subBlkEntryComparison_{ allow_duplicate_subblocks },
+    subBlks(subBlkEntryComparison_)
+{
+}
+
 bool CWriterCziSubBlockDirectory::TryAddSubBlock(const SubBlkEntry& entry)
 {
     auto insert = this->subBlks.insert(entry);
@@ -533,7 +539,7 @@ bool CWriterCziSubBlockDirectory::SubBlkEntryCompare::operator()(const SubBlkEnt
     }
 
     // test - if everything is "equal" so far, then let's check the fileposition
-    if (a.FilePosition < b.FilePosition)
+    if (this->include_file_position_ && a.FilePosition < b.FilePosition)
     {
         return true;
     }
