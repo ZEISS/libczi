@@ -1160,7 +1160,7 @@ void CCziWriter::WriteAttachmentDirectory()
     }
 }
 
-std::tuple<std::uint64_t, std::uint64_t>  CCziWriter::WriteCurrentAttachmentsDirectory()
+std::tuple<std::uint64_t, std::uint64_t> CCziWriter::WriteCurrentAttachmentsDirectory()
 {
     CWriterUtils::AttachmentDirWriteInfo info;
     if (this->attachmentDirectorySegment.IsValid())

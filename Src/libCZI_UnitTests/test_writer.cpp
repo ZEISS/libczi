@@ -2121,3 +2121,26 @@ TEST(CziWriter, WriteReadCompressedZStd1ImageBrg48LowPacking)
     constexpr PixelType pixelType = PixelType::Bgr48;
     _testWriteReadCompressedImageZStd1LowPacking(61, 61, pixelType, 2, true);
 }
+
+TEST(CziWriter, TryAddingDuplicateAttachmentToCziWriterAndExpectError)
+{
+    const auto writer = CreateCZIWriter();
+    const auto output_stream = make_shared<CMemOutputStream>(0);
+
+    const auto czi_writer_info = std::make_shared<libCZI::CCziWriterInfo>(GUID{ 0, 0, 0, {0, 0, 0, 0, 0, 0, 0, 0} });
+
+    writer->Create(output_stream, czi_writer_info);
+
+    constexpr uint8_t data[] = { 1,2,3 };
+
+    AddAttachmentInfo add_attachment_info;
+    add_attachment_info.contentGuid = GUID{ 1, 2, 3, {4, 5, 6, 7, 8, 9, 10, 11} };
+    add_attachment_info.SetContentFileType("ABC");
+    add_attachment_info.SetName("Test");
+    add_attachment_info.ptrData = data;
+    add_attachment_info.dataSize = sizeof(data);
+    writer->SyncAddAttachment(add_attachment_info);
+
+    // now, try to add it a second time
+    EXPECT_THROW(writer->SyncAddAttachment(add_attachment_info), LibCZIException);
+}
