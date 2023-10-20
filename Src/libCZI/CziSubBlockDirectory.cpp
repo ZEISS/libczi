@@ -54,45 +54,45 @@ void CSbBlkStatisticsUpdater::UpdateStatistics(const CCziSubBlockDirectoryBase::
         [&](libCZI::DimensionIndex dim, int value)->bool
         {
             int start, size;
-    if (this->statistics.dimBounds.TryGetInterval(dim, &start, &size) == false)
-    {
-        this->statistics.dimBounds.Set(dim, value, 1);
-    }
-    else
-    {
-        bool changed = false;
-        if (value < start)
-        {
-            size += (start - value);
-            start = value;
-            changed = true;
-        }
-        else if (value >= start + size)
-        {
-            size = 1 + value - start;
-            changed = true;
-        }
+            if (this->statistics.dimBounds.TryGetInterval(dim, &start, &size) == false)
+            {
+                this->statistics.dimBounds.Set(dim, value, 1);
+            }
+            else
+            {
+                bool changed = false;
+                if (value < start)
+                {
+                    size += (start - value);
+                    start = value;
+                    changed = true;
+                }
+                else if (value >= start + size)
+                {
+                    size = 1 + value - start;
+                    changed = true;
+                }
 
-        if (changed)
-        {
-            this->statistics.dimBounds.Set(dim, start, size);
-        }
-    }
+                if (changed)
+                {
+                    this->statistics.dimBounds.Set(dim, start, size);
+                }
+            }
 
-    if (entry.IsMIndexValid())
-    {
-        if (entry.mIndex < this->statistics.minMindex)
-        {
-            this->statistics.minMindex = entry.mIndex;
-        }
+            if (entry.IsMIndexValid())
+            {
+                if (entry.mIndex < this->statistics.minMindex)
+                {
+                    this->statistics.minMindex = entry.mIndex;
+                }
 
-        if (entry.mIndex > this->statistics.maxMindex)
-        {
-            this->statistics.maxMindex = entry.mIndex;
-        }
-    }
+                if (entry.mIndex > this->statistics.maxMindex)
+                {
+                    this->statistics.maxMindex = entry.mIndex;
+                }
+            }
 
-    return true;
+            return true;
         });
 
     // now deal with "enclosing Rect" for the scenes...
@@ -331,35 +331,35 @@ void CSbBlkStatisticsUpdater::SortPyramidStatistics()
                     return true;
                 }
 
-        // ...and "not identified" always last
-        if (a.layerInfo.IsNotIdentifiedAsPyramidLayer())
-        {
-            return false;
-        }
+                // ...and "not identified" always last
+                if (a.layerInfo.IsNotIdentifiedAsPyramidLayer())
+                {
+                    return false;
+                }
 
-        if (b.layerInfo.IsLayer0())
-        {
-            return false;
-        }
+                if (b.layerInfo.IsLayer0())
+                {
+                    return false;
+                }
 
-        if (b.layerInfo.IsNotIdentifiedAsPyramidLayer())
-        {
-            return true;
-        }
+                if (b.layerInfo.IsNotIdentifiedAsPyramidLayer())
+                {
+                    return true;
+                }
 
-        int minificationFactorA = a.layerInfo.minificationFactor;
-        for (int i = 0; i < a.layerInfo.pyramidLayerNo - 1; ++i)
-        {
-            minificationFactorA *= a.layerInfo.minificationFactor;
-        }
+                int minificationFactorA = a.layerInfo.minificationFactor;
+                for (int i = 0; i < a.layerInfo.pyramidLayerNo - 1; ++i)
+                {
+                    minificationFactorA *= a.layerInfo.minificationFactor;
+                }
 
-        int minificationFactorB = b.layerInfo.minificationFactor;
-        for (int i = 0; i < b.layerInfo.pyramidLayerNo - 1; ++i)
-        {
-            minificationFactorB *= b.layerInfo.minificationFactor;
-        }
+                int minificationFactorB = b.layerInfo.minificationFactor;
+                for (int i = 0; i < b.layerInfo.pyramidLayerNo - 1; ++i)
+                {
+                    minificationFactorB *= b.layerInfo.minificationFactor;
+                }
 
-        return minificationFactorA < minificationFactorB;
+                return minificationFactorA < minificationFactorB;
             });
     }
 }
@@ -442,8 +442,8 @@ bool PixelTypeForChannelIndexStatistic::TryGetPixelTypeForNoChannelIndex(int* pi
 //----------------------------------------------------------------------------------------------
 
 CWriterCziSubBlockDirectory::CWriterCziSubBlockDirectory(bool allow_duplicate_subblocks)
-    : subBlkEntryComparison_{ allow_duplicate_subblocks },
-    subBlks(subBlkEntryComparison_)
+    : subBlkEntryComparison{ allow_duplicate_subblocks },
+    subBlks(subBlkEntryComparison)
 {
 }
 
@@ -469,6 +469,8 @@ bool CWriterCziSubBlockDirectory::SubBlkEntryCompare::operator()(const SubBlkEnt
     // 2nd check:  coordinate
     // 3rd check:  m-Index
     // 4th check: (only if both subblocks have invalid M-indices) is coordinate
+    // 5th check: (only if the the property "include_file_position_" of the comparison-object is true)
+    //            the file-position is compared   
 
     // subblocks from a lower layer go before subblocks from an upper layer
     float zoomA = Utils::CalcZoom(IntSize{ (std::uint32_t)a.width,(std::uint32_t)a.height }, IntSize{ (std::uint32_t)a.storedWidth,(std::uint32_t)a.storedHeight });
@@ -538,7 +540,8 @@ bool CWriterCziSubBlockDirectory::SubBlkEntryCompare::operator()(const SubBlkEnt
         }
     }
 
-    // test - if everything is "equal" so far, then let's check the fileposition
+    // If we are instructed to include the file-position, then a lower file-position
+    //  shoud go first
     if (this->include_file_position_ && a.FilePosition < b.FilePosition)
     {
         return true;

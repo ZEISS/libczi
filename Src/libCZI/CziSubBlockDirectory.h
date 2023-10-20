@@ -148,11 +148,11 @@ public:
 private:
     struct SubBlkEntryCompare
     {
-        bool include_file_position_;
+        bool include_file_position_{ false };
         bool operator() (const SubBlkEntry& a, const SubBlkEntry& b) const;
     };
 
-    SubBlkEntryCompare subBlkEntryComparison_;
+    SubBlkEntryCompare subBlkEntryComparison;
 
     std::set<SubBlkEntry, SubBlkEntryCompare> subBlks;
 };
