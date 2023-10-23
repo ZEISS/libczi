@@ -2147,6 +2147,7 @@ TEST(CziWriter, TryAddingDuplicateAttachmentToCziWriterAndExpectError)
 
 TEST(CziWriter, TryAddingDuplicateSubBlocksToCziWriterAndExpectError)
 {
+    // arrange
     const auto writer = CreateCZIWriter();
     const auto output_stream = make_shared<CMemOutputStream>(0);
 
@@ -2154,9 +2155,9 @@ TEST(CziWriter, TryAddingDuplicateSubBlocksToCziWriterAndExpectError)
 
     writer->Create(output_stream, czi_writer_info);
 
-    // now add two subblocks (does not really matter, though)
     auto bitmap = CreateTestBitmap(PixelType::Gray8, 64, 64);
 
+    // now we try to add the same subblock twice
     ScopedBitmapLockerSP lockBm{ bitmap };
     AddSubBlockInfoStridedBitmap addSbBlkInfo;
     addSbBlkInfo.Clear();
@@ -2189,7 +2190,6 @@ TEST(CziWriter, TryAddingDuplicateSubBlocksToCziWriterAndWhenCheckIsDisable)
 
     writer->Create(output_stream, czi_writer_info);
 
-    // now add two subblocks (does not really matter, though)
     auto bitmap = CreateTestBitmap(PixelType::Gray8, 64, 64);
 
     ScopedBitmapLockerSP lockBm{ bitmap };
