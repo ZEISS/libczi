@@ -15,6 +15,8 @@
 #include <map>
 #include <fstream>
 
+#include <streamsFactory.h>
+
 using namespace libCZI;
 using namespace std;
 using namespace rapidjson;
@@ -29,11 +31,23 @@ protected:
 
     static std::shared_ptr<ICZIReader> CreateAndOpenCziReader(const wchar_t* fileName)
     {
-        auto stream = libCZI::CreateStreamFromFile(fileName);
+        libCZIStreamsLib::CreateStreamInfo stream_info;
+        stream_info.class_name = "curl_http_inputstream";
+        stream_info.filename = convertToUtf8(fileName);
+        auto stream = libCZIStreamsLib::CreateStream(stream_info);
+        //auto stream = libCZI::CreateStreamFromFile(fileName);
         auto spReader = libCZI::CreateCZIReader();
         spReader->Open(stream);
         return spReader;
     }
+
+    /*static std::shared_ptr<ICZIReader> CreateAndOpenCziReader(const wchar_t* fileName)
+    {
+        auto stream = libCZI::CreateStreamFromFile(fileName);
+        auto spReader = libCZI::CreateCZIReader();
+        spReader->Open(stream);
+        return spReader;
+    }*/
 
     static IntRect GetRoiFromOptions(const CCmdLineOptions& options, const SubBlockStatistics& subBlockStatistics)
     {

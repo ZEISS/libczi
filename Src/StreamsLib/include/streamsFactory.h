@@ -192,11 +192,11 @@ namespace libCZIStreamsLib
 
     struct CreateStreamInfo
     {
-        std::string className;
+        std::string class_name;
         
         std::string filename;
 
-        std::map<int, Property> propertyBag;
+        std::map<int, Property> property_bag;
     };
 
 

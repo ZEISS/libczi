@@ -574,8 +574,8 @@ CCmdLineOptions::ParseResult CCmdLineOptions::Parse(int argc, char** argv)
     // editorconfig-checker-enable
     cli_app.add_option("-s,--source", argument_source_filename,
         "specifies the source CZI-file.")
-        ->option_text("SOURCEFILE")
-        ->check(CLI::ExistingFile);
+        ->option_text("SOURCEFILE")/*
+        ->check(CLI::ExistingFile)*/;
     cli_app.add_option("-o,--output", argument_output_filename,
         "specifies the output-filename. A suffix will be appended to the name given here depending on the type of the file.")
         ->option_text("OUTPUTFILE");

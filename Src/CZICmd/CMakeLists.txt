@@ -80,7 +80,7 @@ add_executable(CZIcmd ${CZICMDSRCFILES})
 set_target_properties(CZIcmd PROPERTIES CXX_STANDARD 11)
 target_compile_definitions(CZIcmd PRIVATE _LIBCZISTATICLIB)
 
-target_link_libraries(CZIcmd PRIVATE libCZIStatic ${ZLIB_LIBRARIES}  ${PNG_LIBRARIES} CLI11::CLI11)
+target_link_libraries(CZIcmd PRIVATE libCZIStatic libCZIStreamsLib ${ZLIB_LIBRARIES}  ${PNG_LIBRARIES} CLI11::CLI11)
 target_include_directories(CZIcmd PRIVATE ${CMAKE_CURRENT_BINARY_DIR} "${RAPIDJSON_INCLUDE_DIRS}")
 
 IF (FREETYPE_FOUND)
