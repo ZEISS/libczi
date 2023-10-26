@@ -1,4 +1,5 @@
 #include "curlhttpinputstream.h"
+#if LIBCZI_CURL_BASED_STREAM_AVAILABLE
 #include <cstdint>
 #include <string>
 #include <sstream>
@@ -6,10 +7,13 @@
 
 using namespace std;
 
-CurlHttpInputStream::CurlHttpInputStream(const std::string& url, const std::map<int, libCZI::StreamsFactory::Property>& property_bag)
+/*static*/void CurlHttpInputStream::OneTimeGlobalCurlInitialization()
 {
     curl_global_init(CURL_GLOBAL_ALL);
+}
 
+CurlHttpInputStream::CurlHttpInputStream(const std::string& url, const std::map<int, libCZI::StreamsFactory::Property>& property_bag)
+{
     /* init the curl session */
     this->curl_handle = curl_easy_init();
 
@@ -63,3 +67,4 @@ CurlHttpInputStream::~CurlHttpInputStream()
     write_data_context->count_data_received += total_size;
     return total_size;
 }
+#endif

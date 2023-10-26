@@ -29,6 +29,7 @@ protected:
 
     static std::shared_ptr<ICZIReader> CreateAndOpenCziReader(const wchar_t* fileName)
     {
+        libCZI::StreamsFactory::Initialize();
         libCZI::StreamsFactory::CreateStreamInfo stream_info;
         stream_info.class_name = "curl_http_inputstream";
         stream_info.filename = convertToUtf8(fileName);

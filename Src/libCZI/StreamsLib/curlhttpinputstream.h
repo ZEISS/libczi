@@ -1,4 +1,7 @@
 #pragma once
+#include <libCZI_Config.h>
+
+#if LIBCZI_CURL_BASED_STREAM_AVAILABLE
 
 #include "../libCZI.h"
 #include <curl/curl.h>
@@ -13,6 +16,8 @@ public:
     void Read(std::uint64_t offset, void* pv, std::uint64_t size, std::uint64_t* ptrBytesRead) override;
 
     ~CurlHttpInputStream() override;
+
+    static void OneTimeGlobalCurlInitialization();
 private:
     struct WriteDataContext
     {
@@ -24,3 +29,5 @@ private:
 
     static size_t Write_data(void* ptr, size_t size, size_t nmemb, void* stream);
 };
+
+#endif
