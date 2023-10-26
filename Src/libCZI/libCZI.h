@@ -22,6 +22,7 @@
 #include "libCZI_Compositor.h"
 #include "libCZI_Site.h"
 #include "libCZI_compress.h"
+#include "libCZI_StreamsLib.h"
 
 // virtual d'tor -> https://isocpp.org/wiki/faq/virtual-functions#virtual-dtors
 

@@ -9,12 +9,13 @@ else()
 endif()
 
 add_subdirectory(JxrDecode)
-add_subdirectory(libCZI)
 
 if (LIBCZI_BUILD_STREAMSLIB)
   find_package(curl CONFIG REQUIRED)
-  add_subdirectory(StreamsLib)
+  #add_subdirectory(StreamsLib)
 endif(LIBCZI_BUILD_STREAMSLIB)
+
+add_subdirectory(libCZI)
 
 if (LIBCZI_BUILD_CZICMD)
  add_subdirectory(CZICmd)

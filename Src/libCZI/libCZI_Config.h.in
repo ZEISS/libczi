@@ -43,3 +43,6 @@
 
 // whether ARM-Neon-intrinsics can be used
 #define LIBCZI_HAS_NEOININTRINSICS @libCZI_HAS_NEOININTRINSICS@
+
+// whether the curl-based stream implementations are available
+#define LIBCZI_CURL_BASED_STREAM_AVAILABLE  @libCZI_libcurl_available@
