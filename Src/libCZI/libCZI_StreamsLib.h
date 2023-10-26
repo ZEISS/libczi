@@ -191,6 +191,7 @@ namespace libCZI
         class StreamProperties
         {
         public:
+            // TODO(JBL): consider https://curl.se/libcurl/c/CURLOPT_XOAUTH2_BEARER.html
             const int kTest = 0;
         };
 

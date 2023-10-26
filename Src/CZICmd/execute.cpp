@@ -34,7 +34,6 @@ protected:
         stream_info.class_name = "curl_http_inputstream";
         stream_info.filename = convertToUtf8(fileName);
         auto stream = libCZI::StreamsFactory::CreateStream(stream_info);
-        //auto stream = libCZI::CreateStreamFromFile(fileName);
         auto spReader = libCZI::CreateCZIReader();
         spReader->Open(stream);
         return spReader;
