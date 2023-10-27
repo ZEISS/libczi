@@ -1,12 +1,16 @@
 #pragma once
 
 #include "../include/streamsFactory.h"
+#include <mutex>
 #include <curl/curl.h>
 
+/// A simplistic implementation of a stream which uses the curl library to read from an http or https stream.
+/// It uses the libcurl-easy-interface and is operating in a blocking mode and serialized (i.e. only one request at a time).
 class CurlHttpInputStream : public libCZI::IStream
 {
 private:
-    CURL* curl_handle;  
+    CURL* curl_handle_;
+    std::mutex request_mutex_;
 public:
     CurlHttpInputStream(const std::string& url, const std::map<int, libCZIStreamsLib::Property>& property_bag);
 
@@ -14,11 +18,26 @@ public:
 
     ~CurlHttpInputStream() override;
 private:
+    /// This struct is passed to the WriteData function as user-data.
     struct WriteDataContext
     {
-        void* ptr_data;
-        std::uint64_t size;
+        void* data; ///< Pointer to the destination buffer (where the data is to be delivered to).
+        std::uint64_t size; ///< The size of the destination buffer.
     };
 
-    static size_t Write_data(void* ptr, size_t size, size_t nmemb, void* stream);
+    /// This function is the write-callback-function used by curl to write the data into the buffer.
+    /// C.f. https://curl.se/libcurl/c/CURLOPT_WRITEFUNCTION.html for more information.
+    /// Note that this function is usually called multiple times for a single request, where each invocation
+    /// delivers a anohter chunk of data.
+    ///
+    /// \param [in]     ptr         Pointer to the data.
+    /// \param          size        The size of an element (of the data) in bytes. This is documented to be always 1.
+    /// \param          nmemb       The number of 'elements'.
+    /// \param [in]     user_data   The user-data pointer (which was set with the CURLOPT_WRITEDATA option).
+    ///
+    /// \returns    The  number of bytes actually taken care of. If that amount differs from the amount passed to your 
+    ///             callback function, it signals an error condition to the library. This causes the transfer to get 
+    ///             aborted and the libcurl function used returns CURLE_WRITE_ERROR. One  can also abort the transfer 
+    ///             by returning CURL_WRITEFUNC_ERROR (added in 7.87.0), which makes CURLE_WRITE_ERROR get returned.
+    static size_t WriteData(void* ptr, size_t size, size_t nmemb, void* user_data);
 };

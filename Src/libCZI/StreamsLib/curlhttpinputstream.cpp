@@ -27,25 +27,30 @@ CurlHttpInputStream::CurlHttpInputStream(const std::string& url, const std::map<
 
     curl_easy_setopt(curl_handle, CURLOPT_TCP_KEEPALIVE, 1L);
 
-    curl_easy_setopt(curl_handle, CURLOPT_WRITEFUNCTION, Write_data);
+    curl_easy_setopt(curl_handle, CURLOPT_WRITEFUNCTION, CurlHttpInputStream::WriteData);
 }
 
 /*virtual*/void CurlHttpInputStream::Read(std::uint64_t offset, void* pv, std::uint64_t size, std::uint64_t* ptrBytesRead)
 {
     stringstream ss;
     ss << offset << "-" << offset + size - 1;
-    curl_easy_setopt(curl_handle, CURLOPT_RANGE, ss.str().c_str());
 
-    WriteDataContext write_data_context;
-    write_data_context.ptr_data = pv;
-    write_data_context.size = size;
-    curl_easy_setopt(curl_handle, CURLOPT_WRITEDATA, &write_data_context);
-
-    curl_easy_perform(this->curl_handle);
-
-    if (ptrBytesRead != nullptr)
     {
-        *ptrBytesRead = write_data_context.count_data_received;
+        std::lock_guard<std::mutex> lck(this->request_mutex_);
+
+        curl_easy_setopt(curl_handle, CURLOPT_RANGE, ss.str().c_str());
+
+        WriteDataContext write_data_context;
+        write_data_context.data = pv;
+        write_data_context.size = size;
+        curl_easy_setopt(curl_handle, CURLOPT_WRITEDATA, &write_data_context);
+
+        curl_easy_perform(this->curl_handle);
+
+        if (ptrBytesRead != nullptr)
+        {
+            *ptrBytesRead = write_data_context.count_data_received;
+        }
     }
 }
 
@@ -54,12 +59,12 @@ CurlHttpInputStream::~CurlHttpInputStream()
 
 }
 
-/*static*/size_t CurlHttpInputStream::Write_data(void* ptr, size_t size, size_t nmemb, void* stream)
+/*static*/size_t CurlHttpInputStream::WriteData(void* ptr, size_t size, size_t nmemb, void* stream)
 {
     WriteDataContext* write_data_context = (WriteDataContext*)stream;
     const size_t total_size = size * nmemb;
     memcpy(
-        ((uint8_t*)write_data_context->ptr_data) + write_data_context->count_data_received,
+        ((uint8_t*)write_data_context->data) + write_data_context->count_data_received,
         ptr,
         total_size);
     /*size_t written = fwrite(ptr, size, nmemb, (FILE*)stream);
