@@ -563,7 +563,7 @@ CCmdLineOptions::ParseResult CCmdLineOptions::Parse(int argc, char** argv)
            \N'SingleChannelPyramidTileAccessor' adds to the previous command the ability to explictely address a specific pyramid-layer (which must
            exist in the CZI-document).
            \N'SingleChannelScalingTileAccessor' gets the specified region with an arbitrary zoom factor. It uses the pyramid-layers in the CZI-document
-           and scales the bitmap if neccessary. The resulting bitmap will be written to the specified OUTPUTFILE.
+           and scales the bitmap if necessary. The resulting bitmap will be written to the specified OUTPUTFILE.
            \N'ScalingChannelComposite' operates like the previous command, but in addition gets all channels and creates a multi-channel-composite from them
            using display-settings.
            \N'ExtractAttachment' allows to extract (and save to a file) the contents of attachments.)

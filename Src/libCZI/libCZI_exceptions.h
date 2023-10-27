@@ -121,7 +121,7 @@ namespace libCZI
             : LibCZIException(szErrMsg), offset(offset), size(size) {}
 
         /// Gets the offset (in bytes) into the stream at which
-        /// the I/O-error occured.
+        /// the I/O-error occurred.
         ///
         /// \return The offset  (in bytes).
         std::uint64_t GetOffset() const { return this->offset; }

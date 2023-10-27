@@ -14,7 +14,7 @@
 class CurlHttpInputStream : public libCZI::IStream
 {
 private:
-    CURL* curl_handle;
+    CURL* curl_handle_{nullptr};
     std::mutex request_mutex_;///< Mutex to serialize the requests.
 public:
     CurlHttpInputStream(const std::string& url, const std::map<int, libCZI::StreamsFactory::Property>& property_bag);
@@ -28,16 +28,15 @@ private:
     /// This struct is passed to the WriteData function as user-data.
     struct WriteDataContext
     {
-        void* data;                         ///< Pointer to the destination buffer (where the data is to be delivered to).
-        std::uint64_t size;                     ///< The size of the destination buffer.
-
-        std::uint64_t count_data_received{ 0 }; ///< The number of bytes received so far.
+        void* data{nullptr};                         ///< Pointer to the destination buffer (where the data is to be delivered to).
+        std::uint64_t size{0};                       ///< The size of the destination buffer.
+        std::uint64_t count_data_received{ 0 };      ///< The number of bytes received so far.
     };
 
     /// This function is the write-callback-function used by curl to write the data into the buffer.
     /// C.f. https://curl.se/libcurl/c/CURLOPT_WRITEFUNCTION.html for more information.
     /// Note that this function is usually called multiple times for a single request, where each invocation
-    /// delivers a anohter chunk of data.
+    /// delivers a another chunk of data.
     ///
     /// \param [in]     ptr         Pointer to the data.
     /// \param          size        The size of an element (of the data) in bytes. This is documented to be always 1.
@@ -49,6 +48,8 @@ private:
     ///             aborted and the libcurl function used returns CURLE_WRITE_ERROR. One  can also abort the transfer 
     ///             by returning CURL_WRITEFUNC_ERROR (added in 7.87.0), which makes CURLE_WRITE_ERROR get returned.
     static size_t WriteData(void* ptr, size_t size, size_t nmemb, void* user_data);
+
+    static void ThrowIfCurlSetOptError(CURLcode return_code, const char* curl_option_name);
 };
 
 #endif

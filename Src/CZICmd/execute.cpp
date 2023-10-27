@@ -90,7 +90,7 @@ protected:
             [&](uint8_t* ptrHash, size_t size)->bool
             {
                 Utils::CalcMd5SumHash(bm, ptrHash, (int)size);
-        return true;
+                return true;
             },
             options);
     }
@@ -172,7 +172,7 @@ private:
             [&](int index, const AttachmentInfo& info)->bool
             {
                 ++mapAttchmntName[info.name];
-        return true;
+                return true;
             });
 
         if (mapAttchmntName.empty())
@@ -256,10 +256,10 @@ private:
                     options.GetLog()->WriteLineStdOut("------+----------+----------------------------------------+-------------");
                 }
 
-        stringstream ss;
-        ss << setw(5) << index << " | " << setw(8) << std::left << info.contentFileType << " | {" << info.contentGuid << "} | " << info.name;
-        options.GetLog()->WriteLineStdOut(ss.str());
-        return true;
+                stringstream ss;
+                ss << setw(5) << index << " | " << setw(8) << std::left << info.contentFileType << " | {" << info.contentGuid << "} | " << info.name;
+                options.GetLog()->WriteLineStdOut(ss.str());
+                return true;
             });
     }
 
@@ -272,26 +272,26 @@ private:
             [&](int index, const SubBlockInfo& info)->bool
             {
                 stringstream ss;
-        ss << "#" << index << ": " << Utils::DimCoordinateToString(&info.coordinate);
-        if (info.IsMindexValid())
-        {
-            ss << " M=" << info.mIndex;
-        }
+                ss << "#" << index << ": " << Utils::DimCoordinateToString(&info.coordinate);
+                if (info.IsMindexValid())
+                {
+                    ss << " M=" << info.mIndex;
+                }
 
-        ss << " logical=" << info.logicalRect << " phys.=" << info.physicalSize;
-        ss << " pixeltype=" << Utils::PixelTypeToInformalString(info.pixelType);
-        auto compressionMode = info.GetCompressionMode();
-        if (compressionMode != CompressionMode::Invalid)
-        {
-            ss << " compression=" << Utils::CompressionModeToInformalString(compressionMode);
-        }
-        else
-        {
-            ss << " compression=" << Utils::CompressionModeToInformalString(compressionMode) << "(" << info.compressionModeRaw << ")";
-        }
+                ss << " logical=" << info.logicalRect << " phys.=" << info.physicalSize;
+                ss << " pixeltype=" << Utils::PixelTypeToInformalString(info.pixelType);
+                auto compressionMode = info.GetCompressionMode();
+                if (compressionMode != CompressionMode::Invalid)
+                {
+                    ss << " compression=" << Utils::CompressionModeToInformalString(compressionMode);
+                }
+                else
+                {
+                    ss << " compression=" << Utils::CompressionModeToInformalString(compressionMode) << "(" << info.compressionModeRaw << ")";
+                }
 
-        options.GetLog()->WriteLineStdOut(ss.str());
-        return true;
+                options.GetLog()->WriteLineStdOut(ss.str());
+                return true;
             });
     }
 
@@ -329,8 +329,8 @@ private:
             [&](int chIdx)->bool
             {
                 auto dsplChannelSettings = dsplSettings->GetChannelDisplaySettings(chIdx);
-        PrintDisplaySettingsForChannel(chIdx, dsplChannelSettings.get(), options);
-        return true;
+                PrintDisplaySettingsForChannel(chIdx, dsplChannelSettings.get(), options);
+                return true;
             });
     }
 
@@ -421,71 +421,71 @@ private:
             [&](int chIdx)->bool
             {
                 auto dsplChannelSettings = dsplSettings->GetChannelDisplaySettings(chIdx);
-        if (dsplChannelSettings->GetIsEnabled())
-        {
-            writer.StartObject();
-            writer.String("ch");
-            writer.Int(chIdx);
-            float wght = dsplChannelSettings->GetWeight();
-            if (abs(wght - 1) > std::numeric_limits<float>::epsilon())
-            {
-                writer.String("weight");
-                writer.Double(wght);
-            }
-
-            float blkPt, whtPt;
-            dsplChannelSettings->GetBlackWhitePoint(&blkPt, &whtPt);
-            {
-                writer.String("black-point");
-                writer.Double(blkPt);
-                writer.String("white-point");
-                writer.Double(whtPt);
-            }
-
-            Rgb8Color tinting_color;
-            if (dsplChannelSettings->TryGetTintingColorRgb8(&tinting_color))
-            {
-                writer.String("tinting");
-                stringstream ss;
-                ss << '#' << std::hex
-                    << std::setfill('0') << std::setw(2) << (int)tinting_color.r
-                    << std::setfill('0') << std::setw(2) << (int)tinting_color.g
-                    << std::setfill('0') << std::setw(2) << (int)tinting_color.b;
-                writer.String(ss.str());
-            }
-
-            switch (dsplChannelSettings->GetGradationCurveMode())
-            {
-            case IDisplaySettings::GradationCurveMode::Gamma:
-            {
-                float gamma;
-                dsplChannelSettings->TryGetGamma(&gamma);
-                writer.String("gamma");
-                writer.Double(gamma);
-            }
-            break;
-            case IDisplaySettings::GradationCurveMode::Spline:
-            {
-                std::vector<libCZI::IDisplaySettings::SplineControlPoint> ctrlPoints;
-                dsplChannelSettings->TryGetSplineControlPoints(&ctrlPoints);
-                writer.String("splinelut");
-                writer.StartArray();
-                for (const auto& ctrlPt : ctrlPoints)
+                if (dsplChannelSettings->GetIsEnabled())
                 {
-                    writer.Double(ctrlPt.x);
-                    writer.Double(ctrlPt.y);
+                    writer.StartObject();
+                    writer.String("ch");
+                    writer.Int(chIdx);
+                    float wght = dsplChannelSettings->GetWeight();
+                    if (abs(wght - 1) > std::numeric_limits<float>::epsilon())
+                    {
+                        writer.String("weight");
+                        writer.Double(wght);
+                    }
+
+                    float blkPt, whtPt;
+                    dsplChannelSettings->GetBlackWhitePoint(&blkPt, &whtPt);
+                    {
+                        writer.String("black-point");
+                        writer.Double(blkPt);
+                        writer.String("white-point");
+                        writer.Double(whtPt);
+                    }
+
+                    Rgb8Color tinting_color;
+                    if (dsplChannelSettings->TryGetTintingColorRgb8(&tinting_color))
+                    {
+                        writer.String("tinting");
+                        stringstream ss;
+                        ss << '#' << std::hex
+                            << std::setfill('0') << std::setw(2) << (int)tinting_color.r
+                            << std::setfill('0') << std::setw(2) << (int)tinting_color.g
+                            << std::setfill('0') << std::setw(2) << (int)tinting_color.b;
+                        writer.String(ss.str());
+                    }
+
+                    switch (dsplChannelSettings->GetGradationCurveMode())
+                    {
+                    case IDisplaySettings::GradationCurveMode::Gamma:
+                    {
+                        float gamma;
+                        dsplChannelSettings->TryGetGamma(&gamma);
+                        writer.String("gamma");
+                        writer.Double(gamma);
+                    }
+                    break;
+                    case IDisplaySettings::GradationCurveMode::Spline:
+                    {
+                        std::vector<libCZI::IDisplaySettings::SplineControlPoint> ctrlPoints;
+                        dsplChannelSettings->TryGetSplineControlPoints(&ctrlPoints);
+                        writer.String("splinelut");
+                        writer.StartArray();
+                        for (const auto& ctrlPt : ctrlPoints)
+                        {
+                            writer.Double(ctrlPt.x);
+                            writer.Double(ctrlPt.y);
+                        }
+                        writer.EndArray();
+                    }
+                    break;
+                    default:
+                        break;
+                    }
+
+                    writer.EndObject();
                 }
-                writer.EndArray();
-            }
-            break;
-            default:
-                break;
-            }
 
-            writer.EndObject();
-        }
-
-        return true;
+                return true;
             });
 
         writer.EndArray();
@@ -530,7 +530,7 @@ private:
             [&](libCZI::DimensionIndex dim, int start, int size)->bool
             {
                 ss << " " << Utils::DimensionToChar(dim) << " -> Start=" << start << " Size=" << size << endl;
-        return true;
+                return true;
             });
 
         if (!sbStatistics.sceneBoundingBoxes.empty())
@@ -691,13 +691,13 @@ public:
                     return true;
                 }
 
-        return false;
+                return false;
             });
 
         dsplHlp.Initialize(dsplSettings.get(), [&](int chIndx)->libCZI::PixelType
             {
                 int idx = (int)std::distance(activeChannels.cbegin(), std::find(activeChannels.cbegin(), activeChannels.cend(), chIndx));
-        return channelBitmaps[idx]->GetPixelType();
+                return channelBitmaps[idx]->GetPixelType();
             });
 
         shared_ptr<IBitmapData> mcComposite;
@@ -874,13 +874,13 @@ public:
                     return true;
                 }
 
-        return false;
+                return false;
             });
 
         dsplHlp.Initialize(dsplSettings.get(), [&](int chIndx)->libCZI::PixelType
             {
                 int idx = (int)std::distance(activeChannels.cbegin(), std::find(activeChannels.cbegin(), activeChannels.cend(), chIndx));
-        return channelBitmaps[idx]->GetPixelType();
+                return channelBitmaps[idx]->GetPixelType();
             });
 
         shared_ptr<IBitmapData> mcComposite;
@@ -994,14 +994,14 @@ public:
                         [&](uint8_t* ptrHash, size_t sizeHash)->bool
                         {
                             const void* ptr; size_t size;
-                    attchmnt->DangerousGetRawData(ptr, size);
-                    Utils::CalcMd5SumHash(ptr, size, ptrHash, (int)sizeHash);
-                    return true;
+                            attchmnt->DangerousGetRawData(ptr, size);
+                            Utils::CalcMd5SumHash(ptr, size, ptrHash, (int)sizeHash);
+                            return true;
                         },
                         options);
                 }
 
-        return true;
+                return true;
             });
 
         return true;
@@ -1117,12 +1117,12 @@ public:
                         [&](uint8_t* ptrHash, size_t sizeHash)->bool
                         {
                             Utils::CalcMd5SumHash(bm.get(), ptrHash, (int)sizeHash);
-                    return true;
+                            return true;
                         },
                         options);
                 }
 
-        return true;
+                return true;
             });
 
         return true;
@@ -1205,6 +1205,24 @@ bool execute(const CCmdLineOptions& options)
         default:
             break;
         }
+    }
+    catch (libCZI::LibCZIIOException& libCZI_io_exception)
+    {
+        std::wstringstream ss;
+        string what(libCZI_io_exception.what() != nullptr ? libCZI_io_exception.what() : "");
+        ss << "LibCZIIOException caught -> \"" << convertUtf8ToUCS2(what) << "\"";
+        try
+        {
+            libCZI_io_exception.rethrow_nested();
+        }
+        catch (std::exception& inner_exception)
+        {
+            what = inner_exception.what() != nullptr ? inner_exception.what() : "";
+            ss << endl << " nested exception -> \"" << convertUtf8ToUCS2(what) << "\"";
+        }
+
+        options.GetLog()->WriteLineStdErr(ss.str());
+        success = false;
     }
     catch (std::exception& excp)
     {

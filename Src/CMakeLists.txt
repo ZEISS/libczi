@@ -12,7 +12,6 @@ add_subdirectory(JxrDecode)
 
 if (LIBCZI_BUILD_STREAMSLIB)
   find_package(curl CONFIG REQUIRED)
-  #add_subdirectory(StreamsLib)
 endif(LIBCZI_BUILD_STREAMSLIB)
 
 add_subdirectory(libCZI)
