@@ -3,9 +3,11 @@
 #include <cstdint>
 #include <string>
 #include <sstream>
+#include "../libCZI_StreamsLib.h"
 #include <curl/curl.h>
 
 using namespace std;
+using namespace libCZI;
 
 /*static*/void CurlHttpInputStream::OneTimeGlobalCurlInitialization()
 {
@@ -28,7 +30,7 @@ CurlHttpInputStream::CurlHttpInputStream(const std::string& url, const std::map<
     CURLcode return_code = curl_easy_setopt(up_curl_handle.get(), CURLOPT_URL, url.c_str());
     ThrowIfCurlSetOptError(return_code, "CURLOPT_URL");
 
-    return_code = curl_easy_setopt(up_curl_handle.get(), CURLOPT_VERBOSE, 0L/*1L*/);
+    return_code = curl_easy_setopt(up_curl_handle.get(), CURLOPT_VERBOSE, 1L/*1L*/);
     ThrowIfCurlSetOptError(return_code, "CURLOPT_VERBOSE");
 
     /* disable progress meter, set to 0L to enable it */
@@ -36,13 +38,72 @@ CurlHttpInputStream::CurlHttpInputStream(const std::string& url, const std::map<
     ThrowIfCurlSetOptError(return_code, "CURLOPT_NOPROGRESS");
 
     return_code = curl_easy_setopt(up_curl_handle.get(), CURLOPT_TCP_KEEPALIVE, 1L);
-    ThrowIfCurlSetOptError(return_code, "CURLOPT_TCP_KEEPALIVE");
+    //ThrowIfCurlSetOptError(return_code, "CURLOPT_TCP_KEEPALIVE");
 
     return_code = curl_easy_setopt(up_curl_handle.get(), CURLOPT_WRITEFUNCTION, CurlHttpInputStream::WriteData);
     ThrowIfCurlSetOptError(return_code, "CURLOPT_WRITEFUNCTION");
 
-   // curl_easy_setopt(up_curl_handle.get(), CURLOPT_FOLLOWLOCATION, 0L);
-    
+    auto property = property_bag.find(StreamsFactory::StreamProperties::kCurlHttp_Proxy);
+    if (property != property_bag.end())
+    {
+        return_code = curl_easy_setopt(up_curl_handle.get(), CURLOPT_PROXY, property->second.GetAsStringOrThrow().c_str());
+        ThrowIfCurlSetOptError(return_code, "CURLOPT_PROXY");
+    }
+
+    property = property_bag.find(StreamsFactory::StreamProperties::kCurlHttp_UserAgent);
+    if (property != property_bag.end())
+    {
+        return_code = curl_easy_setopt(up_curl_handle.get(), CURLOPT_USERAGENT, property->second.GetAsStringOrThrow().c_str());
+        ThrowIfCurlSetOptError(return_code, "CURLOPT_USERAGENT");
+    }
+
+    property = property_bag.find(StreamsFactory::StreamProperties::kCurlHttp_Timeout);
+    if (property != property_bag.end())
+    {
+        return_code = curl_easy_setopt(up_curl_handle.get(), CURLOPT_TIMEOUT, static_cast<long>(property->second.GetAsInt32OrThrow()));
+        ThrowIfCurlSetOptError(return_code, "CURLOPT_TIMEOUT");
+    }
+
+    property = property_bag.find(StreamsFactory::StreamProperties::kCurlHttp_ConnectTimeout);
+    if (property != property_bag.end())
+    {
+        return_code = curl_easy_setopt(up_curl_handle.get(), CURLOPT_CONNECTTIMEOUT, static_cast<long>(property->second.GetAsInt32OrThrow()));
+        ThrowIfCurlSetOptError(return_code, "CURLOPT_CONNECTTIMEOUT");
+    }
+
+    property = property_bag.find(StreamsFactory::StreamProperties::kCurlHttp_Xoauth2Bearer);
+    if (property != property_bag.end())
+    {
+        return_code = curl_easy_setopt(up_curl_handle.get(), CURLOPT_XOAUTH2_BEARER, property->second.GetAsStringOrThrow().c_str());
+        ThrowIfCurlSetOptError(return_code, "CURLOPT_XOAUTH2_BEARER");
+    }
+
+    property = property_bag.find(StreamsFactory::StreamProperties::kCurlHttp_Cookie);
+    if (property != property_bag.end())
+    {
+        return_code = curl_easy_setopt(up_curl_handle.get(), CURLOPT_COOKIE, property->second.GetAsStringOrThrow().c_str());
+        ThrowIfCurlSetOptError(return_code, "CURLOPT_COOKIE");
+    }
+
+    property = property_bag.find(StreamsFactory::StreamProperties::kCurlHttp_SslVerifyPeer);
+    if (property != property_bag.end())
+    {
+        return_code = curl_easy_setopt(up_curl_handle.get(), CURLOPT_SSL_VERIFYPEER, property->second.GetAsBoolOrThrow() ? 1L : 0L);
+        ThrowIfCurlSetOptError(return_code, "CURLOPT_SSL_VERIFYPEER");
+    }
+
+    property = property_bag.find(StreamsFactory::StreamProperties::kCurlHttp_SslVerifyHost);
+    if (property != property_bag.end())
+    {
+        return_code = curl_easy_setopt(up_curl_handle.get(), CURLOPT_SSL_VERIFYHOST, property->second.GetAsBoolOrThrow() ? 1L : 0L);
+        ThrowIfCurlSetOptError(return_code, "CURLOPT_SSL_VERIFYHOST");
+    }
+
+    // curl_easy_setopt(up_curl_handle.get(), CURLOPT_FOLLOWLOCATION, 0L);
+     //curl_easy_setopt(up_curl_handle.get(), CURLOPT_PROXY, "https://127.0.0.1:8080");
+
+     //curl_easy_setopt(up_curl_handle.get(), CURLOPT_SSL_VERIFYPEER, 0L);
+
     this->curl_handle_ = up_curl_handle.release();
 }
 

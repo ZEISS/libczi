@@ -34,19 +34,19 @@ struct PlaneCoordinateValidator : public CLI::Validator
     {
         this->name_ = "PlaneCoordinate";
         this->func_ = [](const std::string& str) -> string
-        {
-            try
             {
-                auto plane_coordinate = libCZI::CDimCoordinate::Parse(str.c_str());
-                return {}; // returning "" means "validation was successful" (c.f. https://cliutils.github.io/CLI11/book/chapters/validators.html)
-            }
-            catch (libCZI::LibCZIStringParseException&)
-            {
-                ostringstream string_stream;
-                string_stream << "Invalid coordinate given \"" << str << "\"";
-                throw CLI::ValidationError(string_stream.str());
-            }
-        };
+                try
+                {
+                    auto plane_coordinate = libCZI::CDimCoordinate::Parse(str.c_str());
+                    return {}; // returning "" means "validation was successful" (c.f. https://cliutils.github.io/CLI11/book/chapters/validators.html)
+                }
+                catch (libCZI::LibCZIStringParseException&)
+                {
+                    ostringstream string_stream;
+                    string_stream << "Invalid coordinate given \"" << str << "\"";
+                    throw CLI::ValidationError(string_stream.str());
+                }
+            };
     }
 };
 
@@ -57,17 +57,17 @@ struct RegionOfInterestValidator : public CLI::Validator
     {
         this->name_ = "RegionOfInterest";
         this->func_ = [](const std::string& str) -> string
-        {
-            const bool parsed_ok = CCmdLineOptions::TryParseRect(str, nullptr, nullptr, nullptr, nullptr, nullptr);
-            if (!parsed_ok)
             {
-                ostringstream string_stream;
-                string_stream << "Invalid ROI given \"" << str << "\"";
-                throw CLI::ValidationError(string_stream.str());
-            }
+                const bool parsed_ok = CCmdLineOptions::TryParseRect(str, nullptr, nullptr, nullptr, nullptr, nullptr);
+                if (!parsed_ok)
+                {
+                    ostringstream string_stream;
+                    string_stream << "Invalid ROI given \"" << str << "\"";
+                    throw CLI::ValidationError(string_stream.str());
+                }
 
-            return {};
-        };
+                return {};
+            };
     }
 };
 
@@ -78,17 +78,17 @@ struct DisplaySettingsValidator : public CLI::Validator
     {
         this->name_ = "DisplaySettings";
         this->func_ = [](const std::string& str) -> string
-        {
-            const bool parsed_ok = CCmdLineOptions::TryParseDisplaySettings(str, nullptr);
-            if (!parsed_ok)
             {
-                ostringstream string_stream;
-                string_stream << "Invalid DisplaySettings (JSON) given \"" << str << "\"";
-                throw CLI::ValidationError(string_stream.str());
-            }
+                const bool parsed_ok = CCmdLineOptions::TryParseDisplaySettings(str, nullptr);
+                if (!parsed_ok)
+                {
+                    ostringstream string_stream;
+                    string_stream << "Invalid DisplaySettings (JSON) given \"" << str << "\"";
+                    throw CLI::ValidationError(string_stream.str());
+                }
 
-            return {};
-        };
+                return {};
+            };
     }
 };
 
@@ -99,17 +99,17 @@ struct JpgXrCodecValidator : public CLI::Validator
     {
         this->name_ = "JpgXrCodecValidator";
         this->func_ = [](const std::string& str) -> string
-        {
-            const bool parsed_ok = CCmdLineOptions::TryParseJxrCodecUseWicCodec(str, nullptr);
-            if (!parsed_ok)
             {
-                ostringstream string_stream;
-                string_stream << "Invalid JPGXR-decoder-name given \"" << str << "\"";
-                throw CLI::ValidationError(string_stream.str());
-            }
+                const bool parsed_ok = CCmdLineOptions::TryParseJxrCodecUseWicCodec(str, nullptr);
+                if (!parsed_ok)
+                {
+                    ostringstream string_stream;
+                    string_stream << "Invalid JPGXR-decoder-name given \"" << str << "\"";
+                    throw CLI::ValidationError(string_stream.str());
+                }
 
-            return {};
-        };
+                return {};
+            };
     }
 };
 
@@ -120,17 +120,17 @@ struct VerbosityValidator : public CLI::Validator
     {
         this->name_ = "VerbosityValidator";
         this->func_ = [](const std::string& str) -> string
-        {
-            const bool parsed_ok = CCmdLineOptions::TryParseVerbosityLevel(str, nullptr);
-            if (!parsed_ok)
             {
-                ostringstream string_stream;
-                string_stream << "Invalid verbosity given \"" << str << "\"";
-                throw CLI::ValidationError(string_stream.str());
-            }
+                const bool parsed_ok = CCmdLineOptions::TryParseVerbosityLevel(str, nullptr);
+                if (!parsed_ok)
+                {
+                    ostringstream string_stream;
+                    string_stream << "Invalid verbosity given \"" << str << "\"";
+                    throw CLI::ValidationError(string_stream.str());
+                }
 
-            return {};
-        };
+                return {};
+            };
     }
 };
 
@@ -141,17 +141,17 @@ struct BackgroundColorValidator : public CLI::Validator
     {
         this->name_ = "BackgroundColorValidator";
         this->func_ = [](const std::string& str) -> string
-        {
-            const bool parsed_ok = CCmdLineOptions::TryParseParseBackgroundColor(str, nullptr);
-            if (!parsed_ok)
             {
-                ostringstream string_stream;
-                string_stream << "Invalid background-color given \"" << str << "\"";
-                throw CLI::ValidationError(string_stream.str());
-            }
+                const bool parsed_ok = CCmdLineOptions::TryParseParseBackgroundColor(str, nullptr);
+                if (!parsed_ok)
+                {
+                    ostringstream string_stream;
+                    string_stream << "Invalid background-color given \"" << str << "\"";
+                    throw CLI::ValidationError(string_stream.str());
+                }
 
-            return {};
-        };
+                return {};
+            };
     }
 };
 
@@ -162,17 +162,17 @@ struct PyramidInfoValidator : public CLI::Validator
     {
         this->name_ = "PyramidInfoValidator";
         this->func_ = [](const std::string& str) -> string
-        {
-            const bool parsed_ok = CCmdLineOptions::TryParsePyramidInfo(str, nullptr, nullptr);
-            if (!parsed_ok)
             {
-                ostringstream string_stream;
-                string_stream << "Invalid pyramid-info given \"" << str << "\"";
-                throw CLI::ValidationError(string_stream.str());
-            }
+                const bool parsed_ok = CCmdLineOptions::TryParsePyramidInfo(str, nullptr, nullptr);
+                if (!parsed_ok)
+                {
+                    ostringstream string_stream;
+                    string_stream << "Invalid pyramid-info given \"" << str << "\"";
+                    throw CLI::ValidationError(string_stream.str());
+                }
 
-            return {};
-        };
+                return {};
+            };
     }
 };
 
@@ -183,17 +183,17 @@ struct InfoLevelValidator : public CLI::Validator
     {
         this->name_ = "InfoLevelValidator";
         this->func_ = [](const std::string& str) -> string
-        {
-            const bool parsed_ok = CCmdLineOptions::TryParseInfoLevel(str, nullptr);
-            if (!parsed_ok)
             {
-                ostringstream string_stream;
-                string_stream << "Invalid info-level given \"" << str << "\"";
-                throw CLI::ValidationError(string_stream.str());
-            }
+                const bool parsed_ok = CCmdLineOptions::TryParseInfoLevel(str, nullptr);
+                if (!parsed_ok)
+                {
+                    ostringstream string_stream;
+                    string_stream << "Invalid info-level given \"" << str << "\"";
+                    throw CLI::ValidationError(string_stream.str());
+                }
 
-            return {};
-        };
+                return {};
+            };
     }
 };
 
@@ -204,17 +204,17 @@ struct SelectionValidator : public CLI::Validator
     {
         this->name_ = "SelectionValidator";
         this->func_ = [](const std::string& str) -> string
-        {
-            const bool parsed_ok = CCmdLineOptions::TryParseSelection(str, nullptr);
-            if (!parsed_ok)
             {
-                ostringstream string_stream;
-                string_stream << "Invalid selection given \"" << str << "\"";
-                throw CLI::ValidationError(string_stream.str());
-            }
+                const bool parsed_ok = CCmdLineOptions::TryParseSelection(str, nullptr);
+                if (!parsed_ok)
+                {
+                    ostringstream string_stream;
+                    string_stream << "Invalid selection given \"" << str << "\"";
+                    throw CLI::ValidationError(string_stream.str());
+                }
 
-            return {};
-        };
+                return {};
+            };
     }
 };
 
@@ -225,17 +225,17 @@ struct TileFilterValidator : public CLI::Validator
     {
         this->name_ = "TileFilterValidator";
         this->func_ = [](const std::string& str) -> string
-        {
-            const bool parsed_ok = CCmdLineOptions::TryParseTileFilter(str, nullptr);
-            if (!parsed_ok)
             {
-                ostringstream string_stream;
-                string_stream << "Invalid tile-filter given \"" << str << "\"";
-                throw CLI::ValidationError(string_stream.str());
-            }
+                const bool parsed_ok = CCmdLineOptions::TryParseTileFilter(str, nullptr);
+                if (!parsed_ok)
+                {
+                    ostringstream string_stream;
+                    string_stream << "Invalid tile-filter given \"" << str << "\"";
+                    throw CLI::ValidationError(string_stream.str());
+                }
 
-            return {};
-        };
+                return {};
+            };
     }
 };
 
@@ -246,17 +246,17 @@ struct ChannelCompositionFormatValidator : public CLI::Validator
     {
         this->name_ = "ChannelCompositionFormatValidator";
         this->func_ = [](const std::string& str) -> string
-        {
-            const bool parsed_ok = CCmdLineOptions::TryParseChannelCompositionFormat(str, nullptr, nullptr);
-            if (!parsed_ok)
             {
-                ostringstream string_stream;
-                string_stream << "Invalid channel-composition-format given \"" << str << "\"";
-                throw CLI::ValidationError(string_stream.str());
-            }
+                const bool parsed_ok = CCmdLineOptions::TryParseChannelCompositionFormat(str, nullptr, nullptr);
+                if (!parsed_ok)
+                {
+                    ostringstream string_stream;
+                    string_stream << "Invalid channel-composition-format given \"" << str << "\"";
+                    throw CLI::ValidationError(string_stream.str());
+                }
 
-            return {};
-        };
+                return {};
+            };
     }
 };
 
@@ -267,17 +267,17 @@ struct CreateBoundsValidator : public CLI::Validator
     {
         this->name_ = "CreateBoundsValidator";
         this->func_ = [](const std::string& str) -> string
-        {
-            const bool parsed_ok = CCmdLineOptions::TryParseCreateBounds(str, nullptr);
-            if (!parsed_ok)
             {
-                ostringstream string_stream;
-                string_stream << "Invalid create-bounds given \"" << str << "\"";
-                throw CLI::ValidationError(string_stream.str());
-            }
+                const bool parsed_ok = CCmdLineOptions::TryParseCreateBounds(str, nullptr);
+                if (!parsed_ok)
+                {
+                    ostringstream string_stream;
+                    string_stream << "Invalid create-bounds given \"" << str << "\"";
+                    throw CLI::ValidationError(string_stream.str());
+                }
 
-            return {};
-        };
+                return {};
+            };
     }
 };
 
@@ -288,17 +288,17 @@ struct CreateSubblockSizeValidator : public CLI::Validator
     {
         this->name_ = "CreateSubblockSizeValidator";
         this->func_ = [](const std::string& str) -> string
-        {
-            const bool parsed_ok = CCmdLineOptions::TryParseCreateSize(str, nullptr);
-            if (!parsed_ok)
             {
-                ostringstream string_stream;
-                string_stream << "Invalid create-subblock-size given \"" << str << "\"";
-                throw CLI::ValidationError(string_stream.str());
-            }
+                const bool parsed_ok = CCmdLineOptions::TryParseCreateSize(str, nullptr);
+                if (!parsed_ok)
+                {
+                    ostringstream string_stream;
+                    string_stream << "Invalid create-subblock-size given \"" << str << "\"";
+                    throw CLI::ValidationError(string_stream.str());
+                }
 
-            return {};
-        };
+                return {};
+            };
     }
 };
 
@@ -309,17 +309,17 @@ struct CreateTileInfoValidator : public CLI::Validator
     {
         this->name_ = "CreateTileInfoValidator";
         this->func_ = [](const std::string& str) -> string
-        {
-            const bool parsed_ok = CCmdLineOptions::TryParseCreateTileInfo(str, nullptr);
-            if (!parsed_ok)
             {
-                ostringstream string_stream;
-                string_stream << "Invalid create-tileinfo given \"" << str << "\"";
-                throw CLI::ValidationError(string_stream.str());
-            }
+                const bool parsed_ok = CCmdLineOptions::TryParseCreateTileInfo(str, nullptr);
+                if (!parsed_ok)
+                {
+                    ostringstream string_stream;
+                    string_stream << "Invalid create-tileinfo given \"" << str << "\"";
+                    throw CLI::ValidationError(string_stream.str());
+                }
 
-            return {};
-        };
+                return {};
+            };
     }
 };
 
@@ -330,17 +330,17 @@ struct GuidOfCziValidator : public CLI::Validator
     {
         this->name_ = "GuidOfCziValidator";
         this->func_ = [](const std::string& str) -> string
-        {
-            const bool parsed_ok = CCmdLineOptions::TryParseNewCziFileguid(str, nullptr);
-            if (!parsed_ok)
             {
-                ostringstream string_stream;
-                string_stream << "Invalid GUID-of-CZI given \"" << str << "\"";
-                throw CLI::ValidationError(string_stream.str());
-            }
+                const bool parsed_ok = CCmdLineOptions::TryParseNewCziFileguid(str, nullptr);
+                if (!parsed_ok)
+                {
+                    ostringstream string_stream;
+                    string_stream << "Invalid GUID-of-CZI given \"" << str << "\"";
+                    throw CLI::ValidationError(string_stream.str());
+                }
 
-            return {};
-        };
+                return {};
+            };
     }
 };
 
@@ -351,17 +351,17 @@ struct BitmapGeneratorValidator : public CLI::Validator
     {
         this->name_ = "BitmapGeneratorValidator";
         this->func_ = [](const std::string& str) -> string
-        {
-            const bool parsed_ok = CCmdLineOptions::TryParseBitmapGenerator(str, nullptr);
-            if (!parsed_ok)
             {
-                ostringstream string_stream;
-                string_stream << "Invalid bitmapgenerator-classname given \"" << str << "\"";
-                throw CLI::ValidationError(string_stream.str());
-            }
+                const bool parsed_ok = CCmdLineOptions::TryParseBitmapGenerator(str, nullptr);
+                if (!parsed_ok)
+                {
+                    ostringstream string_stream;
+                    string_stream << "Invalid bitmapgenerator-classname given \"" << str << "\"";
+                    throw CLI::ValidationError(string_stream.str());
+                }
 
-            return {};
-        };
+                return {};
+            };
     }
 };
 
@@ -372,17 +372,17 @@ struct CreateSubblockMetadataValidator : public CLI::Validator
     {
         this->name_ = "CreateSubblockMetadataValidator";
         this->func_ = [](const std::string& str) -> string
-        {
-            const bool parsed_ok = CCmdLineOptions::TryParseSubBlockMetadataKeyValue(str, nullptr);
-            if (!parsed_ok)
             {
-                ostringstream string_stream;
-                string_stream << "Invalid create-subblock-metadata (JSON) given \"" << str << "\"";
-                throw CLI::ValidationError(string_stream.str());
-            }
+                const bool parsed_ok = CCmdLineOptions::TryParseSubBlockMetadataKeyValue(str, nullptr);
+                if (!parsed_ok)
+                {
+                    ostringstream string_stream;
+                    string_stream << "Invalid create-subblock-metadata (JSON) given \"" << str << "\"";
+                    throw CLI::ValidationError(string_stream.str());
+                }
 
-            return {};
-        };
+                return {};
+            };
     }
 };
 
@@ -393,17 +393,17 @@ struct CompressionOptionsValidator : public CLI::Validator
     {
         this->name_ = "CompressionOptionsValidator";
         this->func_ = [](const std::string& str) -> string
-        {
-            const bool parsed_ok = CCmdLineOptions::TryParseCompressionOptions(str, nullptr);
-            if (!parsed_ok)
             {
-                ostringstream string_stream;
-                string_stream << "Invalid compression-options given \"" << str << "\"";
-                throw CLI::ValidationError(string_stream.str());
-            }
+                const bool parsed_ok = CCmdLineOptions::TryParseCompressionOptions(str, nullptr);
+                if (!parsed_ok)
+                {
+                    ostringstream string_stream;
+                    string_stream << "Invalid compression-options given \"" << str << "\"";
+                    throw CLI::ValidationError(string_stream.str());
+                }
 
-            return {};
-        };
+                return {};
+            };
     }
 };
 
@@ -414,17 +414,17 @@ struct GeneratorPixelTypeValidator : public CLI::Validator
     {
         this->name_ = "GeneratorPixelTypeValidator";
         this->func_ = [](const std::string& str) -> string
-        {
-            const bool parsed_ok = CCmdLineOptions::TryParseGeneratorPixeltype(str, nullptr);
-            if (!parsed_ok)
             {
-                ostringstream string_stream;
-                string_stream << "Invalid generator-pixel-type given \"" << str << "\"";
-                throw CLI::ValidationError(string_stream.str());
-            }
+                const bool parsed_ok = CCmdLineOptions::TryParseGeneratorPixeltype(str, nullptr);
+                if (!parsed_ok)
+                {
+                    ostringstream string_stream;
+                    string_stream << "Invalid generator-pixel-type given \"" << str << "\"";
+                    throw CLI::ValidationError(string_stream.str());
+                }
 
-            return {};
-        };
+                return {};
+            };
     }
 };
 
@@ -727,6 +727,7 @@ CCmdLineOptions::ParseResult CCmdLineOptions::Parse(int argc, char** argv)
         this->GetLog()->WriteLineStdOut("");
         this->GetLog()->WriteLineStdOut("");
         this->PrintHelpBitmapGenerator();
+        this->PrintHelpStreamsObjects();
         return ParseResult::Exit;
     }
 
@@ -1905,7 +1906,7 @@ void CCmdLineOptions::PrintHelpBitmapGenerator()
         [&](int no, std::tuple<std::string, std::string, bool> name_explanation_isdefault) -> bool
         {
             maxLengthClassName = (std::max)(get<0>(name_explanation_isdefault).length(), maxLengthClassName);
-    return true;
+            return true;
         });
 
     ostringstream string_stream;
@@ -1913,12 +1914,18 @@ void CCmdLineOptions::PrintHelpBitmapGenerator()
         [&](int no, std::tuple<std::string, std::string, bool> name_explanation_isdefault) -> bool
         {
             string_stream << no + 1 << ": " << std::setw(maxLengthClassName) << std::left << get<0>(name_explanation_isdefault) << std::setw(0) <<
-            (!get<2>(name_explanation_isdefault) ? "     " : " (*) ") << "\"" <<
-        get<1>(name_explanation_isdefault) << "\"" << endl;
-    return true;
+                (!get<2>(name_explanation_isdefault) ? "     " : " (*) ") << "\"" <<
+                get<1>(name_explanation_isdefault) << "\"" << endl;
+            return true;
         });
 
     this->GetLog()->WriteLineStdOut(string_stream.str());
+}
+
+void CCmdLineOptions::PrintHelpStreamsObjects()
+{
+    this->GetLog()->WriteLineStdOut("Available Input-Stream objects:  [default class is denoted with '(*)']");
+    this->GetLog()->WriteLineStdOut("");
 }
 
 /*static*/bool CCmdLineOptions::TryParseSubBlockMetadataKeyValue(const std::string& s, std::map<std::string, std::string>* subblock_metadata_property_bag)

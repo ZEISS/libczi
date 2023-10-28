@@ -278,6 +278,7 @@ private:
 
     void PrintHelpBuildInfo();
     void PrintHelpBitmapGenerator();
+    void PrintHelpStreamsObjects();
 
     static bool TryParseInt32(const std::string& str, int* value);
     static bool TryParseRect(const std::string& str, bool* absolute_mode, int* x_position, int* y_position, int* width, int* height);

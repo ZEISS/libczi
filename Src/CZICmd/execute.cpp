@@ -33,6 +33,7 @@ protected:
         libCZI::StreamsFactory::CreateStreamInfo stream_info;
         stream_info.class_name = "curl_http_inputstream";
         stream_info.filename = convertToUtf8(fileName);
+        stream_info.property_bag[StreamsFactory::StreamProperties::kCurlHttp_Proxy] = StreamsFactory::Property("http://127.0.0.1:8888");
         auto stream = libCZI::StreamsFactory::CreateStream(stream_info);
         auto spReader = libCZI::CreateCZIReader();
         spReader->Open(stream);

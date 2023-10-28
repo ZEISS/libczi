@@ -1,6 +1,8 @@
 #include "../libCZI_StreamsLib.h"
 #include <libCZI_Config.h>
 #include "curlhttpinputstream.h"
+#include "windowsfileinputstream.h"
+#include "../utilities.h"
 #include <memory>
 
 using namespace libCZI;
@@ -11,15 +13,24 @@ static const struct
     std::shared_ptr<libCZI::IStream>(*pfn_create_stream)(const StreamsFactory::CreateStreamInfo& stream_info);
 } stream_classes[] =
 {
-    {
 #if LIBCZI_CURL_BASED_STREAM_AVAILABLE
-        { "curl_http_inputstream", "curl-based http/https stream" },
-        [](const StreamsFactory::CreateStreamInfo& stream_info) -> std::shared_ptr<libCZI::IStream>
         {
-            return std::make_shared<CurlHttpInputStream>(stream_info.filename, stream_info.property_bag);
+            { "curl_http_inputstream", "curl-based http/https stream" },
+            [](const StreamsFactory::CreateStreamInfo& stream_info) -> std::shared_ptr<libCZI::IStream>
+            {
+                return std::make_shared<CurlHttpInputStream>(stream_info.filename, stream_info.property_bag);
+            }
         },
 #endif
-    }
+#if _WIN32
+        {
+            { "windows_file_inputstream", "stream implementation based on Windows-API" },
+            [](const StreamsFactory::CreateStreamInfo& stream_info) -> std::shared_ptr<libCZI::IStream>
+            {
+                return std::make_shared<WindowsFileInputStream>(stream_info.filename);
+            }
+        },
+#endif
 };
 
 void libCZI::StreamsFactory::Initialize()
