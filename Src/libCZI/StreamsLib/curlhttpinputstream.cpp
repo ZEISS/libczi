@@ -17,7 +17,7 @@ using namespace libCZI;
 CurlHttpInputStream::CurlHttpInputStream(const std::string& url, const std::map<int, libCZI::StreamsFactory::Property>& property_bag)
 {
     /* init the curl session */
-    const HANDLE curl_handle = curl_easy_init();
+    CURL* curl_handle = curl_easy_init();
     if (curl_handle == nullptr)
     {
         throw std::runtime_error("curl_easy_init() failed");
