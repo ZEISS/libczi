@@ -43,16 +43,20 @@ if (LIBCZI_BUILD_STREAMSLIB)
 #        LOG_INSTALL ON
 
 
-    ExternalProject_Get_Property(libcurl source_dir)
-    ExternalProject_Get_Property(libcurl binary_dir)
+    #ExternalProject_Get_Property(libcurl source_dir)
+    #ExternalProject_Get_Property(libcurl binary_dir)
 
     # Define an imported target
     add_library(CURL::libcurl STATIC IMPORTED GLOBAL)
 
 
-    message(STATUS "********** CURL-source **********: ${source_dir}")
+    #message(STATUS "********** CURL-source **********: ${source_dir}")
 
     add_dependencies(CURL::libcurl libcurl)
+
+    add_custom_target(set_curl_properties
+    COMMAND ${CMAKE_COMMAND} -P set_curl_properties.cmake)
+    add_dependencies(set_curl_properties curl_project)
 
    # Set properties for the imported target
    set_target_properties(CURL::libcurl PROPERTIES
