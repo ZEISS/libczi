@@ -76,6 +76,7 @@ if (LIBCZI_BUILD_CURL_BASED_STREAM)
     #set(CURL_LIBRARIES ${CURL_BINARY_DIR}/lib/.libs/libcurl.dylib)
     #include_directories(${CURL_SOURCE_DIR})
     #set(DEPENDENCIES ${DEPENDENCIES} libcurl)
+    set(CURL_DOWNLOADED_AND_BUILT TRUE)
   endif(${CURL_FOUND})
 
 endif(LIBCZI_BUILD_CURL_BASED_STREAM)

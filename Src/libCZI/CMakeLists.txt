@@ -274,8 +274,10 @@ if (LIBCZI_BUILD_DYNLIB)
    target_include_directories(libCZI PRIVATE ${zstd_SOURCE_DIR}/lib)
   endif()
   if (LIBCZI_BUILD_CURL_BASED_STREAM)
-    # Ensure curl is built before your project
-    add_dependencies(libCZI libcurl)
+    if (CURL_DOWNLOADED_AND_BUILT)
+      # Ensure curl is built before your project
+      add_dependencies(libCZI libcurl)
+    endif()
     target_link_libraries(libCZI PRIVATE ${CURL_LIBRARIES})
     target_include_directories(libCZI PRIVATE ${CURL_INCLUDE_DIRS})
   endif()
@@ -310,8 +312,10 @@ else()
 endif()
 
 if (LIBCZI_BUILD_CURL_BASED_STREAM)
-  # Ensure curl is built before your project
-  add_dependencies(libCZIStatic libcurl)
+  if (CURL_DOWNLOADED_AND_BUILT)
+    # Ensure curl is built before your project
+    add_dependencies(libCZIStatic libcurl)
+  endif()
   target_link_libraries(libCZIStatic PRIVATE ${CURL_LIBRARIES})
   target_include_directories(libCZIStatic PRIVATE ${CURL_INCLUDE_DIRS})
 endif()
