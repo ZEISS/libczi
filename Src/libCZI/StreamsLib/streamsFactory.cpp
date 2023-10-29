@@ -2,6 +2,7 @@
 #include <libCZI_Config.h>
 #include "curlhttpinputstream.h"
 #include "windowsfileinputstream.h"
+#include "simplefileinputstream.h"
 #include "../utilities.h"
 #include <memory>
 
@@ -31,6 +32,14 @@ static const struct
             }
         },
 #endif
+        {
+            { "c_runtime_file_inputstream", "stream implementation based on C-runtime library" },
+            [](const StreamsFactory::CreateStreamInfo& stream_info) -> std::shared_ptr<libCZI::IStream>
+            {
+                return std::make_shared<SimpleFileInputStream>(stream_info.filename);
+            }
+        },
+
 };
 
 void libCZI::StreamsFactory::Initialize()
@@ -68,4 +77,22 @@ std::shared_ptr<libCZI::IStream> libCZI::StreamsFactory::CreateStream(const Crea
     }
 
     return {};
+}
+
+std::shared_ptr<libCZI::IStream> libCZI::StreamsFactory::CreateDefaultStreamForFile(const char* filename)
+{
+#if _WIN32
+    return std::make_shared<WindowsFileInputStream>(filename);
+#endif
+
+    return std::make_shared<SimpleFileInputStream>(filename);
+}
+
+std::shared_ptr<libCZI::IStream> libCZI::StreamsFactory::CreateDefaultStreamForFile(const wchar_t* filename)
+{
+#if _WIN32
+    return std::make_shared<WindowsFileInputStream>(filename);
+#endif
+
+    return std::make_shared<SimpleFileInputStream>(filename);
 }

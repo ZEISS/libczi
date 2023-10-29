@@ -230,5 +230,8 @@ namespace libCZI
 
         static bool GetStreamInfoForClass(int index, StreamClassInfo& stream_info);
         static int GetStreamInfoCount();
+
+        static std::shared_ptr<libCZI::IStream> CreateDefaultStreamForFile(const char* filename);
+        static std::shared_ptr<libCZI::IStream> CreateDefaultStreamForFile(const wchar_t* filename);
     };
 }

@@ -110,6 +110,8 @@ set(LIBCZISRCFILES
             StreamsLib/curlhttpinputstream.h
             StreamsLib/windowsfileinputstream.cpp
             StreamsLib/windowsfileinputstream.h
+            StreamsLib/simplefileinputstream.cpp
+            StreamsLib/simplefileinputstream.h
 )
 
 # prepare the configuration-file "libCZI_Config.h"

@@ -90,15 +90,16 @@ std::shared_ptr<IAccessor> libCZI::CreateAccesor(std::shared_ptr<ISubBlockReposi
 
 std::shared_ptr<libCZI::IStream> libCZI::CreateStreamFromFile(const wchar_t* szFilename)
 {
-#ifdef _WIN32
-    return make_shared<CSimpleStreamImplWindows>(szFilename);
-#else
-#if LIBCZI_USE_PREADPWRITEBASED_STREAMIMPL
-    return make_shared<CStreamImplPread>(szFilename);
-#else
-    return make_shared<CSimpleStreamImpl>(szFilename);
-#endif
-#endif
+    return StreamsFactory::CreateDefaultStreamForFile(szFilename);
+//#ifdef _WIN32
+//    return make_shared<CSimpleStreamImplWindows>(szFilename);
+//#else
+//#if LIBCZI_USE_PREADPWRITEBASED_STREAMIMPL
+//    return make_shared<CStreamImplPread>(szFilename);
+//#else
+//    return make_shared<CSimpleStreamImpl>(szFilename);
+//#endif
+//#endif
 }
 
 std::shared_ptr<libCZI::IStream> libCZI::CreateStreamFromMemory(std::shared_ptr<const void> ptr, size_t dataSize)

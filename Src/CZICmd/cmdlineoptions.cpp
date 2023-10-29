@@ -1926,6 +1926,18 @@ void CCmdLineOptions::PrintHelpStreamsObjects()
 {
     this->GetLog()->WriteLineStdOut("Available Input-Stream objects:  [default class is denoted with '(*)']");
     this->GetLog()->WriteLineStdOut("");
+
+    int stream_object_count = libCZI::StreamsFactory::GetStreamInfoCount();
+    ostringstream string_stream;
+    for (int i=0;i<stream_object_count;++i)
+    {
+        libCZI::StreamsFactory::StreamClassInfo stream_class_info;
+        libCZI::StreamsFactory::GetStreamInfoForClass(i, stream_class_info);
+        string_stream << i + 1 << ": " << stream_class_info.class_name << endl;
+        string_stream << "    " << stream_class_info.short_description << endl;
+    }
+
+    this->GetLog()->WriteLineStdOut(string_stream.str());
 }
 
 /*static*/bool CCmdLineOptions::TryParseSubBlockMetadataKeyValue(const std::string& s, std::map<std::string, std::string>* subblock_metadata_property_bag)

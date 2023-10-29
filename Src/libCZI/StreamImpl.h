@@ -12,6 +12,7 @@
     #include <Windows.h>
 #endif
 
+#if 0
 /// <summary>   A simplistic stream implementation (based on C-runtime fopen). Note that this implementation is NOT thread-safe.</summary>
 class CSimpleStreamImpl : public libCZI::IStream
 {
@@ -24,6 +25,7 @@ public:
 public: // interface libCZI::IStream
     void Read(std::uint64_t offset, void* pv, std::uint64_t size, std::uint64_t* ptrBytesRead) override;
 };
+#endif
 
 /// <summary>   A simplistic output-stream implementation (based on C-runtime fopen). Note that this implementation is NOT thread-safe.</summary>
 class CSimpleOutputStreamStreams : public libCZI::IOutputStream
@@ -80,17 +82,17 @@ public: // interface libCZI::IOutputStream
 #endif
 
 #if defined(_WIN32)
-class CSimpleStreamImplWindows : public libCZI::IStream
-{
-private:
-    HANDLE handle;
-public:
-    CSimpleStreamImplWindows() = delete;
-    explicit CSimpleStreamImplWindows(const wchar_t* filename);
-    ~CSimpleStreamImplWindows() override;
-public: // interface libCZI::IStream
-    void Read(std::uint64_t offset, void* pv, std::uint64_t size, std::uint64_t* ptrBytesRead) override;
-};
+//class CSimpleStreamImplWindows : public libCZI::IStream
+//{
+//private:
+//    HANDLE handle;
+//public:
+//    CSimpleStreamImplWindows() = delete;
+//    explicit CSimpleStreamImplWindows(const wchar_t* filename);
+//    ~CSimpleStreamImplWindows() override;
+//public: // interface libCZI::IStream
+//    void Read(std::uint64_t offset, void* pv, std::uint64_t size, std::uint64_t* ptrBytesRead) override;
+//};
 
 class CSimpleOutputStreamImplWindows : public libCZI::IOutputStream
 {

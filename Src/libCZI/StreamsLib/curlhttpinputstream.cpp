@@ -30,7 +30,7 @@ CurlHttpInputStream::CurlHttpInputStream(const std::string& url, const std::map<
     CURLcode return_code = curl_easy_setopt(up_curl_handle.get(), CURLOPT_URL, url.c_str());
     ThrowIfCurlSetOptError(return_code, "CURLOPT_URL");
 
-    return_code = curl_easy_setopt(up_curl_handle.get(), CURLOPT_VERBOSE, 1L/*1L*/);
+    return_code = curl_easy_setopt(up_curl_handle.get(), CURLOPT_VERBOSE, 0L/*1L*/);
     ThrowIfCurlSetOptError(return_code, "CURLOPT_VERBOSE");
 
     /* disable progress meter, set to 0L to enable it */
