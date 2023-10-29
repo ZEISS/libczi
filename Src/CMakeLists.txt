@@ -10,7 +10,7 @@ endif()
 
 add_subdirectory(JxrDecode)
 
-if (LIBCZI_BUILD_STREAMSLIB)
+if (LIBCZI_BUILD_CURL_BASED_STREAM)
   find_package(CURL CONFIG)
   if(${CURL_FOUND})
     message(STATUS "Found CURL version: ${CURL_VERSION_STRING}")
@@ -47,16 +47,16 @@ if (LIBCZI_BUILD_STREAMSLIB)
     #ExternalProject_Get_Property(libcurl binary_dir)
 
     # Define an imported target
-    add_library(CURL::libcurl STATIC IMPORTED GLOBAL)
+    #add_library(CURL::libcurl STATIC IMPORTED GLOBAL)
 
 
     #message(STATUS "********** CURL-source **********: ${source_dir}")
 
-    add_dependencies(CURL::libcurl libcurl)
+    #add_dependencies(CURL::libcurl libcurl)
 
-    add_custom_target(set_curl_properties
-    COMMAND ${CMAKE_COMMAND} -P set_curl_properties.cmake)
-    add_dependencies(set_curl_properties libcurl)
+    #add_custom_target(set_curl_properties
+    #COMMAND ${CMAKE_COMMAND} -P set_curl_properties.cmake)
+    #add_dependencies(set_curl_properties libcurl)
 
    # Set properties for the imported target
 #   set_target_properties(CURL::libcurl PROPERTIES
@@ -64,7 +64,8 @@ if (LIBCZI_BUILD_STREAMSLIB)
 #    INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_BINARY_DIR}/curl/include"
 #    )
 
-
+    set(CURL_INCLUDE_DIRS ${CMAKE_BINARY_DIR}/curl/include)
+    set(CURL_LIBRARIES ${CMAKE_BINARY_DIR}/curl/lib/libcurl.a)
     #set(CURL_SOURCE_DIR ${source_dir})
     #set(CURL_BINARY_DIR ${binary_dir})
     #set(CURL_LIBRARIES ${CURL_BINARY_DIR}/lib/.libs/libcurl.dylib)
