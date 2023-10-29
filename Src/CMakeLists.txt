@@ -27,7 +27,7 @@ if (LIBCZI_BUILD_STREAMSLIB)
          # Pass CMake arguments to build curl as a static library
         CMAKE_ARGS -DBUILD_SHARED_LIBS=OFF
                    -DBUILD_STATIC_LIBS =ON
-                   -DCMAKE_INSTALL_PREFIX=<install-path>
+                   -DCMAKE_INSTALL_PREFIX=${CMAKE_BINARY_DIR}/curl
                    -DENABLE_UNICODE=ON
   
     )
