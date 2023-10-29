@@ -34,12 +34,12 @@ SimpleFileInputStream::SimpleFileInputStream(const wchar_t* filename)
 
 SimpleFileInputStream::SimpleFileInputStream(const std::string& filename)
 {
-    FILE* file = fopen(filename_utf8.c_str(), "rb");
+    FILE* file = fopen(filename.c_str(), "rb");
     if (file == NULL)
     {
         auto err = errno;
         stringstream ss;
-        ss << "Error opening the file \"" << filename_utf8 << "\" -> errno=" << err << " (" << strerror(err) << ")";
+        ss << "Error opening the file \"" << filename<< "\" -> errno=" << err << " (" << strerror(err) << ")";
         throw runtime_error(ss.str());
     }
 
