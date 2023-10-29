@@ -20,8 +20,8 @@ if (LIBCZI_BUILD_STREAMSLIB)
     message(STATUS "Could not find libcURL.  This dependency will be downloaded.")
     ExternalProject_Add(
         libcurl
-        GIT_REPOSITORY "git://github.com/bagder/curl.git"
-        GIT_TAG "1b6bc02fb926403f04061721f9159e9887202a96"
+        GIT_REPOSITORY  "https://github.com/curl/curl.git"
+        GIT_TAG "curl-8_4_0"
         SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/lib/curl
         PATCH_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/lib/cURL/buildconf
         CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/lib/cURL/configure --prefix=<INSTALL_DIR>
