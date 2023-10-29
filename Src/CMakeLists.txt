@@ -66,6 +66,8 @@ if (LIBCZI_BUILD_CURL_BASED_STREAM)
 
     set(CURL_INCLUDE_DIRS ${CMAKE_BINARY_DIR}/curl/include)
     set(CURL_LIBRARIES ${CMAKE_BINARY_DIR}/curl/lib/libcurl.a)
+
+    message(STATUS "********** CURL_INCLUDE_DIRS **********: ${CURL_INCLUDE_DIRS}")
     #set(CURL_SOURCE_DIR ${source_dir})
     #set(CURL_BINARY_DIR ${binary_dir})
     #set(CURL_LIBRARIES ${CURL_BINARY_DIR}/lib/.libs/libcurl.dylib)
