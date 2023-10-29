@@ -42,7 +42,9 @@ if (LIBCZI_BUILD_CURL_BASED_STREAM)
 #        LOG_TEST ON
 #        LOG_INSTALL ON
 
-
+    # Specify the include directories
+    ExternalProject_Get_Property(curl INSTALL_DIR)
+    message(STATUS "********** CURL-INSTALL_DIR **********: ${INSTALL_DIR}")
     #ExternalProject_Get_Property(libcurl source_dir)
     #ExternalProject_Get_Property(libcurl binary_dir)
 
