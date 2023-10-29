@@ -1,8 +1,7 @@
 #include "windowsfileinputstream.h"
 
-#include <intsafe.h>
-
 #if defined(_WIN32)
+#include <intsafe.h>
 #include <iomanip>
 #include "../utilities.h"
 
