@@ -80,6 +80,8 @@ add_executable(CZIcmd ${CZICMDSRCFILES})
 set_target_properties(CZIcmd PROPERTIES CXX_STANDARD 11)
 target_compile_definitions(CZIcmd PRIVATE _LIBCZISTATICLIB)
 message(STATUS "********** ZLIB_LIBRARIES **********: ${ZLIB_LIBRARIES}")
+message(STATUS "********** CMAKE_REQUIRED_LIBRARIES **********: ${CMAKE_REQUIRED_LIBRARIES}")
+
 target_link_libraries(CZIcmd PRIVATE ${ZLIB_LIBRARIES}  ${PNG_LIBRARIES} CLI11::CLI11 libCZIStatic)
 target_include_directories(CZIcmd PRIVATE ${CMAKE_CURRENT_BINARY_DIR} "${RAPIDJSON_INCLUDE_DIRS}")
 
