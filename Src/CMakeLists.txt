@@ -22,19 +22,29 @@ if (LIBCZI_BUILD_STREAMSLIB)
         libcurl
         GIT_REPOSITORY  "https://github.com/curl/curl.git"
         GIT_TAG "curl-8_4_0"
-        SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/lib/curl
-        PATCH_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/lib/cURL/buildconf
-        CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/lib/cURL/configure --prefix=<INSTALL_DIR>
-        BUILD_COMMAND ${MAKE}
-        UPDATE_COMMAND ""
-        INSTALL_COMMAND ""
-        LOG_DOWNLOAD ON
-        LOG_UPDATE ON
-        LOG_CONFIGURE ON
-        LOG_BUILD ON
-        LOG_TEST ON
-        LOG_INSTALL ON
+        # Set the prefix to control where it's installed
+        PREFIX ${CMAKE_BINARY_DIR}/curl
+         # Pass CMake arguments to build curl as a static library
+        CMAKE_ARGS -DBUILD_SHARED_LIBS=OFF
+               -DCMAKE_INSTALL_PREFIX=<install-path>
+               -DCURL_STATICLIB=ON
+  
     )
+
+#    SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/lib/curl
+#        PATCH_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/lib/cURL/buildconf
+#        CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/lib/cURL/configure --prefix=<INSTALL_DIR>
+#        BUILD_COMMAND ${MAKE}
+#        UPDATE_COMMAND ""
+#        INSTALL_COMMAND ""
+#        LOG_DOWNLOAD ON
+#        LOG_UPDATE ON
+#        LOG_CONFIGURE ON
+#        LOG_BUILD ON
+#        LOG_TEST ON
+#        LOG_INSTALL ON
+
+
     ExternalProject_Get_Property(libcurl source_dir)
     ExternalProject_Get_Property(libcurl binary_dir)
 
