@@ -113,6 +113,7 @@ SimpleFileInputStream::~SimpleFileInputStream()
 
 /*virtual*/void SimpleFileInputStream::Read(std::uint64_t offset, void* pv, std::uint64_t size, std::uint64_t* ptrBytesRead)
 {
+    std::lock_guard<std::mutex> lck(this->request_mutex_);
 #if defined(_WIN32)
     int r = _fseeki64(this->fp, offset, SEEK_SET);
 #else
