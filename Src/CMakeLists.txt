@@ -56,7 +56,7 @@ if (LIBCZI_BUILD_STREAMSLIB)
 
     add_custom_target(set_curl_properties
     COMMAND ${CMAKE_COMMAND} -P set_curl_properties.cmake)
-    add_dependencies(set_curl_properties curl_project)
+    add_dependencies(set_curl_properties libcurl)
 
    # Set properties for the imported target
 #   set_target_properties(CURL::libcurl PROPERTIES
