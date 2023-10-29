@@ -49,6 +49,9 @@ if (LIBCZI_BUILD_STREAMSLIB)
     # Define an imported target
     add_library(CURL::libcurl STATIC IMPORTED GLOBAL)
 
+
+    message(STATUS "********** CURL-source **********: ${source_dir}")
+
    # Set properties for the imported target
    set_target_properties(CURL::libcurl PROPERTIES
     IMPORTED_LOCATION ${binary_dir}
