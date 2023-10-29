@@ -37,11 +37,24 @@ if (LIBCZI_BUILD_STREAMSLIB)
     )
     ExternalProject_Get_Property(libcurl source_dir)
     ExternalProject_Get_Property(libcurl binary_dir)
-    set(CURL_SOURCE_DIR ${source_dir})
-    set(CURL_BINARY_DIR ${binary_dir})
-    set(CURL_LIBRARIES ${CURL_BINARY_DIR}/lib/.libs/libcurl.dylib)
-    include_directories(${CURL_SOURCE_DIR})
-    set(DEPENDENCIES ${DEPENDENCIES} libcurl)
+
+    # Define an imported target
+    add_library(CURL::libcurl IMPORTED GLOBAL)
+
+   # Set properties for the imported target
+   set_target_properties(CURL::libcurl PROPERTIES
+    IMPORTED_LOCATION ${binary_dir}
+    INTERFACE_INCLUDE_DIRECTORIES ${source_dir}
+    )
+
+   add_dependencies(CURL::libcurl libcurl)
+
+
+    #set(CURL_SOURCE_DIR ${source_dir})
+    #set(CURL_BINARY_DIR ${binary_dir})
+    #set(CURL_LIBRARIES ${CURL_BINARY_DIR}/lib/.libs/libcurl.dylib)
+    #include_directories(${CURL_SOURCE_DIR})
+    #set(DEPENDENCIES ${DEPENDENCIES} libcurl)
   endif(${CURL_FOUND})
 
 endif(LIBCZI_BUILD_STREAMSLIB)
