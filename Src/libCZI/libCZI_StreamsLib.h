@@ -191,22 +191,24 @@ namespace libCZI
         class StreamProperties
         {
         public:
-            
-            static constexpr int kCurlHttp_Proxy = 100; ///< For CurlHttpInputStream, type string: gives the proxy to use, c.f. https://curl.se/libcurl/c/CURLOPT_PROXY.html for more information.
+            enum
+            {
+                kCurlHttp_Proxy = 100, ///< For CurlHttpInputStream, type string: gives the proxy to use, c.f. https://curl.se/libcurl/c/CURLOPT_PROXY.html for more information.
 
-            static constexpr int kCurlHttp_UserAgent = 101; ///< For CurlHttpInputStream, type string: gives the user agent to use, c.f. https://curl.se/libcurl/c/CURLOPT_USERAGENT.html for more information.
+                kCurlHttp_UserAgent = 101, ///< For CurlHttpInputStream, type string: gives the user agent to use, c.f. https://curl.se/libcurl/c/CURLOPT_USERAGENT.html for more information.
 
-            static constexpr int kCurlHttp_Timeout = 102; ///< For CurlHttpInputStream, type int32: gives the timeout in seconds, c.f. https://curl.se/libcurl/c/CURLOPT_TIMEOUT.html for more information.
+                kCurlHttp_Timeout = 102, ///< For CurlHttpInputStream, type int32: gives the timeout in seconds, c.f. https://curl.se/libcurl/c/CURLOPT_TIMEOUT.html for more information.
 
-            static constexpr int kCurlHttp_ConnectTimeout = 103; ///< For CurlHttpInputStream, type int32: gives the timeout in seconds for the connection phase, c.f. https://curl.se/libcurl/c/CURLOPT_CONNECTTIMEOUT.html for more information.
+                kCurlHttp_ConnectTimeout = 103, ///< For CurlHttpInputStream, type int32: gives the timeout in seconds for the connection phase, c.f. https://curl.se/libcurl/c/CURLOPT_CONNECTTIMEOUT.html for more information.
 
-            static constexpr int kCurlHttp_Xoauth2Bearer = 104; ///< For CurlHttpInputStream, type string: gives an OAuth2.0 access token, c.f. https://curl.se/libcurl/c/CURLOPT_XOAUTH2_BEARER.html for more information.
+                kCurlHttp_Xoauth2Bearer = 104, ///< For CurlHttpInputStream, type string: gives an OAuth2.0 access token, c.f. https://curl.se/libcurl/c/CURLOPT_XOAUTH2_BEARER.html for more information.
 
-            static constexpr int kCurlHttp_Cookie = 105; ///< For CurlHttpInputStream, type string: gives a cookie, c.f. https://curl.se/libcurl/c/CURLOPT_COOKIE.html for more information.
+                kCurlHttp_Cookie = 105, ///< For CurlHttpInputStream, type string: gives a cookie, c.f. https://curl.se/libcurl/c/CURLOPT_COOKIE.html for more information.
 
-            static constexpr int kCurlHttp_SslVerifyPeer = 106; ///< For CurlHttpInputStream, type bool: a boolean indicating whether the SSL-certificate of the remote host is to be verified, c.f. https://curl.se/libcurl/c/CURLOPT_SSL_VERIFYPEER.html for more information.
+                kCurlHttp_SslVerifyPeer = 106, ///< For CurlHttpInputStream, type bool: a boolean indicating whether the SSL-certificate of the remote host is to be verified, c.f. https://curl.se/libcurl/c/CURLOPT_SSL_VERIFYPEER.html for more information.
 
-            static constexpr int kCurlHttp_SslVerifyHost = 107; ///< For CurlHttpInputStream, type bool: a boolean indicating whether the SSL-certificate's name is to be verified against host, c.f. https://curl.se/libcurl/c/CURLOPT_SSL_VERIFYHOST.html for more information.
+                kCurlHttp_SslVerifyHost = 107, ///< For CurlHttpInputStream, type bool: a boolean indicating whether the SSL-certificate's name is to be verified against host, c.f. https://curl.se/libcurl/c/CURLOPT_SSL_VERIFYHOST.html for more information.
+            };
         };
 
         struct CreateStreamInfo
