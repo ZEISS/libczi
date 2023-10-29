@@ -39,7 +39,7 @@ if (LIBCZI_BUILD_STREAMSLIB)
     ExternalProject_Get_Property(libcurl binary_dir)
 
     # Define an imported target
-    add_library(CURL::libcurl IMPORTED GLOBAL)
+    add_library(CURL::libcurl STATIC IMPORTED GLOBAL)
 
    # Set properties for the imported target
    set_target_properties(CURL::libcurl PROPERTIES
