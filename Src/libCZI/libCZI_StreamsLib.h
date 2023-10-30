@@ -15,6 +15,13 @@ namespace libCZI
 {
     class IStream;
 
+    /// A factory object for creating streams objects. 
+    /// libCZI is operating on abstractions (IStream for an input stream, IOutputStream for an output stream and IInputOutputStream
+    /// for and input-output-stream) for accessing the CZI-data. In this class factory we gather implementations provided by libCZI
+    /// and provide functionality to enumerate available classes.
+    /// At this point, we can find two variants here - for operating on a file in a file-system and for operating on an http- or
+    /// https-stream.
+    /// The http-stream class is based on cURL (https://curl.se/libcurl/), and it needs to be configured in when building libCZI.
     class StreamsFactory
     {
     public:
@@ -193,6 +200,7 @@ namespace libCZI
             }
         };
 
+        /// Here the keys for the property-bag with options for creating a stream-object are gathered.
         class StreamProperties
         {
         public:
@@ -217,6 +225,7 @@ namespace libCZI
             };
         };
 
+        /// The parameters for creating an instance of a stream object.
         struct CreateStreamInfo
         {
             std::string class_name;
