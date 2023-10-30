@@ -50,14 +50,14 @@ public:
 
     // interface IAttachmentRepository
     void EnumerateAttachments(const std::function<bool(int index, const libCZI::AttachmentInfo& info)>& funcEnum) override;
-    void EnumerateSubset(const char* contentFileType, const char* name, const std::function<bool(int index, const libCZI::AttachmentInfo& infi)>& funcEnum) override;
+    void EnumerateSubset(const char* contentFileType, const char* name, const std::function<bool(int index, const libCZI::AttachmentInfo& info)>& funcEnum) override;
     std::shared_ptr<libCZI::IAttachment> ReadAttachment(int index) override;
 
 private:
     void Finish();
 
     void ReadCziStructure();
-    GUID UpdateFileHeaderGuid();
+    libCZI::GUID UpdateFileHeaderGuid();
     void DetermineNextSubBlockOffset();
 
     std::tuple<bool, std::uint64_t, CCziSubBlockDirectoryBase::SubBlkEntry> ReplaceSubBlock(const libCZI::AddSubBlockInfo& addSubBlockInfo, const CCziSubBlockDirectoryBase::SubBlkEntry& subBlkEntry);

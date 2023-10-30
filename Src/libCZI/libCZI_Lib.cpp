@@ -2,7 +2,6 @@
 //
 // SPDX-License-Identifier: LGPL-3.0-or-later
 
-#include "stdafx.h"
 #include "libCZI.h"
 #include "CZIReader.h"
 #include "CziMetadata.h"
@@ -54,9 +53,14 @@ std::shared_ptr<ICZIReader> libCZI::CreateCZIReader()
     return std::make_shared<CCZIReader>();
 }
 
-std::shared_ptr<ICziWriter> libCZI::CreateCZIWriter()
+std::shared_ptr<ICziWriter> libCZI::CreateCZIWriter(const CZIWriterOptions* options)
 {
-    return std::make_shared<CCziWriter>();
+    if (options == nullptr)
+    {
+        return std::make_shared<CCziWriter>();
+    }
+
+    return std::make_shared<CCziWriter>(*options);
 }
 
 std::shared_ptr<ICziReaderWriter> libCZI::CreateCZIReaderWriter()

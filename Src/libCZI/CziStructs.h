@@ -4,7 +4,7 @@
 
 #pragma once
 
-// TODO: we need a platform-independent replacement for GUID
+#include "libCZI_Utilities.h"
 
 #if !defined(__GNUC__)
 #include <pshpack2.h>
@@ -50,7 +50,7 @@ typedef struct PACKED AttachmentInfo
     std::int64_t AllocatedSize;
     std::int64_t DataSize;
     std::int32_t FilePart;
-    GUID ContentGuid;
+    libCZI::GUID ContentGuid;
     char ContentFileType[8];
     char Name[80];
     //HANDLE FileHandle;
@@ -120,8 +120,8 @@ struct PACKED FileHeaderSegmentData
     std::int32_t Minor;
     std::int32_t _Reserved1;
     std::int32_t _Reserved2;
-    GUID PrimaryFileGuid;
-    GUID FileGuid;
+    libCZI::GUID PrimaryFileGuid;
+    libCZI::GUID FileGuid;
     std::int32_t FilePart;
     std::int64_t SubBlockDirectoryPosition;
     std::int64_t MetadataPosition;
@@ -179,7 +179,16 @@ struct PACKED SubBlockDirectoryEntryDV
     std::int64_t FilePosition;
     std::int32_t FilePart;
     std::int32_t Compression;
-    unsigned char _spare[6];
+
+    /// _spare[0] seems to contain information about the "pyramid-type", where valid values are
+    /// 
+    /// 0: None
+    /// 1: SingleSubblock  
+    /// 2: MultiSubblock  
+    /// 
+    /// The significance and importance of this field is unclear, and it seems of questionable use. It is
+    /// considered legacy and should not be used.
+    std::uint8_t _spare[6];
     std::int32_t DimensionCount;
 
     // max. allocation for ease of use (valid size = 32 + EntryCount * 20)
@@ -202,7 +211,7 @@ struct PACKED AttachmentEntryA1
     unsigned char _spare[10];
     std::int64_t FilePosition;
     std::int32_t FilePart;
-    GUID ContentGuid;
+    libCZI::GUID ContentGuid;
     unsigned char ContentFileType[8];
     unsigned char Name[80];
 };

@@ -2,7 +2,6 @@
 //
 // SPDX-License-Identifier: LGPL-3.0-or-later
 
-#include "stdafx.h"
 #include <utility>
 #include "CZIReader.h"
 #include "CziParse.h"
@@ -15,6 +14,23 @@
 using namespace std;
 using namespace libCZI;
 
+static CCZIParse::SubblockDirectoryParseOptions GetParseOptionsFromOpenOptions(const ICZIReader::OpenOptions& options)
+{
+    CCZIParse::SubblockDirectoryParseOptions parse_options;
+    if (options.lax_subblock_coordinate_checks == false)
+    {
+        parse_options.SetStrictParsing();
+        if (options.ignore_sizem_for_pyramid_subblocks)
+        {
+            // in this case we require only that non-pyramid-subblocks have a SizeM=1
+            parse_options.SetDimensionMMustHaveSizeOne(false);
+            parse_options.SetDimensionMMustHaveSizeOneExceptForPyramidSubblocks(true);
+        }
+    }
+
+    return parse_options;
+}
+
 CCZIReader::CCZIReader() : isOperational(false)
 {
 }
@@ -23,21 +39,27 @@ CCZIReader::~CCZIReader()
 {
 }
 
-/*virtual */void CCZIReader::Open(std::shared_ptr<libCZI::IStream> stream)
+/*virtual */void CCZIReader::Open(const std::shared_ptr<libCZI::IStream>& stream, const ICZIReader::OpenOptions* options)
 {
     if (this->isOperational == true)
     {
         throw logic_error("CZIReader is already operational.");
     }
 
+    if (options == nullptr)
+    {
+        const auto default_options = OpenOptions{};
+        return CCZIReader::Open(stream, &default_options);
+    }
+
     this->hdrSegmentData = CCZIParse::ReadFileHeaderSegmentData(stream.get());
-    this->subBlkDir = CCZIParse::ReadSubBlockDirectory(stream.get(), this->hdrSegmentData.GetSubBlockDirectoryPosition());
-    auto attachmentPos = this->hdrSegmentData.GetAttachmentDirectoryPosition();
+    this->subBlkDir = CCZIParse::ReadSubBlockDirectory(stream.get(), this->hdrSegmentData.GetSubBlockDirectoryPosition(), GetParseOptionsFromOpenOptions(*options));
+    const auto attachmentPos = this->hdrSegmentData.GetAttachmentDirectoryPosition();
     if (attachmentPos != 0)
     {
         // we should be operational without an attachment-directory as well I suppose.
         // TODO: how to determine whether there is "no attachment-directory" - is the check for 0 sufficient?
-        this->attachmentDir = std::move(CCZIParse::ReadAttachmentsDirectory(stream.get(), attachmentPos));
+        this->attachmentDir = CCZIParse::ReadAttachmentsDirectory(stream.get(), attachmentPos);
     }
 
     this->stream = stream;
@@ -84,13 +106,14 @@ CCZIReader::~CCZIReader()
         [&](int index, const CCziSubBlockDirectory::SubBlkEntry& entry)->bool
         {
             SubBlockInfo info;
-    info.compressionModeRaw = entry.Compression;
-    info.pixelType = CziUtils::PixelTypeFromInt(entry.PixelType);
-    info.coordinate = entry.coordinate;
-    info.logicalRect = IntRect{ entry.x,entry.y,entry.width,entry.height };
-    info.physicalSize = IntSize{ (std::uint32_t)entry.storedWidth, (std::uint32_t)entry.storedHeight };
-    info.mIndex = entry.mIndex;
-    return funcEnum(index, info);
+            info.compressionModeRaw = entry.Compression;
+            info.pixelType = CziUtils::PixelTypeFromInt(entry.PixelType);
+            info.coordinate = entry.coordinate;
+            info.logicalRect = IntRect{ entry.x,entry.y,entry.width,entry.height };
+            info.physicalSize = IntSize{ (std::uint32_t)entry.storedWidth, (std::uint32_t)entry.storedHeight };
+            info.mIndex = entry.mIndex;
+            info.pyramidType = CziUtils::PyramidTypeFromByte(entry.pyramid_type_from_spare);
+            return funcEnum(index, info);
         });
 }
 
@@ -101,14 +124,15 @@ CCZIReader::~CCZIReader()
         [&](int index, const CCziSubBlockDirectory::SubBlkEntry& entry)->bool
         {
             DirectorySubBlockInfo info;
-    info.compressionModeRaw = entry.Compression;
-    info.pixelType = CziUtils::PixelTypeFromInt(entry.PixelType);
-    info.coordinate = entry.coordinate;
-    info.logicalRect = IntRect{ entry.x,entry.y,entry.width,entry.height };
-    info.physicalSize = IntSize{ (std::uint32_t)entry.storedWidth, (std::uint32_t)entry.storedHeight };
-    info.mIndex = entry.mIndex;
-    info.filePosition = entry.FilePosition;
-    return funcEnum(index, info);
+            info.compressionModeRaw = entry.Compression;
+            info.pixelType = CziUtils::PixelTypeFromInt(entry.PixelType);
+            info.coordinate = entry.coordinate;
+            info.logicalRect = IntRect{ entry.x,entry.y,entry.width,entry.height };
+            info.physicalSize = IntSize{ (std::uint32_t)entry.storedWidth, (std::uint32_t)entry.storedHeight };
+            info.mIndex = entry.mIndex;
+            info.pyramidType = CziUtils::PyramidTypeFromByte(entry.pyramid_type_from_spare);
+            info.filePosition = entry.FilePosition;
+            return funcEnum(index, info);
         });
 }
 
@@ -137,7 +161,7 @@ CCZIReader::~CCZIReader()
                 }
             }
 
-    return true;
+            return true;
         });
 }
 
@@ -169,8 +193,8 @@ CCZIReader::~CCZIReader()
             [&](int index, const SubBlockInfo& sbinfo)->bool
             {
                 info = sbinfo;
-        foundASubBlock = true;
-        return false;
+                foundASubBlock = true;
+                return false;
             });
     }
     else
@@ -179,14 +203,14 @@ CCZIReader::~CCZIReader()
             [&](int index, const SubBlockInfo& sbinfo)->bool
             {
                 int c;
-        if (sbinfo.coordinate.TryGetPosition(DimensionIndex::C, &c) == true && c == channelIndex)
-        {
-            info = sbinfo;
-            foundASubBlock = true;
-            return false;
-        }
+                if (sbinfo.coordinate.TryGetPosition(DimensionIndex::C, &c) == true && c == channelIndex)
+                {
+                    info = sbinfo;
+                    foundASubBlock = true;
+                    return false;
+                }
 
-        return true;
+                return true;
             });
     }
 
@@ -209,6 +233,7 @@ CCZIReader::~CCZIReader()
         info->logicalRect = IntRect{ entry.x,entry.y,entry.width,entry.height };
         info->physicalSize = IntSize{ static_cast<std::uint32_t>(entry.storedWidth), static_cast<std::uint32_t>(entry.storedHeight) };
         info->mIndex = entry.mIndex;
+        info->pyramidType = CziUtils::PyramidTypeFromByte(entry.pyramid_type_from_spare);
     }
 
     return true;
@@ -236,14 +261,14 @@ CCZIReader::~CCZIReader()
         [&](int index, const CCziAttachmentsDirectory::AttachmentEntry& ae)
         {
             ai.contentGuid = ae.ContentGuid;
-    memcpy(ai.contentFileType, ae.ContentFileType, sizeof(ae.ContentFileType));
-    ai.name = ae.Name;
-    bool b = funcEnum(index, ai);
-    return b;
+            memcpy(ai.contentFileType, ae.ContentFileType, sizeof(ae.ContentFileType));
+            ai.name = ae.Name;
+            bool b = funcEnum(index, ai);
+            return b;
         });
 }
 
-/*virtual*/void CCZIReader::EnumerateSubset(const char* contentFileType, const char* name, const std::function<bool(int index, const libCZI::AttachmentInfo& infi)>& funcEnum)
+/*virtual*/void CCZIReader::EnumerateSubset(const char* contentFileType, const char* name, const std::function<bool(int index, const libCZI::AttachmentInfo& info)>& funcEnum)
 {
     this->ThrowIfNotOperational();
     libCZI::AttachmentInfo ai;
@@ -263,7 +288,7 @@ CCZIReader::~CCZIReader()
                 }
             }
 
-    return true;
+            return true;
         });
 }
 
@@ -292,6 +317,7 @@ std::shared_ptr<ISubBlock> CCZIReader::ReadSubBlock(const CCziSubBlockDirectory:
     info.mIndex = subBlkData.mIndex;
     info.logicalRect = subBlkData.logicalRect;
     info.physicalSize = subBlkData.physicalSize;
+    info.pyramidType = CziUtils::PyramidTypeFromByte(subBlkData.spare[0]);
 
     return std::make_shared<CCziSubBlock>(info, subBlkData, free);
 }

@@ -2,7 +2,6 @@
 //
 // SPDX-License-Identifier: LGPL-3.0-or-later
 
-#include "stdafx.h"
 #include <stdexcept>
 #include <cstdint>
 #include "inc_libCZI_Config.h"

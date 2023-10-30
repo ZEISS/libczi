@@ -13,7 +13,6 @@
 
 #include "ImportExport.h"
 
-#include "priv_guiddef.h"
 #include "libCZI_exceptions.h"
 #include "libCZI_DimCoordinate.h"
 #include "libCZI_Pixels.h"
@@ -101,9 +100,20 @@ namespace libCZI
     /// \return The newly created CZI-reader.
     LIBCZI_API std::shared_ptr<ICZIReader> CreateCZIReader();
 
+    /// Options controlling the operation of a CZI-writer object. Those options are set at construction
+    /// time and cannot be mutated afterwards.
+    struct CZIWriterOptions
+    {
+        /// True if the writer should allow that duplicate subblocks are added. In general, it is
+        /// not recommended to bypass the check for duplicate subblocks.
+        bool allow_duplicate_subblocks{ false };
+    };
+
     /// Creates a new instance of the CZI-writer class.
-    /// \return The newly created CZI-writer.
-    LIBCZI_API std::shared_ptr<ICziWriter> CreateCZIWriter();
+    /// \param  options (Optional) Options for controlling the operation. This argument may
+    ///                 be null, in which case default options are used.
+    /// \returns The newly created CZI-writer.
+    LIBCZI_API std::shared_ptr<ICziWriter> CreateCZIWriter(const CZIWriterOptions* options = nullptr);
 
     /// Creates a new instance of the CZI-reader-writer class.
     /// \return The newly created CZI-reader-writer.
@@ -231,6 +241,10 @@ namespace libCZI
         /// The M-index of the sub-block (if available). If not available, it has the value std::numeric_limits<int>::max() or std::numeric_limits<int>::min().
         int                     mIndex;
 
+        /// This field indicates the "pyramid-type" of the sub-block. The significance and importance of this field is unclear, and is considered
+        /// legacy. It is recommended to ignore this field.
+        SubBlockPyramidType     pyramidType;
+
         /// Calculate a zoom-factor from the physical- and logical size.
         /// \remark
         /// This calculation not really well-defined.
@@ -327,9 +341,9 @@ namespace libCZI
     /// Information about an attachment.
     struct AttachmentInfo
     {
-        GUID        contentGuid;            ///< A Guid identifying the content of the attachment.
-        char        contentFileType[9];     ///< A null-terminated character array identifying the content of the attachment.
-        std::string name;                   ///< A string identifying the content of the attachment.
+        libCZI::GUID    contentGuid;            ///< A Guid identifying the content of the attachment.
+        char            contentFileType[9];     ///< A null-terminated character array identifying the content of the attachment.
+        std::string     name;                   ///< A string identifying the content of the attachment.
     };
 
     /// Representation of an attachment. An attachment is a binary blob, its inner structure is opaque.
@@ -351,7 +365,7 @@ namespace libCZI
         /// \return The raw data.
         virtual std::shared_ptr<const void> GetRawData(size_t* ptrSize) = 0;
 
-        virtual ~IAttachment() {}
+        virtual ~IAttachment() = default;
 
         /// A helper method used to cast the pointer to a specific type.
         /// \param [out] ptr     The pointer to the data is stored here.
@@ -595,7 +609,7 @@ namespace libCZI
         ///                 functor is true, the enumeration is continued, otherwise it is stopped.
         ///                 The first argument is the index of the attachment and the second is providing
         ///                 information about the attachment.
-        virtual void EnumerateSubset(const char* contentFileType, const char* name, const std::function<bool(int index, const AttachmentInfo& infi)>& funcEnum) = 0;
+        virtual void EnumerateSubset(const char* contentFileType, const char* name, const std::function<bool(int index, const AttachmentInfo& info)>& funcEnum) = 0;
 
         /// Reads the attachment identified by the specified index. If there is no attachment present (for
         /// the specified index) then an empty shared_ptr is returned. If a different kind of problem
@@ -612,23 +626,52 @@ namespace libCZI
     {
         ///< The file-GUID of the CZI. Note: CZI defines two GUIDs, this is the "FileGuid". Multi-file containers 
         /// (for which the other GUID "PrimaryFileGuid" is used) are not supported by libCZI currently.
-        GUID fileGuid;
+        libCZI::GUID fileGuid;
         int majorVersion;   ///< The major version.
         int minorVersion;   ///< The minor version.
     };
 
     /// This interface is used to represent the CZI-file.
-    class ICZIReader : public ISubBlockRepository, public ISubBlockRepositoryEx, public IAttachmentRepository
+    class LIBCZI_API ICZIReader : public ISubBlockRepository, public ISubBlockRepositoryEx, public IAttachmentRepository
     {
     public:
-        /// Opens the specified stream and reads the global information from the CZI-document.
-        /// The stream passed in will have its refcount incremented, a reference is held until Close
-        /// is called (or the instance is destroyed).
+        /// This structure gathers the settings for controlling the 'Open' operation of the CZIReader-class.
+        struct LIBCZI_API OpenOptions
+        {
+            /// This option controls whether the lax parameter validation when parsing the dimension-entry of a subblock is to be used.
+            /// Previous versions of libCZI did not check whether certain values in the file have the expected value. If those values
+            /// are different than expected, this meant that libCZI would not be able to deal with the document properly.  
+            /// If lax checking of this is disabled, then Open will fail with a corresponding exception.
+            /// The default is to enable lax checking (for compatibility with previous libCZI-versions), but users are encouraged to
+            /// disable this for new code.
+            bool lax_subblock_coordinate_checks{ true };
+
+            /// This option controls whether the size-M-attribute of a pyramid-subblocks is to be ignored (when parsing and validating
+            /// the dimension-entry of a subblock). This flag is only relevant if strict validation is enabled (i.e. lax_subblock_coordinate_checks
+            /// is 'false'). If lax_subblock_coordinate_checks is true, then this flag has no effect.
+            /// This is useful as some versions of software creating CZI-files used to write bogus values for size-M, and those files
+            /// would otherwise not be usable with strict validation enabled. If this bogus size-M is ignored, then the files can be used
+            /// without problems.
+            bool ignore_sizem_for_pyramid_subblocks{ false };   
+
+            /// Sets the the default.
+            void SetDefault()
+            {
+                this->lax_subblock_coordinate_checks = true;
+            }
+        };
+
+        /// Opens the specified stream and reads the global information from the CZI-document. The stream
+        /// passed in will have its refcount incremented, a reference is held until Close is called (or
+        /// the instance is destroyed).
+        /// 
         /// \remark
-        /// If this method is called twice, then an exception of type std::logic_error is thrown.
+        /// If this method is called twice (assuming successful return), then an exception of type std::logic_error is
+        /// thrown.
         ///
-        /// \param stream The stream object.
-        virtual void Open(std::shared_ptr<IStream> stream) = 0;
+        /// \param  stream  The stream object.
+        /// \param  options (Optional) Options for controlling the operation. If nullptr is given here, then the default settings are used.
+        virtual void Open(const std::shared_ptr<IStream>& stream, const OpenOptions* options = nullptr) = 0;
 
         /// Gets the file header information.
         /// \return The file header information.

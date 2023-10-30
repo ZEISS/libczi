@@ -2,7 +2,6 @@
 //
 // SPDX-License-Identifier: LGPL-3.0-or-later
 
-#include "stdafx.h"
 #include "CziReaderWriter.h"
 #include "CziMetadataSegment.h"
 #include "libCZI_Utilities.h"
@@ -396,6 +395,7 @@ void CCziReaderWriter::ReadCziStructure()
             {
                 this->sbBlkDirectory.AddSubBlock(e);
             },
+            CCZIParse::SubblockDirectoryParseOptions{},
             &sbBlkDirSegmentSize);
 
         this->sbBlkDirectory.SetModified(false);
@@ -435,7 +435,7 @@ void CCziReaderWriter::ReadCziStructure()
         fhs.data.Major = 1;
         fhs.data.Minor = 0;
 
-        GUID fileGuid = this->info->GetFileGuid();
+        libCZI::GUID fileGuid = this->info->GetFileGuid();
         if (Utilities::IsGuidNull(fileGuid))
         {
             fileGuid = Utilities::GenerateNewGuid();
@@ -456,9 +456,9 @@ void CCziReaderWriter::ReadCziStructure()
     this->DetermineNextSubBlockOffset();
 }
 
-GUID CCziReaderWriter::UpdateFileHeaderGuid()
+libCZI::GUID CCziReaderWriter::UpdateFileHeaderGuid()
 {
-    GUID fileGuid = this->info->GetFileGuid();
+    libCZI::GUID fileGuid = this->info->GetFileGuid();
     if (Utilities::IsGuidNull(fileGuid))
     {
         fileGuid = Utilities::GenerateNewGuid();
@@ -676,6 +676,7 @@ void CCziReaderWriter::WriteToOutputStream(std::uint64_t offset, const void* pv,
     info.mIndex = subBlkData.mIndex;
     info.logicalRect = subBlkData.logicalRect;
     info.physicalSize = subBlkData.physicalSize;
+    info.pyramidType = CziUtils::PyramidTypeFromByte(subBlkData.spare[0]);
 
     return std::make_shared<CCziSubBlock>(info, subBlkData, free);
 }
@@ -697,6 +698,7 @@ void CCziReaderWriter::WriteToOutputStream(std::uint64_t offset, const void* pv,
         info->logicalRect = IntRect{ entry.x,entry.y,entry.width,entry.height };
         info->physicalSize = IntSize{ static_cast<std::uint32_t>(entry.storedWidth), static_cast<std::uint32_t>(entry.storedHeight) };
         info->mIndex = entry.mIndex;
+        info->pyramidType = CziUtils::PyramidTypeFromByte(entry.pyramid_type_from_spare);
     }
 
     return true;

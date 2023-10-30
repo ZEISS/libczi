@@ -2,7 +2,6 @@
 //
 // SPDX-License-Identifier: LGPL-3.0-or-later
 
-#include "stdafx.h"
 #include "CziWriter.h"
 #include "CziMetadataSegment.h"
 #include "libCZI_Utilities.h"
@@ -31,21 +30,21 @@ void libCZI::ICziWriter::SyncAddSubBlock(const libCZI::AddSubBlockInfoMemPtr& ad
     AddSubBlockInfo addSbInfo(addSbBlkInfo);
     addSbInfo.sizeData = addSbBlkInfo.dataSize;
     addSbInfo.getData = [&](int callCnt, size_t offset, const void*& ptr, size_t& size)->bool
-    {
-        return SetIfCallCountZero(callCnt, addSbBlkInfo.ptrData, addSbBlkInfo.dataSize, ptr, size);
-    };
+        {
+            return SetIfCallCountZero(callCnt, addSbBlkInfo.ptrData, addSbBlkInfo.dataSize, ptr, size);
+        };
 
     addSbInfo.sizeAttachment = addSbBlkInfo.sbBlkAttachmentSize;
     addSbInfo.getAttachment = [&](int callCnt, size_t offset, const void*& ptr, size_t& size)->bool
-    {
-        return SetIfCallCountZero(callCnt, addSbBlkInfo.ptrSbBlkAttachment, addSbBlkInfo.sbBlkAttachmentSize, ptr, size);
-    };
+        {
+            return SetIfCallCountZero(callCnt, addSbBlkInfo.ptrSbBlkAttachment, addSbBlkInfo.sbBlkAttachmentSize, ptr, size);
+        };
 
     addSbInfo.sizeMetadata = addSbBlkInfo.sbBlkMetadataSize;
     addSbInfo.getMetaData = [&](int callCnt, size_t offset, const void*& ptr, size_t& size)->bool
-    {
-        return SetIfCallCountZero(callCnt, addSbBlkInfo.ptrSbBlkMetadata, addSbBlkInfo.sbBlkMetadataSize, ptr, size);
-    };
+        {
+            return SetIfCallCountZero(callCnt, addSbBlkInfo.ptrSbBlkMetadata, addSbBlkInfo.sbBlkMetadataSize, ptr, size);
+        };
 
     return this->SyncAddSubBlock(addSbInfo);
 }
@@ -58,28 +57,28 @@ void libCZI::ICziWriter::SyncAddSubBlock(const libCZI::AddSubBlockInfoLinewiseBi
     addSbInfo.sizeData = addSbInfoLinewise.physicalHeight * stride;
     auto linesCnt = addSbInfoLinewise.physicalHeight;
     addSbInfo.getData = [&](int callCnt, size_t offset, const void*& ptr, size_t& size)->bool
-    {
-        if (callCnt < linesCnt)
         {
-            ptr = addSbInfoLinewise.getBitmapLine(callCnt);
-            size = stride;
-            return true;
-        }
+            if (callCnt < linesCnt)
+            {
+                ptr = addSbInfoLinewise.getBitmapLine(callCnt);
+                size = stride;
+                return true;
+            }
 
-        return false;
-    };
+            return false;
+        };
 
     addSbInfo.sizeAttachment = addSbInfoLinewise.sbBlkAttachmentSize;
     addSbInfo.getAttachment = [&](int callCnt, size_t offset, const void*& ptr, size_t& size)->bool
-    {
-        return SetIfCallCountZero(callCnt, addSbInfoLinewise.ptrSbBlkAttachment, addSbInfoLinewise.sbBlkAttachmentSize, ptr, size);
-    };
+        {
+            return SetIfCallCountZero(callCnt, addSbInfoLinewise.ptrSbBlkAttachment, addSbInfoLinewise.sbBlkAttachmentSize, ptr, size);
+        };
 
     addSbInfo.sizeMetadata = addSbInfoLinewise.sbBlkMetadataSize;
     addSbInfo.getMetaData = [&](int callCnt, size_t offset, const void*& ptr, size_t& size)->bool
-    {
-        return SetIfCallCountZero(callCnt, addSbInfoLinewise.ptrSbBlkMetadata, addSbInfoLinewise.sbBlkMetadataSize, ptr, size);
-    };
+        {
+            return SetIfCallCountZero(callCnt, addSbInfoLinewise.ptrSbBlkMetadata, addSbInfoLinewise.sbBlkMetadataSize, ptr, size);
+        };
 
     return this->SyncAddSubBlock(addSbInfo);
 }
@@ -90,28 +89,28 @@ void libCZI::ICziWriter::SyncAddSubBlock(const AddSubBlockInfoStridedBitmap& add
 
     addSbInfo.sizeData = addSbBlkInfoStrideBitmap.physicalHeight * (addSbBlkInfoStrideBitmap.physicalWidth * (size_t)CziUtils::GetBytesPerPel(addSbBlkInfoStrideBitmap.PixelType));
     addSbInfo.getData = [&](int callCnt, size_t offset, const void*& ptr, size_t& size)->bool
-    {
-        if (callCnt < addSbBlkInfoStrideBitmap.physicalHeight)
         {
-            ptr = static_cast<const char*>(addSbBlkInfoStrideBitmap.ptrBitmap) + callCnt * (size_t)addSbBlkInfoStrideBitmap.strideBitmap;
-            size = addSbBlkInfoStrideBitmap.physicalWidth * (size_t)CziUtils::GetBytesPerPel(addSbBlkInfoStrideBitmap.PixelType);
-            return true;
-        }
+            if (callCnt < addSbBlkInfoStrideBitmap.physicalHeight)
+            {
+                ptr = static_cast<const char*>(addSbBlkInfoStrideBitmap.ptrBitmap) + callCnt * (size_t)addSbBlkInfoStrideBitmap.strideBitmap;
+                size = addSbBlkInfoStrideBitmap.physicalWidth * (size_t)CziUtils::GetBytesPerPel(addSbBlkInfoStrideBitmap.PixelType);
+                return true;
+            }
 
-        return false;
-    };
+            return false;
+        };
 
     addSbInfo.sizeAttachment = addSbBlkInfoStrideBitmap.sbBlkAttachmentSize;
     addSbInfo.getAttachment = [&](int callCnt, size_t offset, const void*& ptr, size_t& size)->bool
-    {
-        return SetIfCallCountZero(callCnt, addSbBlkInfoStrideBitmap.ptrSbBlkAttachment, addSbBlkInfoStrideBitmap.sbBlkAttachmentSize, ptr, size);
-    };
+        {
+            return SetIfCallCountZero(callCnt, addSbBlkInfoStrideBitmap.ptrSbBlkAttachment, addSbBlkInfoStrideBitmap.sbBlkAttachmentSize, ptr, size);
+        };
 
     addSbInfo.sizeMetadata = addSbBlkInfoStrideBitmap.sbBlkMetadataSize;
     addSbInfo.getMetaData = [&](int callCnt, size_t offset, const void*& ptr, size_t& size)->bool
-    {
-        return SetIfCallCountZero(callCnt, addSbBlkInfoStrideBitmap.ptrSbBlkMetadata, addSbBlkInfoStrideBitmap.sbBlkMetadataSize, ptr, size);
-    };
+        {
+            return SetIfCallCountZero(callCnt, addSbBlkInfoStrideBitmap.ptrSbBlkMetadata, addSbBlkInfoStrideBitmap.sbBlkMetadataSize, ptr, size);
+        };
 
     return this->SyncAddSubBlock(addSbInfo);
 }
@@ -269,7 +268,8 @@ void libCZI::ICziWriter::SyncAddSubBlock(const AddSubBlockInfoStridedBitmap& add
     ptr->PixelType = CziUtils::IntFromPixelType(addSbBlkInfo.PixelType);
     ptr->FilePosition = ptr->FilePart = 0;
     ptr->Compression = addSbBlkInfo.compressionModeRaw;
-    memset(ptr->_spare, 0, sizeof(ptr->_spare));
+    ptr->_spare[0] = CziUtils::ByteFromPyramidType(addSbBlkInfo.pyramid_type);
+    memset(ptr->_spare + 1, 0, sizeof(ptr->_spare) - 1);
     ptr->DimensionCount = CalcCountOfDimensionsEntriesInDirectoryEntryDV(addSbBlkInfo);
 
     // first X and Y
@@ -331,7 +331,8 @@ void libCZI::ICziWriter::SyncAddSubBlock(const AddSubBlockInfoStridedBitmap& add
     ptr->FilePosition = entry.FilePosition;
     ptr->FilePart = 0;
     ptr->Compression = entry.Compression;
-    memset(ptr->_spare, 0, sizeof(ptr->_spare));
+    ptr->_spare[0] = entry.pyramid_type_from_spare;
+    memset(ptr->_spare + 1, 0, sizeof(ptr->_spare) - 1);    // skipping the pyramid-spare-byte we set above here
     ptr->DimensionCount = CalcCountOfDimensionsEntriesInDirectoryEntryDV(entry);
 
     // first X and Y
@@ -829,6 +830,7 @@ void libCZI::ICziWriter::SyncAddSubBlock(const AddSubBlockInfoStridedBitmap& add
     entry.PixelType = CziUtils::IntFromPixelType(addSbBlkInfo.PixelType);
     entry.FilePosition = 0;
     entry.Compression = addSbBlkInfo.compressionModeRaw;
+    entry.pyramid_type_from_spare = CziUtils::ByteFromPyramidType(addSbBlkInfo.pyramid_type);
     return entry;
 }
 
@@ -878,7 +880,11 @@ CCziWriter::CziWriterInfoWrapper::CziWriterInfoWrapper(std::shared_ptr<libCZI::I
 
 //--------------------------------------------------------------------------------------------------
 
-CCziWriter::CCziWriter() : nextSegmentPos(0)
+CCziWriter::CCziWriter() : CCziWriter(CZIWriterOptions{})
+{}
+
+CCziWriter::CCziWriter(const libCZI::CZIWriterOptions& options) 
+    : cziWriterOptions(options), sbBlkDirectory{options.allow_duplicate_subblocks}, nextSegmentPos(0)
 {
 }
 
@@ -1001,7 +1007,7 @@ CCziWriter::~CCziWriter()
     this->ThrowIfNotOperational();
     this->Finish();
     this->nextSegmentPos = 0;
-    this->sbBlkDirectory = CWriterCziSubBlockDirectory();
+    this->sbBlkDirectory = CWriterCziSubBlockDirectory{ this->cziWriterOptions.allow_duplicate_subblocks };
     this->attachmentDirectory = CWriterCziAttachmentsDirectory();
     this->metadataSegment.Invalidate();
     this->subBlockDirectorySegment.Invalidate();
@@ -1158,7 +1164,7 @@ void CCziWriter::WriteAttachmentDirectory()
     }
 }
 
-std::tuple<std::uint64_t, std::uint64_t>  CCziWriter::WriteCurrentAttachmentsDirectory()
+std::tuple<std::uint64_t, std::uint64_t> CCziWriter::WriteCurrentAttachmentsDirectory()
 {
     CWriterUtils::AttachmentDirWriteInfo info;
     if (this->attachmentDirectorySegment.IsValid())
@@ -1176,13 +1182,13 @@ std::tuple<std::uint64_t, std::uint64_t>  CCziWriter::WriteCurrentAttachmentsDir
     info.segmentPosForNewSegment = this->nextSegmentPos;
     info.entryCnt = this->attachmentDirectory.GetAttachmentCount();
     info.enumEntriesFunc = [&](const std::function<void(size_t, const CCziAttachmentsDirectoryBase::AttachmentEntry&)>& f)->void
-    {
-        this->attachmentDirectory.EnumEntries([&](size_t index, const CCziAttachmentsDirectoryBase::AttachmentEntry& e)->bool
-            {
-                f(index, e);
-                return true;
-            });
-    };
+        {
+            this->attachmentDirectory.EnumEntries([&](size_t index, const CCziAttachmentsDirectoryBase::AttachmentEntry& e)->bool
+                {
+                    f(index, e);
+                    return true;
+                });
+        };
     info.writeFunc = std::bind(&CCziWriter::WriteToOutputStream, this, placeholders::_1, placeholders::_2, placeholders::_3, placeholders::_4, placeholders::_5);
     auto posAndSize = CWriterUtils::WriteAttachmentDirectory(info);
     if (get<0>(posAndSize) == info.segmentPosForNewSegment)
@@ -1217,13 +1223,13 @@ std::tuple<std::uint64_t, std::uint64_t> CCziWriter::WriteCurrentSubBlkDirectory
 
     info.segmentPosForNewSegment = this->nextSegmentPos;
     info.enumEntriesFunc = [&](const std::function<void(size_t, const CCziSubBlockDirectoryBase::SubBlkEntry&)>& f)->void
-    {
-        this->sbBlkDirectory.EnumEntries([&](size_t index, const CCziSubBlockDirectoryBase::SubBlkEntry& e)->bool
-            {
-                f(index, e);
-                return true;
-            });
-    };
+        {
+            this->sbBlkDirectory.EnumEntries([&](size_t index, const CCziSubBlockDirectoryBase::SubBlkEntry& e)->bool
+                {
+                    f(index, e);
+                    return true;
+                });
+        };
     info.writeFunc = std::bind(&CCziWriter::WriteToOutputStream, this, placeholders::_1, placeholders::_2, placeholders::_3, placeholders::_4, placeholders::_5);
     auto posAndSize = CWriterUtils::WriteSubBlkDirectory(info);
     if (get<0>(posAndSize) == info.segmentPosForNewSegment)

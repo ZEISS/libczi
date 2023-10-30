@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: LGPL-3.0-or-later
 
-#include "pch.h"
+#include "include_gtest.h"
 #include "testImage.h"
 #include "inc_libCZI.h"
 
@@ -23,6 +23,7 @@ struct SubBlockEntryData
 static CCziSubBlockDirectory::SubBlkEntry SubBlkEntryFromSubBlockEntryData(const SubBlockEntryData* ptrData)
 {
     CCziSubBlockDirectory::SubBlkEntry entry;
+    entry.Invalidate();
     entry.coordinate = CDimCoordinate::Parse(ptrData->coordinate);
     entry.mIndex = ptrData->mIndex;
     entry.x = ptrData->x;
@@ -36,7 +37,6 @@ static CCziSubBlockDirectory::SubBlkEntry SubBlkEntryFromSubBlockEntryData(const
     entry.Compression = 1;
     return entry;
 }
-
 
 TEST(CziSubBlockDirectory, CziSubBlockDirectory1)
 {

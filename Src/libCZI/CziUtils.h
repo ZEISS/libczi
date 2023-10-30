@@ -20,6 +20,8 @@ class CziUtils
 {
 public:
     static libCZI::PixelType PixelTypeFromInt(int i);
+    static libCZI::SubBlockPyramidType PyramidTypeFromByte(std::uint8_t byte);
+    static std::uint8_t ByteFromPyramidType(libCZI::SubBlockPyramidType pyramid_type);
     static int IntFromPixelType(libCZI::PixelType);
     static libCZI::CompressionMode CompressionModeFromInt(int i);
     static std::int32_t CompressionModeToInt(libCZI::CompressionMode m);
@@ -45,4 +47,4 @@ template <> constexpr std::uint8_t CziUtils::BytesPerPel<libCZI::PixelType::Bgra
 template <> constexpr std::uint8_t CziUtils::BytesPerPel<libCZI::PixelType::Gray32>() { return 4; }
 template <> constexpr std::uint8_t CziUtils::BytesPerPel<libCZI::PixelType::Bgr96Float>() { return 3 * 4; }
 template <> constexpr std::uint8_t CziUtils::BytesPerPel<libCZI::PixelType::Gray64ComplexFloat>() { return 2 * 8; }
-template <> constexpr std::uint8_t CziUtils::BytesPerPel<libCZI::PixelType::Bgr192ComplexFloat>() { return 48; }
+template <> constexpr std::uint8_t CziUtils::BytesPerPel<libCZI::PixelType::Bgr192ComplexFloat>() { return 24; }

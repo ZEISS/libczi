@@ -2,7 +2,6 @@
 //
 // SPDX-License-Identifier: LGPL-3.0-or-later
 
-#include "stdafx.h"
 #include "SingleChannelTileAccessor.h"
 #include "CziUtils.h"
 #include "utilities.h"
