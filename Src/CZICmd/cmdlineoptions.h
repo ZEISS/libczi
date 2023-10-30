@@ -142,6 +142,7 @@ private:
     Command command;
     std::wstring cziFilename;
     std::string source_stream_class;
+    std::map<int, libCZI::StreamsFactory::Property> property_bag_for_stream_class;
     libCZI::CDimCoordinate planeCoordinate;
 
     bool    rectModeAbsoluteOrRelative; // true->absolute, false->relative
@@ -215,7 +216,7 @@ public:
     std::shared_ptr<ILog> GetLog() const { return this->log; }
     Command GetCommand() const { return this->command; }
     const std::wstring& GetCZIFilename() const { return this->cziFilename; }
-    const std::string& GetInputStreamClassName() const{ return this->source_stream_class; }
+    const std::string& GetInputStreamClassName() const { return this->source_stream_class; }
     const libCZI::CDimCoordinate& GetPlaneCoordinate() const { return this->planeCoordinate; }
     const std::map<int, ChannelDisplaySettings>& GetMultiChannelCompositeChannelInfos() const { return this->multiChannelCompositeChannelInfos; }
     bool GetUseDisplaySettingsFromDocument() const { return this->useDisplaySettingsFromDocument; }
@@ -304,6 +305,7 @@ private:
     static bool TryParseSubBlockMetadataKeyValue(const std::string& s, std::map<std::string, std::string>* subblock_metadata_property_bag);
     static bool TryParseCompressionOptions(const std::string& s, libCZI::Utils::CompressionOption* compression_option);
     static bool TryParseGeneratorPixeltype(const std::string& s, libCZI::PixelType* pixel_type);
+    static bool TryParseInputStreamCreationPropertyBag(const std::string& s, std::map<int, libCZI::StreamsFactory::Property>* property_bag);
 
     static void ThrowIfFalse(bool b, const std::string& argument_switch, const std::string& argument);
 };

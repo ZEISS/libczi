@@ -548,6 +548,7 @@ CCmdLineOptions::ParseResult CCmdLineOptions::Parse(int argc, char** argv)
     string argument_generatorpixeltype;
     bool argument_versionflag = false;
     string argument_source_stream_class;
+    string argument_source_stream_creation_propbag;
 
     // editorconfig-checker-disable
     cli_app.add_option("-c,--command", argument_command,
@@ -580,6 +581,9 @@ CCmdLineOptions::ParseResult CCmdLineOptions::Parse(int argc, char** argv)
     cli_app.add_option("--source-stream-class", argument_source_stream_class,
         "Specifies the stream-class used for reading the source CZI-file. If not specified, the default file-reader stream-class is used.")
         ->option_text("STREAMCLASS");
+    cli_app.add_option("--source-stream-creation-propbag", argument_source_stream_creation_propbag,
+               "Specifies the property-bag used for creating the stream used for reading the source CZI-file. The data is given in JSON-notation.")
+        ->option_text("PROPBAG");
     cli_app.add_option("-o,--output", argument_output_filename,
         "specifies the output-filename. A suffix will be appended to the name given here depending on the type of the file.")
         ->option_text("OUTPUTFILE");
@@ -741,14 +745,20 @@ CCmdLineOptions::ParseResult CCmdLineOptions::Parse(int argc, char** argv)
 
     try
     {
+        if (!argument_source_filename.empty())
+        {
+            this->cziFilename = convertUtf8ToUCS2(argument_source_filename);
+        }
+
         if (!argument_source_stream_class.empty())
         {
             this->source_stream_class = argument_source_stream_class;
         }
 
-        if (!argument_source_filename.empty())
+        if (!argument_source_stream_creation_propbag.empty())
         {
-            this->cziFilename = convertUtf8ToUCS2(argument_source_filename);
+            const bool b = TryParseInputStreamCreationPropertyBag(argument_source_stream_creation_propbag, &this->property_bag_for_stream_class);
+            // TODO ThrowIfFalse(b, "-r,--rect", argument_rect);
         }
 
         if (!argument_output_filename.empty())
@@ -2161,4 +2171,51 @@ void CCmdLineOptions::PrintHelpStreamsObjects()
     }
 
     return false;
+}
+
+/*static*/bool CCmdLineOptions::TryParseInputStreamCreationPropertyBag(const std::string& s, std::map<int, libCZI::StreamsFactory::Property>* property_bag)
+{
+    std::map<int, libCZI::StreamsFactory::Property> map;
+    rapidjson::Document document;
+    document.Parse(s.c_str());
+    if (document.HasParseError() || !document.IsObject())
+    {
+               return false;
+    }
+
+    for (rapidjson::Value::ConstMemberIterator itr = document.MemberBegin(); itr != document.MemberEnd(); ++itr)
+    {
+               if (!itr->name.IsString())
+               {
+                              return false;
+        }
+
+        string name = itr->name.GetString();
+        libCZI::StreamsFactory::Property property;
+        if (itr->value.IsString())
+        {
+                       property = libCZI::StreamsFactory::Property(itr->value.GetString());
+        }
+        else if (itr->value.IsDouble())
+        {
+                       property = libCZI::StreamsFactory::Property(itr->value.GetDouble());
+        }
+        else if (itr->value.IsBool())
+        {
+                       property = libCZI::StreamsFactory::Property(itr->value.GetBool());
+        }
+        else
+        {
+                       return false;
+        }
+
+     //   map[libCZI::StreamsFactory::GetStreamPropertyId(name)] = property;
+    }
+
+    if (property_bag != nullptr)
+    {
+               property_bag->swap(map);
+    }
+
+    return true;
 }
