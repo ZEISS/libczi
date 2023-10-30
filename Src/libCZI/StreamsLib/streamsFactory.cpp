@@ -27,7 +27,7 @@ static const struct
                 return std::make_shared<CurlHttpInputStream>(stream_info.filename, stream_info.property_bag);
             },
         },
-#endif
+#endif  // LIBCZI_CURL_BASED_STREAM_AVAILABLE
 #if _WIN32
         {
             { "windows_file_inputstream", "stream implementation based on Windows-API" },
@@ -36,7 +36,16 @@ static const struct
                 return std::make_shared<WindowsFileInputStream>(stream_info.filename);
             }
         },
-#endif
+#endif  // _WIN32
+#if LIBCZI_USE_PREADPWRITEBASED_STREAMIMPL
+        {
+            { "pread_file_inputstream", "stream implementation based on pread-API" },
+            [](const StreamsFactory::CreateStreamInfo& stream_info) -> std::shared_ptr<libCZI::IStream>
+            {
+                return std::make_shared<PreadFileInputStream>(stream_info.filename);
+            }
+        },
+#endif // LIBCZI_USE_PREADPWRITEBASED_STREAMIMPL
         {
             { "c_runtime_file_inputstream", "stream implementation based on C-runtime library" },
             [](const StreamsFactory::CreateStreamInfo& stream_info) -> std::shared_ptr<libCZI::IStream>

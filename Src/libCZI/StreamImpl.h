@@ -54,6 +54,7 @@ public: // interface libCZI::IStream
 };
 
 #if LIBCZI_USE_PREADPWRITEBASED_STREAMIMPL
+/*
 /// <summary>   An input-stream implementation (based on open and pread). This implementation is thread-safe.</summary>
 class CStreamImplPread : public libCZI::IStream
 {
@@ -66,6 +67,7 @@ public:
 public: // interface libCZI::IStream
     void Read(std::uint64_t offset, void* pv, std::uint64_t size, std::uint64_t* ptrBytesRead) override;
 };
+*/
 
 /// <summary>   An output-stream implementation (based on open and pwrite). This implementation is thread-safe.</summary>
 class COutputStreamImplPwrite : public libCZI::IOutputStream
