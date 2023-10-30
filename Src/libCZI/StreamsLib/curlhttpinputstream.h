@@ -28,6 +28,8 @@ public:
     ~CurlHttpInputStream() override;
 
     static void OneTimeGlobalCurlInitialization();
+
+    static std::string GetBuildInformation();
 private:
     /// This struct is passed to the WriteData function as user-data.
     struct WriteDataContext

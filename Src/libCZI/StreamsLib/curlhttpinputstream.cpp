@@ -18,6 +18,40 @@ using namespace libCZI;
     curl_global_init(CURL_GLOBAL_ALL);
 }
 
+/*static*/std::string CurlHttpInputStream::GetBuildInformation()
+{
+    auto version_info = curl_version_info(CURLVERSION_NOW);
+
+    stringstream string_stream;
+    string_stream << "Version:" << version_info->version;
+    string_stream << " SSL:" << version_info->ssl_version;
+    if (version_info->age >= CURLVERSION_ELEVENTH)
+    {
+        for (size_t i = 0;; ++i)
+        {
+            if (version_info->feature_names[i] != nullptr)
+            {
+                if (i == 0)
+                {
+                    string_stream << " Features:";
+                }
+                else
+                {
+                    string_stream << ',';
+                }
+
+                string_stream << version_info->feature_names[i];
+            }
+            else
+            {
+                break;
+            }
+        }
+    }
+
+    return string_stream.str();
+}
+
 CurlHttpInputStream::CurlHttpInputStream(const std::string& url, const std::map<int, libCZI::StreamsFactory::Property>& property_bag)
 {
     /* init the curl session */

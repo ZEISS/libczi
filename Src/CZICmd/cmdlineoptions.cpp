@@ -1942,8 +1942,18 @@ void CCmdLineOptions::PrintHelpStreamsObjects()
     {
         libCZI::StreamsFactory::StreamClassInfo stream_class_info;
         libCZI::StreamsFactory::GetStreamInfoForClass(i, stream_class_info);
+
         string_stream << i + 1 << ": " << stream_class_info.class_name << endl;
         string_stream << "    " << stream_class_info.short_description << endl;
+
+        if (stream_class_info.get_build_info)
+        {
+            string build_info = stream_class_info.get_build_info();
+            if (!build_info.empty())
+            {
+                string_stream << "    " << "Build: " << build_info << endl;
+            }
+        }
     }
 
     this->GetLog()->WriteLineStdOut(string_stream.str());

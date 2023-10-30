@@ -4,11 +4,12 @@
 
 #include "../libCZI_StreamsLib.h"
 #include <libCZI_Config.h>
+#include <memory>
+#include <mutex>
 #include "curlhttpinputstream.h"
 #include "windowsfileinputstream.h"
 #include "simplefileinputstream.h"
 #include "../utilities.h"
-#include <memory>
 
 using namespace libCZI;
 
@@ -20,11 +21,11 @@ static const struct
 {
 #if LIBCZI_CURL_BASED_STREAM_AVAILABLE
         {
-            { "curl_http_inputstream", "curl-based http/https stream" },
+            { "curl_http_inputstream", "curl-based http/https stream", CurlHttpInputStream::GetBuildInformation },
             [](const StreamsFactory::CreateStreamInfo& stream_info) -> std::shared_ptr<libCZI::IStream>
             {
                 return std::make_shared<CurlHttpInputStream>(stream_info.filename, stream_info.property_bag);
-            }
+            },
         },
 #endif
 #if _WIN32
@@ -46,12 +47,18 @@ static const struct
 
 };
 
+static std::once_flag streams_factory_already_initialized;
+
 void libCZI::StreamsFactory::Initialize()
 {
+    std::call_once(streams_factory_already_initialized,
+                []()
+                {
 #if LIBCZI_CURL_BASED_STREAM_AVAILABLE
     // TODO(JBL): we could choose the SSL-backend here (https://curl.se/libcurl/c/curl_global_sslset.html)
-    CurlHttpInputStream::OneTimeGlobalCurlInitialization();
+                    CurlHttpInputStream::OneTimeGlobalCurlInitialization();
 #endif
+                });
 }
 
 bool libCZI::StreamsFactory::GetStreamInfoForClass(int index, StreamClassInfo& stream_info)

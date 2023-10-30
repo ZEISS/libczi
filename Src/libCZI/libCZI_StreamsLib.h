@@ -8,6 +8,7 @@
 #include <string>
 #include <map>
 #include <memory>
+#include <functional>
 #include <stdexcept>
 
 namespace libCZI
@@ -233,12 +234,25 @@ namespace libCZI
         {
             std::string class_name;
             std::string short_description;
+            std::function<std::string()> get_build_info;
         };
 
         static bool GetStreamInfoForClass(int index, StreamClassInfo& stream_info);
+
         static int GetStreamInfoCount();
 
+        /// Creates an instance of the default streams-objects for reading from the file-system.
+        ///
+        /// \param  filename Filename of the file to open (in UTF-8 encoding).
+        ///
+        /// \returns A new instance of a streams-objects for reading the specified file from the file-system.
         static std::shared_ptr<libCZI::IStream> CreateDefaultStreamForFile(const char* filename);
+
+        /// Creates an instance of the default streams-objects for reading from the file-system.
+        ///
+        /// \param  filename Filename of the file to open.
+        ///
+        /// \returns A new instance of a streams-objects for reading the specified file from the file-system.
         static std::shared_ptr<libCZI::IStream> CreateDefaultStreamForFile(const wchar_t* filename);
     };
 }
