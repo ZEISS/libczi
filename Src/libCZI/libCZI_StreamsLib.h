@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2023 Carl Zeiss Microscopy GmbH
+//
+// SPDX-License-Identifier: LGPL-3.0-or-later
+
 #pragma once
 
 #include <cstdint>
@@ -191,6 +195,7 @@ namespace libCZI
         class StreamProperties
         {
         public:
+            /// Values that identify properties in the property-bag for constructing a stream-object.
             enum
             {
                 kCurlHttp_Proxy = 100, ///< For CurlHttpInputStream, type string: gives the proxy to use, c.f. https://curl.se/libcurl/c/CURLOPT_PROXY.html for more information.

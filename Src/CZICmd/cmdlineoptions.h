@@ -141,6 +141,7 @@ private:
 
     Command command;
     std::wstring cziFilename;
+    std::string source_stream_class;
     libCZI::CDimCoordinate planeCoordinate;
 
     bool    rectModeAbsoluteOrRelative; // true->absolute, false->relative
@@ -214,6 +215,7 @@ public:
     std::shared_ptr<ILog> GetLog() const { return this->log; }
     Command GetCommand() const { return this->command; }
     const std::wstring& GetCZIFilename() const { return this->cziFilename; }
+    const std::string& GetInputStreamClassName() const{ return this->source_stream_class; }
     const libCZI::CDimCoordinate& GetPlaneCoordinate() const { return this->planeCoordinate; }
     const std::map<int, ChannelDisplaySettings>& GetMultiChannelCompositeChannelInfos() const { return this->multiChannelCompositeChannelInfos; }
     bool GetUseDisplaySettingsFromDocument() const { return this->useDisplaySettingsFromDocument; }

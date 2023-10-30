@@ -577,7 +577,7 @@ CCmdLineOptions::ParseResult CCmdLineOptions::Parse(int argc, char** argv)
         "Specifies the source CZI-file.")
         ->option_text("SOURCEFILE")/*
         ->check(CLI::ExistingFile)*/;
-    cli_app.add_option("--source_stream_class", argument_source_stream_class,
+    cli_app.add_option("--source-stream-class", argument_source_stream_class,
         "Specifies the stream-class used for reading the source CZI-file. If not specified, the default file-reader stream-class is used.")
         ->option_text("STREAMCLASS");
     cli_app.add_option("-o,--output", argument_output_filename,
@@ -741,6 +741,11 @@ CCmdLineOptions::ParseResult CCmdLineOptions::Parse(int argc, char** argv)
 
     try
     {
+        if (!argument_source_stream_class.empty())
+        {
+            this->source_stream_class = argument_source_stream_class;
+        }
+
         if (!argument_source_filename.empty())
         {
             this->cziFilename = convertUtf8ToUCS2(argument_source_filename);

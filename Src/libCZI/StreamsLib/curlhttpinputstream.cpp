@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2023 Carl Zeiss Microscopy GmbH
+//
+// SPDX-License-Identifier: LGPL-3.0-or-later
+
 #include "curlhttpinputstream.h"
 #if LIBCZI_CURL_BASED_STREAM_AVAILABLE
 #include <cstdint>

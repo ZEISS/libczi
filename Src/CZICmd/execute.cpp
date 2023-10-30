@@ -24,29 +24,39 @@ class CExecuteBase
 protected:
     static std::shared_ptr<ICZIReader> CreateAndOpenCziReader(const CCmdLineOptions& options)
     {
-        return CreateAndOpenCziReader(options.GetCZIFilename().c_str());
+        shared_ptr<IStream> stream;
+        if (options.GetInputStreamClassName().empty())
+        {
+            stream = CExecuteBase::CreateStandardFileBasedStreamObject(options.GetCZIFilename().c_str());
+        }
+        else
+        {
+            stream = CExecuteBase::CreateInputStreamObject(options.GetCZIFilename().c_str(), options.GetInputStreamClassName());
+        }
+
+        auto spReader = libCZI::CreateCZIReader();
+        spReader->Open(stream);
+        return spReader;
     }
 
-    static std::shared_ptr<ICZIReader> CreateAndOpenCziReader(const wchar_t* fileName)
+    static std::shared_ptr<IStream> CreateStandardFileBasedStreamObject(const wchar_t* fileName)
+    {
+        auto stream = libCZI::CreateStreamFromFile(fileName);
+        return stream;
+    }
+
+    static std::shared_ptr<IStream> CreateInputStreamObject(const wchar_t* uri, const string& class_name)
     {
         libCZI::StreamsFactory::Initialize();
         libCZI::StreamsFactory::CreateStreamInfo stream_info;
-        stream_info.class_name = "curl_http_inputstream";
-        stream_info.filename = convertToUtf8(fileName);
-        //stream_info.property_bag[StreamsFactory::StreamProperties::kCurlHttp_Proxy] = StreamsFactory::Property("http://127.0.0.1:8888");
-        auto stream = libCZI::StreamsFactory::CreateStream(stream_info);
-        auto spReader = libCZI::CreateCZIReader();
-        spReader->Open(stream);
-        return spReader;
-    }
+        stream_info.class_name = class_name;
+        stream_info.filename = convertToUtf8(uri);
 
-    /*static std::shared_ptr<ICZIReader> CreateAndOpenCziReader(const wchar_t* fileName)
-    {
-        auto stream = libCZI::CreateStreamFromFile(fileName);
-        auto spReader = libCZI::CreateCZIReader();
-        spReader->Open(stream);
-        return spReader;
-    }*/
+        // stream_info.property_bag[StreamsFactory::StreamProperties::kCurlHttp_Proxy] = StreamsFactory::Property("http://127.0.0.1:8888");
+
+        auto stream = libCZI::StreamsFactory::CreateStream(stream_info);
+        return stream;
+    }
 
     static IntRect GetRoiFromOptions(const CCmdLineOptions& options, const SubBlockStatistics& subBlockStatistics)
     {
