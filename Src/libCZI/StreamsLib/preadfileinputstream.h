@@ -12,14 +12,14 @@
 class PreadFileInputStream : public libCZI::IStream
 {
 private:
-  int fileDescriptor;
+    int fileDescriptor;
 public:
-  PreadFileInputStream() = delete;
-  explicit PreadFileInputStream(const wchar_t* filename);
-  explicit PreadFileInputStream(const std::string& filename);
-  ~PreadFileInputStream() override;
+    PreadFileInputStream() = delete;
+    explicit PreadFileInputStream(const wchar_t* filename);
+    explicit PreadFileInputStream(const std::string& filename);
+    ~PreadFileInputStream() override;
 public: // interface libCZI::IStream
-  void Read(std::uint64_t offset, void* pv, std::uint64_t size, std::uint64_t* ptrBytesRead) override;
+    void Read(std::uint64_t offset, void* pv, std::uint64_t size, std::uint64_t* ptrBytesRead) override;
 };
 
 #endif
