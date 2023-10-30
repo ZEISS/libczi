@@ -10,21 +10,28 @@
 #include <unistd.h>
 #include <sys/stat.h>   // required on BSD
 
-PreadFileInputStream::PreadFileInputStream(const wchar_t* filename)
-    : fileDescriptor(0)
+#include "../utilities.h"
+
+using namespace libCZI;
+
+PreadFileInputStream::PreadFileInputStream(const std::string& filename)
 {
-    auto filename_utf8 = Utilities::convertWchar_tToUtf8(filename);
-    this->fileDescriptor = open(filename_utf8.c_str(), O_RDONLY);
+    this->fileDescriptor = open(filename.c_str(), O_RDONLY);
     if (this->fileDescriptor < 0)
     {
         auto err = errno;
         std::stringstream ss;
-        ss << "Error opening the file \"" << filename_utf8 << "\" -> errno=" << err << " (" << strerror(err) << ")";
+        ss << "Error opening the file \"" << filename << "\" -> errno=" << err << " (" << strerror(err) << ")";
         throw std::runtime_error(ss.str());
     }
 }
 
-CStreamImplPread::~CStreamImplPread()
+PreadFileInputStream::PreadFileInputStream(const wchar_t* filename)
+    : PreadFileInputStream(Utilities::convertWchar_tToUtf8(filename))
+{
+}
+
+PreadFileInputStream::~PreadFileInputStream()
 {
     if (this->fileDescriptor != 0)
     {
@@ -32,7 +39,7 @@ CStreamImplPread::~CStreamImplPread()
     }
 }
 
-/*virtual*/void CStreamImplPread::Read(std::uint64_t offset, void* pv, std::uint64_t size, std::uint64_t* ptrBytesRead)
+/*virtual*/void PreadFileInputStream::Read(std::uint64_t offset, void* pv, std::uint64_t size, std::uint64_t* ptrBytesRead)
 {
     ssize_t bytesRead = pread(this->fileDescriptor, pv, size, offset);
     if (bytesRead < 0)

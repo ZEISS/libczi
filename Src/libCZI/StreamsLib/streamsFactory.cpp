@@ -9,6 +9,7 @@
 #include "curlhttpinputstream.h"
 #include "windowsfileinputstream.h"
 #include "simplefileinputstream.h"
+#include "preadfileinputstream.h"
 #include "../utilities.h"
 
 using namespace libCZI;
@@ -103,6 +104,8 @@ std::shared_ptr<libCZI::IStream> libCZI::StreamsFactory::CreateDefaultStreamForF
 {
 #if _WIN32
     return std::make_shared<WindowsFileInputStream>(filename);
+#elif LIBCZI_USE_PREADPWRITEBASED_STREAMIMPL
+    return std::make_shared<PreadFileInputStream>(filename);
 #endif
 
     return std::make_shared<SimpleFileInputStream>(filename);
@@ -112,6 +115,8 @@ std::shared_ptr<libCZI::IStream> libCZI::StreamsFactory::CreateDefaultStreamForF
 {
 #if _WIN32
     return std::make_shared<WindowsFileInputStream>(filename);
+#elif LIBCZI_USE_PREADPWRITEBASED_STREAMIMPL
+    return std::make_shared<PreadFileInputStream>(filename);
 #endif
 
     return std::make_shared<SimpleFileInputStream>(filename);
