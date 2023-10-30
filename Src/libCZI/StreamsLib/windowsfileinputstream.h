@@ -10,6 +10,9 @@
 #include "../libCZI.h"
 #include <Windows.h>
 
+/// Implementation of the IStream-interface for files based on the Win32-API.
+/// It leverages the Win32-API ReadFile passing in an offset, thus allowing for concurrent
+/// access without locking.
 class WindowsFileInputStream : public libCZI::IStream
 {
 private:

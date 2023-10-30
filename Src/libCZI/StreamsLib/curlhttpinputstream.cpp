@@ -76,8 +76,9 @@ CurlHttpInputStream::CurlHttpInputStream(const std::string& url, const std::map<
     ThrowIfCurlSetOptError(return_code, "CURLOPT_NOPROGRESS");
 
     return_code = curl_easy_setopt(up_curl_handle.get(), CURLOPT_TCP_KEEPALIVE, 1L);
-    //ThrowIfCurlSetOptError(return_code, "CURLOPT_TCP_KEEPALIVE");
+    ThrowIfCurlSetOptError(return_code, "CURLOPT_TCP_KEEPALIVE");
 
+    // set the "write function" - to this function curl will deliver the payload data
     return_code = curl_easy_setopt(up_curl_handle.get(), CURLOPT_WRITEFUNCTION, CurlHttpInputStream::WriteData);
     ThrowIfCurlSetOptError(return_code, "CURLOPT_WRITEFUNCTION");
 
@@ -147,6 +148,11 @@ CurlHttpInputStream::CurlHttpInputStream(const std::string& url, const std::map<
 
     {
         std::lock_guard<std::mutex> lck(this->request_mutex_);
+
+        // TODO(JBL): We may be able to use a "header-function" (https://curl.se/libcurl/c/CURLOPT_HEADERFUNCTION.html) in order to find out
+        //             whether the server accepted out "Range-Request". According to https://developer.mozilla.org/en-US/docs/Web/HTTP/Range_requests,
+        //             we can expect to have a line "something like 'Accept-Ranges: bytes'" in the response header with a server that supports range
+        //             requests (and a line 'Accept-Ranges: none') would tell us explicitely that range requests are *not* supported.
 
         // https://curl.se/libcurl/c/CURLOPT_RANGE.html states that the range may be ignored by the server, and it would then
         //  deliver the entire document. And, it says, that there is no way to detect that the range was ignored. We take precautions

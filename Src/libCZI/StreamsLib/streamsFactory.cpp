@@ -65,7 +65,7 @@ void libCZI::StreamsFactory::Initialize()
                 []()
                 {
 #if LIBCZI_CURL_BASED_STREAM_AVAILABLE
-    // TODO(JBL): we could choose the SSL-backend here (https://curl.se/libcurl/c/curl_global_sslset.html)
+                    // TODO(JBL): we could choose the SSL-backend here (https://curl.se/libcurl/c/curl_global_sslset.html)
                     CurlHttpInputStream::OneTimeGlobalCurlInitialization();
 #endif
                 });
@@ -100,24 +100,27 @@ std::shared_ptr<libCZI::IStream> libCZI::StreamsFactory::CreateStream(const Crea
     return {};
 }
 
-std::shared_ptr<libCZI::IStream> libCZI::StreamsFactory::CreateDefaultStreamForFile(const char* filename)
+template<typename t_charactertype> 
+std::shared_ptr<libCZI::IStream> CreateDefaultStreamForFileGeneric(const t_charactertype* filename)
 {
 #if _WIN32
+    // if we are on Windows, then "WindowsFileInputStream" should give best performance/features
     return std::make_shared<WindowsFileInputStream>(filename);
 #elif LIBCZI_USE_PREADPWRITEBASED_STREAMIMPL
+    // otherwise (and if pread is available), then "PreadFileInputStream" is the best choice
     return std::make_shared<PreadFileInputStream>(filename);
 #endif
 
+    // otherwise... we fall back to the simple fseek/fread-based one
     return std::make_shared<SimpleFileInputStream>(filename);
+}
+
+std::shared_ptr<libCZI::IStream> libCZI::StreamsFactory::CreateDefaultStreamForFile(const char* filename)
+{
+    return CreateDefaultStreamForFileGeneric<char>(filename);
 }
 
 std::shared_ptr<libCZI::IStream> libCZI::StreamsFactory::CreateDefaultStreamForFile(const wchar_t* filename)
 {
-#if _WIN32
-    return std::make_shared<WindowsFileInputStream>(filename);
-#elif LIBCZI_USE_PREADPWRITEBASED_STREAMIMPL
-    return std::make_shared<PreadFileInputStream>(filename);
-#endif
-
-    return std::make_shared<SimpleFileInputStream>(filename);
+    return CreateDefaultStreamForFileGeneric<wchar_t>(filename);
 }

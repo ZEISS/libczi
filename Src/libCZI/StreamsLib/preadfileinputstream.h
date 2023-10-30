@@ -8,7 +8,9 @@
 #if LIBCZI_USE_PREADPWRITEBASED_STREAMIMPL
 #include "../libCZI.h"
 
-/// <summary>   An input-stream implementation (based on open and pread). This implementation is thread-safe.</summary>
+/// Implementation of the IStream-interface for files based on the Unix-specific pread-API.
+/// It leverages the pread function passing in an offset, thus allowing for concurrent
+/// access without locking.
 class PreadFileInputStream : public libCZI::IStream
 {
 private:

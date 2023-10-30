@@ -28,6 +28,7 @@ if (LIBCZI_BUILD_CURL_BASED_STREAM)
         # Set the prefix to control where it's installed
         PREFIX ${CMAKE_BINARY_DIR}/curl
          # Pass CMake arguments to build curl as a static library
+         # for possible options -> c.f https://github.com/curl/curl/blob/master/CMakeLists.txt
         CMAKE_ARGS -DBUILD_SHARED_LIBS=OFF 
                     -DBUILD_STATIC_LIBS=ON 
                     -DCMAKE_POSITION_INDEPENDENT_CODE=ON 
@@ -36,55 +37,6 @@ if (LIBCZI_BUILD_CURL_BASED_STREAM)
     )
 
     FetchContent_MakeAvailable(libcurl)
-#    SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/lib/curl
-#        PATCH_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/lib/cURL/buildconf
-#        CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/lib/cURL/configure --prefix=<INSTALL_DIR>
-#        BUILD_COMMAND ${MAKE}
-#        UPDATE_COMMAND ""
-#        INSTALL_COMMAND ""
-#        LOG_DOWNLOAD ON
-#        LOG_UPDATE ON
-#        LOG_CONFIGURE ON
-#        LOG_BUILD ON
-#        LOG_TEST ON
-#        LOG_INSTALL ON
-#[[
-    # Specify the include directories
-    #ExternalProject_Get_Property(libcurl INSTALL_DIR)
-    message(STATUS "********** CURL-INSTALL_DIR **********: ${INSTALL_DIR}")
-    #ExternalProject_Get_Property(libcurl source_dir)
-    #ExternalProject_Get_Property(libcurl binary_dir)
-
-    # Define an imported target
-    #add_library(CURL::libcurl STATIC IMPORTED GLOBAL)
-
-
-    #message(STATUS "********** CURL-source **********: ${source_dir}")
-
-    #add_dependencies(CURL::libcurl libcurl)
-
-    #add_custom_target(set_curl_properties
-    #COMMAND ${CMAKE_COMMAND} -P set_curl_properties.cmake)
-    #add_dependencies(set_curl_properties libcurl)
-
-   # Set properties for the imported target
-#   set_target_properties(CURL::libcurl PROPERTIES
-#    IMPORTED_LOCATION ${binary_dir}
-#    INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_BINARY_DIR}/curl/include"
-#    )
-
-    set(CURL_INCLUDE_DIRS ${CMAKE_BINARY_DIR}/curl/include)
-    set(CURL_LIBRARIES ${CMAKE_BINARY_DIR}/curl/lib/libcurl.a)
-
-    #find_package(CURL REQUIRED)
-    message(STATUS "********** CURL_INCLUDE_DIRS **********: ${CURL_INCLUDE_DIRS}")
-    #set(CURL_SOURCE_DIR ${source_dir})
-    #set(CURL_BINARY_DIR ${binary_dir})
-    #set(CURL_LIBRARIES ${CURL_BINARY_DIR}/lib/.libs/libcurl.dylib)
-    #include_directories(${CURL_SOURCE_DIR})
-    #set(DEPENDENCIES ${DEPENDENCIES} libcurl)
-    set(CURL_DOWNLOADED_AND_BUILT TRUE)
-      #]]
   endif(${CURL_FOUND})
 
 endif(LIBCZI_BUILD_CURL_BASED_STREAM)

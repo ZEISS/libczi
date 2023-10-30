@@ -1933,12 +1933,12 @@ void CCmdLineOptions::PrintHelpBitmapGenerator()
 
 void CCmdLineOptions::PrintHelpStreamsObjects()
 {
-    this->GetLog()->WriteLineStdOut("Available Input-Stream objects:  [default class is denoted with '(*)']");
+    this->GetLog()->WriteLineStdOut("Available Input-Stream objects:");
     this->GetLog()->WriteLineStdOut("");
 
     int stream_object_count = libCZI::StreamsFactory::GetStreamInfoCount();
     ostringstream string_stream;
-    for (int i=0;i<stream_object_count;++i)
+    for (int i = 0; i < stream_object_count; ++i)
     {
         libCZI::StreamsFactory::StreamClassInfo stream_class_info;
         libCZI::StreamsFactory::GetStreamInfoForClass(i, stream_class_info);

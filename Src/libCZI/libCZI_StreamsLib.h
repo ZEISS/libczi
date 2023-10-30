@@ -226,6 +226,9 @@ namespace libCZI
             std::map<int, Property> property_bag;
         };
 
+        /// Perform one-time initialization of the streams objects.
+        /// Some stream objects may require some one-time initialization for being operational (this is e.g. the case with
+        /// the libcurl-based ones). 
         static void Initialize();
 
         static std::shared_ptr<libCZI::IStream> CreateStream(const CreateStreamInfo& stream_info);
