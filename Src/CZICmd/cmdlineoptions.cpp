@@ -547,6 +547,7 @@ CCmdLineOptions::ParseResult CCmdLineOptions::Parse(int argc, char** argv)
     string argument_compressionoptions;
     string argument_generatorpixeltype;
     bool argument_versionflag = false;
+    string argument_source_stream_class;
 
     // editorconfig-checker-disable
     cli_app.add_option("-c,--command", argument_command,
@@ -573,9 +574,12 @@ CCmdLineOptions::ParseResult CCmdLineOptions::Parse(int argc, char** argv)
         ->transform(CLI::CheckedTransformer(map_string_to_command, CLI::ignore_case));
     // editorconfig-checker-enable
     cli_app.add_option("-s,--source", argument_source_filename,
-        "specifies the source CZI-file.")
+        "Specifies the source CZI-file.")
         ->option_text("SOURCEFILE")/*
         ->check(CLI::ExistingFile)*/;
+    cli_app.add_option("--source_stream_class", argument_source_stream_class,
+        "Specifies the stream-class used for reading the source CZI-file. If not specified, the default file-reader stream-class is used.")
+        ->option_text("STREAMCLASS");
     cli_app.add_option("-o,--output", argument_output_filename,
         "specifies the output-filename. A suffix will be appended to the name given here depending on the type of the file.")
         ->option_text("OUTPUTFILE");

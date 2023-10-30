@@ -99,11 +99,6 @@ CurlHttpInputStream::CurlHttpInputStream(const std::string& url, const std::map<
         ThrowIfCurlSetOptError(return_code, "CURLOPT_SSL_VERIFYHOST");
     }
 
-    // curl_easy_setopt(up_curl_handle.get(), CURLOPT_FOLLOWLOCATION, 0L);
-     //curl_easy_setopt(up_curl_handle.get(), CURLOPT_PROXY, "https://127.0.0.1:8080");
-
-     //curl_easy_setopt(up_curl_handle.get(), CURLOPT_SSL_VERIFYPEER, 0L);
-
     this->curl_handle_ = up_curl_handle.release();
 }
 
@@ -130,7 +125,7 @@ CurlHttpInputStream::CurlHttpInputStream(const std::string& url, const std::map<
         return_code = curl_easy_perform(this->curl_handle_);
         if (return_code != CURLE_OK)
         {
-            stringstream ss;
+            ss = stringstream{};
             ss << "curl_easy_perform() failed with error code " << return_code << " (" << curl_easy_strerror(return_code) << ")";
             throw runtime_error(ss.str());
         }
