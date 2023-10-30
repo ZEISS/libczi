@@ -33,7 +33,8 @@ if (LIBCZI_BUILD_CURL_BASED_STREAM)
                     -DBUILD_STATIC_LIBS=ON 
                     -DCMAKE_POSITION_INDEPENDENT_CODE=ON 
                     -DCMAKE_INSTALL_PREFIX=${CMAKE_BINARY_DIR}/curl 
-                    -DENABLE_UNICODE=ON  
+                    -DENABLE_UNICODE=ON
+                    -DCURL_USE_SECTRANSP=ON  # for MacOS - let's choose Apple's native secure transport backend
     )
 
     FetchContent_MakeAvailable(libcurl)
