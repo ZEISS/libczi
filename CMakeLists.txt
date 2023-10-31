@@ -75,7 +75,11 @@ check_cxx_symbol_exists(pwrite unistd.h HAVE_UNISTD_H_PWRITE)
 BoolToFoundNotFound(HAVE_UNISTD_H_PWRITE HAVE_UNISTD_H_PWRITE_TEXT)
 message("check for open -> ${HAVE_FCNTL_H_OPEN_TEXT} ; check for pread -> ${HAVE_UNISTD_H_PREAD_TEXT} ; check for pwrite -> ${HAVE_UNISTD_H_PWRITE_TEXT}")
 
+# This option controls whether to build the curl-based http-/https-stream object. If this option is
+#  "ON", the build will fail if the curl-library available.
 option(LIBCZI_BUILD_CURL_BASED_STREAM "include curl-based http-/https-stream object" OFF)
+
+option(LIBCZI_BUILD_PREFER_EXTERNALPACKAGE_LIBCURL "Prefer an libcurl-curl package present on the system" ON)
 
 # This option allows to exclude the unit-tests from the build. The unit-tests are using the
 # Google-Test-framework which is downloaded from GitHub during the CMake-run.

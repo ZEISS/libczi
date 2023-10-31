@@ -11,14 +11,21 @@ endif()
 add_subdirectory(JxrDecode)
 
 if (LIBCZI_BUILD_CURL_BASED_STREAM)
-  find_package(CURL CONFIG )
-  # apt install libcurl4-openssl-dev
-# #[[
-  if(${CURL_FOUND})
+  if (LIBCZI_BUILD_PREFER_EXTERNALPACKAGE_LIBCURL)
+    find_package(CURL CONFIG QUIET)
+    if (NOT CURL_FOUND)
+      message(FATAL_ERROR [=[
+        CURL library was not found, which is required for building. Consider installing
+        like 'sudo apt-get install libcurl4-openssl-dev' or enable the option 'LIBCZI_BUILD_PREFER_EXTERNALPACKAGE_LIBCURL'.
+      ]=])
+    endif()
+
     message(STATUS "Found CURL version: ${CURL_VERSION_STRING}")
     message(STATUS "Using CURL include dir(s): ${CURL_INCLUDE_DIRS}")
     message(STATUS "Using CURL lib(s): ${CURL_LIBRARIES}")
-  else(${CURL_FOUND})
+
+  else(LIBCZI_BUILD_PREFER_EXTERNALPACKAGE_LIBCURL)
+    # apt install libcurl4-openssl-dev
     message(STATUS "Could not find libcURL.  This dependency will be downloaded.")
     include(FetchContent)
     FetchContent_Declare(
@@ -38,8 +45,7 @@ if (LIBCZI_BUILD_CURL_BASED_STREAM)
     )
 
     FetchContent_MakeAvailable(libcurl)
-  endif(${CURL_FOUND})
-
+  endif(LIBCZI_BUILD_PREFER_EXTERNALPACKAGE_LIBCURL)
 endif(LIBCZI_BUILD_CURL_BASED_STREAM)
 
 add_subdirectory(libCZI)
