@@ -25,6 +25,7 @@ namespace libCZI
     class StreamsFactory
     {
     public:
+        /// This declares a variant type (to be used with the property bag in the streams factory).
         struct Property
         {
         public:
@@ -255,8 +256,18 @@ namespace libCZI
             std::function<std::string()> get_build_info;    ///< A function which returns a string with build information for the class (e.g. version information).
         };
 
+        /// Gets information about a stream class available in the factory. The function returns false if the index is out of range.
+        /// The function is idempotent, the information returned from it will not change during the lifetime of the application.
+        ///
+        /// \param          index       Zero-based index of the class for which information is to be retrieved.
+        /// \param [out]    stream_info Information describing the stream class.
+        ///
+        /// \returns    True if it succeeds; false otherwise.
         static bool GetStreamInfoForClass(int index, StreamClassInfo& stream_info);
 
+        /// Gets the number of stream classes available in the factory.
+        ///
+        /// \returns    The number of available stream classes.
         static int GetStreamInfoCount();
 
         /// Creates an instance of the default streams-objects for reading from the file-system.

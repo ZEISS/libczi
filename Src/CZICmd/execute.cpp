@@ -60,6 +60,13 @@ protected:
         }
 
         auto stream = libCZI::StreamsFactory::CreateStream(stream_info);
+        if (!stream)
+        {
+            stringstream string_stream;
+            string_stream << "Failed to create stream object of the class \"" << class_name << "\".";
+            throw std::runtime_error(string_stream.str());
+        }
+
         return stream;
     }
 
@@ -85,14 +92,19 @@ protected:
         DoCalcHashOfResult(bm.get(), options);
     }
 
-    static void HandleHashOfResult(std::function<bool(uint8_t*, size_t)> f, const CCmdLineOptions& options)
+    static void HandleHashOfResult(const std::function<bool(uint8_t*, size_t)>& f, const CCmdLineOptions& options)
     {
         if (!options.GetCalcHashOfResult())
+        {
             return;
+        }
 
         uint8_t md5sumHash[16];
         if (!f(md5sumHash, sizeof(md5sumHash)))
+        {
             return;
+        }
+
         string hashHex = BytesToHexString(md5sumHash, sizeof(md5sumHash));
         std::stringstream ss;
         ss << "hash of result: " << hashHex;

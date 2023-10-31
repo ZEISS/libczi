@@ -933,6 +933,7 @@ INPUT                  = ./libCZI/libCZI.h \
                          ./libCZI/libCZI_Write.h \
                          ./libCZI/libCZI_ReadWrite.h \
                          ./libCZI/libCZI_compress.h \
+                         ./libCZI/libCZI_StreamsLib.h \
                          ./libCZI/Doc/mainpage.markdown \
                          ./libCZI/Doc/building_libCZI.markdown \
                          ./libCZI/Doc/image_document_concept.markdown \
