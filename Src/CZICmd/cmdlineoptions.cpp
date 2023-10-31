@@ -2175,6 +2175,9 @@ void CCmdLineOptions::PrintHelpStreamsObjects()
 
 /*static*/bool CCmdLineOptions::TryParseInputStreamCreationPropertyBag(const std::string& s, std::map<int, libCZI::StreamsFactory::Property>* property_bag)
 {
+    // Here we parse the JSON-formatted string that contains the property bag for the input stream and
+    //  construct a map<int, libCZI::StreamsFactory::Property> from it.
+      
     static constexpr struct 
     {
         const char* name;
@@ -2261,6 +2264,9 @@ void CCmdLineOptions::PrintHelpStreamsObjects()
             }
 
             break;
+        default:
+            // this actually indicates an internal error - the table kKeyStringToId contains a not yet implemented property type
+            return false;
         }
     }
 

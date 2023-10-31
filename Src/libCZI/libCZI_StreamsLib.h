@@ -228,11 +228,11 @@ namespace libCZI
         /// The parameters for creating an instance of a stream object.
         struct CreateStreamInfo
         {
-            std::string class_name;
+            std::string class_name; ///< Name of the class (this uniquely identifies the class).
 
-            std::string filename;
+            std::string filename;   ///< Filename (in UTF-8 encoding) or  more generally some kind of URI which identifies the data for which a stream is to be created.
 
-            std::map<int, Property> property_bag;
+            std::map<int, Property> property_bag; ///< A property-bag with options for creating the stream-object.
         };
 
         /// Perform one-time initialization of the streams objects.
@@ -240,13 +240,19 @@ namespace libCZI
         /// the libcurl-based ones). 
         static void Initialize();
 
+        /// Creates and initializes a new instance of the specified stream class.
+        ///
+        /// \param  stream_info Information describing the stream.
+        ///
+        /// \returns    The newly created and initialized stream.
         static std::shared_ptr<libCZI::IStream> CreateStream(const CreateStreamInfo& stream_info);
 
+        /// This structure gathers information about a stream class.
         struct StreamClassInfo
         {
-            std::string class_name;
-            std::string short_description;
-            std::function<std::string()> get_build_info;
+            std::string class_name;                         ///< Name of the class (this uniquely identifies the class).
+            std::string short_description;                  ///< A short and informal description of the class.  
+            std::function<std::string()> get_build_info;    ///< A function which returns a string with build information for the class (e.g. version information).
         };
 
         static bool GetStreamInfoForClass(int index, StreamClassInfo& stream_info);
