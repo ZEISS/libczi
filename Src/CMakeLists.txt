@@ -10,6 +10,7 @@ endif()
 
 add_subdirectory(JxrDecode)
 
+# if the build is configured to include the curl-based stream, we need to find or download the curl library
 if (LIBCZI_BUILD_CURL_BASED_STREAM)
   if (LIBCZI_BUILD_PREFER_EXTERNALPACKAGE_LIBCURL)
     find_package(CURL CONFIG QUIET)
@@ -25,7 +26,6 @@ if (LIBCZI_BUILD_CURL_BASED_STREAM)
     message(STATUS "Using CURL lib(s): ${CURL_LIBRARIES}")
 
   else(LIBCZI_BUILD_PREFER_EXTERNALPACKAGE_LIBCURL)
-    # apt install libcurl4-openssl-dev
     message(STATUS "Could not find libcURL.  This dependency will be downloaded.")
     include(FetchContent)
     FetchContent_Declare(
@@ -33,7 +33,7 @@ if (LIBCZI_BUILD_CURL_BASED_STREAM)
         GIT_REPOSITORY  "https://github.com/curl/curl.git"
         GIT_TAG "curl-8_4_0"
         # Set the prefix to control where it's installed
-        PREFIX ${CMAKE_BINARY_DIR}/curl
+        PREFIX "${CMAKE_BINARY_DIR}/vendor/curl"
          # Pass CMake arguments to build curl as a static library
          # for possible options -> c.f https://github.com/curl/curl/blob/master/CMakeLists.txt
         CMAKE_ARGS -DBUILD_SHARED_LIBS=OFF 
@@ -42,7 +42,7 @@ if (LIBCZI_BUILD_CURL_BASED_STREAM)
                     -DCMAKE_INSTALL_PREFIX=${CMAKE_BINARY_DIR}/curl 
                     -DENABLE_UNICODE=ON
                     -DCURL_USE_SECTRANSP=ON  # for MacOS - let's choose Apple's native secure transport backend
-    )
+        )
 
     FetchContent_MakeAvailable(libcurl)
   endif(LIBCZI_BUILD_PREFER_EXTERNALPACKAGE_LIBCURL)

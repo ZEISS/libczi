@@ -10,7 +10,6 @@ using namespace libCZI;
 TEST(CurlHttpInputStream, SimpleReadFromHttps)
 {
     static const char url[] = "https://media.githubusercontent.com/media/ptahmose/libCZI_testdata/main/MD5/ff20e3a15d797509f7bf494ea21109d3";  // sparse_planes.czi.
-    // const char url[] = "https://libczirwtestdata.z13.web.core.windows.net/CZICheckSamples/MD5/ff20e3a15d797509f7bf494ea21109d3";   // sparse_planes.czi.
 
     StreamsFactory::CreateStreamInfo create_info;
     create_info.class_name = "curl_http_inputstream";
@@ -45,7 +44,6 @@ TEST(CurlHttpInputStream, SimpleReadFromHttps)
 TEST(CurlHttpInputStream, OpenAndReadCziFromUrl)
 {
     static const char url[] = "https://media.githubusercontent.com/media/ptahmose/libCZI_testdata/main/MD5/ff20e3a15d797509f7bf494ea21109d3";  // sparse_planes.czi.
-    // const char url[] = "https://libczirwtestdata.z13.web.core.windows.net/CZICheckSamples/MD5/ff20e3a15d797509f7bf494ea21109d3";   // sparse_planes.czi.
 
     StreamsFactory::CreateStreamInfo create_info;
     create_info.class_name = "curl_http_inputstream";

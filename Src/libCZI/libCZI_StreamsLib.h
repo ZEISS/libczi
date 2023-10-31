@@ -22,11 +22,11 @@ namespace libCZI
     /// At this point, we can find two variants here - for operating on a file in a file-system and for operating on an http- or
     /// https-stream.
     /// The http-stream class is based on cURL (https://curl.se/libcurl/), and it needs to be configured in when building libCZI.
-    class StreamsFactory
+    class LIBCZI_API StreamsFactory
     {
     public:
         /// This declares a variant type (to be used with the property bag in the streams factory).
-        struct Property
+        struct LIBCZI_API Property
         {
         public:
             /// Values that represent the type represented by this variant.
@@ -227,7 +227,7 @@ namespace libCZI
         };
 
         /// The parameters for creating an instance of a stream object.
-        struct CreateStreamInfo
+        struct LIBCZI_API CreateStreamInfo
         {
             std::string class_name; ///< Name of the class (this uniquely identifies the class).
 
@@ -251,7 +251,7 @@ namespace libCZI
         static std::shared_ptr<libCZI::IStream> CreateStream(const CreateStreamInfo& stream_info);
 
         /// This structure gathers information about a stream class.
-        struct StreamClassInfo
+        struct LIBCZI_API StreamClassInfo
         {
             std::string class_name;                         ///< Name of the class (this uniquely identifies the class).
             std::string short_description;                  ///< A short and informal description of the class.  
