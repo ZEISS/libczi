@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include "ImportExport.h"
 #include <cstdint>
 #include <string>
 #include <map>
