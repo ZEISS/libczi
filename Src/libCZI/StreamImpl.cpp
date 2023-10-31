@@ -19,36 +19,6 @@ using namespace std;
 
 //----------------------------------------------------------------------------
 
-
-CSimpleStreamImplCppStreams::CSimpleStreamImplCppStreams(const wchar_t* filename)
-{
-    this->infile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
-#if defined(_WIN32)
-    this->infile.open(filename, ios::binary | ios::in);
-#else
-    // convert the wchar_t to an UTF8-string
-    auto filename_utf8 = Utilities::convertWchar_tToUtf8(filename);
-    this->infile.open(filename_utf8.c_str(), ios::binary | ios::in);
-#endif
-}
-
-CSimpleStreamImplCppStreams::~CSimpleStreamImplCppStreams()
-{
-    this->infile.close();
-}
-
-void CSimpleStreamImplCppStreams::Read(std::uint64_t offset, void* pv, std::uint64_t size, std::uint64_t* ptrBytesRead)
-{
-    this->infile.seekg(offset, ios::beg);
-    this->infile.read(static_cast<char*>(pv), size);
-    if (ptrBytesRead != nullptr)
-    {
-        *ptrBytesRead = this->infile.gcount();
-    }
-}
-
-//----------------------------------------------------------------------------
-
 #if LIBCZI_USE_PREADPWRITEBASED_STREAMIMPL
 
 COutputStreamImplPwrite::COutputStreamImplPwrite(const wchar_t* filename, bool overwriteExisting)
