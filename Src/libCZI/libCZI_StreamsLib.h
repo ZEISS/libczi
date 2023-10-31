@@ -268,7 +268,7 @@ namespace libCZI
         /// Gets the number of stream classes available in the factory.
         ///
         /// \returns    The number of available stream classes.
-        static int GetStreamInfoCount();
+        static int GetStreamClassesCount();
 
         /// Creates an instance of the default streams-objects for reading from the file-system.
         ///

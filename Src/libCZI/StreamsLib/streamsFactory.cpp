@@ -73,7 +73,7 @@ void libCZI::StreamsFactory::Initialize()
 
 bool libCZI::StreamsFactory::GetStreamInfoForClass(int index, StreamClassInfo& stream_info)
 {
-    if (index < 0 || index >= GetStreamInfoCount())
+    if (index < 0 || index >= GetStreamClassesCount())
     {
         return false;
     }
@@ -82,14 +82,14 @@ bool libCZI::StreamsFactory::GetStreamInfoForClass(int index, StreamClassInfo& s
     return true;
 }
 
-int libCZI::StreamsFactory::GetStreamInfoCount()
+int libCZI::StreamsFactory::GetStreamClassesCount()
 {
     return sizeof(stream_classes) / sizeof(stream_classes[0]);
 }
 
 std::shared_ptr<libCZI::IStream> libCZI::StreamsFactory::CreateStream(const CreateStreamInfo& stream_info)
 {
-    for (int i = 0; i < StreamsFactory::GetStreamInfoCount(); ++i)
+    for (int i = 0; i < StreamsFactory::GetStreamClassesCount(); ++i)
     {
         if (stream_info.class_name == stream_classes[i].stream_class_info.class_name)
         {
