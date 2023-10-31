@@ -41,7 +41,7 @@ jobs:
           sudo apt-get install libpng-dev -y
           sudo apt-get install libfreetype6-dev -y
           sudo apt-get install rapidjson-dev -y
-          sudo apt-get install libssl-dev libcurl4-openssl-dev -y
+          sudo apt-get install curl libssl-dev libcurl4-openssl-dev -y
 
       - name: Configure CMake (Windows)
         if: ${{ (matrix.OS == 'windows-latest') }}
