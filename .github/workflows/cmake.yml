@@ -30,7 +30,7 @@ jobs:
         # on Windows, we rely on vcpkg to pull in dependencies
         shell: bash
         run: |
-          vcpkg install --triplet x64-windows rapidjson
+          vcpkg install --triplet x64-windows rapidjson curl[ssl]
 
       - name: Install dependencies (Linux)
         if: ${{ (matrix.OS == 'ubuntu-latest') }}
