@@ -79,7 +79,7 @@ message("check for open -> ${HAVE_FCNTL_H_OPEN_TEXT} ; check for pread -> ${HAVE
 #  "ON", the build will fail if the curl-library available.
 option(LIBCZI_BUILD_CURL_BASED_STREAM "include curl-based http-/https-stream object" OFF)
 
-option(LIBCZI_BUILD_PREFER_EXTERNALPACKAGE_LIBCURL "Prefer an libcurl-curl package present on the system" ON)
+option(LIBCZI_BUILD_PREFER_EXTERNALPACKAGE_LIBCURL "Prefer a libcurl-curl package present on the system" OFF)
 
 # This option allows to exclude the unit-tests from the build. The unit-tests are using the
 # Google-Test-framework which is downloaded from GitHub during the CMake-run.
