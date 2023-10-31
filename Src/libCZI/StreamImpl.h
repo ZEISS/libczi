@@ -7,7 +7,6 @@
 #include <memory>
 #include "libCZI.h"
 #include "inc_libCZI_Config.h"
-#include <fstream>
 #if defined(_WIN32)
     #include <Windows.h>
 #endif
