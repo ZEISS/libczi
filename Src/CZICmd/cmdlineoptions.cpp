@@ -2177,7 +2177,7 @@ void CCmdLineOptions::PrintHelpStreamsObjects()
 {
     // Here we parse the JSON-formatted string that contains the property bag for the input stream and
     //  construct a map<int, libCZI::StreamsFactory::Property> from it.
-      
+
     static constexpr struct 
     {
         const char* name;
