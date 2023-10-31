@@ -1946,7 +1946,7 @@ void CCmdLineOptions::PrintHelpStreamsObjects()
     this->GetLog()->WriteLineStdOut("Available Input-Stream objects:");
     this->GetLog()->WriteLineStdOut("");
 
-    int stream_object_count = libCZI::StreamsFactory::GetStreamClassesCount();
+    const int stream_object_count = libCZI::StreamsFactory::GetStreamClassesCount();
     ostringstream string_stream;
     for (int i = 0; i < stream_object_count; ++i)
     {
