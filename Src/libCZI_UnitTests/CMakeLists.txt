@@ -59,7 +59,8 @@ ADD_EXECUTABLE(libCZI_UnitTests
 										utils.h 
 										test_Accessors.cpp 
 										test_CZIParse.cpp 
-										test_streamslib.cpp)
+										test_streamslib.cpp 
+										test_curlhttpstream.cpp)
 
 TARGET_LINK_LIBRARIES(libCZI_UnitTests PRIVATE libCZIStatic GTest::gtest GTest::gmock)
 

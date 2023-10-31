@@ -625,7 +625,7 @@ namespace libCZI
     /// Global information about the CZI-file (from the CZI-fileheader-segment).
     struct FileHeaderInfo
     {
-        ///< The file-GUID of the CZI. Note: CZI defines two GUIDs, this is the "FileGuid". Multi-file containers 
+        /// The file-GUID of the CZI. Note: CZI defines two GUIDs, this is the "FileGuid". Multi-file containers 
         /// (for which the other GUID "PrimaryFileGuid" is used) are not supported by libCZI currently.
         libCZI::GUID fileGuid;
         int majorVersion;   ///< The major version.
