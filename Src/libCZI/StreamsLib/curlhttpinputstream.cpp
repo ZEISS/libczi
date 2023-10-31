@@ -64,7 +64,15 @@ CurlHttpInputStream::CurlHttpInputStream(const std::string& url, const std::map<
     // put the handle into a smart-pointer with a custom deleter (so that we don't have to worry about calling curl_easy_cleanup in the lines below in case of error)
     unique_ptr<CURL, void(*)(CURL*)> up_curl_handle(curl_handle, [](CURL* h)->void {curl_easy_cleanup(h); });
 
-    /* set URL to get here */
+    /* set URL to get here - note that the URL is not validated when setting this, but only later when trying to connect*/
+    // TODO(JBL): - we may want to use CURLOPT_PROTOCOLS and CURLOPT_REDIR_PROTOCOLS to restrict the protocols that are allowed
+    //            - dealing with non-ASCII characters in the URL may be tricky (https://curl.se/libcurl/c/CURLOPT_URL.html)
+    if (url.empty())
+    {
+        // an empty URL is for sure not allowed, and we don't want to deal with it later
+        throw std::runtime_error("url is empty");
+    }
+
     CURLcode return_code = curl_easy_setopt(up_curl_handle.get(), CURLOPT_URL, url.c_str());
     ThrowIfCurlSetOptError(return_code, "CURLOPT_URL");
 

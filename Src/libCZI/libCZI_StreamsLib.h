@@ -241,7 +241,8 @@ namespace libCZI
         /// the libcurl-based ones). 
         static void Initialize();
 
-        /// Creates and initializes a new instance of the specified stream class.
+        /// Creates and initializes a new instance of the specified stream class. If the specified class is not known, 
+        /// then this function will return nullptr. In case of an error when initializing the stream, an exception will be thrown.
         ///
         /// \param  stream_info Information describing the stream.
         ///

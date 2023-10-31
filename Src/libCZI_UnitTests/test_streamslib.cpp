@@ -13,7 +13,7 @@ TEST(StreamsLib, Enumeration)
     EXPECT_GT(number_of_classes, 0);
 
     StreamsFactory::StreamClassInfo info;
-    for (int i=0;i<number_of_classes;++i)
+    for (int i = 0; i < number_of_classes; ++i)
     {
         const bool b = StreamsFactory::GetStreamInfoForClass(i, info);
         EXPECT_TRUE(b);
@@ -25,4 +25,22 @@ TEST(StreamsLib, Enumeration)
     const bool b = StreamsFactory::GetStreamInfoForClass(number_of_classes, info);
     EXPECT_FALSE(b);
 }
-    
+
+TEST(StreamsLib, TryToInstantiate)
+{
+    const int number_of_classes = StreamsFactory::GetStreamClassesCount();
+
+    StreamsFactory::StreamClassInfo info;
+    for (int i = 0; i < number_of_classes; ++i)
+    {
+        const bool b = StreamsFactory::GetStreamInfoForClass(i, info);
+        ASSERT_TRUE(b);
+
+        StreamsFactory::CreateStreamInfo create_info;
+        create_info.class_name = info.class_name;
+
+        // It is reasonable to assume (and therefore checked here) that when passing in an empty filename,
+        //  the creation of the stream will fail.
+        EXPECT_ANY_THROW(StreamsFactory::CreateStream(create_info)) << "with stream-class \"" << create_info.class_name << "\"";
+    }
+}
