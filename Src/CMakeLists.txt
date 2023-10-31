@@ -28,6 +28,11 @@ if (LIBCZI_BUILD_CURL_BASED_STREAM)
   else(LIBCZI_BUILD_PREFER_EXTERNALPACKAGE_LIBCURL)
     message(STATUS "Could not find libcURL.  This dependency will be downloaded.")
     include(FetchContent)
+    # It seems for MacOS, the secure transport API is deprecated (->  https://curl.se/mail/lib-2023-09/0027.html),
+    #  using OpenSSL seems to be the way to go here - so, we better do not default to secure transport here.
+    # if (APPLE)  # for MacOS - let's choose Apple's native secure transport backend
+    #    set(CURL_USE_SECTRANSP ON)
+    # endif(APPLE)
     FetchContent_Declare(
         libcurl
         GIT_REPOSITORY  "https://github.com/curl/curl.git"
@@ -41,7 +46,6 @@ if (LIBCZI_BUILD_CURL_BASED_STREAM)
                     -DCMAKE_POSITION_INDEPENDENT_CODE=ON 
                     -DCMAKE_INSTALL_PREFIX=${CMAKE_BINARY_DIR}/curl 
                     -DENABLE_UNICODE=ON
-                    -DCURL_USE_SECTRANSP=ON  # for MacOS - let's choose Apple's native secure transport backend
         )
 
     FetchContent_MakeAvailable(libcurl)
