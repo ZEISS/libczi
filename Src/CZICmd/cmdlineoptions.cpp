@@ -4,7 +4,7 @@
 
 #include "stdafx.h"
 #include "cmdlineoptions.h"
-
+#include "inc_libCZI.h"
 #include <clocale>
 #include <locale>
 #include <regex>
@@ -581,8 +581,8 @@ CCmdLineOptions::ParseResult CCmdLineOptions::Parse(int argc, char** argv)
     cli_app.add_option("--source-stream-class", argument_source_stream_class,
         "Specifies the stream-class used for reading the source CZI-file. If not specified, the default file-reader stream-class is used.")
         ->option_text("STREAMCLASS");
-    cli_app.add_option("--source-stream-creation-propbag", argument_source_stream_creation_propbag,
-               "Specifies the property-bag used for creating the stream used for reading the source CZI-file. The data is given in JSON-notation.")
+    cli_app.add_option("--propbag-source-stream-creation", argument_source_stream_creation_propbag,
+        "Specifies the property-bag used for creating the stream used for reading the source CZI-file. The data is given in JSON-notation.")
         ->option_text("PROPBAG");
     cli_app.add_option("-o,--output", argument_output_filename,
         "specifies the output-filename. A suffix will be appended to the name given here depending on the type of the file.")
@@ -2175,46 +2175,85 @@ void CCmdLineOptions::PrintHelpStreamsObjects()
 
 /*static*/bool CCmdLineOptions::TryParseInputStreamCreationPropertyBag(const std::string& s, std::map<int, libCZI::StreamsFactory::Property>* property_bag)
 {
-    std::map<int, libCZI::StreamsFactory::Property> map;
+    static constexpr struct KeyStringToId
+    {
+        const char* name;
+        int stream_property_id;
+        libCZI::StreamsFactory::Property::Type property_type;
+    } kKeyStringToId[] =
+    {
+        {"CurlHttp_Proxy", libCZI::StreamsFactory::StreamProperties::kCurlHttp_Proxy, libCZI::StreamsFactory::Property::Type::String},
+        {"CurlHttp_UserAgent", libCZI::StreamsFactory::StreamProperties::kCurlHttp_UserAgent, libCZI::StreamsFactory::Property::Type::String},
+        {"CurlHttp_Timeout", libCZI::StreamsFactory::StreamProperties::kCurlHttp_Timeout, libCZI::StreamsFactory::Property::Type::Int32},
+        {"CurlHttp_ConnectTimeout", libCZI::StreamsFactory::StreamProperties::kCurlHttp_ConnectTimeout, libCZI::StreamsFactory::Property::Type::Int32},
+        {"CurlHttp_Xoauth2Bearer", libCZI::StreamsFactory::StreamProperties::kCurlHttp_Xoauth2Bearer, libCZI::StreamsFactory::Property::Type::String},
+        {"CurlHttp_Cookie", libCZI::StreamsFactory::StreamProperties::kCurlHttp_Cookie, libCZI::StreamsFactory::Property::Type::String},
+        {"CurlHttp_SslVerifyPeer", libCZI::StreamsFactory::StreamProperties::kCurlHttp_SslVerifyPeer, libCZI::StreamsFactory::Property::Type::Boolean},
+        {"CurlHttp_SslVerifyHost", libCZI::StreamsFactory::StreamProperties::kCurlHttp_SslVerifyHost, libCZI::StreamsFactory::Property::Type::Boolean},
+    };
+
     rapidjson::Document document;
     document.Parse(s.c_str());
     if (document.HasParseError() || !document.IsObject())
     {
-               return false;
+        return false;
     }
 
     for (rapidjson::Value::ConstMemberIterator itr = document.MemberBegin(); itr != document.MemberEnd(); ++itr)
     {
-               if (!itr->name.IsString())
-               {
-                              return false;
+        if (!itr->name.IsString())
+        {
+            return false;
         }
 
         string name = itr->name.GetString();
-        libCZI::StreamsFactory::Property property;
+        size_t index_of_key = numeric_limits<size_t>::max();
+        for (size_t i = 0; i < sizeof(kKeyStringToId) / sizeof(kKeyStringToId[0]); ++i)
+        {
+            if (name == kKeyStringToId[i].name)
+            {
+                index_of_key = i;
+                break;
+            }
+        }
+
+        if (index_of_key == numeric_limits<size_t>::max())
+        {
+            return false;
+        }
+
+        switch (kKeyStringToId[index_of_key].property_type)
+        {
+        case libCZI::StreamsFactory::Property::Type::String:
+            if (!itr->value.IsString())
+            {
+                return false;
+            }
+
+            if (property_bag != nullptr)
+            {
+                property_bag->insert(std::make_pair(kKeyStringToId[index_of_key].stream_property_id, libCZI::StreamsFactory::Property(itr->value.GetString())));
+            }
+
+            break;
+        }
+        /*libCZI::StreamsFactory::Property property;
         if (itr->value.IsString())
         {
-                       property = libCZI::StreamsFactory::Property(itr->value.GetString());
+            property = libCZI::StreamsFactory::Property(itr->value.GetString());
         }
         else if (itr->value.IsDouble())
         {
-                       property = libCZI::StreamsFactory::Property(itr->value.GetDouble());
+            property = libCZI::StreamsFactory::Property(itr->value.GetDouble());
         }
         else if (itr->value.IsBool())
         {
-                       property = libCZI::StreamsFactory::Property(itr->value.GetBool());
+            property = libCZI::StreamsFactory::Property(itr->value.GetBool());
         }
         else
         {
-                       return false;
-        }
-
-     //   map[libCZI::StreamsFactory::GetStreamPropertyId(name)] = property;
-    }
-
-    if (property_bag != nullptr)
-    {
-               property_bag->swap(map);
+            return false;
+        }*/
     }
 
     return true;

@@ -31,7 +31,10 @@ protected:
         }
         else
         {
-            stream = CExecuteBase::CreateInputStreamObject(options.GetCZIFilename().c_str(), options.GetInputStreamClassName());
+            stream = CExecuteBase::CreateInputStreamObject(
+                                    options.GetCZIFilename().c_str(), 
+                                    options.GetInputStreamClassName(),
+                                    &options.GetInputStreamPropertyBag());
         }
 
         auto spReader = libCZI::CreateCZIReader();
@@ -45,14 +48,16 @@ protected:
         return stream;
     }
 
-    static std::shared_ptr<IStream> CreateInputStreamObject(const wchar_t* uri, const string& class_name)
+    static std::shared_ptr<IStream> CreateInputStreamObject(const wchar_t* uri, const string& class_name, const std::map<int, libCZI::StreamsFactory::Property>* property_bag)
     {
         libCZI::StreamsFactory::Initialize();
         libCZI::StreamsFactory::CreateStreamInfo stream_info;
         stream_info.class_name = class_name;
         stream_info.filename = convertToUtf8(uri);
-
-        // stream_info.property_bag[StreamsFactory::StreamProperties::kCurlHttp_Proxy] = StreamsFactory::Property("http://127.0.0.1:8888");
+        if (property_bag != nullptr)
+        {
+            stream_info.property_bag = *property_bag;
+        }
 
         auto stream = libCZI::StreamsFactory::CreateStream(stream_info);
         return stream;

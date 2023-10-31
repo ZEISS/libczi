@@ -217,6 +217,7 @@ public:
     Command GetCommand() const { return this->command; }
     const std::wstring& GetCZIFilename() const { return this->cziFilename; }
     const std::string& GetInputStreamClassName() const { return this->source_stream_class; }
+    const std::map<int, libCZI::StreamsFactory::Property>& GetInputStreamPropertyBag() const { return this->property_bag_for_stream_class; }
     const libCZI::CDimCoordinate& GetPlaneCoordinate() const { return this->planeCoordinate; }
     const std::map<int, ChannelDisplaySettings>& GetMultiChannelCompositeChannelInfos() const { return this->multiChannelCompositeChannelInfos; }
     bool GetUseDisplaySettingsFromDocument() const { return this->useDisplaySettingsFromDocument; }
