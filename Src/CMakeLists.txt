@@ -15,8 +15,8 @@ if (LIBCZI_BUILD_CURL_BASED_STREAM)
     find_package(CURL CONFIG QUIET)
     if (NOT CURL_FOUND)
       message(FATAL_ERROR [=[
-        CURL library was not found, which is required for building. Consider installing
-        like 'sudo apt-get install libcurl4-openssl-dev' or enable the option 'LIBCZI_BUILD_PREFER_EXTERNALPACKAGE_LIBCURL'.
+        CURL library was not found, which is required for building. Consider installing it with a package manager, something
+        like 'sudo apt-get install libcurl4-openssl-dev', or enable the option 'LIBCZI_BUILD_PREFER_EXTERNALPACKAGE_LIBCURL'.
       ]=])
     endif()
 
