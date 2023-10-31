@@ -238,7 +238,8 @@ namespace libCZI
 
         /// Perform one-time initialization of the streams objects.
         /// Some stream objects may require some one-time initialization for being operational (this is e.g. the case with
-        /// the libcurl-based ones). 
+        /// the libcurl-based ones). It is considered good practice to call this function before using any of the other methods.
+        /// Calling it multiple times is not a problem (and subsequent calls after the first are ignored).
         static void Initialize();
 
         /// Creates and initializes a new instance of the specified stream class. If the specified class is not known, 
