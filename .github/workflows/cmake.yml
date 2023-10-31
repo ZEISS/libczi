@@ -41,7 +41,7 @@ jobs:
           sudo apt-get install libpng-dev -y
           sudo apt-get install libfreetype6-dev -y
           sudo apt-get install rapidjson-dev -y
-          sudo apt-get install libcurl4 libssl-dev libcurl4-openssl-dev -y
+          sudo apt-get install libssl-dev -y
 
       - name: Configure CMake (Windows)
         if: ${{ (matrix.OS == 'windows-latest') }}
@@ -56,7 +56,7 @@ jobs:
         if: ${{ (matrix.OS == 'ubuntu-latest') }}
         shell: bash
         run: |
-          cmake -B "${{github.workspace}}/build" -DCMAKE_BUILD_TYPE=${{matrix.build}} -DLIBCZI_BUILD_CZICMD=ON -DLIBCZI_BUILD_CURL_BASED_STREAM=ON
+          cmake -B "${{github.workspace}}/build" -DCMAKE_BUILD_TYPE=${{matrix.build}} -DLIBCZI_BUILD_CZICMD=ON -DLIBCZI_BUILD_CURL_BASED_STREAM=ON -DLIBCZI_BUILD_PREFER_EXTERNALPACKAGE_LIBCUR=OFF
 
       - name: Build
         # Build your program with the given configuration
