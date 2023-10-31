@@ -758,7 +758,7 @@ CCmdLineOptions::ParseResult CCmdLineOptions::Parse(int argc, char** argv)
         if (!argument_source_stream_creation_propbag.empty())
         {
             const bool b = TryParseInputStreamCreationPropertyBag(argument_source_stream_creation_propbag, &this->property_bag_for_stream_class);
-            // TODO ThrowIfFalse(b, "-r,--rect", argument_rect);
+            ThrowIfFalse(b, "--propbag-source-stream-creation", argument_source_stream_creation_propbag);
         }
 
         if (!argument_output_filename.empty())
@@ -2175,12 +2175,13 @@ void CCmdLineOptions::PrintHelpStreamsObjects()
 
 /*static*/bool CCmdLineOptions::TryParseInputStreamCreationPropertyBag(const std::string& s, std::map<int, libCZI::StreamsFactory::Property>* property_bag)
 {
-    static constexpr struct KeyStringToId
+    static constexpr struct 
     {
         const char* name;
         int stream_property_id;
         libCZI::StreamsFactory::Property::Type property_type;
-    } kKeyStringToId[] =
+    }
+    kKeyStringToId[] =
     {
         {"CurlHttp_Proxy", libCZI::StreamsFactory::StreamProperties::kCurlHttp_Proxy, libCZI::StreamsFactory::Property::Type::String},
         {"CurlHttp_UserAgent", libCZI::StreamsFactory::StreamProperties::kCurlHttp_UserAgent, libCZI::StreamsFactory::Property::Type::String},
@@ -2236,24 +2237,31 @@ void CCmdLineOptions::PrintHelpStreamsObjects()
             }
 
             break;
+        case libCZI::StreamsFactory::Property::Type::Boolean:
+            if (!itr->value.IsBool())
+            {
+                return false;
+            }
+
+            if (property_bag != nullptr)
+            {
+                property_bag->insert(std::make_pair(kKeyStringToId[index_of_key].stream_property_id, libCZI::StreamsFactory::Property(itr->value.GetBool())));
+            }
+
+            break;
+        case libCZI::StreamsFactory::Property::Type::Int32:
+            if (!itr->value.IsInt())
+            {
+                return false;
+            }
+
+            if (property_bag != nullptr)
+            {
+                property_bag->insert(std::make_pair(kKeyStringToId[index_of_key].stream_property_id, libCZI::StreamsFactory::Property(itr->value.GetInt())));
+            }
+
+            break;
         }
-        /*libCZI::StreamsFactory::Property property;
-        if (itr->value.IsString())
-        {
-            property = libCZI::StreamsFactory::Property(itr->value.GetString());
-        }
-        else if (itr->value.IsDouble())
-        {
-            property = libCZI::StreamsFactory::Property(itr->value.GetDouble());
-        }
-        else if (itr->value.IsBool())
-        {
-            property = libCZI::StreamsFactory::Property(itr->value.GetBool());
-        }
-        else
-        {
-            return false;
-        }*/
     }
 
     return true;
