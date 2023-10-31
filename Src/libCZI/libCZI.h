@@ -179,13 +179,18 @@ namespace libCZI
     /// \return The newly created metadata-builder-object.
     LIBCZI_API std::shared_ptr<ICziMetadataBuilder> CreateMetadataBuilderFromXml(const std::string& xml);
 
-
-    /// Interface used for accessing the data-stream.
-    ///
+    /// Interface used for accessing the data-stream.  
+    /// Implementations of this interface are expected to be thread-safe - it should be possible to
+    /// call the Read-method from multiple threads simultaneously.
+    /// In libCZI-usage, exceptions thrown by Read-method are wrapped into a libCZI::LibCZIException-exception,
+    /// where the exception thrown by the Read-method is stored as the inner exception.
     class IStream
     {
     public:
-        /// Reads the specified amount of data from the stream at the specified position.
+        /// Reads the specified amount of data from the stream at the specified position. This method
+        /// is expected to throw an exception for any kind of I/O-related error. It must not throw
+        /// an exception if reading past the end of a file - instead, it must return the number of
+        /// bytes actually read accordingly.
         ///
         /// \param offset                The offset to start reading from.
         /// \param [out] pv              The caller-provided buffer for the data. Must be non-null.
