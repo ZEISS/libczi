@@ -18,8 +18,9 @@
 class CurlHttpInputStream : public libCZI::IStream
 {
 private:
-    CURL* curl_handle_{nullptr};
-    std::mutex request_mutex_;///< Mutex to serialize the requests.
+    CURL* curl_handle_{nullptr};        ///< The curl-handle.
+    CURLU* curl_url_handle_{nullptr};   ///< The curl-url-handle.
+    std::mutex request_mutex_;          ///< Mutex to serialize the requests.
 public:
     CurlHttpInputStream(const std::string& url, const std::map<int, libCZI::StreamsFactory::Property>& property_bag);
 

@@ -20,7 +20,7 @@ using namespace libCZI;
 
 /*static*/std::string CurlHttpInputStream::GetBuildInformation()
 {
-    auto version_info = curl_version_info(CURLVERSION_NOW);
+    const auto version_info = curl_version_info(CURLVERSION_NOW);
 
     stringstream string_stream;
     string_stream << "Version:" << version_info->version;
@@ -64,17 +64,32 @@ CurlHttpInputStream::CurlHttpInputStream(const std::string& url, const std::map<
     // put the handle into a smart-pointer with a custom deleter (so that we don't have to worry about calling curl_easy_cleanup in the lines below in case of error)
     unique_ptr<CURL, void(*)(CURL*)> up_curl_handle(curl_handle, [](CURL* h)->void {curl_easy_cleanup(h); });
 
-    /* set URL to get here - note that the URL is not validated when setting this, but only later when trying to connect*/
-    // TODO(JBL): - we may want to use CURLOPT_PROTOCOLS and CURLOPT_REDIR_PROTOCOLS to restrict the protocols that are allowed
-    //            - dealing with non-ASCII characters in the URL may be tricky (https://curl.se/libcurl/c/CURLOPT_URL.html)
-    if (url.empty())
+    // construct a "curl-URL-handle" (an object that can be used to parse and manipulate URLs) -> https://curl.se/libcurl/c/libcurl-url.html
+    CURLU* curl_url_handle = curl_url();
+    if (curl_url_handle == nullptr)
     {
-        // an empty URL is for sure not allowed, and we don't want to deal with it later
-        throw std::runtime_error("url is empty");
+        throw std::runtime_error("curl_url() failed");
     }
 
-    CURLcode return_code = curl_easy_setopt(up_curl_handle.get(), CURLOPT_URL, url.c_str());
-    ThrowIfCurlSetOptError(return_code, "CURLOPT_URL");
+    // put the url-handle also into a smart-pointer with a custom deleter
+    unique_ptr<CURLU, void(*)(CURLU*)> up_curl_url_handle(curl_url_handle, [](CURLU* h)->void {curl_url_cleanup(h); });
+
+    // Now, we parse the URL provided - the benefit of doing it this way is that at this point the URL is parsed for 
+    //  syntactical correctness, and we can be sure that the URL is valid. If we simply set the URL with CURLOPT_URL,
+    //  this would happen later on (when actually performing the request). I'd guess it is beneficial to catch this
+    //  kind of error early on.
+    // TODO(JBL): - we may want to restrict the schemes that are allowed 
+    //            - dealing with non-ASCII characters in the URL may be tricky (https://curl.se/libcurl/c/CURLOPT_URL.html, https://curl.se/libcurl/c/curl_url_set.html)
+    const CURLUcode return_code_url = curl_url_set(up_curl_url_handle.get(), CURLUPART_URL, url.c_str(), 0);
+    if (return_code_url != CURLUE_OK)
+    {
+        stringstream string_stream;
+        string_stream << "curl_url_set(..) failed with error code " << return_code_url << " (" << curl_url_strerror(return_code_url) << ")";
+        throw std::runtime_error(string_stream.str());
+    }
+
+    CURLcode return_code = curl_easy_setopt(up_curl_handle.get(), CURLOPT_CURLU, up_curl_url_handle.get());
+    ThrowIfCurlSetOptError(return_code, "CURLOPT_CURLU");
 
     return_code = curl_easy_setopt(up_curl_handle.get(), CURLOPT_VERBOSE, 0L/*1L*/);
     ThrowIfCurlSetOptError(return_code, "CURLOPT_VERBOSE");
@@ -147,6 +162,7 @@ CurlHttpInputStream::CurlHttpInputStream(const std::string& url, const std::map<
     }
 
     this->curl_handle_ = up_curl_handle.release();
+    this->curl_url_handle_ = up_curl_url_handle.release();
 }
 
 /*virtual*/void CurlHttpInputStream::Read(std::uint64_t offset, void* pv, std::uint64_t size, std::uint64_t* ptrBytesRead)
@@ -194,6 +210,11 @@ CurlHttpInputStream::~CurlHttpInputStream()
     if (this->curl_handle_ != nullptr)
     {
         curl_easy_cleanup(this->curl_handle_);
+    }
+
+    if (this->curl_url_handle_ != nullptr)
+    {
+        curl_url_cleanup(this->curl_url_handle_);
     }
 }
 
