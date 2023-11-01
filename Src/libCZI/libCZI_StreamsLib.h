@@ -232,8 +232,6 @@ namespace libCZI
         {
             std::string class_name; ///< Name of the class (this uniquely identifies the class).
 
-            std::string filename;   ///< Filename (in UTF-8 encoding) or  more generally some kind of URI which identifies the data for which a stream is to be created.
-
             std::map<int, Property> property_bag; ///< A property-bag with options for creating the stream-object.
         };
 
@@ -243,13 +241,25 @@ namespace libCZI
         /// Calling it multiple times is not a problem (and subsequent calls after the first are ignored).
         static void Initialize();
 
-        /// Creates and initializes a new instance of the specified stream class. If the specified class is not known, 
-        /// then this function will return nullptr. In case of an error when initializing the stream, an exception will be thrown.
+        /// Creates and initializes a new instance of the specified stream class. If the specified
+        /// class is not known, then this function will return nullptr. In case of an error when
+        /// initializing the stream, an exception will be thrown.
         ///
-        /// \param  stream_info Information describing the stream.
+        /// \param  stream_info     Information describing the stream.
+        /// \param  file_identifier The filename (or, more generally, an URI of some sort) identifying the file to be opened in UTF8-encoding.
         ///
         /// \returns    The newly created and initialized stream.
-        static std::shared_ptr<libCZI::IStream> CreateStream(const CreateStreamInfo& stream_info);
+        static std::shared_ptr<libCZI::IStream> CreateStream(const CreateStreamInfo& stream_info, const std::string& file_identifier);
+
+        /// Creates and initializes a new instance of the specified stream class. If the specified
+        /// class is not known, then this function will return nullptr. In case of an error when
+        /// initializing the stream, an exception will be thrown.
+        ///
+        /// \param  stream_info     Information describing the stream.
+        /// \param  file_identifier The filename (or, more generally, an URI of some sort) identifying the file to be opened.
+        ///
+        /// \returns    The newly created and initialized stream.
+        static std::shared_ptr<libCZI::IStream> CreateStream(const CreateStreamInfo& stream_info, const std::wstring& file_identifier);
 
         /// This structure gathers information about a stream class.
         struct LIBCZI_API StreamClassInfo

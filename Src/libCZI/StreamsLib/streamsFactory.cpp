@@ -17,24 +17,38 @@ using namespace libCZI;
 static const struct
 {
     StreamsFactory::StreamClassInfo stream_class_info;
-    std::shared_ptr<libCZI::IStream>(*pfn_create_stream)(const StreamsFactory::CreateStreamInfo& stream_info);
+
+    /// Function for creating and initializing the stream-instance. Note that we have two variants here, one for UTF-8 and one for wide string.
+    /// Only one must be provided (the other one can be nullptr) - in which case the string is converted to the other format by the caller.
+    /// By calling the appropriate function, the caller can avoid the conversion.
+    std::shared_ptr<libCZI::IStream>(*pfn_create_stream_utf8)(const StreamsFactory::CreateStreamInfo& stream_info, const std::string& file_name);
+
+    /// Function for creating and initializing the stream-instance. Note that we have two variants here, one for UTF-8 and one for wide string.
+    /// Only one must be provided (the other one can be nullptr) - in which case the string is converted to the other format by the caller.
+    /// By calling the appropriate function, the caller can avoid the conversion.
+    std::shared_ptr<libCZI::IStream>(*pfn_create_stream_wide)(const StreamsFactory::CreateStreamInfo& stream_info, const std::wstring& file_name);
 } stream_classes[] =
 {
 #if LIBCZI_CURL_BASED_STREAM_AVAILABLE
         {
             { "curl_http_inputstream", "curl-based http/https stream", CurlHttpInputStream::GetBuildInformation },
-            [](const StreamsFactory::CreateStreamInfo& stream_info) -> std::shared_ptr<libCZI::IStream>
+            [](const StreamsFactory::CreateStreamInfo& stream_info, const std::string& file_name) -> std::shared_ptr<libCZI::IStream>
             {
-                return std::make_shared<CurlHttpInputStream>(stream_info.filename, stream_info.property_bag);
+                return std::make_shared<CurlHttpInputStream>(file_name, stream_info.property_bag);
             },
+            nullptr
         },
 #endif  // LIBCZI_CURL_BASED_STREAM_AVAILABLE
 #if _WIN32
         {
             { "windows_file_inputstream", "stream implementation based on Windows-API" },
-            [](const StreamsFactory::CreateStreamInfo& stream_info) -> std::shared_ptr<libCZI::IStream>
+            [](const StreamsFactory::CreateStreamInfo& stream_info, const std::string& file_name) -> std::shared_ptr<libCZI::IStream>
             {
-                return std::make_shared<WindowsFileInputStream>(stream_info.filename);
+                return std::make_shared<WindowsFileInputStream>(file_name);
+            },
+            [](const StreamsFactory::CreateStreamInfo& stream_info, const std::wstring& file_name) -> std::shared_ptr<libCZI::IStream>
+            {
+                return std::make_shared<WindowsFileInputStream>(file_name.c_str());
             }
         },
 #endif  // _WIN32
@@ -44,17 +58,21 @@ static const struct
             [](const StreamsFactory::CreateStreamInfo& stream_info) -> std::shared_ptr<libCZI::IStream>
             {
                 return std::make_shared<PreadFileInputStream>(stream_info.filename);
-            }
+            },
+            nullptr
         },
 #endif // LIBCZI_USE_PREADPWRITEBASED_STREAMIMPL
         {
             { "c_runtime_file_inputstream", "stream implementation based on C-runtime library" },
-            [](const StreamsFactory::CreateStreamInfo& stream_info) -> std::shared_ptr<libCZI::IStream>
+            [](const StreamsFactory::CreateStreamInfo& stream_info, const std::string& file_name) -> std::shared_ptr<libCZI::IStream>
             {
-                return std::make_shared<SimpleFileInputStream>(stream_info.filename);
+                return std::make_shared<SimpleFileInputStream>(file_name);
+            },
+            [](const StreamsFactory::CreateStreamInfo& stream_info, const std::wstring& file_name) -> std::shared_ptr<libCZI::IStream>
+            {
+                return std::make_shared<SimpleFileInputStream>(file_name.c_str());
             }
         },
-
 };
 
 static std::once_flag streams_factory_already_initialized;
@@ -87,20 +105,51 @@ int libCZI::StreamsFactory::GetStreamClassesCount()
     return sizeof(stream_classes) / sizeof(stream_classes[0]);
 }
 
-std::shared_ptr<libCZI::IStream> libCZI::StreamsFactory::CreateStream(const CreateStreamInfo& stream_info)
+std::shared_ptr<libCZI::IStream> libCZI::StreamsFactory::CreateStream(const CreateStreamInfo& stream_info, const std::string& file_identifier)
 {
     for (int i = 0; i < StreamsFactory::GetStreamClassesCount(); ++i)
     {
         if (stream_info.class_name == stream_classes[i].stream_class_info.class_name)
         {
-            return stream_classes[i].pfn_create_stream(stream_info);
+            if (stream_classes[i].pfn_create_stream_utf8)
+            {
+                return stream_classes[i].pfn_create_stream_utf8(stream_info, file_identifier);
+            }
+            else if (stream_classes[i].pfn_create_stream_wide)
+            {
+                return stream_classes[i].pfn_create_stream_wide(stream_info, Utilities::convertUtf8ToWchar_t(file_identifier.c_str()));
+            }
+
+            break;
         }
     }
 
     return {};
 }
 
-template<typename t_charactertype> 
+std::shared_ptr<libCZI::IStream> libCZI::StreamsFactory::CreateStream(const CreateStreamInfo& stream_info, const std::wstring& file_identifier)
+{
+    for (int i = 0; i < StreamsFactory::GetStreamClassesCount(); ++i)
+    {
+        if (stream_info.class_name == stream_classes[i].stream_class_info.class_name)
+        {
+            if (stream_classes[i].pfn_create_stream_wide)
+            {
+                return stream_classes[i].pfn_create_stream_wide(stream_info, file_identifier);
+            }
+            else if (stream_classes[i].pfn_create_stream_utf8)
+            {
+                return stream_classes[i].pfn_create_stream_utf8(stream_info, Utilities::convertWchar_tToUtf8(file_identifier.c_str()));
+            }
+
+            break;
+        }
+    }
+
+    return {};
+}
+
+template<typename t_charactertype>
 std::shared_ptr<libCZI::IStream> CreateDefaultStreamForFileGeneric(const t_charactertype* filename)
 {
 #if _WIN32

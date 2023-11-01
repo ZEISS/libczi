@@ -53,13 +53,12 @@ protected:
         libCZI::StreamsFactory::Initialize();
         libCZI::StreamsFactory::CreateStreamInfo stream_info;
         stream_info.class_name = class_name;
-        stream_info.filename = convertToUtf8(uri);
         if (property_bag != nullptr)
         {
             stream_info.property_bag = *property_bag;
         }
 
-        auto stream = libCZI::StreamsFactory::CreateStream(stream_info);
+        auto stream = libCZI::StreamsFactory::CreateStream(stream_info, uri);
         if (!stream)
         {
             stringstream string_stream;

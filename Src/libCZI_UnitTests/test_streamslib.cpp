@@ -41,6 +41,7 @@ TEST(StreamsLib, TryToInstantiate)
 
         // It is reasonable to assume (and therefore checked here) that when passing in an empty filename,
         //  the creation of the stream will fail.
-        EXPECT_ANY_THROW(StreamsFactory::CreateStream(create_info)) << "with stream-class \"" << create_info.class_name << "\"";
+        EXPECT_ANY_THROW(StreamsFactory::CreateStream(create_info, L"")) << "with stream-class \"" << create_info.class_name << "\"";
+        EXPECT_ANY_THROW(StreamsFactory::CreateStream(create_info, "")) << "with stream-class \"" << create_info.class_name << "\"";
     }
 }
