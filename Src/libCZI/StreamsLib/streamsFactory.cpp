@@ -55,9 +55,9 @@ static const struct
 #if LIBCZI_USE_PREADPWRITEBASED_STREAMIMPL
         {
             { "pread_file_inputstream", "stream implementation based on pread-API" },
-            [](const StreamsFactory::CreateStreamInfo& stream_info) -> std::shared_ptr<libCZI::IStream>
+            [](const StreamsFactory::CreateStreamInfo& stream_info, const std::string& file_name) -> std::shared_ptr<libCZI::IStream>
             {
-                return std::make_shared<PreadFileInputStream>(stream_info.filename);
+                return std::make_shared<PreadFileInputStream>(file_name);
             },
             nullptr
         },
