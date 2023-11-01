@@ -7,6 +7,7 @@ include(FetchContent)
 set(INSTALL_GTEST OFF CACHE BOOL "" FORCE)
 # For Windows: Prevent overriding the parent project's compiler/linker settings
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
 
 if(${CMAKE_VERSION}  VERSION_GREATER_EQUAL "3.24.0")
 	FetchContent_Declare(

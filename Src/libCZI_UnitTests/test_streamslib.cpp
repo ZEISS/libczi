@@ -45,3 +45,23 @@ TEST(StreamsLib, TryToInstantiate)
         EXPECT_ANY_THROW(StreamsFactory::CreateStream(create_info, "")) << "with stream-class \"" << create_info.class_name << "\"";
     }
 }
+
+TEST(StreamsLib, TestGetBuildInfoAndCheckThatStringIsNonEmptyIfAvailable)
+{
+    // here we check that if a stream-class has a non-zero get_build_info function, that this function
+    //  would return a non-empty string
+    const int number_of_classes = StreamsFactory::GetStreamClassesCount();
+
+    StreamsFactory::StreamClassInfo info;
+    for (int i = 0; i < number_of_classes; ++i)
+    {
+        const bool b = StreamsFactory::GetStreamInfoForClass(i, info);
+        ASSERT_TRUE(b);
+
+        if (info.get_build_info)
+        {
+            const std::string build_info = info.get_build_info();
+            EXPECT_FALSE(build_info.empty()) << "for stream-class \"" << info.class_name << "\"";
+        }
+    }
+}
