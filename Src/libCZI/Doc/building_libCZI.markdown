@@ -65,6 +65,11 @@ For building with a downloaded libcurl, the following packages is needed:
 
     sudo apt-get install libssl-dev
 
+Alternatively, the cross-platform package-manager [vcpkg](https://vcpkg.io/en/) can be used to manage the dependencies. For building on Windows,
+the following command brings in the necessary dependencies:
+
+    vcpkg install rapidjson 'curl[ssl]'
+
 
 Building the documentation
 --------------------------
