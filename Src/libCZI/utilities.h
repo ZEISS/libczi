@@ -24,7 +24,9 @@ public:
             if (!temp.empty())
             {
                 if (funcToken(temp) == false)
+                {
                     return;
+                }
             }
 
             start = end + 1;

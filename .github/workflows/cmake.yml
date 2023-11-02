@@ -30,7 +30,7 @@ jobs:
         # on Windows, we rely on vcpkg to pull in dependencies
         shell: bash
         run: |
-          vcpkg install --triplet x64-windows rapidjson
+          vcpkg install rapidjson 'curl[ssl]' --triplet x64-windows
 
       - name: Install dependencies (Linux)
         if: ${{ (matrix.OS == 'ubuntu-latest') }}
@@ -41,6 +41,7 @@ jobs:
           sudo apt-get install libpng-dev -y
           sudo apt-get install libfreetype6-dev -y
           sudo apt-get install rapidjson-dev -y
+          sudo apt-get install libssl-dev -y
 
       - name: Configure CMake (Windows)
         if: ${{ (matrix.OS == 'windows-latest') }}
@@ -49,13 +50,13 @@ jobs:
           # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
           # See https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type
           # on Windows, we need to point CMake to the vcpkg-toolchain-file
-          cmake -B "${{github.workspace}}/build" -DCMAKE_BUILD_TYPE=${{matrix.build}} -DLIBCZI_BUILD_CZICMD=ON -DCMAKE_TOOLCHAIN_FILE="${VCPKG_INSTALLATION_ROOT}/scripts/buildsystems/vcpkg.cmake"
+          cmake -B "${{github.workspace}}/build" -DCMAKE_BUILD_TYPE=${{matrix.build}} -DLIBCZI_BUILD_CZICMD=ON -DLIBCZI_BUILD_CURL_BASED_STREAM=ON -DLIBCZI_BUILD_PREFER_EXTERNALPACKAGE_LIBCURL=ON -DCMAKE_TOOLCHAIN_FILE="${VCPKG_INSTALLATION_ROOT}/scripts/buildsystems/vcpkg.cmake"
 
       - name: Configure CMake (Linux)
         if: ${{ (matrix.OS == 'ubuntu-latest') }}
         shell: bash
         run: |
-          cmake -B "${{github.workspace}}/build" -DCMAKE_BUILD_TYPE=${{matrix.build}} -DLIBCZI_BUILD_CZICMD=ON
+          cmake -B "${{github.workspace}}/build" -DCMAKE_BUILD_TYPE=${{matrix.build}} -DLIBCZI_BUILD_CZICMD=ON -DLIBCZI_BUILD_CURL_BASED_STREAM=ON -DLIBCZI_BUILD_PREFER_EXTERNALPACKAGE_LIBCURL=OFF
 
       - name: Build
         # Build your program with the given configuration

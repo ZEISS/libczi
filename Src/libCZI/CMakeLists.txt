@@ -87,6 +87,7 @@ set(LIBCZISRCFILES
             libCZI_Site.h
             libCZI_Utilities.h
             libCZI_Write.h
+            libCZI_StreamsLib.h
             MD5Sum.h
             MultiChannelCompositor.h
             SingleChannelAccessorBase.h
@@ -104,6 +105,15 @@ set(LIBCZISRCFILES
             pugiconfig.hpp
             pugixml.hpp
             jxrlibcompress.cpp
+            StreamsLib/streamsFactory.cpp
+            StreamsLib/curlhttpinputstream.cpp
+            StreamsLib/curlhttpinputstream.h
+            StreamsLib/windowsfileinputstream.cpp
+            StreamsLib/windowsfileinputstream.h
+            StreamsLib/simplefileinputstream.cpp
+            StreamsLib/simplefileinputstream.h
+            StreamsLib/preadfileinputstream.cpp
+            StreamsLib/preadfileinputstream.h
 )
 
 # prepare the configuration-file "libCZI_Config.h"
@@ -206,6 +216,12 @@ if (libCZI_HAS_AVXINTRINSICS)
   ENDIF()
 endif()
 
+if (LIBCZI_BUILD_CURL_BASED_STREAM)
+  set(libCZI_libcurl_available 1)
+else()
+  set(libCZI_libcurl_available 0)
+endif()
+
 if (LIBCZI_BUILD_PREFER_EXTERNALPACKAGE_ZSTD)
   find_package(zstd CONFIG REQUIRED)
 else()
@@ -237,7 +253,7 @@ configure_file (
 #  Define headers for this library. PUBLIC headers are used for compiling the library, and will be added to consumers' build paths.
 set(libCZIPublicHeaders "ImportExport.h" "libCZI.h" "libCZI_Compositor.h" "libCZI_DimCoordinate.h" "libCZI_exceptions.h"
                "libCZI_Helpers.h" "libCZI_Metadata.h" "libCZI_Metadata2.h" "libCZI_Pixels.h" "libCZI_ReadWrite.h"
-               "libCZI_Site.h" "libCZI_Utilities.h" "libCZI_Write.h" "libCZI_compress.h")
+               "libCZI_Site.h" "libCZI_Utilities.h" "libCZI_Write.h" "libCZI_compress.h" "libCZI_StreamsLib.h")
 
 #
 #define the shared libCZI - library
@@ -258,6 +274,9 @@ if (LIBCZI_BUILD_DYNLIB)
   else()
    target_link_libraries(libCZI PRIVATE libzstd_static)
    target_include_directories(libCZI PRIVATE ${zstd_SOURCE_DIR}/lib)
+  endif()
+  if (LIBCZI_BUILD_CURL_BASED_STREAM)
+    target_link_libraries(libCZI PRIVATE CURL::libcurl)
   endif()
   if (LIBCZI_BUILD_PREFER_EXTERNALPACKAGE_EIGEN3)
    target_link_libraries(libCZI PRIVATE Eigen3::Eigen)
@@ -289,6 +308,10 @@ else()
    target_include_directories(libCZIStatic PRIVATE ${zstd_SOURCE_DIR}/lib)
 endif()
 
+if (LIBCZI_BUILD_CURL_BASED_STREAM)
+  target_link_libraries(libCZIStatic PRIVATE CURL::libcurl)
+endif()
+
 if (LIBCZI_BUILD_PREFER_EXTERNALPACKAGE_EIGEN3)
   target_link_libraries(libCZIStatic PRIVATE Eigen3::Eigen)
 else()
@@ -298,6 +321,7 @@ IF(UNIX)
   target_compile_options(libCZIStatic PRIVATE -D_FILE_OFFSET_BITS=64)
   set_property(TARGET libCZIStatic PROPERTY POSITION_INDEPENDENT_CODE ON)
 ENDIF(UNIX)
+
 
 #
 # Notes: - the variables CMAKE_INSTALL_<...> have been defined in the module "GNUInstallDirs"

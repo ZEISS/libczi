@@ -27,12 +27,12 @@ std::wstring BytesToHexWString(const std::uint8_t* ptr, size_t size);
 std::vector<std::wstring> wrap(const wchar_t* text, size_t line_length/* = 72*/);
 std::vector<std::string> wrap(const char* text, size_t line_length/* = 72*/);
 
-const wchar_t* skipWhiteSpaceAndOneOfThese(const wchar_t* s, const wchar_t* charToSkipOnce);
+const wchar_t* skipWhiteSpaceAndOneOfThese(const wchar_t* s, const wchar_t* charsToSkipOnce);
 const char* skipWhiteSpaceAndOneOfThese(const char* s, const char* charsToSkipOnce);
 
 std::ostream& operator<<(std::ostream& os, const libCZI::GUID& guid);
 
-bool TryParseGuid(const std::wstring& str, libCZI::GUID* g);
+bool TryParseGuid(const std::wstring& str, libCZI::GUID* outGuid);
 
 /// This is an utility in order to implement a "scope guard" - an object that when gets out-of-scope is executing
 /// a functor which may implement any kind of clean-up - akin to a finally-clause in C#. C.f. https://www.heise.de/blog/C-Core-Guidelines-finally-in-C-4133759.html

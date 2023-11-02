@@ -7,6 +7,7 @@ include(FetchContent)
 set(INSTALL_GTEST OFF CACHE BOOL "" FORCE)
 # For Windows: Prevent overriding the parent project's compiler/linker settings
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
 
 if(${CMAKE_VERSION}  VERSION_GREATER_EQUAL "3.24.0")
 	FetchContent_Declare(
@@ -58,7 +59,9 @@ ADD_EXECUTABLE(libCZI_UnitTests
 										test_reader.cpp                 
 										utils.h 
 										test_Accessors.cpp 
-										test_CZIParse.cpp)
+										test_CZIParse.cpp 
+										test_streamslib.cpp 
+										test_curlhttpstream.cpp)
 
 TARGET_LINK_LIBRARIES(libCZI_UnitTests PRIVATE libCZIStatic GTest::gtest GTest::gmock)
 
