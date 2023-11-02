@@ -236,7 +236,7 @@ libCZI defines three different stream objects - read-only streams, write-only st
 interfaces are: IStream, IOutputStream and IInputOutputStream.
 libCZI provides implementations for reading from a file and for writing to a file in the file-system.  
 In addition, there is an experimental implementation for reading from an http(s)-server. This implementation is based on [libcurl](https://curl.se/libcurl/) and allows 
-to read from a CZI-file which is located on a web-server.
+reading from a CZI-file which is located on a web-server.
 
 For creating a stream object for reading, a class factory is provided (in the file libCZI_StreamsLib.h).
 
