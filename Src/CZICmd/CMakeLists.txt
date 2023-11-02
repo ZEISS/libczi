@@ -35,6 +35,7 @@ if (LIBCZI_BUILD_PREFER_EXTERNALPACKAGE_RAPIDJSON)
         ]=])
     ENDIF()
 else()
+    message(STATUS "*************** ${CMAKE_BINARY_DIR}/vendor/rapidjson")
     FetchContent_Declare(
             RapidJSON
             GIT_REPOSITORY  https://github.com/Tencent/rapidjson.git
@@ -98,8 +99,8 @@ add_executable(CZIcmd ${CZICMDSRCFILES})
 set_target_properties(CZIcmd PROPERTIES CXX_STANDARD 11)
 target_compile_definitions(CZIcmd PRIVATE _LIBCZISTATICLIB)
 
-target_link_libraries(CZIcmd PRIVATE ${ZLIB_LIBRARIES}  ${PNG_LIBRARIES} CLI11::CLI11 libCZIStatic)
-target_include_directories(CZIcmd PRIVATE ${CMAKE_CURRENT_BINARY_DIR} "${RAPIDJSON_INCLUDE_DIRS}")
+target_link_libraries(CZIcmd PRIVATE ${ZLIB_LIBRARIES}  ${PNG_LIBRARIES} CLI11::CLI11 libCZIStatic RapidJSON)
+target_include_directories(CZIcmd PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
 
 IF (FREETYPE_FOUND)
     target_compile_definitions(CZIcmd PRIVATE _USE_FREETYPE)
