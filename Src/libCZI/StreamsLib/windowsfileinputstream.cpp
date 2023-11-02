@@ -17,15 +17,15 @@ WindowsFileInputStream::WindowsFileInputStream(const std::string& filename)
 WindowsFileInputStream::WindowsFileInputStream(const wchar_t* filename)
     : handle(INVALID_HANDLE_VALUE)
 {
-    const HANDLE h = CreateFileW(filename, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_FLAG_RANDOM_ACCESS, NULL);
-    if (h == INVALID_HANDLE_VALUE)
+    const HANDLE file_handle = CreateFileW(filename, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_FLAG_RANDOM_ACCESS, NULL);
+    if (file_handle == INVALID_HANDLE_VALUE)
     {
         std::stringstream ss;
         ss << "Error opening the file \"" << Utilities::convertWchar_tToUtf8(filename) << "\"";
         throw std::runtime_error(ss.str());
     }
 
-    this->handle = h;
+    this->handle = file_handle;
 }
 
 WindowsFileInputStream::~WindowsFileInputStream()
