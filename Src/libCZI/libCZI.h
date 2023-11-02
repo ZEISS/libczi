@@ -182,7 +182,7 @@ namespace libCZI
     /// Interface used for accessing the data-stream.  
     /// Implementations of this interface are expected to be thread-safe - it should be possible to
     /// call the Read-method from multiple threads simultaneously.
-    /// In libCZI-usage, exceptions thrown by Read-method are wrapped into a libCZI::LibCZIException-exception,
+    /// In libCZI-usage, exceptions thrown by Read-method are wrapped into a libCZI::LibCZIIOException-exception,
     /// where the exception thrown by the Read-method is stored as the inner exception.
     class IStream
     {
