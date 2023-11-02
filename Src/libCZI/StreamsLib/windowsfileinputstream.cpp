@@ -47,8 +47,8 @@ void WindowsFileInputStream::Read(std::uint64_t offset, void* pv, std::uint64_t 
     ol.Offset = static_cast<DWORD>(offset);
     ol.OffsetHigh = static_cast<DWORD>(offset >> 32);
     DWORD bytes_read;
-    const BOOL B = ReadFile(this->handle, pv, static_cast<DWORD>(size), &bytes_read, &ol);
-    if (!B)
+    const BOOL read_file_return_code = ReadFile(this->handle, pv, static_cast<DWORD>(size), &bytes_read, &ol);
+    if (!read_file_return_code)
     {
         const DWORD lastError = GetLastError();
         std::stringstream ss;
