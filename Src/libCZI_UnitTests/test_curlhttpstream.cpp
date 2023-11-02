@@ -13,6 +13,10 @@ TEST(CurlHttpInputStream, SimpleReadFromHttps)
 
     StreamsFactory::CreateStreamInfo create_info;
     create_info.class_name = "curl_http_inputstream";
+
+    // set a five-seconds time-out (for the whole operation)
+    create_info.property_bag = { {StreamsFactory::StreamProperties::kCurlHttp_Timeout,StreamsFactory::Property(5)} };
+
     const auto stream = StreamsFactory::CreateStream(create_info, kUrl);
 
     if (!stream)
@@ -46,6 +50,10 @@ TEST(CurlHttpInputStream, OpenAndReadCziFromUrl)
 
     StreamsFactory::CreateStreamInfo create_info;
     create_info.class_name = "curl_http_inputstream";
+
+    // set a five-seconds time-out (for the whole operation)
+    create_info.property_bag = { {StreamsFactory::StreamProperties::kCurlHttp_Timeout,StreamsFactory::Property(5)} };
+
     const auto stream = StreamsFactory::CreateStream(create_info, kUrl);
 
     if (!stream)
@@ -62,7 +70,7 @@ TEST(CurlHttpInputStream, OpenAndReadCziFromUrl)
     {
         GTEST_SKIP() << "Exception: " << e.what() << "--> skipping this test as inconclusive, assuming network issues";
     }
-    
+
     const auto statistics = czi_reader->GetStatistics();
     EXPECT_EQ(statistics.subBlockCount, 2);
 
