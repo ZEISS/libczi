@@ -80,6 +80,11 @@ CurlHttpInputStream::CurlHttpInputStream(const std::string& url, const std::map<
     //  kind of error early on.
     // TODO(JBL): - we may want to restrict the schemes that are allowed 
     //            - dealing with non-ASCII characters in the URL may be tricky (https://curl.se/libcurl/c/CURLOPT_URL.html, https://curl.se/libcurl/c/curl_url_set.html)
+    // Regarding the topic of "sanitizing the URL" - currently, we just pass the string we get to libcurl as is, and
+    // the string we get here is conceptually in UTF-8 encoding. So, we rely on that the caller has made all necessary
+    // adjustments before passing in the URL. Should necessity arise, it might be a good idea to revisit this topic
+    // (and maybe use libcurl respective functionality for URL-sanitization here).
+    // Btw, this topic of sanitization may also arise with some of the items from the property-bag (e.g. 'kCurlHttp_UserAgent').
     const CURLUcode return_code_url = curl_url_set(up_curl_url_handle.get(), CURLUPART_URL, url.c_str(), 0);
     if (return_code_url != CURLUE_OK)
     {
