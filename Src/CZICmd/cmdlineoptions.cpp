@@ -562,7 +562,7 @@ CCmdLineOptions::ParseResult CCmdLineOptions::Parse(int argc, char** argv)
            to the specified OUTPUTFILE.
            \N'SingleChannelTileAccessor' will create a tile-composite (only from sub-blocks on pyramid-layer 0) of the specified region and plane.
            The resulting bitmap will be written to the specified OUTPUTFILE.
-           \N'SingleChannelPyramidTileAccessor' adds to the previous command the ability to explictely address a specific pyramid-layer (which must
+           \N'SingleChannelPyramidTileAccessor' adds to the previous command the ability to explicitly address a specific pyramid-layer (which must
            exist in the CZI-document).
            \N'SingleChannelScalingTileAccessor' gets the specified region with an arbitrary zoom factor. It uses the pyramid-layers in the CZI-document
            and scales the bitmap if necessary. The resulting bitmap will be written to the specified OUTPUTFILE.
