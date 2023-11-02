@@ -45,6 +45,8 @@ LIBCZI_BUILD_CZICMD                        | Whether to build the test- and samp
 LIBCZI_BUILD_DYNLIB                        | Whether to build the dynamic link libaray for libczi. Default is **ON**.
 LIBCZI_BUILD_PREFER_EXTERNALPACKAGE_EIGEN3 | Whether to use an existing Eigen3-library on the system (included via find_package). If this is OFF, then a copy of Eigen3 is downloaded as part of the build. Default is **OFF**.
 LIBCZI_BUILD_PREFER_EXTERNALPACKAGE_ZSTD   | Whether to use an existing zstd-library on the system (included via find_package). If this is OFF, then a copy of zstd is downloaded as part of the build. Default is **OFF**.
+LIBCZI_BUILD_CURL_BASED_STREAM             | Whether a curl-based stream object should be built (and be available in the stream factory). Default is **OFF**.
+LIBCZI_BUILD_PREFER_EXTERNALPACKAGE_LIBCURL| Whether to use an existing libcurl-library on the system (included via find_package). If this is OFF, then a copy of libcurl is downloaded as part of the build. Default is **OFF**.
 
 If building CZICmd is desired, then running CMake with this command line will enable building CZICmd:
     
@@ -57,6 +59,16 @@ If necessary, they can be installed like this (assuming a Debian based distro):
     sudo apt-get install zlib1g-dev
     sudo apt-get install libpng-dev
     sudo apt-get install rapidjson-dev
+    sudo apt-get install libfreetype6-dev
+
+For building with a downloaded libcurl, the following packages is needed:
+
+    sudo apt-get install libssl-dev
+
+Alternatively, the cross-platform package-manager [vcpkg](https://vcpkg.io/en/) can be used to manage the dependencies. For building on Windows,
+the following command brings in the necessary dependencies:
+
+    vcpkg install rapidjson 'curl[ssl]'
 
 
 Building the documentation

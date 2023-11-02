@@ -22,6 +22,7 @@
 #include "libCZI_Compositor.h"
 #include "libCZI_Site.h"
 #include "libCZI_compress.h"
+#include "libCZI_StreamsLib.h"
 
 // virtual d'tor -> https://isocpp.org/wiki/faq/virtual-functions#virtual-dtors
 
@@ -178,13 +179,18 @@ namespace libCZI
     /// \return The newly created metadata-builder-object.
     LIBCZI_API std::shared_ptr<ICziMetadataBuilder> CreateMetadataBuilderFromXml(const std::string& xml);
 
-
-    /// Interface used for accessing the data-stream.
-    ///
+    /// Interface used for accessing the data-stream.  
+    /// Implementations of this interface are expected to be thread-safe - it should be possible to
+    /// call the Read-method from multiple threads simultaneously.
+    /// In libCZI-usage, exceptions thrown by Read-method are wrapped into a libCZI::LibCZIIOException-exception,
+    /// where the exception thrown by the Read-method is stored as the inner exception.
     class IStream
     {
     public:
-        /// Reads the specified amount of data from the stream at the specified position.
+        /// Reads the specified amount of data from the stream at the specified position. This method
+        /// is expected to throw an exception for any kind of I/O-related error. It must not throw
+        /// an exception if reading past the end of a file - instead, it must return the number of
+        /// bytes actually read accordingly.
         ///
         /// \param offset                The offset to start reading from.
         /// \param [out] pv              The caller-provided buffer for the data. Must be non-null.
@@ -624,7 +630,7 @@ namespace libCZI
     /// Global information about the CZI-file (from the CZI-fileheader-segment).
     struct FileHeaderInfo
     {
-        ///< The file-GUID of the CZI. Note: CZI defines two GUIDs, this is the "FileGuid". Multi-file containers 
+        /// The file-GUID of the CZI. Note: CZI defines two GUIDs, this is the "FileGuid". Multi-file containers 
         /// (for which the other GUID "PrimaryFileGuid" is used) are not supported by libCZI currently.
         libCZI::GUID fileGuid;
         int majorVersion;   ///< The major version.

@@ -8,6 +8,14 @@
 include(CheckSymbolExists)
 include(CheckCSourceCompiles)
 
+function(BoolToYesNo var result_text)
+  if (${var})
+    set( ${result_text} "yes" PARENT_SCOPE)
+  else()
+    set( ${result_text} "no" PARENT_SCOPE)
+  endif()
+endfunction()
+
 add_library(JxrDecodeStatic OBJECT 
 							"JxrDecode.h"
 							"JxrDecode.cpp"
@@ -69,12 +77,16 @@ check_c_source_compiles(
 		"#include <byteswap.h>
 		 int main() {__builtin_bswap32(0x12345678);}"
 		jxrdecode_Has_builtin_bswap32)
-message("jxrdecode_Has_builtin_bswap32 = ${jxrdecode_Has_builtin_bswap32}.")
+BoolToYesNo(jxrdecode_Has_builtin_bswap32 jxrdecode_result_text)
+message("jxrdecode_Has_builtin_bswap32 = ${jxrdecode_result_text}.")
 if (NOT jxrdecode_Has_builtin_bswap32)
 	check_symbol_exists(_byteswap_ulong "stdlib.h" jxrdecode_Has_byteswap_long_in_stdlib)
-	message("jxrdecode_Has_byteswap_long_in_stdlib = ${jxrdecode_Has_byteswap_long_in_stdlib}.")
+	BoolToYesNo(jxrdecode_Has_byteswap_long_in_stdlib jxrdecode_result_text)
+	message("jxrdecode_Has_byteswap_long_in_stdlib = ${jxrdecode_result_text}.")
 	if (NOT jxrdecode_Has_byteswap_long_in_stdlib)
 	  check_symbol_exists(bswap32 "sys/endian.h" jxrdecode_Has_bswap_long_in_sys_endian)
+		BoolToYesNo(jxrdecode_Has_bswap_long_in_sys_endian jxrdecode_result_text)
+		message("jxrdecode_Has_bswap_long_in_sys_endian = ${jxrdecode_result_text}.")
 	endif()
 endif()
 
@@ -91,14 +103,16 @@ endif()
 # Here we check for the _rotl() function - c.f. https://stackoverflow.com/questions/776508/best-practices-for-circular-shift-rotate-operations-in-c
 # With MSVC, it is found in <intrin.h>, with gcc it is expected to be found in <x86intrin.h>.
 check_symbol_exists(_rotl "intrin.h" jxrdecode_Has_rotl_with_intrin)
-message("jxrdecode_Has_rotl_with_intrin = ${jxrdecode_Has_rotl_with_intrin}.")
+BoolToYesNo(jxrdecode_Has_rotl_with_intrin jxrdecode_result_text)
+message("jxrdecode_Has_rotl_with_intrin = ${jxrdecode_result_text}.")
 if (NOT jxrdecode_Has_rotl_with_intrin)
 	set (jxrdecode_Has_rotl_with_intrin 0)
 endif()
 
 if (NOT jxrdecode_Has_rotl_with_intrin )
 	check_symbol_exists(_rotl "x86intrin.h" jxrdecode_Has_rotl_with_x86intrin)
-	message("jxrdecode_Has_rotl_with_x86intrin= ${jxrdecode_Has_rotl_with_x86intrin}.")
+	BoolToYesNo(jxrdecode_Has_rotl_with_x86intrin jxrdecode_result_text)
+	message("jxrdecode_Has_rotl_with_x86intrin = ${jxrdecode_result_text}.")
 endif()
 if (NOT jxrdecode_Has_rotl_with_x86intrin)
 	set (jxrdecode_Has_rotl_with_x86intrin 0)

@@ -1,7 +1,7 @@
 ﻿using libCZI                 {#using_libczi}
 ============
 
-## Opening a CZI-file ##
+## Opening a CZI-file
 
 The first thing you want to do with a CZI-file is to open it. This is done with the CZIReader-object.
 An instance of a CZIReader is created with the function
@@ -43,7 +43,7 @@ The `SubBlockStatistics` gives information about the sub-blocks in the CZI-file.
 the mininum and maximum are determined and are available in the struct returned by the method `ISubBlockRepository::GetStatistics()`.
 It is usually important to examine the dimBounds member in order to determine which dimensions are used in the CZI-file.
 
-## Reading sub-blocks in a CZI-file ##
+## Reading sub-blocks in a CZI-file
 
 All the sub-blocks in the CZI-file can be enumerated by the method `ISubBlockRepository::EnumerateSubBlocks`:
 
@@ -159,7 +159,7 @@ This operaton is depicted here:
 ![single channel scaling tile accessor](SingleChannelTileAccessor_4.PNG "multi-tile_accessor_4")
 @image latex SingleChannelTileAccessor_4.PNG "single channel scaling tile accessor"
 
-## creating a multi-channel composite ##
+## creating a multi-channel composite
 
 In order to create a colorful picture from a bunch of channels (usually grayscale), we need to apply a color to it - that's refered to as "tinting". 
 Furthermore, we want to apply a gradation curve. All the required parameters for this are refered to as "display settings".
@@ -227,3 +227,16 @@ The complete operation is depicted here:
 
 ![multi-channel-composite from a (scaled) tile-composite](ScalingSingleChannelTileAccessor1.png "scaled_multi-channel-composite1")
 @image latex ScalingSingleChannelTileAccessor1.png "multi-channel-composite from a (scaled) tile-composite"
+
+## stream objects
+
+All input/output operations in libCZI are done through stream objects. Stream objects are used by the CZIReader to access the data in a CZI-file.
+The stream object is an abstraction of a random-access stream.   
+libCZI defines three different stream objects - read-only streams, write-only streams and read-write streams. The respective 
+interfaces are: IStream, IOutputStream and IInputOutputStream.
+libCZI provides implementations for reading from a file and for writing to a file in the file-system.  
+In addition, there is an experimental implementation for reading from an http(s)-server. This implementation is based on [libcurl](https://curl.se/libcurl/) and allows 
+reading from a CZI-file which is located on a web-server.
+
+For creating a stream object for reading, a class factory is provided (in the file libCZI_StreamsLib.h).
+

@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.15)
 cmake_policy(SET CMP0091 NEW) # enable new "MSVC runtime library selection" (https://cmake.org/cmake/help/latest/variable/CMAKE_MSVC_RUNTIME_LIBRARY.html)
 
 project(libCZI 
-      VERSION 0.53.2
+      VERSION 0.54.0
       HOMEPAGE_URL "https://github.com/ZEISS/libczi"
       DESCRIPTION "libCZI is an Open Source Cross-Platform C++ library to read and write CZI")
 
@@ -75,6 +75,15 @@ check_cxx_symbol_exists(pwrite unistd.h HAVE_UNISTD_H_PWRITE)
 BoolToFoundNotFound(HAVE_UNISTD_H_PWRITE HAVE_UNISTD_H_PWRITE_TEXT)
 message("check for open -> ${HAVE_FCNTL_H_OPEN_TEXT} ; check for pread -> ${HAVE_UNISTD_H_PREAD_TEXT} ; check for pwrite -> ${HAVE_UNISTD_H_PWRITE_TEXT}")
 
+# This option controls whether to build the curl-based http-/https-stream object. If this option is
+# "ON", the build will fail if the curl-library is not available (either as an external package or
+# as a private copy downloaded during the CMake-run).
+option(LIBCZI_BUILD_CURL_BASED_STREAM "include curl-based http-/https-stream object" OFF)
+
+# This option controls whether we should prefer an external package of libcurl (this means that it must be
+# found with the find_package()-command). If this option is "OFF", we will download a private copy of libcurl
+# during the CMake-run (and build and use this one).
+option(LIBCZI_BUILD_PREFER_EXTERNALPACKAGE_LIBCURL "Prefer a libcurl package present on the system" OFF)
 
 # This option allows to exclude the unit-tests from the build. The unit-tests are using the
 # Google-Test-framework which is downloaded from GitHub during the CMake-run.
