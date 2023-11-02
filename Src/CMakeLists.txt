@@ -39,14 +39,13 @@ if (LIBCZI_BUILD_CURL_BASED_STREAM)
         GIT_TAG "curl-8_4_0"
         # Set the prefix to control where it's installed
         PREFIX "${CMAKE_BINARY_DIR}/vendor/curl"
-         # Pass CMake arguments to build curl as a static library
-         # for possible options -> c.f https://github.com/curl/curl/blob/master/CMakeLists.txt
-        CMAKE_ARGS -DBUILD_SHARED_LIBS=OFF 
-                    -DBUILD_STATIC_LIBS=ON 
-                    -DCMAKE_POSITION_INDEPENDENT_CODE=ON 
-                    -DCMAKE_INSTALL_PREFIX=${CMAKE_BINARY_DIR}/curl 
-                    -DENABLE_UNICODE=ON
         )
+
+    # configure libcurl-build as a static library, for possible options -> c.f. https://github.com/curl/curl/blob/master/CMakeLists.txt
+    set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
+    set(BUILD_STATIC_LIBS ON CACHE BOOL "" FORCE)
+    set(CMAKE_POSITION_INDEPENDENT_CODE ON CACHE BOOL "" FORCE)
+    set(ENABLE_UNICODE ON CACHE BOOL "" FORCE)
 
     FetchContent_MakeAvailable(libcurl)
   endif(LIBCZI_BUILD_PREFER_EXTERNALPACKAGE_LIBCURL)

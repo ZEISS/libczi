@@ -26,13 +26,31 @@ IF(UNIX)
  ENDIF()
 ENDIF(UNIX)
 
-find_package(RapidJSON QUIET)
-IF (NOT RapidJSON_FOUND)
-    message(FATAL_ERROR [=[
-    RapidJSON library was not found, which is required for building. Consider installing
-    like 'sudo apt-get install rapidjson-dev'.
-    ]=])
-ENDIF()
+if (LIBCZI_BUILD_PREFER_EXTERNALPACKAGE_RAPIDJSON)
+    find_package(RapidJSON QUIET)
+    IF (NOT RapidJSON_FOUND)
+        message(FATAL_ERROR [=[
+        RapidJSON library was not found, which is required for building. Consider installing
+        like 'sudo apt-get install rapidjson-dev'.
+        ]=])
+    ENDIF()
+else()
+    FetchContent_Declare(
+            RapidJSON
+            GIT_REPOSITORY  https://github.com/Tencent/rapidjson.git
+            GIT_TAG "v1.1.0"
+            # Set the prefix to control where it's installed
+            PREFIX "${CMAKE_BINARY_DIR}/vendor/rapidjson"
+            )
+
+    set(RAPIDJSON_BUILD_DOC OFF CACHE BOOL "" FORCE)
+    set(RAPIDJSON_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+    set(RAPIDJSON_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+    set(RAPIDJSON_HAS_STDSTRING OFF CACHE BOOL "" FORCE)
+    set(RAPIDJSON_BUILD_THIRDPARTY_GTEST  OFF CACHE BOOL "" FORCE)
+
+    FetchContent_MakeAvailable(RapidJSON)
+endif()
 
 include(FetchContent)
 
