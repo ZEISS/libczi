@@ -100,7 +100,7 @@ using namespace libCZI;
         { "gdi", "based on GDI+, providing text-rendering" },
 #endif
 #if CZICMD_USE_FREETYPE == 1
-        { "freetype", "based on the Freetype-library providing text-rendering" },
+        { "freetype", "based on the Freetype-library, providing text-rendering" },
 #endif
     };
 
