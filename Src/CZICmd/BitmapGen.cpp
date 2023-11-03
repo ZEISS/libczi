@@ -97,10 +97,10 @@ using namespace libCZI;
     {
         { "null", "creating just black images" },
 #if CZICMD_USE_GDIPLUS == 1
-        { "gdi", "based on GDI+, providing text-rendering" },
+        { "gdi", "based on GDI+, provides text-rendering" },
 #endif
 #if CZICMD_USE_FREETYPE == 1
-        { "freetype", "based on the Freetype-library, providing text-rendering" },
+        { "freetype", "based on the Freetype-library, provides text-rendering" },
 #endif
     };
 
