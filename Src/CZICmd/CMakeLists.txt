@@ -26,34 +26,30 @@ IF(UNIX)
  ENDIF()
 ENDIF(UNIX)
 
+include(FetchContent)
+
 if (LIBCZI_BUILD_PREFER_EXTERNALPACKAGE_RAPIDJSON)
     find_package(RapidJSON QUIET)
     IF (NOT RapidJSON_FOUND)
         message(FATAL_ERROR [=[
         RapidJSON library was not found, which is required for building. Consider installing
-        like 'sudo apt-get install rapidjson-dev'.
+        like 'sudo apt-get install rapidjson-dev'. Alternatively, consider setting the option
+        LIBCZI_BUILD_PREFER_EXTERNALPACKAGE_RAPIDJSON to OFF in order to download and build RapidJSON
+        automatically as part of the build process.
         ]=])
     ENDIF()
 else()
-    message(STATUS "*************** ${CMAKE_BINARY_DIR}/vendor/rapidjson")
-    FetchContent_Declare(
+    # since "RapidJSON" is a header-only library, we just have to download it and point to the include directory
+     FetchContent_Declare(
             RapidJSON
-            GIT_REPOSITORY  https://github.com/Tencent/rapidjson.git
-            GIT_TAG "v1.1.0"
-            # Set the prefix to control where it's installed
+            GIT_REPOSITORY https://github.com/Tencent/rapidjson.git
+            GIT_TAG        "v1.1.0"
+            GIT_SHALLOW    TRUE
             PREFIX "${CMAKE_BINARY_DIR}/vendor/rapidjson"
-            )
-
-    set(RAPIDJSON_BUILD_DOC OFF CACHE BOOL "" FORCE)
-    set(RAPIDJSON_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
-    set(RAPIDJSON_BUILD_TESTS OFF CACHE BOOL "" FORCE)
-    set(RAPIDJSON_HAS_STDSTRING OFF CACHE BOOL "" FORCE)
-    set(RAPIDJSON_BUILD_THIRDPARTY_GTEST  OFF CACHE BOOL "" FORCE)
-
-    FetchContent_MakeAvailable(RapidJSON)
+    )
+    FetchContent_Populate(RapidJSON)
+    set(RAPIDJSON_INCLUDE_DIRS ${rapidjson_SOURCE_DIR}/include)
 endif()
-
-include(FetchContent)
 
 # make "CLI11" available
 FetchContent_Declare(
@@ -99,8 +95,12 @@ add_executable(CZIcmd ${CZICMDSRCFILES})
 set_target_properties(CZIcmd PROPERTIES CXX_STANDARD 11)
 target_compile_definitions(CZIcmd PRIVATE _LIBCZISTATICLIB)
 
-target_link_libraries(CZIcmd PRIVATE ${ZLIB_LIBRARIES}  ${PNG_LIBRARIES} CLI11::CLI11 libCZIStatic RapidJSON)
-target_include_directories(CZIcmd PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
+target_link_libraries(CZIcmd PRIVATE ${ZLIB_LIBRARIES}  ${PNG_LIBRARIES} CLI11::CLI11 libCZIStatic)
+target_include_directories(CZIcmd PRIVATE ${CMAKE_CURRENT_BINARY_DIR} ${RAPIDJSON_INCLUDE_DIRS})
+
+IF(WIN32)
+  target_link_libraries(CZIcmd PRIVATE gdiplus)
+ENDIF()
 
 IF (FREETYPE_FOUND)
     target_compile_definitions(CZIcmd PRIVATE _USE_FREETYPE)
