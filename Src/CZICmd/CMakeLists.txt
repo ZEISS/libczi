@@ -47,8 +47,11 @@ else()
             GIT_SHALLOW    TRUE
             PREFIX "${CMAKE_BINARY_DIR}/vendor/rapidjson"
     )
-    FetchContent_Populate(RapidJSON)
-    set(RAPIDJSON_INCLUDE_DIRS ${rapidjson_SOURCE_DIR}/include)
+
+    if (NOT rapidjson_POPULATED)
+      FetchContent_Populate(RapidJSON)
+      set(RAPIDJSON_INCLUDE_DIRS ${rapidjson_SOURCE_DIR}/include)
+    endif()
 endif()
 
 # make "CLI11" available
@@ -57,7 +60,10 @@ FetchContent_Declare(
   GIT_REPOSITORY https://github.com/CLIUtils/CLI11
   GIT_TAG        v2.2.0
 )
-FetchContent_MakeAvailable(cli11)
+
+if (NOT cli11_POPULATED)
+  FetchContent_MakeAvailable(cli11)
+endif()
 
 set (CZICMDSRCFILES
          BitmapGen.cpp          
