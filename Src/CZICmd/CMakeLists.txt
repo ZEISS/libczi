@@ -30,7 +30,7 @@ include(FetchContent)
 
 if (LIBCZI_BUILD_PREFER_EXTERNALPACKAGE_RAPIDJSON)
     find_package(RapidJSON QUIET)
-    IF (NOT RapidJSON_FOUND)
+    if (NOT RapidJSON_FOUND)
         message(FATAL_ERROR [=[
         RapidJSON library was not found, which is required for building. Consider installing
         like 'sudo apt-get install rapidjson-dev'. Alternatively, consider setting the option
