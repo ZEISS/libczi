@@ -105,7 +105,7 @@ target_link_libraries(CZIcmd PRIVATE ${ZLIB_LIBRARIES}  ${PNG_LIBRARIES} CLI11::
 target_include_directories(CZIcmd PRIVATE ${CMAKE_CURRENT_BINARY_DIR} ${RAPIDJSON_INCLUDE_DIRS})
 
 IF(WIN32)
-  target_link_libraries(CZIcmd PRIVATE gdiplus)
+  target_link_libraries(CZIcmd PRIVATE gdiplus Windowscodecs)
 ENDIF()
 
 IF (FREETYPE_FOUND)

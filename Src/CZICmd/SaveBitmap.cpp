@@ -15,8 +15,6 @@
 #include <memory>
 #include <wincodec.h>
 
-#pragma comment(lib, "Windowscodecs.lib")
-
 using namespace std;
 
 struct COMDeleter
