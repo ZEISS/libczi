@@ -37,7 +37,7 @@ if (LIBCZI_BUILD_PREFER_EXTERNALPACKAGE_RAPIDJSON)
         LIBCZI_BUILD_PREFER_EXTERNALPACKAGE_RAPIDJSON to OFF in order to download and build RapidJSON
         automatically as part of the build process.
         ]=])
-    ENDIF()
+    endif()
 else()
     # since "RapidJSON" is a header-only library, we just have to download it and point to the include directory
      FetchContent_Declare(
