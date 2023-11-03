@@ -26,15 +26,33 @@ IF(UNIX)
  ENDIF()
 ENDIF(UNIX)
 
-find_package(RapidJSON QUIET)
-IF (NOT RapidJSON_FOUND)
-    message(FATAL_ERROR [=[
-    RapidJSON library was not found, which is required for building. Consider installing
-    like 'sudo apt-get install rapidjson-dev'.
-    ]=])
-ENDIF()
-
 include(FetchContent)
+
+if (LIBCZI_BUILD_PREFER_EXTERNALPACKAGE_RAPIDJSON)
+    find_package(RapidJSON QUIET)
+    if (NOT RapidJSON_FOUND)
+        message(FATAL_ERROR [=[
+        RapidJSON library was not found, which is required for building. Consider installing
+        like 'sudo apt-get install rapidjson-dev'. Alternatively, consider setting the option
+        LIBCZI_BUILD_PREFER_EXTERNALPACKAGE_RAPIDJSON to OFF in order to download and build RapidJSON
+        automatically as part of the build process.
+        ]=])
+    endif()
+else()
+    # since "RapidJSON" is a header-only library, we just have to download it and point to the include directory
+     FetchContent_Declare(
+            RapidJSON
+            GIT_REPOSITORY https://github.com/Tencent/rapidjson.git
+            GIT_TAG        "v1.1.0"
+            GIT_SHALLOW    TRUE
+            PREFIX "${CMAKE_BINARY_DIR}/vendor/rapidjson"
+    )
+
+    if (NOT rapidjson_POPULATED)
+      FetchContent_Populate(RapidJSON)
+      set(RAPIDJSON_INCLUDE_DIRS ${rapidjson_SOURCE_DIR}/include)
+    endif()
+endif()
 
 # make "CLI11" available
 FetchContent_Declare(
@@ -42,7 +60,10 @@ FetchContent_Declare(
   GIT_REPOSITORY https://github.com/CLIUtils/CLI11
   GIT_TAG        v2.2.0
 )
-FetchContent_MakeAvailable(cli11)
+
+if (NOT cli11_POPULATED)
+  FetchContent_MakeAvailable(cli11)
+endif()
 
 set (CZICMDSRCFILES
          BitmapGen.cpp          
@@ -81,7 +102,11 @@ set_target_properties(CZIcmd PROPERTIES CXX_STANDARD 11)
 target_compile_definitions(CZIcmd PRIVATE _LIBCZISTATICLIB)
 
 target_link_libraries(CZIcmd PRIVATE ${ZLIB_LIBRARIES}  ${PNG_LIBRARIES} CLI11::CLI11 libCZIStatic)
-target_include_directories(CZIcmd PRIVATE ${CMAKE_CURRENT_BINARY_DIR} "${RAPIDJSON_INCLUDE_DIRS}")
+target_include_directories(CZIcmd PRIVATE ${CMAKE_CURRENT_BINARY_DIR} ${RAPIDJSON_INCLUDE_DIRS})
+
+IF(WIN32)
+  target_link_libraries(CZIcmd PRIVATE gdiplus Windowscodecs)
+ENDIF()
 
 IF (FREETYPE_FOUND)
     target_compile_definitions(CZIcmd PRIVATE _USE_FREETYPE)

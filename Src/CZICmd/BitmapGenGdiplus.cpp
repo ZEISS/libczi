@@ -13,8 +13,6 @@
 #include <gdiplus.h>
 
 using namespace Gdiplus;
-#pragma comment (lib, "gdiplus.lib")
-
 using namespace std;
 using namespace libCZI;
 
@@ -116,7 +114,7 @@ CBitmapGenGdiplus::CBitmapGenGdiplus(const IBitmapGenParameters* params) : fonth
         pxlFmt = PixelFormat24bppRGB;
         break;
     default:
-        throw std::exception("unsupported pixelformat");
+        throw std::runtime_error("unsupported pixelformat");
     }
 
     shared_ptr<Bitmap> bitmap = make_shared<Bitmap>(width, height, pxlFmt);

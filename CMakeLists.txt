@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.15)
 cmake_policy(SET CMP0091 NEW) # enable new "MSVC runtime library selection" (https://cmake.org/cmake/help/latest/variable/CMAKE_MSVC_RUNTIME_LIBRARY.html)
 
 project(libCZI 
-      VERSION 0.54.0
+      VERSION 0.54.1
       HOMEPAGE_URL "https://github.com/ZEISS/libczi"
       DESCRIPTION "libCZI is an Open Source Cross-Platform C++ library to read and write CZI")
 
@@ -104,6 +104,10 @@ option(LIBCZI_BUILD_PREFER_EXTERNALPACKAGE_EIGEN3 "Prefer an Eigen3-package pres
 #  on Debian it seems that the package "libzstd-dev" does not have the required CMake-config-file.
 #  See here: https://discourse.cmake.org/t/findzstd/3506
 option(LIBCZI_BUILD_PREFER_EXTERNALPACKAGE_ZSTD "Prefer a ZSTD-package present on the system" OFF)
+
+# When this option is ON, we try to use an existing RapidJSON-library. Otherwise, we download a private
+#  copy of RapidJSON during the CMake-run. This option is only relevant if building CZICmd.
+option(LIBCZI_BUILD_PREFER_EXTERNALPACKAGE_RAPIDJSON "Prefer an RapidJSON-package present on the system" ON)
 
 if (LIBCZI_BUILD_UNITTESTS)
  include (CTest)

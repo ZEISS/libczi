@@ -10,7 +10,6 @@
 
 #if defined(WIN32ENV)
 #define HAS_CODECVT
-#define NOMINMAX
 #include <Windows.h>
 #endif
 

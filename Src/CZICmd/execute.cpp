@@ -1106,7 +1106,7 @@ private:
         std::ofstream  output;
         output.exceptions(std::ifstream::badbit | std::ifstream::failbit);
 #if defined(WIN32ENV)
-        output.open(filename, ios::out | ios::binary);
+        output.open(filename.c_str(), ios::out | ios::binary);
 #endif
 #if defined(LINUXENV)
         output.open(convertToUtf8(filename), ios::out | ios::binary);

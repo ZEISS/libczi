@@ -5,7 +5,7 @@
 #include "windowsfileinputstream.h"
 
 #if defined(_WIN32)
-#include <intsafe.h>
+#include <limits>
 #include <iomanip>
 #include "../utilities.h"
 
@@ -38,7 +38,7 @@ WindowsFileInputStream::~WindowsFileInputStream()
 
 void WindowsFileInputStream::Read(std::uint64_t offset, void* pv, std::uint64_t size, std::uint64_t* ptrBytesRead)
 {
-    if (size > DWORD_MAX)
+    if (size > (std::numeric_limits<DWORD>::max)())
     {
         throw std::runtime_error("size is too large");
     }
