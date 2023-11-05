@@ -1,4 +1,6 @@
 #include "../libCZI/libCZI.h"
+#include "save_bitmap.h"
+#include <Windows.h>
 
 using namespace libCZI;
 using namespace std;
@@ -6,25 +8,16 @@ using namespace std;
 class CLibCZISite : public libCZI::ISite
 {
     libCZI::ISite* pSite;
-    public:
-    explicit CLibCZISite() 
+public:
+    explicit CLibCZISite()
     {
-#if defined(WIN32ENV)
-        if (options.GetUseWICJxrDecoder())
-        {
-            this->pSite = libCZI::GetDefaultSiteObject(libCZI::SiteObjectType::WithWICDecoder);
-        }
-        else
-        {
-            this->pSite = libCZI::GetDefaultSiteObject(libCZI::SiteObjectType::WithJxrDecoder);
-        }
-#else
-        this->pSite = libCZI::GetDefaultSiteObject(libCZI::SiteObjectType::Default);
-#endif
+        this->pSite = libCZI::GetDefaultSiteObject(libCZI::SiteObjectType::WithWICDecoder);
+        //this->pSite = libCZI::GetDefaultSiteObject(libCZI::SiteObjectType::WithJxrDecoder);
     }
 
     bool IsEnabled(int logLevel) override
     {
+       // return false;
         return true;
     }
 
@@ -47,6 +40,7 @@ class CLibCZISite : public libCZI::ISite
 
 int main(int argc, char* argv[])
 {
+    CoInitializeEx(nullptr, COINIT_MULTITHREADED);
     CLibCZISite site;
     libCZI::SetSiteObject(&site);
 
@@ -63,47 +57,41 @@ int main(int argc, char* argv[])
     int size_x = 2000;
     int size_y = 2000;
 
-    for (int y = 0; y < statistics.boundingBoxLayer0Only.h / size_y; ++y)
+    auto save_bitmap = CSaveBitmapFactory::CreateDefaultSaveBitmapObj();
+
+    //for (int y = 0; y < statistics.boundingBoxLayer0Only.h / size_y; ++y)
     {
-        for (int x = 0; x < statistics.boundingBoxLayer0Only.w / size_x; ++x)
+        //for (int x = 0; x < statistics.boundingBoxLayer0Only.w / size_x; ++x)
+        for (int i=0; i < 1; ++i)
         {
             CDimCoordinate coordinate
             {
                 { DimensionIndex::C, 0 },
             };
 
+            ISingleChannelScalingTileAccessor::Options options;
+            options.backGroundColor = RgbFloatColor{ 0, 0, 0 };
+            options.sceneFilter = libCZI::Utils::IndexSetFromString(L"0");
+
             auto bitmap = accessor->Get(
                 IntRect
                 {
-                    statistics.boundingBoxLayer0Only.x + x * size_x,
-                    statistics.boundingBoxLayer0Only.y + y * size_y,
+                    -126748,// statistics.boundingBoxLayer0Only.x + x * size_x,
+                    46095,//statistics.boundingBoxLayer0Only.y + y * size_y,
                     size_x,
                     size_y
                 },
                 &coordinate,
                 1,
                 nullptr);
+
+            /*
+            wstringstream wss;
+            wss << "N:\\testout\\x=" << x << "_y=" << y << ".png";
+            save_bitmap->Save(wss.str().c_str(), SaveDataFormat::PNG, bitmap.get());
+            */
         }
     }
-    // Load the image
-    //    CZI::Image image;
-    //       image.Load("test.jxr");
-       // Get the image size
-       //    const int width = image.GetWidth();
-       //       const int height = image.GetHeight();
-          // Get the pixel data
-          //    const CZI::Pixel* pixels = image.GetPixels();
-             // Print the first pixel
-             //    printf("First pixel: %d %d %d %d\n",
-             //           pixels[0].r,
-             //                  pixels[0].g,
-             //                         pixels[0].b,
-             //                                pixels[0].a);
-                // Print the last pixel
-                //    printf("Last pixel: %d %d %d %d\n",
-                //           pixels[width * height - 1].r,
-                //                  pixels[width * height - 1].g,
-                //                         pixels[width * height - 1].b,
-                //                                pixels[width * height - 1].a);
+
     return 0;
 }
