@@ -11,8 +11,8 @@ class CLibCZISite : public libCZI::ISite
 public:
     explicit CLibCZISite()
     {
-        this->pSite = libCZI::GetDefaultSiteObject(libCZI::SiteObjectType::WithWICDecoder);
-        //this->pSite = libCZI::GetDefaultSiteObject(libCZI::SiteObjectType::WithJxrDecoder);
+        //this->pSite = libCZI::GetDefaultSiteObject(libCZI::SiteObjectType::WithWICDecoder);
+        this->pSite = libCZI::GetDefaultSiteObject(libCZI::SiteObjectType::WithJxrDecoder);
     }
 
     bool IsEnabled(int logLevel) override
@@ -44,9 +44,9 @@ int main(int argc, char* argv[])
     CLibCZISite site;
     libCZI::SetSiteObject(&site);
 
-    //auto stream = StreamsFactory::CreateDefaultStreamForFile(R"(D:\OneDrive\jbohl\OneDrive\Z\libCZI-Jpgxr-performance-issue\20200903_RS013_AJB02_000.czi)");
+    auto stream = StreamsFactory::CreateDefaultStreamForFile(R"(D:\OneDrive\jbohl\OneDrive\Z\libCZI-Jpgxr-performance-issue\20200903_RS013_AJB02_000.czi)");
 
-    auto stream = StreamsFactory::CreateDefaultStreamForFile(R"(n:\uncompressed_20200903_RS013_AJB02_000.czi)");
+    //auto stream = StreamsFactory::CreateDefaultStreamForFile(R"(n:\uncompressed_20200903_RS013_AJB02_000.czi)");
 
     auto reader = libCZI::CreateCZIReader();
     reader->Open(stream);
@@ -72,6 +72,7 @@ int main(int argc, char* argv[])
             ISingleChannelScalingTileAccessor::Options options;
             options.backGroundColor = RgbFloatColor{ 0, 0, 0 };
             options.sceneFilter = libCZI::Utils::IndexSetFromString(L"0");
+            options.useCoverageOptimization = true;
 
             auto bitmap = accessor->Get(
                 IntRect
@@ -83,7 +84,7 @@ int main(int argc, char* argv[])
                 },
                 &coordinate,
                 1,
-                nullptr);
+                &options);
 
             /*
             wstringstream wss;

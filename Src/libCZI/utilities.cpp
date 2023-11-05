@@ -551,12 +551,17 @@ void RectangleCoverageCalculator::AddRectangle(const libCZI::IntRect& rectangle)
         inner.y >= outer.y && inner.y + inner.h <= outer.y + outer.h;
 }
 
-std::int64_t RectangleCoverageCalculator::CalcAreaOfIntersectionWithRectangle(const libCZI::IntRect& rectQuery) const
+std::int64_t RectangleCoverageCalculator::CalcAreaOfIntersectionWithRectangle(const libCZI::IntRect& query_rectangle) const
 {
+    if (!query_rectangle.IsValid())
+    {
+        return 0;
+    }
+
     int64_t area = 0;
     for (const auto& r : this->splitters_)
     {
-        auto intersection = r.Intersect(rectQuery);
+        auto intersection = r.Intersect(query_rectangle);
         if (intersection.IsValid())
         {
             area += intersection.w * static_cast<int64_t>(intersection.h);
@@ -564,4 +569,14 @@ std::int64_t RectangleCoverageCalculator::CalcAreaOfIntersectionWithRectangle(co
     }
 
     return area;
+}
+
+bool RectangleCoverageCalculator::IsCompletelyCovered(const libCZI::IntRect& query_rectangle) const
+{
+    if (!query_rectangle.IsValid())
+    {
+        return true;
+    }
+
+    return this->CalcAreaOfIntersectionWithRectangle(query_rectangle) == static_cast<int64_t>(query_rectangle.w) * query_rectangle.h;
 }

@@ -240,12 +240,21 @@ public:
 
     /// Calculates the area of intersection of the specified rectangle with the
     /// union of the rectangles added before.
+    /// If the query_rectangle rectangle is invalid, the return value is 0.
     ///
     /// \param  rectQuery   The query rectangle.
     ///
     /// \returns    The calculated area of intersection of the specified rectangle with the
     ///             union of the rectangles added before.
-    std::int64_t CalcAreaOfIntersectionWithRectangle(const libCZI::IntRect& rectQuery) const;
+    std::int64_t CalcAreaOfIntersectionWithRectangle(const libCZI::IntRect& query_rectangle) const;
+
+    /// Query if 'rectQuery' is completely covered is completely covered by the union of the rectangles added before.
+    /// If the query_rectangle rectangle is invalid, the return value is true.
+    ///
+    /// \param  rectQuery   The query rectangle.
+    ///
+    /// \returns    True if completely covered; false otherwise.
+    bool IsCompletelyCovered(const libCZI::IntRect& query_rectangle) const;
 private:
     /// Test whether the rectangle 'inner' is completely contained in the rectangle 'outer'.
     ///

@@ -74,7 +74,7 @@ void CSingleChannelScalingTileAccessor::ScaleBlt(libCZI::IBitmapData* bmDest, fl
     if (GetSite()->IsEnabled(LOGLEVEL_CHATTYINFORMATION))
     {
         stringstream ss;
-        ss << "   bounds: " << Utils::DimCoordinateToString(&sb->GetSubBlockInfo().coordinate);
+        ss << "   bounds: " << Utils::DimCoordinateToString(&sb->GetSubBlockInfo().coordinate) << " M=" << (Utils::IsValidMindex(sbInfo.mIndex) ? to_string(sbInfo.mIndex) : "invalid");
         GetSite()->Log(LOGLEVEL_CHATTYINFORMATION, ss);
     }
 
@@ -118,7 +118,7 @@ void CSingleChannelScalingTileAccessor::ScaleBlt(libCZI::IBitmapData* bmDest, fl
     {
         // calculate the intersection of the subblock (logical rect) and the destination
         const auto intersect = Utilities::Intersect(sbInfo.logicalRect, roi);
-    
+
         const double roiSrcTopLeftX = double(intersect.x - sbInfo.logicalRect.x) / sbInfo.logicalRect.w;
         const double roiSrcTopLeftY = double(intersect.y - sbInfo.logicalRect.y) / sbInfo.logicalRect.h;
         const double roiSrcBttmRightX = double(intersect.x + intersect.w - sbInfo.logicalRect.x) / sbInfo.logicalRect.w;
@@ -288,19 +288,19 @@ void CSingleChannelScalingTileAccessor::InternalGet(libCZI::IBitmapData* bmDest,
         // we only have to deal with a single scene (or: the document does not include a scene-dimension at all), in this
         //  case we do not have group by scene and save some cycles
         auto sbSetsortedByZoom = this->GetSubSetFilteredBySceneSortedByZoom(roi, planeCoordinate, scenesInvolved, options.sortByM);
-        this->Paint(bmDest, roi, sbSetsortedByZoom, zoom);
+        this->Paint(bmDest, roi, sbSetsortedByZoom, zoom, options.useCoverageOptimization);
     }
     else
     {
         const auto sbSetSortedByZoomPerScene = this->GetSubSetSortedByZoomPerScene(scenesInvolved, roi, planeCoordinate, options.sortByM);
         for (const auto& it : sbSetSortedByZoomPerScene)
         {
-            this->Paint(bmDest, roi, get<1>(it), zoom);
+            this->Paint(bmDest, roi, get<1>(it), zoom, options.useCoverageOptimization);
         }
     }
 }
 
-void CSingleChannelScalingTileAccessor::Paint(libCZI::IBitmapData* bmDest, const libCZI::IntRect& roi, const SubSetSortedByZoom& sbSetSortedByZoom, float zoom)
+void CSingleChannelScalingTileAccessor::Paint(libCZI::IBitmapData* bmDest, const libCZI::IntRect& roi, const SubSetSortedByZoom& sbSetSortedByZoom, float zoom, bool useCoverageOptimization)
 {
     const int idxOf1stSubBlockOfZoomGreater = this->GetIdxOf1stSubBlockWithZoomGreater(sbSetSortedByZoom.subBlocks, sbSetSortedByZoom.sortedByZoom, zoom);
     if (idxOf1stSubBlockOfZoomGreater < 0)
@@ -318,6 +318,43 @@ void CSingleChannelScalingTileAccessor::Paint(libCZI::IBitmapData* bmDest, const
 
     const float startZoom = sbSetSortedByZoom.subBlocks.at(*it).GetZoom();
 
+    // determine the end
+    std::vector<int>::const_iterator itEnd = sbSetSortedByZoom.sortedByZoom.cend();
+    if (useCoverageOptimization)
+    {
+        RectangleCoverageCalculator coverageCalculator;
+        for (auto it2 = it; it2 != sbSetSortedByZoom.sortedByZoom.cend(); ++it2)
+        {
+            const SbInfo& sbInfo = sbSetSortedByZoom.subBlocks.at(*it2);
+            coverageCalculator.AddRectangle(sbInfo.logicalRect);
+            if (coverageCalculator.CalcAreaOfIntersectionWithRectangle(roi) == roi.w * roi.h)
+            {
+                itEnd = ++it2;
+                break;
+            }
+        }
+    }
+
+    for (; it != itEnd; ++it)
+    {
+        const SbInfo& sbInfo = sbSetSortedByZoom.subBlocks.at(*it);
+
+        // as an interim solution (in fact... this seems to be a rather good solution...), stop when we arrive at subblocks with a zoom-level about twice that what we started with
+        if (sbInfo.GetZoom() >= startZoom * 1.9f)
+        {
+            break;
+        }
+
+        if (GetSite()->IsEnabled(LOGLEVEL_CHATTYINFORMATION))
+        {
+            stringstream ss;
+            ss << " Drawing subblock: idx=" << sbInfo.index << " Log.: " << sbInfo.logicalRect << " Phys.Size: " << sbInfo.physicalSize;
+            GetSite()->Log(LOGLEVEL_CHATTYINFORMATION, ss);
+        }
+
+        this->ScaleBlt(bmDest, zoom, roi, sbInfo);
+    }
+    /*
     for (; it != sbSetSortedByZoom.sortedByZoom.cend(); ++it)
     {
         const SbInfo& sbInfo = sbSetSortedByZoom.subBlocks.at(*it);
@@ -337,6 +374,36 @@ void CSingleChannelScalingTileAccessor::Paint(libCZI::IBitmapData* bmDest, const
 
         this->ScaleBlt(bmDest, zoom, roi, sbInfo);
     }
+    */
+    /*
+    RectangleCoverageCalculator coverageCalculator;
+    for (; it != sbSetSortedByZoom.sortedByZoom.cend(); ++it)
+    {
+        const SbInfo& sbInfo = sbSetSortedByZoom.subBlocks.at(*it);
+
+        coverageCalculator.AddRectangle(sbInfo.logicalRect);
+
+        // as an interim solution (in fact... this seems to be a rather good solution...), stop when we arrive at subblocks with a zoom-level about twice that what we started with
+        if (sbInfo.GetZoom() >= startZoom * 1.9f)
+        {
+            break;
+        }
+
+        if (GetSite()->IsEnabled(LOGLEVEL_CHATTYINFORMATION))
+        {
+            stringstream ss;
+            ss << " Drawing subblock: idx=" << sbInfo.index << " Log.: " << sbInfo.logicalRect << " Phys.Size: " << sbInfo.physicalSize;
+            GetSite()->Log(LOGLEVEL_CHATTYINFORMATION, ss);
+        }
+
+        this->ScaleBlt(bmDest, zoom, roi, sbInfo);
+
+        if (coverageCalculator.CalcAreaOfIntersectionWithRectangle(roi) == roi.w*roi.h)
+        {
+            break;
+        }
+    }
+    */
 }
 
 /// <summary>	Using the specified ROI, determine the scenes it intersects with. If the

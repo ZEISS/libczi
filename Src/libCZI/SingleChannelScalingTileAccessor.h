@@ -53,5 +53,5 @@ private:
     SubSetSortedByZoom GetSubSetFilteredBySceneSortedByZoom(const libCZI::IntRect& roi, const libCZI::IDimCoordinate* planeCoordinate, const std::vector<int>& allowedScenes, bool sortByM);
 
     std::vector<std::tuple<int, SubSetSortedByZoom>> GetSubSetSortedByZoomPerScene(const std::vector<int>& scenes, const libCZI::IntRect& roi, const libCZI::IDimCoordinate* planeCoordinate, bool sortByM);
-    void Paint(libCZI::IBitmapData* bmDest, const libCZI::IntRect& roi, const SubSetSortedByZoom& sbSetSortedByZoom, float zoom);
+    void Paint(libCZI::IBitmapData* bmDest, const libCZI::IntRect& roi, const SubSetSortedByZoom& sbSetSortedByZoom, float zoom, bool useCoverageOptimization);
 };

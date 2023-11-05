@@ -249,6 +249,8 @@ namespace libCZI
             /// is given here, then no filtering is applied.
             std::shared_ptr<libCZI::IIndexSet> sceneFilter;
 
+            bool useCoverageOptimization;   ///< If true, then the coverage optimization is used (if available).
+
             /// Clears this object to its blank state.
             void Clear()
             {
@@ -256,6 +258,7 @@ namespace libCZI
                 this->sortByM = true;
                 this->backGroundColor.r = this->backGroundColor.g = this->backGroundColor.b = std::numeric_limits<float>::quiet_NaN();
                 this->sceneFilter.reset();
+                this->useCoverageOptimization = false;
             }
         };
 
