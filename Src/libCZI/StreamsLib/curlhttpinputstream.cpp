@@ -24,7 +24,7 @@ using namespace libCZI;
 
     stringstream string_stream;
     string_stream << "Version:" << version_info->version;
-    string_stream << " SSL:" << version_info->ssl_version;
+    string_stream << " SSL:" << (version_info->ssl_version != nullptr ? version_info->ssl_version : "none");
     if (version_info->age >= CURLVERSION_ELEVENTH)
     {
         for (size_t i = 0;; ++i)
