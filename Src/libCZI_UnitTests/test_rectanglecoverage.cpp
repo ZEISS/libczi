@@ -5,9 +5,86 @@
 #include "include_gtest.h"
 #include "inc_libCZI.h"
 #include "../libCZI/utilities.h"
+#include <random>
 
 using namespace libCZI;
 using namespace std;
+
+/// A simplistic reference implementation of a rectangle coverage calculator. We calculate
+/// what area of the query rectangle is covered by the given vector of rectangles.
+///
+/// \param  rectangles  The vector of rectangles.
+/// \param  queryRect   The query rectangle.
+/// \returns            The area of the query rectangle being covered by the rectangles of the rectangles vector.
+static int64_t CalcAreaOfIntersectionWithRectangleReference(const vector<IntRect>& rectangles, const IntRect& queryRect)
+{
+    // what we do here is:
+    // - we create a bitmap of the size of the query rectangle
+    // - we then fill the bitmap with 0xff in the areas that are covered by the rectangles
+    // - then we count how many pixels are set to 0xff
+    const auto bitmap = CStdBitmapData::Create(PixelType::Gray8, queryRect.w, queryRect.h);
+    ScopedBitmapLockerSP bitmap_locked{ bitmap };
+    CBitmapOperations::Fill_Gray8(queryRect.w, queryRect.h, bitmap_locked.ptrDataRoi, bitmap_locked.stride, 0);
+    for (const auto& rect : rectangles)
+    {
+        const auto intersection = rect.Intersect(queryRect);
+        if (!intersection.IsValid())
+        {
+            continue;
+        }
+
+        CBitmapOperations::Fill_Gray8(
+            intersection.w,
+            intersection.h,
+            static_cast<uint8_t*>(bitmap_locked.ptrDataRoi) + intersection.x + intersection.y * static_cast<size_t>(bitmap_locked.stride),
+            bitmap_locked.stride,
+            0xff);
+    }
+
+    // now, we simply have to count the number of pixels that are set to 0xff
+    int64_t set_pixel_count = 0;
+    for (uint32_t y = 0; y < bitmap->GetHeight(); ++y)
+    {
+        const uint8_t* ptr = static_cast<const uint8_t*>(bitmap_locked.ptrDataRoi) + y * static_cast<size_t>(bitmap_locked.stride);
+        for (uint32_t x = 0; x < bitmap->GetWidth(); ++x)
+        {
+            if (*ptr++ == 0xff)
+            {
+                ++set_pixel_count;
+            }
+        }
+    }
+
+    return set_pixel_count;
+}
+
+TEST(CoverageCalculator, RandomRectanglesCompareWithReferenceImplementation)
+{
+    std::random_device dev;
+    std::mt19937 rng(dev());
+    std::uniform_int_distribution<int> distribution(0, 99); // distribution in range [0, 99]
+
+    static constexpr IntRect kQueryRect{ 0, 0, 100, 100 };
+
+    for (int repeat = 0; repeat < 10; repeat++)
+    {
+        const int number_of_rectangles = 1 + distribution(rng);
+
+        vector<IntRect> rectangles;
+        rectangles.reserve(number_of_rectangles);
+        for (int i = 0; i < number_of_rectangles; ++i)
+        {
+            rectangles.emplace_back(IntRect{ distribution(rng), distribution(rng), 1 + distribution(rng), 1 + distribution(rng) });
+        }
+
+        const int64_t reference_result_for_covered_area = CalcAreaOfIntersectionWithRectangleReference(rectangles, kQueryRect);
+
+        RectangleCoverageCalculator calculator;
+        calculator.AddRectangles(rectangles.cbegin(), rectangles.cend());
+        const int64_t total_covered_area = calculator.CalcAreaOfIntersectionWithRectangle(kQueryRect);
+        EXPECT_EQ(reference_result_for_covered_area, total_covered_area);
+    }
+}
 
 struct CoverageCoverageCalculatorFixture : public testing::TestWithParam<tuple<vector<IntRect>, __int64>> {};
 
