@@ -86,7 +86,7 @@ TEST(CoverageCalculator, RandomRectanglesCompareWithReferenceImplementation)
     }
 }
 
-struct CoverageCoverageCalculatorFixture : public testing::TestWithParam<tuple<vector<IntRect>, __int64>> {};
+struct CoverageCoverageCalculatorFixture : public testing::TestWithParam<tuple<vector<IntRect>, int64_t>> {};
 
 TEST_P(CoverageCoverageCalculatorFixture, CreateDocumentAndUseSingleChannelScalingTileAccessorWithSortByMAndCheckResult)
 {
