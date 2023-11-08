@@ -23,7 +23,7 @@ static int64_t CalcAreaOfIntersectionWithRectangleReference(const vector<IntRect
     // - we then fill the bitmap with 0xff in the areas that are covered by the rectangles
     // - then we count how many pixels are set to 0xff
     const auto bitmap = CStdBitmapData::Create(PixelType::Gray8, queryRect.w, queryRect.h);
-    ScopedBitmapLockerSP bitmap_locked{ bitmap };
+    const ScopedBitmapLockerSP bitmap_locked{ bitmap };
     CBitmapOperations::Fill_Gray8(bitmap->GetWidth(), bitmap->GetHeight(), bitmap_locked.ptrDataRoi, bitmap_locked.stride, 0);
     for (const auto& rect : rectangles)
     {
