@@ -308,7 +308,7 @@ void CSingleChannelScalingTileAccessor::Paint(libCZI::IBitmapData* bmDest, const
         // this means that we would need to overzoom (i.e. the requested zoom is less than the lowest level we find in the subblock-repository)
         // TODO: this requires special consideration, for the time being -> bail out
         // ...we end up here e. g. when lowest level does not cover all the range, so - this is not
-        //    something where we want to throw an excpetion
+        //    something where we want to throw an exception
         //throw LibCZIAccessorException("Overzoom not supported", LibCZIAccessorException::ErrorType::Unspecified);
         return;
     }

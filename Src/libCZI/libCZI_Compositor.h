@@ -29,7 +29,7 @@ namespace libCZI
     class IAccessor
     {
     protected:
-        virtual ~IAccessor() {}
+        virtual ~IAccessor() = default;
     };
 
     /// This accessor creates a multi-tile composite of a single channel (and a single plane).
@@ -335,7 +335,7 @@ namespace libCZI
         /// <param name="yPos">     The y-coordinate of the top-left of the destination bitmap. </param>
         /// <param name="pOptions"> Options for controlling the operation. This argument is optional (may be nullptr).</param>
         static void ComposeSingleChannelTiles(
-            std::function<bool(int index, std::shared_ptr<libCZI::IBitmapData>& src, int& x, int& y)> getTiles,
+            const std::function<bool(int index, std::shared_ptr<libCZI::IBitmapData>& src, int& x, int& y)>& getTiles,
             libCZI::IBitmapData* dest,
             int xPos,
             int yPos,

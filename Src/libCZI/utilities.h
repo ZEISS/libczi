@@ -242,7 +242,7 @@ public:
     /// union of the rectangles added before.
     /// If the query_rectangle rectangle is invalid, the return value is 0.
     ///
-    /// \param  rectQuery   The query rectangle.
+    /// \param  query_rectangle   The query rectangle.
     ///
     /// \returns    The calculated area of intersection of the specified rectangle with the
     ///             union of the rectangles added before.
@@ -251,7 +251,7 @@ public:
     /// Query if 'rectQuery' is completely covered is completely covered by the union of the rectangles added before.
     /// If the query_rectangle rectangle is invalid, the return value is true.
     ///
-    /// \param  rectQuery   The query rectangle.
+    /// \param  query_rectangle   The query rectangle.
     ///
     /// \returns    True if completely covered; false otherwise.
     bool IsCompletelyCovered(const libCZI::IntRect& query_rectangle) const;

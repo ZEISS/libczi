@@ -47,6 +47,41 @@ void CSingleChannelTileAccessor::ComposeTiles(libCZI::IBitmapData* pBm, int xPos
 {
     Compositors::ComposeSingleTileOptions composeOptions; composeOptions.Clear();
     composeOptions.drawTileBorder = options.drawTileBorder;
+
+    size_t subblocks_set_size = subBlocksSet.size();
+    vector<int> indices;
+
+    if (subblocks_set_size > 1)
+    {
+        IntRect roi{ xPos,yPos,static_cast<int>(pBm->GetWidth()),static_cast<int>(pBm->GetHeight()) };
+        // - We start with the last tile to draw, then we add the one before and so on. 
+        // - For each tile, we check if the area covered increases - if not, it means that this tile is not 
+        //    visible (it will be overdrawn by the latter ones), so we can skip it.
+        RectangleCoverageCalculator coverageCalculator;
+        SubBlockInfo subblock_info;
+        const bool b = this->sbBlkRepository->TryGetSubBlockInfo(subBlocksSet[subblocks_set_size - 1].index, &subblock_info);
+        coverageCalculator.AddRectangle(subblock_info.logicalRect);
+        auto covered_pixel_count = coverageCalculator.CalcAreaOfIntersectionWithRectangle(roi);
+
+        size_t index = subblocks_set_size - 2;
+        do
+        {
+            const auto& indexAndM = subBlocksSet[subblocks_set_size - 1];
+            const bool b = this->sbBlkRepository->TryGetSubBlockInfo(indexAndM.index, &subblock_info);
+            coverageCalculator.AddRectangle(subblock_info.logicalRect);
+
+            const auto covered_pixel_count_new = coverageCalculator.CalcAreaOfIntersectionWithRectangle(roi);
+            if (covered_pixel_count == covered_pixel_count_new)
+            {
+                // this tile is not visible, so we can skip it
+                continue;
+            }
+
+            covered_pixel_count = covered_pixel_count_new;
+        }
+        while (index-- > 0);
+    }
+
     Compositors::ComposeSingleChannelTiles(
         [&](int index, std::shared_ptr<libCZI::IBitmapData>& spBm, int& xPosTile, int& yPosTile)->bool
         {
@@ -59,12 +94,12 @@ void CSingleChannelTileAccessor::ComposeTiles(libCZI::IBitmapData* pBm, int xPos
                 return true;
             }
 
-    return false;
+            return false;
         },
         pBm,
-            xPos,
-            yPos,
-            &composeOptions);
+        xPos,
+        yPos,
+        &composeOptions);
 }
 
 void CSingleChannelTileAccessor::InternalGet(int xPos, int yPos, libCZI::IBitmapData* pBm, const IDimCoordinate* planeCoordinate, const ISingleChannelTileAccessor::Options* pOptions)
@@ -79,13 +114,13 @@ void CSingleChannelTileAccessor::InternalGet(int xPos, int yPos, libCZI::IBitmap
     this->CheckPlaneCoordinates(planeCoordinate);
     Clear(pBm, pOptions->backGroundColor);
     const IntSize sizeBm = pBm->GetSize();
-    IntRect roi{ xPos,yPos,static_cast<int>(sizeBm.w),static_cast<int>(sizeBm.h) };
+    const IntRect roi{ xPos,yPos,static_cast<int>(sizeBm.w),static_cast<int>(sizeBm.h) };
     const std::vector<IndexAndM> subBlocksSet = this->GetSubBlocksSubset(roi, planeCoordinate, pOptions->sortByM);
 
     this->ComposeTiles(pBm, xPos, yPos, subBlocksSet, *pOptions);
 }
 
-std::vector<CSingleChannelTileAccessor::IndexAndM> CSingleChannelTileAccessor::GetSubBlocksSubset(const IntRect& roi, const IDimCoordinate* planeCoordinate, bool sortByM /*,libCZI::PixelType* pPixelTypeOfFirstFoundSubBlock=nullptr*/)
+std::vector<CSingleChannelTileAccessor::IndexAndM> CSingleChannelTileAccessor::GetSubBlocksSubset(const IntRect& roi, const IDimCoordinate* planeCoordinate, bool sortByM)
 {
     // ok... for a first tentative, experimental and quick-n-dirty implementation, simply
     // get all subblocks by enumerating all
@@ -106,7 +141,7 @@ std::vector<CSingleChannelTileAccessor::IndexAndM> CSingleChannelTileAccessor::G
     return subBlocksSet;
 }
 
-void CSingleChannelTileAccessor::GetAllSubBlocks(const IntRect& roi, const IDimCoordinate* planeCoordinate, std::function<void(int index, int mIndex)> appender/*, libCZI::PixelType* pPixelTypeOfFirstFoundSubBlock*/)
+void CSingleChannelTileAccessor::GetAllSubBlocks(const IntRect& roi, const IDimCoordinate* planeCoordinate, const std::function<void(int index, int mIndex)>& appender) const
 {
     this->sbBlkRepository->EnumSubset(planeCoordinate, nullptr, true,
         [&](int idx, const SubBlockInfo& info)->bool
@@ -116,7 +151,7 @@ void CSingleChannelTileAccessor::GetAllSubBlocks(const IntRect& roi, const IDimC
                 appender(idx, info.mIndex);
             }
 
-    return true;
+            return true;
         });
 }
 
