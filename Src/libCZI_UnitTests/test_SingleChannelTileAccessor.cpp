@@ -61,7 +61,7 @@ public:
     }
 };
 
-static tuple<shared_ptr<void>, size_t> CreateTestCzi()
+static tuple<shared_ptr<void>, size_t> CreateTestCzi(int x1, int y1, int x2, int y2, int x3, int y3)
 {
     const auto writer = CreateCZIWriter();
     const auto outStream = make_shared<CMemOutputStream>(0);
@@ -83,8 +83,8 @@ static tuple<shared_ptr<void>, size_t> CreateTestCzi()
     addSbBlkInfo.coordinate.Set(DimensionIndex::T, 0);
     addSbBlkInfo.mIndexValid = true;
     addSbBlkInfo.mIndex = 0;
-    addSbBlkInfo.x = 0;
-    addSbBlkInfo.y = 0;
+    addSbBlkInfo.x = x1;
+    addSbBlkInfo.y = y1;
     addSbBlkInfo.logicalWidth = 2;
     addSbBlkInfo.logicalHeight = 2;
     addSbBlkInfo.physicalWidth = 2;
@@ -94,14 +94,14 @@ static tuple<shared_ptr<void>, size_t> CreateTestCzi()
     addSbBlkInfo.strideBitmap = 2;
     writer->SyncAddSubBlock(addSbBlkInfo);
 
-    addSbBlkInfo.x = 1;
-    addSbBlkInfo.y = 1;
+    addSbBlkInfo.x = x2;
+    addSbBlkInfo.y = y2;
     addSbBlkInfo.mIndex = 1;
     addSbBlkInfo.ptrBitmap = kBitmap2;
     writer->SyncAddSubBlock(addSbBlkInfo);
 
-    addSbBlkInfo.x = 2;
-    addSbBlkInfo.y = 2;
+    addSbBlkInfo.x = x3;
+    addSbBlkInfo.y = y3;
     addSbBlkInfo.mIndex = 2;
     addSbBlkInfo.ptrBitmap = kBitmap3;
     writer->SyncAddSubBlock(addSbBlkInfo);
@@ -122,9 +122,11 @@ static tuple<shared_ptr<void>, size_t> CreateTestCzi()
     return make_tuple(outStream->GetCopy(nullptr), outStream->GetDataSize());
 }
 
-TEST(SingleChannelTileAccessor, VisibilityCheck)
+TEST(SingleChannelTileAccessor, VisibilityCheck1)
 {
-    auto czi_document_as_blob = CreateTestCzi();
+    // We create a CZI with 3 subblocks, each containing a 2x2 bitmap.
+    // 1st subblock is at (0,0), 2nd subblock is at (1,1), 3rd subblock is at (2,2).
+    auto czi_document_as_blob = CreateTestCzi(0, 0, 1, 1, 2, 2);
 
     const auto memory_stream = make_shared<CMemInputOutputStream>(get<0>(czi_document_as_blob).get(), get<1>(czi_document_as_blob));
     const auto reader = CreateCZIReader();
@@ -148,4 +150,32 @@ TEST(SingleChannelTileAccessor, VisibilityCheck)
         find(subblock_repository_with_read_history->GetSubblocksRead().cbegin(),
         subblock_repository_with_read_history->GetSubblocksRead().cend(),
         2) == subblock_repository_with_read_history->GetSubblocksRead().cend()) << "subblock #2 is not expected to be read";
+}
+
+TEST(SingleChannelTileAccessor, VisibilityCheck2)
+{
+    auto czi_document_as_blob = CreateTestCzi(0, 0, 0, 0, 0, 0);
+
+    const auto memory_stream = make_shared<CMemInputOutputStream>(get<0>(czi_document_as_blob).get(), get<1>(czi_document_as_blob));
+    const auto reader = CreateCZIReader();
+    reader->Open(memory_stream);
+    auto subblock_repository_with_read_history = make_shared<SubBlockRepositoryShim>(reader);
+    const auto accessor = make_shared<CSingleChannelTileAccessor>(subblock_repository_with_read_history);
+    const CDimCoordinate plane_coordinate{ {DimensionIndex::C, 0}, {DimensionIndex::T, 0} };
+
+    const auto tile_composite_bitmap = accessor->Get(PixelType::Gray8, IntRect{ 1, 1, 1, 1 }, &plane_coordinate, nullptr);
+    EXPECT_EQ(tile_composite_bitmap->GetWidth(), 1);
+    EXPECT_EQ(tile_composite_bitmap->GetHeight(), 1);
+    const ScopedBitmapLockerSP locked_tile_composite_bitmap{ tile_composite_bitmap };
+    EXPECT_EQ(*(static_cast<const std::uint8_t*>(locked_tile_composite_bitmap.ptrDataRoi)), 3);
+
+    // check that subblock #0 and #1 have NOT been read
+    EXPECT_TRUE(
+        find(subblock_repository_with_read_history->GetSubblocksRead().cbegin(),
+        subblock_repository_with_read_history->GetSubblocksRead().cend(),
+        0) == subblock_repository_with_read_history->GetSubblocksRead().cend()) << "subblock #0 is not expected to be read";
+    EXPECT_TRUE(
+        find(subblock_repository_with_read_history->GetSubblocksRead().cbegin(),
+        subblock_repository_with_read_history->GetSubblocksRead().cend(),
+        1) == subblock_repository_with_read_history->GetSubblocksRead().cend()) << "subblock #1 is not expected to be read";
 }
