@@ -224,7 +224,7 @@ public:
     /// \param  rectangle   The rectangle to be added.
     void AddRectangle(const libCZI::IntRect& rectangle);
 
-    /// Adds the rectangles given by the iterators to the state of the instance.
+    /// Adds the rectangles given by the iterator to the state of the instance.
     ///
     /// \typeparam  tIterator   Type of the iterator.
     /// \param  begin   The begin.
