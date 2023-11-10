@@ -48,51 +48,68 @@ void CSingleChannelTileAccessor::ComposeTiles(libCZI::IBitmapData* pBm, int xPos
     Compositors::ComposeSingleTileOptions composeOptions; composeOptions.Clear();
     composeOptions.drawTileBorder = options.drawTileBorder;
 
-    size_t subblocks_set_size = subBlocksSet.size();
-    vector<int> indices;
-
-    if (subblocks_set_size > 1)
-    {
-        IntRect roi{ xPos,yPos,static_cast<int>(pBm->GetWidth()),static_cast<int>(pBm->GetHeight()) };
-        // - We start with the last tile to draw, then we add the one before and so on. 
-        // - For each tile, we check if the area covered increases - if not, it means that this tile is not 
-        //    visible (it will be overdrawn by the latter ones), so we can skip it.
-        RectangleCoverageCalculator coverageCalculator;
-        SubBlockInfo subblock_info;
-        const bool b = this->sbBlkRepository->TryGetSubBlockInfo(subBlocksSet[subblocks_set_size - 1].index, &subblock_info);
-        coverageCalculator.AddRectangle(subblock_info.logicalRect);
-        auto covered_pixel_count = coverageCalculator.CalcAreaOfIntersectionWithRectangle(roi);
-
-        size_t index = subblocks_set_size - 2;
-        do
+    const auto indices_of_visible_tiles = this->CheckForVisibility(
+        { xPos,yPos,static_cast<int>(pBm->GetWidth()),static_cast<int>(pBm->GetHeight()) },
+        static_cast<int>(subBlocksSet.size()),
+        [&](int index)->int
         {
-            const auto& indexAndM = subBlocksSet[subblocks_set_size - 1];
-            const bool b = this->sbBlkRepository->TryGetSubBlockInfo(indexAndM.index, &subblock_info);
-            coverageCalculator.AddRectangle(subblock_info.logicalRect);
+            auto it = subBlocksSet.rbegin(); // Reverse iterator pointing to the last element
+            std::advance(it, index); // Advance it index times
+            return it->index;
+        });
+    //size_t subblocks_set_size = subBlocksSet.size();
+    //vector<int> indices;
 
-            const auto covered_pixel_count_new = coverageCalculator.CalcAreaOfIntersectionWithRectangle(roi);
-            if (covered_pixel_count == covered_pixel_count_new)
-            {
-                // this tile is not visible, so we can skip it
-                continue;
-            }
+    //if (subblocks_set_size > 1)
+    //{
+    //    IntRect roi{ xPos,yPos,static_cast<int>(pBm->GetWidth()),static_cast<int>(pBm->GetHeight()) };
+    //    // - We start with the last tile to draw, then we add the one before and so on. 
+    //    // - For each tile, we check if the area covered increases - if not, it means that this tile is not 
+    //    //    visible (it will be overdrawn by the latter ones), so we can skip it.
+    //    RectangleCoverageCalculator coverageCalculator;
+    //    SubBlockInfo subblock_info;
+    //    const bool b = this->sbBlkRepository->TryGetSubBlockInfo(subBlocksSet[subblocks_set_size - 1].index, &subblock_info);
+    //    coverageCalculator.AddRectangle(subblock_info.logicalRect);
+    //    auto covered_pixel_count = coverageCalculator.CalcAreaOfIntersectionWithRectangle(roi);
 
-            covered_pixel_count = covered_pixel_count_new;
-        }
-        while (index-- > 0);
-    }
+    //    size_t index = subblocks_set_size - 2;
+    //    do
+    //    {
+    //        const auto& indexAndM = subBlocksSet[index];
+    //        const bool b = this->sbBlkRepository->TryGetSubBlockInfo(indexAndM.index, &subblock_info);
+    //        coverageCalculator.AddRectangle(subblock_info.logicalRect);
+
+    //        const auto covered_pixel_count_new = coverageCalculator.CalcAreaOfIntersectionWithRectangle(roi);
+    //        if (covered_pixel_count == covered_pixel_count_new)
+    //        {
+    //            // this tile is not visible, so we can skip it
+    //            continue;
+    //        }
+
+    //        covered_pixel_count = covered_pixel_count_new;
+    //    }
+    //    while (index-- > 0);
+    //}
 
     Compositors::ComposeSingleChannelTiles(
         [&](int index, std::shared_ptr<libCZI::IBitmapData>& spBm, int& xPosTile, int& yPosTile)->bool
         {
-            if (index < static_cast<int>(subBlocksSet.size()))
+            if (index < static_cast<int>(indices_of_visible_tiles.size()))
+            {
+                const auto sb = this->sbBlkRepository->ReadSubBlock(subBlocksSet[indices_of_visible_tiles[index]].index);
+                spBm = sb->CreateBitmap();
+                xPosTile = sb->GetSubBlockInfo().logicalRect.x;
+                yPosTile = sb->GetSubBlockInfo().logicalRect.y;
+                return true;
+            }
+            /*if (index < static_cast<int>(subBlocksSet.size()))
             {
                 const auto sb = this->sbBlkRepository->ReadSubBlock(subBlocksSet[index].index);
                 spBm = sb->CreateBitmap();
                 xPosTile = sb->GetSubBlockInfo().logicalRect.x;
                 yPosTile = sb->GetSubBlockInfo().logicalRect.y;
                 return true;
-            }
+            }*/
 
             return false;
         },

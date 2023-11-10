@@ -62,7 +62,8 @@ ADD_EXECUTABLE(libCZI_UnitTests
 										test_CZIParse.cpp 
 										test_streamslib.cpp 
 										test_curlhttpstream.cpp
-										test_rectanglecoverage.cpp)
+										test_rectanglecoverage.cpp 
+										test_SingleChannelTileAccessor.cpp)
 
 TARGET_LINK_LIBRARIES(libCZI_UnitTests PRIVATE libCZIStatic GTest::gtest GTest::gmock)
 

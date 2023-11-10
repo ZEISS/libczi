@@ -4,6 +4,7 @@
 
 #include "SingleChannelAccessorBase.h"
 #include "BitmapOperations.h"
+#include "utilities.h"
 
 using namespace std;
 using namespace libCZI;
@@ -79,4 +80,46 @@ void CSingleChannelAccessorBase::CheckPlaneCoordinates(const libCZI::IDimCoordin
             }
         }
     }
+}
+
+std::vector<int> CSingleChannelAccessorBase::CheckForVisibility(const libCZI::IntRect& roi, int count, const std::function<int(int)>& get_subblock_index) const
+{
+    std::vector<int> result;
+    result.reserve(count);
+
+    if (count == 1)
+    {
+        result.push_back(0);
+        return result;
+    }
+
+    int subblock_index = get_subblock_index(0);
+    result.push_back(count - 1);
+    RectangleCoverageCalculator coverageCalculator;
+    SubBlockInfo subblock_info;
+    bool b = this->sbBlkRepository->TryGetSubBlockInfo(subblock_index, &subblock_info);
+    coverageCalculator.AddRectangle(subblock_info.logicalRect);
+    auto covered_pixel_count = coverageCalculator.CalcAreaOfIntersectionWithRectangle(roi);
+
+    // TODO: if every pixel is now covered, we are done
+
+    int i = 1;
+    do
+    {
+        subblock_index = get_subblock_index(i);
+        b = this->sbBlkRepository->TryGetSubBlockInfo(subblock_index, &subblock_info);
+        coverageCalculator.AddRectangle(subblock_info.logicalRect);
+        const auto covered_pixel_count_new = coverageCalculator.CalcAreaOfIntersectionWithRectangle(roi);
+        if (covered_pixel_count_new > covered_pixel_count)
+        {
+            result.push_back(count - 1 - i);
+        }
+
+        covered_pixel_count = covered_pixel_count_new;
+    }
+    while (++i < count);
+
+    std::reverse(result.begin(), result.end());
+
+    return result;
 }
