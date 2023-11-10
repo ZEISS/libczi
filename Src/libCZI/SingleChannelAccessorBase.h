@@ -24,11 +24,13 @@ protected:
 
     /// This method is used to do a visibility test of a list of subblocks. The mode of operation is as follows:
     /// - The method is given a ROI, and the number of subblocks to check.  
-    /// - The functor 'get_subblock_index' is called (with the argument being a counter, starting with 0 and counting up to count-1).  
+    /// - The functor 'get_subblock_index' is called with the argument being a counter, starting with 0 and counting up to count-1.  
+    ///   If called with value 0, the subblocks is the **last** one to be rendered, if called with value 1, the subblock is the
+    ///   second-last one to be rendered, and so on.
     ///   The value it returns is the subblock index (in the subblock repository) to check.
     /// - The subblocks are assumed to be rendered in the order given, so the one we get by calling  'get_subblock_index' with  
     ///   argument 0 is the first one to be rendered, the one with argument 1 is the second one, and so on. The rendering 
-    ///   is assumed to be done with 'painters algorithm", so what is rendered last is on top.
+    ///   is assumed to be done with 'painter's algorithm", so what is rendered last is on top.
     /// - We return a list of indices which are to rendered, potentially leaving out some which have been determined  
     ///   as not being visible. Those indices returned are "indices as used by the 'get_subblock_index' functor, i.e.
     ///   it is **not** the subblock-number, but the argument that was passed to the functor.

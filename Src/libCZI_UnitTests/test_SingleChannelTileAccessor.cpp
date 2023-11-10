@@ -157,6 +157,8 @@ TEST(SingleChannelTileAccessor, VisibilityCheck1)
 
 TEST(SingleChannelTileAccessor, VisibilityCheck2)
 {
+    // now the three subblocks are all positioned at (0,0)
+    
     // arrange
     auto czi_document_as_blob = CreateTestCzi(0, 0, 0, 0, 0, 0);
     const auto memory_stream = make_shared<CMemInputOutputStream>(get<0>(czi_document_as_blob).get(), get<1>(czi_document_as_blob));
