@@ -106,8 +106,7 @@ static tuple<shared_ptr<void>, size_t> CreateTestCzi(int x1, int y1, int x2, int
     addSbBlkInfo.ptrBitmap = kBitmap3;
     writer->SyncAddSubBlock(addSbBlkInfo);
 
-    PrepareMetadataInfo prepare_metadata_info;
-    const auto metaDataBuilder = writer->GetPreparedMetadata(prepare_metadata_info);
+    const auto metaDataBuilder = writer->GetPreparedMetadata(PrepareMetadataInfo{});
 
     WriteMetadataInfo write_metadata_info;
     const auto& strMetadata = metaDataBuilder->GetXml();
@@ -126,8 +125,9 @@ TEST(SingleChannelTileAccessor, VisibilityCheck1)
 {
     // We create a CZI with 3 subblocks, each containing a 2x2 bitmap.
     // 1st subblock is at (0,0), 2nd subblock is at (1,1), 3rd subblock is at (2,2).
-    auto czi_document_as_blob = CreateTestCzi(0, 0, 1, 1, 2, 2);
 
+    // arrange
+    auto czi_document_as_blob = CreateTestCzi(0, 0, 1, 1, 2, 2);
     const auto memory_stream = make_shared<CMemInputOutputStream>(get<0>(czi_document_as_blob).get(), get<1>(czi_document_as_blob));
     const auto reader = CreateCZIReader();
     reader->Open(memory_stream);
@@ -135,7 +135,10 @@ TEST(SingleChannelTileAccessor, VisibilityCheck1)
     const auto accessor = make_shared<CSingleChannelTileAccessor>(subblock_repository_with_read_history);
     const CDimCoordinate plane_coordinate{ {DimensionIndex::C, 0}, {DimensionIndex::T, 0} };
 
+    // act
     const auto tile_composite_bitmap = accessor->Get(PixelType::Gray8, IntRect{ 1, 1, 1, 1 }, &plane_coordinate, nullptr);
+
+    // assert
     EXPECT_EQ(tile_composite_bitmap->GetWidth(), 1);
     EXPECT_EQ(tile_composite_bitmap->GetHeight(), 1);
     const ScopedBitmapLockerSP locked_tile_composite_bitmap{ tile_composite_bitmap };
@@ -154,8 +157,8 @@ TEST(SingleChannelTileAccessor, VisibilityCheck1)
 
 TEST(SingleChannelTileAccessor, VisibilityCheck2)
 {
+    // arrange
     auto czi_document_as_blob = CreateTestCzi(0, 0, 0, 0, 0, 0);
-
     const auto memory_stream = make_shared<CMemInputOutputStream>(get<0>(czi_document_as_blob).get(), get<1>(czi_document_as_blob));
     const auto reader = CreateCZIReader();
     reader->Open(memory_stream);
@@ -163,7 +166,10 @@ TEST(SingleChannelTileAccessor, VisibilityCheck2)
     const auto accessor = make_shared<CSingleChannelTileAccessor>(subblock_repository_with_read_history);
     const CDimCoordinate plane_coordinate{ {DimensionIndex::C, 0}, {DimensionIndex::T, 0} };
 
+    // act
     const auto tile_composite_bitmap = accessor->Get(PixelType::Gray8, IntRect{ 1, 1, 1, 1 }, &plane_coordinate, nullptr);
+
+    // assert
     EXPECT_EQ(tile_composite_bitmap->GetWidth(), 1);
     EXPECT_EQ(tile_composite_bitmap->GetHeight(), 1);
     const ScopedBitmapLockerSP locked_tile_composite_bitmap{ tile_composite_bitmap };
