@@ -125,6 +125,8 @@ TEST(SingleChannelTileAccessor, VisibilityCheck1)
 {
     // We create a CZI with 3 subblocks, each containing a 2x2 bitmap.
     // 1st subblock is at (0,0), 2nd subblock is at (1,1), 3rd subblock is at (2,2).
+    // We then query for the ROI (1,1,1,1) and check that only the 2nd subblock is read -
+    // because subblock #0 is not visible (overdrawn by #1), and #2 does not intersect.
 
     // arrange
     auto czi_document_as_blob = CreateTestCzi(0, 0, 1, 1, 2, 2);
@@ -157,7 +159,8 @@ TEST(SingleChannelTileAccessor, VisibilityCheck1)
 
 TEST(SingleChannelTileAccessor, VisibilityCheck2)
 {
-    // now the three subblocks are all positioned at (0,0)
+    // Now the three subblocks are all positioned at (0,0). We query for the ROI (1,1,1,1) and check that
+    // only the top-most subblock (Which is #2) is read, because the other two are not visible (are overdrawn).
     
     // arrange
     auto czi_document_as_blob = CreateTestCzi(0, 0, 0, 0, 0, 0);
