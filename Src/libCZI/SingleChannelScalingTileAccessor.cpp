@@ -327,29 +327,66 @@ void CSingleChannelScalingTileAccessor::Paint(libCZI::IBitmapData* bmDest, const
         return;
     }
 
-    std::vector<int>::const_iterator it = sbSetSortedByZoom.sortedByZoom.cbegin();
-    std::advance(it, idxOf1stSubBlockOfZoomGreater);
+    std::vector<int>::const_iterator start_iterator = sbSetSortedByZoom.sortedByZoom.cbegin();
+    std::advance(start_iterator, idxOf1stSubBlockOfZoomGreater);
 
-    const float startZoom = sbSetSortedByZoom.subBlocks.at(*it).GetZoom();
-
-    for (; it != sbSetSortedByZoom.sortedByZoom.cend(); ++it)
+    const float startZoom = sbSetSortedByZoom.subBlocks.at(*start_iterator).GetZoom();
+    auto end_iterator = start_iterator;
+    for (; end_iterator != sbSetSortedByZoom.sortedByZoom.cend(); ++end_iterator)
     {
-        const SbInfo& sbInfo = sbSetSortedByZoom.subBlocks.at(*it);
-
+        const SbInfo& sbInfo = sbSetSortedByZoom.subBlocks.at(*end_iterator);
         // as an interim solution (in fact... this seems to be a rather good solution...), stop when we arrive at subblocks with a zoom-level about twice that what we started with
         if (sbInfo.GetZoom() >= startZoom * 1.9f)
         {
             break;
         }
+    }
 
-        if (GetSite()->IsEnabled(LOGLEVEL_CHATTYINFORMATION))
+    if (!useCoverageOptimization)
+    {
+        for (auto it = start_iterator; it != end_iterator; ++it)
         {
-            stringstream ss;
-            ss << " Drawing subblock: idx=" << sbInfo.index << " Log.: " << sbInfo.logicalRect << " Phys.Size: " << sbInfo.physicalSize;
-            GetSite()->Log(LOGLEVEL_CHATTYINFORMATION, ss);
-        }
+            const SbInfo& sbInfo = sbSetSortedByZoom.subBlocks.at(*it);
+            /*
+            // as an interim solution (in fact... this seems to be a rather good solution...), stop when we arrive at subblocks with a zoom-level about twice that what we started with
+            if (sbInfo.GetZoom() >= startZoom * 1.9f)
+            {
+                break;
+            }
+            */
+            if (GetSite()->IsEnabled(LOGLEVEL_CHATTYINFORMATION))
+            {
+                stringstream ss;
+                ss << " Drawing subblock: idx=" << sbInfo.index << " Log.: " << sbInfo.logicalRect << " Phys.Size: " << sbInfo.physicalSize;
+                GetSite()->Log(LOGLEVEL_CHATTYINFORMATION, ss);
+            }
 
-        this->ScaleBlt(bmDest, zoom, roi, sbInfo);
+            this->ScaleBlt(bmDest, zoom, roi, sbInfo);
+        }
+    }
+    else
+    {
+        const auto indices_of_visible_tiles = this->CheckForVisibility(
+           roi,
+           static_cast<int>(distance(start_iterator, end_iterator)),
+           [&](int index)->int
+           {
+               const auto element = end_iterator - 1 - index;
+               return sbSetSortedByZoom.subBlocks.at(*element).index;
+           });
+
+        for (const auto it : indices_of_visible_tiles)
+        {
+            const SbInfo& sbInfo = sbSetSortedByZoom.subBlocks.at(*(start_iterator + it));
+            if (GetSite()->IsEnabled(LOGLEVEL_CHATTYINFORMATION))
+            {
+                stringstream ss;
+                ss << " Drawing subblock: idx=" << sbInfo.index << " Log.: " << sbInfo.logicalRect << " Phys.Size: " << sbInfo.physicalSize;
+                GetSite()->Log(LOGLEVEL_CHATTYINFORMATION, ss);
+            }
+
+            this->ScaleBlt(bmDest, zoom, roi, sbInfo);
+        }
     }
 
 #if false
