@@ -295,8 +295,8 @@ TEST(SingleChannelTileAccessor, RandomSubblock_CompareRenderingWithAndWithoutVis
         const CDimCoordinate plane_coordinate{ {DimensionIndex::C, 0}, {DimensionIndex::T, 0} };
 
         ISingleChannelTileAccessor::Options options;
-        options.backGroundColor = RgbFloatColor{ 0,0,0 };
         options.Clear();
+        options.backGroundColor = RgbFloatColor{ 0,0,0 };
         options.visibilityOptimization = true;
         const auto tile_composite_bitmap_with_visibility_optimization = accessor->Get(PixelType::Gray8, kRoi, &plane_coordinate, &options);
         const auto number_of_subblocks_read_with_visibility_optimization = subblock_repository_with_read_history->GetSubblocksRead().size();
