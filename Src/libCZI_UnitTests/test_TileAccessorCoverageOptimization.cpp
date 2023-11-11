@@ -246,11 +246,11 @@ void RandomSubblocksAndCompareRenderingWithAndWithoutVisibilityOptimization(tAcc
         handler.Initialize(subblock_repository_with_read_history);
         const CDimCoordinate plane_coordinate{ {DimensionIndex::C, 0}, {DimensionIndex::T, 0} };
 
-        const auto tile_composite_bitmap_with_visibility_optimization = handler.GetBitmapWithOptimization(PixelType::Gray8, IntRect{ 1, 1, 1, 1 }, &plane_coordinate);
+        const auto tile_composite_bitmap_with_visibility_optimization = handler.GetBitmapWithOptimization(PixelType::Gray8, kRoi, &plane_coordinate);
         const auto number_of_subblocks_read_with_visibility_optimization = subblock_repository_with_read_history->GetSubblocksRead().size();
 
         subblock_repository_with_read_history->ClearSubblockReadHistory();
-        const auto tile_composite_bitmap_without_visibility_optimization = handler.GetBitmapWithoutOptimization(PixelType::Gray8, IntRect{ 1, 1, 1, 1 }, &plane_coordinate);
+        const auto tile_composite_bitmap_without_visibility_optimization = handler.GetBitmapWithoutOptimization(PixelType::Gray8, kRoi, &plane_coordinate);
         const auto number_of_subblocks_read_without_visibility_optimization = subblock_repository_with_read_history->GetSubblocksRead().size();
 
         EXPECT_TRUE(AreBitmapDataEqual(tile_composite_bitmap_with_visibility_optimization, tile_composite_bitmap_without_visibility_optimization)) <<
