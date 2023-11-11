@@ -61,4 +61,4 @@ if (LIBCZI_BUILD_UNITTESTS)
  add_subdirectory(libCZI_UnitTests)
 endif(LIBCZI_BUILD_UNITTESTS)
 
-add_subdirectory(jpgxrdecodetest)
+# add_subdirectory(jpgxrdecodetest)
