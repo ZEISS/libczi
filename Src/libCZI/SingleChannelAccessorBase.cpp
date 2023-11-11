@@ -98,6 +98,7 @@ std::vector<int> CSingleChannelAccessorBase::CheckForVisibility(const libCZI::In
         return result;
     }
 
+    const int64_t total_pixel_count = static_cast<int64_t>(roi.w) * roi.h;
     int subblock_index = get_subblock_index(0);
     result.push_back(count - 1);
     RectangleCoverageCalculator coverageCalculator;
@@ -106,7 +107,11 @@ std::vector<int> CSingleChannelAccessorBase::CheckForVisibility(const libCZI::In
     coverageCalculator.AddRectangle(subblock_info.logicalRect);
     auto covered_pixel_count = coverageCalculator.CalcAreaOfIntersectionWithRectangle(roi);
 
-    // TODO: if every pixel is now covered, we are done
+    if (covered_pixel_count == total_pixel_count)
+    {
+        // if the whole ROI is covered by the first subblock, then we are done
+        return result;
+    }
 
     int i = 1;
     do
@@ -118,6 +123,12 @@ std::vector<int> CSingleChannelAccessorBase::CheckForVisibility(const libCZI::In
         if (covered_pixel_count_new > covered_pixel_count)
         {
             result.push_back(count - 1 - i);
+        }
+
+        if (covered_pixel_count_new == total_pixel_count)
+        {
+            // if the whole ROI is covered now, then we are done
+            break;
         }
 
         covered_pixel_count = covered_pixel_count_new;
