@@ -2,9 +2,9 @@
 //
 // SPDX-License-Identifier: LGPL-3.0-or-later
 
-#include <random>
 
 #include "include_gtest.h"
+#include <random>
 #include "inc_libCZI.h"
 #include "../libCZI/SingleChannelTileAccessor.h"
 #include "MemOutputStream.h"
@@ -13,6 +13,7 @@
 using namespace libCZI;
 using namespace std;
 
+/// This is a shim for the ISubBlockRepository interface, which keeps track of the subblocks that were read.
 class SubBlockRepositoryShim : public ISubBlockRepository
 {
 private:
@@ -32,6 +33,7 @@ public:
         return this->subblocks_read_;
     }
 
+    /// Clears the subblocks-read history.
     void ClearSubblockReadHistory()
     {
         this->subblocks_read_.clear();
@@ -126,66 +128,6 @@ static tuple<shared_ptr<void>, size_t> CreateTestCzi(const vector<SubBlockPositi
     return make_tuple(outStream->GetCopy(nullptr), outStream->GetDataSize());
 }
 
-/*static tuple<shared_ptr<void>, size_t> CreateTestCzi(int x1, int y1, int x2, int y2, int x3, int y3)
-{
-    const auto writer = CreateCZIWriter();
-    const auto outStream = make_shared<CMemOutputStream>(0);
-
-    const auto spWriterInfo = make_shared<CCziWriterInfo >(
-        GUID{ 0x1234567,0x89ab,0xcdef,{ 1,2,3,4,5,6,7,8 } },
-        CDimBounds{ { DimensionIndex::T, 0, 1 }, { DimensionIndex::C, 0, 1 } },	// set a bounds for Z and C
-        0, 5);	// set a bounds M : 0<=m<=5
-
-    writer->Create(outStream, spWriterInfo);
-
-    static constexpr uint8_t kBitmap1[4] = { 1, 1, 1, 1 };
-    static constexpr uint8_t kBitmap2[4] = { 2, 2, 2, 2 };
-    static constexpr uint8_t kBitmap3[4] = { 3, 3, 3, 3 };
-
-    AddSubBlockInfoStridedBitmap addSbBlkInfo;
-    addSbBlkInfo.Clear();
-    addSbBlkInfo.coordinate.Set(DimensionIndex::C, 0);
-    addSbBlkInfo.coordinate.Set(DimensionIndex::T, 0);
-    addSbBlkInfo.mIndexValid = true;
-    addSbBlkInfo.mIndex = 0;
-    addSbBlkInfo.x = x1;
-    addSbBlkInfo.y = y1;
-    addSbBlkInfo.logicalWidth = 2;
-    addSbBlkInfo.logicalHeight = 2;
-    addSbBlkInfo.physicalWidth = 2;
-    addSbBlkInfo.physicalHeight = 2;
-    addSbBlkInfo.PixelType = PixelType::Gray8;
-    addSbBlkInfo.ptrBitmap = kBitmap1;
-    addSbBlkInfo.strideBitmap = 2;
-    writer->SyncAddSubBlock(addSbBlkInfo);
-
-    addSbBlkInfo.x = x2;
-    addSbBlkInfo.y = y2;
-    addSbBlkInfo.mIndex = 1;
-    addSbBlkInfo.ptrBitmap = kBitmap2;
-    writer->SyncAddSubBlock(addSbBlkInfo);
-
-    addSbBlkInfo.x = x3;
-    addSbBlkInfo.y = y3;
-    addSbBlkInfo.mIndex = 2;
-    addSbBlkInfo.ptrBitmap = kBitmap3;
-    writer->SyncAddSubBlock(addSbBlkInfo);
-
-    const auto metaDataBuilder = writer->GetPreparedMetadata(PrepareMetadataInfo{});
-
-    WriteMetadataInfo write_metadata_info;
-    const auto& strMetadata = metaDataBuilder->GetXml();
-    write_metadata_info.szMetadata = strMetadata.c_str();
-    write_metadata_info.szMetadataSize = strMetadata.size() + 1;
-    write_metadata_info.ptrAttachment = nullptr;
-    write_metadata_info.attachmentSize = 0;
-    writer->SyncWriteMetadata(write_metadata_info);
-
-    writer->Close();
-
-    return make_tuple(outStream->GetCopy(nullptr), outStream->GetDataSize());
-}*/
-
 TEST(SingleChannelTileAccessor, VisibilityCheck1)
 {
     // We create a CZI with 3 subblocks, each containing a 2x2 bitmap.
@@ -232,7 +174,6 @@ TEST(SingleChannelTileAccessor, VisibilityCheck2)
     // only the top-most subblock (Which is #2) is read, because the other two are not visible (are overdrawn).
 
     // arrange
-    //auto czi_document_as_blob = CreateTestCzi(0, 0, 0, 0, 0, 0);
     auto czi_document_as_blob = CreateTestCzi(vector<SubBlockPositions>{{ {0, 0, 2, 2}, 0 }, { {0, 0, 2, 2}, 1 }, { {0, 0, 2, 2}, 2 }});
     const auto memory_stream = make_shared<CMemInputOutputStream>(get<0>(czi_document_as_blob).get(), get<1>(czi_document_as_blob));
     const auto reader = CreateCZIReader();
