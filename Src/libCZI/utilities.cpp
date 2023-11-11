@@ -466,7 +466,6 @@ void RectangleCoverageCalculator::AddRectangle(const libCZI::IntRect& rectangle)
                     // to add those pieces
                     std::array<libCZI::IntRect, 4> splitUpRects;
                     const int number_of_split_up_rects = SplitUpIntoNonOverlapping(*i, rectangle, splitUpRects);
-                    //List<Rectangle> splitUpRects = RectangleCoverageCalculator::SplitUpIntoNonOverlapping(this.splitters[i], rectangle);
                     for (int n = 0; n < number_of_split_up_rects; ++n)
                     {
                         this->AddRectangle(splitUpRects[n]);
