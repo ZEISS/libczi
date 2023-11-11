@@ -302,14 +302,14 @@ void CSingleChannelScalingTileAccessor::InternalGet(libCZI::IBitmapData* bmDest,
         // we only have to deal with a single scene (or: the document does not include a scene-dimension at all), in this
         //  case we do not have group by scene and save some cycles
         auto sbSetsortedByZoom = this->GetSubSetFilteredBySceneSortedByZoom(roi, planeCoordinate, scenesInvolved, options.sortByM);
-        this->Paint(bmDest, roi, sbSetsortedByZoom, zoom, options.useCoverageOptimization);
+        this->Paint(bmDest, roi, sbSetsortedByZoom, zoom, options.useVisibilityCheckOptimization);
     }
     else
     {
         const auto sbSetSortedByZoomPerScene = this->GetSubSetSortedByZoomPerScene(scenesInvolved, roi, planeCoordinate, options.sortByM);
         for (const auto& it : sbSetSortedByZoomPerScene)
         {
-            this->Paint(bmDest, roi, get<1>(it), zoom, options.useCoverageOptimization);
+            this->Paint(bmDest, roi, get<1>(it), zoom, options.useVisibilityCheckOptimization);
         }
     }
 }
@@ -408,7 +408,7 @@ void CSingleChannelScalingTileAccessor::Paint(libCZI::IBitmapData* bmDest, const
 
     // determine the end
     std::vector<int>::const_iterator itEnd = sbSetSortedByZoom.sortedByZoom.cend();
-    if (useCoverageOptimization)
+    if (useVisibilityCheckOptimization)
     {
         RectangleCoverageCalculator coverageCalculator;
         for (auto it2 = it; it2 != sbSetSortedByZoom.sortedByZoom.cend(); ++it2)

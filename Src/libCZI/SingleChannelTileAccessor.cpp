@@ -48,7 +48,7 @@ void CSingleChannelTileAccessor::ComposeTiles(libCZI::IBitmapData* pBm, int xPos
     Compositors::ComposeSingleTileOptions composeOptions; composeOptions.Clear();
     composeOptions.drawTileBorder = options.drawTileBorder;
 
-    if (options.visibilityOptimization)
+    if (options.useVisibilityCheckOptimization)
     {
         const auto indices_of_visible_tiles = this->CheckForVisibility(
             { xPos,yPos,static_cast<int>(pBm->GetWidth()),static_cast<int>(pBm->GetHeight()) },

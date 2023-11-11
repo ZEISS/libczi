@@ -129,7 +129,98 @@ static tuple<shared_ptr<void>, size_t> CreateTestCzi(const vector<SubBlockPositi
     return make_tuple(outStream->GetCopy(nullptr), outStream->GetDataSize());
 }
 
-TEST(SingleChannelTileAccessor, VisibilityCheck1)
+template<class tAccessorHandler>
+void ThreeOverlappingSubBlockWithVisibilityOptimizationTest(tAccessorHandler handler)
+{
+    // We create a CZI with 3 subblocks, each containing a 2x2 bitmap.
+    // 1st subblock is at (0,0), 2nd subblock is at (1,1), 3rd subblock is at (2,2).
+    // We then query for the ROI (1,1,1,1) and check that only the 2nd subblock is read -
+    // because subblock #0 is not visible (overdrawn by #1), and #2 does not intersect.
+
+    // arrange
+    //auto czi_document_as_blob = CreateTestCzi(0, 0, 1, 1, 2, 2);
+    auto czi_document_as_blob = CreateTestCzi(vector<SubBlockPositions>{{ {0, 0, 2, 2}, 0 }, { {1, 1, 2, 2}, 1 }, { {2, 2, 2, 2}, 2 }});
+    const auto memory_stream = make_shared<CMemInputOutputStream>(get<0>(czi_document_as_blob).get(), get<1>(czi_document_as_blob));
+    const auto reader = CreateCZIReader();
+    reader->Open(memory_stream);
+    auto subblock_repository_with_read_history = make_shared<SubBlockRepositoryShim>(reader);
+    handler.Initialize(subblock_repository_with_read_history);
+    //const auto accessor = make_shared<CSingleChannelTileAccessor>(subblock_repository_with_read_history);
+    const CDimCoordinate plane_coordinate{ {DimensionIndex::C, 0}, {DimensionIndex::T, 0} };
+
+    // act
+    ISingleChannelTileAccessor::Options options;
+    options.Clear();
+    options.useVisibilityCheckOptimization = true;
+    //const auto tile_composite_bitmap = accessor->Get(PixelType::Gray8, IntRect{ 1, 1, 1, 1 }, &plane_coordinate, &options);
+    const auto tile_composite_bitmap = handler.GetBitmap(PixelType::Gray8, IntRect{ 1, 1, 1, 1 }, &plane_coordinate);
+
+    // assert
+    EXPECT_EQ(tile_composite_bitmap->GetWidth(), 1);
+    EXPECT_EQ(tile_composite_bitmap->GetHeight(), 1);
+    const ScopedBitmapLockerSP locked_tile_composite_bitmap{ tile_composite_bitmap };
+    EXPECT_EQ(*(static_cast<const std::uint8_t*>(locked_tile_composite_bitmap.ptrDataRoi)), 2);
+
+    // check that subblock #0 and #2 have NOT been read
+    EXPECT_TRUE(
+        find(subblock_repository_with_read_history->GetSubblocksRead().cbegin(),
+        subblock_repository_with_read_history->GetSubblocksRead().cend(),
+        0) == subblock_repository_with_read_history->GetSubblocksRead().cend()) << "subblock #0 is not expected to be read";
+    EXPECT_TRUE(
+        find(subblock_repository_with_read_history->GetSubblocksRead().cbegin(),
+        subblock_repository_with_read_history->GetSubblocksRead().cend(),
+        2) == subblock_repository_with_read_history->GetSubblocksRead().cend()) << "subblock #2 is not expected to be read";
+}
+
+
+TEST(TileAccessorCoverageOptimization, ThreeOverlappingSubBlockWithVisibilityOptimizationTest_SingleChannelTileAccessor)
+{
+    class SingleChannelTileAccessorHandler
+    {
+        shared_ptr<CSingleChannelTileAccessor> accessor_;
+    public:
+        void Initialize(shared_ptr<libCZI::ISubBlockRepository> repository)
+        {
+            this->accessor_ = make_shared<CSingleChannelTileAccessor>(repository);
+        }
+
+        shared_ptr<IBitmapData> GetBitmap(PixelType pixeltype, const IntRect& roi, const IDimCoordinate* planeCoordinate) const
+        {
+            ISingleChannelTileAccessor::Options options;
+            options.Clear();
+            options.useVisibilityCheckOptimization = true;
+            return this->accessor_->Get(pixeltype, roi, planeCoordinate, &options);
+        }
+    };
+
+    ThreeOverlappingSubBlockWithVisibilityOptimizationTest(SingleChannelTileAccessorHandler{});
+}
+
+TEST(TileAccessorCoverageOptimization, ThreeOverlappingSubBlockWithVisibilityOptimizationTest_SingleChannelScalingTileAccessor)
+{
+    class SingleChannelScalingTileAccessorHandler
+    {
+        shared_ptr<CSingleChannelScalingTileAccessor> accessor_;
+    public:
+        void Initialize(shared_ptr<libCZI::ISubBlockRepository> repository)
+        {
+            this->accessor_ = make_shared<CSingleChannelScalingTileAccessor>(repository);
+        }
+
+        shared_ptr<IBitmapData> GetBitmap(PixelType pixeltype, const IntRect& roi, const IDimCoordinate* planeCoordinate) const
+        {
+            ISingleChannelScalingTileAccessor::Options options;
+            options.Clear();
+            options.useVisibilityCheckOptimization = true;
+            return this->accessor_->Get(pixeltype, roi, planeCoordinate, 1.f, &options);
+        }
+    };
+
+    ThreeOverlappingSubBlockWithVisibilityOptimizationTest(SingleChannelScalingTileAccessorHandler{});
+}
+
+/*
+TEST(TileAccessorCoverageOptimization, VisibilityCheck1)
 {
     // We create a CZI with 3 subblocks, each containing a 2x2 bitmap.
     // 1st subblock is at (0,0), 2nd subblock is at (1,1), 3rd subblock is at (2,2).
@@ -149,7 +240,7 @@ TEST(SingleChannelTileAccessor, VisibilityCheck1)
     // act
     ISingleChannelTileAccessor::Options options;
     options.Clear();
-    options.visibilityOptimization = true;
+    options.useVisibilityCheckOptimization = true;
     const auto tile_composite_bitmap = accessor->Get(PixelType::Gray8, IntRect{ 1, 1, 1, 1 }, &plane_coordinate, &options);
 
     // assert
@@ -168,8 +259,9 @@ TEST(SingleChannelTileAccessor, VisibilityCheck1)
         subblock_repository_with_read_history->GetSubblocksRead().cend(),
         2) == subblock_repository_with_read_history->GetSubblocksRead().cend()) << "subblock #2 is not expected to be read";
 }
+*/
 
-TEST(SingleChannelTileAccessor, VisibilityCheck2)
+TEST(TileAccessorCoverageOptimization, VisibilityCheck2)
 {
     // Now the three subblocks are all positioned at (0,0). We query for the ROI (1,1,1,1) and check that
     // only the top-most subblock (Which is #2) is read, because the other two are not visible (are overdrawn).
@@ -186,7 +278,7 @@ TEST(SingleChannelTileAccessor, VisibilityCheck2)
     // act
     ISingleChannelTileAccessor::Options options;
     options.Clear();
-    options.visibilityOptimization = true;
+    options.useVisibilityCheckOptimization = true;
     const auto tile_composite_bitmap = accessor->Get(PixelType::Gray8, IntRect{ 1, 1, 1, 1 }, &plane_coordinate, &options);
 
     // assert
@@ -206,7 +298,7 @@ TEST(SingleChannelTileAccessor, VisibilityCheck2)
         1) == subblock_repository_with_read_history->GetSubblocksRead().cend()) << "subblock #1 is not expected to be read";
 }
 
-TEST(SingleChannelTileAccessor, RandomSubblock_CompareRenderingWithAndWithoutVisibilityOptimization)
+TEST(TileAccessorCoverageOptimization, RandomSubblocksCompareRenderingWithAndWithoutVisibilityOptimizationFor)
 {
     // Here we place a random number of subblocks at random positions, and then check that the
     // rendering result w/ and w/o visibility-optimization is the same
@@ -247,11 +339,11 @@ TEST(SingleChannelTileAccessor, RandomSubblock_CompareRenderingWithAndWithoutVis
         ISingleChannelTileAccessor::Options options;
         options.Clear();
         options.backGroundColor = RgbFloatColor{ 0,0,0 };
-        options.visibilityOptimization = true;
+        options.useVisibilityCheckOptimization = true;
         const auto tile_composite_bitmap_with_visibility_optimization = accessor->Get(PixelType::Gray8, kRoi, &plane_coordinate, &options);
         const auto number_of_subblocks_read_with_visibility_optimization = subblock_repository_with_read_history->GetSubblocksRead().size();
 
-        options.visibilityOptimization = false;
+        options.useVisibilityCheckOptimization = false;
         subblock_repository_with_read_history->ClearSubblockReadHistory();
         const auto tile_composite_bitmap_without_visibility_optimization = accessor->Get(PixelType::Gray8, kRoi, &plane_coordinate, &options);
         const auto number_of_subblocks_read_without_visibility_optimization = subblock_repository_with_read_history->GetSubblocksRead().size();
@@ -264,7 +356,7 @@ TEST(SingleChannelTileAccessor, RandomSubblock_CompareRenderingWithAndWithoutVis
     }
 }
 
-TEST(SingleChannelTileAccessor, Scaling_RandomSubblock_CompareRenderingWithAndWithoutVisibilityOptimization)
+TEST(TileAccessorCoverageOptimization, Scaling_RandomSubblock_CompareRenderingWithAndWithoutVisibilityOptimization)
 {
     // Here we place a random number of subblocks at random positions, and then check that the
     // rendering result w/ and w/o visibility-optimization is the same
@@ -305,11 +397,11 @@ TEST(SingleChannelTileAccessor, Scaling_RandomSubblock_CompareRenderingWithAndWi
         ISingleChannelScalingTileAccessor::Options options;
         options.Clear();
         options.backGroundColor = RgbFloatColor{ 0,0,0 };
-        options.useCoverageOptimization = true;
+        options.useVisibilityCheckOptimization = true;
         const auto tile_composite_bitmap_with_visibility_optimization = accessor->Get(PixelType::Gray8, kRoi, &plane_coordinate, 1, &options);
         const auto number_of_subblocks_read_with_visibility_optimization = subblock_repository_with_read_history->GetSubblocksRead().size();
 
-        options.useCoverageOptimization = false;
+        options.useVisibilityCheckOptimization = false;
         subblock_repository_with_read_history->ClearSubblockReadHistory();
         const auto tile_composite_bitmap_without_visibility_optimization = accessor->Get(PixelType::Gray8, kRoi, &plane_coordinate, 1, &options);
         const auto number_of_subblocks_read_without_visibility_optimization = subblock_repository_with_read_history->GetSubblocksRead().size();

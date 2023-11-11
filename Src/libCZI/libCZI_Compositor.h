@@ -63,7 +63,7 @@ namespace libCZI
             /// Otherwise the Z-order is arbitrary.
             bool sortByM;
 
-            bool visibilityOptimization; ///< If true, then the visibility optimization is used (if available).
+            bool useVisibilityCheckOptimization; ///< If true, then the visibility optimization is used (if available).
 
             /// If true, then a one-pixel wide boundary will be drawn around 
             /// each tile (in black color).
@@ -77,7 +77,7 @@ namespace libCZI
             {
                 this->backGroundColor.r = this->backGroundColor.g = this->backGroundColor.b = std::numeric_limits<float>::quiet_NaN();
                 this->sortByM = true;
-                this->visibilityOptimization = false;
+                this->useVisibilityCheckOptimization = false;
                 this->drawTileBorder = false;
                 this->sceneFilter.reset();
             }
@@ -252,7 +252,7 @@ namespace libCZI
             /// is given here, then no filtering is applied.
             std::shared_ptr<libCZI::IIndexSet> sceneFilter;
 
-            bool useCoverageOptimization;   ///< If true, then the coverage optimization is used (if available).
+            bool useVisibilityCheckOptimization;   ///< If true, then the tile-visibility-check-optimization is used (if available).
 
             /// Clears this object to its blank state.
             void Clear()
@@ -261,7 +261,7 @@ namespace libCZI
                 this->sortByM = true;
                 this->backGroundColor.r = this->backGroundColor.g = this->backGroundColor.b = std::numeric_limits<float>::quiet_NaN();
                 this->sceneFilter.reset();
-                this->useCoverageOptimization = false;
+                this->useVisibilityCheckOptimization = false;
             }
         };
 
