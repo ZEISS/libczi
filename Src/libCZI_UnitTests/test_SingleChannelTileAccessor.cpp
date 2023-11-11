@@ -2,6 +2,8 @@
 //
 // SPDX-License-Identifier: LGPL-3.0-or-later
 
+#include <random>
+
 #include "include_gtest.h"
 #include "inc_libCZI.h"
 #include "../libCZI/SingleChannelTileAccessor.h"
@@ -28,6 +30,11 @@ public:
     const vector<int>& GetSubblocksRead() const
     {
         return this->subblocks_read_;
+    }
+
+    void ClearSubblockReadHistory()
+    {
+        this->subblocks_read_.clear();
     }
 
     void EnumerateSubBlocks(const std::function<bool(int index, const SubBlockInfo& info)>& funcEnum) override
@@ -61,7 +68,65 @@ public:
     }
 };
 
-static tuple<shared_ptr<void>, size_t> CreateTestCzi(int x1, int y1, int x2, int y2, int x3, int y3)
+struct SubBlockPositions
+{
+    IntRect rectangle;
+    int mIndex;
+};
+
+static tuple<shared_ptr<void>, size_t> CreateTestCzi(const vector<SubBlockPositions>& subblocks)
+{
+    const auto writer = CreateCZIWriter();
+    const auto outStream = make_shared<CMemOutputStream>(0);
+
+    const auto spWriterInfo = make_shared<CCziWriterInfo>(
+        GUID{ 0,0,0,{ 0,0,0,0,0,0,0,0 } },
+        CDimBounds{ { DimensionIndex::T, 0, 1 }, { DimensionIndex::C, 0, 1 } },	// set a bounds for Z and C
+        0, static_cast<int>(subblocks.size() - 1));
+
+    writer->Create(outStream, spWriterInfo);
+
+    int count = 0;
+    for (const auto& block : subblocks)
+    {
+        ++count;
+        const size_t size_of_bitmap = static_cast<size_t>(block.rectangle.w) * block.rectangle.h;
+        unique_ptr<uint8_t[]> bitmap(new uint8_t[size_of_bitmap]);
+        memset(bitmap.get(), count, size_of_bitmap);
+        AddSubBlockInfoStridedBitmap addSbBlkInfo;
+        addSbBlkInfo.Clear();
+        addSbBlkInfo.coordinate.Set(DimensionIndex::C, 0);
+        addSbBlkInfo.coordinate.Set(DimensionIndex::T, 0);
+        addSbBlkInfo.mIndexValid = true;
+        addSbBlkInfo.mIndex = block.mIndex;
+        addSbBlkInfo.x = block.rectangle.x;
+        addSbBlkInfo.y = block.rectangle.y;
+        addSbBlkInfo.logicalWidth = block.rectangle.w;
+        addSbBlkInfo.logicalHeight = block.rectangle.h;
+        addSbBlkInfo.physicalWidth = block.rectangle.w;
+        addSbBlkInfo.physicalHeight = block.rectangle.h;
+        addSbBlkInfo.PixelType = PixelType::Gray8;
+        addSbBlkInfo.ptrBitmap = bitmap.get();
+        addSbBlkInfo.strideBitmap = block.rectangle.w;
+        writer->SyncAddSubBlock(addSbBlkInfo);
+    }
+
+    const auto metaDataBuilder = writer->GetPreparedMetadata(PrepareMetadataInfo{});
+
+    WriteMetadataInfo write_metadata_info;
+    const auto& strMetadata = metaDataBuilder->GetXml();
+    write_metadata_info.szMetadata = strMetadata.c_str();
+    write_metadata_info.szMetadataSize = strMetadata.size() + 1;
+    write_metadata_info.ptrAttachment = nullptr;
+    write_metadata_info.attachmentSize = 0;
+    writer->SyncWriteMetadata(write_metadata_info);
+
+    writer->Close();
+
+    return make_tuple(outStream->GetCopy(nullptr), outStream->GetDataSize());
+}
+
+/*static tuple<shared_ptr<void>, size_t> CreateTestCzi(int x1, int y1, int x2, int y2, int x3, int y3)
 {
     const auto writer = CreateCZIWriter();
     const auto outStream = make_shared<CMemOutputStream>(0);
@@ -119,7 +184,7 @@ static tuple<shared_ptr<void>, size_t> CreateTestCzi(int x1, int y1, int x2, int
     writer->Close();
 
     return make_tuple(outStream->GetCopy(nullptr), outStream->GetDataSize());
-}
+}*/
 
 TEST(SingleChannelTileAccessor, VisibilityCheck1)
 {
@@ -129,7 +194,8 @@ TEST(SingleChannelTileAccessor, VisibilityCheck1)
     // because subblock #0 is not visible (overdrawn by #1), and #2 does not intersect.
 
     // arrange
-    auto czi_document_as_blob = CreateTestCzi(0, 0, 1, 1, 2, 2);
+    //auto czi_document_as_blob = CreateTestCzi(0, 0, 1, 1, 2, 2);
+    auto czi_document_as_blob = CreateTestCzi(vector<SubBlockPositions>{{ {0, 0, 2, 2}, 0 }, { {1, 1, 2, 2}, 1 }, { {2, 2, 2, 2}, 2 }});
     const auto memory_stream = make_shared<CMemInputOutputStream>(get<0>(czi_document_as_blob).get(), get<1>(czi_document_as_blob));
     const auto reader = CreateCZIReader();
     reader->Open(memory_stream);
@@ -138,7 +204,10 @@ TEST(SingleChannelTileAccessor, VisibilityCheck1)
     const CDimCoordinate plane_coordinate{ {DimensionIndex::C, 0}, {DimensionIndex::T, 0} };
 
     // act
-    const auto tile_composite_bitmap = accessor->Get(PixelType::Gray8, IntRect{ 1, 1, 1, 1 }, &plane_coordinate, nullptr);
+    ISingleChannelTileAccessor::Options options;
+    options.Clear();
+    options.visibilityOptimization = true;
+    const auto tile_composite_bitmap = accessor->Get(PixelType::Gray8, IntRect{ 1, 1, 1, 1 }, &plane_coordinate, &options);
 
     // assert
     EXPECT_EQ(tile_composite_bitmap->GetWidth(), 1);
@@ -161,9 +230,10 @@ TEST(SingleChannelTileAccessor, VisibilityCheck2)
 {
     // Now the three subblocks are all positioned at (0,0). We query for the ROI (1,1,1,1) and check that
     // only the top-most subblock (Which is #2) is read, because the other two are not visible (are overdrawn).
-    
+
     // arrange
-    auto czi_document_as_blob = CreateTestCzi(0, 0, 0, 0, 0, 0);
+    //auto czi_document_as_blob = CreateTestCzi(0, 0, 0, 0, 0, 0);
+    auto czi_document_as_blob = CreateTestCzi(vector<SubBlockPositions>{{ {0, 0, 2, 2}, 0 }, { {0, 0, 2, 2}, 1 }, { {0, 0, 2, 2}, 2 }});
     const auto memory_stream = make_shared<CMemInputOutputStream>(get<0>(czi_document_as_blob).get(), get<1>(czi_document_as_blob));
     const auto reader = CreateCZIReader();
     reader->Open(memory_stream);
@@ -172,7 +242,10 @@ TEST(SingleChannelTileAccessor, VisibilityCheck2)
     const CDimCoordinate plane_coordinate{ {DimensionIndex::C, 0}, {DimensionIndex::T, 0} };
 
     // act
-    const auto tile_composite_bitmap = accessor->Get(PixelType::Gray8, IntRect{ 1, 1, 1, 1 }, &plane_coordinate, nullptr);
+    ISingleChannelTileAccessor::Options options;
+    options.Clear();
+    options.visibilityOptimization = true;
+    const auto tile_composite_bitmap = accessor->Get(PixelType::Gray8, IntRect{ 1, 1, 1, 1 }, &plane_coordinate, &options);
 
     // assert
     EXPECT_EQ(tile_composite_bitmap->GetWidth(), 1);
@@ -189,4 +262,51 @@ TEST(SingleChannelTileAccessor, VisibilityCheck2)
         find(subblock_repository_with_read_history->GetSubblocksRead().cbegin(),
         subblock_repository_with_read_history->GetSubblocksRead().cend(),
         1) == subblock_repository_with_read_history->GetSubblocksRead().cend()) << "subblock #1 is not expected to be read";
+}
+
+TEST(SingleChannelTileAccessor, RandomSubblock_CompareRenderingWithAndWithoutVisibilityOptimization)
+{
+    random_device dev;
+    mt19937 rng(dev());
+    uniform_int_distribution<int> distribution(0, 99); // distribution in range [0, 99]
+
+    static constexpr  IntRect kRoi{ 0, 0, 120, 120 };
+
+    for (int repeat = 0; repeat < 10; repeat++)
+    {
+        const int number_of_rectangles = distribution(rng) + 1;
+
+        vector<SubBlockPositions> subblocks;
+        subblocks.reserve(number_of_rectangles);
+        for (int i = 0; i < number_of_rectangles; ++i)
+        {
+            subblocks.emplace_back(SubBlockPositions{ IntRect{ distribution(rng), distribution(rng), 1 + distribution(rng), 1 + distribution(rng) }, i });
+        }
+
+        auto czi_document_as_blob = CreateTestCzi(subblocks);
+
+        const auto memory_stream = make_shared<CMemInputOutputStream>(get<0>(czi_document_as_blob).get(), get<1>(czi_document_as_blob));
+        const auto reader = CreateCZIReader();
+        reader->Open(memory_stream);
+
+        auto subblock_repository_with_read_history = make_shared<SubBlockRepositoryShim>(reader);
+        const auto accessor = make_shared<CSingleChannelTileAccessor>(subblock_repository_with_read_history);
+        //const auto accessor = reader->CreateSingleChannelTileAccessor();
+        const CDimCoordinate plane_coordinate{ {DimensionIndex::C, 0}, {DimensionIndex::T, 0} };
+
+        ISingleChannelTileAccessor::Options options;
+        options.Clear();
+        options.visibilityOptimization = true;
+        const auto tile_composite_bitmap_with_visibility_optimization = accessor->Get(PixelType::Gray8, kRoi, &plane_coordinate, &options);
+        const auto number_of_subblocks_read_with_visibility_optimization = subblock_repository_with_read_history->GetSubblocksRead().size();
+
+        options.visibilityOptimization = false;
+        subblock_repository_with_read_history->ClearSubblockReadHistory();
+        const auto tile_composite_bitmap_without_visibility_optimization = accessor->Get(PixelType::Gray8, kRoi, &plane_coordinate, &options);
+        const auto number_of_subblocks_read_without_visibility_optimization = subblock_repository_with_read_history->GetSubblocksRead().size();
+
+        EXPECT_TRUE(AreBitmapDataEqual(tile_composite_bitmap_with_visibility_optimization, tile_composite_bitmap_without_visibility_optimization));
+
+        EXPECT_LE(number_of_subblocks_read_with_visibility_optimization, number_of_subblocks_read_without_visibility_optimization);
+    }
 }

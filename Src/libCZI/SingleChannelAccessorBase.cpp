@@ -87,7 +87,12 @@ std::vector<int> CSingleChannelAccessorBase::CheckForVisibility(const libCZI::In
     std::vector<int> result;
     result.reserve(count);
 
-    if (count == 1)
+    // handle the trivial cases
+    if (count == 0)
+    {
+        return result;
+    }
+    else if (count == 1)
     {
         result.push_back(0);
         return result;

@@ -25,7 +25,12 @@ CSingleChannelScalingTileAccessor::CSingleChannelScalingTileAccessor(std::shared
 
 /*virtual*/ std::shared_ptr<libCZI::IBitmapData> CSingleChannelScalingTileAccessor::Get(const libCZI::IntRect& roi, const libCZI::IDimCoordinate* planeCoordinate, float zoom, const libCZI::ISingleChannelScalingTileAccessor::Options* pOptions)
 {
-    if (pOptions == nullptr) { Options opt; opt.Clear(); return this->Get(roi, planeCoordinate, zoom, &opt); }
+    if (pOptions == nullptr)
+    {
+        Options opt; opt.Clear();
+        return this->Get(roi, planeCoordinate, zoom, &opt);
+    }
+
     libCZI::PixelType pixelType;
     const bool b = this->TryGetPixelType(planeCoordinate, pixelType);
     if (b == false)
@@ -38,7 +43,12 @@ CSingleChannelScalingTileAccessor::CSingleChannelScalingTileAccessor(std::shared
 
 /*virtual*/std::shared_ptr<libCZI::IBitmapData> CSingleChannelScalingTileAccessor::Get(libCZI::PixelType pixeltype, const libCZI::IntRect& roi, const libCZI::IDimCoordinate* planeCoordinate, float zoom, const libCZI::ISingleChannelScalingTileAccessor::Options* pOptions)
 {
-    if (pOptions == nullptr) { Options opt; opt.Clear(); return this->Get(pixeltype, roi, planeCoordinate, zoom, &opt); }
+    if (pOptions == nullptr)
+    {
+        Options opt; opt.Clear();
+        return this->Get(pixeltype, roi, planeCoordinate, zoom, &opt);
+    }
+
     const IntSize sizeOfBitmap = InternalCalcSize(roi, zoom);
     auto bmDest = GetSite()->CreateBitmap(pixeltype, sizeOfBitmap.w, sizeOfBitmap.h);
     this->InternalGet(bmDest.get(), roi, planeCoordinate, zoom, *pOptions);
@@ -47,7 +57,11 @@ CSingleChannelScalingTileAccessor::CSingleChannelScalingTileAccessor(std::shared
 
 /*virtual*/void CSingleChannelScalingTileAccessor::Get(libCZI::IBitmapData* pDest, const libCZI::IntRect& roi, const libCZI::IDimCoordinate* planeCoordinate, float zoom, const libCZI::ISingleChannelScalingTileAccessor::Options* pOptions)
 {
-    if (pOptions == nullptr) { Options opt; opt.Clear(); return this->Get(pDest, roi, planeCoordinate, zoom, &opt); }
+    if (pOptions == nullptr)
+    {
+        Options opt; opt.Clear();
+        return this->Get(pDest, roi, planeCoordinate, zoom, &opt);
+    }
 
     const IntSize sizeOfBitmap = InternalCalcSize(roi, zoom);
     if (sizeOfBitmap.w != pDest->GetWidth() || sizeOfBitmap.h != pDest->GetHeight())
@@ -308,6 +322,43 @@ void CSingleChannelScalingTileAccessor::Paint(libCZI::IBitmapData* bmDest, const
         // this means that we would need to overzoom (i.e. the requested zoom is less than the lowest level we find in the subblock-repository)
         // TODO: this requires special consideration, for the time being -> bail out
         // ...we end up here e. g. when lowest level does not cover all the range, so - this is not
+        //    something where we want to throw an excpetion
+        //throw LibCZIAccessorException("Overzoom not supported", LibCZIAccessorException::ErrorType::Unspecified);
+        return;
+    }
+
+    std::vector<int>::const_iterator it = sbSetSortedByZoom.sortedByZoom.cbegin();
+    std::advance(it, idxOf1stSubBlockOfZoomGreater);
+
+    const float startZoom = sbSetSortedByZoom.subBlocks.at(*it).GetZoom();
+
+    for (; it != sbSetSortedByZoom.sortedByZoom.cend(); ++it)
+    {
+        const SbInfo& sbInfo = sbSetSortedByZoom.subBlocks.at(*it);
+
+        // as an interim solution (in fact... this seems to be a rather good solution...), stop when we arrive at subblocks with a zoom-level about twice that what we started with
+        if (sbInfo.GetZoom() >= startZoom * 1.9f)
+        {
+            break;
+        }
+
+        if (GetSite()->IsEnabled(LOGLEVEL_CHATTYINFORMATION))
+        {
+            stringstream ss;
+            ss << " Drawing subblock: idx=" << sbInfo.index << " Log.: " << sbInfo.logicalRect << " Phys.Size: " << sbInfo.physicalSize;
+            GetSite()->Log(LOGLEVEL_CHATTYINFORMATION, ss);
+        }
+
+        this->ScaleBlt(bmDest, zoom, roi, sbInfo);
+    }
+
+#if false
+    const int idxOf1stSubBlockOfZoomGreater = this->GetIdxOf1stSubBlockWithZoomGreater(sbSetSortedByZoom.subBlocks, sbSetSortedByZoom.sortedByZoom, zoom);
+    if (idxOf1stSubBlockOfZoomGreater < 0)
+    {
+        // this means that we would need to overzoom (i.e. the requested zoom is less than the lowest level we find in the subblock-repository)
+        // TODO: this requires special consideration, for the time being -> bail out
+        // ...we end up here e. g. when lowest level does not cover all the range, so - this is not
         //    something where we want to throw an exception
         //throw LibCZIAccessorException("Overzoom not supported", LibCZIAccessorException::ErrorType::Unspecified);
         return;
@@ -404,6 +455,7 @@ void CSingleChannelScalingTileAccessor::Paint(libCZI::IBitmapData* bmDest, const
         }
     }
     */
+#endif
 }
 
 /// <summary>	Using the specified ROI, determine the scenes it intersects with. If the

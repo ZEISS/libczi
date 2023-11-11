@@ -63,6 +63,8 @@ namespace libCZI
             /// Otherwise the Z-order is arbitrary.
             bool sortByM;
 
+            bool visibilityOptimization; ///< If true, then the visibility optimization is used (if available).
+
             /// If true, then a one-pixel wide boundary will be drawn around 
             /// each tile (in black color).
             bool drawTileBorder;
@@ -75,6 +77,7 @@ namespace libCZI
             {
                 this->backGroundColor.r = this->backGroundColor.g = this->backGroundColor.b = std::numeric_limits<float>::quiet_NaN();
                 this->sortByM = true;
+                this->visibilityOptimization = false;
                 this->drawTileBorder = false;
                 this->sceneFilter.reset();
             }
