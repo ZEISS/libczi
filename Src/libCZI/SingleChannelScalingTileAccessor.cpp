@@ -3,9 +3,6 @@
 // SPDX-License-Identifier: LGPL-3.0-or-later
 
 #include "SingleChannelScalingTileAccessor.h"
-
-#include <chrono>
-
 #include "utilities.h"
 #include "BitmapOperations.h"
 #include "Site.h"
@@ -83,7 +80,6 @@ CSingleChannelScalingTileAccessor::CSingleChannelScalingTileAccessor(std::shared
 
 void CSingleChannelScalingTileAccessor::ScaleBlt(libCZI::IBitmapData* bmDest, float zoom, const libCZI::IntRect& roi, const SbInfo& sbInfo)
 {
-    auto start = std::chrono::high_resolution_clock::now();
     const auto sb = this->sbBlkRepository->ReadSubBlock(sbInfo.index);
     if (GetSite()->IsEnabled(LOGLEVEL_CHATTYINFORMATION))
     {
@@ -93,17 +89,6 @@ void CSingleChannelScalingTileAccessor::ScaleBlt(libCZI::IBitmapData* bmDest, fl
     }
 
     const auto source = sb->CreateBitmap();
-    auto end = std::chrono::high_resolution_clock::now();
-    std::chrono::duration<double> elapsed_seconds = end - start;
-    if (GetSite()->IsEnabled(LOGLEVEL_CHATTYINFORMATION))
-    {
-        IntSize extent = source->GetSize();
-        int64_t data_size = static_cast<int64_t>(extent.w) * extent.h * CziUtils::GetBytesPerPel(source->GetPixelType());
-        std::stringstream ss;
-        double elapsed_time = elapsed_seconds.count();
-        ss << "ReadSubblock&CreateBitmap: " << elapsed_time * 1000.0 << "ms, size: " << data_size / 1e6 << "MB -> " << (data_size / elapsed_time) / 1e6 << "MB/s";
-        GetSite()->Log(LOGLEVEL_CHATTYINFORMATION, ss);
-    }
 
     // In order not to run into trouble with floating point precision, if the scale is exactly 1, we refrain from using the scaling operation
     //  and do instead a simple copy operation. This should ensure a pixel-accurate result if zoom is exactly 1.
