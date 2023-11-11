@@ -388,111 +388,6 @@ void CSingleChannelScalingTileAccessor::Paint(libCZI::IBitmapData* bmDest, const
             this->ScaleBlt(bmDest, zoom, roi, sbInfo);
         }
     }
-
-#if false
-    const int idxOf1stSubBlockOfZoomGreater = this->GetIdxOf1stSubBlockWithZoomGreater(sbSetSortedByZoom.subBlocks, sbSetSortedByZoom.sortedByZoom, zoom);
-    if (idxOf1stSubBlockOfZoomGreater < 0)
-    {
-        // this means that we would need to overzoom (i.e. the requested zoom is less than the lowest level we find in the subblock-repository)
-        // TODO: this requires special consideration, for the time being -> bail out
-        // ...we end up here e. g. when lowest level does not cover all the range, so - this is not
-        //    something where we want to throw an exception
-        //throw LibCZIAccessorException("Overzoom not supported", LibCZIAccessorException::ErrorType::Unspecified);
-        return;
-    }
-
-    std::vector<int>::const_iterator it = sbSetSortedByZoom.sortedByZoom.cbegin();
-    std::advance(it, idxOf1stSubBlockOfZoomGreater);
-
-    const float startZoom = sbSetSortedByZoom.subBlocks.at(*it).GetZoom();
-
-    // determine the end
-    std::vector<int>::const_iterator itEnd = sbSetSortedByZoom.sortedByZoom.cend();
-    if (useVisibilityCheckOptimization)
-    {
-        RectangleCoverageCalculator coverageCalculator;
-        for (auto it2 = it; it2 != sbSetSortedByZoom.sortedByZoom.cend(); ++it2)
-        {
-            const SbInfo& sbInfo = sbSetSortedByZoom.subBlocks.at(*it2);
-            coverageCalculator.AddRectangle(sbInfo.logicalRect);
-            if (coverageCalculator.CalcAreaOfIntersectionWithRectangle(roi) == roi.w * roi.h)
-            {
-                itEnd = ++it2;
-                break;
-            }
-        }
-    }
-
-    for (; it != itEnd; ++it)
-    {
-        const SbInfo& sbInfo = sbSetSortedByZoom.subBlocks.at(*it);
-
-        // as an interim solution (in fact... this seems to be a rather good solution...), stop when we arrive at subblocks with a zoom-level about twice that what we started with
-        if (sbInfo.GetZoom() >= startZoom * 1.9f)
-        {
-            break;
-        }
-
-        if (GetSite()->IsEnabled(LOGLEVEL_CHATTYINFORMATION))
-        {
-            stringstream ss;
-            ss << " Drawing subblock: idx=" << sbInfo.index << " Log.: " << sbInfo.logicalRect << " Phys.Size: " << sbInfo.physicalSize;
-            GetSite()->Log(LOGLEVEL_CHATTYINFORMATION, ss);
-        }
-
-        this->ScaleBlt(bmDest, zoom, roi, sbInfo);
-    }
-    /*
-    for (; it != sbSetSortedByZoom.sortedByZoom.cend(); ++it)
-    {
-        const SbInfo& sbInfo = sbSetSortedByZoom.subBlocks.at(*it);
-
-        // as an interim solution (in fact... this seems to be a rather good solution...), stop when we arrive at subblocks with a zoom-level about twice that what we started with
-        if (sbInfo.GetZoom() >= startZoom * 1.9f)
-        {
-            break;
-        }
-
-        if (GetSite()->IsEnabled(LOGLEVEL_CHATTYINFORMATION))
-        {
-            stringstream ss;
-            ss << " Drawing subblock: idx=" << sbInfo.index << " Log.: " << sbInfo.logicalRect << " Phys.Size: " << sbInfo.physicalSize;
-            GetSite()->Log(LOGLEVEL_CHATTYINFORMATION, ss);
-        }
-
-        this->ScaleBlt(bmDest, zoom, roi, sbInfo);
-    }
-    */
-    /*
-    RectangleCoverageCalculator coverageCalculator;
-    for (; it != sbSetSortedByZoom.sortedByZoom.cend(); ++it)
-    {
-        const SbInfo& sbInfo = sbSetSortedByZoom.subBlocks.at(*it);
-
-        coverageCalculator.AddRectangle(sbInfo.logicalRect);
-
-        // as an interim solution (in fact... this seems to be a rather good solution...), stop when we arrive at subblocks with a zoom-level about twice that what we started with
-        if (sbInfo.GetZoom() >= startZoom * 1.9f)
-        {
-            break;
-        }
-
-        if (GetSite()->IsEnabled(LOGLEVEL_CHATTYINFORMATION))
-        {
-            stringstream ss;
-            ss << " Drawing subblock: idx=" << sbInfo.index << " Log.: " << sbInfo.logicalRect << " Phys.Size: " << sbInfo.physicalSize;
-            GetSite()->Log(LOGLEVEL_CHATTYINFORMATION, ss);
-        }
-
-        this->ScaleBlt(bmDest, zoom, roi, sbInfo);
-
-        if (coverageCalculator.CalcAreaOfIntersectionWithRectangle(roi) == roi.w*roi.h)
-        {
-            break;
-        }
-    }
-    */
-#endif
 }
 
 /// <summary>	Using the specified ROI, determine the scenes it intersects with. If the
@@ -554,7 +449,7 @@ std::vector<std::tuple<int, CSingleChannelScalingTileAccessor::SubSetSortedByZoo
         coord.Set(DimensionIndex::S, sceneIdx);
         sbset.subBlocks = this->GetSubSet(roi, &coord, nullptr);
         sbset.sortedByZoom = this->CreateSortByZoom(sbset.subBlocks, sortByM);
-        result.emplace_back(make_tuple(sceneIdx, sbset));
+        result.emplace_back(sceneIdx, sbset);
     }
 
     return result;

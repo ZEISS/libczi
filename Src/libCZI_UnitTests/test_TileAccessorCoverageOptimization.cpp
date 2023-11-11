@@ -265,7 +265,12 @@ void RandomSubblocksAndCompareRenderingWithAndWithoutVisibilityOptimization(tAcc
 class SingleChannelTileAccessorHandler
 {
     shared_ptr<CSingleChannelTileAccessor> accessor_;
+    bool sort_by_m_;
 public:
+    explicit SingleChannelTileAccessorHandler(bool sortByM = true) : sort_by_m_(sortByM)
+    {
+    }
+
     void Initialize(const shared_ptr<libCZI::ISubBlockRepository>& repository)
     {
         this->accessor_ = make_shared<CSingleChannelTileAccessor>(repository);
@@ -276,6 +281,7 @@ public:
         ISingleChannelTileAccessor::Options options;
         options.Clear();
         options.useVisibilityCheckOptimization = with_optimization;
+        options.sortByM = this->sort_by_m_;
         if (with_background_clear)
         {
             options.backGroundColor = RgbFloatColor{ 0,0,0 };
@@ -298,7 +304,12 @@ public:
 class SingleChannelScalingTileAccessorHandler
 {
     shared_ptr<CSingleChannelScalingTileAccessor> accessor_;
+    bool sort_by_m_;
 public:
+    explicit SingleChannelScalingTileAccessorHandler(bool sortByM = true) : sort_by_m_(sortByM)
+    {
+    }
+
     void Initialize(const shared_ptr<libCZI::ISubBlockRepository>& repository)
     {
         this->accessor_ = make_shared<CSingleChannelScalingTileAccessor>(repository);
@@ -309,6 +320,7 @@ public:
         ISingleChannelScalingTileAccessor::Options options;
         options.Clear();
         options.useVisibilityCheckOptimization = with_optimization;
+        options.sortByM = this->sort_by_m_;
         if (with_background_clear)
         {
             options.backGroundColor = RgbFloatColor{ 0,0,0 };
@@ -356,4 +368,14 @@ TEST(TileAccessorCoverageOptimization, RandomSubblocksCompareRenderingWithAndWit
 TEST(TileAccessorCoverageOptimization, RandomSubblocksCompareRenderingWithAndWithoutVisibilityOptimization_SingleChannelScalingTileAccessor)
 {
     RandomSubblocksAndCompareRenderingWithAndWithoutVisibilityOptimization(SingleChannelScalingTileAccessorHandler{});
+}
+
+TEST(TileAccessorCoverageOptimization, RandomSubblocksCompareRenderingWithAndWithoutVisibilityOptimizationWithoutSortByM_SingleChannelTileAccessor)
+{
+    RandomSubblocksAndCompareRenderingWithAndWithoutVisibilityOptimization(SingleChannelTileAccessorHandler{ false });
+}
+
+TEST(TileAccessorCoverageOptimization, RandomSubblocksCompareRenderingWithAndWithoutVisibilityOptimizationWithoutSortByM_SingleChannelScalingTileAccessor)
+{
+    RandomSubblocksAndCompareRenderingWithAndWithoutVisibilityOptimization(SingleChannelScalingTileAccessorHandler{ false });
 }
