@@ -138,7 +138,6 @@ void ThreeOverlappingSubBlockWithVisibilityOptimizationTest(tAccessorHandler han
     // because subblock #0 is not visible (overdrawn by #1), and #2 does not intersect.
 
     // arrange
-    //auto czi_document_as_blob = CreateTestCzi(0, 0, 1, 1, 2, 2);
     auto czi_document_as_blob = CreateTestCzi(vector<SubBlockPositions>{{ {0, 0, 2, 2}, 0 }, { {1, 1, 2, 2}, 1 }, { {2, 2, 2, 2}, 2 }});
     const auto memory_stream = make_shared<CMemInputOutputStream>(get<0>(czi_document_as_blob).get(), get<1>(czi_document_as_blob));
     const auto reader = CreateCZIReader();

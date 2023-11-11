@@ -352,13 +352,13 @@ void CSingleChannelScalingTileAccessor::Paint(libCZI::IBitmapData* bmDest, const
     else
     {
         const auto indices_of_visible_tiles = this->CheckForVisibility(
-           roi,
-           static_cast<int>(distance(start_iterator, end_iterator)),
-           [&](int index)->int
-           {
-               const auto element = end_iterator - 1 - index;
-               return sbSetSortedByZoom.subBlocks.at(*element).index;
-           });
+            roi,
+            static_cast<int>(distance(start_iterator, end_iterator)),
+            [&](int index)->int
+            {
+                const auto element = end_iterator - 1 - index;
+                return sbSetSortedByZoom.subBlocks.at(*element).index;
+            });
 
         for (const auto it : indices_of_visible_tiles)
         {
