@@ -306,8 +306,10 @@ TEST(SingleChannelTileAccessor, RandomSubblock_CompareRenderingWithAndWithoutVis
         const auto tile_composite_bitmap_without_visibility_optimization = accessor->Get(PixelType::Gray8, kRoi, &plane_coordinate, &options);
         const auto number_of_subblocks_read_without_visibility_optimization = subblock_repository_with_read_history->GetSubblocksRead().size();
 
-        EXPECT_TRUE(AreBitmapDataEqual(tile_composite_bitmap_with_visibility_optimization, tile_composite_bitmap_without_visibility_optimization));
+        EXPECT_TRUE(AreBitmapDataEqual(tile_composite_bitmap_with_visibility_optimization, tile_composite_bitmap_without_visibility_optimization)) <<
+            "tile-composites w/ and w/o visibility-optimization are found to differ";
 
-        EXPECT_LE(number_of_subblocks_read_with_visibility_optimization, number_of_subblocks_read_without_visibility_optimization);
+        EXPECT_LE(number_of_subblocks_read_with_visibility_optimization, number_of_subblocks_read_without_visibility_optimization) <<
+            "the number of subblocks actually read w/ visibility-optimization must be less or equal to the number w/o this optimization";
     }
 }
