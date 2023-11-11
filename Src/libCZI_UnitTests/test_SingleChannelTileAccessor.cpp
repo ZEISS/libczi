@@ -266,13 +266,16 @@ TEST(SingleChannelTileAccessor, VisibilityCheck2)
 
 TEST(SingleChannelTileAccessor, RandomSubblock_CompareRenderingWithAndWithoutVisibilityOptimization)
 {
+    // Here we place a random number of subblocks at random positions, and then check that the
+    // rendering result w/ and w/o visibility-optimization is the same
+
     random_device dev;
     mt19937 rng(dev());
     uniform_int_distribution<int> distribution(0, 99); // distribution in range [0, 99]
 
     static constexpr  IntRect kRoi{ 0, 0, 120, 120 };
 
-    for (int repeat = 0; repeat < 10; repeat++)
+    for (int repeat = 0; repeat < 10; repeat++) // let's repeat this 10 times
     {
         const int number_of_rectangles = distribution(rng) + 1;
 
@@ -292,9 +295,11 @@ TEST(SingleChannelTileAccessor, RandomSubblock_CompareRenderingWithAndWithoutVis
         const auto reader = CreateCZIReader();
         reader->Open(memory_stream);
 
+        // We construct a subblock-repository shim here which keeps track of the subblocks that were read - which
+        //  is not really necessary here, but we do it anyway to make sure that the visibility-optimization
+        //  is actually reducing the number of subblocks read.
         auto subblock_repository_with_read_history = make_shared<SubBlockRepositoryShim>(reader);
         const auto accessor = make_shared<CSingleChannelTileAccessor>(subblock_repository_with_read_history);
-        //const auto accessor = reader->CreateSingleChannelTileAccessor();
         const CDimCoordinate plane_coordinate{ {DimensionIndex::C, 0}, {DimensionIndex::T, 0} };
 
         ISingleChannelTileAccessor::Options options;
