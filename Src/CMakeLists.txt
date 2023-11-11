@@ -44,6 +44,8 @@ if (LIBCZI_BUILD_CURL_BASED_STREAM)
     # configure libcurl-build as a static library, for possible options -> c.f. https://github.com/curl/curl/blob/master/CMakeLists.txt
     set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
     set(BUILD_STATIC_LIBS ON CACHE BOOL "" FORCE)
+    set(BUILD_STATIC_CURL ON CACHE BOOL "" FORCE)
+    set(BUILD_CURL_EXE OFF CACHE BOOL "" FORCE)
     set(CMAKE_POSITION_INDEPENDENT_CODE ON CACHE BOOL "" FORCE)
     set(ENABLE_UNICODE ON CACHE BOOL "" FORCE)
 
