@@ -283,6 +283,9 @@ TEST(SingleChannelTileAccessor, RandomSubblock_CompareRenderingWithAndWithoutVis
             subblocks.emplace_back(SubBlockPositions{ IntRect{ distribution(rng), distribution(rng), 1 + distribution(rng), 1 + distribution(rng) }, i });
         }
 
+        // Shuffle the vector into a random order
+        std::shuffle(subblocks.begin(), subblocks.end(), rng);
+
         auto czi_document_as_blob = CreateTestCzi(subblocks);
 
         const auto memory_stream = make_shared<CMemInputOutputStream>(get<0>(czi_document_as_blob).get(), get<1>(czi_document_as_blob));
