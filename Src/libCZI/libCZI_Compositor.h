@@ -63,7 +63,7 @@ namespace libCZI
             /// Otherwise the Z-order is arbitrary.
             bool sortByM;
 
-            /// If true, then the tile-visibility-check-optimization is used (if available). When doing the multi-tile composition,
+            /// If true, then the tile-visibility-check-optimization is used. When doing the multi-tile composition,
             /// all relevant tiles are checked whether they are visible in the destination bitmap. If a tile is not visible, then
             /// the corresponding sub-block is not read. This can speed up the operation considerably. The result is the same as
             /// without this optimization - i.e. there should be no reason to turn it off besides potential bugs.
@@ -256,7 +256,7 @@ namespace libCZI
             /// is given here, then no filtering is applied.
             std::shared_ptr<libCZI::IIndexSet> sceneFilter;
 
-            /// If true, then the tile-visibility-check-optimization is used (if available). When doing the multi-tile composition,
+            /// If true, then the tile-visibility-check-optimization is used. When doing the multi-tile composition,
             /// all relevant tiles are checked whether they are visible in the destination bitmap. If a tile is not visible, then
             /// the corresponding sub-block is not read. This can speed up the operation considerably. The result is the same as
             /// without this optimization - i.e. there should be no reason to turn it off besides potential bugs.
