@@ -71,6 +71,8 @@ public:
     }
 };
 
+/// This struct is used for creating a test CZI document - it contains the X-Y-position/width/height
+/// and the M-index of a subblock to be ceated in the document.
 struct SubBlockPositions
 {
     IntRect rectangle;
