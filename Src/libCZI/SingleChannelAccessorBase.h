@@ -30,7 +30,7 @@ protected:
     ///   The value it returns is the subblock index (in the subblock repository) to check.
     /// - The subblocks are assumed to be rendered in the order given, so the one we get by calling  'get_subblock_index' with  
     ///   argument 0 is the first one to be rendered, the one with argument 1 is the second one, and so on. The rendering 
-    ///   is assumed to be done with 'painter's algorithm", so what is rendered last is on top.
+    ///   is assumed to be done with the 'painter's algorithm", so what is rendered last is on top.
     /// - We return a list of indices which are to be rendered, potentially leaving out some which have been determined  
     ///   as not being visible. The indices returned are "indices as used by the 'get_subblock_index' functor, i.e.
     ///   it is **not** the subblock-number, but the argument that was passed to the functor.
