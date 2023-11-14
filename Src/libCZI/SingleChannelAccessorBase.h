@@ -12,7 +12,7 @@ class CSingleChannelAccessorBase
 protected:
     std::shared_ptr<libCZI::ISubBlockRepository> sbBlkRepository;
 
-    explicit CSingleChannelAccessorBase(std::shared_ptr<libCZI::ISubBlockRepository> sbBlkRepository)
+    explicit CSingleChannelAccessorBase(const std::shared_ptr<libCZI::ISubBlockRepository>& sbBlkRepository)
         : sbBlkRepository(sbBlkRepository)
     {}
 
@@ -36,10 +36,12 @@ protected:
     ///   it is **not** the subblock-number, but the argument that was passed to the functor.
     /// - The caller can then use this list to render the subblocks (in the order as given in this vector).
     ///
-    /// \param  roi     The roi.
+    /// \param  roi     The roi - if this is empty or invalid, then an empty vector is returned.
     /// \param  count   Number of subblocks (specifying how many times the get_subblock_index-functor is being called.
     /// \param  get_subblock_index Functor which gives the subblock index to check.
     ///
     /// \returns    A list of indices of "arguments to the functor which delivered a visible subblock".
     std::vector<int> CheckForVisibility(const libCZI::IntRect& roi, int count, const std::function<int(int)>& get_subblock_index) const;
+
+    static std::vector<int> CheckForVisibilityCore(const libCZI::IntRect& roi, int count, const std::function<int(int)>& get_subblock_index, const std::function<libCZI::IntRect(int)>& get_rect_of_subblock);
 };

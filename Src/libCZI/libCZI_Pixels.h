@@ -26,6 +26,9 @@ namespace libCZI
         /// Returns a boolean indicating whether this rectangle contains valid information.
         bool IsValid() const { return this->w >= 0 && this->h >= 0; }
 
+        /// Returns a boolean indicating whether this rectangle is valid and non-empty.
+        bool IsNonEmpty() const { return this->w > 0 && this->h > 0; }
+
         /// Determine whether this rectangle intersects with the specified one.
         /// \param r The other rectangle.
         /// \return True if the two rectangles intersect, false otherwise.

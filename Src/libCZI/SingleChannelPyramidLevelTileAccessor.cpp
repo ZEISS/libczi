@@ -10,7 +10,7 @@
 using namespace libCZI;
 using namespace std;
 
-CSingleChannelPyramidLevelTileAccessor::CSingleChannelPyramidLevelTileAccessor(std::shared_ptr<ISubBlockRepository> sbBlkRepository)
+CSingleChannelPyramidLevelTileAccessor::CSingleChannelPyramidLevelTileAccessor(const std::shared_ptr<ISubBlockRepository>& sbBlkRepository)
     : CSingleChannelAccessorBase(sbBlkRepository)
 {
 }

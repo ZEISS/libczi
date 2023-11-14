@@ -5,6 +5,7 @@
 
 #include "include_gtest.h"
 #include <random>
+#include <array>
 #include "inc_libCZI.h"
 #include "../libCZI/SingleChannelTileAccessor.h"
 #include "../libCZI/SingleChannelScalingTileAccessor.h"
@@ -235,6 +236,7 @@ void RandomSubblocksAndCompareRenderingWithAndWithoutVisibilityOptimization(tAcc
         // Shuffle the vector into a random order
         std::shuffle(subblocks.begin(), subblocks.end(), rng);
 
+        // now, create the test CZI document (in memory)
         auto czi_document_as_blob = CreateTestCzi(subblocks);
 
         const auto memory_stream = make_shared<CMemInputOutputStream>(get<0>(czi_document_as_blob).get(), get<1>(czi_document_as_blob));
@@ -379,4 +381,59 @@ TEST(TileAccessorCoverageOptimization, RandomSubblocksCompareRenderingWithAndWit
 TEST(TileAccessorCoverageOptimization, RandomSubblocksCompareRenderingWithAndWithoutVisibilityOptimizationWithoutSortByM_SingleChannelScalingTileAccessor)
 {
     RandomSubblocksAndCompareRenderingWithAndWithoutVisibilityOptimization(SingleChannelScalingTileAccessorHandler{ false });
+}
+
+// Stub to bridge the access restrictions
+class CSingleChannelAccessorBaseToTestStub : public CSingleChannelAccessorBase
+{
+public:
+    CSingleChannelAccessorBaseToTestStub() : CSingleChannelAccessorBase(nullptr)
+    {}
+    using CSingleChannelAccessorBase::CheckForVisibilityCore;
+};
+
+TEST(TileAccessorCoverageOptimization, CheckForVisibility_TwoSubblocksWhere1stOneIsCompleteyOverdrawn)
+{
+    static constexpr array<IntRect, 2> kSubBlocks{ IntRect{0,0,2,2}, IntRect{0,0,3,3} };
+
+    // We have two subblocks (0,0,2,2) and (0,0,3,3), and we the order in which they are passed to the
+    //  rendering is a stated above. So, we draw first (0,0,2,2), then (0,0,3,3), which means (0,0,3,3)
+    //  is "on top". We then query for the visibility of the ROI (0,0,2,2), which is completely covered
+    //  by (0,0,3,3), so we expect that only the second subblock is returned as visible. The first one 
+    //  (0,0,2,2) is completely overdrawn by the second one, so it is not visible.
+
+    const auto indices_of_visible_tiles = CSingleChannelAccessorBaseToTestStub::CheckForVisibilityCore(
+        { 0,0,2,2 },
+        kSubBlocks.size(),
+        [&](int index)->int
+        {
+            return index;
+        },
+        [&](int subblock_index)->IntRect
+        {
+            return kSubBlocks[subblock_index];
+        });
+
+    ASSERT_EQ(indices_of_visible_tiles.size(), 1);
+    EXPECT_EQ(indices_of_visible_tiles[0], 1);
+}
+
+TEST(TileAccessorCoverageOptimization, CheckForVisibility_EmptyRoi)
+{
+    static constexpr array<IntRect, 2> kSubBlocks{ IntRect{0,0,2,2}, IntRect{0,0,3,3} };
+
+    // here we pass an empty ROI, and we expect that no subblock is returned as visible
+    const auto indices_of_visible_tiles = CSingleChannelAccessorBaseToTestStub::CheckForVisibilityCore(
+        { 0,0,0,0 },
+        kSubBlocks.size(),
+        [&](int index)->int
+        {
+            return index;
+        },
+        [&](int subblock_index)->IntRect
+        {
+            return kSubBlocks[subblock_index];
+        });
+
+    ASSERT_EQ(indices_of_visible_tiles.size(), 0);
 }

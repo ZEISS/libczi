@@ -10,7 +10,7 @@
 using namespace libCZI;
 using namespace std;
 
-CSingleChannelScalingTileAccessor::CSingleChannelScalingTileAccessor(std::shared_ptr<ISubBlockRepository> sbBlkRepository)
+CSingleChannelScalingTileAccessor::CSingleChannelScalingTileAccessor(const std::shared_ptr<ISubBlockRepository>& sbBlkRepository)
     : CSingleChannelAccessorBase(sbBlkRepository)
 {
 }

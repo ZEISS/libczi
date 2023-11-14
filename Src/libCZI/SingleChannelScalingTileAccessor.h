@@ -25,7 +25,7 @@ private:
     };
 
 public:
-    explicit CSingleChannelScalingTileAccessor(std::shared_ptr<libCZI::ISubBlockRepository> sbBlkRepository);
+    explicit CSingleChannelScalingTileAccessor(const std::shared_ptr<libCZI::ISubBlockRepository>& sbBlkRepository);
 
 public:	// interface ISingleChannelScalingTileAccessor
     libCZI::IntSize CalcSize(const libCZI::IntRect& roi, float zoom) const override;

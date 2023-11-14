@@ -28,7 +28,7 @@ private:
     };
 
 public:
-    explicit CSingleChannelPyramidLevelTileAccessor(std::shared_ptr<libCZI::ISubBlockRepository> sbBlkRepository);
+    explicit CSingleChannelPyramidLevelTileAccessor(const std::shared_ptr<libCZI::ISubBlockRepository>& sbBlkRepository);
 
 public:	// interface ISingleChannelTileAccessor
     std::shared_ptr<libCZI::IBitmapData> Get(const libCZI::IntRect& roi, const libCZI::IDimCoordinate* planeCoordinate, const PyramidLayerInfo& pyramidInfo, const Options* pOptions) override;

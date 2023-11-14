@@ -13,7 +13,7 @@
 class CSingleChannelTileAccessor : public CSingleChannelAccessorBase, public libCZI::ISingleChannelTileAccessor
 {
 public:
-    explicit CSingleChannelTileAccessor(std::shared_ptr<libCZI::ISubBlockRepository> sbBlkRepository);
+    explicit CSingleChannelTileAccessor(const std::shared_ptr<libCZI::ISubBlockRepository>& sbBlkRepository);
 
 public:	// interface ISingleChannelTileAccessor
     std::shared_ptr<libCZI::IBitmapData> Get(const libCZI::IntRect& roi, const libCZI::IDimCoordinate* planeCoordinate, const libCZI::ISingleChannelTileAccessor::Options* pOptions) override;
