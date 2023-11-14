@@ -437,3 +437,25 @@ TEST(TileAccessorCoverageOptimization, CheckForVisibility_EmptyRoi)
 
     ASSERT_EQ(indices_of_visible_tiles.size(), 0);
 }
+
+TEST(TileAccessorCoverageOptimization, CheckForVisibility_InvalidRoi)
+{
+    static constexpr array<IntRect, 2> kSubBlocks{ IntRect{0,0,2,2}, IntRect{0,0,3,3} };
+
+    // here we pass an invalid ROI, and we expect that no subblock is returned as visible
+    IntRect roi;
+    roi.Invalidate();
+    const auto indices_of_visible_tiles = CSingleChannelAccessorBaseToTestStub::CheckForVisibilityCore(
+        roi,
+        kSubBlocks.size(),
+        [&](int index)->int
+        {
+            return index;
+        },
+        [&](int subblock_index)->IntRect
+        {
+            return kSubBlocks[subblock_index];
+        });
+
+    ASSERT_EQ(indices_of_visible_tiles.size(), 0);
+}
