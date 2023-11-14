@@ -162,13 +162,13 @@ std::vector<int> CSingleChannelAccessorBase::CheckForVisibility(const libCZI::In
     const int64_t total_pixel_count = static_cast<int64_t>(roi.w) * roi.h;
     std::vector<int> result;
     result.reserve(count);
-    RectangleCoverageCalculator coverageCalculator;
+    RectangleCoverageCalculator coverage_calculator;
     int64_t covered_pixel_count = 0;
     //for (int i = 0; i < count; ++i)
     for (int i = count -1; i >= 0; --i) // we start at the end, because that is the subblock which is rendered last (and thus is on top)
     {
-        coverageCalculator.AddRectangle(get_rect_of_subblock(i));
-        const int64_t new_covered_pixel_count = coverageCalculator.CalcAreaOfIntersectionWithRectangle(roi);
+        coverage_calculator.AddRectangle(get_rect_of_subblock(i));
+        const int64_t new_covered_pixel_count = coverage_calculator.CalcAreaOfIntersectionWithRectangle(roi);
         if (new_covered_pixel_count > covered_pixel_count)  // if the covered pixel count has increased, it means that this subblock covers some new pixels,
                                                             //  some pixels which were not overdrawn by all the previous ones
         {
