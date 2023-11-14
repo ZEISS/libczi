@@ -459,3 +459,38 @@ TEST(TileAccessorCoverageOptimization, CheckForVisibility_InvalidRoi)
 
     ASSERT_EQ(indices_of_visible_tiles.size(), 0);
 }
+
+TEST(TileAccessorCoverageOptimization, CheckForVisibility_SubblocksNotIntersectionRoi)
+{
+    static constexpr array<IntRect, 1> kSubBlocks1{ IntRect{5,5,5,5} };
+
+    auto indices_of_visible_tiles = CSingleChannelAccessorBaseToTestStub::CheckForVisibilityCore(
+        { 0, 0, 4, 4 },
+        kSubBlocks1.size(),
+        [&](int index)->int
+        {
+            return index;
+        },
+        [&](int subblock_index)->IntRect
+        {
+            return kSubBlocks1[subblock_index];
+        });
+
+    ASSERT_TRUE(indices_of_visible_tiles.empty());
+
+    static constexpr array<IntRect, 3> kSubBlocks2{ IntRect{5,5,5,5}, IntRect{10,10,5,5}, IntRect{10,5,5,5} };
+
+    indices_of_visible_tiles = CSingleChannelAccessorBaseToTestStub::CheckForVisibilityCore(
+        { 0, 0, 4, 4 },
+        kSubBlocks2.size(),
+        [&](int index)->int
+        {
+            return index;
+        },
+        [&](int subblock_index)->IntRect
+        {
+            return kSubBlocks2[subblock_index];
+        });
+
+    ASSERT_TRUE(indices_of_visible_tiles.empty());
+}
