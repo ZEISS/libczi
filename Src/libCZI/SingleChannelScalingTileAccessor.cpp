@@ -356,8 +356,9 @@ void CSingleChannelScalingTileAccessor::Paint(libCZI::IBitmapData* bmDest, const
             static_cast<int>(distance(start_iterator, end_iterator)),
             [&](int index)->int
             {
-                const auto element = end_iterator - 1 - index;
-                return sbSetSortedByZoom.subBlocks.at(*element).index;
+               /* const auto element = end_iterator - 1 - index;
+                return sbSetSortedByZoom.subBlocks.at(*element).index;*/
+                return sbSetSortedByZoom.subBlocks[*(start_iterator+index)].index;
             });
 
         for (const auto it : indices_of_visible_tiles)

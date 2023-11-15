@@ -186,6 +186,7 @@ std::vector<int> CSingleChannelAccessorBase::CheckForVisibility(const libCZI::In
         }
     }
 
+    // now, reverse the result vector, so that the subblocks are in the order in which they are to be rendered
     std::reverse(result.begin(), result.end());
     return result;
 

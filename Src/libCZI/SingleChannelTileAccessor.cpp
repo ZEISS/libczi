@@ -51,13 +51,14 @@ void CSingleChannelTileAccessor::ComposeTiles(libCZI::IBitmapData* pBm, int xPos
     if (options.useVisibilityCheckOptimization)
     {
         const auto indices_of_visible_tiles = this->CheckForVisibility(
-            { xPos,yPos,static_cast<int>(pBm->GetWidth()),static_cast<int>(pBm->GetHeight()) },
+            { xPos, yPos, static_cast<int>(pBm->GetWidth()), static_cast<int>(pBm->GetHeight()) },
             static_cast<int>(subBlocksSet.size()),
             [&](int index)->int
             {
-                auto it = subBlocksSet.rbegin(); // Reverse iterator pointing to the last element
-                std::advance(it, index); // Advance it index times
-                return it->index;
+                return subBlocksSet[index].index;
+                //auto it = subBlocksSet.rbegin(); // Reverse iterator pointing to the last element
+                //std::advance(it, index); // Advance it index times
+                //return it->index;
             });
 
         Compositors::ComposeSingleChannelTiles(
