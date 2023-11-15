@@ -153,14 +153,15 @@ std::vector<int> CSingleChannelAccessorBase::CheckForVisibility(const libCZI::In
 
 /*static*/std::vector<int> CSingleChannelAccessorBase::CheckForVisibilityCore(const libCZI::IntRect& roi, int count, const std::function<int(int)>& get_subblock_index, const std::function<libCZI::IntRect(int)>& get_rect_of_subblock)
 {
+    std::vector<int> result;
+
     // handle the trivial cases
     if (count == 0 || !roi.IsNonEmpty())
     {
-        return {};
+        return result;
     }
     
     const int64_t total_pixel_count = static_cast<int64_t>(roi.w) * roi.h;
-    std::vector<int> result;
     result.reserve(count);
     RectangleCoverageCalculator coverage_calculator;
     int64_t covered_pixel_count = 0;
