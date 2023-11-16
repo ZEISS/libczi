@@ -494,3 +494,70 @@ TEST(TileAccessorCoverageOptimization, CheckForVisibility_SubblocksNotIntersecti
 
     ASSERT_TRUE(indices_of_visible_tiles.empty());
 }
+
+TEST(TileAccessorCoverageOptimization, CheckForVisibility_TestCase1)
+{
+    static constexpr array<IntRect, 2> kSubBlocks{ IntRect{0,0,2,1}, IntRect{0,0,3,3} };
+
+    // We report {0,0,3,3} as the subblock being rendered *last* (the one with index 1), and {0,0,2,1} as the one
+    //  being rendered before. {0,0,2,1} is completely overdrawn by {0,0,3,3}, so we expect that only the last
+    //  index (i.e. "1") is returned as visible.
+    const auto indices_of_visible_tiles = CSingleChannelAccessorBaseToTestStub::CheckForVisibilityCore(
+        { 0, 0, 3, 3 },
+        kSubBlocks.size(),
+        [&](int index)->int
+        {
+            return index;
+        },
+        [&](int subblock_index)->IntRect
+        {
+            return kSubBlocks[subblock_index];
+        });
+
+    ASSERT_EQ(indices_of_visible_tiles.size(), 1);
+    EXPECT_EQ(indices_of_visible_tiles[0], 1);
+}
+
+TEST(TileAccessorCoverageOptimization, CheckForVisibility_TestCase2)
+{
+    static constexpr array<IntRect, 5> kSubBlocks{ IntRect{0,0,1,3}, IntRect{0,1,1,1}, IntRect{0,2,1,1}, IntRect{0,0,1,1}, IntRect{1,0,2,3} };
+
+    const auto indices_of_visible_tiles = CSingleChannelAccessorBaseToTestStub::CheckForVisibilityCore(
+        { 0, 0, 3, 3 },
+        kSubBlocks.size(),
+        [&](int index)->int
+        {
+            return index;
+        },
+        [&](int subblock_index)->IntRect
+        {
+            return kSubBlocks[subblock_index];
+        });
+
+    ASSERT_EQ(indices_of_visible_tiles.size(), 4);
+    EXPECT_EQ(indices_of_visible_tiles[0], 1);
+    EXPECT_EQ(indices_of_visible_tiles[1], 2);
+    EXPECT_EQ(indices_of_visible_tiles[2], 3);
+    EXPECT_EQ(indices_of_visible_tiles[3], 4);
+}
+
+TEST(TileAccessorCoverageOptimization, CheckForVisibility_TestCase3)
+{
+    static constexpr array<IntRect, 5> kSubBlocks{ IntRect{0,0,1,1}, IntRect{0,0,1,1}, IntRect{1,0,1,2}, IntRect{2,0,1,1}, IntRect{1,0,2,3} };
+
+    const auto indices_of_visible_tiles = CSingleChannelAccessorBaseToTestStub::CheckForVisibilityCore(
+        { 0, 0, 3, 3 },
+        kSubBlocks.size(),
+        [&](int index)->int
+        {
+        return index;
+        },
+        [&](int subblock_index)->IntRect
+        {
+        return kSubBlocks[subblock_index];
+        });
+
+    ASSERT_EQ(indices_of_visible_tiles.size(), 2);
+    EXPECT_EQ(indices_of_visible_tiles[0], 1);
+    EXPECT_EQ(indices_of_visible_tiles[1], 4);
+}
