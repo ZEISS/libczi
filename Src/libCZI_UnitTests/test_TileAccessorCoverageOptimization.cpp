@@ -550,11 +550,11 @@ TEST(TileAccessorCoverageOptimization, CheckForVisibility_TestCase3)
         kSubBlocks.size(),
         [&](int index)->int
         {
-        return index;
+            return index;
         },
         [&](int subblock_index)->IntRect
         {
-        return kSubBlocks[subblock_index];
+            return kSubBlocks[subblock_index];
         });
 
     ASSERT_EQ(indices_of_visible_tiles.size(), 2);
