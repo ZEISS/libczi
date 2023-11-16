@@ -224,6 +224,10 @@ namespace libCZI
                 kCurlHttp_SslVerifyPeer = 106, ///< For CurlHttpInputStream, type bool: a boolean indicating whether the SSL-certificate of the remote host is to be verified, c.f. https://curl.se/libcurl/c/CURLOPT_SSL_VERIFYPEER.html for more information.
 
                 kCurlHttp_SslVerifyHost = 107, ///< For CurlHttpInputStream, type bool: a boolean indicating whether the SSL-certificate's name is to be verified against host, c.f. https://curl.se/libcurl/c/CURLOPT_SSL_VERIFYHOST.html for more information.
+
+                kCurlHttp_FollowLocation = 108, ///< For CurlHttpInputStream, type bool: a boolean indicating whether redirects are to be followed, c.f. https://curl.se/libcurl/c/CURLOPT_FOLLOWLOCATION.html for more information.
+
+                kCurlHttp_MaxRedirs = 109, ///< For CurlHttpInputStream, type int32: gives the maximum number of redirects to follow, c.f. https://curl.se/libcurl/c/CURLOPT_MAXREDIRS.html for more information.
             };
         };
 
