@@ -561,3 +561,24 @@ TEST(TileAccessorCoverageOptimization, CheckForVisibility_TestCase3)
     EXPECT_EQ(indices_of_visible_tiles[0], 1);
     EXPECT_EQ(indices_of_visible_tiles[1], 4);
 }
+
+TEST(TileAccessorCoverageOptimization, CheckForVisibility_TestCase4)
+{
+    static constexpr array<IntRect, 6> kSubBlocks{ IntRect{0,0,1,1}, IntRect{0,0,1,1}, IntRect{1,0,1,2}, IntRect{2,0,3,3}, IntRect{2,0,1,1}, IntRect{1,0,2,3} };
+
+    const auto indices_of_visible_tiles = CSingleChannelAccessorBaseToTestStub::CheckForVisibilityCore(
+        { 0, 0, 3, 3 },
+        kSubBlocks.size(),
+        [&](int index)->int
+        {
+            return index;
+        },
+        [&](int subblock_index)->IntRect
+        {
+            return kSubBlocks[subblock_index];
+        });
+
+    ASSERT_EQ(indices_of_visible_tiles.size(), 2);
+    EXPECT_EQ(indices_of_visible_tiles[0], 1);
+    EXPECT_EQ(indices_of_visible_tiles[1], 5);
+}

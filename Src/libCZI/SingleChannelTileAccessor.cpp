@@ -7,7 +7,6 @@
 #include "utilities.h"
 #include "SingleChannelTileCompositor.h"
 #include "Site.h"
-#include <iterator> 
 #include "bitmapData.h"
 
 using namespace libCZI;
@@ -45,20 +44,24 @@ CSingleChannelTileAccessor::CSingleChannelTileAccessor(const std::shared_ptr<ISu
 
 void CSingleChannelTileAccessor::ComposeTiles(libCZI::IBitmapData* pBm, int xPos, int yPos, const std::vector<IndexAndM>& subBlocksSet, const ISingleChannelTileAccessor::Options& options)
 {
-    Compositors::ComposeSingleTileOptions composeOptions; composeOptions.Clear();
+    Compositors::ComposeSingleTileOptions composeOptions;
+    composeOptions.Clear();
     composeOptions.drawTileBorder = options.drawTileBorder;
 
     if (options.useVisibilityCheckOptimization)
     {
+        // Try to reduce the number of subblocks to be rendered by doing a visibility check, and only rendering those which are visible.
+        // We report the subblocks in the order as they are given in the vector 'subBlocksSet', the lambda will be called with the
+        // argument 'index' counting down from subBlocksSet.size()-1 to 0. The subblock index we report for 'index=0' is the first one
+        // to be rendered, and 'index=subBlocksSet.size()-1' is the last one to be rendered (on top of all the others).
+        // We get a vector with the indices of the subblocks to be rendered, and then render them in the order as given in this vector 
+        // (index here means - the number as passed to the lambda).
         const auto indices_of_visible_tiles = this->CheckForVisibility(
             { xPos, yPos, static_cast<int>(pBm->GetWidth()), static_cast<int>(pBm->GetHeight()) },
             static_cast<int>(subBlocksSet.size()),
             [&](int index)->int
             {
                 return subBlocksSet[index].index;
-                //auto it = subBlocksSet.rbegin(); // Reverse iterator pointing to the last element
-                //std::advance(it, index); // Advance it index times
-                //return it->index;
             });
 
         Compositors::ComposeSingleChannelTiles(
