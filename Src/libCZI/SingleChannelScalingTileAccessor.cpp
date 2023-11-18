@@ -209,7 +209,12 @@ std::vector<int> CSingleChannelScalingTileAccessor::CreateSortByZoom(const std::
     }
     else
     {
-        std::sort(byZoom.begin(), byZoom.end(), [&](const int i1, const int i2)->bool {return sbBlks.at(i1).GetZoom() < sbBlks.at(i2).GetZoom(); });
+        // Sort by zoom only - note that we use "stable_sort" here, because otherwise the order of subblocks with the same zoom-level would be arbitrary.
+        // This would mean that the result is not idem-potent, i.e. if we call this function twice with the same input, we would get different results.
+        // This is not a problem for the "sort by M-index" case, because there we have a deterministic sorting.
+        // With "stable_sort" we ensure that the order of subblocks with the same zoom-level is preserved. This randomness was actually observed
+        // in case of with stdlibc++ - with MSVC on Windows, the order was always the same.
+        std::stable_sort(byZoom.begin(), byZoom.end(), [&](const int i1, const int i2)->bool {return sbBlks.at(i1).GetZoom() < sbBlks.at(i2).GetZoom(); });
     }
     return byZoom;
 }
@@ -318,7 +323,7 @@ void CSingleChannelScalingTileAccessor::Paint(libCZI::IBitmapData* bmDest, const
 
     // find the end_iterator - this is the first element in the sortedByZoom-vector which has a zoom-level that is about twice that of the first element
     const float startZoom = sbSetSortedByZoom.subBlocks.at(*start_iterator).GetZoom();
-    auto end_iterator = start_iterator;
+    auto end_iterator = start_iterator + 1;
     for (; end_iterator != sbSetSortedByZoom.sortedByZoom.cend(); ++end_iterator)
     {
         const SbInfo& sbInfo = sbSetSortedByZoom.subBlocks.at(*end_iterator);
@@ -354,7 +359,7 @@ void CSingleChannelScalingTileAccessor::Paint(libCZI::IBitmapData* bmDest, const
             {
                 // dereference the iterator (advanced by the index we get), this gives us an index into the 
                 // subBlocks-vector, which we then use to get the subblock-index of the subblock
-                return sbSetSortedByZoom.subBlocks[*(start_iterator+index)].index;
+                return sbSetSortedByZoom.subBlocks[*(start_iterator + index)].index;
             });
 
         // Now, draw only the subblocks which are visible - the vector "indices_of_visible_tiles" contains the indices "as they were passed to the lambda".
