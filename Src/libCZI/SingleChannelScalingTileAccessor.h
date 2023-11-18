@@ -44,11 +44,11 @@ private:
 
     std::vector<int> DetermineInvolvedScenes(const libCZI::IntRect& roi, const libCZI::IIndexSet* pSceneIndexSet);
 
-    /// This struct contains a vector of subblocks, and a vector of indices into this vector which gives and ordering
+    /// This struct contains a vector of subblocks, and a vector of indices into this vector which gives an ordering
     /// by zoom of the subblocks.
     struct SubSetSortedByZoom
     {
-        std::vector<SbInfo> subBlocks;      ///< The sub blocks
+        std::vector<SbInfo> subBlocks;      ///< The vector containing the subblocks (which are in no particular order).
         std::vector<int>    sortedByZoom;   ///< Vector with indices (into the vector 'subBlocks') which gives the ordering by zoom.
     };
 
