@@ -2194,6 +2194,8 @@ void CCmdLineOptions::PrintHelpStreamsObjects()
         {"CurlHttp_Cookie", libCZI::StreamsFactory::StreamProperties::kCurlHttp_Cookie, libCZI::StreamsFactory::Property::Type::String},
         {"CurlHttp_SslVerifyPeer", libCZI::StreamsFactory::StreamProperties::kCurlHttp_SslVerifyPeer, libCZI::StreamsFactory::Property::Type::Boolean},
         {"CurlHttp_SslVerifyHost", libCZI::StreamsFactory::StreamProperties::kCurlHttp_SslVerifyHost, libCZI::StreamsFactory::Property::Type::Boolean},
+        {"CurlHttp_FollowLocation", libCZI::StreamsFactory::StreamProperties::kCurlHttp_FollowLocation, libCZI::StreamsFactory::Property::Type::Boolean},
+        {"CurlHttp_MaxRedirs", libCZI::StreamsFactory::StreamProperties::kCurlHttp_MaxRedirs, libCZI::StreamsFactory::Property::Type::Int32},
     };
 
     rapidjson::Document document;
