@@ -312,9 +312,11 @@ void CSingleChannelScalingTileAccessor::Paint(libCZI::IBitmapData* bmDest, const
         return;
     }
 
+    // start_iterator points into the "sortedByZoom" vector, which contains indices into the "subBlocks" vector
     std::vector<int>::const_iterator start_iterator = sbSetSortedByZoom.sortedByZoom.cbegin();
     std::advance(start_iterator, idxOf1stSubBlockOfZoomGreater);
 
+    // find the end_iterator - this is the first element in the sortedByZoom-vector which has a zoom-level that is about twice that of the first element
     const float startZoom = sbSetSortedByZoom.subBlocks.at(*start_iterator).GetZoom();
     auto end_iterator = start_iterator;
     for (; end_iterator != sbSetSortedByZoom.sortedByZoom.cend(); ++end_iterator)
@@ -332,13 +334,7 @@ void CSingleChannelScalingTileAccessor::Paint(libCZI::IBitmapData* bmDest, const
         for (auto it = start_iterator; it != end_iterator; ++it)
         {
             const SbInfo& sbInfo = sbSetSortedByZoom.subBlocks.at(*it);
-            /*
-            // as an interim solution (in fact... this seems to be a rather good solution...), stop when we arrive at subblocks with a zoom-level about twice that what we started with
-            if (sbInfo.GetZoom() >= startZoom * 1.9f)
-            {
-                break;
-            }
-            */
+
             if (GetSite()->IsEnabled(LOGLEVEL_CHATTYINFORMATION))
             {
                 stringstream ss;
@@ -353,17 +349,20 @@ void CSingleChannelScalingTileAccessor::Paint(libCZI::IBitmapData* bmDest, const
     {
         const auto indices_of_visible_tiles = this->CheckForVisibility(
             roi,
-            static_cast<int>(distance(start_iterator, end_iterator)),
+            static_cast<int>(distance(start_iterator, end_iterator)),           // how many subblocks we have in the range [start_iterator, end_iterator)
             [&](int index)->int
             {
-               /* const auto element = end_iterator - 1 - index;
-                return sbSetSortedByZoom.subBlocks.at(*element).index;*/
+                // dereference the iterator (advanced by the index we get), this gives us an index into the 
+                // subBlocks-vector, which we then use to get the subblock-index of the subblock
                 return sbSetSortedByZoom.subBlocks[*(start_iterator+index)].index;
             });
 
-        for (const auto it : indices_of_visible_tiles)
+        // Now, draw only the subblocks which are visible - the vector "indices_of_visible_tiles" contains the indices "as they were passed to the lambda".
+        for (const auto i : indices_of_visible_tiles)
         {
-            const SbInfo& sbInfo = sbSetSortedByZoom.subBlocks.at(*(start_iterator + it));
+            // dereference the iterator (advanced by the index from out loop variable), this gives us an index into the
+            // subBlocks-vector
+            const SbInfo& sbInfo = sbSetSortedByZoom.subBlocks.at(*(start_iterator + i));
             if (GetSite()->IsEnabled(LOGLEVEL_CHATTYINFORMATION))
             {
                 stringstream ss;
