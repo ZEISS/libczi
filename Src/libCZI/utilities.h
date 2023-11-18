@@ -215,7 +215,7 @@ class RectangleCoverageCalculator
 private:
     /// This vector contains the rectangles added to the state of the instance. The rectangles
     /// in this vector are guaranteed to be non-overlapping. That is why the name 'splitters' is used -
-    /// if rectangles are which are overlapping with the existing ones, the rectangle is split smaller 
+    /// if a rectangles is added which is overlapping with the existing ones, the rectangle is split into smaller 
     /// rectangles (which we call the 'splitters') which are non-overlapping with the existing ones.
     std::vector<libCZI::IntRect> splitters_;    
 public:
