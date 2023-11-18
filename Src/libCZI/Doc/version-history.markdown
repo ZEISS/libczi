@@ -8,4 +8,5 @@ version history                 {#version_history}
  0.53.2             | [70](https://github.com/ZEISS/libczi/pull/70)        | add option to write 'duplicate' subblocks
  0.54.0             | [71](https://github.com/ZEISS/libczi/pull/71)        | introduce 'streamsLib', add curl-based stream class
  0.54.2             | [74](https://github.com/ZEISS/libczi/pull/74)        | minor bug fix
- 0.54.3             | [78](https://github.com/ZEISS/libczi/pull/78)        | optimization: for multi-tile-composition, check relevant tiles for visibility before loading them (and do not load/decode non-visible tiles)
+ 0.54.3             | [79](https://github.com/ZEISS/libczi/pull/79)        | add option _kCurlHttp_FollowLocation_ to follow HTTP redirects tp curl_http_inputstream
+ 0.55.0             | [78](https://github.com/ZEISS/libczi/pull/78)        | optimization: for multi-tile-composition, check relevant tiles for visibility before loading them (and do not load/decode non-visible tiles)
