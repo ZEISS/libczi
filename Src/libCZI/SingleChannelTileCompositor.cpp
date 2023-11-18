@@ -43,7 +43,8 @@ using namespace libCZI;
 {
     if (pOptions == nullptr)
     {
-        ComposeSingleTileOptions options; options.Clear();
+        ComposeSingleTileOptions options;
+        options.Clear();
         ComposeSingleChannelTiles(getTiles, dest, xPos, yPos, &options);
         return;
     }
