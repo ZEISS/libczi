@@ -438,41 +438,39 @@ void RectangleCoverageCalculator::AddRectangle(const libCZI::IntRect& rectangle)
     }
     else
     {
-        for (auto i = this->splitters_.begin(); i != this->splitters_.end(); ++i)
+        for (auto splitter = this->splitters_.begin(); splitter != this->splitters_.end(); ++splitter)
         {
             // does the rectangle intersect with one of existing rectangles?
-            if (i->IntersectsWith(rectangle) == true)
+            if (splitter->IntersectsWith(rectangle) == true)
             {
                 // check if it is completely contained in the current existing rectangle
-                if (RectangleCoverageCalculator::IsCompletelyContained(*i, rectangle) == true)
+                if (RectangleCoverageCalculator::IsCompletelyContained(*splitter, rectangle) == true)
                 {
                     // ok, in this case we have nothing to do!
                     return;
                 }
-                else
+
+                // check if the existing rectangle is completely contained in the new one
+                if (RectangleCoverageCalculator::IsCompletelyContained(rectangle, *splitter) == true)
                 {
-                    // check if the existing rectangle is completely contained in the new one
-                    if (RectangleCoverageCalculator::IsCompletelyContained(rectangle, *i) == true)
-                    {
-                        // in this case we remove the (smaller) rect splitters[i] (which is fully
-                        // contained in rectangle) from our list and add rectangle
-                        this->splitters_.erase(i);
-                        this->AddRectangle(rectangle);
-                        return;
-                    }
-
-                    // ok, the rectangle overlap only partially... then let's cut the new rectangle into pieces
-                    // (which do not intersect with the currently investigated rectangle) and try
-                    // to add those pieces
-                    std::array<libCZI::IntRect, 4> splitUpRects;
-                    const int number_of_split_up_rects = SplitUpIntoNonOverlapping(*i, rectangle, splitUpRects);
-                    for (int n = 0; n < number_of_split_up_rects; ++n)
-                    {
-                        this->AddRectangle(splitUpRects[n]);
-                    }
-
+                    // in this case we remove the (smaller) rect splitters[i] (which is fully
+                    // contained in rectangle) from our list and add rectangle
+                    this->splitters_.erase(splitter);
+                    this->AddRectangle(rectangle);
                     return;
                 }
+
+                // ok, the rectangle overlap only partially... then let's cut the new rectangle into pieces
+                // (which do not intersect with the currently investigated rectangle) and try
+                // to add those pieces
+                std::array<libCZI::IntRect, 4> splitUpRects;
+                const int number_of_split_up_rects = SplitUpIntoNonOverlapping(*splitter, rectangle, splitUpRects);
+                for (int n = 0; n < number_of_split_up_rects; ++n)
+                {
+                    this->AddRectangle(splitUpRects[n]);
+                }
+
+                return;
             }
         }
 
