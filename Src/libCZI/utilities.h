@@ -219,7 +219,13 @@ private:
     /// rectangles (which we call the 'splitters') which are non-overlapping with the existing ones.
     std::vector<libCZI::IntRect> splitters_;    
 public:
-    /// Adds a rectangle to the state.
+    /// Adds a rectangle to the state. The runtime of this method increases with the number of
+    /// splitters in the state of the instance and the number of rectangles this rectangle
+    /// needs to be split into. For a modest number of rectangles, the runtime is for
+    /// sure negligible.
+    /// A pathologic case to be aware of is when there are many existing and then a large rectangle
+    /// is added (which is overlapping with many of the existing ones). In this case, it would be
+    /// greatly beneficial to add the large rectangle first, and then the smaller ones.
     ///
     /// \param  rectangle   The rectangle to be added.
     void AddRectangle(const libCZI::IntRect& rectangle);
