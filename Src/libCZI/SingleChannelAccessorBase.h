@@ -40,7 +40,8 @@ protected:
     /// \param  count   Number of subblocks (specifying how many times the get_subblock_index-functor is being called).
     /// \param  get_subblock_index Functor which gives the subblock index to check. This index is the index in the subblock repository.
     ///
-    /// \returns    A list of indices of "arguments to the functor which delivered a visible subblock".
+    /// \returns    A list of indices of "arguments to the functor which delivered a visible subblock". If the subblocks are rendered in the order
+    ///             given here, then the result is guaranteed to be the same as if all subblocks were rendered.
     std::vector<int> CheckForVisibility(const libCZI::IntRect& roi, int count, const std::function<int(int)>& get_subblock_index) const;
 
     /// Do a visibility check for a list of subblocks. This is the core method, which is used by the public method 'CheckForVisibility'.
