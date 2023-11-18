@@ -166,6 +166,20 @@ CurlHttpInputStream::CurlHttpInputStream(const std::string& url, const std::map<
         ThrowIfCurlSetOptError(return_code, "CURLOPT_SSL_VERIFYHOST");
     }
 
+    property = property_bag.find(StreamsFactory::StreamProperties::kCurlHttp_FollowLocation);
+    if (property != property_bag.end())
+    {
+        return_code = curl_easy_setopt(up_curl_handle.get(), CURLOPT_FOLLOWLOCATION, property->second.GetAsBoolOrThrow() ? 1L : 0L);
+        ThrowIfCurlSetOptError(return_code, "CURLOPT_FOLLOWLOCATION");
+    }
+
+    property = property_bag.find(StreamsFactory::StreamProperties::kCurlHttp_MaxRedirs);
+    if (property != property_bag.end())
+    {
+        return_code = curl_easy_setopt(up_curl_handle.get(), CURLOPT_MAXREDIRS, property->second.GetAsInt32OrThrow());
+        ThrowIfCurlSetOptError(return_code, "CURLOPT_MAXREDIRS");
+    }
+
     this->curl_handle_ = up_curl_handle.release();
     this->curl_url_handle_ = up_curl_url_handle.release();
 }
