@@ -10,8 +10,8 @@ using namespace libCZI;
 
 /*static*/void CSingleChannelTileCompositor::Compose(libCZI::IBitmapData* dest, libCZI::IBitmapData* source, int x, int y, bool drawTileBorder)
 {
-    ScopedBitmapLockerP srcLck{ source };
-    ScopedBitmapLockerP dstLck{ dest };
+    const ScopedBitmapLockerP srcLck{ source };
+    const ScopedBitmapLockerP dstLck{ dest };
     CBitmapOperations::CopyWithOffsetInfo info;
     info.xOffset = x;
     info.yOffset = y;
@@ -35,7 +35,7 @@ using namespace libCZI;
 /*-----------------------------------------------------------------------------------------------*/
 
 /*static*/void libCZI::Compositors::ComposeSingleChannelTiles(
-    std::function<bool(int, std::shared_ptr<libCZI::IBitmapData>&, int&, int&)> getTiles,
+    const std::function<bool(int, std::shared_ptr<libCZI::IBitmapData>&, int&, int&)>& getTiles,
     libCZI::IBitmapData* dest,
     int xPos,
     int yPos,
@@ -43,7 +43,8 @@ using namespace libCZI;
 {
     if (pOptions == nullptr)
     {
-        ComposeSingleTileOptions options; options.Clear();
+        ComposeSingleTileOptions options;
+        options.Clear();
         ComposeSingleChannelTiles(getTiles, dest, xPos, yPos, &options);
         return;
     }

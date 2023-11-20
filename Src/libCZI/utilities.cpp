@@ -7,6 +7,7 @@
 #include <codecvt>
 #include <sstream>
 #include <cstring>
+#include <array>
 #if !defined(_WIN32)
 #include <random>
 #endif
@@ -133,7 +134,7 @@ tString trimImpl(const tString& str, const tString& whitespace)
         guid.Data1,
             guid.Data2,
             guid.Data3,
-        { guid.Data4[0],guid.Data4[1],guid.Data4[2],guid.Data4[3],guid.Data4[4],guid.Data4[5],guid.Data4[6],guid.Data4[7] }};
+        { guid.Data4[0],guid.Data4[1],guid.Data4[2],guid.Data4[3],guid.Data4[4],guid.Data4[5],guid.Data4[6],guid.Data4[7] } };
     return guid_value;
 #else
     std::mt19937 rng;
@@ -423,3 +424,156 @@ tString trimImpl(const tString& str, const tString& whitespace)
     LoHiBytePackStrided_C(ptrSrc, sizeSrc, width, height, stride, dest);
 }
 #endif
+
+void RectangleCoverageCalculator::AddRectangle(const libCZI::IntRect& rectangle)
+{
+    if (!rectangle.IsValid())
+    {
+        return;
+    }
+
+    if (this->splitters_.empty())
+    {
+        this->splitters_.push_back(rectangle);
+    }
+    else
+    {
+        for (auto splitter = this->splitters_.begin(); splitter != this->splitters_.end(); ++splitter)
+        {
+            // does the rectangle intersect with one of existing rectangles?
+            if (splitter->IntersectsWith(rectangle) == true)
+            {
+                // check if it is completely contained in the current existing rectangle
+                if (RectangleCoverageCalculator::IsCompletelyContained(*splitter, rectangle) == true)
+                {
+                    // ok, in this case we have nothing to do!
+                    return;
+                }
+
+                // check if the existing rectangle is completely contained in the new one
+                if (RectangleCoverageCalculator::IsCompletelyContained(rectangle, *splitter) == true)
+                {
+                    // in this case we remove the (smaller) rect splitters[i] (which is fully
+                    // contained in rectangle) from our list and add rectangle
+                    this->splitters_.erase(splitter);
+                    this->AddRectangle(rectangle);
+                    return;
+                }
+
+                // ok, the rectangle overlap only partially... then let's cut the new rectangle into pieces
+                // (which do not intersect with the currently investigated rectangle) and try
+                // to add those pieces
+                std::array<libCZI::IntRect, 4> splitUpRects;
+                const int number_of_split_up_rects = SplitUpIntoNonOverlapping(*splitter, rectangle, splitUpRects);
+                for (int n = 0; n < number_of_split_up_rects; ++n)
+                {
+                    this->AddRectangle(splitUpRects[n]);
+                }
+
+                return;
+            }
+        }
+
+        // if we end up here this means that the new rectangle does not
+        // overlap with an existing one -> we can happily add it now!
+        this->splitters_.push_back(rectangle);
+    }
+}
+
+/*static*/int RectangleCoverageCalculator::SplitUpIntoNonOverlapping(const libCZI::IntRect& rectangle_a, const libCZI::IntRect& rectangle_b, std::array<libCZI::IntRect, 4>& result)
+{
+    // precondition: rectangle_b is not completely contained in rectangle_a (and rectangle_a not completely contained in rectangle_b)!
+    int result_index = 0;
+    if (rectangle_b.x >= rectangle_a.x && rectangle_b.x + rectangle_b.w <= rectangle_a.x + rectangle_a.w)
+    {
+        if (rectangle_a.y > rectangle_b.y)
+        {
+            result[result_index++] = libCZI::IntRect{ rectangle_b.x, rectangle_b.y, rectangle_b.w, rectangle_a.y - rectangle_b.y };
+        }
+
+        if (rectangle_b.y + rectangle_b.h > rectangle_a.y + rectangle_a.h)
+        {
+            result[result_index++] = libCZI::IntRect{ rectangle_b.x, rectangle_a.y + rectangle_a.h, rectangle_b.w, rectangle_b.y + rectangle_b.h - rectangle_a.y - rectangle_a.h };
+        }
+    }
+    else if (rectangle_b.x < rectangle_a.x && rectangle_b.x + rectangle_b.w <= rectangle_a.x + rectangle_a.w)
+    {
+        result[result_index++] = libCZI::IntRect{ rectangle_b.x, rectangle_b.y, rectangle_a.x - rectangle_b.x, rectangle_b.h };
+        if (rectangle_b.y < rectangle_a.y)
+        {
+            result[result_index++] = libCZI::IntRect{ rectangle_a.x, rectangle_b.y, rectangle_b.x + rectangle_b.w - rectangle_a.x, rectangle_a.y - rectangle_b.y };
+        }
+
+        if (rectangle_b.y + rectangle_b.h > rectangle_a.y + rectangle_a.h)
+        {
+            result[result_index++] = libCZI::IntRect{ rectangle_a.x, rectangle_a.y + rectangle_a.h, rectangle_b.x + rectangle_b.w - rectangle_a.x, rectangle_b.y + rectangle_b.h - rectangle_a.y - rectangle_a.h };
+        }
+    }
+    else if (rectangle_b.x >= rectangle_a.x && rectangle_b.x + rectangle_b.w > rectangle_a.x + rectangle_a.w)
+    {
+        result[result_index++] = libCZI::IntRect{ rectangle_a.x + rectangle_a.w, rectangle_b.y, rectangle_b.x + rectangle_b.w - rectangle_a.x - rectangle_a.w, rectangle_b.h };
+
+        if (rectangle_b.y < rectangle_a.y)
+        {
+            result[result_index++] = libCZI::IntRect{ rectangle_b.x, rectangle_b.y, rectangle_a.x + rectangle_a.w - rectangle_b.x, rectangle_a.y - rectangle_b.y };
+        }
+
+        if (rectangle_b.y + rectangle_b.h > rectangle_a.y + rectangle_a.h)
+        {
+            result[result_index++] = libCZI::IntRect{ rectangle_b.x, rectangle_a.y + rectangle_a.h, rectangle_a.x + rectangle_a.w - rectangle_b.x, rectangle_b.y + rectangle_b.h - rectangle_a.y - rectangle_a.h };
+        }
+    }
+    else if (rectangle_b.x <= rectangle_a.x && rectangle_b.x + rectangle_b.w >= rectangle_a.x + rectangle_a.w)
+    {
+        result[result_index++] = libCZI::IntRect{ rectangle_b.x, rectangle_b.y, rectangle_a.x - rectangle_b.x, rectangle_b.h };
+        result[result_index++] = libCZI::IntRect{ rectangle_a.x + rectangle_a.w, rectangle_b.y, rectangle_b.x + rectangle_b.w - rectangle_a.x - rectangle_a.w, rectangle_b.h };
+
+        if (rectangle_a.y > rectangle_b.y)
+        {
+            result[result_index++] = libCZI::IntRect{ rectangle_a.x, rectangle_b.y, rectangle_a.w, rectangle_a.y - rectangle_b.y };
+        }
+        else if (rectangle_a.y + rectangle_a.h > rectangle_b.y && rectangle_a.y + rectangle_a.h < rectangle_b.y + rectangle_b.h)
+        {
+            result[result_index++] = libCZI::IntRect{ rectangle_a.x, rectangle_a.y + rectangle_a.h, rectangle_a.w, rectangle_b.y + rectangle_b.h - rectangle_a.y - rectangle_a.h };
+        }
+    }
+
+    return result_index;
+}
+
+
+/*static*/bool RectangleCoverageCalculator::IsCompletelyContained(const libCZI::IntRect& outer, const libCZI::IntRect& inner)
+{
+    return inner.x >= outer.x && inner.x + inner.w <= outer.x + outer.w &&
+        inner.y >= outer.y && inner.y + inner.h <= outer.y + outer.h;
+}
+
+std::int64_t RectangleCoverageCalculator::CalcAreaOfIntersectionWithRectangle(const libCZI::IntRect& query_rectangle) const
+{
+    if (!query_rectangle.IsValid())
+    {
+        return 0;
+    }
+
+    int64_t area = 0;
+    for (const auto& r : this->splitters_)
+    {
+        auto intersection = r.Intersect(query_rectangle);
+        if (intersection.IsValid())
+        {
+            area += intersection.w * static_cast<int64_t>(intersection.h);
+        }
+    }
+
+    return area;
+}
+
+bool RectangleCoverageCalculator::IsCompletelyCovered(const libCZI::IntRect& query_rectangle) const
+{
+    if (!query_rectangle.IsValid())
+    {
+        return true;
+    }
+
+    return this->CalcAreaOfIntersectionWithRectangle(query_rectangle) == static_cast<int64_t>(query_rectangle.w) * query_rectangle.h;
+}

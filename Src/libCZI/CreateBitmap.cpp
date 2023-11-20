@@ -46,7 +46,7 @@ static std::shared_ptr<libCZI::IBitmapData> CreateBitmapFromSubBlock_Uncompresse
 
     const auto& sbBlkInfo = subBlk->GetSubBlockInfo();
 
-    // TODO: How exactly shoud the stride be derived? It seems that stride must be exactly linesize.
+    // The stride with an uncompressed bitmap in CZI is exactly the linesize.
     const std::uint32_t stride = sbBlkInfo.physicalSize.w * CziUtils::GetBytesPerPel(sbBlkInfo.pixelType);
     if (static_cast<size_t>(stride) * sbBlkInfo.physicalSize.h > size)
     {

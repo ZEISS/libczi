@@ -4,6 +4,7 @@
 
 #include "SingleChannelAccessorBase.h"
 #include "BitmapOperations.h"
+#include "utilities.h"
 
 using namespace std;
 using namespace libCZI;
@@ -14,7 +15,7 @@ bool CSingleChannelAccessorBase::TryGetPixelType(const libCZI::IDimCoordinate* p
     planeCoordinate->TryGetPosition(libCZI::DimensionIndex::C, &c);
 
     // the idea is: for the cornerstone-case where we do not have a C-index, the call to "TryGetSubBlockInfoOfArbitrarySubBlockInChannel"
-    // will igonore the specified index _if_ there are no C-indices at all
+    // will ignore the specified index _if_ there are no C-indices at all
     pixeltype = Utils::TryDeterminePixelTypeForChannel(this->sbBlkRepository.get(), c);
     return (pixeltype != PixelType::Invalid) ? true : false;
 }
@@ -79,4 +80,57 @@ void CSingleChannelAccessorBase::CheckPlaneCoordinates(const libCZI::IDimCoordin
             }
         }
     }
+}
+
+std::vector<int> CSingleChannelAccessorBase::CheckForVisibility(const libCZI::IntRect& roi, int count, const std::function<int(int)>& get_subblock_index) const
+{
+    return CSingleChannelAccessorBase::CheckForVisibilityCore(
+        roi,
+        count,
+        get_subblock_index,
+        [this](int subblock_index) -> IntRect
+            {
+                SubBlockInfo subblock_info;
+                bool b = this->sbBlkRepository->TryGetSubBlockInfo(subblock_index, &subblock_info);
+                return subblock_info.logicalRect;
+            });
+}
+
+/*static*/std::vector<int> CSingleChannelAccessorBase::CheckForVisibilityCore(const libCZI::IntRect& roi, int count, const std::function<int(int)>& get_subblock_index, const std::function<libCZI::IntRect(int)>& get_rect_of_subblock)
+{
+    std::vector<int> result;
+
+    // handle the trivial cases
+    if (count == 0 || !roi.IsNonEmpty())
+    {
+        return result;
+    }
+    
+    const int64_t total_pixel_count = static_cast<int64_t>(roi.w) * roi.h;
+    result.reserve(count);
+    RectangleCoverageCalculator coverage_calculator;
+    int64_t covered_pixel_count = 0;
+    for (int i = count -1; i >= 0; --i) // we start at the end, because that is the subblock which is rendered last (and thus is on top)
+    {
+        const int subblock_index = get_subblock_index(i);
+        coverage_calculator.AddRectangle(get_rect_of_subblock(subblock_index));
+        const int64_t new_covered_pixel_count = coverage_calculator.CalcAreaOfIntersectionWithRectangle(roi);
+        if (new_covered_pixel_count > covered_pixel_count)  // if the covered pixel count has increased, it means that this subblock covers some new pixels,
+        {                                                   //  some pixels which were not overdrawn by all the previous ones
+            // this means - when drawing this subblock, some new pixels will be covered which were not covered before,
+            //  so we need to draw this subblock, therefore we add it to our result vector
+            result.push_back(subblock_index);
+
+            covered_pixel_count = new_covered_pixel_count;
+            if (new_covered_pixel_count == total_pixel_count)
+            {
+                // if the whole ROI is covered now, then we are done
+                break;
+            }
+        }
+    }
+
+    // now, reverse the result vector, so that the subblocks are in the order in which they are to be rendered
+    std::reverse(result.begin(), result.end());
+    return result;
 }

@@ -204,3 +204,80 @@ struct ParseEnumHelper
     }
 };
 
+/// This class allows to calculate the area covered by a set of rectangles. The mode of operation
+/// is:
+/// - Create an instance of the class and add the rectangles to it (using AddRectangle) .
+/// - Then, for a given rectangle, call CalcAreaOfIntersectionWithRectangle in order to get the area of the intersection  
+///    of this rectangle with the union of the rectangles added before.
+/// The rectangles being added do not have to follow any order, or are required to be non-overlapping.
+class RectangleCoverageCalculator
+{
+private:
+    /// This vector contains the rectangles added to the state of the instance. The rectangles
+    /// in this vector are guaranteed to be non-overlapping. That is why the name 'splitters' is used -
+    /// if a rectangles is added which is overlapping with the existing ones, the rectangle is split into smaller 
+    /// rectangles (which we call the 'splitters') which are non-overlapping with the existing ones.
+    std::vector<libCZI::IntRect> splitters_;    
+public:
+    /// Adds a rectangle to the state. The runtime of this method increases with the number of
+    /// splitters in the state of the instance and the number of rectangles this rectangle
+    /// needs to be split into. For a modest number of rectangles, the runtime is for
+    /// sure negligible.
+    /// A pathologic case to be aware of is when there are many existing and then a large rectangle
+    /// is added (which is overlapping with many of the existing ones). In this case, it would be
+    /// greatly beneficial to add the large rectangle first, and then the smaller ones.
+    ///
+    /// \param  rectangle   The rectangle to be added.
+    void AddRectangle(const libCZI::IntRect& rectangle);
+
+    /// Adds the rectangles given by the iterator to the state of the instance.
+    ///
+    /// \typeparam  tIterator   Type of the iterator.
+    /// \param  begin   The begin.
+    /// \param  end     The end.
+    template <typename tIterator>
+    void AddRectangles(tIterator begin, tIterator end)
+    {
+        for (tIterator it = begin; it != end; ++it) 
+        {
+            this->AddRectangle(*it);
+        }
+    }
+
+    /// Calculates the area of intersection of the specified rectangle with the
+    /// union of the rectangles added before.
+    /// If the query_rectangle rectangle is invalid, the return value is 0.
+    ///
+    /// \param  query_rectangle   The query rectangle.
+    ///
+    /// \returns    The calculated area of intersection of the specified rectangle with the
+    ///             union of the rectangles added before.
+    std::int64_t CalcAreaOfIntersectionWithRectangle(const libCZI::IntRect& query_rectangle) const;
+
+    /// Query if 'rectQuery' is completely covered is completely covered by the union of the rectangles added before.
+    /// If the query_rectangle rectangle is invalid, the return value is true.
+    ///
+    /// \param  query_rectangle   The query rectangle.
+    ///
+    /// \returns    True if completely covered; false otherwise.
+    bool IsCompletelyCovered(const libCZI::IntRect& query_rectangle) const;
+private:
+    /// Test whether the rectangle 'inner' is completely contained in the rectangle 'outer'.
+    ///
+    /// \param  outer   The outer rectangle.
+    /// \param  inner   The inner rectangle.
+    ///
+    /// \returns    True if completely contained, false if not.
+    static bool IsCompletelyContained(const libCZI::IntRect& outer, const libCZI::IntRect& inner);
+
+    /// The area of rectangle_b which does not overlap with rectangle_a is determined and
+    /// we return this part as a list of 4 rectangles at most. The return value is the number
+    /// of rectangles in the result array.
+    ///
+    /// \param          rectangle_a The rectangle a.
+    /// \param          rectangle_b The rectangle b.
+    /// \param [out]    result      The resulting splitters are put into this array. There will be 4 rectangles at most.
+    ///
+    /// \returns    The number of valid rectangles in the 'result' array.
+    static int SplitUpIntoNonOverlapping(const libCZI::IntRect& rectangle_a, const libCZI::IntRect& rectangle_b, std::array<libCZI::IntRect, 4>& result);
+};
