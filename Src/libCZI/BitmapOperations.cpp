@@ -283,7 +283,7 @@ using namespace std;
     for (int y = 0; y < h; ++y)
     {
         void* p = static_cast<char*>(ptr) + (y * static_cast<ptrdiff_t>(stride));
-        memset(p, val, stride);
+        memset(p, val, w);
     }
 }
 

@@ -1263,7 +1263,7 @@ bool CCmdLineOptions::TryParseDisplaySettings(const std::string& s, std::map<int
     {
         for (const auto& it : vecChNoAndChannelInfo)
         {
-            multiChannelCompositeChannelInfos->at(get<0>(it)) = get<1>(it);
+            multiChannelCompositeChannelInfos->operator[](get<0>(it)) = get<1>(it);
         }
     }
 

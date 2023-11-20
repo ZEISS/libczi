@@ -576,7 +576,7 @@ TEST(Accessor, CreateDocumentAndExerciseScalingAccessorAllowingForInaccuracy)
 
     // act
     constexpr float zoom = 1 - numeric_limits<float>::epsilon();    // use a zoom a tiny bit less than 1
-    IntSize resulting_size = accessor->CalcSize(IntRect{ 0,0,5121,5121 }, zoom);
+    const IntSize resulting_size = accessor->CalcSize(IntRect{ 0,0,5121,5121 }, zoom);
     const auto composite_bitmap = accessor->Get(
         PixelType::Gray8,
         IntRect{ 0,0,5121,5121 },
@@ -596,10 +596,10 @@ TEST(Accessor, CreateDocumentAndExerciseScalingAccessorAllowingForInaccuracy)
     {
         for (size_t x = 0; x < composite_bitmap->GetWidth(); ++x)
         {
-            uint8_t expected_value = (x < 761 && y >= 2671 && y < 2671 + 2449) ? 0x2a : 0;
+            const uint8_t expected_value = (x < 761 && y >= 2671 && y < 2671 + 2449) ? 0x2a : 0;
 
             // allow both values for the exact borders of the subblock, i.e. allow for the bitmap to be one pixel smaller on the edges
-            bool inaccuracy_allowed = ((y == 2670 || y == 2671 || y == 2670 + 2449 || y == 2671 + 2449) && (x < 760));
+            const bool inaccuracy_allowed = ((y == 2670 || y == 2671 || y == 2670 + 2449 || y == 2671 + 2449) && (x < 760));
             const uint8_t* p = static_cast<const uint8_t*>(lock_info_bitmap.ptrDataRoi) + y * lock_info_bitmap.stride + x;
             if (*p != expected_value)
             {

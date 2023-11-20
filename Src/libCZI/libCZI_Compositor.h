@@ -29,7 +29,7 @@ namespace libCZI
     class IAccessor
     {
     protected:
-        virtual ~IAccessor() {}
+        virtual ~IAccessor() = default;
     };
 
     /// This accessor creates a multi-tile composite of a single channel (and a single plane).
@@ -63,6 +63,12 @@ namespace libCZI
             /// Otherwise the Z-order is arbitrary.
             bool sortByM;
 
+            /// If true, then the tile-visibility-check-optimization is used. When doing the multi-tile composition,
+            /// all relevant tiles are checked whether they are visible in the destination bitmap. If a tile is not visible, then
+            /// the corresponding sub-block is not read. This can speed up the operation considerably. The result is the same as
+            /// without this optimization - i.e. there should be no reason to turn it off besides potential bugs.
+            bool useVisibilityCheckOptimization; 
+
             /// If true, then a one-pixel wide boundary will be drawn around 
             /// each tile (in black color).
             bool drawTileBorder;
@@ -75,6 +81,7 @@ namespace libCZI
             {
                 this->backGroundColor.r = this->backGroundColor.g = this->backGroundColor.b = std::numeric_limits<float>::quiet_NaN();
                 this->sortByM = true;
+                this->useVisibilityCheckOptimization = false;
                 this->drawTileBorder = false;
                 this->sceneFilter.reset();
             }
@@ -249,6 +256,12 @@ namespace libCZI
             /// is given here, then no filtering is applied.
             std::shared_ptr<libCZI::IIndexSet> sceneFilter;
 
+            /// If true, then the tile-visibility-check-optimization is used. When doing the multi-tile composition,
+            /// all relevant tiles are checked whether they are visible in the destination bitmap. If a tile is not visible, then
+            /// the corresponding sub-block is not read. This can speed up the operation considerably. The result is the same as
+            /// without this optimization - i.e. there should be no reason to turn it off besides potential bugs.
+            bool useVisibilityCheckOptimization;   
+
             /// Clears this object to its blank state.
             void Clear()
             {
@@ -256,6 +269,7 @@ namespace libCZI
                 this->sortByM = true;
                 this->backGroundColor.r = this->backGroundColor.g = this->backGroundColor.b = std::numeric_limits<float>::quiet_NaN();
                 this->sceneFilter.reset();
+                this->useVisibilityCheckOptimization = false;
             }
         };
 
@@ -332,7 +346,7 @@ namespace libCZI
         /// <param name="yPos">     The y-coordinate of the top-left of the destination bitmap. </param>
         /// <param name="pOptions"> Options for controlling the operation. This argument is optional (may be nullptr).</param>
         static void ComposeSingleChannelTiles(
-            std::function<bool(int index, std::shared_ptr<libCZI::IBitmapData>& src, int& x, int& y)> getTiles,
+            const std::function<bool(int index, std::shared_ptr<libCZI::IBitmapData>& src, int& x, int& y)>& getTiles,
             libCZI::IBitmapData* dest,
             int xPos,
             int yPos,
