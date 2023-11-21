@@ -582,3 +582,29 @@ TEST(TileAccessorCoverageOptimization, CheckForVisibility_TestCase4)
     EXPECT_EQ(indices_of_visible_tiles[0], 1);
     EXPECT_EQ(indices_of_visible_tiles[1], 5);
 }
+
+TEST(TileAccessorCoverageOptimization, CheckForVisibility_TestCase5)
+{
+    static constexpr array<IntRect, 6> kSubBlocks{ IntRect{0,0,1,1}, IntRect{0,0,1,1}, IntRect{1,0,1,2}, IntRect{2,0,3,3}, IntRect{2,0,1,1}, IntRect{1,0,2,3} };
+
+    // the function CheckForVisibilityCore is supposed to return a vector with indices "as they are used to call into
+    // 'get_subblock_index'-functor" (**not** the subblock-index as returned from this functor). We check this here by
+    // returning a "non-zero-based"-index from the functor, where we then check that the returned vector contains the
+    // correct results according to above rule (and the function's documentation).
+
+    const auto indices_of_visible_tiles = CSingleChannelAccessorBaseToTestStub::CheckForVisibilityCore(
+        { 0, 0, 3, 3 },
+        kSubBlocks.size(),
+        [&](int index)->int
+        {
+            return index + 10;
+        },
+        [&](int subblock_index)->IntRect
+        {
+            return kSubBlocks[subblock_index - 10];
+        });
+
+    ASSERT_EQ(indices_of_visible_tiles.size(), 2);
+    EXPECT_EQ(indices_of_visible_tiles[0], 1);
+    EXPECT_EQ(indices_of_visible_tiles[1], 5);
+}
