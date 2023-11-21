@@ -587,8 +587,8 @@ TEST(TileAccessorCoverageOptimization, CheckForVisibility_TestCase5)
 {
     static constexpr array<IntRect, 6> kSubBlocks{ IntRect{0,0,1,1}, IntRect{0,0,1,1}, IntRect{1,0,1,2}, IntRect{2,0,3,3}, IntRect{2,0,1,1}, IntRect{1,0,2,3} };
 
-    // the function CheckForVisibilityCore is supposed to return a vector with indices 'as they are used to call into
-    // 'get_subblock_index'-functor (**not** the subblock-index as returned from this functor). We check this here by
+    // the function CheckForVisibilityCore is supposed to return a vector with indices "as they are used to call into
+    // 'get_subblock_index'-functor" (**not** the subblock-index as returned from this functor). We check this here by
     // returning a "non-zero-based"-index from the functor, where we then check that the returned vector contains the
     // correct results according to above rule (and the function's documentation).
 
