@@ -119,7 +119,7 @@ std::vector<int> CSingleChannelAccessorBase::CheckForVisibility(const libCZI::In
         {                                                   //  some pixels which were not overdrawn by all the previous ones
             // this means - when drawing this subblock, some new pixels will be covered which were not covered before,
             //  so we need to draw this subblock, therefore we add it to our result vector
-            result.push_back(subblock_index);
+            result.push_back(i);
 
             covered_pixel_count = new_covered_pixel_count;
             if (new_covered_pixel_count == total_pixel_count)
