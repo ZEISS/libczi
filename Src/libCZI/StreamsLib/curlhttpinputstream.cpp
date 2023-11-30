@@ -180,6 +180,13 @@ CurlHttpInputStream::CurlHttpInputStream(const std::string& url, const std::map<
         ThrowIfCurlSetOptError(return_code, "CURLOPT_MAXREDIRS");
     }
 
+    property = property_bag.find(StreamsFactory::StreamProperties::kCurlCaInfo);
+    if (property != property_bag.end())
+    {
+        return_code = curl_easy_setopt(up_curl_handle.get(), CURLOPT_CAINFO, property->second.GetAsStringOrThrow().c_str());
+        ThrowIfCurlSetOptError(return_code, "CURLOPT_CAINFO");
+    }
+
     this->curl_handle_ = up_curl_handle.release();
     this->curl_url_handle_ = up_curl_url_handle.release();
 }

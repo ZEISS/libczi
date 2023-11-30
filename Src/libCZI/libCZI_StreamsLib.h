@@ -228,6 +228,9 @@ namespace libCZI
                 kCurlHttp_FollowLocation = 108, ///< For CurlHttpInputStream, type bool: a boolean indicating whether redirects are to be followed, c.f. https://curl.se/libcurl/c/CURLOPT_FOLLOWLOCATION.html for more information.
 
                 kCurlHttp_MaxRedirs = 109, ///< For CurlHttpInputStream, type int32: gives the maximum number of redirects to follow, c.f. https://curl.se/libcurl/c/CURLOPT_MAXREDIRS.html for more information.
+            
+                kCurlCaInfo= 110, ///< For CurlHttpInputStream, type string: gives the directory to check for ca certificate bundle , c.f. https://curl.se/libcurl/c/CURLOPT_CAINFO.html for more information.
+            
             };
         };
 
