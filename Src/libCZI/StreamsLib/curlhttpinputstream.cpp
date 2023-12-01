@@ -56,7 +56,7 @@ using namespace libCZI;
 {
     if (property_name != nullptr)
     {
-        if (strcmp(property_name, StreamsFactory::StreamClassInfoProperty_CurlHttp_CaInfo) == 0)
+        if (strcmp(property_name, StreamsFactory::kStreamClassInfoProperty_CurlHttp_CaInfo) == 0)
         {
             const auto version_info = curl_version_info(CURLVERSION_NOW);
             if (version_info->cainfo != nullptr)
@@ -64,7 +64,7 @@ using namespace libCZI;
                 return StreamsFactory::Property(version_info->cainfo);
             }
         }
-        else if (strcmp(property_name, StreamsFactory::StreamClassInfoProperty_CurlHttp_CaPath) == 0)
+        else if (strcmp(property_name, StreamsFactory::kStreamClassInfoProperty_CurlHttp_CaPath) == 0)
         {
             const auto version_info = curl_version_info(CURLVERSION_NOW);
             if (version_info->capath != nullptr)
