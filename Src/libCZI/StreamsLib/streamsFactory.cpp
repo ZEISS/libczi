@@ -14,8 +14,8 @@
 
 using namespace libCZI;
 
-/*static*/const char* StreamsFactory::StreamClassInfoProperty_CurlHttp_CaInfo = "CurlHttp_CaInfo";
-/*static*/const char* StreamsFactory::StreamClassInfoProperty_CurlHttp_CaPath = "CurlHttp_CaPath";
+/*static*/const char* StreamsFactory::kStreamClassInfoProperty_CurlHttp_CaInfo = "CurlHttp_CaInfo";
+/*static*/const char* StreamsFactory::kStreamClassInfoProperty_CurlHttp_CaPath = "CurlHttp_CaPath";
 
 static const struct
 {

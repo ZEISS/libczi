@@ -311,7 +311,14 @@ namespace libCZI
         /// \returns A new instance of a streams-objects for reading the specified file from the file-system.
         static std::shared_ptr<libCZI::IStream> CreateDefaultStreamForFile(const wchar_t* filename);
 
-        static const char* StreamClassInfoProperty_CurlHttp_CaInfo;
-        static const char* StreamClassInfoProperty_CurlHttp_CaPath;
+        /// A static string for the property_name for the get_property-function of the StreamClassInfo identifying the
+        /// build-time configured file holding one or more certificates to verify the peer with. C.f. https://curl.se/libcurl/c/curl_version_info.html, this
+        /// property gives the value of the "cainfo"-field. If it is null, then an invalid property is returned. 
+        static const char* kStreamClassInfoProperty_CurlHttp_CaInfo;
+
+        /// A static string for the property_name for the get_property-function of the StreamClassInfo identifying the
+        /// build-time configured directory holding CA certificates. C.f. https://curl.se/libcurl/c/curl_version_info.html, this
+        /// property gives the value of the "capath"-field. If it is null, then an invalid property is returned.
+        static const char* kStreamClassInfoProperty_CurlHttp_CaPath;
     };
 }
