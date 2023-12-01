@@ -52,6 +52,31 @@ using namespace libCZI;
     return string_stream.str();
 }
 
+/*static*/Property CurlHttpInputStream::GetClassProperty(const char* property_name)
+{
+    if (property_name != nullptr)
+    {
+        if (strcmp(property_name, StreamsFactory::StreamClassInfoProperty_CurlHttp_CaInfo) == 0)
+        {
+            const auto version_info = curl_version_info(CURLVERSION_NOW);
+            if (version_info.cainfo != nullptr)
+            {
+                return Property(version_info.cainfo);
+            }
+        }
+        else if (strcmp(property_name, StreamsFactory::StreamClassInfoProperty_CurlHttp_CaPath) == 0)
+        {
+            const auto version_info = curl_version_info(CURLVERSION_NOW);
+            if (version_info.capath != nullptr)
+            {
+                return Property(version_info.capath);
+            }
+        }
+    }
+
+    return {};
+}
+
 CurlHttpInputStream::CurlHttpInputStream(const std::string& url, const std::map<int, libCZI::StreamsFactory::Property>& property_bag)
 {
     /* init the curl session */
