@@ -1967,6 +1967,27 @@ void CCmdLineOptions::PrintHelpStreamsObjects()
     }
 
     this->GetLog()->WriteLineStdOut(string_stream.str());
+
+    for (int i = 0; i < libCZI::StreamsFactory::GetStreamClassesCount(); i++)
+    {
+        libCZI::StreamsFactory::StreamClassInfo stream_info;
+        if (libCZI::StreamsFactory::GetStreamInfoForClass(i, stream_info) &&
+            stream_info.class_name == "curl_http_inputstream")
+        {
+            if (stream_info.get_property)
+            {
+                auto property = stream_info.get_property(libCZI::StreamsFactory::kStreamClassInfoProperty_CurlHttp_CaInfo);
+                if (property.GetType() == libCZI::StreamsFactory::Property::Type::String)
+                {
+                    auto ca_info = property.GetAsStringOrThrow();
+                    if (!ca_info.empty())
+                    {
+                        this->GetLog()->WriteLineStdOut("CA-Info: " + ca_info);
+                    }
+                }
+            }
+        }
+    }
 }
 
 /*static*/bool CCmdLineOptions::TryParseSubBlockMetadataKeyValue(const std::string& s, std::map<std::string, std::string>* subblock_metadata_property_bag)
