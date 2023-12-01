@@ -65,3 +65,29 @@ TEST(StreamsLib, TestGetBuildInfoAndCheckThatStringIsNonEmptyIfAvailable)
         }
     }
 }
+
+TEST(StreamsLib, TestGetProperty)
+{
+    // for the classes that have a get_property function, we call into this function
+    const int number_of_classes = StreamsFactory::GetStreamClassesCount();
+
+    StreamsFactory::StreamClassInfo info;
+    for (int i = 0; i < number_of_classes; ++i)
+    {
+        const bool b = StreamsFactory::GetStreamInfoForClass(i, info);
+        ASSERT_TRUE(b);
+
+        if (info.get_property)
+        {
+            auto property = info.get_property(StreamsFactory::kStreamClassInfoProperty_CurlHttp_CaInfo);
+
+            // the result should be either invalid or a string
+            EXPECT_TRUE(property.GetType() == StreamsFactory::Property::Type::Invalid || property.GetType() == StreamsFactory::Property::Type::String);
+
+            property = info.get_property(StreamsFactory::kStreamClassInfoProperty_CurlHttp_CaPath);
+
+            // the result should be either invalid or a string
+            EXPECT_TRUE(property.GetType() == StreamsFactory::Property::Type::Invalid || property.GetType() == StreamsFactory::Property::Type::String);
+        }
+    }
+}
