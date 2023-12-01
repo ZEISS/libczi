@@ -240,7 +240,7 @@ CurlHttpInputStream::CurlHttpInputStream(const std::string& url, const std::map<
         std::lock_guard<std::mutex> lck(this->request_mutex_);
 
         // TODO(JBL): We may be able to use a "header-function" (https://curl.se/libcurl/c/CURLOPT_HEADERFUNCTION.html) in order to find out
-        //             whether the server accepted out "Range-Request". According to https://developer.mozilla.org/en-US/docs/Web/HTTP/Range_requests,
+        //             whether the server accepted our "Range-Request". According to https://developer.mozilla.org/en-US/docs/Web/HTTP/Range_requests,
         //             we can expect to have a line "something like 'Accept-Ranges: bytes'" in the response header with a server that supports range
         //             requests (and a line 'Accept-Ranges: none') would tell us explicitly that range requests are *not* supported.
 
