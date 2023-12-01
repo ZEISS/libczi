@@ -180,6 +180,25 @@ CurlHttpInputStream::CurlHttpInputStream(const std::string& url, const std::map<
         ThrowIfCurlSetOptError(return_code, "CURLOPT_MAXREDIRS");
     }
 
+    property = property_bag.find(StreamsFactory::StreamProperties::kCurlHttp_CaInfo);
+    if (property != property_bag.end())
+    {
+        return_code = curl_easy_setopt(up_curl_handle.get(), CURLOPT_CAINFO, property->second.GetAsStringOrThrow().c_str());
+        ThrowIfCurlSetOptError(return_code, "CURLOPT_CAINFO");
+    }
+
+    property = property_bag.find(StreamsFactory::StreamProperties::kCurlHttp_CaInfoBlob);
+    if (property != property_bag.end())
+    {
+        string ca_info_blob = property->second.GetAsStringOrThrow();
+        struct curl_blob blob;
+        blob.data = ca_info_blob.c_str();
+        blob.len = ca_info_blob.size();
+        blob.flags = CURL_BLOB_COPY;
+        return_code = curl_easy_setopt(up_curl_handle.get(), CURLOPT_CAINFO_BLOB, &blob);
+        ThrowIfCurlSetOptError(return_code, "CURLOPT_CAINFO_BLOB");
+    }
+
     this->curl_handle_ = up_curl_handle.release();
     this->curl_url_handle_ = up_curl_url_handle.release();
 }
