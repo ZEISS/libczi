@@ -52,24 +52,24 @@ using namespace libCZI;
     return string_stream.str();
 }
 
-/*static*/Property CurlHttpInputStream::GetClassProperty(const char* property_name)
+/*static*/libCZI::StreamsFactory::Property CurlHttpInputStream::GetClassProperty(const char* property_name)
 {
     if (property_name != nullptr)
     {
         if (strcmp(property_name, StreamsFactory::StreamClassInfoProperty_CurlHttp_CaInfo) == 0)
         {
             const auto version_info = curl_version_info(CURLVERSION_NOW);
-            if (version_info.cainfo != nullptr)
+            if (version_info->cainfo != nullptr)
             {
-                return Property(version_info.cainfo);
+                return StreamsFactory::Property(version_info->cainfo);
             }
         }
         else if (strcmp(property_name, StreamsFactory::StreamClassInfoProperty_CurlHttp_CaPath) == 0)
         {
             const auto version_info = curl_version_info(CURLVERSION_NOW);
-            if (version_info.capath != nullptr)
+            if (version_info->capath != nullptr)
             {
-                return Property(version_info.capath);
+                return StreamsFactory::Property(version_info->capath);
             }
         }
     }

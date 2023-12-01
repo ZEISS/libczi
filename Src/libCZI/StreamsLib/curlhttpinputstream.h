@@ -31,7 +31,7 @@ public:
     static void OneTimeGlobalCurlInitialization();
 
     static std::string GetBuildInformation();
-    static GetClassProperty(const char* property_name)
+    static libCZI::StreamsFactory::Property GetClassProperty(const char* property_name);
 private:
     /// This struct is passed to the WriteData function as user-data.
     struct WriteDataContext
