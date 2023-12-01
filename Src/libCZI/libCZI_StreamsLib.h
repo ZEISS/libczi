@@ -273,14 +273,18 @@ namespace libCZI
         struct LIBCZI_API StreamClassInfo
         {
             std::string class_name;                         ///< Name of the class (this uniquely identifies the class).
-            std::string short_description;                  ///< A short and informal description of the class.  
-            std::function<std::string()> get_build_info;    ///< A function which returns a string with build information for the class (e.g. version information).
+            std::string short_description;                  ///< A short and informal description of the class.
+
+            /// A function which returns a string with build information for the class (e.g. version information). Note 
+            /// that this field may be null, in which case no information is available.
+            std::function<std::string()> get_build_info;
 
             /// A function which returns a class-specific property about the class. This is e.g. intended for
             /// providing information about build-time options for a specific class. Currently, it is used for
             /// the libcurl-based stream-class to provide information about the build-time configured paths for
             /// the CA certificates.
-            std::function<Property(const char* property_name)> get_property;    
+            /// Note that this field may be null, in which case no information is available.
+            std::function<Property(const char* property_name)> get_property;
         };
 
         /// Gets information about a stream class available in the factory. The function returns false if the index is out of range.
