@@ -1901,16 +1901,20 @@ void CCmdLineOptions::PrintHelpBuildInfo()
     stringstream ss;
     ss << "version          : " << majorVer << "." << minorVer << "." << patchVer;
     this->GetLog()->WriteLineStdOut(ss.str());
-    ss = stringstream();
+    ss.clear();
+    ss.str("");
     ss << "compiler         : " << buildInfo.compilerIdentification;
     this->GetLog()->WriteLineStdOut(ss.str());
-    ss = stringstream();
+    ss.clear();
+    ss.str("");
     ss << "repository-URL   : " << buildInfo.repositoryUrl;
     this->GetLog()->WriteLineStdOut(ss.str());
-    ss = stringstream();
+    ss.clear();
+    ss.str("");
     ss << "repository-branch: " << buildInfo.repositoryBranch;
     this->GetLog()->WriteLineStdOut(ss.str());
-    ss = stringstream();
+    ss.clear();
+    ss.str("");
     ss << "repository-tag   : " << buildInfo.repositoryTag;
     this->GetLog()->WriteLineStdOut(ss.str());
 }
