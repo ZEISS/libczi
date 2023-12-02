@@ -282,7 +282,9 @@ namespace libCZI
             /// all relevant tiles are checked whether they are visible in the destination bitmap. If a tile is not visible, then
             /// the corresponding sub-block is not read. This can speed up the operation considerably. The result is the same as
             /// without this optimization - i.e. there should be no reason to turn it off besides potential bugs.
-            bool useVisibilityCheckOptimization;   
+            bool useVisibilityCheckOptimization;
+
+            std::shared_ptr<libCZI::ISubBlockCache> subBlockCache;
 
             /// Clears this object to its blank state.
             void Clear()
@@ -292,6 +294,7 @@ namespace libCZI
                 this->backGroundColor.r = this->backGroundColor.g = this->backGroundColor.b = std::numeric_limits<float>::quiet_NaN();
                 this->sceneFilter.reset();
                 this->useVisibilityCheckOptimization = false;
+                this->subBlockCache.reset();
             }
         };
 
