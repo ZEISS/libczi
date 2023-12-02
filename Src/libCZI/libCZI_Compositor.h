@@ -198,6 +198,8 @@ namespace libCZI
             /// If specified, only subblocks with a scene-index contained in the set will be considered.
             std::shared_ptr<libCZI::IIndexSet> sceneFilter;
 
+            std::shared_ptr<libCZI::ISubBlockCache> subBlockCache;
+
             /// Clears this object to its blank state.
             void Clear()
             {
@@ -205,6 +207,7 @@ namespace libCZI
                 this->sortByM = true;
                 this->backGroundColor.r = this->backGroundColor.g = this->backGroundColor.b = std::numeric_limits<float>::quiet_NaN();
                 this->sceneFilter.reset();
+                this->subBlockCache.reset();
             }
         };
 
