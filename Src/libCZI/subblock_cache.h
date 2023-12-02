@@ -16,12 +16,12 @@ private:
     struct CacheEntry
     {
         std::shared_ptr<libCZI::IBitmapData> bitmap;
-        std::uint64_t last_used;
+        std::uint64_t lru_value;
     };
 
     std::map<int, CacheEntry> cache_;
     std::mutex mutex_;
-    std::atomic_uint64_t usage_counter_{ 0 };
+    std::atomic_uint64_t lru_counter_{ 0 };
     std::atomic_uint64_t cache_size_in_bytes_{ 0 };
     std::atomic_uint32_t cache_subblock_count_{ 0 };
 public:
