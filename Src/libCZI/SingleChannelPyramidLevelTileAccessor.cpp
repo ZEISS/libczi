@@ -137,7 +137,7 @@ libCZI::IntRect CSingleChannelPyramidLevelTileAccessor::CalcDestinationRectFromS
 
 libCZI::IntRect CSingleChannelPyramidLevelTileAccessor::NormalizePyramidRect(int x, int y, int w, int h, const PyramidLayerInfo& pyramidInfo)
 {
-    const int p = this->CalcSizeOfPixelOnLayer0(pyramidInfo);
+    const int p = CSingleChannelPyramidLevelTileAccessor::CalcSizeOfPixelOnLayer0(pyramidInfo);
     return IntRect{ x,y,w * p,h * p };
 }
 
