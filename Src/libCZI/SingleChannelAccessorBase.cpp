@@ -105,12 +105,12 @@ std::vector<int> CSingleChannelAccessorBase::CheckForVisibility(const libCZI::In
     {
         return result;
     }
-    
+
     const int64_t total_pixel_count = static_cast<int64_t>(roi.w) * roi.h;
     result.reserve(count);
     RectangleCoverageCalculator coverage_calculator;
     int64_t covered_pixel_count = 0;
-    for (int i = count -1; i >= 0; --i) // we start at the end, because that is the subblock which is rendered last (and thus is on top)
+    for (int i = count - 1; i >= 0; --i) // we start at the end, because that is the subblock which is rendered last (and thus is on top)
     {
         const int subblock_index = get_subblock_index(i);
         coverage_calculator.AddRectangle(get_rect_of_subblock(subblock_index));
@@ -133,4 +133,36 @@ std::vector<int> CSingleChannelAccessorBase::CheckForVisibility(const libCZI::In
     // now, reverse the result vector, so that the subblocks are in the order in which they are to be rendered
     std::reverse(result.begin(), result.end());
     return result;
+}
+
+/*static*/CSingleChannelAccessorBase::SubBlockData CSingleChannelAccessorBase::GetSubBlockDataForSubBlockIndex(
+    const std::shared_ptr<libCZI::ISubBlockRepository>& sbBlkRepository,
+    const std::shared_ptr<libCZI::ISubBlockCache>& cache,
+    int subBlockIndex)
+{
+    if (!cache)
+    {
+        const auto sb = sbBlkRepository->ReadSubBlock(subBlockIndex);
+        return { sb->CreateBitmap(), sb->GetSubBlockInfo() };
+    }
+    else
+    {
+        auto bitmap_data = cache->Get(subBlockIndex);
+        if (bitmap_data)
+        {
+            SubBlockData result;
+            sbBlkRepository->TryGetSubBlockInfo(subBlockIndex, &result.subBlockInfo);
+            result.bitmap = bitmap_data;
+            return result;
+        }
+        else
+        {
+            const auto sb = sbBlkRepository->ReadSubBlock(subBlockIndex);
+            SubBlockData result;
+            result.bitmap = sb->CreateBitmap();
+            cache->Add(subBlockIndex, result.bitmap);
+            result.subBlockInfo = sb->GetSubBlockInfo();
+            return result;
+        }
+    }
 }

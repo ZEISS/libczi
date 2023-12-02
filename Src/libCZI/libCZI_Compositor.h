@@ -25,6 +25,25 @@ namespace libCZI
         SingleChannelScalingTileAccessor        ///< The scaling-single-channel-tile accessor (associated interface: ISingleChannelScalingTileAccessor).
     };
 
+    class ISubBlockCache
+    {
+    public:
+        struct Options
+        {
+            /// The maximum memory usage (in bytes) for the cache. If the cache exceeds this limit, 
+            /// then the least recently used sub-blocks are removed from the cache.
+            std::uint64_t   maxMemoryUsage;     
+
+            /// The maximum number of sub-blocks in the cache. If the cache exceeds this limit,
+            /// then the least recently used sub-blocks are removed from the cache.
+            std::uint32_t  maxSubBlockCount;
+        };
+
+        virtual std::shared_ptr<IBitmapData> Get(int subblock_index) = 0;
+        virtual void Add(int subblock_index, std::shared_ptr<IBitmapData> pBitmap) = 0;
+        virtual ~ISubBlockCache() = default;
+    };
+
     /// The base interface (all accessor-interface must derive from this).
     class IAccessor
     {
@@ -76,6 +95,8 @@ namespace libCZI
             /// If specified, only subblocks with a scene-index contained in the set will be considered.
             std::shared_ptr<libCZI::IIndexSet> sceneFilter;
 
+            std::shared_ptr<libCZI::ISubBlockCache> subBlockCache;
+
             /// Clears this object to its blank state.
             void Clear()
             {
@@ -84,6 +105,7 @@ namespace libCZI
                 this->useVisibilityCheckOptimization = false;
                 this->drawTileBorder = false;
                 this->sceneFilter.reset();
+                this->subBlockCache.reset();
             }
         };
 
