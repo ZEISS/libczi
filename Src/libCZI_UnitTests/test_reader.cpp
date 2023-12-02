@@ -10,6 +10,25 @@ using namespace std;
 
 TEST(DimCoordinate, ReaderException)
 {
+    class MyException : public std::exception
+    {
+    private:
+        std::string exception_text_;
+        std::error_code code_;
+    public:
+        MyException(const std::string& exceptionText, std::error_code code) :exception_text_(exceptionText), code_(code) {}
+
+        const char* what() const noexcept override
+        {
+            return this->exception_text_.c_str();
+        }
+
+        std::error_code code() const noexcept
+        {
+            return this->code_;
+        }
+    };
+
     class CTestStreamImp :public libCZI::IStream
     {
     private:
@@ -20,7 +39,7 @@ TEST(DimCoordinate, ReaderException)
 
         virtual void Read(std::uint64_t offset, void* pv, std::uint64_t size, std::uint64_t* ptrBytesRead) override
         {
-            throw std::ios_base::failure(this->exceptionText, this->code);
+            throw MyException(this->exceptionText, this->code);
         }
     };
 
@@ -39,7 +58,7 @@ TEST(DimCoordinate, ReaderException)
         {
             excp.rethrow_nested();
         }
-        catch (std::ios_base::failure& innerExcp)
+        catch (MyException& innerExcp)
         {
             // according to standard, the content of the what()-test is implementation-specific,
             // so it is not suited for checking - but it seems that the code goes unaltered
