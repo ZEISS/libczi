@@ -56,8 +56,6 @@ TEST(MetadataReading, ScalingInfoExTest)
 
     EXPECT_STREQ(scalingInfo.defaultUnitFormatX.c_str(), L"um");
     EXPECT_STREQ(scalingInfo.defaultUnitFormatY.c_str(), L"um");
-    //EXPECT_TRUE(scalingInfo.defaultUnitFormatX.compare(L"um") == 0);
-    //EXPECT_TRUE(scalingInfo.defaultUnitFormatY.compare(L"um") == 0);
     EXPECT_TRUE(scalingInfo.defaultUnitFormatZ.empty());
 }
 
