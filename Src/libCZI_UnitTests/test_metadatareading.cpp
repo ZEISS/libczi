@@ -54,8 +54,10 @@ TEST(MetadataReading, ScalingInfoExTest)
     EXPECT_DOUBLE_EQ(scalingInfo.scaleY, 1.6432520108980473e-07);
     EXPECT_FALSE(scalingInfo.IsScaleZValid());
 
-    EXPECT_TRUE(scalingInfo.defaultUnitFormatX.compare(L"um") == 0);
-    EXPECT_TRUE(scalingInfo.defaultUnitFormatY.compare(L"um") == 0);
+    EXPECT_STREQ(scalingInfo.defaultUnitFormatX.c_str(), L"um");
+    EXPECT_STREQ(scalingInfo.defaultUnitFormatY.c_str(), L"um");
+    //EXPECT_TRUE(scalingInfo.defaultUnitFormatX.compare(L"um") == 0);
+    //EXPECT_TRUE(scalingInfo.defaultUnitFormatY.compare(L"um") == 0);
     EXPECT_TRUE(scalingInfo.defaultUnitFormatZ.empty());
 }
 
