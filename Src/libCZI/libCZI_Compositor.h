@@ -25,14 +25,32 @@ namespace libCZI
         SingleChannelScalingTileAccessor        ///< The scaling-single-channel-tile accessor (associated interface: ISingleChannelScalingTileAccessor).
     };
 
-    class ISubBlockCache
+    class ISubBlockCacheStatistics
     {
     public:
-        struct Options
+        static constexpr std::uint8_t kMemoryUsage = 1;
+        static constexpr std::uint8_t kElementsCount = 2;
+
+        struct Statistics
+        {
+            std::uint8_t validityMask;
+            std::uint64_t memoryUsage;
+            std::uint32_t elementsCount;
+        };
+
+        virtual Statistics GetStatistics(std::uint8_t mask) const = 0;
+
+        virtual ~ISubBlockCacheStatistics() = default;
+    };
+
+    class ISubBlockCache : public ISubBlockCacheStatistics
+    {
+    public:
+        struct PruneOptions
         {
             /// The maximum memory usage (in bytes) for the cache. If the cache exceeds this limit, 
             /// then the least recently used sub-blocks are removed from the cache.
-            std::uint64_t   maxMemoryUsage;     
+            std::uint64_t   maxMemoryUsage;
 
             /// The maximum number of sub-blocks in the cache. If the cache exceeds this limit,
             /// then the least recently used sub-blocks are removed from the cache.
@@ -41,6 +59,7 @@ namespace libCZI
 
         virtual std::shared_ptr<IBitmapData> Get(int subblock_index) = 0;
         virtual void Add(int subblock_index, std::shared_ptr<IBitmapData> pBitmap) = 0;
+        virtual void Prune(const PruneOptions& options) = 0;
         virtual ~ISubBlockCache() = default;
     };
 
@@ -86,7 +105,7 @@ namespace libCZI
             /// all relevant tiles are checked whether they are visible in the destination bitmap. If a tile is not visible, then
             /// the corresponding sub-block is not read. This can speed up the operation considerably. The result is the same as
             /// without this optimization - i.e. there should be no reason to turn it off besides potential bugs.
-            bool useVisibilityCheckOptimization; 
+            bool useVisibilityCheckOptimization;
 
             /// If true, then a one-pixel wide boundary will be drawn around 
             /// each tile (in black color).

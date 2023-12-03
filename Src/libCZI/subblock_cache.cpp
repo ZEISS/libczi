@@ -7,13 +7,37 @@
 using namespace libCZI;
 using namespace std;
 
-SubBlockCache::SubBlockCache(const libCZI::ISubBlockCache::Options& options)
+SubBlockCache::SubBlockCache(const libCZI::ISubBlockCache::PruneOptions& options)
 {
 
 }
 
 SubBlockCache::~SubBlockCache()
 {}
+
+ISubBlockCacheStatistics::Statistics SubBlockCache::GetStatistics(std::uint8_t mask) const
+{
+    Statistics result{ 0 };
+    if (mask == ISubBlockCacheStatistics::kMemoryUsage)
+    {
+        result.validityMask = ISubBlockCacheStatistics::kMemoryUsage;
+        result.memoryUsage = this->cache_size_in_bytes_.load();
+    }
+    else if (mask == ISubBlockCacheStatistics::kElementsCount)
+    {
+        result.validityMask = ISubBlockCacheStatistics::kElementsCount;
+        result.memoryUsage = this->cache_subblock_count_.load();
+    }
+    else if (mask == (ISubBlockCacheStatistics::kMemoryUsage | ISubBlockCacheStatistics::kElementsCount))
+    {
+        result.validityMask = ISubBlockCacheStatistics::kMemoryUsage | ISubBlockCacheStatistics::kElementsCount;
+        lock_guard<mutex> lck(this->mutex_);
+        result.memoryUsage = this->cache_size_in_bytes_.load();
+        result.memoryUsage = this->cache_subblock_count_.load();
+    }
+
+    return result;
+}
 
 std::shared_ptr<IBitmapData> SubBlockCache::Get(int subblock_index)
 {
@@ -50,8 +74,14 @@ void SubBlockCache::Add(int subblock_index, std::shared_ptr<IBitmapData> bitmap)
     }
 }
 
+void SubBlockCache::Prune(const PruneOptions& options)
+{
+    
+}
+
 /*static*/std::uint64_t SubBlockCache::CalculateSizeInBytes(const libCZI::IBitmapData* bitmap)
 {
     const IntSize size = bitmap->GetSize();
     return static_cast<uint64_t>(size.w) * size.h * Utils::GetBytesPerPixel(bitmap->GetPixelType());
 }
+
