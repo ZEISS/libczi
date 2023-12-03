@@ -25,7 +25,7 @@ private:
     std::atomic_uint64_t cache_size_in_bytes_{ 0 };
     std::atomic_uint32_t cache_subblock_count_{ 0 };
 public:
-    SubBlockCache(const libCZI::ISubBlockCache::PruneOptions& options);
+    SubBlockCache();
     ~SubBlockCache() override;
 
     std::shared_ptr<libCZI::IBitmapData> Get(int subblock_index) override;
@@ -35,5 +35,6 @@ public:
     Statistics GetStatistics(std::uint8_t mask) const override;
 
 private:
+    void PruneByMemoryUsage(std::uint64_t max_memory_usage);
     static std::uint64_t CalculateSizeInBytes(const libCZI::IBitmapData* bitmap);
 };
