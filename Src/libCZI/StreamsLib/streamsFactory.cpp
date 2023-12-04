@@ -14,6 +14,9 @@
 
 using namespace libCZI;
 
+/*static*/const char* StreamsFactory::kStreamClassInfoProperty_CurlHttp_CaInfo = "CurlHttp_CaInfo";
+/*static*/const char* StreamsFactory::kStreamClassInfoProperty_CurlHttp_CaPath = "CurlHttp_CaPath";
+
 static const struct
 {
     StreamsFactory::StreamClassInfo stream_class_info;
@@ -31,7 +34,7 @@ static const struct
 {
 #if LIBCZI_CURL_BASED_STREAM_AVAILABLE
         {
-            { "curl_http_inputstream", "curl-based http/https stream", CurlHttpInputStream::GetBuildInformation },
+            { "curl_http_inputstream", "curl-based http/https stream", CurlHttpInputStream::GetBuildInformation, CurlHttpInputStream::GetClassProperty },
             [](const StreamsFactory::CreateStreamInfo& stream_info, const std::string& file_name) -> std::shared_ptr<libCZI::IStream>
             {
                 return std::make_shared<CurlHttpInputStream>(file_name, stream_info.property_bag);
@@ -41,7 +44,7 @@ static const struct
 #endif  // LIBCZI_CURL_BASED_STREAM_AVAILABLE
 #if _WIN32
         {
-            { "windows_file_inputstream", "stream implementation based on Windows-API" },
+            { "windows_file_inputstream", "stream implementation based on Windows-API", nullptr, nullptr },
             [](const StreamsFactory::CreateStreamInfo& stream_info, const std::string& file_name) -> std::shared_ptr<libCZI::IStream>
             {
                 return std::make_shared<WindowsFileInputStream>(file_name);
@@ -54,7 +57,7 @@ static const struct
 #endif  // _WIN32
 #if LIBCZI_USE_PREADPWRITEBASED_STREAMIMPL
         {
-            { "pread_file_inputstream", "stream implementation based on pread-API" },
+            { "pread_file_inputstream", "stream implementation based on pread-API", nullptr, nullptr },
             [](const StreamsFactory::CreateStreamInfo& stream_info, const std::string& file_name) -> std::shared_ptr<libCZI::IStream>
             {
                 return std::make_shared<PreadFileInputStream>(file_name);
@@ -63,7 +66,7 @@ static const struct
         },
 #endif // LIBCZI_USE_PREADPWRITEBASED_STREAMIMPL
         {
-            { "c_runtime_file_inputstream", "stream implementation based on C-runtime library" },
+            { "c_runtime_file_inputstream", "stream implementation based on C-runtime library", nullptr, nullptr },
             [](const StreamsFactory::CreateStreamInfo& stream_info, const std::string& file_name) -> std::shared_ptr<libCZI::IStream>
             {
                 return std::make_shared<SimpleFileInputStream>(file_name);
