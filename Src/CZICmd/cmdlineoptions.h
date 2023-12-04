@@ -32,7 +32,9 @@ enum class Command
 
     CreateCZI,
 
-    ReadWriteCZI
+    ReadWriteCZI,
+
+    PlaneScan,
 };
 
 enum class InfoLevel : std::uint32_t

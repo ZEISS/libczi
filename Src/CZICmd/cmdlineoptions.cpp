@@ -497,6 +497,7 @@ CCmdLineOptions::ParseResult CCmdLineOptions::Parse(int argc, char** argv)
         { "ScalingChannelComposite",            Command::ScalingChannelComposite },
         { "ExtractAttachment",                  Command::ExtractAttachment},
         { "CreateCZI",                          Command::CreateCZI },
+        { "PlaneScan",                          Command::PlaneScan },
     };
 
     const static PlaneCoordinateValidator plane_coordinate_validator;

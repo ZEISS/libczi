@@ -140,28 +140,33 @@ std::vector<int> CSingleChannelAccessorBase::CheckForVisibility(const libCZI::In
     const std::shared_ptr<libCZI::ISubBlockCache>& cache,
     int subBlockIndex)
 {
+    SubBlockData result;
+
     // if no cache-object is given, then we simply read the subblock and create a bitmap from it
     if (!cache)
     {
-        const auto sb = sbBlkRepository->ReadSubBlock(subBlockIndex);
-        return { sb->CreateBitmap(), sb->GetSubBlockInfo() };
-    }
-
-    const auto bitmap_from_cache = cache->Get(subBlockIndex);
-    if (bitmap_from_cache)
-    {
-        SubBlockData result;
-        sbBlkRepository->TryGetSubBlockInfo(subBlockIndex, &result.subBlockInfo);
-        result.bitmap = bitmap_from_cache;
-        return result;
+        const auto subblock = sbBlkRepository->ReadSubBlock(subBlockIndex);
+        result.bitmap = subblock->CreateBitmap();
+        result.subBlockInfo = subblock->GetSubBlockInfo();
     }
     else
     {
-        const auto sb = sbBlkRepository->ReadSubBlock(subBlockIndex);
-        SubBlockData result;
-        result.bitmap = sb->CreateBitmap();
-        cache->Add(subBlockIndex, result.bitmap);
-        result.subBlockInfo = sb->GetSubBlockInfo();
-        return result;
+        const auto bitmap_from_cache = cache->Get(subBlockIndex);
+        if (bitmap_from_cache)
+        {
+            sbBlkRepository->TryGetSubBlockInfo(subBlockIndex, &result.subBlockInfo);
+            result.bitmap = bitmap_from_cache;
+            return result;
+        }
+        else
+        {
+            const auto subblock = sbBlkRepository->ReadSubBlock(subBlockIndex);
+            result.bitmap = subblock->CreateBitmap();
+            cache->Add(subBlockIndex, result.bitmap);
+            result.subBlockInfo = subblock->GetSubBlockInfo();
+            return result;
+        }
     }
+
+    return result;
 }

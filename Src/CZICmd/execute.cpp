@@ -3,14 +3,15 @@
 // SPDX-License-Identifier: LGPL-3.0-or-later
 
 #include "stdafx.h"
-#include <limits>
 #include "execute.h"
 #include "executeCreateCzi.h"
+#include "executePlaneScan.h"
 #include "inc_libCZI.h"
 #include "SaveBitmap.h"
 #include "utils.h"
 #include "DisplaySettingsHelper.h"
 #include "inc_rapidjson.h"
+#include <limits>
 #include <iomanip>
 #include <map>
 #include <fstream>
@@ -1228,6 +1229,9 @@ bool execute(const CCmdLineOptions& options)
             break;
         case Command::CreateCZI:
             success = executeCreateCzi(options);
+            break;
+        case Command::PlaneScan:
+            success = executePlaneScan(options);
             break;
         default:
             break;
