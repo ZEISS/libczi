@@ -228,6 +228,10 @@ namespace libCZI
                 kCurlHttp_FollowLocation = 108, ///< For CurlHttpInputStream, type bool: a boolean indicating whether redirects are to be followed, c.f. https://curl.se/libcurl/c/CURLOPT_FOLLOWLOCATION.html for more information.
 
                 kCurlHttp_MaxRedirs = 109, ///< For CurlHttpInputStream, type int32: gives the maximum number of redirects to follow, c.f. https://curl.se/libcurl/c/CURLOPT_MAXREDIRS.html for more information.
+
+                kCurlHttp_CaInfo = 110, ///< For CurlHttpInputStream, type string: gives the directory to check for CA certificate bundle , c.f. https://curl.se/libcurl/c/CURLOPT_CAINFO.html for more information.
+
+                kCurlHttp_CaInfoBlob = 111, ///< For CurlHttpInputStream, type string: give PEM encoded content holding one or more certificates to verify the HTTPS server with, c.f. https://curl.se/libcurl/c/CURLOPT_CAINFO_BLOB.html for more information.
             };
         };
 
@@ -269,8 +273,18 @@ namespace libCZI
         struct LIBCZI_API StreamClassInfo
         {
             std::string class_name;                         ///< Name of the class (this uniquely identifies the class).
-            std::string short_description;                  ///< A short and informal description of the class.  
-            std::function<std::string()> get_build_info;    ///< A function which returns a string with build information for the class (e.g. version information).
+            std::string short_description;                  ///< A short and informal description of the class.
+
+            /// A function which returns a string with build information for the class (e.g. version information). Note 
+            /// that this field may be null, in which case no information is available.
+            std::function<std::string()> get_build_info;
+
+            /// A function which returns a class-specific property about the class. This is e.g. intended for
+            /// providing information about build-time options for a specific class. Currently, it is used for
+            /// the libcurl-based stream-class to provide information about the build-time configured paths for
+            /// the CA certificates.
+            /// Note that this field may be null, in which case no information is available.
+            std::function<Property(const char* property_name)> get_property;
         };
 
         /// Gets information about a stream class available in the factory. The function returns false if the index is out of range.
@@ -300,5 +314,15 @@ namespace libCZI
         ///
         /// \returns A new instance of a streams-objects for reading the specified file from the file-system.
         static std::shared_ptr<libCZI::IStream> CreateDefaultStreamForFile(const wchar_t* filename);
+
+        /// A static string for the property_name for the get_property-function of the StreamClassInfo identifying the
+        /// build-time configured file holding one or more certificates to verify the peer with. C.f. https://curl.se/libcurl/c/curl_version_info.html, this
+        /// property gives the value of the "cainfo"-field. If it is null, then an invalid property is returned. 
+        static const char* kStreamClassInfoProperty_CurlHttp_CaInfo;
+
+        /// A static string for the property_name for the get_property-function of the StreamClassInfo identifying the
+        /// build-time configured directory holding CA certificates. C.f. https://curl.se/libcurl/c/curl_version_info.html, this
+        /// property gives the value of the "capath"-field. If it is null, then an invalid property is returned.
+        static const char* kStreamClassInfoProperty_CurlHttp_CaPath;
     };
 }

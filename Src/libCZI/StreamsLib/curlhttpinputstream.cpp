@@ -52,6 +52,31 @@ using namespace libCZI;
     return string_stream.str();
 }
 
+/*static*/libCZI::StreamsFactory::Property CurlHttpInputStream::GetClassProperty(const char* property_name)
+{
+    if (property_name != nullptr)
+    {
+        if (strcmp(property_name, StreamsFactory::kStreamClassInfoProperty_CurlHttp_CaInfo) == 0)
+        {
+            const auto version_info = curl_version_info(CURLVERSION_NOW);
+            if (version_info->cainfo != nullptr)
+            {
+                return StreamsFactory::Property(version_info->cainfo);
+            }
+        }
+        else if (strcmp(property_name, StreamsFactory::kStreamClassInfoProperty_CurlHttp_CaPath) == 0)
+        {
+            const auto version_info = curl_version_info(CURLVERSION_NOW);
+            if (version_info->capath != nullptr)
+            {
+                return StreamsFactory::Property(version_info->capath);
+            }
+        }
+    }
+
+    return {};
+}
+
 CurlHttpInputStream::CurlHttpInputStream(const std::string& url, const std::map<int, libCZI::StreamsFactory::Property>& property_bag)
 {
     /* init the curl session */
@@ -180,6 +205,28 @@ CurlHttpInputStream::CurlHttpInputStream(const std::string& url, const std::map<
         ThrowIfCurlSetOptError(return_code, "CURLOPT_MAXREDIRS");
     }
 
+    property = property_bag.find(StreamsFactory::StreamProperties::kCurlHttp_CaInfo);
+    if (property != property_bag.end())
+    {
+        return_code = curl_easy_setopt(up_curl_handle.get(), CURLOPT_CAINFO, property->second.GetAsStringOrThrow().c_str());
+        ThrowIfCurlSetOptError(return_code, "CURLOPT_CAINFO");
+    }
+
+    property = property_bag.find(StreamsFactory::StreamProperties::kCurlHttp_CaInfoBlob);
+    if (property != property_bag.end())
+    {
+        string ca_info_blob = property->second.GetAsStringOrThrow();
+        if (!ca_info_blob.empty())
+        {
+            struct curl_blob blob;
+            blob.data = &ca_info_blob[0];
+            blob.len = ca_info_blob.size();
+            blob.flags = CURL_BLOB_COPY;
+            return_code = curl_easy_setopt(up_curl_handle.get(), CURLOPT_CAINFO_BLOB, &blob);
+            ThrowIfCurlSetOptError(return_code, "CURLOPT_CAINFO_BLOB");
+        }
+    }
+
     this->curl_handle_ = up_curl_handle.release();
     this->curl_url_handle_ = up_curl_url_handle.release();
 }
@@ -193,7 +240,7 @@ CurlHttpInputStream::CurlHttpInputStream(const std::string& url, const std::map<
         std::lock_guard<std::mutex> lck(this->request_mutex_);
 
         // TODO(JBL): We may be able to use a "header-function" (https://curl.se/libcurl/c/CURLOPT_HEADERFUNCTION.html) in order to find out
-        //             whether the server accepted out "Range-Request". According to https://developer.mozilla.org/en-US/docs/Web/HTTP/Range_requests,
+        //             whether the server accepted our "Range-Request". According to https://developer.mozilla.org/en-US/docs/Web/HTTP/Range_requests,
         //             we can expect to have a line "something like 'Accept-Ranges: bytes'" in the response header with a server that supports range
         //             requests (and a line 'Accept-Ranges: none') would tell us explicitly that range requests are *not* supported.
 

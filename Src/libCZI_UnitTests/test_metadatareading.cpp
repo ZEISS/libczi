@@ -54,8 +54,8 @@ TEST(MetadataReading, ScalingInfoExTest)
     EXPECT_DOUBLE_EQ(scalingInfo.scaleY, 1.6432520108980473e-07);
     EXPECT_FALSE(scalingInfo.IsScaleZValid());
 
-    EXPECT_TRUE(scalingInfo.defaultUnitFormatX == L"um");
-    EXPECT_TRUE(scalingInfo.defaultUnitFormatY == L"um");
+    EXPECT_STREQ(scalingInfo.defaultUnitFormatX.c_str(), L"um");
+    EXPECT_STREQ(scalingInfo.defaultUnitFormatY.c_str(), L"um");
     EXPECT_TRUE(scalingInfo.defaultUnitFormatZ.empty());
 }
 
@@ -274,8 +274,8 @@ static void EnumAllRecursively(IXmlNodeRead* node, std::function<bool(std::share
                 return false;
             }
 
-    EnumAllRecursively(n.get(), func);
-    return true;
+            EnumAllRecursively(n.get(), func);
+            return true;
         });
 }
 
@@ -291,7 +291,7 @@ TEST(MetadataReading, WalkChildrenTest1)
         [&](std::shared_ptr<IXmlNodeRead> n)->bool
         {
             names.push_back(utf8_conv.to_bytes(n->Name()));
-    return true;
+            return true;
         });
 
     auto cnt = md.use_count();
@@ -317,15 +317,15 @@ TEST(MetadataReading, WalkChildrenTest2)
         {
             string s(utf8_conv.to_bytes(n->Name()));
 
-    n->EnumAttributes(
-        [&](const std::wstring& attribName, const std::wstring& attribValue)->bool
-        {
-            s += ":" + utf8_conv.to_bytes(attribName) + "=" + utf8_conv.to_bytes(attribValue);
-    return true;
-        });
+            n->EnumAttributes(
+                [&](const std::wstring& attribName, const std::wstring& attribValue)->bool
+                {
+                    s += ":" + utf8_conv.to_bytes(attribName) + "=" + utf8_conv.to_bytes(attribValue);
+                    return true;
+                });
 
-    namesAndAttributes.push_back(s);
-    return true;
+            namesAndAttributes.push_back(s);
+            return true;
         });
 
     auto cnt = md.use_count();
@@ -350,14 +350,14 @@ TEST(MetadataReading, WalkChildrenTest3)
         [&](std::shared_ptr<IXmlNodeRead> n)->bool
         {
             string s(utf8_conv.to_bytes(n->Name()));
-    wstring value;
-    if (n->TryGetValue(&value))
-    {
-        s += " -> " + utf8_conv.to_bytes(value);
-    }
+            wstring value;
+            if (n->TryGetValue(&value))
+            {
+                s += " -> " + utf8_conv.to_bytes(value);
+            }
 
-    namesAndValue.push_back(s);
-    return true;
+            namesAndValue.push_back(s);
+            return true;
         });
 
     auto cnt = md.use_count();
