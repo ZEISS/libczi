@@ -43,9 +43,25 @@ namespace libCZI
         virtual ~ISubBlockCacheStatistics() = default;
     };
 
+    /// Interface for a caching components (which can be used with the compositors). The intended use is as follows:
+    /// * Whenever the bitmap corresponding to a subblock (c.f. ISubBlock::CreateBitmap) is accessed, the bitmap may be added  
+    ///   to a cache object, where the subblock-index is the key.
+    /// * Whenever a bitmap is needed (for a given subblock-index), the cache object is first queried whether it contains the bitmap. If yes, then the bitmap  
+    ///   returned may be used instead of executing the subblock-read-and-decode operation.
+    /// In order to control the memory usage of the cache, the cache object must be pruned (i.e. subblocks are removed from the cache). Currently this means,
+    /// that the Prune-method must be called manually. The cache object does not do any pruning automatically.
+    /// The operations of Adding, Querying and Pruning the cache object are thread-safe.
     class ISubBlockCache : public ISubBlockCacheStatistics
     {
     public:
+        /// Options for controlling the prune operation. There are two metrics which can be used to control what
+        /// remains in the cache and what is discarded: the maximum memory usage (for all elements in the cache) and 
+        /// the maximum number of sub-blocks. If the cache exceeds one of those limits, then elements are evicted from the cache
+        /// until both condions are met. Eviction is done in the order starting with elements where their last access is the longest 
+        /// time ago. As "access" we define either the Add-operation or the Get-operation - so, when an element is retrieved from the
+        /// cache, it is considered as "accessed".
+        /// If only one condition is desired, then the other condition can be set to the maximum value of the respective type (which is the
+        /// default value).
         struct PruneOptions
         {
             /// The maximum memory usage (in bytes) for the cache. If the cache exceeds this limit, 

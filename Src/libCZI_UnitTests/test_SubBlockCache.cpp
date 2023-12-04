@@ -85,6 +85,8 @@ TEST(SubBlockCache, GetStatistics)
 
 TEST(SubBlockCache, PruneCacheCase1)
 {
+    // We add two elements to the cache, making the last-added element the least recently used one. When then pruning the cache to 1 element,
+    // the first added element (with key=0) should be removed.
     const auto cache = CreateSubBlockCache();
     const auto bm1 = CreateTestBitmap(PixelType::Bgr24, 163, 128);
     cache->Add(0, bm1);
@@ -104,6 +106,8 @@ TEST(SubBlockCache, PruneCacheCase1)
 
 TEST(SubBlockCache, PruneCacheCase2)
 {
+    // We add two items to the cache (with key 0, 1). Then, we retrieve element 0 from the cache, which makes it the least recently used one.
+    // When then pruning the cache to 1 element, element 1 should be removed.
     const auto cache = CreateSubBlockCache();
     const auto bm1 = CreateTestBitmap(PixelType::Bgr24, 163, 128);
     cache->Add(0, bm1);
@@ -127,6 +131,9 @@ TEST(SubBlockCache, PruneCacheCase2)
 
 TEST(SubBlockCache, PruneCacheCase3)
 {
+    // We add three items to the cache (with key 0, 1, 2), each one byte in size. Then, we request to prune the cache
+    // to 1 byte max memory usage. This should remove the first two items from the cache (since they are the oldest entries), 
+    // and keep the last one.
     const auto cache = CreateSubBlockCache();
     const auto bm1 = CreateTestBitmap(PixelType::Gray8, 1, 1);
     cache->Add(0, bm1);
