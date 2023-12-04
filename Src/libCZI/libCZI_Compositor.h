@@ -50,17 +50,17 @@ namespace libCZI
         {
             /// The maximum memory usage (in bytes) for the cache. If the cache exceeds this limit, 
             /// then the least recently used sub-blocks are removed from the cache.
-            std::uint64_t   maxMemoryUsage;
+            std::uint64_t   maxMemoryUsage{ (std::numeric_limits<decltype(maxMemoryUsage)>::max)() };
 
             /// The maximum number of sub-blocks in the cache. If the cache exceeds this limit,
             /// then the least recently used sub-blocks are removed from the cache.
-            std::uint32_t  maxSubBlockCount;
+            std::uint32_t  maxSubBlockCount{ (std::numeric_limits<decltype(maxSubBlockCount)>::max)() };
         };
 
         virtual std::shared_ptr<IBitmapData> Get(int subblock_index) = 0;
         virtual void Add(int subblock_index, std::shared_ptr<IBitmapData> pBitmap) = 0;
         virtual void Prune(const PruneOptions& options) = 0;
-        virtual ~ISubBlockCache() = default;
+        ~ISubBlockCache() override = default;
     };
 
     /// The base interface (all accessor-interface must derive from this).

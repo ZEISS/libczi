@@ -35,6 +35,8 @@ public:
     Statistics GetStatistics(std::uint8_t mask) const override;
 
 private:
-    void PruneByMemoryUsage(std::uint64_t max_memory_usage);
+    void PruneByMemoryUsageAndElementCount(std::uint64_t max_memory_usage, std::uint32_t max_element_count);
     static std::uint64_t CalculateSizeInBytes(const libCZI::IBitmapData* bitmap);
+
+    static bool CompareForLruValue(const std::pair<int, CacheEntry>& a, const std::pair<int, CacheEntry>& b);
 };

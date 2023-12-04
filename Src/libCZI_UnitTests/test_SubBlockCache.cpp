@@ -54,7 +54,7 @@ TEST(SubBlockCache, OverwriteExisting)
 
     const auto statistics_memory_usage = cache->GetStatistics(ISubBlockCacheStatistics::kMemoryUsage);
     EXPECT_EQ(statistics_memory_usage.validityMask, ISubBlockCacheStatistics::kMemoryUsage);
-    EXPECT_EQ(statistics_memory_usage.memoryUsage, 163 * 128 *3 + 11 * 14);
+    EXPECT_EQ(statistics_memory_usage.memoryUsage, 163 * 128 * 3 + 11 * 14);
 
     const auto statistics_elements_count = cache->GetStatistics(ISubBlockCacheStatistics::kElementsCount);
     EXPECT_EQ(statistics_elements_count.validityMask, ISubBlockCacheStatistics::kElementsCount);
@@ -83,3 +83,44 @@ TEST(SubBlockCache, GetStatistics)
     EXPECT_EQ(statistics_both.elementsCount, 2);
 }
 
+TEST(SubBlockCache, PruneCacheCase1)
+{
+    const auto cache = CreateSubBlockCache();
+    const auto bm1 = CreateTestBitmap(PixelType::Bgr24, 163, 128);
+    cache->Add(0, bm1);
+    const auto bm2 = CreateTestBitmap(PixelType::Bgr24, 161, 114);
+    cache->Add(1, bm2);
+
+    cache->Prune({ numeric_limits<uint64_t>::max(), 1 });
+    const auto statistics_elements_count = cache->GetStatistics(ISubBlockCacheStatistics::kElementsCount);
+    EXPECT_EQ(statistics_elements_count.validityMask, ISubBlockCacheStatistics::kElementsCount);
+    EXPECT_EQ(statistics_elements_count.elementsCount, 1);
+
+    auto bitmap_from_cache = cache->Get(1);
+    EXPECT_TRUE(bitmap_from_cache != nullptr);
+    bitmap_from_cache = cache->Get(0);
+    EXPECT_TRUE(bitmap_from_cache == nullptr);
+}
+
+TEST(SubBlockCache, PruneCacheCase2)
+{
+    const auto cache = CreateSubBlockCache();
+    const auto bm1 = CreateTestBitmap(PixelType::Bgr24, 163, 128);
+    cache->Add(0, bm1);
+    const auto bm2 = CreateTestBitmap(PixelType::Bgr24, 161, 114);
+    cache->Add(1, bm2);
+
+    // Now, element 0 is the oldest one, and 1 is the least recently used one.
+    // We now retrieve element 0 from the cache, which makes it the least recently used one.
+    auto bitmap_from_cache = cache->Get(0);
+
+    cache->Prune({ numeric_limits<uint64_t>::max(), 1 });
+    const auto statistics_elements_count = cache->GetStatistics(ISubBlockCacheStatistics::kElementsCount);
+    EXPECT_EQ(statistics_elements_count.validityMask, ISubBlockCacheStatistics::kElementsCount);
+    EXPECT_EQ(statistics_elements_count.elementsCount, 1);
+
+    bitmap_from_cache = cache->Get(0);
+    EXPECT_TRUE(bitmap_from_cache != nullptr);
+    bitmap_from_cache = cache->Get(1);
+    EXPECT_TRUE(bitmap_from_cache == nullptr);
+}

@@ -80,62 +80,27 @@ void SubBlockCache::Add(int subblock_index, std::shared_ptr<IBitmapData> bitmap)
 
 void SubBlockCache::Prune(const PruneOptions& options)
 {
-    if (options.maxMemoryUsage != numeric_limits<uint64_t>::max())
+    if (options.maxMemoryUsage != numeric_limits<decltype(options.maxMemoryUsage)>::max() ||
+        options.maxSubBlockCount != numeric_limits<decltype(options.maxSubBlockCount)>::max())
     {
-        this->PruneToMemoryUsage(options.maxMemoryUsage);
-               lock_guard<mutex> lck(this->mutex_);
-        if (this->cache_size_in_bytes_ > options.maxMemoryUsage)
-        {
-                       // Sort the cache entries by LRU value
-                       //            vector<pair<int, CacheEntry>> sorted_cache_entries;
-                       //                       sorted_cache_entries.reserve(this->cache_.size());
-                       //                                  for (const auto& element : this->cache_)
-                       //                                             {
-                       //                                                            sorted_cache_entries.push_back(element);
-                       //                                                                       }
-                       //                                                                                  sort(sorted_cache_entries.begin(), sorted_cache_entries.end(), [](const auto& a, const auto& b) { return a.second.lru_value < b.second.lru_value; });
-                                  // Remove the oldest entries until the memory usage is below the threshold
-                                  //            for (const auto& element : sorted_cache_entries)
-                                  //                       {
-                                  //                                      this->cache_size_in_bytes_ -= SubBlockCache::CalculateSizeInBytes(element.second.bitmap.get());
-                                  //                                                     this->cache_.erase(element.first);
-                                  //                                                                    --this->cache_subblock_count_;
-                                  //                                                                                   if (this->cache_size_in_bytes_ <= options.maxMemoryUsage)
-                                  //                                                                                                  {
-                                  //                                                                                                                     break;
-                                  //                                                                                                                                    }
-                                  //                                                                                                                                               }
-                                  //                                                                                                                                                      }
-                                  //                                                                                                                                                         }
-        }
+        lock_guard<mutex> lck(this->mutex_);
+        this->PruneByMemoryUsageAndElementCount(options.maxMemoryUsage, options.maxSubBlockCount);
     }
 }
 
-void SubBlockCache::PruneByMemoryUsage(std::uint64_t max_memory_usage)
+void SubBlockCache::PruneByMemoryUsageAndElementCount(std::uint64_t max_memory_usage, std::uint32_t max_element_count)
 {
-    lock_guard<mutex> lck(this->mutex_);
-    if (this->cache_size_in_bytes_ > max_memory_usage)
+    while (this->cache_size_in_bytes_.load() > max_memory_usage || this->cache_subblock_count_.load() > max_element_count)
     {
-               // Sort the cache entries by LRU value
-               //        vector<pair<int, CacheEntry>> sorted_cache_entries;
-               //               sorted_cache_entries.reserve(this->cache_.size());
-               //                      for (const auto& element : this->cache_)
-               //                             {
-               //                                        sorted_cache_entries.push_back(element);
-               //                                               }
-               //                                                      sort(sorted_cache_entries.begin(), sorted_cache_entries.end(), [](const auto& a, const auto& b) { return a.second.lru_value < b.second.lru_value; });
-                      // Remove the oldest entries until the memory usage is below the threshold
-                      //        for (const auto& element : sorted_cache_entries)
-                      //               {
-                      //                          this->cache_size_in_bytes_ -= SubBlockCache::CalculateSizeInBytes(element.second.bitmap.get());
-                      //                                     this->cache_.erase(element.first);
-                      //                                                --this->cache_subblock_count_;
-                      //                                                           if (this->cache_size_in_bytes_ <= max_memory_usage)
-                      //                                                                      {
-                      //                                                                                     break;
-                      //                                                                                                }
-                      //                                                                                                       }
-                      //                                                                                                          }
+        auto oldest_element = std::min_element(this->cache_.begin(), this->cache_.end(), SubBlockCache::CompareForLruValue);
+        if (oldest_element == this->cache_.end())
+        {
+            break;
+        }
+
+        this->cache_size_in_bytes_ -= SubBlockCache::CalculateSizeInBytes(oldest_element->second.bitmap.get());
+        --this->cache_subblock_count_;
+        this->cache_.erase(oldest_element);
     }
 }
 
@@ -145,3 +110,7 @@ void SubBlockCache::PruneByMemoryUsage(std::uint64_t max_memory_usage)
     return static_cast<uint64_t>(size.w) * size.h * Utils::GetBytesPerPixel(bitmap->GetPixelType());
 }
 
+/*static*/bool SubBlockCache::CompareForLruValue(const std::pair<int, CacheEntry>& a, const std::pair<int, CacheEntry>& b)
+{
+    return a.second.lru_value < b.second.lru_value;
+}
