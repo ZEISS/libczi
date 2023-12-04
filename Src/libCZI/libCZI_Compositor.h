@@ -31,13 +31,28 @@ namespace libCZI
         static constexpr std::uint8_t kMemoryUsage = 1;
         static constexpr std::uint8_t kElementsCount = 2;
 
+        /// This struct defines the statistics which can be queried from the cache. There is a bitfield which
+        /// defines which elements are valid. If the bit is set, then the corresponding member is valid.
         struct Statistics
         {
+            /// A bit mask which indicates which members are valid. C.f. the constants kMemoryUsage and kElementsCount.
             std::uint8_t validityMask;
+
+            /// The memory usage of all elements in the cache. This field is only valid if the bit kMemoryUsage is set in the validityMask.
             std::uint64_t memoryUsage;
+
+            /// The number of elements in the cache. This field is only valid if the bit kElementsCount is set in the validityMask.
             std::uint32_t elementsCount;
         };
 
+        /// Gets momentarily valid statistics about the cache. The mask defines which statistics is to be retrieved.
+        /// In case of multiple fields being requested, it is guaranteed that all requested fields are a transactional 
+        /// snapshot of the state.
+        ///
+        /// \param  mask A bitmask specifying which fields are requested. Only the fields requested are guaranteed to be valid
+        ///              in the returned struct.
+        ///
+        /// \returns A consistent snapshot of the statistics.
         virtual Statistics GetStatistics(std::uint8_t mask) const = 0;
 
         virtual ~ISubBlockCacheStatistics() = default;
