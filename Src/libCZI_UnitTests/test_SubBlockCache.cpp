@@ -124,3 +124,28 @@ TEST(SubBlockCache, PruneCacheCase2)
     bitmap_from_cache = cache->Get(1);
     EXPECT_TRUE(bitmap_from_cache == nullptr);
 }
+
+TEST(SubBlockCache, PruneCacheCase3)
+{
+    const auto cache = CreateSubBlockCache();
+    const auto bm1 = CreateTestBitmap(PixelType::Gray8, 1, 1);
+    cache->Add(0, bm1);
+    const auto bm2 = CreateTestBitmap(PixelType::Gray8, 1, 1);
+    cache->Add(1, bm2);
+    const auto bm3 = CreateTestBitmap(PixelType::Gray8, 1, 1);
+    cache->Add(2, bm3);
+
+    ISubBlockCache::PruneOptions prune_options;
+    prune_options.maxMemoryUsage = 1;
+    cache->Prune(prune_options);
+    const auto statistics_elements_count = cache->GetStatistics(ISubBlockCacheStatistics::kElementsCount);
+    EXPECT_EQ(statistics_elements_count.validityMask, ISubBlockCacheStatistics::kElementsCount);
+    EXPECT_EQ(statistics_elements_count.elementsCount, 1);
+
+    auto bitmap_from_cache = cache->Get(0);
+    EXPECT_TRUE(bitmap_from_cache == nullptr);
+    bitmap_from_cache = cache->Get(1);
+    EXPECT_TRUE(bitmap_from_cache == nullptr);
+    bitmap_from_cache = cache->Get(2);
+    EXPECT_TRUE(bitmap_from_cache != nullptr);
+}
