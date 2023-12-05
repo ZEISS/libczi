@@ -308,7 +308,7 @@ void CSingleChannelScalingTileAccessor::InternalGet(libCZI::IBitmapData* bmDest,
     }
 }
 
-void CSingleChannelScalingTileAccessor::Paint(libCZI::IBitmapData* bmDest, const libCZI::IntRect& roi, const SubSetSortedByZoom& sbSetSortedByZoom, float zoom, const libCZI::ISingleChannelScalingTileAccessor::Options& options/*bool useCoverageOptimization*/)
+void CSingleChannelScalingTileAccessor::Paint(libCZI::IBitmapData* bmDest, const libCZI::IntRect& roi, const SubSetSortedByZoom& sbSetSortedByZoom, float zoom, const libCZI::ISingleChannelScalingTileAccessor::Options& options)
 {
     const int idxOf1stSubBlockOfZoomGreater = this->GetIdxOf1stSubBlockWithZoomGreater(sbSetSortedByZoom.subBlocks, sbSetSortedByZoom.sortedByZoom, zoom);
     if (idxOf1stSubBlockOfZoomGreater < 0)
@@ -338,7 +338,7 @@ void CSingleChannelScalingTileAccessor::Paint(libCZI::IBitmapData* bmDest, const
         }
     }
 
-    if (!/*useCoverageOptimization*/options.useVisibilityCheckOptimization)
+    if (!options.useVisibilityCheckOptimization)
     {
         for (auto it = start_iterator; it != end_iterator; ++it)
         {
