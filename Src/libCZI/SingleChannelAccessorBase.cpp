@@ -156,7 +156,6 @@ std::vector<int> CSingleChannelAccessorBase::CheckForVisibility(const libCZI::In
         {
             sbBlkRepository->TryGetSubBlockInfo(subBlockIndex, &result.subBlockInfo);
             result.bitmap = bitmap_from_cache;
-            return result;
         }
         else
         {
@@ -164,7 +163,6 @@ std::vector<int> CSingleChannelAccessorBase::CheckForVisibility(const libCZI::In
             result.bitmap = subblock->CreateBitmap();
             cache->Add(subBlockIndex, result.bitmap);
             result.subBlockInfo = subblock->GetSubBlockInfo();
-            return result;
         }
     }
 
