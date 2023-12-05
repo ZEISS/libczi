@@ -72,7 +72,8 @@ void CSingleChannelTileAccessor::ComposeTiles(libCZI::IBitmapData* pBm, int xPos
                     const auto subblock_data = CSingleChannelAccessorBase::GetSubBlockDataForSubBlockIndex(
                         this->sbBlkRepository,
                         options.subBlockCache,
-                        subBlocksSet[indices_of_visible_tiles[index]].index);
+                        subBlocksSet[indices_of_visible_tiles[index]].index,
+                        options.onlyUseSubBlockCacheForCompressedData);
                     spBm = subblock_data.bitmap;
                     xPosTile = subblock_data.subBlockInfo.logicalRect.x;
                     yPosTile = subblock_data.subBlockInfo.logicalRect.y;
@@ -96,7 +97,8 @@ void CSingleChannelTileAccessor::ComposeTiles(libCZI::IBitmapData* pBm, int xPos
                     const auto subblock_data = CSingleChannelAccessorBase::GetSubBlockDataForSubBlockIndex(
                         this->sbBlkRepository,
                         options.subBlockCache,
-                        subBlocksSet[index].index);
+                        subBlocksSet[index].index,
+                        options.onlyUseSubBlockCacheForCompressedData);
                     spBm = subblock_data.bitmap;
                     xPosTile = subblock_data.subBlockInfo.logicalRect.x;
                     yPosTile = subblock_data.subBlockInfo.logicalRect.y;

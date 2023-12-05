@@ -83,7 +83,8 @@ void CSingleChannelScalingTileAccessor::ScaleBlt(libCZI::IBitmapData* bmDest, fl
     auto subblock_bitmap_data = CSingleChannelAccessorBase::GetSubBlockDataForSubBlockIndex(
         this->sbBlkRepository,
         options.subBlockCache,
-        sbInfo.index);
+        sbInfo.index,
+        options.onlyUseSubBlockCacheForCompressedData);
     if (GetSite()->IsEnabled(LOGLEVEL_CHATTYINFORMATION))
     {
         stringstream ss;

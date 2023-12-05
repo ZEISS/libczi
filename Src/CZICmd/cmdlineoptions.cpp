@@ -11,6 +11,7 @@
 #include <iostream>
 #include <utility>
 #include <cstring>
+#include <cmath>
 #if defined(LINUXENV)
 #include <libgen.h>
 #endif
@@ -449,6 +450,26 @@ struct CachesizeValidator : public CLI::Validator
     }
 };
 
+struct TileSizeForPlaneScanValidator : public CLI::Validator
+{
+    TileSizeForPlaneScanValidator()
+    {
+        this->name_ = "TileSizeForPlaneScanValidator";
+        this->func_ = [](const std::string& str) -> string
+            {
+                const bool parsed_ok = CCmdLineOptions::TryParseCreateSize(str, nullptr);
+                if (!parsed_ok)
+                {
+                    ostringstream string_stream;
+                    string_stream << "Invalid tile-size-plane-scan given \"" << str << "\"";
+                    throw CLI::ValidationError(string_stream.str());
+                }
+
+                return {};
+            };
+    }
+};
+
 /// A custom formatter for CLI11 - used to have nicely formatted descriptions.
 class CustomFormatter : public CLI::Formatter
 {
@@ -541,6 +562,7 @@ CCmdLineOptions::ParseResult CCmdLineOptions::Parse(int argc, char** argv)
     const static CompressionOptionsValidator compressionoptions_validator;
     const static GeneratorPixelTypeValidator generatorpixeltype_validator;
     const static CachesizeValidator cachesize_validator;
+    const static TileSizeForPlaneScanValidator tile_size_for_plane_scan_validator;
 
     Command argument_command;
     string argument_source_filename;
@@ -570,9 +592,11 @@ CCmdLineOptions::ParseResult CCmdLineOptions::Parse(int argc, char** argv)
     string argument_compressionoptions;
     string argument_generatorpixeltype;
     string argument_subblock_cachesize;
+    string argument_tilesize_for_scan;
     bool argument_versionflag = false;
     string argument_source_stream_class;
     string argument_source_stream_creation_propbag;
+    bool argument_use_visibility_check_optimization = false;
 
     // editorconfig-checker-disable
     cli_app.add_option("-c,--command", argument_command,
@@ -593,7 +617,12 @@ CCmdLineOptions::ParseResult CCmdLineOptions::Parse(int argc, char** argv)
            \N'ScalingChannelComposite' operates like the previous command, but in addition gets all channels and creates a multi-channel-composite from them
            using display-settings.
            \N'ExtractAttachment' allows to extract (and save to a file) the contents of attachments.)
-           \N'CreateCZI' is used to demonstrate the CZI-creation capabilities of libCZI.)")
+           \N'CreateCZI' is used to demonstrate the CZI-creation capabilities of libCZI.)
+           \N'PlaneScan' does the following: over a ROI of given with the --rect option a rectangle of size given with 
+           the --tilesize-for-plane-scan option is moved, and the image content of this rectangle is written out to
+           files. The operation takes place on a plane which is given with the --plane-coordinate option. The filenames of the
+           tile-bitmaps are generated from the filename given with the --output option, where a string _X[x-position]_Y[y-position]_W[width]_H[height]
+           is added.)")
         ->default_val(Command::Invalid)
         ->option_text("COMMAND")
         ->transform(CLI::CheckedTransformer(map_string_to_command, CLI::ignore_case));
@@ -733,9 +762,17 @@ CCmdLineOptions::ParseResult CCmdLineOptions::Parse(int argc, char** argv)
         ->option_text("PIXELTYPE")
         ->check(generatorpixeltype_validator);
     cli_app.add_option("--cachesize", argument_subblock_cachesize,
-        "Only used for 'PlaneScan' ...")
+        "Only used for 'PlaneScan' - specify the size of the subblock-cache in bytes. The argument is to "
+        "be given with a suffix k, M, G, ...")
         ->option_text("CACHESIZE")
         ->check(cachesize_validator);
+    cli_app.add_option("--tilesize-for-plane-scan", argument_tilesize_for_scan,
+        "Only used for 'PlaneScan' - specify the size of ROI which is used for scanning the plane in "
+        "units of pixels. Format is e.g. '1600x1200' and default is 512x512.")
+        ->option_text("TILESIZE")
+        ->check(tile_size_for_plane_scan_validator);
+    cli_app.add_flag("--use-visibility-check-optimization", argument_use_visibility_check_optimization,
+        "Whether to enable the experimental \"visibility check optimization\" for the accessors.");
     cli_app.add_flag("--version", argument_versionflag,
         "Print extended version-info and supported operations, then exit.");
 
@@ -770,6 +807,7 @@ CCmdLineOptions::ParseResult CCmdLineOptions::Parse(int argc, char** argv)
     this->calcHashOfResult = argument_calc_hash;
     this->drawTileBoundaries = argument_drawtileboundaries;
     this->command = argument_command;
+    this->useVisibilityCheckOptimization = argument_use_visibility_check_optimization;
 
     try
     {
@@ -935,6 +973,12 @@ CCmdLineOptions::ParseResult CCmdLineOptions::Parse(int argc, char** argv)
             const bool b = TryParseSubBlockCacheSize(argument_subblock_cachesize, &this->subBlockCacheSize);
             ThrowIfFalse(b, "--cachesize", argument_subblock_cachesize);
         }
+
+        if (!argument_tilesize_for_scan.empty())
+        {
+            const bool b = TryParseCreateSize(argument_tilesize_for_scan, &this->tilesSizeForPlaneScan);
+            ThrowIfFalse(b, "--tilesize-for-plane-scan", argument_tilesize_for_scan);
+        }
     }
     catch (runtime_error& exception)
     {
@@ -1061,7 +1105,7 @@ void CCmdLineOptions::Clear()
     this->sbBlkMetadataKeyValue.clear();
     this->rectX = this->rectY = 0;
     this->rectW = this->rectH = -1;;
-    this->zoom = -1;
+    this->zoom = 1;
     this->pyramidLayerNo = -1;
     this->pyramidMinificationFactor = -1;
     this->createTileInfo.rows = this->createTileInfo.columns = 1;
@@ -1070,6 +1114,8 @@ void CCmdLineOptions::Clear()
     this->compressionParameters = nullptr;
     this->pixelTypeForBitmapGenerator = libCZI::PixelType::Bgr24;
     this->subBlockCacheSize = 0;
+    this->tilesSizeForPlaneScan = make_tuple(512, 512);
+    this->useVisibilityCheckOptimization = false;
 }
 
 bool CCmdLineOptions::IsLogLevelEnabled(int level) const
@@ -2351,7 +2397,7 @@ void CCmdLineOptions::PrintHelpStreamsObjects()
     {
         factor = 1024;
     }
-    else if (icasecmp(suffix_string, "m") )
+    else if (icasecmp(suffix_string, "m"))
     {
         factor = 1000 * 1000;
     }
@@ -2380,7 +2426,7 @@ void CCmdLineOptions::PrintHelpStreamsObjects()
         return false;
     }
 
-    const uint64_t memory_size = static_cast<uint64_t>(number * static_cast<double>(factor) + 0.5);
+    const uint64_t memory_size = llround(number * static_cast<double>(factor));
     if (size != nullptr)
     {
         *size = memory_size;

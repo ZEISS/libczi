@@ -137,8 +137,9 @@ std::vector<int> CSingleChannelAccessorBase::CheckForVisibility(const libCZI::In
 
 /*static*/CSingleChannelAccessorBase::SubBlockData CSingleChannelAccessorBase::GetSubBlockDataForSubBlockIndex(
     const std::shared_ptr<libCZI::ISubBlockRepository>& sbBlkRepository,
-    const std::shared_ptr<libCZI::ISubBlockCache>& cache,
-    int subBlockIndex)
+    const std::shared_ptr<libCZI::ISubBlockCacheOperation>& cache,
+    int subBlockIndex,
+    bool onlyAddCompressedSubBlockToCache)
 {
     SubBlockData result;
 
@@ -154,15 +155,25 @@ std::vector<int> CSingleChannelAccessorBase::CheckForVisibility(const libCZI::In
         const auto bitmap_from_cache = cache->Get(subBlockIndex);
         if (bitmap_from_cache)
         {
-            sbBlkRepository->TryGetSubBlockInfo(subBlockIndex, &result.subBlockInfo);
+            const bool b = sbBlkRepository->TryGetSubBlockInfo(subBlockIndex, &result.subBlockInfo);
+            if (!b)
+            {
+                stringstream ss;
+                ss << "SubBlockInfo not found in repository for subblock index " << subBlockIndex << ".";
+                throw logic_error(ss.str());
+            }
+
             result.bitmap = bitmap_from_cache;
         }
         else
         {
             const auto subblock = sbBlkRepository->ReadSubBlock(subBlockIndex);
             result.bitmap = subblock->CreateBitmap();
-            cache->Add(subBlockIndex, result.bitmap);
             result.subBlockInfo = subblock->GetSubBlockInfo();
+            if (!onlyAddCompressedSubBlockToCache || result.subBlockInfo.GetCompressionMode() != CompressionMode::UnCompressed)
+            {
+                cache->Add(subBlockIndex, result.bitmap);
+            }
         }
     }
 

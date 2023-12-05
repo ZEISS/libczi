@@ -194,6 +194,9 @@ private:
     libCZI::PixelType pixelTypeForBitmapGenerator;
 
     std::uint64_t subBlockCacheSize;    ///< The size of the sub-block cache in bytes.
+    std::tuple<std::uint32_t, std::uint32_t> tilesSizeForPlaneScan; ///< The size of the tiles in pixels for the plane scan operation.
+
+    bool useVisibilityCheckOptimization;
 public:
     /// Values that represent the result of the "Parse"-operation.
     enum class ParseResult
@@ -262,6 +265,8 @@ public:
     std::shared_ptr<libCZI::ICompressParameters> GetCompressionParameters() const { return this->compressionParameters; }
     libCZI::PixelType GetPixelGeneratorPixeltype() const { return this->pixelTypeForBitmapGenerator; }
     std::uint64_t GetSubBlockCacheSize() const { return this->subBlockCacheSize; }
+    const std::tuple<std::uint32_t, std::uint32_t>& GetTileSizeForPlaneScan() const { return this->tilesSizeForPlaneScan; }
+    bool GetUseVisibilityCheckOptimization() const { return this->useVisibilityCheckOptimization; }
 private:
     friend struct RegionOfInterestValidator;
     friend struct DisplaySettingsValidator;
@@ -282,6 +287,7 @@ private:
     friend struct CompressionOptionsValidator;
     friend struct GeneratorPixelTypeValidator;
     friend struct CachesizeValidator;
+    friend struct TileSizeForPlaneScanValidator;
 
     bool CheckArgumentConsistency() const;
     void SetOutputFilename(const std::wstring& s);

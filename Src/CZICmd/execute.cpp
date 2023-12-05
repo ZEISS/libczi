@@ -553,6 +553,9 @@ public:
         libCZI::ISingleChannelTileAccessor::Options sctaOptions; sctaOptions.Clear();
         sctaOptions.sortByM = true;
         sctaOptions.drawTileBorder = options.GetDrawTileBoundaries();
+        sctaOptions.backGroundColor = GetBackgroundColorFromOptions(options);
+        sctaOptions.sceneFilter = options.GetSceneIndexSet();
+        sctaOptions.useVisibilityCheckOptimization = options.GetUseVisibilityCheckOptimization();
 
         IntRect roi{ options.GetRectX() ,options.GetRectY(),options.GetRectW(),options.GetRectH() };
         if (options.GetIsRelativeRectCoordinate())
@@ -748,6 +751,7 @@ public:
         libCZI::ISingleChannelScalingTileAccessor::Options scstaOptions; scstaOptions.Clear();
         scstaOptions.backGroundColor = GetBackgroundColorFromOptions(options);
         scstaOptions.sceneFilter = options.GetSceneIndexSet();
+        scstaOptions.useVisibilityCheckOptimization = options.GetUseVisibilityCheckOptimization();
 
         auto re = accessor->Get(roi, &coordinate, options.GetZoom(), &scstaOptions);
 
@@ -854,6 +858,7 @@ private:
         sctaOptions.backGroundColor = GetBackgroundColorFromOptions(options);
         sctaOptions.drawTileBorder = options.GetDrawTileBoundaries();
         sctaOptions.sceneFilter = options.GetSceneIndexSet();
+        sctaOptions.useVisibilityCheckOptimization = options.GetUseVisibilityCheckOptimization();
         IntRect roi{ options.GetRectX() ,options.GetRectY() ,options.GetRectW(),options.GetRectH() };
         if (options.GetIsRelativeRectCoordinate())
         {

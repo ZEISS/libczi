@@ -75,6 +75,7 @@ protected:
 
     static SubBlockData GetSubBlockDataForSubBlockIndex(
         const std::shared_ptr<libCZI::ISubBlockRepository>& sbBlkRepository, 
-        const std::shared_ptr<libCZI::ISubBlockCache>& cache,
-        int subBlockIndex);
+        const std::shared_ptr<libCZI::ISubBlockCacheOperation>& cache,
+        int subBlockIndex,
+        bool onlyAddCompressedSubBlockToCache);
 };

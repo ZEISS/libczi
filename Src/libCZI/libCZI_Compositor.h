@@ -25,6 +25,7 @@ namespace libCZI
         SingleChannelScalingTileAccessor        ///< The scaling-single-channel-tile accessor (associated interface: ISingleChannelScalingTileAccessor).
     };
 
+    /// This interface defines how status information about the cache-state can be queried.
     class ISubBlockCacheStatistics
     {
     public:
@@ -58,15 +59,8 @@ namespace libCZI
         virtual ~ISubBlockCacheStatistics() = default;
     };
 
-    /// Interface for a caching components (which can be used with the compositors). The intended use is as follows:
-    /// * Whenever the bitmap corresponding to a subblock (c.f. ISubBlock::CreateBitmap) is accessed, the bitmap may be added  
-    ///   to a cache object, where the subblock-index is the key.
-    /// * Whenever a bitmap is needed (for a given subblock-index), the cache object is first queried whether it contains the bitmap. If yes, then the bitmap  
-    ///   returned may be used instead of executing the subblock-read-and-decode operation.
-    /// In order to control the memory usage of the cache, the cache object must be pruned (i.e. subblocks are removed from the cache). Currently this means,
-    /// that the Prune-method must be called manually. The cache object does not do any pruning automatically.
-    /// The operations of Adding, Querying and Pruning the cache object are thread-safe.
-    class ISubBlockCache : public ISubBlockCacheStatistics
+    /// This interface defines the global operations on the cache. It is used to control the memory usage of the cache.
+    class ISubBlockCacheControl
     {
     public:
         /// Options for controlling the prune operation. There are two metrics which can be used to control what
@@ -88,9 +82,34 @@ namespace libCZI
             std::uint32_t  maxSubBlockCount{ (std::numeric_limits<decltype(maxSubBlockCount)>::max)() };
         };
 
+        /// Prunes the cache. This means that sub-blocks are removed from the cache until the cache satisfies the conditions given in the options.
+        /// \param  options Options for controlling the operation.
+        virtual void Prune(const PruneOptions& options) = 0;
+
+        virtual ~ISubBlockCacheControl() = default;
+    };
+
+    /// This interface defines the operations of adding and querying an element to/from the cache.
+    class ISubBlockCacheOperation
+    {
+    public:
         virtual std::shared_ptr<IBitmapData> Get(int subblock_index) = 0;
         virtual void Add(int subblock_index, std::shared_ptr<IBitmapData> pBitmap) = 0;
-        virtual void Prune(const PruneOptions& options) = 0;
+
+        virtual ~ISubBlockCacheOperation() = default;
+    };
+
+    /// Interface for a caching component (which can be used with the compositors). The intended use is as follows:
+    /// * Whenever the bitmap corresponding to a subblock (c.f. ISubBlock::CreateBitmap) is accessed, the bitmap may be added  
+    ///   to a cache object, where the subblock-index is the key.
+    /// * Whenever a bitmap is needed (for a given subblock-index), the cache object is first queried whether it contains the bitmap. If yes, then the bitmap  
+    ///   returned may be used instead of executing the subblock-read-and-decode operation.
+    /// In order to control the memory usage of the cache, the cache object must be pruned (i.e. subblocks are removed from the cache). Currently this means,
+    /// that the Prune-method must be called manually. The cache object does not do any pruning automatically.
+    /// The operations of Adding, Querying and Pruning the cache object are thread-safe.
+    class ISubBlockCache : public ISubBlockCacheStatistics, public ISubBlockCacheControl, public ISubBlockCacheOperation
+    {
+    public:
         ~ISubBlockCache() override = default;
     };
 
@@ -145,7 +164,13 @@ namespace libCZI
             /// If specified, only subblocks with a scene-index contained in the set will be considered.
             std::shared_ptr<libCZI::IIndexSet> sceneFilter;
 
-            std::shared_ptr<libCZI::ISubBlockCache> subBlockCache;
+            /// If specified, then the sub-block cache is used. This can speed up the operation considerably.
+            /// Bitmaps that are read by the accessor are added to the cache. If a bitmap is needed which is already 
+            /// in the cache, then the bitmap from the cache is used instead of reading the sub-block from the file.
+            std::shared_ptr<libCZI::ISubBlockCacheOperation> subBlockCache;
+
+            /// If true, then only bitmaps from sub-blocks with compressed data are added to the cache.
+            bool onlyUseSubBlockCacheForCompressedData;
 
             /// Clears this object to its blank state.
             void Clear()
@@ -156,6 +181,7 @@ namespace libCZI
                 this->drawTileBorder = false;
                 this->sceneFilter.reset();
                 this->subBlockCache.reset();
+                this->onlyUseSubBlockCacheForCompressedData = true;
             }
         };
 
@@ -219,7 +245,7 @@ namespace libCZI
         /// \return A std::shared_ptr&lt;libCZI::IBitmapData&gt;
         inline std::shared_ptr<libCZI::IBitmapData> Get(libCZI::PixelType pixeltype, int xPos, int yPos, int width, int height, const IDimCoordinate* planeCoordinate, const Options* pOptions) { return this->Get(pixeltype, libCZI::IntRect{ xPos,yPos,width,height }, planeCoordinate, pOptions); }
     protected:
-        virtual ~ISingleChannelTileAccessor() {}
+        virtual ~ISingleChannelTileAccessor() = default;
     };
 
     /// Interface for single-channel-pyramidlayer tile accessors. 
@@ -248,7 +274,13 @@ namespace libCZI
             /// If specified, only subblocks with a scene-index contained in the set will be considered.
             std::shared_ptr<libCZI::IIndexSet> sceneFilter;
 
-            std::shared_ptr<libCZI::ISubBlockCache> subBlockCache;
+            /// If specified, then the sub-block cache is used. This can speed up the operation considerably.
+            /// Bitmaps that are read by the accessor are added to the cache. If a bitmap is needed which is already 
+            /// in the cache, then the bitmap from the cache is used instead of reading the sub-block from the file.
+            std::shared_ptr<libCZI::ISubBlockCacheOperation> subBlockCache;
+
+            /// If true, then only bitmaps from sub-blocks with compressed data are added to the cache.
+            bool onlyUseSubBlockCacheForCompressedData;
 
             /// Clears this object to its blank state.
             void Clear()
@@ -258,6 +290,7 @@ namespace libCZI
                 this->backGroundColor.r = this->backGroundColor.g = this->backGroundColor.b = std::numeric_limits<float>::quiet_NaN();
                 this->sceneFilter.reset();
                 this->subBlockCache.reset();
+                this->onlyUseSubBlockCacheForCompressedData = true;
             }
         };
 
@@ -317,7 +350,7 @@ namespace libCZI
             /// with the maximum pixel value (of the specific pixeltype). If it is a RGB-color type, then R, G and B are separately multiplied with
             /// the maximum pixel value.
             /// If any of R, G or B is NaN, then the background is not cleared.
-            RgbFloatColor   backGroundColor;
+            RgbFloatColor backGroundColor;
 
             /// If true, then the tiles are sorted by their M-index (tile with highest M-index will be 'on top').
             /// Otherwise the Z-order is arbitrary.
@@ -337,7 +370,13 @@ namespace libCZI
             /// without this optimization - i.e. there should be no reason to turn it off besides potential bugs.
             bool useVisibilityCheckOptimization;
 
-            std::shared_ptr<libCZI::ISubBlockCache> subBlockCache;
+            /// If specified, then the sub-block cache is used. This can speed up the operation considerably.
+            /// Bitmaps that are read by the accessor are added to the cache. If a bitmap is needed which is already 
+            /// in the cache, then the bitmap from the cache is used instead of reading the sub-block from the file.
+            std::shared_ptr<libCZI::ISubBlockCacheOperation> subBlockCache;
+
+            /// If true, then only bitmaps from sub-blocks with compressed data are added to the cache.
+            bool onlyUseSubBlockCacheForCompressedData; 
 
             /// Clears this object to its blank state.
             void Clear()
@@ -348,6 +387,7 @@ namespace libCZI
                 this->sceneFilter.reset();
                 this->useVisibilityCheckOptimization = false;
                 this->subBlockCache.reset();
+                this->onlyUseSubBlockCacheForCompressedData = true;
             }
         };
 
