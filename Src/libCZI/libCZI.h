@@ -174,6 +174,8 @@ namespace libCZI
     /// \return The newly created metadata-builder-object.
     LIBCZI_API std::shared_ptr<ICziMetadataBuilder> CreateMetadataBuilder();
 
+    /// Creates a sub block cache object.
+    /// \returns    The newly created sub block cache.
     LIBCZI_API std::shared_ptr<ISubBlockCache> CreateSubBlockCache();
 
     /// Creates metadata builder object from the specified UTF8-encoded XML-string. If the XML is

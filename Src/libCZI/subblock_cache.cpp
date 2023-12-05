@@ -12,13 +12,6 @@ std::shared_ptr<ISubBlockCache> libCZI::CreateSubBlockCache()
     return make_shared<SubBlockCache>();
 }
 
-SubBlockCache::SubBlockCache()
-{
-}
-
-SubBlockCache::~SubBlockCache()
-{}
-
 ISubBlockCacheStatistics::Statistics SubBlockCache::GetStatistics(std::uint8_t mask) const
 {
     Statistics result{ 0 };

@@ -10,6 +10,7 @@
 #include <mutex>
 #include <atomic>
 
+/// A simplistic sub-block cache implementation. It is thread-safe and uses a LRU eviction strategy.
 class SubBlockCache : public libCZI::ISubBlockCache
 {
 private:
@@ -25,18 +26,15 @@ private:
     std::atomic_uint64_t cache_size_in_bytes_{ 0 };
     std::atomic_uint32_t cache_subblock_count_{ 0 };
 public:
-    SubBlockCache();
-    ~SubBlockCache() override;
+    SubBlockCache() = default;
+    ~SubBlockCache() override = default;
 
     std::shared_ptr<libCZI::IBitmapData> Get(int subblock_index) override;
     void Add(int subblock_index, std::shared_ptr<libCZI::IBitmapData> bitmap) override;
     void Prune(const PruneOptions& options) override;
-
     Statistics GetStatistics(std::uint8_t mask) const override;
-
 private:
     void PruneByMemoryUsageAndElementCount(std::uint64_t max_memory_usage, std::uint32_t max_element_count);
     static std::uint64_t CalculateSizeInBytes(const libCZI::IBitmapData* bitmap);
-
     static bool CompareForLruValue(const std::pair<int, CacheEntry>& a, const std::pair<int, CacheEntry>& b);
 };
