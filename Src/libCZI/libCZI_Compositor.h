@@ -165,7 +165,7 @@ namespace libCZI
     /// The pixel type of the output bitmap is either specified as an argument or it is automatically
     /// determined. In the latter case the first sub-block found on the specified plane is examined for its
     /// pixeltype, and this pixeltype is used.\n
-    /// The pixels in the output bitmap get converted from the source pixels (if their pixeltypes differs).
+    /// The pixels in the output bitmap get converted from the source pixels (if their pixeltypes differ).
     class ISingleChannelTileAccessor : public IAccessor
     {
     public:
