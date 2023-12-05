@@ -96,7 +96,9 @@ set (CZICMDSRCFILES
          CZIcmd.cpp          
          platform_defines.h
          executePlaneScan.h
-         executePlaneScan.cpp)
+         executePlaneScan.cpp
+         executeBase.h
+         executeBase.cpp)
 
 add_executable(CZIcmd ${CZICMDSRCFILES})
 
