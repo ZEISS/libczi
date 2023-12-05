@@ -34,11 +34,11 @@ public:
 
         IntSize tileSize = { 512, 512 };
 
-        for (int y = roi.y; y < roi.y + roi.h; y += tileSize.h)
+        for (int y = 0; y < roi.h / tileSize.h; ++y)
         {
-            for (int x = roi.x; x < roi.x + roi.w; x += tileSize.w)
+            for (int x = 0; x <  roi.w / tileSize.w; ++x)
             {
-                IntRect tileRect = { x, y, (int)tileSize.w, (int)tileSize.h };
+                IntRect tileRect = { (int)(roi.x + x * tileSize.w), (int)(roi.y + y * tileSize.h), (int)tileSize.w, (int)tileSize.h };
                 WriteRoi(accessor, coordinate, tileRect, cache_context, options);
             }
         }
