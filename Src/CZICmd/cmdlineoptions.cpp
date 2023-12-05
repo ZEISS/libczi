@@ -2345,31 +2345,31 @@ void CCmdLineOptions::PrintHelpStreamsObjects()
     {
         factor = 1000;
     }
-    else if (icasecmp(suffix_string, "ki") == 0)
+    else if (icasecmp(suffix_string, "ki"))
     {
         factor = 1024;
     }
-    else if (icasecmp(suffix_string, "m") == 0)
+    else if (icasecmp(suffix_string, "m") )
     {
         factor = 1000 * 1000;
     }
-    else if (icasecmp(suffix_string, "mi") == 0)
+    else if (icasecmp(suffix_string, "mi"))
     {
         factor = 1024 * 1024;
     }
-    else if (icasecmp(suffix_string, "g") == 0)
+    else if (icasecmp(suffix_string, "g"))
     {
         factor = 1000 * 1000 * 1000;
     }
-    else if (icasecmp(suffix_string, "gi") == 0)
+    else if (icasecmp(suffix_string, "gi"))
     {
         factor = 1024 * 1024 * 1024;
     }
-    else if (icasecmp(suffix_string, "t") == 0)
+    else if (icasecmp(suffix_string, "t"))
     {
         factor = 1000ULL * 1000 * 1000 * 1000;
     }
-    else if (icasecmp(suffix_string, "ti") == 0)
+    else if (icasecmp(suffix_string, "ti"))
     {
         factor = 1024ULL * 1024 * 1024 * 1024;
     }

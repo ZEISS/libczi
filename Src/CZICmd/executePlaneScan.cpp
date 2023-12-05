@@ -30,8 +30,12 @@ public:
 
 
         CacheContext cache_context;
-        cache_context.cache = CreateSubBlockCache();
-        cache_context.prune_options.maxMemoryUsage = 40 * 1024 * 1024;
+        const uint64_t max_cache_size = options.GetSubBlockCacheSize();
+        if (max_cache_size > 0)
+        {
+            cache_context.cache = CreateSubBlockCache();
+            cache_context.prune_options.maxMemoryUsage = max_cache_size;
+        }
 
         IntSize tileSize = { 512, 512 };
 
