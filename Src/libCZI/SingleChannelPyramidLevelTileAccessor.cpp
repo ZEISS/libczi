@@ -103,11 +103,6 @@ void CSingleChannelPyramidLevelTileAccessor::ComposeTiles(libCZI::IBitmapData* b
         {
             if (index < bitmapCnt)
             {
-                /*SbInfo sbinfo = getSbInfo(index);
-                auto sb = this->sbBlkRepository->ReadSubBlock(sbinfo.index);
-                spBm = sb->CreateBitmap();
-                xPosTile = (sb->GetSubBlockInfo().logicalRect.x - xPos) / sizeOfPixel;
-                yPosTile = (sb->GetSubBlockInfo().logicalRect.y - yPos) / sizeOfPixel;*/
                 const SbInfo sbinfo = getSbInfo(index);
                 const auto subblock_bitmap_data = CSingleChannelAccessorBase::GetSubBlockDataForSubBlockIndex(
                         this->sbBlkRepository,

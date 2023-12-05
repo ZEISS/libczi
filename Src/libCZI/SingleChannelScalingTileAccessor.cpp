@@ -80,17 +80,6 @@ CSingleChannelScalingTileAccessor::CSingleChannelScalingTileAccessor(const std::
 
 void CSingleChannelScalingTileAccessor::ScaleBlt(libCZI::IBitmapData* bmDest, float zoom, const libCZI::IntRect& roi, const SbInfo& sbInfo, const libCZI::ISingleChannelScalingTileAccessor::Options& options)
 {
-    /*
-    const auto sb = this->sbBlkRepository->ReadSubBlock(sbInfo.index);
-    if (GetSite()->IsEnabled(LOGLEVEL_CHATTYINFORMATION))
-    {
-        stringstream ss;
-        ss << "   bounds: " << Utils::DimCoordinateToString(&sb->GetSubBlockInfo().coordinate) << " M=" << (Utils::IsValidMindex(sbInfo.mIndex) ? to_string(sbInfo.mIndex) : "invalid");
-        GetSite()->Log(LOGLEVEL_CHATTYINFORMATION, ss);
-    }
-
-    const auto source = sb->CreateBitmap();
-    */
     auto subblock_bitmap_data = CSingleChannelAccessorBase::GetSubBlockDataForSubBlockIndex(
         this->sbBlkRepository,
         options.subBlockCache,
