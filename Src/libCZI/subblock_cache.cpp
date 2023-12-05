@@ -28,6 +28,8 @@ ISubBlockCacheStatistics::Statistics SubBlockCache::GetStatistics(std::uint8_t m
     else if (mask == (ISubBlockCacheStatistics::kMemoryUsage | ISubBlockCacheStatistics::kElementsCount))
     {
         result.validityMask = ISubBlockCacheStatistics::kMemoryUsage | ISubBlockCacheStatistics::kElementsCount;
+
+        // We want to ensure that the memory usage and the element count are consistent, therefore we need to lock reading both values.
         lock_guard<mutex> lck(this->mutex_);
         result.memoryUsage = this->cache_size_in_bytes_.load();
         result.elementsCount = this->cache_subblock_count_.load();
@@ -83,6 +85,10 @@ void SubBlockCache::Prune(const PruneOptions& options)
 
 void SubBlockCache::PruneByMemoryUsageAndElementCount(std::uint64_t max_memory_usage, std::uint32_t max_element_count)
 {
+    // TODO(JBL): This is a very simple implementation of the prune operation. We determine the oldest element and remove it.
+    //            This is repeated until the cache size is below the maximum memory usage and the element count is below the maximum element count.
+    //            Detrimental is the fact that we have to iterate over all elements in the cache to determine the oldest element, and we might have 
+    //            to do this multiple times. If the number of elements in the cache is large, this might be a performance bottleneck.
     while (this->cache_size_in_bytes_.load() > max_memory_usage || this->cache_subblock_count_.load() > max_element_count)
     {
         auto oldest_element = std::min_element(this->cache_.begin(), this->cache_.end(), SubBlockCache::CompareForLruValue);

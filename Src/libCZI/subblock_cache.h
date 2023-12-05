@@ -16,15 +16,15 @@ class SubBlockCache : public libCZI::ISubBlockCache
 private:
     struct CacheEntry
     {
-        std::shared_ptr<libCZI::IBitmapData> bitmap;
-        std::uint64_t lru_value;
+        std::shared_ptr<libCZI::IBitmapData> bitmap;    ////< The cached bitmap.
+        std::uint64_t lru_value;                        ////< The "LRU value" - when marking a cache entry as "used", this value is set to the current value of the "LRU counter".
     };
 
     std::map<int, CacheEntry> cache_;
     mutable std::mutex mutex_;
-    std::atomic_uint64_t lru_counter_{ 0 };
-    std::atomic_uint64_t cache_size_in_bytes_{ 0 };
-    std::atomic_uint32_t cache_subblock_count_{ 0 };
+    std::atomic_uint64_t lru_counter_{ 0 }; ///< The "LRU counter" - when marking a cache entry as "used", this counter is incremented and the new value is stored in the cache entry.
+    std::atomic_uint64_t cache_size_in_bytes_{ 0 }; ////< The current size of the cache in bytes.
+    std::atomic_uint32_t cache_subblock_count_{ 0 }; ///< The current number of sub-blocks in the cache.
 public:
     SubBlockCache() = default;
     ~SubBlockCache() override = default;
