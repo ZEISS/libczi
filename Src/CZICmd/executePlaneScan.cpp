@@ -60,14 +60,18 @@ public:
 protected:
     static void WriteRoi(const shared_ptr<ISingleChannelScalingTileAccessor>& accessor, const CDimCoordinate& coordinate, const IntRect& roi, const CacheContext& cache_context, const CCmdLineOptions& options)
     {
-        libCZI::ISingleChannelScalingTileAccessor::Options scstaOptions; scstaOptions.Clear();
+        libCZI::ISingleChannelScalingTileAccessor::Options scstaOptions;
+        scstaOptions.Clear();
         scstaOptions.backGroundColor = GetBackgroundColorFromOptions(options);
         scstaOptions.sceneFilter = options.GetSceneIndexSet();
         scstaOptions.subBlockCache = cache_context.cache;
 
         auto bitmap = accessor->Get(roi, &coordinate, options.GetZoom(), &scstaOptions);
 
-        cache_context.cache->Prune(cache_context.prune_options);
+        if (cache_context.cache)
+        {
+            cache_context.cache->Prune(cache_context.prune_options);
+        }
 
         auto filename = GetFileName(options, roi);
         auto saver = CSaveBitmapFactory::CreateSaveBitmapObj(nullptr);
