@@ -428,6 +428,27 @@ struct GeneratorPixelTypeValidator : public CLI::Validator
     }
 };
 
+/// CLI11-validator for the option "--cachesize".
+struct CachesizeValidator : public CLI::Validator
+{
+    CachesizeValidator()
+    {
+        this->name_ = "CachesizeValidator";
+        this->func_ = [](const std::string& str) -> string
+            {
+                const bool parsed_ok = CCmdLineOptions::TryParseSubBlockCacheSize(str, nullptr);
+                if (!parsed_ok)
+                {
+                    ostringstream string_stream;
+                    string_stream << "Invalid subblock-cache-size given \"" << str << "\"";
+                    throw CLI::ValidationError(string_stream.str());
+                }
+
+                return {};
+            };
+    }
+};
+
 /// A custom formatter for CLI11 - used to have nicely formatted descriptions.
 class CustomFormatter : public CLI::Formatter
 {
@@ -519,6 +540,7 @@ CCmdLineOptions::ParseResult CCmdLineOptions::Parse(int argc, char** argv)
     const static CreateSubblockMetadataValidator createsubblockmetadata_validator;
     const static CompressionOptionsValidator compressionoptions_validator;
     const static GeneratorPixelTypeValidator generatorpixeltype_validator;
+    const static CachesizeValidator cachesize_validator;
 
     Command argument_command;
     string argument_source_filename;
@@ -547,6 +569,7 @@ CCmdLineOptions::ParseResult CCmdLineOptions::Parse(int argc, char** argv)
     string argument_createczisubblockmetadata;
     string argument_compressionoptions;
     string argument_generatorpixeltype;
+    string argument_subblock_cachesize;
     bool argument_versionflag = false;
     string argument_source_stream_class;
     string argument_source_stream_creation_propbag;
@@ -709,6 +732,10 @@ CCmdLineOptions::ParseResult CCmdLineOptions::Parse(int argc, char** argv)
         "'Bgr24' or 'Bgr48'. Default is 'Bgr24'.")
         ->option_text("PIXELTYPE")
         ->check(generatorpixeltype_validator);
+    cli_app.add_option("--cachesize", argument_subblock_cachesize,
+        "Only used for 'PlaneScan' ...")
+        ->option_text("CACHESIZE")
+        ->check(cachesize_validator);
     cli_app.add_flag("--version", argument_versionflag,
         "Print extended version-info and supported operations, then exit.");
 
@@ -902,6 +929,12 @@ CCmdLineOptions::ParseResult CCmdLineOptions::Parse(int argc, char** argv)
             const bool b = TryParseGeneratorPixeltype(argument_generatorpixeltype, &this->pixelTypeForBitmapGenerator);
             ThrowIfFalse(b, "--generatorpixeltype", argument_generatorpixeltype);
         }
+
+        if (!argument_subblock_cachesize.empty())
+        {
+            const bool b = TryParseSubBlockCacheSize(argument_subblock_cachesize, &this->subBlockCacheSize);
+            ThrowIfFalse(b, "--cachesize", argument_subblock_cachesize);
+        }
     }
     catch (runtime_error& exception)
     {
@@ -1036,6 +1069,7 @@ void CCmdLineOptions::Clear()
     this->compressionMode = libCZI::CompressionMode::Invalid;
     this->compressionParameters = nullptr;
     this->pixelTypeForBitmapGenerator = libCZI::PixelType::Bgr24;
+    this->subBlockCacheSize = 0;
 }
 
 bool CCmdLineOptions::IsLogLevelEnabled(int level) const
@@ -2183,7 +2217,7 @@ void CCmdLineOptions::PrintHelpStreamsObjects()
     // Here we parse the JSON-formatted string that contains the property bag for the input stream and
     //  construct a map<int, libCZI::StreamsFactory::Property> from it.
 
-    static constexpr struct 
+    static constexpr struct
     {
         const char* name;
         int stream_property_id;
@@ -2275,6 +2309,79 @@ void CCmdLineOptions::PrintHelpStreamsObjects()
             // this actually indicates an internal error - the table kKeyStringToId contains a not yet implemented property type
             return false;
         }
+    }
+
+    return true;
+}
+
+/*static*/bool CCmdLineOptions::TryParseSubBlockCacheSize(const std::string& text, std::uint64_t* size)
+{
+    regex regex(R"(^\s*([+]?(?:[0-9]+(?:[.][0-9]*)?|[.][0-9]+))\s*(k|m|g|t|ki|mi|gi|ti)(?:b?)\s*$)", regex_constants::icase);
+    smatch match;
+    regex_search(text, match, regex);
+    if (match.size() != 3)
+    {
+        return false;
+    }
+
+    double number;
+
+    try
+    {
+        number = stod(match[1].str());
+    }
+    catch (invalid_argument&)
+    {
+        return false;
+    }
+    catch (out_of_range&)
+    {
+        return false;
+    }
+
+    uint64_t factor;
+    string suffix_string = match[2].str();
+    if (icasecmp(suffix_string, "k"))
+    {
+        factor = 1000;
+    }
+    else if (icasecmp(suffix_string, "ki") == 0)
+    {
+        factor = 1024;
+    }
+    else if (icasecmp(suffix_string, "m") == 0)
+    {
+        factor = 1000 * 1000;
+    }
+    else if (icasecmp(suffix_string, "mi") == 0)
+    {
+        factor = 1024 * 1024;
+    }
+    else if (icasecmp(suffix_string, "g") == 0)
+    {
+        factor = 1000 * 1000 * 1000;
+    }
+    else if (icasecmp(suffix_string, "gi") == 0)
+    {
+        factor = 1024 * 1024 * 1024;
+    }
+    else if (icasecmp(suffix_string, "t") == 0)
+    {
+        factor = 1000ULL * 1000 * 1000 * 1000;
+    }
+    else if (icasecmp(suffix_string, "ti") == 0)
+    {
+        factor = 1024ULL * 1024 * 1024 * 1024;
+    }
+    else
+    {
+        return false;
+    }
+
+    const uint64_t memory_size = static_cast<uint64_t>(number * static_cast<double>(factor) + 0.5);
+    if (size != nullptr)
+    {
+        *size = memory_size;
     }
 
     return true;

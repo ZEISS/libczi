@@ -5,6 +5,7 @@
 #include "stdafx.h"
 #include "executePlaneScan.h"
 #include "executeBase.h"
+#include "SaveBitmap.h"
 
 using namespace std;
 using namespace libCZI;
@@ -20,9 +21,9 @@ protected:
 public:
     static bool execute(const CCmdLineOptions& options)
     {
-        auto reader = CreateAndOpenCziReader(options);
+        const auto reader = CreateAndOpenCziReader(options);
         const auto subblock_statistics = reader->GetStatistics();
-        auto accessor = reader->CreateSingleChannelScalingTileAccessor();
+        const auto accessor = reader->CreateSingleChannelScalingTileAccessor();
 
         auto roi = GetRoiFromOptions(options, subblock_statistics);
         CDimCoordinate coordinate = options.GetPlaneCoordinate();
@@ -34,18 +35,23 @@ public:
 
         IntSize tileSize = { 512, 512 };
 
-        for (int y = 0; y < roi.h / tileSize.h; ++y)
+        for (int y = 0; y < (roi.h + static_cast<int>(tileSize.h) - 1) / static_cast<int>(tileSize.h); ++y)
         {
-            for (int x = 0; x <  roi.w / tileSize.w; ++x)
+            for (int x = 0; x < (roi.w + static_cast<int>(tileSize.w) - 1) / static_cast<int>(tileSize.w); ++x)
             {
-                IntRect tileRect = { (int)(roi.x + x * tileSize.w), (int)(roi.y + y * tileSize.h), (int)tileSize.w, (int)tileSize.h };
+                IntRect tileRect =
+                {
+                    roi.x + x * static_cast<int>(tileSize.w),
+                    roi.y + y * static_cast<int>(tileSize.h),
+                    min(static_cast<int>(tileSize.w), roi.w - x * static_cast<int>(tileSize.w)),
+                    min(static_cast<int>(tileSize.h), roi.h - y * static_cast<int>(tileSize.h))
+                };
+
                 WriteRoi(accessor, coordinate, tileRect, cache_context, options);
             }
         }
 
         return true;
-        //for (int x = 0; x < statistics.boundingBoxLayer0Only.w / size_x; ++x)
-    //auto re = accessor->Get(roi, &coordinate, options.GetZoom(), &scstaOptions);
     }
 protected:
     static void WriteRoi(const shared_ptr<ISingleChannelScalingTileAccessor>& accessor, const CDimCoordinate& coordinate, const IntRect& roi, const CacheContext& cache_context, const CCmdLineOptions& options)
@@ -58,6 +64,18 @@ protected:
         auto bitmap = accessor->Get(roi, &coordinate, options.GetZoom(), &scstaOptions);
 
         cache_context.cache->Prune(cache_context.prune_options);
+
+        auto filename = GetFileName(options, roi);
+        auto saver = CSaveBitmapFactory::CreateSaveBitmapObj(nullptr);
+        saver->Save(filename.c_str(), SaveDataFormat::PNG, bitmap.get());
+    }
+
+    static wstring GetFileName(const CCmdLineOptions& options, const IntRect& roi)
+    {
+        wstringstream string_stream;
+        string_stream << "_X" << roi.x << "_Y" << roi.y << "_W" << roi.w << "_H" << roi.h;
+        wstring outputfilename = options.MakeOutputFilename(string_stream.str().c_str(), L"PNG");
+        return outputfilename;
     }
 };
 
