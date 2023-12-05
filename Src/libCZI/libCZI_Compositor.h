@@ -29,8 +29,8 @@ namespace libCZI
     class ISubBlockCacheStatistics
     {
     public:
-        static constexpr std::uint8_t kMemoryUsage = 1;
-        static constexpr std::uint8_t kElementsCount = 2;
+        static constexpr std::uint8_t kMemoryUsage = 1;     ///< Bit-mask identifying the memory-usage field in the statistics struct.
+        static constexpr std::uint8_t kElementsCount = 2;   ///< Bit-mask identifying the elements-count field in the statistics struct.
 
         /// This struct defines the statistics which can be queried from the cache. There is a bitfield which
         /// defines which elements are valid. If the bit is set, then the corresponding member is valid.
@@ -57,6 +57,12 @@ namespace libCZI
         virtual Statistics GetStatistics(std::uint8_t mask) const = 0;
 
         virtual ~ISubBlockCacheStatistics() = default;
+
+        ISubBlockCacheStatistics() = default;
+        ISubBlockCacheStatistics(const ISubBlockCacheStatistics&) = delete;
+        ISubBlockCacheStatistics& operator=(const ISubBlockCacheStatistics&) = delete;
+        ISubBlockCacheStatistics(ISubBlockCacheStatistics&&) noexcept = delete;
+        ISubBlockCacheStatistics& operator=(ISubBlockCacheStatistics&&) noexcept = delete;
     };
 
     /// This interface defines the global operations on the cache. It is used to control the memory usage of the cache.
@@ -66,7 +72,7 @@ namespace libCZI
         /// Options for controlling the prune operation. There are two metrics which can be used to control what
         /// remains in the cache and what is discarded: the maximum memory usage (for all elements in the cache) and 
         /// the maximum number of sub-blocks. If the cache exceeds one of those limits, then elements are evicted from the cache
-        /// until both condions are met. Eviction is done in the order starting with elements where their last access is the longest 
+        /// until both conditions are met. Eviction is done in the order starting with elements where their last access is the longest 
         /// time ago. As "access" we define either the Add-operation or the Get-operation - so, when an element is retrieved from the
         /// cache, it is considered as "accessed".
         /// If only one condition is desired, then the other condition can be set to the maximum value of the respective type (which is the
@@ -87,16 +93,35 @@ namespace libCZI
         virtual void Prune(const PruneOptions& options) = 0;
 
         virtual ~ISubBlockCacheControl() = default;
+
+        ISubBlockCacheControl() = default;
+        ISubBlockCacheControl(const ISubBlockCacheControl&) = delete;
+        ISubBlockCacheControl& operator=(const ISubBlockCacheControl&) = delete;
+        ISubBlockCacheControl(ISubBlockCacheControl&&) noexcept = delete;
+        ISubBlockCacheControl& operator=(ISubBlockCacheControl&&) noexcept = delete;
     };
 
     /// This interface defines the operations of adding and querying an element to/from the cache.
     class ISubBlockCacheOperation
     {
     public:
+        /// Gets the bitmap for the specified subblock-index. If the subblock is not in the cache, then a nullptr is returned.
+        /// \param  subblock_index  The subblock index to get.
+        /// \returns    If the subblock is in the cache, then a std::shared_ptr&lt;libCZI::IBitmapData&gt; is returned. Otherwise a nullptr is returned.
         virtual std::shared_ptr<IBitmapData> Get(int subblock_index) = 0;
+
+        /// Adds the specified bitmap for the specified subblock_index to the cache. If the subblock is already in the cache, then it is overwritten.
+        /// \param  subblock_index  The subblock index to add.
+        /// \param  pBitmap         The bitmap.
         virtual void Add(int subblock_index, std::shared_ptr<IBitmapData> pBitmap) = 0;
 
         virtual ~ISubBlockCacheOperation() = default;
+
+        ISubBlockCacheOperation() = default;
+        ISubBlockCacheOperation(const ISubBlockCacheOperation&) = delete;
+        ISubBlockCacheOperation& operator=(const ISubBlockCacheOperation&) = delete;
+        ISubBlockCacheOperation(ISubBlockCacheOperation&&) noexcept = delete;
+        ISubBlockCacheOperation& operator=(ISubBlockCacheOperation&&) noexcept = delete;
     };
 
     /// Interface for a caching component (which can be used with the compositors). The intended use is as follows:
@@ -111,6 +136,12 @@ namespace libCZI
     {
     public:
         ~ISubBlockCache() override = default;
+
+        ISubBlockCache() = default;
+        ISubBlockCache(const ISubBlockCache&) = delete;
+        ISubBlockCache& operator=(const ISubBlockCache&) = delete;
+        ISubBlockCache(ISubBlockCache&&) noexcept = delete;
+        ISubBlockCache& operator=(ISubBlockCache&&) noexcept = delete;
     };
 
     /// The base interface (all accessor-interface must derive from this).
@@ -169,7 +200,9 @@ namespace libCZI
             /// in the cache, then the bitmap from the cache is used instead of reading the sub-block from the file.
             std::shared_ptr<libCZI::ISubBlockCacheOperation> subBlockCache;
 
-            /// If true, then only bitmaps from sub-blocks with compressed data are added to the cache.
+            /// If true, then only bitmaps from sub-blocks with compressed data are added to the cache. For uncompressed
+            /// data, the time for reading the bitmap can be negligible, so the benefit of caching might not outweigh the
+            /// increased memory usage.
             bool onlyUseSubBlockCacheForCompressedData;
 
             /// Clears this object to its blank state.
@@ -376,7 +409,7 @@ namespace libCZI
             std::shared_ptr<libCZI::ISubBlockCacheOperation> subBlockCache;
 
             /// If true, then only bitmaps from sub-blocks with compressed data are added to the cache.
-            bool onlyUseSubBlockCacheForCompressedData; 
+            bool onlyUseSubBlockCacheForCompressedData;
 
             /// Clears this object to its blank state.
             void Clear()
