@@ -34,8 +34,8 @@ public:
             cache_context.cache = CreateSubBlockCache();
             cache_context.prune_options.maxMemoryUsage = max_cache_size;
         }
-
-        const IntSize tileSize = { get<0>(options.GetTileSizeForPlaneScan()), get<1>(options.GetTileSizeForPlaneScan()) };
+        const auto tile_size_for_plane_scan = options.GetTileSizeForPlaneScan();
+        const IntSize tileSize = { get<0>(tile_size_for_plane_scan), get<1>(tile_size_for_plane_scan) };
         const auto saver = CSaveBitmapFactory::CreateSaveBitmapObj(nullptr);
 
         for (int y = 0; y < (roi.h + static_cast<int>(tileSize.h) - 1) / static_cast<int>(tileSize.h); ++y)

@@ -72,8 +72,8 @@ namespace libCZI
         /// Options for controlling the prune operation. There are two metrics which can be used to control what
         /// remains in the cache and what is discarded: the maximum memory usage (for all elements in the cache) and 
         /// the maximum number of sub-blocks. If the cache exceeds one of those limits, then elements are evicted from the cache
-        /// until both conditions are met. Eviction is done in the order starting with elements where their last access is the longest 
-        /// time ago. As "access" we define either the Add-operation or the Get-operation - so, when an element is retrieved from the
+        /// until both conditions are met. Eviction is done in the order starting with elements which have been least recently accessed.
+        /// As "access" we define either the Add-operation or the Get-operation - so, when an element is retrieved from the
         /// cache, it is considered as "accessed".
         /// If only one condition is desired, then the other condition can be set to the maximum value of the respective type (which is the
         /// default value).
