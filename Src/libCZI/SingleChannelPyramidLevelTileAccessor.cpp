@@ -103,11 +103,15 @@ void CSingleChannelPyramidLevelTileAccessor::ComposeTiles(libCZI::IBitmapData* b
         {
             if (index < bitmapCnt)
             {
-                SbInfo sbinfo = getSbInfo(index);
-                auto sb = this->sbBlkRepository->ReadSubBlock(sbinfo.index);
-                spBm = sb->CreateBitmap();
-                xPosTile = (sb->GetSubBlockInfo().logicalRect.x - xPos) / sizeOfPixel;
-                yPosTile = (sb->GetSubBlockInfo().logicalRect.y - yPos) / sizeOfPixel;
+                const SbInfo sbinfo = getSbInfo(index);
+                const auto subblock_bitmap_data = CSingleChannelAccessorBase::GetSubBlockDataForSubBlockIndex(
+                        this->sbBlkRepository,
+                        options.subBlockCache,
+                        sbinfo.index,
+                        options.onlyUseSubBlockCacheForCompressedData);
+                spBm = subblock_bitmap_data.bitmap;
+                xPosTile = (subblock_bitmap_data.subBlockInfo.logicalRect.x - xPos) / sizeOfPixel;
+                yPosTile = (subblock_bitmap_data.subBlockInfo.logicalRect.y - yPos) / sizeOfPixel;
                 return true;
             }
 
@@ -129,7 +133,7 @@ libCZI::IntRect CSingleChannelPyramidLevelTileAccessor::CalcDestinationRectFromS
 
 libCZI::IntRect CSingleChannelPyramidLevelTileAccessor::NormalizePyramidRect(int x, int y, int w, int h, const PyramidLayerInfo& pyramidInfo)
 {
-    const int p = this->CalcSizeOfPixelOnLayer0(pyramidInfo);
+    const int p = CSingleChannelPyramidLevelTileAccessor::CalcSizeOfPixelOnLayer0(pyramidInfo);
     return IntRect{ x,y,w * p,h * p };
 }
 

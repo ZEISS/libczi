@@ -66,4 +66,16 @@ protected:
     ///             given here, then the result is guaranteed to be the same as if all subblocks were rendered. Non-visible subblocks are not
     ///             part of this list.
     static std::vector<int> CheckForVisibilityCore(const libCZI::IntRect& roi, int count, const std::function<int(int)>& get_subblock_index, const std::function<libCZI::IntRect(int)>& get_rect_of_subblock);
+
+    struct SubBlockData
+    {
+        std::shared_ptr<libCZI::IBitmapData> bitmap;
+        libCZI::SubBlockInfo subBlockInfo;
+    };
+
+    static SubBlockData GetSubBlockDataForSubBlockIndex(
+        const std::shared_ptr<libCZI::ISubBlockRepository>& sbBlkRepository, 
+        const std::shared_ptr<libCZI::ISubBlockCacheOperation>& cache,
+        int subBlockIndex,
+        bool onlyAddCompressedSubBlockToCache);
 };

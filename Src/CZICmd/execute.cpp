@@ -3,14 +3,16 @@
 // SPDX-License-Identifier: LGPL-3.0-or-later
 
 #include "stdafx.h"
-#include <limits>
 #include "execute.h"
+#include "executeBase.h"
 #include "executeCreateCzi.h"
+#include "executePlaneScan.h"
 #include "inc_libCZI.h"
 #include "SaveBitmap.h"
 #include "utils.h"
 #include "DisplaySettingsHelper.h"
 #include "inc_rapidjson.h"
+#include <limits>
 #include <iomanip>
 #include <map>
 #include <fstream>
@@ -18,110 +20,6 @@
 using namespace libCZI;
 using namespace std;
 using namespace rapidjson;
-
-class CExecuteBase
-{
-protected:
-    static std::shared_ptr<ICZIReader> CreateAndOpenCziReader(const CCmdLineOptions& options)
-    {
-        shared_ptr<IStream> stream;
-        if (options.GetInputStreamClassName().empty())
-        {
-            stream = CExecuteBase::CreateStandardFileBasedStreamObject(options.GetCZIFilename().c_str());
-        }
-        else
-        {
-            stream = CExecuteBase::CreateInputStreamObject(
-                                    options.GetCZIFilename().c_str(), 
-                                    options.GetInputStreamClassName(),
-                                    &options.GetInputStreamPropertyBag());
-        }
-
-        auto spReader = libCZI::CreateCZIReader();
-        spReader->Open(stream);
-        return spReader;
-    }
-
-    static std::shared_ptr<IStream> CreateStandardFileBasedStreamObject(const wchar_t* fileName)
-    {
-        auto stream = libCZI::CreateStreamFromFile(fileName);
-        return stream;
-    }
-
-    static std::shared_ptr<IStream> CreateInputStreamObject(const wchar_t* uri, const string& class_name, const std::map<int, libCZI::StreamsFactory::Property>* property_bag)
-    {
-        libCZI::StreamsFactory::Initialize();
-        libCZI::StreamsFactory::CreateStreamInfo stream_info;
-        stream_info.class_name = class_name;
-        if (property_bag != nullptr)
-        {
-            stream_info.property_bag = *property_bag;
-        }
-
-        auto stream = libCZI::StreamsFactory::CreateStream(stream_info, uri);
-        if (!stream)
-        {
-            stringstream string_stream;
-            string_stream << "Failed to create stream object of the class \"" << class_name << "\".";
-            throw std::runtime_error(string_stream.str());
-        }
-
-        return stream;
-    }
-
-    static IntRect GetRoiFromOptions(const CCmdLineOptions& options, const SubBlockStatistics& subBlockStatistics)
-    {
-        IntRect roi{ options.GetRectX(), options.GetRectY(), options.GetRectW(), options.GetRectH() };
-        if (options.GetIsRelativeRectCoordinate())
-        {
-            roi.x += subBlockStatistics.boundingBox.x;
-            roi.y += subBlockStatistics.boundingBox.y;
-        }
-
-        return roi;
-    }
-
-    static libCZI::RgbFloatColor GetBackgroundColorFromOptions(const CCmdLineOptions& options)
-    {
-        return options.GetBackGroundColor();
-    }
-
-    static void DoCalcHashOfResult(shared_ptr<libCZI::IBitmapData> bm, const CCmdLineOptions& options)
-    {
-        DoCalcHashOfResult(bm.get(), options);
-    }
-
-    static void HandleHashOfResult(const std::function<bool(uint8_t*, size_t)>& f, const CCmdLineOptions& options)
-    {
-        if (!options.GetCalcHashOfResult())
-        {
-            return;
-        }
-
-        uint8_t md5sumHash[16];
-        if (!f(md5sumHash, sizeof(md5sumHash)))
-        {
-            return;
-        }
-
-        string hashHex = BytesToHexString(md5sumHash, sizeof(md5sumHash));
-        std::stringstream ss;
-        ss << "hash of result: " << hashHex;
-        auto log = options.GetLog();
-        log->WriteLineStdOut(ss.str().c_str());
-    }
-
-    static void DoCalcHashOfResult(libCZI::IBitmapData* bm, const CCmdLineOptions& options)
-    {
-        HandleHashOfResult(
-            [&](uint8_t* ptrHash, size_t size)->bool
-            {
-                Utils::CalcMd5SumHash(bm, ptrHash, (int)size);
-                return true;
-            },
-            options);
-    }
-};
 
 class CExecutePrintInformation : CExecuteBase
 {
@@ -655,6 +553,9 @@ public:
         libCZI::ISingleChannelTileAccessor::Options sctaOptions; sctaOptions.Clear();
         sctaOptions.sortByM = true;
         sctaOptions.drawTileBorder = options.GetDrawTileBoundaries();
+        sctaOptions.backGroundColor = GetBackgroundColorFromOptions(options);
+        sctaOptions.sceneFilter = options.GetSceneIndexSet();
+        sctaOptions.useVisibilityCheckOptimization = options.GetUseVisibilityCheckOptimization();
 
         IntRect roi{ options.GetRectX() ,options.GetRectY(),options.GetRectW(),options.GetRectH() };
         if (options.GetIsRelativeRectCoordinate())
@@ -850,6 +751,7 @@ public:
         libCZI::ISingleChannelScalingTileAccessor::Options scstaOptions; scstaOptions.Clear();
         scstaOptions.backGroundColor = GetBackgroundColorFromOptions(options);
         scstaOptions.sceneFilter = options.GetSceneIndexSet();
+        scstaOptions.useVisibilityCheckOptimization = options.GetUseVisibilityCheckOptimization();
 
         auto re = accessor->Get(roi, &coordinate, options.GetZoom(), &scstaOptions);
 
@@ -956,6 +858,7 @@ private:
         sctaOptions.backGroundColor = GetBackgroundColorFromOptions(options);
         sctaOptions.drawTileBorder = options.GetDrawTileBoundaries();
         sctaOptions.sceneFilter = options.GetSceneIndexSet();
+        sctaOptions.useVisibilityCheckOptimization = options.GetUseVisibilityCheckOptimization();
         IntRect roi{ options.GetRectX() ,options.GetRectY() ,options.GetRectW(),options.GetRectH() };
         if (options.GetIsRelativeRectCoordinate())
         {
@@ -1228,6 +1131,9 @@ bool execute(const CCmdLineOptions& options)
             break;
         case Command::CreateCZI:
             success = executeCreateCzi(options);
+            break;
+        case Command::PlaneScan:
+            success = executePlaneScan(options);
             break;
         default:
             break;
