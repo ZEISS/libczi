@@ -2364,6 +2364,18 @@ void CCmdLineOptions::PrintHelpStreamsObjects()
 
 /*static*/bool CCmdLineOptions::TryParseSubBlockCacheSize(const std::string& text, std::uint64_t* size)
 {
+    // This regular expression is used to match strings that represent sizes in bytes, kilobytes, megabytes, gigabytes, terabytes, kibibytes, mebibytes, gibibytes, and tebibytes. 
+    //
+    // Here is a breakdown of the regular expression:
+    //
+    // - ^\s*: Matches the start of the string, followed by any amount of whitespace.
+    // - ([+]?(?:[0-9]+(?:[.][0-9]*)?|[.][0-9]+)): Matches a positive number, which can be an integer or a decimal. The number may optionally be preceded by a plus sign.
+    // - \s*: Matches any amount of whitespace following the number.
+    // - (k|m|g|t|ki|mi|gi|ti): Matches one of the following units of size: k (kilobytes), m (megabytes), g (gigabytes), t (terabytes), ki (kibibytes), mi (mebibytes), gi (gibibytes), ti (tebibytes).
+    // - (?:b?): Optionally matches a 'b', which can be used to explicitly specify that the size is in bytes.
+    // - \s*$: Matches any amount of whitespace at the end of the string, followed by the end of the string.
+    //
+    // This regular expression is case-insensitive.
     regex regex(R"(^\s*([+]?(?:[0-9]+(?:[.][0-9]*)?|[.][0-9]+))\s*(k|m|g|t|ki|mi|gi|ti)(?:b?)\s*$)", regex_constants::icase);
     smatch match;
     regex_search(text, match, regex);
