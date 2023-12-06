@@ -618,7 +618,7 @@ CCmdLineOptions::ParseResult CCmdLineOptions::Parse(int argc, char** argv)
            using display-settings.
            \N'ExtractAttachment' allows to extract (and save to a file) the contents of attachments.)
            \N'CreateCZI' is used to demonstrate the CZI-creation capabilities of libCZI.)
-           \N'PlaneScan' does the following: over a ROI of given with the --rect option a rectangle of size given with 
+           \N'PlaneScan' does the following: over a ROI given with the --rect option a rectangle of size given with 
            the --tilesize-for-plane-scan option is moved, and the image content of this rectangle is written out to
            files. The operation takes place on a plane which is given with the --plane-coordinate option. The filenames of the
            tile-bitmaps are generated from the filename given with the --output option, where a string _X[x-position]_Y[y-position]_W[width]_H[height]
