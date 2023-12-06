@@ -89,6 +89,8 @@ namespace libCZI
         };
 
         /// Prunes the cache. This means that sub-blocks are removed from the cache until the cache satisfies the conditions given in the options.
+        /// Note that the prune operation is not done automatically - it must be called manually. I.e. when adding an element to the cache, the cache
+        /// is **not** pruned automatically.
         /// \param  options Options for controlling the operation.
         virtual void Prune(const PruneOptions& options) = 0;
 
