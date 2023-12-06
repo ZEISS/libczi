@@ -46,7 +46,7 @@ namespace libCZI
             std::uint32_t elementsCount;
         };
 
-        /// Gets momentarily valid statistics about the cache. The mask defines which statistics is to be retrieved.
+        /// Gets momentarily valid statistics about the cache. The mask defines which statistic/s is/are to be retrieved.
         /// In case of multiple fields being requested, it is guaranteed that all requested fields are a transactional 
         /// snapshot of the state.
         ///
