@@ -7,14 +7,6 @@
 using namespace libCZI;
 using namespace std;
 
-// Surprisingly, with C++11 it is possible to have the constants odr-used (One-Definition-Rule used),
-//  e.g. by taking their address, binding it to a reference of passing it to a function by reference. 
-//  So, to be on the safe side, we provide an out-of-class definition here. With C++17 this is not
-//  necessary any more, 'static constexpr' is implictly inlined, and even in case of odr-use an out-of-
-//  class definition is not needed.
-constexpr std::uint8_t ISubBlockCacheStatistics::kMemoryUsage;
-constexpr std::uint8_t ISubBlockCacheStatistics::kElementsCount;
-
 std::shared_ptr<ISubBlockCache> libCZI::CreateSubBlockCache()
 {
     return make_shared<SubBlockCache>();

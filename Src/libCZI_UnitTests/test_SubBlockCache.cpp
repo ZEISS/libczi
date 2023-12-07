@@ -53,11 +53,11 @@ TEST(SubBlockCache, OverwriteExisting)
     EXPECT_TRUE(AreBitmapDataEqual(bm3, bitmap_from_cache_2));
 
     const auto statistics_memory_usage = cache->GetStatistics(ISubBlockCacheStatistics::kMemoryUsage);
-    EXPECT_EQ(statistics_memory_usage.validityMask, ISubBlockCacheStatistics::kMemoryUsage);
+    EXPECT_TRUE(statistics_memory_usage.validityMask == ISubBlockCacheStatistics::kMemoryUsage);
     EXPECT_EQ(statistics_memory_usage.memoryUsage, 163 * 128 * 3 + 11 * 14);
 
     const auto statistics_elements_count = cache->GetStatistics(ISubBlockCacheStatistics::kElementsCount);
-    EXPECT_EQ(statistics_elements_count.validityMask, ISubBlockCacheStatistics::kElementsCount);
+    EXPECT_TRUE(statistics_elements_count.validityMask == ISubBlockCacheStatistics::kElementsCount);
     EXPECT_EQ(statistics_elements_count.elementsCount, 2);
 }
 
@@ -70,11 +70,11 @@ TEST(SubBlockCache, GetStatistics)
     cache->Add(1, bm2);
 
     const auto statistics_memory_usage = cache->GetStatistics(ISubBlockCacheStatistics::kMemoryUsage);
-    EXPECT_EQ(statistics_memory_usage.validityMask, ISubBlockCacheStatistics::kMemoryUsage);
+    EXPECT_TRUE(statistics_memory_usage.validityMask == ISubBlockCacheStatistics::kMemoryUsage);
     EXPECT_EQ(statistics_memory_usage.memoryUsage, 4 * 2 + 2 * 2 * 2);
 
     const auto statistics_elements_count = cache->GetStatistics(ISubBlockCacheStatistics::kElementsCount);
-    EXPECT_EQ(statistics_elements_count.validityMask, ISubBlockCacheStatistics::kElementsCount);
+    EXPECT_TRUE(statistics_elements_count.validityMask == ISubBlockCacheStatistics::kElementsCount);
     EXPECT_EQ(statistics_elements_count.elementsCount, 2);
 
     const auto statistics_both = cache->GetStatistics(ISubBlockCacheStatistics::kMemoryUsage | ISubBlockCacheStatistics::kElementsCount);
@@ -95,7 +95,7 @@ TEST(SubBlockCache, PruneCacheCase1)
 
     cache->Prune({ numeric_limits<uint64_t>::max(), 1 });
     const auto statistics_elements_count = cache->GetStatistics(ISubBlockCacheStatistics::kElementsCount);
-    EXPECT_EQ(statistics_elements_count.validityMask, ISubBlockCacheStatistics::kElementsCount);
+    EXPECT_TRUE(statistics_elements_count.validityMask == ISubBlockCacheStatistics::kElementsCount);
     EXPECT_EQ(statistics_elements_count.elementsCount, 1);
 
     auto bitmap_from_cache = cache->Get(1);
@@ -120,7 +120,7 @@ TEST(SubBlockCache, PruneCacheCase2)
 
     cache->Prune({ numeric_limits<uint64_t>::max(), 1 });
     const auto statistics_elements_count = cache->GetStatistics(ISubBlockCacheStatistics::kElementsCount);
-    EXPECT_EQ(statistics_elements_count.validityMask, ISubBlockCacheStatistics::kElementsCount);
+    EXPECT_TRUE(statistics_elements_count.validityMask == ISubBlockCacheStatistics::kElementsCount);
     EXPECT_EQ(statistics_elements_count.elementsCount, 1);
 
     bitmap_from_cache = cache->Get(0);
@@ -146,7 +146,7 @@ TEST(SubBlockCache, PruneCacheCase3)
     prune_options.maxMemoryUsage = 1;
     cache->Prune(prune_options);
     const auto statistics_elements_count = cache->GetStatistics(ISubBlockCacheStatistics::kElementsCount);
-    EXPECT_EQ(statistics_elements_count.validityMask, ISubBlockCacheStatistics::kElementsCount);
+    EXPECT_TRUE(statistics_elements_count.validityMask == ISubBlockCacheStatistics::kElementsCount);
     EXPECT_EQ(statistics_elements_count.elementsCount, 1);
 
     auto bitmap_from_cache = cache->Get(0);

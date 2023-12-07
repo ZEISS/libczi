@@ -26,7 +26,7 @@ namespace libCZI
     };
 
     /// This interface defines how status information about the cache-state can be queried.
-    class LIBCZI_API ISubBlockCacheStatistics
+    class ISubBlockCacheStatistics
     {
     public:
         static constexpr std::uint8_t kMemoryUsage = 1;     ///< Bit-mask identifying the memory-usage field in the statistics struct.
