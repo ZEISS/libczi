@@ -1,7 +1,6 @@
 {
-  "image": "mcr.microsoft.com/devcontainers/universal:2",
+  "image": "mcr.microsoft.com/devcontainers/cpp:debian",
   "features": {
-    "ghcr.io/msclock/features/vcpkg:1": {},
-    "ghcr.io/devcontainers-contrib/features/bash-command:1": {"command":"vcpkg install libpng"}
+    "ghcr.io/devcontainers-contrib/features/bash-command:1": {"command":"cd ${VCPKG_ROOT} && git pull --ff-only"}
   }
 }
