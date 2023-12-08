@@ -1,0 +1,7 @@
+{
+  "image": "mcr.microsoft.com/devcontainers/universal:2",
+  "features": {
+    "ghcr.io/msclock/features/vcpkg:1": {},
+    "ghcr.io/devcontainers-contrib/features/bash-command:1": {"command":"vcpkg install libpng"}
+  }
+}
