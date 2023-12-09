@@ -6,7 +6,9 @@
 		"dockerfile": "Dockerfile"
 	},
 	"features": {
-		"ghcr.io/devcontainers-contrib/features/bash-command:1": {}
+		"ghcr.io/devcontainers-contrib/features/bash-command:1": {
+			"script": "apt-get update && apt-get install -y libpng-dev libfreetype6-dev rapidjson-dev libssl-dev"
+		}
 	}
 
 	// Features to add to the dev container. More info: https://containers.dev/features.
