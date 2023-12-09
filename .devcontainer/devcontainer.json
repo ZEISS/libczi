@@ -5,6 +5,15 @@
 	"build": {
 		"dockerfile": "Dockerfile"
 	},
+	"settings": {
+        "cmake.configureArgs": [
+            "-DLIBCZI_BUILD_CURL_BASED_STREAM=ON",
+            "-DLIBCZI_BUILD_DYNLIB=OFF",
+            "-DLIBCZI_BUILD_CZICMD=ON",
+			"-DLIBCZI_BUILD_PREFER_EXTERNALPACKAGE_LIBCURL=ON"
+        ]
+        // Add other settings here as needed
+    },
 	"features": {
 		"ghcr.io/devcontainers-contrib/features/bash-command:1": {
 			
