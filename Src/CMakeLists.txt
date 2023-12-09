@@ -26,7 +26,7 @@ if (LIBCZI_BUILD_CURL_BASED_STREAM)
     message(STATUS "Using CURL lib(s): ${CURL_LIBRARIES}")
 
   else(LIBCZI_BUILD_PREFER_EXTERNALPACKAGE_LIBCURL)
-    message(STATUS "Could not find libcURL.  This dependency will be downloaded.")
+    message(STATUS "Attempting to download and build libcURL.")
     include(FetchContent)
     # It seems for MacOS, the secure transport API is deprecated (->  https://curl.se/mail/lib-2023-09/0027.html),
     #  using OpenSSL seems to be the way to go here - so, we better do not default to secure transport here.

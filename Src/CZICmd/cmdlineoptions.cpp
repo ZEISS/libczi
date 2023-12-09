@@ -11,6 +11,7 @@
 #include <iostream>
 #include <utility>
 #include <cstring>
+#include <cmath>
 #if defined(LINUXENV)
 #include <libgen.h>
 #endif
@@ -428,6 +429,47 @@ struct GeneratorPixelTypeValidator : public CLI::Validator
     }
 };
 
+/// CLI11-validator for the option "--cachesize".
+struct CachesizeValidator : public CLI::Validator
+{
+    CachesizeValidator()
+    {
+        this->name_ = "CachesizeValidator";
+        this->func_ = [](const std::string& str) -> string
+            {
+                const bool parsed_ok = CCmdLineOptions::TryParseSubBlockCacheSize(str, nullptr);
+                if (!parsed_ok)
+                {
+                    ostringstream string_stream;
+                    string_stream << "Invalid subblock-cache-size given \"" << str << "\"";
+                    throw CLI::ValidationError(string_stream.str());
+                }
+
+                return {};
+            };
+    }
+};
+
+struct TileSizeForPlaneScanValidator : public CLI::Validator
+{
+    TileSizeForPlaneScanValidator()
+    {
+        this->name_ = "TileSizeForPlaneScanValidator";
+        this->func_ = [](const std::string& str) -> string
+            {
+                const bool parsed_ok = CCmdLineOptions::TryParseCreateSize(str, nullptr);
+                if (!parsed_ok)
+                {
+                    ostringstream string_stream;
+                    string_stream << "Invalid tile-size-plane-scan given \"" << str << "\"";
+                    throw CLI::ValidationError(string_stream.str());
+                }
+
+                return {};
+            };
+    }
+};
+
 /// A custom formatter for CLI11 - used to have nicely formatted descriptions.
 class CustomFormatter : public CLI::Formatter
 {
@@ -497,6 +539,7 @@ CCmdLineOptions::ParseResult CCmdLineOptions::Parse(int argc, char** argv)
         { "ScalingChannelComposite",            Command::ScalingChannelComposite },
         { "ExtractAttachment",                  Command::ExtractAttachment},
         { "CreateCZI",                          Command::CreateCZI },
+        { "PlaneScan",                          Command::PlaneScan },
     };
 
     const static PlaneCoordinateValidator plane_coordinate_validator;
@@ -518,6 +561,8 @@ CCmdLineOptions::ParseResult CCmdLineOptions::Parse(int argc, char** argv)
     const static CreateSubblockMetadataValidator createsubblockmetadata_validator;
     const static CompressionOptionsValidator compressionoptions_validator;
     const static GeneratorPixelTypeValidator generatorpixeltype_validator;
+    const static CachesizeValidator cachesize_validator;
+    const static TileSizeForPlaneScanValidator tile_size_for_plane_scan_validator;
 
     Command argument_command;
     string argument_source_filename;
@@ -546,9 +591,12 @@ CCmdLineOptions::ParseResult CCmdLineOptions::Parse(int argc, char** argv)
     string argument_createczisubblockmetadata;
     string argument_compressionoptions;
     string argument_generatorpixeltype;
+    string argument_subblock_cachesize;
+    string argument_tilesize_for_scan;
     bool argument_versionflag = false;
     string argument_source_stream_class;
     string argument_source_stream_creation_propbag;
+    bool argument_use_visibility_check_optimization = false;
 
     // editorconfig-checker-disable
     cli_app.add_option("-c,--command", argument_command,
@@ -569,7 +617,12 @@ CCmdLineOptions::ParseResult CCmdLineOptions::Parse(int argc, char** argv)
            \N'ScalingChannelComposite' operates like the previous command, but in addition gets all channels and creates a multi-channel-composite from them
            using display-settings.
            \N'ExtractAttachment' allows to extract (and save to a file) the contents of attachments.)
-           \N'CreateCZI' is used to demonstrate the CZI-creation capabilities of libCZI.)")
+           \N'CreateCZI' is used to demonstrate the CZI-creation capabilities of libCZI.)
+           \N'PlaneScan' does the following: over a ROI given with the --rect option a rectangle of size given with 
+           the --tilesize-for-plane-scan option is moved, and the image content of this rectangle is written out to
+           files. The operation takes place on a plane which is given with the --plane-coordinate option. The filenames of the
+           tile-bitmaps are generated from the filename given with the --output option, where a string _X[x-position]_Y[y-position]_W[width]_H[height]
+           is added.)")
         ->default_val(Command::Invalid)
         ->option_text("COMMAND")
         ->transform(CLI::CheckedTransformer(map_string_to_command, CLI::ignore_case));
@@ -708,6 +761,18 @@ CCmdLineOptions::ParseResult CCmdLineOptions::Parse(int argc, char** argv)
         "'Bgr24' or 'Bgr48'. Default is 'Bgr24'.")
         ->option_text("PIXELTYPE")
         ->check(generatorpixeltype_validator);
+    cli_app.add_option("--cachesize", argument_subblock_cachesize,
+        "Only used for 'PlaneScan' - specify the size of the subblock-cache in bytes. The argument is to "
+        "be given with a suffix k, M, G, ...")
+        ->option_text("CACHESIZE")
+        ->check(cachesize_validator);
+    cli_app.add_option("--tilesize-for-plane-scan", argument_tilesize_for_scan,
+        "Only used for 'PlaneScan' - specify the size of ROI which is used for scanning the plane in "
+        "units of pixels. Format is e.g. '1600x1200' and default is 512x512.")
+        ->option_text("TILESIZE")
+        ->check(tile_size_for_plane_scan_validator);
+    cli_app.add_flag("--use-visibility-check-optimization", argument_use_visibility_check_optimization,
+        "Whether to enable the experimental \"visibility check optimization\" for the accessors.");
     cli_app.add_flag("--version", argument_versionflag,
         "Print extended version-info and supported operations, then exit.");
 
@@ -742,6 +807,7 @@ CCmdLineOptions::ParseResult CCmdLineOptions::Parse(int argc, char** argv)
     this->calcHashOfResult = argument_calc_hash;
     this->drawTileBoundaries = argument_drawtileboundaries;
     this->command = argument_command;
+    this->useVisibilityCheckOptimization = argument_use_visibility_check_optimization;
 
     try
     {
@@ -901,6 +967,18 @@ CCmdLineOptions::ParseResult CCmdLineOptions::Parse(int argc, char** argv)
             const bool b = TryParseGeneratorPixeltype(argument_generatorpixeltype, &this->pixelTypeForBitmapGenerator);
             ThrowIfFalse(b, "--generatorpixeltype", argument_generatorpixeltype);
         }
+
+        if (!argument_subblock_cachesize.empty())
+        {
+            const bool b = TryParseSubBlockCacheSize(argument_subblock_cachesize, &this->subBlockCacheSize);
+            ThrowIfFalse(b, "--cachesize", argument_subblock_cachesize);
+        }
+
+        if (!argument_tilesize_for_scan.empty())
+        {
+            const bool b = TryParseCreateSize(argument_tilesize_for_scan, &this->tilesSizeForPlaneScan);
+            ThrowIfFalse(b, "--tilesize-for-plane-scan", argument_tilesize_for_scan);
+        }
     }
     catch (runtime_error& exception)
     {
@@ -1027,7 +1105,7 @@ void CCmdLineOptions::Clear()
     this->sbBlkMetadataKeyValue.clear();
     this->rectX = this->rectY = 0;
     this->rectW = this->rectH = -1;;
-    this->zoom = -1;
+    this->zoom = 1;
     this->pyramidLayerNo = -1;
     this->pyramidMinificationFactor = -1;
     this->createTileInfo.rows = this->createTileInfo.columns = 1;
@@ -1035,6 +1113,9 @@ void CCmdLineOptions::Clear()
     this->compressionMode = libCZI::CompressionMode::Invalid;
     this->compressionParameters = nullptr;
     this->pixelTypeForBitmapGenerator = libCZI::PixelType::Bgr24;
+    this->subBlockCacheSize = 0;
+    this->tilesSizeForPlaneScan = make_tuple(512, 512);
+    this->useVisibilityCheckOptimization = false;
 }
 
 bool CCmdLineOptions::IsLogLevelEnabled(int level) const
@@ -1458,13 +1539,15 @@ bool CCmdLineOptions::TryParseDisplaySettings(const std::string& s, std::map<int
     {
         if (color != nullptr)
         {
-            *color = libCZI::RgbFloatColor{ f[0],f[0],f[0] };
+            *color = libCZI::RgbFloatColor{ f[0], f[0], f[0] };
         }
     }
-
-    if (color != nullptr)
+    else
     {
-        *color = libCZI::RgbFloatColor{ f[0],f[1],f[2] };
+        if (color != nullptr)
+        {
+            *color = libCZI::RgbFloatColor{ f[0], f[1], f[2] };
+        }
     }
 
     return true;
@@ -1901,16 +1984,20 @@ void CCmdLineOptions::PrintHelpBuildInfo()
     stringstream ss;
     ss << "version          : " << majorVer << "." << minorVer << "." << patchVer;
     this->GetLog()->WriteLineStdOut(ss.str());
-    ss = stringstream();
+    ss.clear();
+    ss.str("");
     ss << "compiler         : " << buildInfo.compilerIdentification;
     this->GetLog()->WriteLineStdOut(ss.str());
-    ss = stringstream();
+    ss.clear();
+    ss.str("");
     ss << "repository-URL   : " << buildInfo.repositoryUrl;
     this->GetLog()->WriteLineStdOut(ss.str());
-    ss = stringstream();
+    ss.clear();
+    ss.str("");
     ss << "repository-branch: " << buildInfo.repositoryBranch;
     this->GetLog()->WriteLineStdOut(ss.str());
-    ss = stringstream();
+    ss.clear();
+    ss.str("");
     ss << "repository-tag   : " << buildInfo.repositoryTag;
     this->GetLog()->WriteLineStdOut(ss.str());
 }
@@ -2178,7 +2265,7 @@ void CCmdLineOptions::PrintHelpStreamsObjects()
     // Here we parse the JSON-formatted string that contains the property bag for the input stream and
     //  construct a map<int, libCZI::StreamsFactory::Property> from it.
 
-    static constexpr struct 
+    static constexpr struct
     {
         const char* name;
         int stream_property_id;
@@ -2270,6 +2357,91 @@ void CCmdLineOptions::PrintHelpStreamsObjects()
             // this actually indicates an internal error - the table kKeyStringToId contains a not yet implemented property type
             return false;
         }
+    }
+
+    return true;
+}
+
+/*static*/bool CCmdLineOptions::TryParseSubBlockCacheSize(const std::string& text, std::uint64_t* size)
+{
+    // This regular expression is used to match strings that represent sizes in bytes, kilobytes, megabytes, gigabytes, terabytes, kibibytes, mebibytes, gibibytes, and tebibytes. 
+    //
+    // Here is a breakdown of the regular expression:
+    //
+    // - ^\s*: Matches the start of the string, followed by any amount of whitespace.
+    // - ([+]?(?:[0-9]+(?:[.][0-9]*)?|[.][0-9]+)): Matches a positive number, which can be an integer or a decimal. The number may optionally be preceded by a plus sign.
+    // - \s*: Matches any amount of whitespace following the number.
+    // - (k|m|g|t|ki|mi|gi|ti): Matches one of the following units of size: k (kilobytes), m (megabytes), g (gigabytes), t (terabytes), ki (kibibytes), mi (mebibytes), gi (gibibytes), ti (tebibytes).
+    // - (?:b?): Optionally matches a 'b', which can be used to explicitly specify that the size is in bytes.
+    // - \s*$: Matches any amount of whitespace at the end of the string, followed by the end of the string.
+    //
+    // This regular expression is case-insensitive.
+    regex regex(R"(^\s*([+]?(?:[0-9]+(?:[.][0-9]*)?|[.][0-9]+))\s*(k|m|g|t|ki|mi|gi|ti)(?:b?)\s*$)", regex_constants::icase);
+    smatch match;
+    regex_search(text, match, regex);
+    if (match.size() != 3)
+    {
+        return false;
+    }
+
+    double number;
+
+    try
+    {
+        number = stod(match[1].str());
+    }
+    catch (invalid_argument&)
+    {
+        return false;
+    }
+    catch (out_of_range&)
+    {
+        return false;
+    }
+
+    uint64_t factor;
+    string suffix_string = match[2].str();
+    if (icasecmp(suffix_string, "k"))
+    {
+        factor = 1000;
+    }
+    else if (icasecmp(suffix_string, "ki"))
+    {
+        factor = 1024;
+    }
+    else if (icasecmp(suffix_string, "m"))
+    {
+        factor = 1000 * 1000;
+    }
+    else if (icasecmp(suffix_string, "mi"))
+    {
+        factor = 1024 * 1024;
+    }
+    else if (icasecmp(suffix_string, "g"))
+    {
+        factor = 1000 * 1000 * 1000;
+    }
+    else if (icasecmp(suffix_string, "gi"))
+    {
+        factor = 1024 * 1024 * 1024;
+    }
+    else if (icasecmp(suffix_string, "t"))
+    {
+        factor = 1000ULL * 1000 * 1000 * 1000;
+    }
+    else if (icasecmp(suffix_string, "ti"))
+    {
+        factor = 1024ULL * 1024 * 1024 * 1024;
+    }
+    else
+    {
+        return false;
+    }
+
+    const uint64_t memory_size = llround(number * static_cast<double>(factor));
+    if (size != nullptr)
+    {
+        *size = memory_size;
     }
 
     return true;

@@ -105,12 +105,12 @@ std::vector<int> CSingleChannelAccessorBase::CheckForVisibility(const libCZI::In
     {
         return result;
     }
-    
+
     const int64_t total_pixel_count = static_cast<int64_t>(roi.w) * roi.h;
     result.reserve(count);
     RectangleCoverageCalculator coverage_calculator;
     int64_t covered_pixel_count = 0;
-    for (int i = count -1; i >= 0; --i) // we start at the end, because that is the subblock which is rendered last (and thus is on top)
+    for (int i = count - 1; i >= 0; --i) // we start at the end, because that is the subblock which is rendered last (and thus is on top)
     {
         const int subblock_index = get_subblock_index(i);
         coverage_calculator.AddRectangle(get_rect_of_subblock(subblock_index));
@@ -132,5 +132,50 @@ std::vector<int> CSingleChannelAccessorBase::CheckForVisibility(const libCZI::In
 
     // now, reverse the result vector, so that the subblocks are in the order in which they are to be rendered
     std::reverse(result.begin(), result.end());
+    return result;
+}
+
+/*static*/CSingleChannelAccessorBase::SubBlockData CSingleChannelAccessorBase::GetSubBlockDataForSubBlockIndex(
+    const std::shared_ptr<libCZI::ISubBlockRepository>& sbBlkRepository,
+    const std::shared_ptr<libCZI::ISubBlockCacheOperation>& cache,
+    int subBlockIndex,
+    bool onlyAddCompressedSubBlockToCache)
+{
+    SubBlockData result;
+
+    // if no cache-object is given, then we simply read the subblock and create a bitmap from it
+    if (!cache)
+    {
+        const auto subblock = sbBlkRepository->ReadSubBlock(subBlockIndex);
+        result.bitmap = subblock->CreateBitmap();
+        result.subBlockInfo = subblock->GetSubBlockInfo();
+    }
+    else
+    {
+        const auto bitmap_from_cache = cache->Get(subBlockIndex);
+        if (bitmap_from_cache)
+        {
+            const bool b = sbBlkRepository->TryGetSubBlockInfo(subBlockIndex, &result.subBlockInfo);
+            if (!b)
+            {
+                stringstream ss;
+                ss << "SubBlockInfo not found in repository for subblock index " << subBlockIndex << ".";
+                throw logic_error(ss.str());
+            }
+
+            result.bitmap = bitmap_from_cache;
+        }
+        else
+        {
+            const auto subblock = sbBlkRepository->ReadSubBlock(subBlockIndex);
+            result.bitmap = subblock->CreateBitmap();
+            result.subBlockInfo = subblock->GetSubBlockInfo();
+            if (!onlyAddCompressedSubBlockToCache || result.subBlockInfo.GetCompressionMode() != CompressionMode::UnCompressed)
+            {
+                cache->Add(subBlockIndex, result.bitmap);
+            }
+        }
+    }
+
     return result;
 }

@@ -94,14 +94,14 @@ CCziMetadataDocumentInfo::CCziMetadataDocumentInfo(std::shared_ptr<CCziMetadata>
 
     static const struct
     {
-        char    dimChar;
+        wchar_t    dimChar;
         double(ScalingInfoEx::* scaleVarPtr);
         std::wstring(ScalingInfoEx::* defaultUnit);
     } dimScalingData[] =
     {
-        {'X', &ScalingInfoEx::scaleX, &ScalingInfoEx::defaultUnitFormatX},
-        {'Y', &ScalingInfoEx::scaleY, &ScalingInfoEx::defaultUnitFormatY},
-        {'Z', &ScalingInfoEx::scaleZ, &ScalingInfoEx::defaultUnitFormatZ},
+        {L'X', &ScalingInfoEx::scaleX, &ScalingInfoEx::defaultUnitFormatX},
+        {L'Y', &ScalingInfoEx::scaleY, &ScalingInfoEx::defaultUnitFormatY},
+        {L'Z', &ScalingInfoEx::scaleZ, &ScalingInfoEx::defaultUnitFormatZ},
     };
 
     for (const auto d : dimScalingData)
@@ -114,12 +114,13 @@ CCziMetadataDocumentInfo::CCziMetadataDocumentInfo(std::shared_ptr<CCziMetadata>
             scalingInfo.*d.scaleVarPtr = nodeScalingValue.node().text().as_double();
         }
 
-        ss = wstringstream();
+        ss.clear();
+        ss.str(L"");
         ss << L"Items/Distance[@Id='" << d.dimChar << L"']/DefaultUnitFormat";
         auto nodeScalingDefaultUnit = np.select_node(ss.str().c_str());
         if (!nodeScalingDefaultUnit.node().empty())
         {
-            scalingInfo.*d.defaultUnit = nodeScalingDefaultUnit.node().text().as_string();
+            scalingInfo.*d.defaultUnit = nodeScalingDefaultUnit.node().text().get();
         }
     }
 
