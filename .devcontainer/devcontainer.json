@@ -7,7 +7,7 @@
 	},
 	"features": {
 		"ghcr.io/devcontainers-contrib/features/bash-command:1": {
-			"script": "sudo apt update && sudo apt install -y libpng-dev libfreetype6-dev rapidjson-dev libssl-dev"
+			
 		}
 	}
 
