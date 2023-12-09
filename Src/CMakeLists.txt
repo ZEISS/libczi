@@ -15,10 +15,14 @@ if (LIBCZI_BUILD_CURL_BASED_STREAM)
   if (LIBCZI_BUILD_PREFER_EXTERNALPACKAGE_LIBCURL)
     find_package(CURL CONFIG QUIET)
     if (NOT CURL_FOUND)
-      message(FATAL_ERROR [=[
-        CURL library was not found, which is required for building. Consider installing it with a package manager, something
-        like 'sudo apt-get install libcurl4-openssl-dev', or disable the option 'LIBCZI_BUILD_PREFER_EXTERNALPACKAGE_LIBCURL'.
-      ]=])
+      message(STATUS "Did not find a package configuration file provided by CURL, will try to locate CURL package by standard search procedure.")
+      find_package(CURL QUIET)
+      if (NOT CURL_FOUND)
+        message(FATAL_ERROR [=[
+          CURL library was not found, which is required for building. Consider installing it with a package manager, something
+          like 'sudo apt-get install libcurl4-openssl-dev', or disable the option 'LIBCZI_BUILD_PREFER_EXTERNALPACKAGE_LIBCURL'.
+        ]=])
+      endif()
     endif()
 
     message(STATUS "Found CURL version: ${CURL_VERSION_STRING}")
