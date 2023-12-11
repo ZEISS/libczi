@@ -15,6 +15,6 @@ Files: Src/JxrDecode/jxrlib/*
 Copyright: Microsoft Corp.
 License: BSD-3-Clause
 
-Files: .github/*
+Files: .github/* .devcontainer/*
 Copyright: 2017-2022 Carl Zeiss Microscopy GmbH
 License: CC0-1.0

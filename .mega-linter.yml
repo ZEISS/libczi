@@ -14,6 +14,8 @@ DISABLE_LINTERS:
   - REPOSITORY_TRIVY  # this linter seems currently broken, so we disable it here for now
 C_CPPLINT_ARGUMENTS: --verbose=2
 CPP_CPPLINT_ARGUMENTS: --verbose=2
+JSON_JSONLINT_ARGUMENTS: --comments # Allow comments in JSON files
+DOCKERFILE_HADOLINT_ARGUMENTS: --ignore DL3008 # Ignore "pin versions in pip" warning
 SHOW_ELAPSED_TIME: true
 FILEIO_REPORTER: false
 UPDATED_SOURCES_REPORTER: false

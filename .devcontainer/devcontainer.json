@@ -1,0 +1,35 @@
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the
+// README at: https://github.com/devcontainers/templates/tree/main/src/cpp
+{
+  "name": "C++",
+  "build": {
+    "dockerfile": "Dockerfile"
+  },
+  "settings": {
+    // configure those options for the CMake-configure run (in VSCode) in the container - we enable the curl-based stream, prefer 
+    // the external package libcurl, disable the dynamic library, enable builing CZICmd and instruct to use an external package for Eigen3
+    "cmake.configureArgs": [
+      "-DLIBCZI_BUILD_CURL_BASED_STREAM=ON",
+      "-DLIBCZI_BUILD_PREFER_EXTERNALPACKAGE_LIBCURL=ON",
+      "-DLIBCZI_BUILD_DYNLIB=OFF",
+      "-DLIBCZI_BUILD_CZICMD=ON",
+      "-DLIBCZI_BUILD_PREFER_EXTERNALPACKAGE_EIGEN3=ON"
+    ]
+    // Add other settings here as needed
+  }
+
+  // Features to add to the dev container. More info: https://containers.dev/features.
+  // "features": {},
+
+  // Use 'forwardPorts' to make a list of ports inside the container available locally.
+  // "forwardPorts": [],
+
+  // Use 'postCreateCommand' to run commands after the container is created.
+  // "postCreateCommand": "gcc -v",
+
+  // Configure tool-specific properties.
+  // "customizations": {},
+
+  // Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
+  // "remoteUser": "root"
+}
