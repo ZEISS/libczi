@@ -7,12 +7,13 @@
   },
   "settings": {
     // configure those options for the CMake-configure run (in VSCode) in the container - we enable the curl-based stream, prefer 
-    // the external package libcurl, disable the dynamic library and enable builing CZICmd
+    // the external package libcurl, disable the dynamic library, enable builing CZICmd and instruct to use an external package for Eigen3
     "cmake.configureArgs": [
       "-DLIBCZI_BUILD_CURL_BASED_STREAM=ON",
       "-DLIBCZI_BUILD_PREFER_EXTERNALPACKAGE_LIBCURL=ON",
       "-DLIBCZI_BUILD_DYNLIB=OFF",
-      "-DLIBCZI_BUILD_CZICMD=ON"
+      "-DLIBCZI_BUILD_CZICMD=ON",
+      "-DLIBCZI_BUILD_PREFER_EXTERNALPACKAGE_EIGEN3=ON"
     ]
     // Add other settings here as needed
   }
