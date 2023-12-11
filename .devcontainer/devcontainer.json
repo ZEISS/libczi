@@ -1,37 +1,34 @@
 // For format details, see https://aka.ms/devcontainer.json. For config options, see the
 // README at: https://github.com/devcontainers/templates/tree/main/src/cpp
 {
-	"name": "C++",
-	"build": {
-		"dockerfile": "Dockerfile"
-	},
-	"settings": {
-        "cmake.configureArgs": [
-            "-DLIBCZI_BUILD_CURL_BASED_STREAM=ON",
-            "-DLIBCZI_BUILD_PREFER_EXTERNALPACKAGE_LIBCURL=ON",			
-            "-DLIBCZI_BUILD_DYNLIB=OFF",
-            "-DLIBCZI_BUILD_CZICMD=ON"
-        ]
-        // Add other settings here as needed
-    },
-	"features": {
-		"ghcr.io/devcontainers-contrib/features/bash-command:1": {
-			
-		}
-	}
+  "name": "C++",
+  "build": {
+    "dockerfile": "Dockerfile"
+  },
+  "settings": {
+    // configure those options for the CMake-configure run (in VSCode) in the container - we enable the curl-based stream, prefer 
+    // the external package libcurl, disable the dynamic library and enable builing CZICmd
+    "cmake.configureArgs": [
+      "-DLIBCZI_BUILD_CURL_BASED_STREAM=ON",
+      "-DLIBCZI_BUILD_PREFER_EXTERNALPACKAGE_LIBCURL=ON",
+      "-DLIBCZI_BUILD_DYNLIB=OFF",
+      "-DLIBCZI_BUILD_CZICMD=ON"
+    ]
+    // Add other settings here as needed
+  }
 
-	// Features to add to the dev container. More info: https://containers.dev/features.
-	// "features": {},
+  // Features to add to the dev container. More info: https://containers.dev/features.
+  // "features": {},
 
-	// Use 'forwardPorts' to make a list of ports inside the container available locally.
-	// "forwardPorts": [],
+  // Use 'forwardPorts' to make a list of ports inside the container available locally.
+  // "forwardPorts": [],
 
-	// Use 'postCreateCommand' to run commands after the container is created.
-	// "postCreateCommand": "gcc -v",
+  // Use 'postCreateCommand' to run commands after the container is created.
+  // "postCreateCommand": "gcc -v",
 
-	// Configure tool-specific properties.
-	// "customizations": {},
+  // Configure tool-specific properties.
+  // "customizations": {},
 
-	// Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
-	// "remoteUser": "root"
+  // Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
+  // "remoteUser": "root"
 }
