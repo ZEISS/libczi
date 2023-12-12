@@ -13,3 +13,4 @@ version history                 {#version_history}
  0.55.1             | [80](https://github.com/ZEISS/libczi/pull/80)        | bugfix for above optimization
  0.56.0             | [82](https://github.com/ZEISS/libczi/pull/82)        | add option "kCurlHttp_CaInfo" & "kCurlHttp_CaInfoBlob", allow to retrieve properties from a stream-class
  0.57.0             | [84](https://github.com/ZEISS/libczi/pull/84)        | add caching for accessors, update CLI11 to version 2.3.2
+ 0.57.1             | [86](https://github.com/ZEISS/libczi/pull/86)        | small improvement for CMake-build: allow to use an apt-provided CURL-package
