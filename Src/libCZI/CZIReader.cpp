@@ -249,6 +249,8 @@ CCZIReader::~CCZIReader()
 {
     this->ThrowIfNotOperational();
     this->SetOperationalState(false);
+
+    std::unique_lock<std::mutex> lock(this->stream_mutex_);
     this->stream.reset();
 }
 
@@ -306,9 +308,24 @@ CCZIReader::~CCZIReader()
 
 std::shared_ptr<ISubBlock> CCZIReader::ReadSubBlock(const CCziSubBlockDirectory::SubBlkEntry& entry)
 {
+    this->ThrowIfNotOperational();
+
     CCZIParse::SubBlockStorageAllocate allocateInfo{ malloc,free };
 
-    auto subBlkData = CCZIParse::ReadSubBlock(this->stream.get(), entry.FilePosition, allocateInfo);
+    shared_ptr<libCZI::IStream> stream_reference;
+
+    {
+        std::unique_lock<std::mutex> lock(this->stream_mutex_);
+        auto stream_reference = this->stream;
+    }
+
+    if (!stream_reference)
+    {
+        // TODO
+        throw logic_error("CZIReader::ReadSubBlock: stream is null");
+    }
+
+    auto subBlkData = CCZIParse::ReadSubBlock(stream_reference.get(), entry.FilePosition, allocateInfo);
 
     libCZI::SubBlockInfo info;
     info.pixelType = CziUtils::PixelTypeFromInt(subBlkData.pixelType);
@@ -324,6 +341,7 @@ std::shared_ptr<ISubBlock> CCZIReader::ReadSubBlock(const CCziSubBlockDirectory:
 
 std::shared_ptr<libCZI::IAttachment> CCZIReader::ReadAttachment(const CCziAttachmentsDirectory::AttachmentEntry& entry)
 {
+    // TODO: same thing as in ReadSubBlock
     CCZIParse::SubBlockStorageAllocate allocateInfo{ malloc,free };
 
     auto attchmnt = CCZIParse::ReadAttachment(this->stream.get(), entry.FilePosition, allocateInfo);
@@ -341,6 +359,7 @@ std::shared_ptr<libCZI::IMetadataSegment> CCZIReader::ReadMetadataSegment(std::u
 {
     CCZIParse::SubBlockStorageAllocate allocateInfo{ malloc,free };
 
+    // TODO: same thing as in ReadSubBlock
     auto metaDataSegmentData = CCZIParse::ReadMetadataSegment(this->stream.get(), position, allocateInfo);
     return std::make_shared<CCziMetadataSegment>(metaDataSegmentData, free);
 }
