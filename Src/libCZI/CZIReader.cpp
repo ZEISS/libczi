@@ -308,15 +308,13 @@ CCZIReader::~CCZIReader()
 
 std::shared_ptr<ISubBlock> CCZIReader::ReadSubBlock(const CCziSubBlockDirectory::SubBlkEntry& entry)
 {
-    this->ThrowIfNotOperational();
-
     CCZIParse::SubBlockStorageAllocate allocateInfo{ malloc,free };
 
     shared_ptr<libCZI::IStream> stream_reference;
 
     {
         std::unique_lock<std::mutex> lock(this->stream_mutex_);
-        auto stream_reference = this->stream;
+        stream_reference = this->stream;
     }
 
     if (!stream_reference)
