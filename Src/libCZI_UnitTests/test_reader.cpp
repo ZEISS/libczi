@@ -7,6 +7,7 @@
 #include "MemInputOutputStream.h"
 #include "MemOutputStream.h"
 #include <array>
+#include <thread>
 
 using namespace libCZI;
 using namespace std;
@@ -193,11 +194,11 @@ TEST(CziReader, Concurrency)
     reader->Open(memory_stream);
 
     constexpr int numThreads = 5; // Number of threads to create
-    std::array<std::thread, numThreads> threads; // Static array to store threads
+    std::array<thread, numThreads> threads; // Static array to store threads
     bool readsubblock_problem_occurred = false;
     for (int i = 0; i < 5; ++i)
     {
-        threads[i] = std::thread([reader, i, &readsubblock_problem_occurred]()
+        threads[i] = thread([reader, i, &readsubblock_problem_occurred]()
         {
             try
             {
@@ -218,7 +219,7 @@ TEST(CziReader, Concurrency)
 
     reader->Close();
 
-    for (std::thread& thread : threads)
+    for (thread& thread : threads)
     {
         thread.join();
     }
