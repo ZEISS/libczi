@@ -23,7 +23,7 @@ private:
     bool    isOperational;  ///<    If true, then stream, hdrSegmentData and subBlkDir can be considered valid and operational
 public:
     CCZIReader();
-    ~CCZIReader() override;
+    ~CCZIReader() override = default;
 
     // interface ISubBlockRepository
     void EnumerateSubBlocks(const std::function<bool(int index, const libCZI::SubBlockInfo& info)>& funcEnum) override;

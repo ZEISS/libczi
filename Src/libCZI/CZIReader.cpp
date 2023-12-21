@@ -35,10 +35,6 @@ CCZIReader::CCZIReader() : isOperational(false)
 {
 }
 
-CCZIReader::~CCZIReader()
-{
-}
-
 /*virtual */void CCZIReader::Open(const std::shared_ptr<libCZI::IStream>& stream, const ICZIReader::OpenOptions* options)
 {
     if (this->isOperational == true)
@@ -171,7 +167,7 @@ CCZIReader::~CCZIReader()
     CCziSubBlockDirectory::SubBlkEntry entry;
     if (this->subBlkDir.TryGetSubBlock(index, entry) == false)
     {
-        return std::shared_ptr<ISubBlock>();
+        return {};
     }
 
     return this->ReadSubBlock(entry);
@@ -250,6 +246,10 @@ CCZIReader::~CCZIReader()
     this->ThrowIfNotOperational();
     this->SetOperationalState(false);
 
+    // We need to have a critical-section around modifying the stream-shared_ptr - there may be concurrent calls to ReadSubBlock, ReadAttachment, etc.
+    //  in which the stream-shared_ptr is accessed. While the stream-shared_ptr is thread-safe, it is not thread-safe to reset it while another thread
+    //  is dealing with the same shared_ptr. C.f. https://stackoverflow.com/questions/14482830/stdshared-ptr-thread-safety. With C++20 we could use 
+    //  atomic<shared_ptr> instead of the manual critical-section (c.f. https://en.cppreference.com/w/cpp/memory/shared_ptr/atomic2).
     std::unique_lock<std::mutex> lock(this->stream_mutex_);
     this->stream.reset();
 }
@@ -300,7 +300,7 @@ CCZIReader::~CCZIReader()
     CCziAttachmentsDirectory::AttachmentEntry entry;
     if (this->attachmentDir.TryGetAttachment(index, entry) == false)
     {
-        return std::shared_ptr<IAttachment>();
+        return {};
     }
 
     return this->ReadAttachment(entry);
@@ -308,19 +308,20 @@ CCZIReader::~CCZIReader()
 
 std::shared_ptr<ISubBlock> CCZIReader::ReadSubBlock(const CCziSubBlockDirectory::SubBlkEntry& entry)
 {
-    CCZIParse::SubBlockStorageAllocate allocateInfo{ malloc,free };
+    const CCZIParse::SubBlockStorageAllocate allocateInfo{ malloc,free };
 
+    // For thread-safety, we need to ensure that we hold a reference to the stream for the whole duration of the call, 
+    //  in order to prepare for concurrent calls to Close() (which will reset the stream-shared_ptr).
     shared_ptr<libCZI::IStream> stream_reference;
 
     {
-        std::unique_lock<std::mutex> lock(this->stream_mutex_);
+        unique_lock<mutex> lock(this->stream_mutex_);
         stream_reference = this->stream;
     }
 
     if (!stream_reference)
     {
-        // TODO
-        throw logic_error("CZIReader::ReadSubBlock: stream is null");
+        throw logic_error("CZIReader::ReadSubBlock: stream is null (Close was already called for this instance)");
     }
 
     auto subBlkData = CCZIParse::ReadSubBlock(stream_reference.get(), entry.FilePosition, allocateInfo);
@@ -339,10 +340,21 @@ std::shared_ptr<ISubBlock> CCZIReader::ReadSubBlock(const CCziSubBlockDirectory:
 
 std::shared_ptr<libCZI::IAttachment> CCZIReader::ReadAttachment(const CCziAttachmentsDirectory::AttachmentEntry& entry)
 {
-    // TODO: same thing as in ReadSubBlock
-    CCZIParse::SubBlockStorageAllocate allocateInfo{ malloc,free };
+    const CCZIParse::SubBlockStorageAllocate allocateInfo{ malloc,free };
 
-    auto attchmnt = CCZIParse::ReadAttachment(this->stream.get(), entry.FilePosition, allocateInfo);
+    shared_ptr<libCZI::IStream> stream_reference;
+
+    {
+        unique_lock<mutex> lock(this->stream_mutex_);
+        stream_reference = this->stream;
+    }
+
+    if (!stream_reference)
+    {
+        throw logic_error("CCZIReader::ReadAttachment: stream is null (Close was already called for this instance)");
+    }
+
+    auto attchmnt = CCZIParse::ReadAttachment(stream_reference.get(), entry.FilePosition, allocateInfo);
     libCZI::AttachmentInfo attchmentInfo;
     attchmentInfo.contentGuid = entry.ContentGuid;
     static_assert(sizeof(attchmentInfo.contentFileType) > sizeof(entry.ContentFileType), "sizeof(attchmentInfo.contentFileType) must be greater than sizeof(entry.ContentFileType)");
@@ -355,10 +367,21 @@ std::shared_ptr<libCZI::IAttachment> CCZIReader::ReadAttachment(const CCziAttach
 
 std::shared_ptr<libCZI::IMetadataSegment> CCZIReader::ReadMetadataSegment(std::uint64_t position)
 {
-    CCZIParse::SubBlockStorageAllocate allocateInfo{ malloc,free };
+    const CCZIParse::SubBlockStorageAllocate allocateInfo{ malloc,free };
 
-    // TODO: same thing as in ReadSubBlock
-    auto metaDataSegmentData = CCZIParse::ReadMetadataSegment(this->stream.get(), position, allocateInfo);
+    shared_ptr<libCZI::IStream> stream_reference;
+
+    {
+        unique_lock<mutex> lock(this->stream_mutex_);
+        stream_reference = this->stream;
+    }
+
+    if (!stream_reference)
+    {
+        throw logic_error("CCZIReader::ReadAttachment: stream is null (Close was already called for this instance)");
+    }
+
+    auto metaDataSegmentData = CCZIParse::ReadMetadataSegment(stream_reference.get(), position, allocateInfo);
     return std::make_shared<CCziMetadataSegment>(metaDataSegmentData, free);
 }
 
