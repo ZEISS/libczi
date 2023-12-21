@@ -44,7 +44,7 @@ CCZIReader::CCZIReader() : isOperational(false)
 
     if (options == nullptr)
     {
-        const auto default_options = OpenOptions{};
+        constexpr auto default_options = OpenOptions{};
         return CCZIReader::Open(stream, &default_options);
     }
 
