@@ -16,7 +16,7 @@ class CCZIReader : public libCZI::ICZIReader, public std::enable_shared_from_thi
 {
 private:
     std::shared_ptr<libCZI::IStream> stream;
-    std::mutex stream_mutex_;               ///< Mutex to protect access to the stream-object (c.f. https://stackoverflow.com/questions/14482830/stdshared-ptr-thread-safety )
+    std::mutex stream_mutex_;               ///< Mutex to protect access to the stream-object.
     CFileHeaderSegmentData hdrSegmentData;
     CCziSubBlockDirectory subBlkDir;
     CCziAttachmentsDirectory attachmentDir;
