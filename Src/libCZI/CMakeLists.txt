@@ -114,6 +114,8 @@ set(LIBCZISRCFILES
             StreamsLib/simplefileinputstream.h
             StreamsLib/preadfileinputstream.cpp
             StreamsLib/preadfileinputstream.h
+            subblock_cache.h
+            subblock_cache.cpp
 )
 
 # prepare the configuration-file "libCZI_Config.h"

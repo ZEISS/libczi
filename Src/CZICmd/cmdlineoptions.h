@@ -32,7 +32,9 @@ enum class Command
 
     CreateCZI,
 
-    ReadWriteCZI
+    ReadWriteCZI,
+
+    PlaneScan,
 };
 
 enum class InfoLevel : std::uint32_t
@@ -190,6 +192,11 @@ private:
     libCZI::CompressionMode compressionMode;
     std::shared_ptr<libCZI::ICompressParameters> compressionParameters;
     libCZI::PixelType pixelTypeForBitmapGenerator;
+
+    std::uint64_t subBlockCacheSize;    ///< The size of the sub-block cache in bytes.
+    std::tuple<std::uint32_t, std::uint32_t> tilesSizeForPlaneScan; ///< The size of the tiles in pixels for the plane scan operation.
+
+    bool useVisibilityCheckOptimization;
 public:
     /// Values that represent the result of the "Parse"-operation.
     enum class ParseResult
@@ -257,6 +264,9 @@ public:
     libCZI::CompressionMode GetCompressionMode() const { return this->compressionMode; }
     std::shared_ptr<libCZI::ICompressParameters> GetCompressionParameters() const { return this->compressionParameters; }
     libCZI::PixelType GetPixelGeneratorPixeltype() const { return this->pixelTypeForBitmapGenerator; }
+    std::uint64_t GetSubBlockCacheSize() const { return this->subBlockCacheSize; }
+    const std::tuple<std::uint32_t, std::uint32_t>& GetTileSizeForPlaneScan() const { return this->tilesSizeForPlaneScan; }
+    bool GetUseVisibilityCheckOptimization() const { return this->useVisibilityCheckOptimization; }
 private:
     friend struct RegionOfInterestValidator;
     friend struct DisplaySettingsValidator;
@@ -276,6 +286,8 @@ private:
     friend struct CreateSubblockMetadataValidator;
     friend struct CompressionOptionsValidator;
     friend struct GeneratorPixelTypeValidator;
+    friend struct CachesizeValidator;
+    friend struct TileSizeForPlaneScanValidator;
 
     bool CheckArgumentConsistency() const;
     void SetOutputFilename(const std::wstring& s);
@@ -307,6 +319,7 @@ private:
     static bool TryParseCompressionOptions(const std::string& s, libCZI::Utils::CompressionOption* compression_option);
     static bool TryParseGeneratorPixeltype(const std::string& s, libCZI::PixelType* pixel_type);
     static bool TryParseInputStreamCreationPropertyBag(const std::string& s, std::map<int, libCZI::StreamsFactory::Property>* property_bag);
+    static bool TryParseSubBlockCacheSize(const std::string& text, std::uint64_t* size);
 
     static void ThrowIfFalse(bool b, const std::string& argument_switch, const std::string& argument);
 };

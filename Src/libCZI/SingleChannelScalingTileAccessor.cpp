@@ -78,17 +78,21 @@ CSingleChannelScalingTileAccessor::CSingleChannelScalingTileAccessor(const std::
     return IntSize{ static_cast<uint32_t>(roi.w * zoom),static_cast<uint32_t>(roi.h * zoom) };
 }
 
-void CSingleChannelScalingTileAccessor::ScaleBlt(libCZI::IBitmapData* bmDest, float zoom, const libCZI::IntRect& roi, const SbInfo& sbInfo)
+void CSingleChannelScalingTileAccessor::ScaleBlt(libCZI::IBitmapData* bmDest, float zoom, const libCZI::IntRect& roi, const SbInfo& sbInfo, const libCZI::ISingleChannelScalingTileAccessor::Options& options)
 {
-    const auto sb = this->sbBlkRepository->ReadSubBlock(sbInfo.index);
+    auto subblock_bitmap_data = CSingleChannelAccessorBase::GetSubBlockDataForSubBlockIndex(
+        this->sbBlkRepository,
+        options.subBlockCache,
+        sbInfo.index,
+        options.onlyUseSubBlockCacheForCompressedData);
     if (GetSite()->IsEnabled(LOGLEVEL_CHATTYINFORMATION))
     {
         stringstream ss;
-        ss << "   bounds: " << Utils::DimCoordinateToString(&sb->GetSubBlockInfo().coordinate) << " M=" << (Utils::IsValidMindex(sbInfo.mIndex) ? to_string(sbInfo.mIndex) : "invalid");
+        ss << "   bounds: " << Utils::DimCoordinateToString(&subblock_bitmap_data.subBlockInfo.coordinate) << " M=" << (Utils::IsValidMindex(subblock_bitmap_data.subBlockInfo.mIndex) ? to_string(subblock_bitmap_data.subBlockInfo.mIndex) : "invalid");
         GetSite()->Log(LOGLEVEL_CHATTYINFORMATION, ss);
     }
 
-    const auto source = sb->CreateBitmap();
+    const auto& source = subblock_bitmap_data.bitmap;
 
     // In order not to run into trouble with floating point precision, if the scale is exactly 1, we refrain from using the scaling operation
     //  and do instead a simple copy operation. This should ensure a pixel-accurate result if zoom is exactly 1.
@@ -118,15 +122,15 @@ void CSingleChannelScalingTileAccessor::ScaleBlt(libCZI::IBitmapData* bmDest, fl
         // calculate the intersection of the subblock (logical rect) and the destination
         const auto intersect = Utilities::Intersect(sbInfo.logicalRect, roi);
 
-        const double roiSrcTopLeftX = double(intersect.x - sbInfo.logicalRect.x) / sbInfo.logicalRect.w;
-        const double roiSrcTopLeftY = double(intersect.y - sbInfo.logicalRect.y) / sbInfo.logicalRect.h;
-        const double roiSrcBttmRightX = double(intersect.x + intersect.w - sbInfo.logicalRect.x) / sbInfo.logicalRect.w;
-        const double roiSrcBttmRightY = double(intersect.y + intersect.h - sbInfo.logicalRect.y) / sbInfo.logicalRect.h;
+        const double roiSrcTopLeftX = static_cast<double>(intersect.x - sbInfo.logicalRect.x) / sbInfo.logicalRect.w;
+        const double roiSrcTopLeftY = static_cast<double>(intersect.y - sbInfo.logicalRect.y) / sbInfo.logicalRect.h;
+        const double roiSrcBttmRightX = static_cast<double>(intersect.x + intersect.w - sbInfo.logicalRect.x) / sbInfo.logicalRect.w;
+        const double roiSrcBttmRightY = static_cast<double>(intersect.y + intersect.h - sbInfo.logicalRect.y) / sbInfo.logicalRect.h;
 
-        const double destTopLeftX = double(intersect.x - roi.x) / roi.w;
-        const double destTopLeftY = double(intersect.y - roi.y) / roi.h;
-        const double destBttmRightX = double(intersect.x + intersect.w - roi.x) / roi.w;
-        const double destBttmRightY = double(intersect.y + intersect.h - roi.y) / roi.h;
+        const double destTopLeftX = static_cast<double>(intersect.x - roi.x) / roi.w;
+        const double destTopLeftY = static_cast<double>(intersect.y - roi.y) / roi.h;
+        const double destBttmRightX = static_cast<double>(intersect.x + intersect.w - roi.x) / roi.w;
+        const double destBttmRightY = static_cast<double>(intersect.y + intersect.h - roi.y) / roi.h;
 
         DblRect srcRoi{ roiSrcTopLeftX ,roiSrcTopLeftY,roiSrcBttmRightX - roiSrcTopLeftX ,roiSrcBttmRightY - roiSrcTopLeftY };
         DblRect dstRoi{ destTopLeftX ,destTopLeftY,destBttmRightX - destTopLeftX ,destBttmRightY - destTopLeftY };
@@ -292,19 +296,19 @@ void CSingleChannelScalingTileAccessor::InternalGet(libCZI::IBitmapData* bmDest,
         // we only have to deal with a single scene (or: the document does not include a scene-dimension at all), in this
         //  case we do not have group by scene and save some cycles
         auto sbSetsortedByZoom = this->GetSubSetFilteredBySceneSortedByZoom(roi, planeCoordinate, scenesInvolved, options.sortByM);
-        this->Paint(bmDest, roi, sbSetsortedByZoom, zoom, options.useVisibilityCheckOptimization);
+        this->Paint(bmDest, roi, sbSetsortedByZoom, zoom, options/*.useVisibilityCheckOptimization*/);
     }
     else
     {
         const auto sbSetSortedByZoomPerScene = this->GetSubSetSortedByZoomPerScene(scenesInvolved, roi, planeCoordinate, options.sortByM);
         for (const auto& it : sbSetSortedByZoomPerScene)
         {
-            this->Paint(bmDest, roi, get<1>(it), zoom, options.useVisibilityCheckOptimization);
+            this->Paint(bmDest, roi, get<1>(it), zoom, options/*.useVisibilityCheckOptimization*/);
         }
     }
 }
 
-void CSingleChannelScalingTileAccessor::Paint(libCZI::IBitmapData* bmDest, const libCZI::IntRect& roi, const SubSetSortedByZoom& sbSetSortedByZoom, float zoom, bool useCoverageOptimization)
+void CSingleChannelScalingTileAccessor::Paint(libCZI::IBitmapData* bmDest, const libCZI::IntRect& roi, const SubSetSortedByZoom& sbSetSortedByZoom, float zoom, const libCZI::ISingleChannelScalingTileAccessor::Options& options)
 {
     const int idxOf1stSubBlockOfZoomGreater = this->GetIdxOf1stSubBlockWithZoomGreater(sbSetSortedByZoom.subBlocks, sbSetSortedByZoom.sortedByZoom, zoom);
     if (idxOf1stSubBlockOfZoomGreater < 0)
@@ -334,7 +338,7 @@ void CSingleChannelScalingTileAccessor::Paint(libCZI::IBitmapData* bmDest, const
         }
     }
 
-    if (!useCoverageOptimization)
+    if (!options.useVisibilityCheckOptimization)
     {
         for (auto it = start_iterator; it != end_iterator; ++it)
         {
@@ -347,7 +351,7 @@ void CSingleChannelScalingTileAccessor::Paint(libCZI::IBitmapData* bmDest, const
                 GetSite()->Log(LOGLEVEL_CHATTYINFORMATION, ss);
             }
 
-            this->ScaleBlt(bmDest, zoom, roi, sbInfo);
+            this->ScaleBlt(bmDest, zoom, roi, sbInfo, options);
         }
     }
     else
@@ -375,7 +379,7 @@ void CSingleChannelScalingTileAccessor::Paint(libCZI::IBitmapData* bmDest, const
                 GetSite()->Log(LOGLEVEL_CHATTYINFORMATION, ss);
             }
 
-            this->ScaleBlt(bmDest, zoom, roi, sbInfo);
+            this->ScaleBlt(bmDest, zoom, roi, sbInfo, options);
         }
     }
 }

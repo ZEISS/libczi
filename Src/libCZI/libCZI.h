@@ -66,6 +66,7 @@ namespace libCZI
     class IMetadataSegment;
     class ISubBlockRepository;
     class IAttachment;
+    class ISubBlockCache;
 
     /// This structure contains information about the compiler settings and the version of the source
     /// which was used to create the library.
@@ -172,6 +173,10 @@ namespace libCZI
     /// Creates a metadata-builder-object.
     /// \return The newly created metadata-builder-object.
     LIBCZI_API std::shared_ptr<ICziMetadataBuilder> CreateMetadataBuilder();
+
+    /// Creates a sub block cache object.
+    /// \returns    The newly created sub block cache.
+    LIBCZI_API std::shared_ptr<ISubBlockCache> CreateSubBlockCache();
 
     /// Creates metadata builder object from the specified UTF8-encoded XML-string. If the XML is
     /// invalid or if the root-node "ImageDocument" is not present, then an exception is thrown.

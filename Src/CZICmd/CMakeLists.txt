@@ -58,7 +58,7 @@ endif()
 FetchContent_Declare(
   cli11
   GIT_REPOSITORY https://github.com/CLIUtils/CLI11
-  GIT_TAG        v2.2.0
+  GIT_TAG        v2.3.2
 )
 
 if (NOT cli11_POPULATED)
@@ -94,7 +94,11 @@ set (CZICMDSRCFILES
          inc_rapidjson.h      
          BitmapGenNull.h        
          CZIcmd.cpp          
-         platform_defines.h)
+         platform_defines.h
+         executePlaneScan.h
+         executePlaneScan.cpp
+         executeBase.h
+         executeBase.cpp)
 
 add_executable(CZIcmd ${CZICMDSRCFILES})
 
