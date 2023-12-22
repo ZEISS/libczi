@@ -643,6 +643,7 @@ namespace libCZI
     };
 
     /// This interface is used to represent the CZI-file.
+    /// A note on thread-safety - all methods of this interface may be called from multiple threads concurrently.
     class LIBCZI_API ICZIReader : public ISubBlockRepository, public ISubBlockRepositoryEx, public IAttachmentRepository
     {
     public:
@@ -707,8 +708,10 @@ namespace libCZI
 
         /// Closes CZI-reader. The underlying stream-object will be released, and further calls to
         /// other methods will fail. The stream is also closed when the object is destroyed, so it
-        /// is usually not necessary to explicitly call `Close`. Also, take care that the ownership of
-        /// the class must be defined when calling `Close`.
+        /// is usually not necessary to explicitly call `Close`. Note that the stream is not closed
+        /// immediately (or - the is no guarantee that on return from this call all references of the 
+        /// stream object are released). Concurrently executing operations continue to use the stream
+        /// and keep it referenced until they are finished.
         virtual void Close() = 0;
     public:
         /// Creates a single channel tile accessor.

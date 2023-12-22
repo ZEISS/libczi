@@ -204,11 +204,12 @@ TEST(CziReader, Concurrency)
             {
                 reader->ReadSubBlock(i);
             }
-            catch (logic_error&)  // NOLINT(bugprone-empty-catch)
+            catch (logic_error&)
             {
                 // Depending on the timing, we expect that either the operations succeeds (if the ReadSubBlock() call
                 //  happens before the Close() call) or that it fails (if the ReadSubBlock() call happens after the Close() call).
                 //  In the latter case, we expect a logic_error exception. Everything else is considered a problem.
+                return;
             }
             catch (...)
             {
