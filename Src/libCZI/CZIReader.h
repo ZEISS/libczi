@@ -6,6 +6,7 @@
 
 #include <functional>
 #include <memory>
+#include <mutex>
 #include "libCZI.h"
 #include "CziSubBlockDirectory.h"
 #include "CziAttachmentsDirectory.h"
@@ -15,13 +16,14 @@ class CCZIReader : public libCZI::ICZIReader, public std::enable_shared_from_thi
 {
 private:
     std::shared_ptr<libCZI::IStream> stream;
+    std::mutex stream_mutex_;               ///< Mutex to protect access to the stream-object.
     CFileHeaderSegmentData hdrSegmentData;
     CCziSubBlockDirectory subBlkDir;
     CCziAttachmentsDirectory attachmentDir;
     bool    isOperational;  ///<    If true, then stream, hdrSegmentData and subBlkDir can be considered valid and operational
 public:
     CCZIReader();
-    ~CCZIReader() override;
+    ~CCZIReader() override = default;
 
     // interface ISubBlockRepository
     void EnumerateSubBlocks(const std::function<bool(int index, const libCZI::SubBlockInfo& info)>& funcEnum) override;
