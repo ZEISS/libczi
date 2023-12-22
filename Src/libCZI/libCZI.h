@@ -709,7 +709,7 @@ namespace libCZI
         /// Closes CZI-reader. The underlying stream-object will be released, and further calls to
         /// other methods will fail. The stream is also closed when the object is destroyed, so it
         /// is usually not necessary to explicitly call `Close`. Note that the stream is not closed
-        /// immediately (or - the is no guarantee that on return from this call all references of the 
+        /// immediately (or - there is no guarantee that on return from this call all references to the 
         /// stream object are released). Concurrently executing operations continue to use the stream
         /// and keep it referenced until they are finished.
         virtual void Close() = 0;
