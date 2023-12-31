@@ -1129,7 +1129,7 @@ bool CCmdLineOptions::IsLogLevelEnabled(int level) const
         level = 31;
     }
 
-    return (this->enabledOutputLevels & (1 << level)) ? true : false;;
+    return (this->enabledOutputLevels & (1 << level)) ? true : false;
 }
 
 void CCmdLineOptions::SetOutputFilename(const std::wstring& s)
