@@ -110,4 +110,7 @@ TEST(StreamsLib, TestGetStreamPropertyBagPropertyInfo)
             EXPECT_FALSE(info.property_name == info2.property_name || info.property_id == info2.property_id);
         }
     }
+
+    // check that the list of properties is terminated with an empty entry
+    ASSERT_TRUE(property_infos[property_infos_count].property_name == nullptr);
 }
