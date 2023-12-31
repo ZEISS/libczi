@@ -243,6 +243,24 @@ namespace libCZI
             std::map<int, Property> property_bag; ///< A property-bag with options for creating the stream-object.
         };
 
+        /// Information about a property for the property bag when creating a stream object.
+        struct StreamPropertyBagPropertyInfo
+        {
+            const char* property_name;              ///< (Proposed) name of the property. This is a null-terminated static string. It is enum name with the initial "k" removed.
+            int property_id;                        ///< The numerical identifier for the property.
+            Property::Type property_type;           ///< Type of the property.
+        };
+
+        /// Gets a (static) list of all properties which can be used for the property bag when creating a stream object.
+        /// This list is terminated by an entry with a null property_name. The list is static and will not change during 
+        /// the lifetime of the application, the returned pointer is valid until the application terminates. It is 
+        /// pointing to static memory and must not be freed.
+        ///
+        /// \param [out] count   If non-null, the number of valid elements (not including the terminal element) is put here.
+        ///
+        /// \returns    A pointer to an array containing property-bag information.
+        static const StreamPropertyBagPropertyInfo* GetStreamPropertyBagPropertyInfo(int* count);
+
         /// Perform one-time initialization of the streams objects.
         /// Some stream objects may require some one-time initialization for being operational (this is e.g. the case with
         /// the libcurl-based ones). It is considered good practice to call this function before using any of the other methods.
