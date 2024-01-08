@@ -1129,7 +1129,7 @@ bool CCmdLineOptions::IsLogLevelEnabled(int level) const
         level = 31;
     }
 
-    return (this->enabledOutputLevels & (1 << level)) ? true : false;;
+    return (this->enabledOutputLevels & (1 << level)) ? true : false;
 }
 
 void CCmdLineOptions::SetOutputFilename(const std::wstring& s)
@@ -2265,25 +2265,8 @@ void CCmdLineOptions::PrintHelpStreamsObjects()
     // Here we parse the JSON-formatted string that contains the property bag for the input stream and
     //  construct a map<int, libCZI::StreamsFactory::Property> from it.
 
-    static constexpr struct
-    {
-        const char* name;
-        int stream_property_id;
-        libCZI::StreamsFactory::Property::Type property_type;
-    }
-    kKeyStringToId[] =
-    {
-        {"CurlHttp_Proxy", libCZI::StreamsFactory::StreamProperties::kCurlHttp_Proxy, libCZI::StreamsFactory::Property::Type::String},
-        {"CurlHttp_UserAgent", libCZI::StreamsFactory::StreamProperties::kCurlHttp_UserAgent, libCZI::StreamsFactory::Property::Type::String},
-        {"CurlHttp_Timeout", libCZI::StreamsFactory::StreamProperties::kCurlHttp_Timeout, libCZI::StreamsFactory::Property::Type::Int32},
-        {"CurlHttp_ConnectTimeout", libCZI::StreamsFactory::StreamProperties::kCurlHttp_ConnectTimeout, libCZI::StreamsFactory::Property::Type::Int32},
-        {"CurlHttp_Xoauth2Bearer", libCZI::StreamsFactory::StreamProperties::kCurlHttp_Xoauth2Bearer, libCZI::StreamsFactory::Property::Type::String},
-        {"CurlHttp_Cookie", libCZI::StreamsFactory::StreamProperties::kCurlHttp_Cookie, libCZI::StreamsFactory::Property::Type::String},
-        {"CurlHttp_SslVerifyPeer", libCZI::StreamsFactory::StreamProperties::kCurlHttp_SslVerifyPeer, libCZI::StreamsFactory::Property::Type::Boolean},
-        {"CurlHttp_SslVerifyHost", libCZI::StreamsFactory::StreamProperties::kCurlHttp_SslVerifyHost, libCZI::StreamsFactory::Property::Type::Boolean},
-        {"CurlHttp_FollowLocation", libCZI::StreamsFactory::StreamProperties::kCurlHttp_FollowLocation, libCZI::StreamsFactory::Property::Type::Boolean},
-        {"CurlHttp_MaxRedirs", libCZI::StreamsFactory::StreamProperties::kCurlHttp_MaxRedirs, libCZI::StreamsFactory::Property::Type::Int32},
-    };
+    int property_info_count;
+    const libCZI::StreamsFactory::StreamPropertyBagPropertyInfo* property_infos = libCZI::StreamsFactory::GetStreamPropertyBagPropertyInfo(&property_info_count);
 
     rapidjson::Document document;
     document.Parse(s.c_str());
@@ -2301,9 +2284,9 @@ void CCmdLineOptions::PrintHelpStreamsObjects()
 
         string name = itr->name.GetString();
         size_t index_of_key = numeric_limits<size_t>::max();
-        for (size_t i = 0; i < sizeof(kKeyStringToId) / sizeof(kKeyStringToId[0]); ++i)
+        for (size_t i = 0; i < static_cast<size_t>(property_info_count); ++i)
         {
-            if (name == kKeyStringToId[i].name)
+            if (name == property_infos[i].property_name)
             {
                 index_of_key = i;
                 break;
@@ -2315,7 +2298,7 @@ void CCmdLineOptions::PrintHelpStreamsObjects()
             return false;
         }
 
-        switch (kKeyStringToId[index_of_key].property_type)
+        switch (property_infos[index_of_key].property_type)
         {
         case libCZI::StreamsFactory::Property::Type::String:
             if (!itr->value.IsString())
@@ -2325,7 +2308,7 @@ void CCmdLineOptions::PrintHelpStreamsObjects()
 
             if (property_bag != nullptr)
             {
-                property_bag->insert(std::make_pair(kKeyStringToId[index_of_key].stream_property_id, libCZI::StreamsFactory::Property(itr->value.GetString())));
+                property_bag->insert(std::make_pair(property_infos[index_of_key].property_id, libCZI::StreamsFactory::Property(itr->value.GetString())));
             }
 
             break;
@@ -2337,7 +2320,7 @@ void CCmdLineOptions::PrintHelpStreamsObjects()
 
             if (property_bag != nullptr)
             {
-                property_bag->insert(std::make_pair(kKeyStringToId[index_of_key].stream_property_id, libCZI::StreamsFactory::Property(itr->value.GetBool())));
+                property_bag->insert(std::make_pair(property_infos[index_of_key].property_id, libCZI::StreamsFactory::Property(itr->value.GetBool())));
             }
 
             break;
@@ -2349,12 +2332,12 @@ void CCmdLineOptions::PrintHelpStreamsObjects()
 
             if (property_bag != nullptr)
             {
-                property_bag->insert(std::make_pair(kKeyStringToId[index_of_key].stream_property_id, libCZI::StreamsFactory::Property(itr->value.GetInt())));
+                property_bag->insert(std::make_pair(property_infos[index_of_key].property_id, libCZI::StreamsFactory::Property(itr->value.GetInt())));
             }
 
             break;
         default:
-            // this actually indicates an internal error - the table kKeyStringToId contains a not yet implemented property type
+            // this actually indicates an internal error - the table property_infos contains a not yet implemented property type
             return false;
         }
     }

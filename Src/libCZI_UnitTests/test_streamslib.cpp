@@ -91,3 +91,26 @@ TEST(StreamsLib, TestGetProperty)
         }
     }
 }
+
+TEST(StreamsLib, TestGetStreamPropertyBagPropertyInfo)
+{
+    int property_infos_count = -1;
+    const auto property_infos = StreamsFactory::GetStreamPropertyBagPropertyInfo(&property_infos_count);
+
+    ASSERT_TRUE(property_infos != nullptr);
+    ASSERT_GE(property_infos_count, 0);
+
+    // now, check that the fields 'property_name' and 'property_id' are unique
+    for (int i = 0; i < property_infos_count; ++i)
+    {
+        const auto& info = property_infos[i];
+        for (int j = i + 1; j < property_infos_count; ++j)
+        {
+            const auto& info2 = property_infos[j];
+            EXPECT_FALSE(info.property_name == info2.property_name || info.property_id == info2.property_id);
+        }
+    }
+
+    // check that the list of properties is terminated with an empty entry
+    ASSERT_TRUE(property_infos[property_infos_count].property_name == nullptr);
+}
