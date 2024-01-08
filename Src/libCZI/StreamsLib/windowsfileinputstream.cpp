@@ -50,9 +50,9 @@ void WindowsFileInputStream::Read(std::uint64_t offset, void* pv, std::uint64_t 
     const BOOL read_file_return_code = ReadFile(this->handle, pv, static_cast<DWORD>(size), &bytes_read, &ol);
     if (!read_file_return_code)
     {
-        const DWORD lastError = GetLastError();
+        const DWORD last_error = GetLastError();
         std::stringstream ss;
-        ss << "Error reading from file (LastError=" << std::setfill('0') << std::setw(8) << std::showbase << lastError << ")";
+        ss << "Error reading from file (LastError=" << std::hex << std::setfill('0') << std::setw(8) << std::showbase << last_error << ")";
         throw std::runtime_error(ss.str());
     }
 
