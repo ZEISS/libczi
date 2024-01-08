@@ -101,29 +101,34 @@ CSimpleOutputStreamImplWindows::~CSimpleOutputStreamImplWindows()
 
 /*virtual*/void CSimpleOutputStreamImplWindows::Write(std::uint64_t offset, const void* pv, std::uint64_t size, std::uint64_t* ptrBytesWritten)
 {
-    OVERLAPPED ol = { 0 };
-    ol.Offset = (DWORD)(offset);
-    ol.OffsetHigh = (DWORD)(offset >> 32);
-    DWORD bytesWritten;
-    BOOL B = WriteFile(this->handle, pv, (DWORD)size, &bytesWritten, &ol);
+    if (size > (std::numeric_limits<DWORD>::max)())
+    {
+        throw std::runtime_error("size is too large");
+    }
+
+    OVERLAPPED ol = {};
+    ol.Offset = static_cast<DWORD>(offset);
+    ol.OffsetHigh = static_cast<DWORD>(offset >> 32);
+    DWORD bytes_written;
+    const BOOL B = WriteFile(this->handle, pv, static_cast<DWORD>(size), &bytes_written, &ol);
     if (!B)
     {
-        DWORD lastError = GetLastError();
+        const DWORD last_error = GetLastError();
         std::stringstream ss;
-        ss << "Error writing to file (LastError=" << std::setfill('0') << std::setw(8) << std::showbase << lastError << ")";
+        ss << "Error writing to file (LastError=" << std::hex << std::setfill('0') << std::setw(8) << std::showbase << last_error << ")";
         throw std::runtime_error(ss.str());
     }
 
     if (ptrBytesWritten != nullptr)
     {
-        *ptrBytesWritten = bytesWritten;
+        *ptrBytesWritten = bytes_written;
     }
 }
 #endif
 
 //----------------------------------------------------------------------------
 CStreamImplInMemory::CStreamImplInMemory(std::shared_ptr<const void> ptr, std::size_t dataSize)
-    : rawData(ptr), dataBufferSize(dataSize)
+    : rawData(std::move(ptr)), dataBufferSize(dataSize)
 {
 }
 
@@ -336,43 +341,53 @@ CSimpleInputOutputStreamImplWindows::CSimpleInputOutputStreamImplWindows(const w
 
 /*virtual*/void CSimpleInputOutputStreamImplWindows::Read(std::uint64_t offset, void* pv, std::uint64_t size, std::uint64_t* ptrBytesRead)
 {
-    OVERLAPPED ol = { 0 };
+    if (size > (std::numeric_limits<DWORD>::max)())
+    {
+        throw std::runtime_error("size is too large");
+    }
+
+    OVERLAPPED ol = {};
     ol.Offset = static_cast<DWORD>(offset);
     ol.OffsetHigh = static_cast<DWORD>(offset >> 32);
-    DWORD bytesRead;
-    BOOL B = ReadFile(this->handle, pv, static_cast<DWORD>(size), &bytesRead, &ol);
+    DWORD bytes_read;
+    const BOOL B = ReadFile(this->handle, pv, static_cast<DWORD>(size), &bytes_read, &ol);
     if (!B)
     {
-        const DWORD lastError = GetLastError();
+        const DWORD last_error = GetLastError();
         ostringstream ss;
-        ss << "Error reading from file (LastError=" << std::setfill('0') << std::setw(8) << std::showbase << lastError << ")";
+        ss << "Error reading from file (LastError=" << std::hex << std::setfill('0') << std::setw(8) << std::showbase << last_error << ")";
         throw std::runtime_error(ss.str());
     }
 
     if (ptrBytesRead != nullptr)
     {
-        *ptrBytesRead = bytesRead;
+        *ptrBytesRead = bytes_read;
     }
 }
 
 /*virtual*/void CSimpleInputOutputStreamImplWindows::Write(std::uint64_t offset, const void* pv, std::uint64_t size, std::uint64_t* ptrBytesWritten)
 {
-    OVERLAPPED ol = { 0 };
+    if (size > (std::numeric_limits<DWORD>::max)())
+    {
+        throw std::runtime_error("size is too large");
+    }
+
+    OVERLAPPED ol = {};
     ol.Offset = static_cast<DWORD>(offset);
     ol.OffsetHigh = static_cast<DWORD>(offset >> 32);
-    DWORD bytesWritten;
-    BOOL B = WriteFile(this->handle, pv, static_cast<DWORD>(size), &bytesWritten, &ol);
+    DWORD bytes_written;
+    const BOOL B = WriteFile(this->handle, pv, static_cast<DWORD>(size), &bytes_written, &ol);
     if (!B)
     {
-        DWORD lastError = GetLastError();
+        const DWORD last_error = GetLastError();
         ostringstream ss;
-        ss << "Error writing to file (LastError=" << std::setfill('0') << std::setw(8) << std::showbase << lastError << ")";
+        ss << "Error writing to file (LastError=" << std::hex << std::setfill('0') << std::setw(8) << std::showbase << last_error << ")";
         throw std::runtime_error(ss.str());
     }
 
     if (ptrBytesWritten != nullptr)
     {
-        *ptrBytesWritten = bytesWritten;
+        *ptrBytesWritten = bytes_written;
     }
 }
 #endif
