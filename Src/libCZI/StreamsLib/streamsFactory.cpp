@@ -6,6 +6,7 @@
 #include <libCZI_Config.h>
 #include <memory>
 #include <mutex>
+#include <assert.h>
 #include "curlhttpinputstream.h"
 #include "windowsfileinputstream.h"
 #include "simplefileinputstream.h"
@@ -90,6 +91,36 @@ void libCZI::StreamsFactory::Initialize()
                     CurlHttpInputStream::OneTimeGlobalCurlInitialization();
 #endif
                 });
+}
+
+/*static*/const libCZI::StreamsFactory::StreamPropertyBagPropertyInfo* libCZI::StreamsFactory::GetStreamPropertyBagPropertyInfo(int* count)
+{
+    static const StreamsFactory::StreamPropertyBagPropertyInfo kStreamPropertyBagPropertyInfo[] =
+    {
+#if LIBCZI_CURL_BASED_STREAM_AVAILABLE
+        {"CurlHttp_Proxy", StreamsFactory::StreamProperties::kCurlHttp_Proxy, StreamsFactory::Property::Type::String},
+        {"CurlHttp_UserAgent", StreamsFactory::StreamProperties::kCurlHttp_UserAgent, StreamsFactory::Property::Type::String},
+        {"CurlHttp_Timeout", StreamsFactory::StreamProperties::kCurlHttp_Timeout, StreamsFactory::Property::Type::Int32},
+        {"CurlHttp_ConnectTimeout", StreamsFactory::StreamProperties::kCurlHttp_ConnectTimeout, StreamsFactory::Property::Type::Int32},
+        {"CurlHttp_Xoauth2Bearer", StreamsFactory::StreamProperties::kCurlHttp_Xoauth2Bearer, StreamsFactory::Property::Type::String},
+        {"CurlHttp_Cookie", StreamsFactory::StreamProperties::kCurlHttp_Cookie, StreamsFactory::Property::Type::String},
+        {"CurlHttp_SslVerifyPeer", StreamsFactory::StreamProperties::kCurlHttp_SslVerifyPeer, StreamsFactory::Property::Type::Boolean},
+        {"CurlHttp_SslVerifyHost", StreamsFactory::StreamProperties::kCurlHttp_SslVerifyHost, StreamsFactory::Property::Type::Boolean},
+        {"CurlHttp_FollowLocation", StreamsFactory::StreamProperties::kCurlHttp_FollowLocation, StreamsFactory::Property::Type::Boolean},
+        {"CurlHttp_MaxRedirs", StreamsFactory::StreamProperties::kCurlHttp_MaxRedirs, StreamsFactory::Property::Type::Int32},
+        {"CurlHttp_CaInfo", StreamsFactory::StreamProperties::kCurlHttp_CaInfo, StreamsFactory::Property::Type::String},
+        {"CurlHttp_CaInfoBlob", StreamsFactory::StreamProperties::kCurlHttp_CaInfoBlob, StreamsFactory::Property::Type::String},
+#endif
+        {nullptr, 0, StreamsFactory::Property::Type::Invalid},
+    };
+
+    if (count != nullptr)
+    {
+        static_assert(sizeof(kStreamPropertyBagPropertyInfo) / sizeof(kStreamPropertyBagPropertyInfo[0]) > 0, "kStreamPropertyBagPropertyInfo must contain at least one element.");
+        *count = sizeof(kStreamPropertyBagPropertyInfo) / sizeof(kStreamPropertyBagPropertyInfo[0]) - 1;
+    }
+
+    return kStreamPropertyBagPropertyInfo;
 }
 
 bool libCZI::StreamsFactory::GetStreamInfoForClass(int index, StreamClassInfo& stream_info)
