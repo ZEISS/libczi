@@ -17,4 +17,4 @@ version history                 {#version_history}
  0.57.2             | [90](https://github.com/ZEISS/libczi/pull/90)        | improve thread-safety of CziReader
  0.57.3             | [91](https://github.com/ZEISS/libczi/pull/91)        | improve error-message
  0.58.0             | [92](https://github.com/ZEISS/libczi/pull/92)        | export a list with properties for streams-property-bag
- 0.58.1             | [93](https://github.com/ZEISS/libczi/pull/93)        | some fixes for CziReaderWriter
+ 0.58.1             | [95](https://github.com/ZEISS/libczi/pull/95)        | some fixes for CziReaderWriter
