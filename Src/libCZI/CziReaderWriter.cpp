@@ -130,8 +130,8 @@ void ICziReaderWriter::ReplaceSubBlock(int key, const libCZI::AddSubBlockInfoStr
     wi.writeFunc = std::bind(&CCziReaderWriter::WriteToOutputStream, this, placeholders::_1, placeholders::_2, placeholders::_3, placeholders::_4, placeholders::_5);
     wi.useSpecifiedAllocatedSize = false;
 
-    auto sizeOfSbBlk = CWriterUtils::WriteSubBlock(wi, addSbBlkInfo);
-    this->nextSegmentInfo.SetNextSegmentPos(wi.segmentPos + sizeOfSbBlk /*+ sizeof(SegmentHeader)*/);
+    const auto sizeOfSbBlk = CWriterUtils::WriteSubBlock(wi, addSbBlkInfo);
+    this->nextSegmentInfo.SetNextSegmentPos(wi.segmentPos + sizeOfSbBlk);
 }
 
 /*virtual*/void CCziReaderWriter::SyncAddAttachment(const libCZI::AddAttachmentInfo& addAttachmentInfo)
@@ -415,13 +415,14 @@ void CCziReaderWriter::ReadCziStructure()
                 },
                 &attchmntDirSegmentSize);
 
+            this->attachmentDirectory.SetModified(false);
             this->attachmentDirectorySegment.SetPositionAndAllocatedSize(pos, attchmntDirSegmentSize.AllocatedSize, false);
         }
 
         pos = this->hdrSegmentData.GetMetadataPosition();
         if (pos != 0)
         {
-            auto segmentSize = CCZIParse::ReadSegmentHeader(CCZIParse::SegmentType::Metadata, this->stream.get(), this->hdrSegmentData.GetMetadataPosition());
+            const auto segmentSize = CCZIParse::ReadSegmentHeader(CCZIParse::SegmentType::Metadata, this->stream.get(), this->hdrSegmentData.GetMetadataPosition());
             this->metadataSegment.SetPositionAndAllocatedSize(pos, segmentSize.AllocatedSize, false);
         }
     }
@@ -641,12 +642,14 @@ void CCziReaderWriter::WriteToOutputStream(std::uint64_t offset, const void* pv,
         [&](int index, const CCziSubBlockDirectory::SubBlkEntry& entry)->bool
         {
             SubBlockInfo info;
-    info.coordinate = entry.coordinate;
-    info.logicalRect = IntRect{ entry.x,entry.y,entry.width,entry.height };
-    info.physicalSize = IntSize{ (std::uint32_t)entry.storedWidth, (std::uint32_t)entry.storedHeight };
-    info.mIndex = entry.mIndex;
-    info.pixelType = CziUtils::PixelTypeFromInt(entry.PixelType);
-    return funcEnum(index, info);
+            info.compressionModeRaw = entry.Compression;
+            info.pixelType = CziUtils::PixelTypeFromInt(entry.PixelType);
+            info.coordinate = entry.coordinate;
+            info.logicalRect = IntRect{ entry.x,entry.y,entry.width,entry.height };
+            info.physicalSize = IntSize{ (std::uint32_t)entry.storedWidth, (std::uint32_t)entry.storedHeight };
+            info.mIndex = entry.mIndex;
+            info.pyramidType = CziUtils::PyramidTypeFromByte(entry.pyramid_type_from_spare);
+            return funcEnum(index, info);
         });
 }
 
