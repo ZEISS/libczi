@@ -730,7 +730,6 @@ void CCziReaderWriter::WriteToOutputStream(std::uint64_t offset, const void* pv,
 /*virtual*/void CCziReaderWriter::EnumerateSubset(const char* contentFileType, const char* name, const std::function<bool(int index, const libCZI::AttachmentInfo& infi)>& funcEnum)
 {
     this->ThrowIfNotOperational();
-    //throw std::runtime_error("Not Implemented");
     CziReaderCommon::EnumerateSubset(
         std::bind(&CReaderWriterCziAttachmentsDirectory::EnumEntries, &this->attachmentDirectory, std::placeholders::_1),
         contentFileType,

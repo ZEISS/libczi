@@ -45,7 +45,7 @@ using namespace libCZI;
     libCZI::SubBlockInfo& info)
 {
     bool foundASubBlock = false;
-    SubBlockStatistics s = repository->GetStatistics();// this->subBlkDir.GetStatistics();
+    SubBlockStatistics s = repository->GetStatistics();
     if (!s.dimBounds.IsValid(DimensionIndex::C))
     {
         // in this case -> just take the first subblock...
@@ -88,19 +88,19 @@ using namespace libCZI;
     func(
         [&](int index, const CCziAttachmentsDirectoryBase::AttachmentEntry& ae)
         {
-        if (contentFileType == nullptr || strcmp(contentFileType, ae.ContentFileType) == 0)
-        {
-            if (name == nullptr || strcmp(name, ae.Name) == 0)
+            if (contentFileType == nullptr || strcmp(contentFileType, ae.ContentFileType) == 0)
             {
-                ai.contentGuid = ae.ContentGuid;
-                memcpy(ai.contentFileType, ae.ContentFileType, sizeof(ae.ContentFileType));
-                ai.name = ae.Name;
-                bool b = funcEnum(index, ai);
-                return b;
+                if (name == nullptr || strcmp(name, ae.Name) == 0)
+                {
+                    ai.contentGuid = ae.ContentGuid;
+                    memcpy(ai.contentFileType, ae.ContentFileType, sizeof(ae.ContentFileType));
+                    ai.name = ae.Name;
+                    bool b = funcEnum(index, ai);
+                    return b;
+                }
             }
-        }
 
-        return true;
+            return true;
         });
 }
 
