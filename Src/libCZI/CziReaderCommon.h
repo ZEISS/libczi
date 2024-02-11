@@ -4,6 +4,7 @@
 #include "CziAttachment.h"
 #include <functional>
 
+/// Here we gather some common functionality that is used by both the CziReader and the CziReaderWriter classes.
 class CziReaderCommon
 {
 public:

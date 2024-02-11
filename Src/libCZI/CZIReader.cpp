@@ -102,15 +102,6 @@ CCZIReader::CCZIReader() : isOperational(false)
     this->subBlkDir.EnumSubBlocks(
         [&](int index, const CCziSubBlockDirectory::SubBlkEntry& entry)->bool
         {
-            /*SubBlockInfo info;
-            info.compressionModeRaw = entry.Compression;
-            info.pixelType = CziUtils::PixelTypeFromInt(entry.PixelType);
-            info.coordinate = entry.coordinate;
-            info.logicalRect = IntRect{ entry.x,entry.y,entry.width,entry.height };
-            info.physicalSize = IntSize{ (std::uint32_t)entry.storedWidth, (std::uint32_t)entry.storedHeight };
-            info.mIndex = entry.mIndex;
-            info.pyramidType = CziUtils::PyramidTypeFromByte(entry.pyramid_type_from_spare);
-            return funcEnum(index, info);*/
             return funcEnum(index, CziReaderCommon::ConvertToSubBlockInfo(entry));
         });
 }
@@ -137,33 +128,7 @@ CCZIReader::CCZIReader() : isOperational(false)
 /*virtual*/void CCZIReader::EnumSubset(const IDimCoordinate* planeCoordinate, const IntRect* roi, bool onlyLayer0, const std::function<bool(int index, const SubBlockInfo& info)>& funcEnum)
 {
     this->ThrowIfNotOperational();
-
     CziReaderCommon::EnumSubset(this, planeCoordinate, roi, onlyLayer0, funcEnum);
-    /*
-    // TODO:
-    // Ok... for a first tentative, experimental and quick-n-dirty implementation, simply
-    //      walk through all the subblocks. We surely want to have something more elaborated
-    //      here.
-    this->EnumerateSubBlocks(
-        [&](int index, const SubBlockInfo& info)->bool
-        {
-            // TODO: we only deal with layer 0 currently... or, more precisely, we do not take "zoom" into account at all
-            //        -> well... added that boolean "onlyLayer0" - is this sufficient...?
-            if (onlyLayer0 == false || (info.physicalSize.w == info.logicalRect.w && info.physicalSize.h == info.logicalRect.h))
-            {
-                if (planeCoordinate == nullptr || CziUtils::CompareCoordinate(planeCoordinate, &info.coordinate) == true)
-                {
-                    if (roi == nullptr || Utilities::DoIntersect(*roi, info.logicalRect))
-                    {
-                        bool b = funcEnum(index, info);
-                        return b;
-                    }
-                }
-            }
-
-            return true;
-        });
-        */
 }
 
 /*virtual*/std::shared_ptr<ISubBlock> CCZIReader::ReadSubBlock(int index)
@@ -182,41 +147,6 @@ CCZIReader::CCZIReader() : isOperational(false)
 {
     this->ThrowIfNotOperational();
     return CziReaderCommon::TryGetSubBlockInfoOfArbitrarySubBlockInChannel(this, channelIndex, info);
-
-    // TODO: we should be able to gather this information when constructing the subblock-list
-    //  for the time being... just walk through the whole list
-    //  
-    //bool foundASubBlock = false;
-    //SubBlockStatistics s = this->subBlkDir.GetStatistics();
-    //if (!s.dimBounds.IsValid(DimensionIndex::C))
-    //{
-    //    // in this case -> just take the first subblock...
-    //    this->EnumerateSubBlocks(
-    //        [&](int index, const SubBlockInfo& sbinfo)->bool
-    //        {
-    //            info = sbinfo;
-    //            foundASubBlock = true;
-    //            return false;
-    //        });
-    //}
-    //else
-    //{
-    //    this->EnumerateSubBlocks(
-    //        [&](int index, const SubBlockInfo& sbinfo)->bool
-    //        {
-    //            int c;
-    //            if (sbinfo.coordinate.TryGetPosition(DimensionIndex::C, &c) == true && c == channelIndex)
-    //            {
-    //                info = sbinfo;
-    //                foundASubBlock = true;
-    //                return false;
-    //            }
-
-    //            return true;
-    //        });
-    //}
-
-    //return foundASubBlock;
 }
 
 /*virtual*/bool CCZIReader::TryGetSubBlockInfo(int index, SubBlockInfo* info) const
@@ -230,13 +160,6 @@ CCZIReader::CCZIReader() : isOperational(false)
     if (info != nullptr)
     {
         *info = CziReaderCommon::ConvertToSubBlockInfo(entry);
-       /* info->compressionModeRaw = entry.Compression;
-        info->pixelType = CziUtils::PixelTypeFromInt(entry.PixelType);
-        info->coordinate = entry.coordinate;
-        info->logicalRect = IntRect{ entry.x,entry.y,entry.width,entry.height };
-        info->physicalSize = IntSize{ static_cast<std::uint32_t>(entry.storedWidth), static_cast<std::uint32_t>(entry.storedHeight) };
-        info->mIndex = entry.mIndex;
-        info->pyramidType = CziUtils::PyramidTypeFromByte(entry.pyramid_type_from_spare);*/
     }
 
     return true;
@@ -280,27 +203,7 @@ CCZIReader::CCZIReader() : isOperational(false)
 /*virtual*/void CCZIReader::EnumerateSubset(const char* contentFileType, const char* name, const std::function<bool(int index, const libCZI::AttachmentInfo& info)>& funcEnum)
 {
     this->ThrowIfNotOperational();
-  /*  libCZI::AttachmentInfo ai;
-    ai.contentFileType[sizeof(ai.contentFileType) - 1] = '\0';
-    this->attachmentDir.EnumAttachments(
-        [&](int index, const CCziAttachmentsDirectory::AttachmentEntry& ae)
-        {
-            if (contentFileType == nullptr || strcmp(contentFileType, ae.ContentFileType) == 0)
-            {
-                if (name == nullptr || strcmp(name, ae.Name) == 0)
-                {
-                    ai.contentGuid = ae.ContentGuid;
-                    memcpy(ai.contentFileType, ae.ContentFileType, sizeof(ae.ContentFileType));
-                    ai.name = ae.Name;
-                    bool b = funcEnum(index, ai);
-                    return b;
-                }
-            }
-
-            return true;
-        });*/
     CziReaderCommon::EnumerateSubset(
-        //this->attachmentDir.EnumAttachments, 
         std::bind(&CCziAttachmentsDirectory::EnumAttachments, &this->attachmentDir, std::placeholders::_1),
         contentFileType, 
         name, 
