@@ -1393,12 +1393,12 @@ TEST(CziReaderWriter, TestEnumerateSubBlocks)
 {
     auto testCzi = CreateTestCzi();
 
-    auto input_output_stream = make_shared<CMemInputOutputStream>(get<0>(testCzi).get(), get<1>(testCzi));
-    auto rw = CreateCZIReaderWriter();
-    rw->Create(input_output_stream);
+    const auto input_output_stream = make_shared<CMemInputOutputStream>(get<0>(testCzi).get(), get<1>(testCzi));
+    const auto reader_writer = CreateCZIReaderWriter();
+    reader_writer->Create(input_output_stream);
 
     vector<int> indices;
-    rw->EnumerateSubBlocks(
+    reader_writer->EnumerateSubBlocks(
         [&](int index, const SubBlockInfo& info)->bool
         {
             indices.push_back(index);
@@ -1423,7 +1423,7 @@ TEST(CziReaderWriter, TestEnumerateSubBlocks)
 
     indices.clear();
     const auto query_rect = IntRect{ 8,0,8,1 };
-    rw->EnumSubset(nullptr, &query_rect, true,
+    reader_writer->EnumSubset(nullptr, &query_rect, true,
          [&](int index, const SubBlockInfo& info)->bool
         {
             indices.push_back(index);
@@ -1440,9 +1440,83 @@ TEST(CziReaderWriter, TestEnumerateSubBlocks)
 
         // check that the subblock is within the query rectangle
         SubBlockInfo sub_block_info;
-        bool b = rw->TryGetSubBlockInfo(*it, &sub_block_info);
+        bool b = reader_writer->TryGetSubBlockInfo(*it, &sub_block_info);
         ASSERT_TRUE(b);
         b = query_rect.IntersectsWith(sub_block_info.logicalRect);
         ASSERT_TRUE(b);
     }
+}
+
+TEST(CziReaderWriter, AttachmentEnumerateSubset)
+{
+    auto testCzi = CreateTestCzi2();
+
+    const auto input_output_stream = make_shared<CMemInputOutputStream>(get<0>(testCzi).get(), get<1>(testCzi));
+    const auto reader_writer = CreateCZIReaderWriter();
+    reader_writer->Create(input_output_stream);
+
+    // compare the results of EnumerateAttachments and EnumerateSubset (where no subset is specified),
+    //  this should give the same result
+    vector<int> indices_from_enumerate;
+    reader_writer->EnumerateAttachments(
+        [&](int index, const AttachmentInfo& info)->bool
+        {
+            indices_from_enumerate.push_back(index);
+            return true;
+        });
+
+    vector<int> indices_from_enumerate_subset;
+    reader_writer->EnumerateSubset(
+        nullptr, nullptr,
+        [&](int index, const AttachmentInfo& info)->bool
+        {
+            indices_from_enumerate_subset.push_back(index);
+            return true;
+        });
+
+    // The matcher will check if 'actual' contains all the elements of 'expected', ignoring order
+    EXPECT_THAT(indices_from_enumerate, ::testing::UnorderedElementsAreArray(indices_from_enumerate_subset));
+
+    // Now use a condition to filter the attachments (only those with name "ATTACHMENT1" should be found).
+    // Note that our CZI-document only has one attachment with this name, so the result should be the same as before.
+    indices_from_enumerate_subset.clear();
+    reader_writer->EnumerateSubset(
+        nullptr, "ATTACHMENT1",
+        [&](int index, const AttachmentInfo& info)->bool
+        {
+            indices_from_enumerate_subset.push_back(index);
+            return true;
+        });
+
+    EXPECT_THAT(indices_from_enumerate, ::testing::UnorderedElementsAreArray(indices_from_enumerate_subset));
+
+    indices_from_enumerate_subset.clear();
+
+    // Now use a condition which is not met by any attachment (so the result should be an empty vector).
+    reader_writer->EnumerateSubset(
+        nullptr, "XXXXXXXXXXX",
+        [&](int index, const AttachmentInfo& info)->bool
+        {
+            indices_from_enumerate_subset.push_back(index);
+            return true;
+        });
+
+    EXPECT_EQ(indices_from_enumerate_subset.size(), 0);
+}
+
+TEST(CziReaderWriter, TryGetSubBlockInfoOfArbitrarySubBlockInChannel)
+{
+    auto testCzi = CreateTestCzi2();
+
+    const auto input_output_stream = make_shared<CMemInputOutputStream>(get<0>(testCzi).get(), get<1>(testCzi));
+    const auto reader_writer = CreateCZIReaderWriter();
+    reader_writer->Create(input_output_stream);
+
+    SubBlockInfo sub_block_info;
+    bool b = reader_writer->TryGetSubBlockInfoOfArbitrarySubBlockInChannel(0, sub_block_info);
+    ASSERT_TRUE(b);
+    EXPECT_EQ(sub_block_info.pixelType, PixelType::Gray8);
+
+    b = reader_writer->TryGetSubBlockInfoOfArbitrarySubBlockInChannel(1, sub_block_info);
+    EXPECT_FALSE(b);
 }

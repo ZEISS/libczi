@@ -269,14 +269,14 @@ void CCziReaderWriter::Finish()
 
         sbBlkDirWriteInfo.segmentPosForNewSegment = this->nextSegmentInfo.GetNextSegmentPos();
         sbBlkDirWriteInfo.enumEntriesFunc = [&](const std::function<void(size_t, const CCziSubBlockDirectoryBase::SubBlkEntry&)>& f)->void
-        {
-            this->sbBlkDirectory.EnumEntries(
-                [&](size_t index, const CCziSubBlockDirectoryBase::SubBlkEntry& e)->bool
-                {
-                    f(index, e);
-            return true;
-                });
-        };
+            {
+                this->sbBlkDirectory.EnumEntries(
+                    [&](size_t index, const CCziSubBlockDirectoryBase::SubBlkEntry& e)->bool
+                    {
+                            f(index, e);
+                            return true;
+                    });
+            };
         sbBlkDirWriteInfo.writeFunc = std::bind(&CCziReaderWriter::WriteToOutputStream, this, placeholders::_1, placeholders::_2, placeholders::_3, placeholders::_4, placeholders::_5);
         const auto posAndSize = CWriterUtils::WriteSubBlkDirectory(sbBlkDirWriteInfo);
         this->subBlockDirectorySegment.SetPositionAndAllocatedSize(get<0>(posAndSize), get<1>(posAndSize), false);
@@ -307,14 +307,14 @@ void CCziReaderWriter::Finish()
         attchmntDirWriteInfo.segmentPosForNewSegment = this->nextSegmentInfo.GetNextSegmentPos();
         attchmntDirWriteInfo.entryCnt = this->attachmentDirectory.GetEntryCnt();
         attchmntDirWriteInfo.enumEntriesFunc = [&](const std::function<void(size_t, const CCziAttachmentsDirectoryBase::AttachmentEntry&)>& f)->void
-        {
-            this->attachmentDirectory.EnumEntries(
-                [&](size_t index, const CCziAttachmentsDirectoryBase::AttachmentEntry& e)->bool
-                {
-                    f(index, e);
-                    return true;
-                });
-        };
+            {
+                this->attachmentDirectory.EnumEntries(
+                    [&](size_t index, const CCziAttachmentsDirectoryBase::AttachmentEntry& e)->bool
+                    {
+                            f(index, e);
+                            return true;
+                    });
+            };
         attchmntDirWriteInfo.writeFunc = std::bind(&CCziReaderWriter::WriteToOutputStream, this, placeholders::_1, placeholders::_2, placeholders::_3, placeholders::_4, placeholders::_5);
         const auto posAndSize = CWriterUtils::WriteAttachmentDirectory(attchmntDirWriteInfo);
         this->attachmentDirectorySegment.SetPositionAndAllocatedSize(get<0>(posAndSize), get<1>(posAndSize), false);
@@ -483,7 +483,7 @@ void CCziReaderWriter::DetermineNextSubBlockOffset()
                 lastSegmentPos = sbBlkEntry.FilePosition;
             }
 
-    return true;
+            return true;
         });
 
     this->attachmentDirectory.EnumEntries(
@@ -494,7 +494,7 @@ void CCziReaderWriter::DetermineNextSubBlockOffset()
                 lastSegmentPos = attEntry.FilePosition;
             }
 
-    return true;
+            return true;
         });
 
     if (this->hdrSegmentData.GetIsSubBlockDirectoryPositionValid())
@@ -642,15 +642,6 @@ void CCziReaderWriter::WriteToOutputStream(std::uint64_t offset, const void* pv,
     this->sbBlkDirectory.EnumEntries(
         [&](int index, const CCziSubBlockDirectory::SubBlkEntry& entry)->bool
         {
-            /*SubBlockInfo info;
-            info.compressionModeRaw = entry.Compression;
-            info.pixelType = CziUtils::PixelTypeFromInt(entry.PixelType);
-            info.coordinate = entry.coordinate;
-            info.logicalRect = IntRect{ entry.x,entry.y,entry.width,entry.height };
-            info.physicalSize = IntSize{ (std::uint32_t)entry.storedWidth, (std::uint32_t)entry.storedHeight };
-            info.mIndex = entry.mIndex;
-            info.pyramidType = CziUtils::PyramidTypeFromByte(entry.pyramid_type_from_spare);
-            return funcEnum(index, info);*/
             return funcEnum(index, CziReaderCommon::ConvertToSubBlockInfo(entry));
         });
 }
@@ -698,13 +689,6 @@ void CCziReaderWriter::WriteToOutputStream(std::uint64_t offset, const void* pv,
     if (info != nullptr)
     {
         *info = CziReaderCommon::ConvertToSubBlockInfo(entry);
-        /*info->compressionModeRaw = entry.Compression;
-        info->pixelType = CziUtils::PixelTypeFromInt(entry.PixelType);
-        info->coordinate = entry.coordinate;
-        info->logicalRect = IntRect{ entry.x,entry.y,entry.width,entry.height };
-        info->physicalSize = IntSize{ static_cast<std::uint32_t>(entry.storedWidth), static_cast<std::uint32_t>(entry.storedHeight) };
-        info->mIndex = entry.mIndex;
-        info->pyramidType = CziUtils::PyramidTypeFromByte(entry.pyramid_type_from_spare);*/
     }
 
     return true;
@@ -714,7 +698,6 @@ void CCziReaderWriter::WriteToOutputStream(std::uint64_t offset, const void* pv,
 {
     this->ThrowIfNotOperational();
     return CziReaderCommon::TryGetSubBlockInfoOfArbitrarySubBlockInChannel(this, channelIndex, info);
- //   throw std::runtime_error("Not Implemented");
 }
 
 /*virtual*/libCZI::SubBlockStatistics CCziReaderWriter::GetStatistics()
@@ -750,8 +733,8 @@ void CCziReaderWriter::WriteToOutputStream(std::uint64_t offset, const void* pv,
     //throw std::runtime_error("Not Implemented");
     CziReaderCommon::EnumerateSubset(
         std::bind(&CReaderWriterCziAttachmentsDirectory::EnumEntries, &this->attachmentDirectory, std::placeholders::_1),
-        contentFileType, 
-        name, 
+        contentFileType,
+        name,
         funcEnum);
 }
 
