@@ -278,7 +278,7 @@ void CCziReaderWriter::Finish()
                 });
         };
         sbBlkDirWriteInfo.writeFunc = std::bind(&CCziReaderWriter::WriteToOutputStream, this, placeholders::_1, placeholders::_2, placeholders::_3, placeholders::_4, placeholders::_5);
-        auto posAndSize = CWriterUtils::WriteSubBlkDirectory(sbBlkDirWriteInfo);
+        const auto posAndSize = CWriterUtils::WriteSubBlkDirectory(sbBlkDirWriteInfo);
         this->subBlockDirectorySegment.SetPositionAndAllocatedSize(get<0>(posAndSize), get<1>(posAndSize), false);
         if (get<0>(posAndSize) == sbBlkDirWriteInfo.segmentPosForNewSegment)
         {
@@ -312,11 +312,11 @@ void CCziReaderWriter::Finish()
                 [&](size_t index, const CCziAttachmentsDirectoryBase::AttachmentEntry& e)->bool
                 {
                     f(index, e);
-            return true;
+                    return true;
                 });
         };
         attchmntDirWriteInfo.writeFunc = std::bind(&CCziReaderWriter::WriteToOutputStream, this, placeholders::_1, placeholders::_2, placeholders::_3, placeholders::_4, placeholders::_5);
-        auto posAndSize = CWriterUtils::WriteAttachmentDirectory(attchmntDirWriteInfo);
+        const auto posAndSize = CWriterUtils::WriteAttachmentDirectory(attchmntDirWriteInfo);
         this->attachmentDirectorySegment.SetPositionAndAllocatedSize(get<0>(posAndSize), get<1>(posAndSize), false);
         if (get<0>(posAndSize) == attchmntDirWriteInfo.segmentPosForNewSegment)
         {
@@ -381,7 +381,7 @@ void CCziReaderWriter::ReadCziStructure()
         if (this->info->GetForceFileGuid())
         {
             // we then immediately update the File-Guid
-            auto newGuid = this->UpdateFileHeaderGuid();
+            const auto newGuid = this->UpdateFileHeaderGuid();
             memcpy(&fileHeaderSegment.FileGuid, &newGuid, sizeof(newGuid));
             memcpy(&fileHeaderSegment.PrimaryFileGuid, &newGuid, sizeof(newGuid));
         }
@@ -642,7 +642,7 @@ void CCziReaderWriter::WriteToOutputStream(std::uint64_t offset, const void* pv,
     this->sbBlkDirectory.EnumEntries(
         [&](int index, const CCziSubBlockDirectory::SubBlkEntry& entry)->bool
         {
-            SubBlockInfo info;
+            /*SubBlockInfo info;
             info.compressionModeRaw = entry.Compression;
             info.pixelType = CziUtils::PixelTypeFromInt(entry.PixelType);
             info.coordinate = entry.coordinate;
@@ -650,7 +650,8 @@ void CCziReaderWriter::WriteToOutputStream(std::uint64_t offset, const void* pv,
             info.physicalSize = IntSize{ (std::uint32_t)entry.storedWidth, (std::uint32_t)entry.storedHeight };
             info.mIndex = entry.mIndex;
             info.pyramidType = CziUtils::PyramidTypeFromByte(entry.pyramid_type_from_spare);
-            return funcEnum(index, info);
+            return funcEnum(index, info);*/
+            return funcEnum(index, CziReaderCommon::ConvertToSubBlockInfo(entry));
         });
 }
 
@@ -696,13 +697,14 @@ void CCziReaderWriter::WriteToOutputStream(std::uint64_t offset, const void* pv,
 
     if (info != nullptr)
     {
-        info->compressionModeRaw = entry.Compression;
+        *info = CziReaderCommon::ConvertToSubBlockInfo(entry);
+        /*info->compressionModeRaw = entry.Compression;
         info->pixelType = CziUtils::PixelTypeFromInt(entry.PixelType);
         info->coordinate = entry.coordinate;
         info->logicalRect = IntRect{ entry.x,entry.y,entry.width,entry.height };
         info->physicalSize = IntSize{ static_cast<std::uint32_t>(entry.storedWidth), static_cast<std::uint32_t>(entry.storedHeight) };
         info->mIndex = entry.mIndex;
-        info->pyramidType = CziUtils::PyramidTypeFromByte(entry.pyramid_type_from_spare);
+        info->pyramidType = CziUtils::PyramidTypeFromByte(entry.pyramid_type_from_spare);*/
     }
 
     return true;

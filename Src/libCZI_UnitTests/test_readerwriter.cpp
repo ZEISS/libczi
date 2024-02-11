@@ -1420,4 +1420,29 @@ TEST(CziReaderWriter, TestEnumerateSubBlocks)
     }
 
     ASSERT_TRUE(allNumbersPresent) << "Not all numbers from 0 to 49 are present in the vector.";
+
+    indices.clear();
+    const auto query_rect = IntRect{ 8,0,8,1 };
+    rw->EnumSubset(nullptr, &query_rect, true,
+         [&](int index, const SubBlockInfo& info)->bool
+        {
+            indices.push_back(index);
+            return true;
+        });
+
+    // Check the size
+    ASSERT_EQ(indices.size(), 20) << "Vector does not contain exactly 20 elements.";
+
+    for (auto it = indices.begin(); it != indices.end(); ++it)
+    {
+        // check that the index is not present more than once
+        ASSERT_FALSE(std::find(it + 1, indices.end(), *it) != indices.end());
+
+        // check that the subblock is within the query rectangle
+        SubBlockInfo sub_block_info;
+        bool b = rw->TryGetSubBlockInfo(*it, &sub_block_info);
+        ASSERT_TRUE(b);
+        b = query_rect.IntersectsWith(sub_block_info.logicalRect);
+        ASSERT_TRUE(b);
+    }
 }

@@ -101,3 +101,16 @@ using namespace libCZI;
         return true;
         });
 }
+
+/*static*/libCZI::SubBlockInfo CziReaderCommon::ConvertToSubBlockInfo(const CCziSubBlockDirectory::SubBlkEntry& entry)
+{
+    SubBlockInfo info;
+    info.compressionModeRaw = entry.Compression;
+    info.pixelType = CziUtils::PixelTypeFromInt(entry.PixelType);
+    info.coordinate = entry.coordinate;
+    info.logicalRect = IntRect{ entry.x,entry.y,entry.width,entry.height };
+    info.physicalSize = IntSize{ (std::uint32_t)entry.storedWidth, (std::uint32_t)entry.storedHeight };
+    info.mIndex = entry.mIndex;
+    info.pyramidType = CziUtils::PyramidTypeFromByte(entry.pyramid_type_from_spare);
+    return info;
+}

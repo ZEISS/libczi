@@ -24,5 +24,6 @@ public:
         const char* contentFileType,
         const char* name,
         const std::function<bool(int index, const libCZI::AttachmentInfo& info)>& funcEnum);
-   
+
+    static libCZI::SubBlockInfo ConvertToSubBlockInfo(const CCziSubBlockDirectory::SubBlkEntry& entry);
 };

@@ -102,7 +102,7 @@ CCZIReader::CCZIReader() : isOperational(false)
     this->subBlkDir.EnumSubBlocks(
         [&](int index, const CCziSubBlockDirectory::SubBlkEntry& entry)->bool
         {
-            SubBlockInfo info;
+            /*SubBlockInfo info;
             info.compressionModeRaw = entry.Compression;
             info.pixelType = CziUtils::PixelTypeFromInt(entry.PixelType);
             info.coordinate = entry.coordinate;
@@ -110,7 +110,8 @@ CCZIReader::CCZIReader() : isOperational(false)
             info.physicalSize = IntSize{ (std::uint32_t)entry.storedWidth, (std::uint32_t)entry.storedHeight };
             info.mIndex = entry.mIndex;
             info.pyramidType = CziUtils::PyramidTypeFromByte(entry.pyramid_type_from_spare);
-            return funcEnum(index, info);
+            return funcEnum(index, info);*/
+            return funcEnum(index, CziReaderCommon::ConvertToSubBlockInfo(entry));
         });
 }
 
@@ -228,13 +229,14 @@ CCZIReader::CCZIReader() : isOperational(false)
 
     if (info != nullptr)
     {
-        info->compressionModeRaw = entry.Compression;
+        *info = CziReaderCommon::ConvertToSubBlockInfo(entry);
+       /* info->compressionModeRaw = entry.Compression;
         info->pixelType = CziUtils::PixelTypeFromInt(entry.PixelType);
         info->coordinate = entry.coordinate;
         info->logicalRect = IntRect{ entry.x,entry.y,entry.width,entry.height };
         info->physicalSize = IntSize{ static_cast<std::uint32_t>(entry.storedWidth), static_cast<std::uint32_t>(entry.storedHeight) };
         info->mIndex = entry.mIndex;
-        info->pyramidType = CziUtils::PyramidTypeFromByte(entry.pyramid_type_from_spare);
+        info->pyramidType = CziUtils::PyramidTypeFromByte(entry.pyramid_type_from_spare);*/
     }
 
     return true;
