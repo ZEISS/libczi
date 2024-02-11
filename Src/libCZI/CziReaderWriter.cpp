@@ -273,8 +273,8 @@ void CCziReaderWriter::Finish()
                 this->sbBlkDirectory.EnumEntries(
                     [&](size_t index, const CCziSubBlockDirectoryBase::SubBlkEntry& e)->bool
                     {
-                            f(index, e);
-                            return true;
+                        f(index, e);
+                        return true;
                     });
             };
         sbBlkDirWriteInfo.writeFunc = std::bind(&CCziReaderWriter::WriteToOutputStream, this, placeholders::_1, placeholders::_2, placeholders::_3, placeholders::_4, placeholders::_5);
@@ -311,8 +311,8 @@ void CCziReaderWriter::Finish()
                 this->attachmentDirectory.EnumEntries(
                     [&](size_t index, const CCziAttachmentsDirectoryBase::AttachmentEntry& e)->bool
                     {
-                            f(index, e);
-                            return true;
+                        f(index, e);
+                        return true;
                     });
             };
         attchmntDirWriteInfo.writeFunc = std::bind(&CCziReaderWriter::WriteToOutputStream, this, placeholders::_1, placeholders::_2, placeholders::_3, placeholders::_4, placeholders::_5);
