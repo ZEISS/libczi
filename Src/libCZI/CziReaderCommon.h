@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2024 Carl Zeiss Microscopy GmbH
+//
+// SPDX-License-Identifier: LGPL-3.0-or-later
+
 #pragma once
 
 #include "libCZI.h"

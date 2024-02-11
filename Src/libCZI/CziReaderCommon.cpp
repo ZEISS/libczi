@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2024 Carl Zeiss Microscopy GmbH
+//
+// SPDX-License-Identifier: LGPL-3.0-or-later
+
 #include "CziReaderCommon.h"
 
 #include "CziUtils.h"
@@ -19,15 +23,13 @@ using namespace libCZI;
     repository->EnumerateSubBlocks(
         [&](int index, const SubBlockInfo& info)->bool
         {
-            // TODO: we only deal with layer 0 currently... or, more precisely, we do not take "zoom" into account at all
-            //        -> well... added that boolean "onlyLayer0" - is this sufficient...?
             if (onlyLayer0 == false || (info.physicalSize.w == info.logicalRect.w && info.physicalSize.h == info.logicalRect.h))
             {
                 if (planeCoordinate == nullptr || CziUtils::CompareCoordinate(planeCoordinate, &info.coordinate) == true)
                 {
                     if (roi == nullptr || Utilities::DoIntersect(*roi, info.logicalRect))
                     {
-                        bool b = funcEnum(index, info);
+                        const bool b = funcEnum(index, info);
                         return b;
                     }
                 }
