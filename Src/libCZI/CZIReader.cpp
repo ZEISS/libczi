@@ -10,6 +10,7 @@
 #include "CziUtils.h"
 #include "utilities.h"
 #include "CziAttachment.h"
+#include "CziReaderCommon.h"
 
 using namespace std;
 using namespace libCZI;
@@ -136,6 +137,8 @@ CCZIReader::CCZIReader() : isOperational(false)
 {
     this->ThrowIfNotOperational();
 
+    CziReaderCommon::EnumSubset(this, planeCoordinate, roi, onlyLayer0, funcEnum);
+    /*
     // TODO:
     // Ok... for a first tentative, experimental and quick-n-dirty implementation, simply
     //      walk through all the subblocks. We surely want to have something more elaborated
@@ -159,6 +162,7 @@ CCZIReader::CCZIReader() : isOperational(false)
 
             return true;
         });
+        */
 }
 
 /*virtual*/std::shared_ptr<ISubBlock> CCZIReader::ReadSubBlock(int index)
@@ -176,41 +180,42 @@ CCZIReader::CCZIReader() : isOperational(false)
 /*virtual*/bool CCZIReader::TryGetSubBlockInfoOfArbitrarySubBlockInChannel(int channelIndex, SubBlockInfo& info)
 {
     this->ThrowIfNotOperational();
+    return CziReaderCommon::TryGetSubBlockInfoOfArbitrarySubBlockInChannel(this, channelIndex, info);
 
     // TODO: we should be able to gather this information when constructing the subblock-list
     //  for the time being... just walk through the whole list
     //  
-    bool foundASubBlock = false;
-    SubBlockStatistics s = this->subBlkDir.GetStatistics();
-    if (!s.dimBounds.IsValid(DimensionIndex::C))
-    {
-        // in this case -> just take the first subblock...
-        this->EnumerateSubBlocks(
-            [&](int index, const SubBlockInfo& sbinfo)->bool
-            {
-                info = sbinfo;
-                foundASubBlock = true;
-                return false;
-            });
-    }
-    else
-    {
-        this->EnumerateSubBlocks(
-            [&](int index, const SubBlockInfo& sbinfo)->bool
-            {
-                int c;
-                if (sbinfo.coordinate.TryGetPosition(DimensionIndex::C, &c) == true && c == channelIndex)
-                {
-                    info = sbinfo;
-                    foundASubBlock = true;
-                    return false;
-                }
+    //bool foundASubBlock = false;
+    //SubBlockStatistics s = this->subBlkDir.GetStatistics();
+    //if (!s.dimBounds.IsValid(DimensionIndex::C))
+    //{
+    //    // in this case -> just take the first subblock...
+    //    this->EnumerateSubBlocks(
+    //        [&](int index, const SubBlockInfo& sbinfo)->bool
+    //        {
+    //            info = sbinfo;
+    //            foundASubBlock = true;
+    //            return false;
+    //        });
+    //}
+    //else
+    //{
+    //    this->EnumerateSubBlocks(
+    //        [&](int index, const SubBlockInfo& sbinfo)->bool
+    //        {
+    //            int c;
+    //            if (sbinfo.coordinate.TryGetPosition(DimensionIndex::C, &c) == true && c == channelIndex)
+    //            {
+    //                info = sbinfo;
+    //                foundASubBlock = true;
+    //                return false;
+    //            }
 
-                return true;
-            });
-    }
+    //            return true;
+    //        });
+    //}
 
-    return foundASubBlock;
+    //return foundASubBlock;
 }
 
 /*virtual*/bool CCZIReader::TryGetSubBlockInfo(int index, SubBlockInfo* info) const
@@ -273,7 +278,7 @@ CCZIReader::CCZIReader() : isOperational(false)
 /*virtual*/void CCZIReader::EnumerateSubset(const char* contentFileType, const char* name, const std::function<bool(int index, const libCZI::AttachmentInfo& info)>& funcEnum)
 {
     this->ThrowIfNotOperational();
-    libCZI::AttachmentInfo ai;
+  /*  libCZI::AttachmentInfo ai;
     ai.contentFileType[sizeof(ai.contentFileType) - 1] = '\0';
     this->attachmentDir.EnumAttachments(
         [&](int index, const CCziAttachmentsDirectory::AttachmentEntry& ae)
@@ -291,7 +296,13 @@ CCZIReader::CCZIReader() : isOperational(false)
             }
 
             return true;
-        });
+        });*/
+    CziReaderCommon::EnumerateSubset(
+        //this->attachmentDir.EnumAttachments, 
+        std::bind(&CCziAttachmentsDirectory::EnumAttachments, &this->attachmentDir, std::placeholders::_1),
+        contentFileType, 
+        name, 
+        funcEnum);
 }
 
 /*virtual*/std::shared_ptr<libCZI::IAttachment> CCZIReader::ReadAttachment(int index)

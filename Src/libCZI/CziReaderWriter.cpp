@@ -11,6 +11,7 @@
 #include "utilities.h"
 #include "CziSubBlock.h"
 #include "CziAttachment.h"
+#include "CziReaderCommon.h"
 
 using namespace libCZI;
 using namespace std;
@@ -656,7 +657,7 @@ void CCziReaderWriter::WriteToOutputStream(std::uint64_t offset, const void* pv,
 /*virtual*/void CCziReaderWriter::EnumSubset(const libCZI::IDimCoordinate* planeCoordinate, const libCZI::IntRect* roi, bool onlyLayer0, const std::function<bool(int index, const libCZI::SubBlockInfo& info)>& funcEnum)
 {
     this->ThrowIfNotOperational();
-    throw std::runtime_error("Not Implemented");
+    CziReaderCommon::EnumSubset(this, planeCoordinate, roi, onlyLayer0, funcEnum);
 }
 
 /*virtual*/std::shared_ptr<libCZI::ISubBlock> CCziReaderWriter::ReadSubBlock(int index)
@@ -710,7 +711,8 @@ void CCziReaderWriter::WriteToOutputStream(std::uint64_t offset, const void* pv,
 /*virtual*/bool CCziReaderWriter::TryGetSubBlockInfoOfArbitrarySubBlockInChannel(int channelIndex, libCZI::SubBlockInfo& info)
 {
     this->ThrowIfNotOperational();
-    throw std::runtime_error("Not Implemented");
+    return CziReaderCommon::TryGetSubBlockInfoOfArbitrarySubBlockInChannel(this, channelIndex, info);
+ //   throw std::runtime_error("Not Implemented");
 }
 
 /*virtual*/libCZI::SubBlockStatistics CCziReaderWriter::GetStatistics()
@@ -732,18 +734,23 @@ void CCziReaderWriter::WriteToOutputStream(std::uint64_t offset, const void* pv,
         [&](int index, const CCziAttachmentsDirectoryBase::AttachmentEntry& entry)->bool
         {
             libCZI::AttachmentInfo info;
-    info.contentGuid = entry.ContentGuid;
-    memcpy(info.contentFileType, entry.ContentFileType, sizeof(entry.ContentFileType));
-    info.name = entry.Name;
-    bool b = funcEnum(index, info);
-    return b;
+            info.contentGuid = entry.ContentGuid;
+            memcpy(info.contentFileType, entry.ContentFileType, sizeof(entry.ContentFileType));
+            info.name = entry.Name;
+            bool b = funcEnum(index, info);
+            return b;
         });
 }
 
 /*virtual*/void CCziReaderWriter::EnumerateSubset(const char* contentFileType, const char* name, const std::function<bool(int index, const libCZI::AttachmentInfo& infi)>& funcEnum)
 {
     this->ThrowIfNotOperational();
-    throw std::runtime_error("Not Implemented");
+    //throw std::runtime_error("Not Implemented");
+    CziReaderCommon::EnumerateSubset(
+        std::bind(&CReaderWriterCziAttachmentsDirectory::EnumEntries, &this->attachmentDirectory, std::placeholders::_1),
+        contentFileType, 
+        name, 
+        funcEnum);
 }
 
 /*virtual*/std::shared_ptr<libCZI::IAttachment> CCziReaderWriter::ReadAttachment(int index)

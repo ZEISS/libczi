@@ -20,6 +20,7 @@ set(LIBCZISRCFILES
             CziMetadataSegment.cpp
             CziParse.cpp
             CZIReader.cpp
+            CziReaderCommon.cpp
             CziReaderWriter.cpp
             CziStructs.cpp
             CziSubBlock.cpp
@@ -60,6 +61,7 @@ set(LIBCZISRCFILES
             CziMetadataDocumentInfo2.h
             CziMetadataSegment.h
             CziParse.h
+            CziReaderCommon.h
             CZIReader.h
             CziReaderWriter.h
             CziStructs.h

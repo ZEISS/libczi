@@ -8,6 +8,7 @@
 #include "utils.h"
 #include "MemInputOutputStream.h"
 #include "SegmentWalker.h"
+#include <algorithm>
 
 using namespace libCZI;
 using namespace std;
@@ -1349,9 +1350,9 @@ INSTANTIATE_TEST_SUITE_P(
     CziReaderWriter,
     SparePyramidTypeFixture,
     testing::Values(
-        SubBlockPyramidType::None,
-        SubBlockPyramidType::SingleSubBlock,
-        SubBlockPyramidType::MultiSubBlock));
+    SubBlockPyramidType::None,
+    SubBlockPyramidType::SingleSubBlock,
+    SubBlockPyramidType::MultiSubBlock));
 
 TEST(CziReaderWriter, TryAddingDuplicateAttachmentToCziReaderWriterAndExpectError)
 {
@@ -1386,4 +1387,37 @@ TEST(CziReaderWriter, TryAddingDuplicateAttachmentToCziReaderWriterAndExpectErro
     add_attachment_info.SetContentFileType("ABC");
     add_attachment_info.contentGuid = GUID{ 111, 2, 3, {4, 5, 6, 7, 8, 9, 10, 11} };
     reader_writer->SyncAddAttachment(add_attachment_info);
+}
+
+TEST(CziReaderWriter, TestEnumerateSubBlocks)
+{
+    auto testCzi = CreateTestCzi();
+
+    auto input_output_stream = make_shared<CMemInputOutputStream>(get<0>(testCzi).get(), get<1>(testCzi));
+    auto rw = CreateCZIReaderWriter();
+    rw->Create(input_output_stream);
+
+    vector<int> indices;
+    rw->EnumerateSubBlocks(
+        [&](int index, const SubBlockInfo& info)->bool
+        {
+            indices.push_back(index);
+            return true;
+        });
+
+    // Check the size
+    ASSERT_EQ(indices.size(), 50) << "Vector does not contain exactly 50 elements.";
+
+    // Verify each number from 0 to 49 is present
+    bool allNumbersPresent = true;
+    for (int i = 0; i < 50; ++i)
+    {
+        if (std::find(indices.begin(), indices.end(), i) == indices.end())
+        {
+            allNumbersPresent = false;
+            break;
+        }
+    }
+
+    ASSERT_TRUE(allNumbersPresent) << "Not all numbers from 0 to 49 are present in the vector.";
 }
