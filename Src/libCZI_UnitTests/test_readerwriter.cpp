@@ -1422,9 +1422,12 @@ TEST(CziReaderWriter, TestEnumerateSubBlocks)
     ASSERT_TRUE(allNumbersPresent) << "Not all numbers from 0 to 49 are present in the vector.";
 
     indices.clear();
-    const auto query_rect = IntRect{ 8,0,8,1 };
-    reader_writer->EnumSubset(nullptr, &query_rect, true,
-         [&](int index, const SubBlockInfo& info)->bool
+    constexpr auto query_rect = IntRect{ 8,0,8,1 };
+    reader_writer->EnumSubset(
+        nullptr,
+        &query_rect,
+        true,
+        [&](int index, const SubBlockInfo& info)->bool
         {
             indices.push_back(index);
             return true;

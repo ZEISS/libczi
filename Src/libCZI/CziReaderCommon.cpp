@@ -78,10 +78,10 @@ using namespace libCZI;
 }
 
 /*static*/void CziReaderCommon::EnumerateSubset(
-       const std::function<void(const std::function<bool(int index, const CCziAttachmentsDirectory::AttachmentEntry&)>&)>& func,
-       const char* contentFileType,
-       const char* name,
-       const std::function<bool(int index, const libCZI::AttachmentInfo& info)>& funcEnum)
+    const std::function<void(const std::function<bool(int index, const CCziAttachmentsDirectory::AttachmentEntry&)>&)>& func,
+    const char* contentFileType,
+    const char* name,
+    const std::function<bool(int index, const libCZI::AttachmentInfo& info)>& funcEnum)
 {
     libCZI::AttachmentInfo ai;
     ai.contentFileType[sizeof(ai.contentFileType) - 1] = '\0';
