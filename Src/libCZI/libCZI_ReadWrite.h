@@ -33,7 +33,9 @@ namespace libCZI
     /// - The indices (or "keys") for a subblock/attachment do not change during the lifetime of the object (even if deleting some).  
     /// - Contrary to ICziWriter, this object does not attempt to verify the consistency of the coordinates - which is due the fact  
     ///    that we aim at allowing arbitrary modifications. We do not require to specify in advance the number of dimensions or the bounds.
-    /// - The information returned by ISubBlockRepository::GetStatistics is valid (taking into consideration the current state).
+    /// - The information returned by ISubBlockRepository::GetStatistics is valid (taking into consideration the current state).  
+    /// - When enumerating subblocks/attachments, mutations (i.e. adding/removing items) of the respective subblock/attachment-collection are not allowed  
+    ///    and result in undefined behavior.
     class LIBCZI_API ICziReaderWriter : public ISubBlockRepository, public IAttachmentRepository
     {
     public:

@@ -733,10 +733,11 @@ void libCZI::ICziWriter::SyncAddSubBlock(const AddSubBlockInfoStridedBitmap& add
 
     std::unique_ptr<AttachmentEntryA1, void(*)(AttachmentEntryA1*)> upAttchmntData((AttachmentEntryA1*)malloc(sizeAttchmntEntries), [](AttachmentEntryA1* p)->void {free(p); });
 
+    size_t index_count = 0;
     info.enumEntriesFunc(
         [&](size_t index, const CCziAttachmentsDirectoryBase::AttachmentEntry& entry)->bool
         {
-            AttachmentEntryA1* p = (upAttchmntData.get() + index);
+            AttachmentEntryA1* p = upAttchmntData.get() + index_count;
             p->SchemaType[0] = 'A';
             p->SchemaType[1] = '1';
             memset(&p->_spare[0], 0, sizeof(p->_spare));
@@ -747,6 +748,7 @@ void libCZI::ICziWriter::SyncAddSubBlock(const AddSubBlockInfoStridedBitmap& add
             memcpy(&p->Name[0], &entry.Name[0], sizeof(p->Name));
 
             ConvertToHostByteOrder::Convert(p);
+            ++index_count;
             return true;
         });
 
