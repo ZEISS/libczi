@@ -146,7 +146,7 @@ Int writeTileHeaderLP(CWMImageStrCodec* pSC, BitIOInfo* pIO)
                 for (i = 0; i < pTile->cNumQPLP; i++) {
                     pTile->cChModeLP[i] = (U8)(rand() & 3); // channel mode, just for concept proofing!
 
-                    for (j = 0; j < pSC->m_param.cNumChannels; j++)
+                    for (j = 0; j < (U8)pSC->m_param.cNumChannels; j++)
                         pTile->pQuantizerLP[j][i].iIndex = (U8)((rand() & 0xfe) + 1); // QP indexes, just for concept proofing!
                     formatQuantizer(pTile->pQuantizerLP, pTile->cChModeLP[i], pSC->m_param.cNumChannels, i, TRUE, pSC->m_param.bScaledArith);
                     writeQuantizer(pTile->pQuantizerLP, pIO, pTile->cChModeLP[i], pSC->m_param.cNumChannels, i);
@@ -189,7 +189,7 @@ Int writeTileHeaderHP(CWMImageStrCodec* pSC, BitIOInfo* pIO)
                 for (i = 0; i < pTile->cNumQPHP; i++) {
                     pTile->cChModeHP[i] = (U8)(rand() & 3); // channel mode, just for concept proofing!
 
-                    for (j = 0; j < pSC->m_param.cNumChannels; j++)
+                    for (j = 0; j < (U8)pSC->m_param.cNumChannels; j++)
                         pTile->pQuantizerHP[j][i].iIndex = (U8)((rand() & 0xfe) + 1); // QP indexes, just for concept proofing!
                     formatQuantizer(pTile->pQuantizerHP, pTile->cChModeHP[i], pSC->m_param.cNumChannels, i, FALSE, pSC->m_param.bScaledArith);
                     writeQuantizer(pTile->pQuantizerHP, pIO, pTile->cChModeHP[i], pSC->m_param.cNumChannels, i);
