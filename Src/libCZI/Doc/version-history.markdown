@@ -18,3 +18,4 @@ version history                 {#version_history}
  0.57.3             | [91](https://github.com/ZEISS/libczi/pull/91)        | improve error-message
  0.58.0             | [92](https://github.com/ZEISS/libczi/pull/92)        | export a list with properties for streams-property-bag
  0.58.1             | [95](https://github.com/ZEISS/libczi/pull/95)        | some fixes for CziReaderWriter
+ 0.58.2             | [95](https://github.com/ZEISS/libczi/pull/96)        | small fixes for deficiencies reported by CodeQL
