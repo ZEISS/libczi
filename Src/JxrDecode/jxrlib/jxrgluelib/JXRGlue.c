@@ -678,7 +678,7 @@ ERR PKImageEncode_WriteSource(
     cbStride = cbStrideFrom > cbStrideTo ? cbStrideFrom : cbStrideTo;//  max(cbStrideFrom, cbStrideTo);
 
     // actual dec/enc with local buffer
-    Call(PKAllocAligned((void**)&pb, cbStride * pRect->Height, 128));
+    Call(PKAllocAligned((void**)&pb, (size_t)cbStride * pRect->Height, 128));
 
     Call(pFC->Copy(pFC, pRect, pb, cbStride));
 
@@ -779,7 +779,7 @@ ERR PKImageEncode_Transcode(
     else
     {
         // actual dec/enc with local buffer
-        Call(PKAllocAligned((void**)&pb, cbStride * pRect->Height, 128));
+        Call(PKAllocAligned((void**)&pb, (size_t)cbStride * pRect->Height, 128));
         Call(pFC->Copy(pFC, pRect, pb, cbStride));
         Call(pIE->WritePixels(pIE, pRect->Height, pb, cbStride));
     }
