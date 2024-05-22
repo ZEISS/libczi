@@ -73,7 +73,7 @@ jobs:
       - name: Prepare Coverage
         if: ${{ (matrix.OS == 'windows-latest') && ( matrix.build == 'Debug') }}
         run: |
-          choco install OpenCppCoverage -y
+          choco install OpenCppCoverage -y --no-progress
           echo "C:\Program Files\OpenCppCoverage" >> "$env:GITHUB_PATH"
 
       - name: Get Coverage
