@@ -44,9 +44,40 @@ TEST(CurlHttpInputStream, SimpleReadFromHttps)
     EXPECT_TRUE(memcmp(hash, expectedResult, 16) == 0) << "Incorrect result";
 }
 
-TEST(CurlHttpInputStream, OpenAndReadCziFromUrl)
+TEST(CurlHttpInputStream, TryToReadZeroBytesFromHttpsAndExpectSuccess)
 {
     static constexpr char kUrl[] = "https://media.githubusercontent.com/media/ptahmose/libCZI_testdata/main/MD5/ff20e3a15d797509f7bf494ea21109d3";  // sparse_planes.czi.
+
+    StreamsFactory::CreateStreamInfo create_info;
+    create_info.class_name = "curl_http_inputstream";
+
+    // set a five-seconds time-out (for the whole operation)
+    create_info.property_bag = { {StreamsFactory::StreamProperties::kCurlHttp_Timeout,StreamsFactory::Property(5)} };
+
+    const auto stream = StreamsFactory::CreateStream(create_info, kUrl);
+
+    if (!stream)
+    {
+        GTEST_SKIP() << "The stream-class 'curl_http_inputstream' is not available/configured, skipping this test therefore.";
+    }
+
+    uint8_t buffer[1];
+    uint64_t bytes_read = (std::numeric_limits<uint64_t>::max)();
+    try
+    {
+        stream->Read(0, buffer, 0, &bytes_read);
+    }
+    catch (const std::exception& e)
+    {
+        GTEST_SKIP() << "Exception: " << e.what() << "--> skipping this test as inconclusive, assuming network issues";
+    }
+
+    EXPECT_EQ(bytes_read, 0);
+}
+
+TEST(CurlHttpInputStream, OpenAndReadCziFromUrl)
+{
+    static constexpr char kUrl[] = "https://media.githubusercontent.com/media/ptahmose/libCZI_testdata/main/MD5/ff20e3a15d797509f7bf494ea21109d3";  // sparse_planes.czi
 
     StreamsFactory::CreateStreamInfo create_info;
     create_info.class_name = "curl_http_inputstream";

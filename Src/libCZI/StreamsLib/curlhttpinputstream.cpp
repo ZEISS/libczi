@@ -121,6 +121,8 @@ CurlHttpInputStream::CurlHttpInputStream(const std::string& url, const std::map<
     CURLcode return_code = curl_easy_setopt(up_curl_handle.get(), CURLOPT_CURLU, up_curl_url_handle.get());
     ThrowIfCurlSetOptError(return_code, "CURLOPT_CURLU");
 
+    // for debugging purposes, set verbose mode to 1, and libcurl will output information about the operation
+    //  to stdout
     return_code = curl_easy_setopt(up_curl_handle.get(), CURLOPT_VERBOSE, 0L/*1L*/);
     ThrowIfCurlSetOptError(return_code, "CURLOPT_VERBOSE");
 
@@ -233,6 +235,17 @@ CurlHttpInputStream::CurlHttpInputStream(const std::string& url, const std::map<
 
 /*virtual*/void CurlHttpInputStream::Read(std::uint64_t offset, void* pv, std::uint64_t size, std::uint64_t* ptrBytesRead)
 {
+    // we handle the case of size == 0 explicitly, because the "curl_easy_perform" would not work with a size of 0
+    if (size == 0)
+    {
+        if (ptrBytesRead != nullptr)
+        {
+            *ptrBytesRead = 0;
+        }
+
+        return;
+    }
+
     stringstream ss;
     ss << offset << "-" << offset + size - 1;
 

@@ -272,7 +272,7 @@ namespace libCZI
         /// initializing the stream, an exception will be thrown.
         ///
         /// \param  stream_info     Information describing the stream.
-        /// \param  file_identifier The filename (or, more generally, an URI of some sort) identifying the file to be opened in UTF8-encoding.
+        /// \param  file_identifier The filename (or, more generally, a URI of some sort) identifying the file to be opened in UTF8-encoding.
         ///
         /// \returns    The newly created and initialized stream.
         static std::shared_ptr<libCZI::IStream> CreateStream(const CreateStreamInfo& stream_info, const std::string& file_identifier);
@@ -282,7 +282,7 @@ namespace libCZI
         /// initializing the stream, an exception will be thrown.
         ///
         /// \param  stream_info     Information describing the stream.
-        /// \param  file_identifier The filename (or, more generally, an URI of some sort) identifying the file to be opened.
+        /// \param  file_identifier The filename (or, more generally, a URI of some sort) identifying the file to be opened.
         ///
         /// \returns    The newly created and initialized stream.
         static std::shared_ptr<libCZI::IStream> CreateStream(const CreateStreamInfo& stream_info, const std::wstring& file_identifier);
