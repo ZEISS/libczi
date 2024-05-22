@@ -20,4 +20,4 @@ version history                 {#version_history}
  0.58.1             | [95](https://github.com/ZEISS/libczi/pull/95)        | some fixes for CziReaderWriter
  0.58.2             | [96](https://github.com/ZEISS/libczi/pull/96)        | small fixes for deficiencies reported by CodeQL
  0.58.3             | [97](https://github.com/ZEISS/libczi/pull/97)        | update zstd to [version 1.5.6](https://github.com/facebook/zstd/releases/tag/v1.5.6)
- 0.58.4             | [98](https://github.com/ZEISS/libczi/pull/98)        | fix a rare issue with curl_http_inputstream which would fail to read CZIs with an attachment-directory containing zero entries
+ 0.58.4             | [99](https://github.com/ZEISS/libczi/pull/99)        | fix a rare issue with curl_http_inputstream which would fail to read CZIs with an attachment-directory containing zero entries
