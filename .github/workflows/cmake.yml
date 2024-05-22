@@ -92,6 +92,4 @@ jobs:
           # Only one flag to be safe with
           # https://docs.codecov.com/docs/flags#one-to-one-relationship-of-flags-to-uploads
           flags: ${{matrix.OS}}
-          token: e9a842e5-9f84-48a6-9320-8f67a28f0260
-
-
+          token: e9a842e5-9f84-48a6-9320-8f67a28f0260 #gitleaks:allow
