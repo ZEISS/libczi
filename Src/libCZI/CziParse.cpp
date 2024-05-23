@@ -201,7 +201,7 @@ using namespace libCZI;
 
     // TODO: we can add a couple of consistency checks here
 
-    // an empty attachment-directory (with zero entries) is a valid, and in this
+    // an empty attachment-directory (with zero entries) is valid and in this
     //  case we can skip the rest of the processing
     if (attachmentDirSegment.data.EntryCount > 0)
     {
