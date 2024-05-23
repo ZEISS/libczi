@@ -196,6 +196,9 @@ namespace libCZI
         /// is expected to throw an exception for any kind of I/O-related error. It must not throw
         /// an exception if reading past the end of a file - instead, it must return the number of
         /// bytes actually read accordingly.
+        /// For the special case of size==0, the behavior should be as follows: the method should
+        /// operate as for a size>0, but it should not read any data. The method should return 0 in
+        /// ptrBytesRead.
         ///
         /// \param offset                The offset to start reading from.
         /// \param [out] pv              The caller-provided buffer for the data. Must be non-null.
