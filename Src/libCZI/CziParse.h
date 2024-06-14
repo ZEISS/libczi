@@ -33,8 +33,10 @@ public:
         {
             kDimensionXyMustBePresent = 0,
             kDimensionOtherThanMMustHaveSizeOne,
+            kStoredDimensionOtherThanMMustHaveSizeOne,
             kDimensionMMustHaveSizeOneExceptForPyramidSubblocks,
             kDimensionMMustHaveSizeOne,
+            kblabla,
 
             kParseFlagsCount    ///< The number of flags - this is not a flag itself, and it must be the last entry in the enum.
         };
@@ -69,6 +71,9 @@ public:
         ///
         /// \returns    True if it is to be checked that the size of all dimensions other than X, Y and M is "1" for each subblock; false otherwise.
         bool GetDimensionOtherThanMMustHaveSizeOne() const { return this->GetFlag(ParseFlags::kDimensionOtherThanMMustHaveSizeOne); }
+
+        /// \returns    True if it is to be checked that the size of all stored dimensions other than X, Y and M is "1" for each subblock; false otherwise.
+        bool GetStoredDimensionOtherThanMMustHaveSizeOne() const { return this->GetFlag(ParseFlags::kStoredDimensionOtherThanMMustHaveSizeOne); }
 
         /// Gets a boolean indicating whether to check that the size is "1" for dimension M for all non-pyramid-subblocks.
         /// This flag is more specific than the flag "DimensionMMustHaveSizeOne".
