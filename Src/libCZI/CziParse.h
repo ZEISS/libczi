@@ -50,8 +50,13 @@ public:
         /// Require that for each subblock the size (for all dimensions other than X, Y and M) is "1".
         ///
         /// \param  enable  True to enable, false to disable.
-        void SetDimensionOtherThanMMustHaveSizeOne(bool enable) { return this->SetFlag(ParseFlags::kDimensionOtherThanMMustHaveSizeOne, enable); }
+        void SetStoredDimensionOtherThanMMustHaveSizeOne(bool enable) { return this->SetFlag(ParseFlags::kStoredDimensionOtherThanMMustHaveSizeOne, enable); }
 
+        /// Require that for each subblock the size (for all dimensions other than X, Y and M) is "1".
+        ///
+        /// \param  enable  True to enable, false to disable.
+
+        void SetDimensionOtherThanMMustHaveSizeOne(bool enable) { return this->SetFlag(ParseFlags::kDimensionOtherThanMMustHaveSizeOne, enable); }
         /// Require that for all subblocks that the size of dimension M is "1" except for pyramid subblocks.
         ///
         /// \param  enable  True to enable, false to disable.
@@ -91,6 +96,7 @@ public:
         {
             this->SetDimensionXyMustBePresent(false);
             this->SetDimensionOtherThanMMustHaveSizeOne(false);
+            this->SetStoredDimensionOtherThanMMustHaveSizeOne(false);
             this->SetDimensionMMustHaveSizeOne(false);
         }
 
@@ -98,6 +104,7 @@ public:
         void SetStrictParsing()
         {
             this->SetDimensionXyMustBePresent(true);
+            this->SetStoredDimensionOtherThanMMustHaveSizeOne(true);
             this->SetDimensionOtherThanMMustHaveSizeOne(true);
             this->SetDimensionMMustHaveSizeOne(true);
         }
