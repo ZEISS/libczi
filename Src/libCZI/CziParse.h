@@ -36,7 +36,6 @@ public:
             kStoredDimensionOtherThanMMustHaveSizeOne,
             kDimensionMMustHaveSizeOneExceptForPyramidSubblocks,
             kDimensionMMustHaveSizeOne,
-            kblabla,
 
             kParseFlagsCount    ///< The number of flags - this is not a flag itself, and it must be the last entry in the enum.
         };
@@ -47,7 +46,7 @@ public:
         /// \param  enable  True to enable, false to disable.
         void SetDimensionXyMustBePresent(bool enable) { return this->SetFlag(ParseFlags::kDimensionXyMustBePresent, enable); }
 
-        /// Require that for each subblock the size (for all dimensions other than X, Y and M) is "1".
+        /// Require that for each subblock the physical (stored) size (for all dimensions other than X, Y and M) is "1".
         ///
         /// \param  enable  True to enable, false to disable.
         void SetStoredDimensionOtherThanMMustHaveSizeOne(bool enable) { return this->SetFlag(ParseFlags::kStoredDimensionOtherThanMMustHaveSizeOne, enable); }
@@ -77,7 +76,9 @@ public:
         /// \returns    True if it is to be checked that the size of all dimensions other than X, Y and M is "1" for each subblock; false otherwise.
         bool GetDimensionOtherThanMMustHaveSizeOne() const { return this->GetFlag(ParseFlags::kDimensionOtherThanMMustHaveSizeOne); }
 
-        /// \returns    True if it is to be checked that the size of all stored dimensions other than X, Y and M is "1" for each subblock; false otherwise.
+        /// Gets a boolean indicating whether to check that the physical (stored) size of all dimensions other than X, Y and M is "1" for each subblock.
+        ///
+        /// \returns    True if it is to be checked that the physical (stored) size of all dimensions other than X, Y and M is "1" for each subblock; false otherwise.
         bool GetStoredDimensionOtherThanMMustHaveSizeOne() const { return this->GetFlag(ParseFlags::kStoredDimensionOtherThanMMustHaveSizeOne); }
 
         /// Gets a boolean indicating whether to check that the size is "1" for dimension M for all non-pyramid-subblocks.
