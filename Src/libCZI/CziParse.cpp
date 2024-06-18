@@ -581,7 +581,7 @@ using namespace libCZI;
                 {
                     stringstream string_stream;
                     string_stream 
-                            << "Size for stored dimension '" << Utils::DimensionToChar(dim)
+                            << "Size for physical dimension '" << Utils::DimensionToChar(dim)
                             << "' is expected to be 1, but found " << physicalSize
                             << " (file-offset:" << subBlkDirDV->FilePosition << ").";
                     throw LibCZICZIParseException(string_stream.str().c_str(), LibCZICZIParseException::ErrorCode::NonConformingSubBlockDimensionEntry);
