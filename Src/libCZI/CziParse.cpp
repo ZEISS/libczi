@@ -574,16 +574,15 @@ using namespace libCZI;
             libCZI::DimensionIndex dim = CCZIParse::DimensionCharToDimensionIndex(subBlkDirDV->DimensionEntries[i].Dimension, 4);
             entry.coordinate.Set(dim, subBlkDirDV->DimensionEntries[i].Start);
 
-            // check all the dimensions here. cr mark
-            if(options.GetStoredDimensionOtherThanMMustHaveSizeOne())
+            if(options.GetPhysicalDimensionOtherThanMMustHaveSizeOne())
             { 
-                auto storedSize = subBlkDirDV->DimensionEntries[i].StoredSize;
-                if(storedSize != 1)
+                auto physicalSize = subBlkDirDV->DimensionEntries[i].StoredSize;
+                if(physicalSize != 1)
                 {
                     stringstream string_stream;
                     string_stream 
                             << "Size for stored dimension '" << Utils::DimensionToChar(dim)
-                            << "' is expected to be 1, but found " << storedSize
+                            << "' is expected to be 1, but found " << physicalSize
                             << " (file-offset:" << subBlkDirDV->FilePosition << ").";
                     throw LibCZICZIParseException(string_stream.str().c_str(), LibCZICZIParseException::ErrorCode::NonConformingSubBlockDimensionEntry);
                 }
