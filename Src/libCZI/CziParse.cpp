@@ -573,6 +573,21 @@ using namespace libCZI;
         {
             libCZI::DimensionIndex dim = CCZIParse::DimensionCharToDimensionIndex(subBlkDirDV->DimensionEntries[i].Dimension, 4);
             entry.coordinate.Set(dim, subBlkDirDV->DimensionEntries[i].Start);
+
+            if(options.GetPhysicalDimensionOtherThanMMustHaveSizeOne())
+            { 
+                auto physicalSize = subBlkDirDV->DimensionEntries[i].StoredSize;
+                if(physicalSize != 1)
+                {
+                    stringstream string_stream;
+                    string_stream 
+                            << "Physical size for dimension '" << Utils::DimensionToChar(dim)
+                            << "' is expected to be 1, but found " << physicalSize
+                            << " (file-offset:" << subBlkDirDV->FilePosition << ").";
+                    throw LibCZICZIParseException(string_stream.str().c_str(), LibCZICZIParseException::ErrorCode::NonConformingSubBlockDimensionEntry);
+                }
+            }
+
             if (options.GetDimensionOtherThanMMustHaveSizeOne() && subBlkDirDV->DimensionEntries[i].Size != 1)
             {
                 stringstream string_stream;
