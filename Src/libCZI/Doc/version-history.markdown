@@ -18,5 +18,7 @@ version history                 {#version_history}
  0.57.3             | [91](https://github.com/ZEISS/libczi/pull/91)        | improve error-message
  0.58.0             | [92](https://github.com/ZEISS/libczi/pull/92)        | export a list with properties for streams-property-bag
  0.58.1             | [95](https://github.com/ZEISS/libczi/pull/95)        | some fixes for CziReaderWriter
- 0.58.2             | [95](https://github.com/ZEISS/libczi/pull/96)        | small fixes for deficiencies reported by CodeQL
- 0.58.3             | [96](https://github.com/ZEISS/libczi/pull/97)        | update zstd to [version 1.5.6](https://github.com/facebook/zstd/releases/tag/v1.5.6)
+ 0.58.2             | [96](https://github.com/ZEISS/libczi/pull/96)        | small fixes for deficiencies reported by CodeQL
+ 0.58.3             | [97](https://github.com/ZEISS/libczi/pull/97)        | update zstd to [version 1.5.6](https://github.com/facebook/zstd/releases/tag/v1.5.6)
+ 0.58.4             | [99](https://github.com/ZEISS/libczi/pull/99)        | fix a rare issue with curl_http_inputstream which would fail to read CZIs with an attachment-directory containing zero entries
+ 0.59.0             | [99](https://github.com/ZEISS/libczi/pull/103)        | add a check for physical size for dimensions other than X,Y,M, they must not be >1, active for strict parsing.

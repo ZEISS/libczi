@@ -33,6 +33,7 @@ public:
         {
             kDimensionXyMustBePresent = 0,
             kDimensionOtherThanMMustHaveSizeOne,
+            kPhysicalDimensionOtherThanMMustHaveSizeOne,
             kDimensionMMustHaveSizeOneExceptForPyramidSubblocks,
             kDimensionMMustHaveSizeOne,
 
@@ -45,11 +46,16 @@ public:
         /// \param  enable  True to enable, false to disable.
         void SetDimensionXyMustBePresent(bool enable) { return this->SetFlag(ParseFlags::kDimensionXyMustBePresent, enable); }
 
+        /// Require that for each subblock the physical size (for all dimensions other than X, Y and M) is "1".
+        ///
+        /// \param  enable  True to enable, false to disable.
+        void SetPhysicalDimensionOtherThanMMustHaveSizeOne(bool enable) { return this->SetFlag(ParseFlags::kPhysicalDimensionOtherThanMMustHaveSizeOne, enable); }
+
         /// Require that for each subblock the size (for all dimensions other than X, Y and M) is "1".
         ///
         /// \param  enable  True to enable, false to disable.
-        void SetDimensionOtherThanMMustHaveSizeOne(bool enable) { return this->SetFlag(ParseFlags::kDimensionOtherThanMMustHaveSizeOne, enable); }
 
+        void SetDimensionOtherThanMMustHaveSizeOne(bool enable) { return this->SetFlag(ParseFlags::kDimensionOtherThanMMustHaveSizeOne, enable); }
         /// Require that for all subblocks that the size of dimension M is "1" except for pyramid subblocks.
         ///
         /// \param  enable  True to enable, false to disable.
@@ -70,6 +76,11 @@ public:
         /// \returns    True if it is to be checked that the size of all dimensions other than X, Y and M is "1" for each subblock; false otherwise.
         bool GetDimensionOtherThanMMustHaveSizeOne() const { return this->GetFlag(ParseFlags::kDimensionOtherThanMMustHaveSizeOne); }
 
+        /// Gets a boolean indicating whether to check that the physical size of all dimensions other than X, Y and M is "1" for each subblock.
+        ///
+        /// \returns    True if it is to be checked that the physical size of all dimensions other than X, Y and M is "1" for each subblock; false otherwise.
+        bool GetPhysicalDimensionOtherThanMMustHaveSizeOne() const { return this->GetFlag(ParseFlags::kPhysicalDimensionOtherThanMMustHaveSizeOne); }
+
         /// Gets a boolean indicating whether to check that the size is "1" for dimension M for all non-pyramid-subblocks.
         /// This flag is more specific than the flag "DimensionMMustHaveSizeOne".
         ///
@@ -86,6 +97,7 @@ public:
         {
             this->SetDimensionXyMustBePresent(false);
             this->SetDimensionOtherThanMMustHaveSizeOne(false);
+            this->SetPhysicalDimensionOtherThanMMustHaveSizeOne(false);
             this->SetDimensionMMustHaveSizeOne(false);
         }
 
@@ -93,6 +105,7 @@ public:
         void SetStrictParsing()
         {
             this->SetDimensionXyMustBePresent(true);
+            this->SetPhysicalDimensionOtherThanMMustHaveSizeOne(true);
             this->SetDimensionOtherThanMMustHaveSizeOne(true);
             this->SetDimensionMMustHaveSizeOne(true);
         }
