@@ -171,7 +171,7 @@ using namespace libCZI;
 /*static*/void CCZIParse::ReadAttachmentsDirectory(libCZI::IStream* str, std::uint64_t offset, const std::function<void(const CCziAttachmentsDirectoryBase::AttachmentEntry&)>& addFunc, SegmentSizes* segmentSizes/*= nullptr*/)
 {
     AttachmentDirectorySegment attachmentDirSegment;
-    std::uint64_t bytesRead;
+    uint64_t bytesRead;
     try
     {
         str->Read(offset, &attachmentDirSegment, sizeof(attachmentDirSegment), &bytesRead);
@@ -201,45 +201,49 @@ using namespace libCZI;
 
     // TODO: we can add a couple of consistency checks here
 
-    // now read the AttachmentEntries
-    std::uint64_t attachmentEntriesSize = ((std::uint64_t)attachmentDirSegment.data.EntryCount) * sizeof(AttachmentEntryA1);
-
-    std::unique_ptr<AttachmentEntryA1, decltype(free)*> pBuffer((AttachmentEntryA1*)malloc((size_t)attachmentEntriesSize), free);
-
-    // now read the attachment-entries
-    try
+    // an empty attachment-directory (with zero entries) is valid and in this
+    //  case we can skip the rest of the processing
+    if (attachmentDirSegment.data.EntryCount > 0)
     {
-        str->Read(offset + sizeof(attachmentDirSegment), pBuffer.get(), attachmentEntriesSize, &bytesRead);
-    }
-    catch (const std::exception&)
-    {
-        std::throw_with_nested(LibCZIIOException("Error reading FileHeaderSegment", offset + sizeof(attachmentDirSegment), attachmentEntriesSize));
-    }
+        // now read the AttachmentEntries
+        const uint64_t attachmentEntriesSize = static_cast<uint64_t>(attachmentDirSegment.data.EntryCount) * sizeof(AttachmentEntryA1);
+        unique_ptr<AttachmentEntryA1, decltype(free)*> pBuffer(static_cast<AttachmentEntryA1*>(malloc((size_t)attachmentEntriesSize)), free);
 
-    if (bytesRead != attachmentEntriesSize)
-    {
-        CCZIParse::ThrowNotEnoughDataRead(offset + sizeof(attachmentDirSegment), attachmentEntriesSize, bytesRead);
-    }
-
-    for (int i = 0; i < attachmentDirSegment.data.EntryCount; ++i)
-    {
-        ConvertToHostByteOrder::Convert(pBuffer.get() + i);
-
-        const AttachmentEntryA1* pSrc = pBuffer.get() + i;
-        CCziAttachmentsDirectoryBase::AttachmentEntry ae;
-        bool b = CheckAttachmentSchemaType((const char*)&pSrc->SchemaType[0], 2);
-        if (b == false)
+        // now read the attachment-entries
+        try
         {
-            // TODO: what do we do if we encounter this...?
-            continue;
+            str->Read(offset + sizeof(attachmentDirSegment), pBuffer.get(), attachmentEntriesSize, &bytesRead);
+        }
+        catch (const std::exception&)
+        {
+            std::throw_with_nested(LibCZIIOException("Error reading FileHeaderSegment", offset + sizeof(attachmentDirSegment), attachmentEntriesSize));
         }
 
-        ae.FilePosition = pSrc->FilePosition;
-        ae.ContentGuid = pSrc->ContentGuid;
-        memcpy(&ae.ContentFileType[0], &pSrc->ContentFileType[0], sizeof(AttachmentEntryA1::ContentFileType));
-        memcpy(&ae.Name[0], &pSrc->Name[0], sizeof(AttachmentEntryA1::Name));
-        ae.Name[sizeof(AttachmentEntryA1::Name) - 1] = '\0';
-        addFunc(ae);
+        if (bytesRead != attachmentEntriesSize)
+        {
+            CCZIParse::ThrowNotEnoughDataRead(offset + sizeof(attachmentDirSegment), attachmentEntriesSize, bytesRead);
+        }
+
+        for (int i = 0; i < attachmentDirSegment.data.EntryCount; ++i)
+        {
+            ConvertToHostByteOrder::Convert(pBuffer.get() + i);
+
+            const AttachmentEntryA1* pSrc = pBuffer.get() + i;
+            CCziAttachmentsDirectoryBase::AttachmentEntry ae;
+            bool b = CheckAttachmentSchemaType(reinterpret_cast<const char*>(&pSrc->SchemaType[0]), 2);
+            if (b == false)
+            {
+                // TODO: what do we do if we encounter this...?
+                continue;
+            }
+
+            ae.FilePosition = pSrc->FilePosition;
+            ae.ContentGuid = pSrc->ContentGuid;
+            memcpy(&ae.ContentFileType[0], &pSrc->ContentFileType[0], sizeof(AttachmentEntryA1::ContentFileType));
+            memcpy(&ae.Name[0], &pSrc->Name[0], sizeof(AttachmentEntryA1::Name));
+            ae.Name[sizeof(AttachmentEntryA1::Name) - 1] = '\0';
+            addFunc(ae);
+        }
     }
 }
 
@@ -569,6 +573,21 @@ using namespace libCZI;
         {
             libCZI::DimensionIndex dim = CCZIParse::DimensionCharToDimensionIndex(subBlkDirDV->DimensionEntries[i].Dimension, 4);
             entry.coordinate.Set(dim, subBlkDirDV->DimensionEntries[i].Start);
+
+            if(options.GetPhysicalDimensionOtherThanMMustHaveSizeOne())
+            { 
+                auto physicalSize = subBlkDirDV->DimensionEntries[i].StoredSize;
+                if(physicalSize != 1)
+                {
+                    stringstream string_stream;
+                    string_stream 
+                            << "Physical size for dimension '" << Utils::DimensionToChar(dim)
+                            << "' is expected to be 1, but found " << physicalSize
+                            << " (file-offset:" << subBlkDirDV->FilePosition << ").";
+                    throw LibCZICZIParseException(string_stream.str().c_str(), LibCZICZIParseException::ErrorCode::NonConformingSubBlockDimensionEntry);
+                }
+            }
+
             if (options.GetDimensionOtherThanMMustHaveSizeOne() && subBlkDirDV->DimensionEntries[i].Size != 1)
             {
                 stringstream string_stream;
