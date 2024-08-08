@@ -1029,8 +1029,16 @@ static void WriteChannelDisplaySettings(const IChannelDisplaySetting* channel_di
     {
         auto channel_display_settings = display_settings->GetChannelDisplaySettings(c);
         auto channel_node = display_settings_channel_node->AppendChildNode("Channel");
+        std::tuple<std::string, std::tuple<bool, std::string>> channelIdAndName;
         if (channel_display_settings)
         {
+
+            if (channel_display_settings->TryGetChannelIdAndName(&channelIdAndName)){
+                channel_node->SetAttribute("Id", std::get<0>(channelIdAndName).c_str());
+                if (std::get<0>(std::get<1>(channelIdAndName))) {
+                    channel_node->SetAttribute("Name", std::get<1>(std::get<1>(channelIdAndName)).c_str());
+                }
+            }
             string pixel_type_string;
             if (channel_pixel_type != nullptr && channel_pixel_type->find(c) != channel_pixel_type->end())
             {

@@ -605,6 +605,13 @@ namespace libCZI
         /// \return True if it the corresponding channels uses gradation curve mode <tt>Spline</tt>, false otherwise.
         virtual bool    TryGetSplineData(std::vector<libCZI::IDisplaySettings::SplineData>* data) const = 0;
 
+        /// Attempts to get the channel Id and name
+        ///
+        /// \param [in,out] channelIdAndName If non-null, the the channel Id and name will be written to this tuple.
+        ///
+        /// \return True if it the corresponding channel has an Id and name <tt>Spline</tt>, false otherwise.
+        virtual bool TryGetChannelIdAndName(std::tuple<std::string, std::tuple<bool, std::string>>* channelIdAndName) const = 0;
+
         virtual ~IChannelDisplaySetting() {}
 
         /// Makes a deep copy of the information in this object and store the information in the POD.
@@ -643,6 +650,9 @@ namespace libCZI
 
         /// The spline control points  (only valid if gradation curve mode == Spline).
         std::vector<libCZI::IDisplaySettings::SplineControlPoint> splineCtrlPoints;
+        
+        /// The ID and name attributes of the channel. Name can be optional which is implied by the fist value of the name tuple.
+        std::tuple<std::string, std::tuple<bool, std::string>> channelIdAndName;
 
         /// Creates an IChannelDisplaySetting-object from the specified ChannelDisplaySettingsPOD-structure.
         /// \param pod The ChannelDisplaySettingsPOD-structure.

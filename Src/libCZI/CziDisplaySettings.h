@@ -28,6 +28,7 @@ public: // interface IChannelDisplaySetting
     bool TryGetGamma(float* gamma) const override;
     bool TryGetSplineControlPoints(std::vector<libCZI::IDisplaySettings::SplineControlPoint>* ctrlPts) const override;
     bool TryGetSplineData(std::vector<libCZI::IDisplaySettings::SplineData>* data) const override;
+    bool TryGetChannelIdAndName(std::tuple<std::string, std::tuple<bool, std::string>>* channelIdAndName) const override;
 };
 
 class CDisplaySettingsOnPod : public libCZI::IDisplaySettings
