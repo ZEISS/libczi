@@ -90,6 +90,18 @@ public:
 
         return false;
     }
+
+    bool TryGetChannelIdAndName(std::tuple<std::string, std::tuple<bool, std::string>>* channelIdAndName) const override
+    {
+        if (channelIdAndName != nullptr)
+        {
+            *channelIdAndName = this->chDisplSettings.channelIdAndName;
+
+            return true;
+        }
+
+        return false;
+    }
 };
 
 class CDisplaySettingsWrapper : public libCZI::IDisplaySettings
