@@ -4,7 +4,6 @@
 
 #include "include_gtest.h"
 #include "inc_libCZI.h"
-#include <codecvt>
 
 using namespace libCZI;
 using namespace std;
@@ -983,31 +982,34 @@ TEST(MetadataBuilder, WriteDisplaySettingsWithTintingModeNoneAndPixelTypeAndChec
 
 TEST(MetadataBuilder, WriteDisplaySettingsAndCheckNameAndId)
 {
-    // set tinting mode to none, provide a channel-to-pixeltype-map, and expect to find a mode "<PixelType>Bgr24</PixelType>" in the xml
     const auto metadata_builder = libCZI::CreateMetadataBuilder();
 
-    std::string channelId = "0";
-    std::string channelName = "ChannelName";
-    std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> converter;
-    std::wstring channelIdWstr = converter.from_bytes(channelId);
-    std::wstring channelNameWstr = converter.from_bytes(channelName);
+    static const wchar_t* kChannelId = L"0";
+    static const wchar_t* kChannelName = L"ChannelName";
 
     DisplaySettingsPOD display_settings;
     ChannelDisplaySettingsPOD channel_display_settings;
     channel_display_settings.Clear();
-    channel_display_settings.channelIdAndName = std::make_tuple(channelId, std::make_tuple(true, channelName));
     display_settings.channelDisplaySettings[0] = channel_display_settings;  // set the channel-display-settings for channel 0
 
-    MetadataUtils::WriteDisplaySettings(metadata_builder.get(), DisplaySettingsPOD::CreateIDisplaySettingSp(display_settings).get(), 1);
-
-    auto xml = metadata_builder->GetXml(true);
+    MetadataUtils::WriteDisplaySettings(
+        metadata_builder.get(), 
+        DisplaySettingsPOD::CreateIDisplaySettingSp(display_settings).get(), 
+        1,
+        [](int channelNo, MetadataUtils::CoerceAdditionalInfoForChannelDisplaySettings& coerce_info)->void
+        {
+            coerce_info.idAttribute = kChannelId;
+            coerce_info.writeIdAttribute = true;
+            coerce_info.nameAttribute = kChannelName;
+            coerce_info.writeNameAttribute = true;
+        });
 
     const auto node = metadata_builder->GetRootNode()->GetChildNodeReadonly("Metadata/DisplaySetting/Channels/Channel[0]");
     ASSERT_TRUE(node != nullptr);
     wstring channelIdActual;
     wstring channelNameActual;
     EXPECT_TRUE(node->TryGetAttribute(L"Id", &channelIdActual));
-    ASSERT_TRUE(channelIdWstr == channelIdActual);
+    ASSERT_TRUE(channelIdActual == kChannelId);
     EXPECT_TRUE(node->TryGetAttribute(L"Name", &channelNameActual));
-    ASSERT_TRUE(channelNameWstr == channelNameActual);
+    ASSERT_TRUE(channelNameActual == kChannelName);
 }

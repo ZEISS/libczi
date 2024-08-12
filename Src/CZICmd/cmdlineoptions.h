@@ -68,7 +68,6 @@ struct ChannelDisplaySettings
 
     float        gamma;
     std::vector<std::tuple<double, double>> splinePoints;
-    std::tuple<std::string, std::tuple<bool, std::string>> channelIdAndName;
 
     bool IsGammaValid() const
     {

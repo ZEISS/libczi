@@ -250,18 +250,6 @@ bool CChannelDisplaySettingsOnPod::TryGetSplineData(std::vector<libCZI::IDisplay
     return false;
 }
 
-bool CChannelDisplaySettingsOnPod::TryGetChannelIdAndName(std::tuple<std::string, std::tuple<bool, std::string>>* channelIdAndName) const /*override*/
-{
-    if (channelIdAndName != nullptr)
-    {
-        *channelIdAndName = this->cdsPod.channelIdAndName;
-
-        return true;
-    }
-
-    return false;
-}
-
 //*****************************************************************************
 
 /*static*/IChannelDisplaySetting* ChannelDisplaySettingsPOD::CreateIChannelDisplaySetting(const libCZI::ChannelDisplaySettingsPOD& pod)
