@@ -1042,7 +1042,7 @@ static bool TryRetrieveIdAndNameAttributeFromChannels(IXmlNodeRw* root, int chan
         {
             channelId.clear();
         }
-       
+
         const bool nameAttributeFound = channelNode->TryGetAttribute(L"Name", &channelName);
         if (!nameAttributeFound)
         {
