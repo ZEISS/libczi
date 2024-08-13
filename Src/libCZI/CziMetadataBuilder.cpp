@@ -1084,7 +1084,6 @@ static bool TryRetrieveIdAndNameAttributeFromChannels(IXmlNodeRw* root, int chan
     {
         auto channel_display_settings = display_settings->GetChannelDisplaySettings(c);
         auto channel_node = display_settings_channel_node->AppendChildNode("Channel");
-        std::tuple<std::string, std::tuple<bool, std::string>> channelIdAndName;
         if (channel_display_settings)
         {
             CoerceAdditionalInfoForChannelDisplaySettings coerce_additional_info;
