@@ -8,6 +8,7 @@
 #include "utils.h"
 #include <codecvt>
 #include <locale>
+#include <string>
 #include "MemOutputStream.h"
 
 using namespace libCZI;
@@ -324,4 +325,217 @@ TEST(DisplaySettings, WriteDisplaySettingsWithGradationCurveGammaAndSplineToDocu
     EXPECT_NEAR(spline_control_points_from_document[2].y, 0.657142857142857, 1e-7);
     EXPECT_NEAR(spline_control_points_from_document[3].x, 0.840182648401826, 1e-7);
     EXPECT_NEAR(spline_control_points_from_document[3].y, 0.2, 1e-7);
+}
+
+TEST(DisplaySettings, WriteDisplaySettingsAndCheckIdAndNameAttributeAutomaticallyGenerated)
+{
+    // what happens here:
+    // - we are creating a simple 2-channel-CZI-document, add two subblocks 
+    // - and, we construct "display-settings" for the document, write them into the CZI-document
+    // - we add the display-settings without explicitly setting the "Id" or "Name" attribute, so
+    //    we expect that the default values are used
+    // - we then open the resulting CZI-document and check if the "Id" and "Name" attributes are set as expected
+    auto writer = CreateCZIWriter();
+    auto outStream = make_shared<CMemOutputStream>(0);
+
+    auto spWriterInfo = make_shared<CCziWriterInfo >(
+        GUID{ 0x1234567,0x89ab,0xcdef,{ 1,2,3,4,5,6,7,8 } },
+        CDimBounds{ { { DimensionIndex::C,0,2 } } });	// set a bounds for  C
+
+    writer->Create(outStream, spWriterInfo);
+
+    // now add two subblocks (does not really matter, though)
+    auto bitmap = CreateTestBitmap(PixelType::Gray8, 64, 64);
+
+    ScopedBitmapLockerSP lockBm{ bitmap };
+    AddSubBlockInfoStridedBitmap addSbBlkInfo;
+    addSbBlkInfo.Clear();
+    addSbBlkInfo.coordinate = CDimCoordinate::Parse("C0");
+    addSbBlkInfo.mIndexValid = true;
+    addSbBlkInfo.mIndex = 0;
+    addSbBlkInfo.x = 0;
+    addSbBlkInfo.y = 0;
+    addSbBlkInfo.logicalWidth = bitmap->GetWidth();
+    addSbBlkInfo.logicalHeight = bitmap->GetHeight();
+    addSbBlkInfo.physicalWidth = bitmap->GetWidth();
+    addSbBlkInfo.physicalHeight = bitmap->GetHeight();
+    addSbBlkInfo.PixelType = bitmap->GetPixelType();
+    addSbBlkInfo.ptrBitmap = lockBm.ptrDataRoi;
+    addSbBlkInfo.strideBitmap = lockBm.stride;
+    writer->SyncAddSubBlock(addSbBlkInfo);
+
+    addSbBlkInfo.coordinate = CDimCoordinate::Parse("C1");
+    writer->SyncAddSubBlock(addSbBlkInfo);
+
+    // the writer-object can give us a "partially filled out metadata-object"
+    auto metadata_to_be_written = writer->GetPreparedMetadata(PrepareMetadataInfo{});
+
+    // ...to which we add here some display-settings
+    DisplaySettingsPOD display_settings;
+    ChannelDisplaySettingsPOD channel_display_settings;
+    channel_display_settings.Clear();
+    channel_display_settings.isEnabled = true;
+    channel_display_settings.tintingMode = IDisplaySettings::TintingMode::Color;
+    channel_display_settings.tintingColor = Rgb8Color{ 0xff,0,0 };
+    channel_display_settings.blackPoint = 0.3f;
+    channel_display_settings.whitePoint = 0.8f;
+    display_settings.channelDisplaySettings[0] = channel_display_settings;  // set the channel-display-settings for channel 0
+    channel_display_settings.tintingColor = Rgb8Color{ 0,0xff,0 };
+    channel_display_settings.blackPoint = 0.1f;
+    channel_display_settings.whitePoint = 0.4f;
+    display_settings.channelDisplaySettings[1] = channel_display_settings;  // set the channel-display-settings for channel 1
+
+    // and now, write those display-settings into the metadata-builder-object
+    MetadataUtils::WriteDisplaySettings(metadata_to_be_written.get(), DisplaySettingsPOD::CreateIDisplaySettingSp(display_settings).get(), 2);
+
+    // then, get the XML-string containing the metadata, and put this into the CZI-file
+    string xml = metadata_to_be_written->GetXml(true);
+    WriteMetadataInfo writerMdInfo;
+    writerMdInfo.Clear();
+    writerMdInfo.szMetadata = xml.c_str();
+    writerMdInfo.szMetadataSize = xml.size();
+    writer->SyncWriteMetadata(writerMdInfo);
+
+    writer->Close();
+    writer.reset();
+
+    size_t cziData_Size;
+    auto cziData = outStream->GetCopy(&cziData_Size);
+    outStream.reset();	// not needed anymore
+
+    // now, we open the CZI-document (note: this is "in-memory")
+    auto inputStream = CreateStreamFromMemory(cziData, cziData_Size);
+    auto spReader = libCZI::CreateCZIReader();
+    spReader->Open(inputStream);
+
+    // read the metadata-segment, get the document-info-object, and from it the display-settings
+    auto metadata = spReader->ReadMetadataSegment()->CreateMetaFromMetadataSegment();
+    ASSERT_TRUE(metadata);
+
+    auto channel0node = metadata->GetChildNodeReadonly("ImageDocument/Metadata/DisplaySetting/Channels/Channel[0]");
+    ASSERT_TRUE(channel0node);
+    wstring channelIdActual;
+    EXPECT_TRUE(channel0node->TryGetAttribute(L"Id", &channelIdActual));
+    EXPECT_STREQ(channelIdActual.c_str(), L"Channel:0");
+    wstring channelNameActual;
+    EXPECT_FALSE(channel0node->TryGetAttribute(L"Name", &channelNameActual));
+
+    auto channel1node = metadata->GetChildNodeReadonly("ImageDocument/Metadata/DisplaySetting/Channels/Channel[1]");
+    ASSERT_TRUE(channel1node);
+    EXPECT_TRUE(channel1node->TryGetAttribute(L"Id", &channelIdActual));
+    EXPECT_STREQ(channelIdActual.c_str(), L"Channel:1");
+    EXPECT_FALSE(channel1node->TryGetAttribute(L"Name", &channelNameActual));
+}
+
+TEST(DisplaySettings, WriteDisplaySettingsAndCheckIdAndNameAttributeExplictlyGenerated)
+{
+    // what happens here:
+    // - we are creating a simple 2-channel-CZI-document, add two subblocks 
+    // - and, we construct "display-settings" for the document, write them into the CZI-document
+    // - we add the display-settings with explicitly setting the "Id" or "Name" attribute, and we
+    //    expect that those values are then used for the display-settings
+    // - we then open the resulting CZI-document and check if the "Id" and "Name" attributes are set as expected
+    auto writer = CreateCZIWriter();
+    auto outStream = make_shared<CMemOutputStream>(0);
+
+    auto spWriterInfo = make_shared<CCziWriterInfo >(
+        GUID{ 0x1234567,0x89ab,0xcdef,{ 1,2,3,4,5,6,7,8 } },
+        CDimBounds{ { { DimensionIndex::C,0,2 } } });	// set a bounds for  C
+
+    writer->Create(outStream, spWriterInfo);
+
+    // now add two subblocks (does not really matter, though)
+    auto bitmap = CreateTestBitmap(PixelType::Gray8, 64, 64);
+
+    ScopedBitmapLockerSP lockBm{ bitmap };
+    AddSubBlockInfoStridedBitmap addSbBlkInfo;
+    addSbBlkInfo.Clear();
+    addSbBlkInfo.coordinate = CDimCoordinate::Parse("C0");
+    addSbBlkInfo.mIndexValid = true;
+    addSbBlkInfo.mIndex = 0;
+    addSbBlkInfo.x = 0;
+    addSbBlkInfo.y = 0;
+    addSbBlkInfo.logicalWidth = bitmap->GetWidth();
+    addSbBlkInfo.logicalHeight = bitmap->GetHeight();
+    addSbBlkInfo.physicalWidth = bitmap->GetWidth();
+    addSbBlkInfo.physicalHeight = bitmap->GetHeight();
+    addSbBlkInfo.PixelType = bitmap->GetPixelType();
+    addSbBlkInfo.ptrBitmap = lockBm.ptrDataRoi;
+    addSbBlkInfo.strideBitmap = lockBm.stride;
+    writer->SyncAddSubBlock(addSbBlkInfo);
+
+    addSbBlkInfo.coordinate = CDimCoordinate::Parse("C1");
+    writer->SyncAddSubBlock(addSbBlkInfo);
+
+    // the writer-object can give us a "partially filled out metadata-object"
+    PrepareMetadataInfo prepareMetadataInfo;
+    prepareMetadataInfo.funcGenerateIdAndNameForChannel = [](size_t channelIndex) ->std::tuple < std::string, std::tuple<bool, std::string>>
+        {
+            if (channelIndex != 0 && channelIndex != 1)
+            {
+                throw std::runtime_error("Invalid channel index");
+            }
+
+            return std::make_tuple("Ch:" + std::to_string(channelIndex), std::make_tuple(true, "ChannelName:" + std::to_string(channelIndex)));
+        };
+
+    auto metadata_to_be_written = writer->GetPreparedMetadata(prepareMetadataInfo);
+
+    // ...to which we add here some display-settings
+    DisplaySettingsPOD display_settings;
+    ChannelDisplaySettingsPOD channel_display_settings;
+    channel_display_settings.Clear();
+    channel_display_settings.isEnabled = true;
+    channel_display_settings.tintingMode = IDisplaySettings::TintingMode::Color;
+    channel_display_settings.tintingColor = Rgb8Color{ 0xff,0,0 };
+    channel_display_settings.blackPoint = 0.3f;
+    channel_display_settings.whitePoint = 0.8f;
+    display_settings.channelDisplaySettings[0] = channel_display_settings;  // set the channel-display-settings for channel 0
+    channel_display_settings.tintingColor = Rgb8Color{ 0,0xff,0 };
+    channel_display_settings.blackPoint = 0.1f;
+    channel_display_settings.whitePoint = 0.4f;
+    display_settings.channelDisplaySettings[1] = channel_display_settings;  // set the channel-display-settings for channel 1
+
+    // and now, write those display-settings into the metadata-builder-object
+    MetadataUtils::WriteDisplaySettings(metadata_to_be_written.get(), DisplaySettingsPOD::CreateIDisplaySettingSp(display_settings).get(), 2);
+
+    // then, get the XML-string containing the metadata, and put this into the CZI-file
+    string xml = metadata_to_be_written->GetXml(true);
+    WriteMetadataInfo writerMdInfo;
+    writerMdInfo.Clear();
+    writerMdInfo.szMetadata = xml.c_str();
+    writerMdInfo.szMetadataSize = xml.size();
+    writer->SyncWriteMetadata(writerMdInfo);
+
+    writer->Close();
+    writer.reset();
+
+    size_t cziData_Size;
+    auto cziData = outStream->GetCopy(&cziData_Size);
+    outStream.reset();	// not needed anymore
+
+    // now, we open the CZI-document (note: this is "in-memory")
+    auto inputStream = CreateStreamFromMemory(cziData, cziData_Size);
+    auto spReader = libCZI::CreateCZIReader();
+    spReader->Open(inputStream);
+
+    // read the metadata-segment, get the document-info-object, and from it the display-settings
+    auto metadata = spReader->ReadMetadataSegment()->CreateMetaFromMetadataSegment();
+    ASSERT_TRUE(metadata);
+
+    auto channel0node = metadata->GetChildNodeReadonly("ImageDocument/Metadata/DisplaySetting/Channels/Channel[0]");
+    ASSERT_TRUE(channel0node);
+    wstring channelIdActual;
+    EXPECT_TRUE(channel0node->TryGetAttribute(L"Id", &channelIdActual));
+    EXPECT_STREQ(channelIdActual.c_str(), L"Ch:0");
+    wstring channelNameActual;
+    EXPECT_TRUE(channel0node->TryGetAttribute(L"Name", &channelNameActual));
+    EXPECT_STREQ(channelNameActual.c_str(), L"ChannelName:0");
+
+    auto channel1node = metadata->GetChildNodeReadonly("ImageDocument/Metadata/DisplaySetting/Channels/Channel[1]");
+    ASSERT_TRUE(channel1node);
+    EXPECT_TRUE(channel1node->TryGetAttribute(L"Id", &channelIdActual));
+    EXPECT_STREQ(channelIdActual.c_str(), L"Ch:1");
+    EXPECT_TRUE(channel1node->TryGetAttribute(L"Name", &channelNameActual));
+    EXPECT_STREQ(channelNameActual.c_str(), L"ChannelName:1");
 }

@@ -304,6 +304,20 @@ pugi::xml_node CNodeWrapper::GetOrCreatePcDataChild()
     attribute.set_value(Utilities::convertUtf8ToWchar_t(value).c_str());
 }
 
+/*virtual*/void CNodeWrapper::SetAttribute(const wchar_t* name, const wchar_t* value)
+{
+    auto attribute = this->node.attribute(name);
+
+    // if the attribute was already existing, we use (and modify) it
+    if (!attribute)
+    {
+        // otherwise, we add a new attribute
+        attribute = this->node.append_attribute(name);
+    }
+
+    attribute.set_value(value);
+}
+
 /*static*/pugi::xml_node CNodeWrapper::GetOrCreateChildElementNodeWithAttributes(pugi::xml_node& node, const std::wstring& str)
 {
     std::wregex nodenameWihtAttribregex(LR"(([^\[\]]+)(\[([^\[\]]*)\])?)");
@@ -504,7 +518,7 @@ CCZiMetadataBuilder::CCZiMetadataBuilder(const wchar_t* rootNodeName, const std:
     libCZI::ICziMetadataBuilder* builder,
     const libCZI::SubBlockStatistics& statistics,
     const PixelTypeForChannelIndexStatistic& pixelTypeForChannel,
-    std::function<std::tuple<std::string, std::tuple<bool, std::string>>(int channelIdx)> getIdAndName)
+    const std::function<std::tuple<std::string, std::tuple<bool, std::string>>(int channelIdx)>& getIdAndName)
 {
     int cStartIdx, cIdxSize;
     if (statistics.dimBounds.TryGetInterval(DimensionIndex::C, &cStartIdx, &cIdxSize))
@@ -525,7 +539,7 @@ CCZiMetadataBuilder::CCZiMetadataBuilder(const wchar_t* rootNodeName, const std:
     libCZI::ICziMetadataBuilder* builder,
     int channelIdxStart, int channelIdxSize,
     const PixelTypeForChannelIndexStatistic& pixelTypeForChannel,
-    std::function<std::tuple<std::string, std::tuple<bool, std::string>>(int channelIdx)> getIdAndName)
+    const std::function<std::tuple<std::string, std::tuple<bool, std::string>>(int channelIdx)>& getIdAndName)
 {
     auto root = builder->GetRootNode();
 
@@ -877,14 +891,14 @@ bool libCZI::XmlDateTime::IsValid() const
 /*static*/void libCZI::MetadataUtils::WriteGeneralDocumentInfo(ICziMetadataBuilder* builder, const libCZI::GeneralDocumentInfo& info)
 {
     const auto setField = [=](bool isValid, const char* nodeName, const wstring& s)
-    {
-        if (isValid)
         {
-            string n("Metadata/Information/Document/");
-            n.append(nodeName);
-            builder->GetRootNode()->GetOrCreateChildNode(n.c_str())->SetValue(s.c_str());
-        }
-    };
+            if (isValid)
+            {
+                string n("Metadata/Information/Document/");
+                n.append(nodeName);
+                builder->GetRootNode()->GetOrCreateChildNode(n.c_str())->SetValue(s.c_str());
+            }
+        };
 
     setField(info.name_valid, "Name", info.name);
     setField(info.title_valid, "Title", info.title);
@@ -1016,7 +1030,48 @@ static void WriteChannelDisplaySettings(const IChannelDisplaySetting* channel_di
     }
 }
 
+static bool TryRetrieveIdAndNameAttributeFromChannels(IXmlNodeRw* root, int channelNo, wstring& channelId, wstring& channelName)
+{
+    stringstream ss;
+    ss << "Metadata/Information/Image/Dimensions/Channels/Channel[" << channelNo << "]";
+    auto channelNode = root->GetChildNodeReadonly(ss.str().c_str());
+    if (channelNode)
+    {
+        const bool idAttributeFound = channelNode->TryGetAttribute(L"Id", &channelId);
+        if (!idAttributeFound)
+        {
+            channelId.clear();
+        }
+
+        const bool nameAttributeFound = channelNode->TryGetAttribute(L"Name", &channelName);
+        if (!nameAttributeFound)
+        {
+            channelName.clear();
+        }
+
+        return idAttributeFound || nameAttributeFound;
+    }
+
+    return false;
+}
+
 /*static*/void libCZI::MetadataUtils::WriteDisplaySettings(libCZI::ICziMetadataBuilder* builder, const libCZI::IDisplaySettings* display_settings, int channel_count, const std::map<int, PixelType>* channel_pixel_type)
+{
+    MetadataUtils::WriteDisplaySettings(
+        builder,
+        display_settings,
+        channel_count,
+        [=](int channelIdx, CoerceAdditionalInfoForChannelDisplaySettings& coerceAdditionalInfo)->void
+        {
+            if (channel_pixel_type != nullptr && channel_pixel_type->find(channelIdx) != channel_pixel_type->end())
+            {
+                coerceAdditionalInfo.pixelType = channel_pixel_type->at(channelIdx);
+                coerceAdditionalInfo.writePixelType = true;
+            }
+        });
+}
+
+/*static*/void libCZI::MetadataUtils::WriteDisplaySettings(libCZI::ICziMetadataBuilder* builder, const libCZI::IDisplaySettings* display_settings, int channel_count, const std::function<void(int, CoerceAdditionalInfoForChannelDisplaySettings&)>& coerce_additional_info_functor)
 {
     const auto display_settings_channel_node = builder->GetRootNode()->GetOrCreateChildNode("Metadata/DisplaySetting/Channels");
 
@@ -1031,11 +1086,46 @@ static void WriteChannelDisplaySettings(const IChannelDisplaySetting* channel_di
         auto channel_node = display_settings_channel_node->AppendChildNode("Channel");
         if (channel_display_settings)
         {
-            string pixel_type_string;
-            if (channel_pixel_type != nullptr && channel_pixel_type->find(c) != channel_pixel_type->end())
+            CoerceAdditionalInfoForChannelDisplaySettings coerce_additional_info;
+
+            // Try to retrieve the attributes "Id" and "Name" from the corresponding dimension-channel-node, and if successful, use those values 
+            // for the attributes of the current channel-node in the display-settings-data.
+            wstring channelId, channelName;
+            if (TryRetrieveIdAndNameAttributeFromChannels(builder->GetRootNode().get(), c, channelId, channelName))
             {
-                const PixelType pixel_type = channel_pixel_type->at(c);
-                CMetadataPrepareHelper::TryConvertToXmlMetadataPixelTypeString(pixel_type, pixel_type_string);
+                if (!channelId.empty())
+                {
+                    coerce_additional_info.idAttribute = channelId;
+                    coerce_additional_info.writeIdAttribute = true;
+                }
+
+                if (!channelName.empty())
+                {
+                    coerce_additional_info.nameAttribute = channelName;
+                    coerce_additional_info.writeNameAttribute = true;
+                }
+            }
+
+            // if non-null, call the functor which may change the "additional information" we want to write into the XML
+            if (coerce_additional_info_functor)
+            {
+                coerce_additional_info_functor(c, coerce_additional_info);
+            }
+
+            string pixel_type_string;
+            if (coerce_additional_info.writePixelType)
+            {
+                CMetadataPrepareHelper::TryConvertToXmlMetadataPixelTypeString(coerce_additional_info.pixelType, pixel_type_string);
+            }
+
+            if (coerce_additional_info.writeIdAttribute)
+            {
+                channel_node->SetAttribute(L"Id", coerce_additional_info.idAttribute.c_str());
+            }
+
+            if (coerce_additional_info.writeNameAttribute)
+            {
+                channel_node->SetAttribute(L"Name", coerce_additional_info.nameAttribute.c_str());
             }
 
             WriteChannelDisplaySettings(channel_display_settings.get(), channel_node.get(), pixel_type_string);
