@@ -9,6 +9,7 @@
 #include <map>
 #include <tuple>
 #include <string>
+#include <codecvt>
 #include "libCZI.h"
 #include "CziSubBlockDirectory.h"
 #include "pugixml.hpp"
@@ -36,7 +37,7 @@ private:
     std::shared_ptr<CCZiMetadataBuilder> builderRef;
     struct MetadataBuilderXmlNodeWrapperThrowExcp
     {
-        static void ThrowInvalidPath();
+        static void ThrowInvalidPath(const char* path="");
     };
 public:
     CNodeWrapper(std::shared_ptr<CCZiMetadataBuilder> builderRef, pugi::xml_node_struct* node_struct) :

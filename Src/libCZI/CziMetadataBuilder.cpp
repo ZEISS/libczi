@@ -5,7 +5,6 @@
 #include "CziMetadataBuilder.h"
 #include "utilities.h"
 #include <regex>
-#include <codecvt>
 #include <iomanip>
 #include <limits>
 #include "CziUtils.h"
@@ -15,9 +14,13 @@ using namespace pugi;
 using namespace libCZI;
 using namespace std;
 
-/*static*/void CNodeWrapper::MetadataBuilderXmlNodeWrapperThrowExcp::ThrowInvalidPath()
-{
-    throw libCZI::LibCZIMetadataBuilderException("invalid path", libCZI::LibCZIMetadataBuilderException::ErrorType::InvalidPath);
+/*static*/ void CNodeWrapper::MetadataBuilderXmlNodeWrapperThrowExcp::ThrowInvalidPath(const char* path){
+    std::string message = "invalid path";
+    if (path && *path != '\0') {
+        message += ": ";
+        message += path;
+    }
+    throw libCZI::LibCZIMetadataBuilderException(message.c_str(), libCZI::LibCZIMetadataBuilderException::ErrorType::InvalidPath);
 }
 
 /*virtual*/std::shared_ptr<libCZI::IXmlNodeRw> CNodeWrapper::AppendChildNode(const char* name)

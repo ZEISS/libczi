@@ -8,6 +8,7 @@
 #include <map>
 #include <vector>
 #include <utility>
+#include <locale>
 
 #include "libCZI_Metadata.h"
 #include <regex>
@@ -91,6 +92,19 @@ private:
             return GetChildElementNodeWithAttributes(node, nodeName, attribute_value_pairs);
         }
     }
+    
+    static std::wstring getAbsoluteNodePath(pugi::xml_node node) {
+        std::wstring path;
+        for (pugi::xml_node current = node; current; current = current.parent()) {
+#ifdef PUGIXML_WCHAR_MODE
+        std::wstring wstr(current.name());
+#else
+        std::wstring wstr = Utilities::convertUtf8ToWchar_t(current.name());
+#endif
+            path = L"/" + wstr + path;
+        }
+        return path;
+    }
 
     /// Gets the n-th child node with name 'node_name' from the specified node. The index is zero-based.
     /// If this node does not exist, an exception is thrown.
@@ -103,7 +117,7 @@ private:
         auto child_node = node.child(node_name.c_str());
         if (!child_node)
         {
-            tExcp::ThrowInvalidPath();
+            tExcp::ThrowInvalidPath(Utilities::convertWchar_tToUtf8((getAbsoluteNodePath(node) + L"/" + node_name + L" with index " + std::to_wstring(index)).c_str()).c_str());
         }
 
         for (std::uint32_t i = 0; i <= index; ++i)
@@ -116,7 +130,7 @@ private:
             child_node = child_node.next_sibling(node_name.c_str());
             if (!child_node)
             {
-                tExcp::ThrowInvalidPath();
+                tExcp::ThrowInvalidPath(Utilities::convertWchar_tToUtf8((getAbsoluteNodePath(node) + L"/" + node_name + L" with index " + std::to_wstring(index)).c_str()).c_str());
             }
         }
 
@@ -336,13 +350,13 @@ public: // interface IXmlNodeRead
         Utilities::Tokenize(p, tokens, L"/");
         if (tokens.empty())
         {
-            tExcp::ThrowInvalidPath();
+            tExcp::ThrowInvalidPath(path);
         }
 
         // if any of the tokens is empty, then we have a path like "/a//b", which is invalid
         if (any_of(tokens.cbegin(), tokens.cend(), [](const std::wstring& str) {return str.empty(); }))
         {
-            tExcp::ThrowInvalidPath();
+            tExcp::ThrowInvalidPath(path);
         }
 
         auto node = XmlPathSpecifierUtilities<tExcp>::GetChildElementNodeWithAttributes(this->node, tokens[0]);

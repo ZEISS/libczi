@@ -15,9 +15,14 @@ class CCziMetadata : public libCZI::ICziMetadata, public std::enable_shared_from
 private:
     struct XmlNodeWrapperThrowExcp
     {
-        [[noreturn]] static void ThrowInvalidPath()
+        [[noreturn]] static void ThrowInvalidPath(const char* path="")
         {
-            throw libCZI::LibCZIMetadataException("invalid path", libCZI::LibCZIMetadataException::ErrorType::InvalidPath);
+            std::string message = "invalid path";
+            if (path && *path != '\0') {
+                message += ": ";
+                message += path;
+            }
+            throw libCZI::LibCZIMetadataException(message.c_str(), libCZI::LibCZIMetadataException::ErrorType::InvalidPath);
         }
     };
 
