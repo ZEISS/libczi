@@ -93,20 +93,22 @@ private:
     }
 
     /// Gets the n-th child node with name 'node_name' from the specified node. The index is zero-based.
-    /// If this node does not exist, an exception is thrown.
+    /// If this node does not exist, nullptr is returned.
     /// \param [in]     node        The node (to get the n-th child node).
     /// \param          node_name   Name of the child node to search for.
     /// \param          index       Zero-based index of the child node (with the specified name) to search for.
-    /// \returns    The child node with the specified index.
-    static pugi::xml_node GetChildElementNodeWithIndex(pugi::xml_node& node, const std::wstring& node_name, std::uint32_t index)
+    /// \returns    The child node with the specified index if it exists; nullptr otherwise.
+    static pugi::xml_node GetChildElementNodeWithIndex(const pugi::xml_node& node, const std::wstring& node_name, std::uint32_t index)
     {
         auto child_node = node.child(node_name.c_str());
         if (!child_node)
         {
-            tExcp::ThrowInvalidPath();
+            //tExcp::ThrowInvalidPath();
+            return {};
         }
 
-        for (std::uint32_t i = 0; i <= index; ++i)
+        //for (std::uint32_t i = 0; i <= index; ++i)
+        for (std::uint32_t i = 0; ; ++i)
         {
             if (i == index)
             {
@@ -116,12 +118,13 @@ private:
             child_node = child_node.next_sibling(node_name.c_str());
             if (!child_node)
             {
-                tExcp::ThrowInvalidPath();
+                return {};
+                //tExcp::ThrowInvalidPath();
             }
         }
 
-        tExcp::ThrowInvalidPath();
-        throw std::logic_error("Must not get here.");
+        //tExcp::ThrowInvalidPath();
+        //throw std::logic_error("Must not get here.");
     }
 
     static pugi::xml_node GetChildElementNodeWithAttributes(pugi::xml_node& node, const std::wstring& str, const std::map<std::wstring, std::wstring>& attribs)

@@ -716,22 +716,53 @@ TEST(MetadataReading, AccessNodeWithInvalidIndexAndExpectExceptionTest)
 
     EXPECT_TRUE(md->IsXmlValid()) << "Expected valid XML.";
 
-    EXPECT_THROW(
+    /*EXPECT_THROW(
         md->GetChildNodeReadonly("ImageDocument/Metadata/DisplaySetting/Channels/Channel[5]"),
-        libCZI::LibCZIMetadataException);
+        libCZI::LibCZIMetadataException);*/
+    // this path does not exist, but the path is syntactically correct - therefore we expect a nullptr (and not an exception)
+    EXPECT_FALSE(md->GetChildNodeReadonly("ImageDocument/Metadata/DisplaySetting/Channels/Channel[5]"));
+
+    // those paths are syntactically incorrect - therefore we expect an exception
+
+    // index is larger than unsigned 32-bit int
     EXPECT_THROW(
         md->GetChildNodeReadonly("ImageDocument/Metadata/DisplaySetting/Channels/Channel[4958123987]"),
         libCZI::LibCZIMetadataException);
+
+    // index is larger than unsigned 32-bit int
     EXPECT_THROW(
         md->GetChildNodeReadonly("ImageDocument/Metadata/DisplaySetting/Channels/Channel[495812394234234587]"),
         libCZI::LibCZIMetadataException);
+
+    // index is not a number
     EXPECT_THROW(
         md->GetChildNodeReadonly("ImageDocument/Metadata/DisplaySetting/Channels/Channel[2 3]"),
         libCZI::LibCZIMetadataException);
+
+    // index is not a number (we do not allow a sign)
     EXPECT_THROW(
         md->GetChildNodeReadonly("ImageDocument/Metadata/DisplaySetting/Channels/Channel[+3]"),
         libCZI::LibCZIMetadataException);
+
+    // index is not a valid number (we do not allow a sign)
     EXPECT_THROW(
         md->GetChildNodeReadonly("ImageDocument/Metadata/DisplaySetting/Channels/Channel[-3]"),
         libCZI::LibCZIMetadataException);
+}
+ 
+TEST(MetadataReading, AccessNodeWithNonExistingPathAndExpectError)
+{
+    auto mockMdSegment = make_shared<MockMetadataSegment>(MockMetadataSegment::Type::Data5);
+    auto md = CreateMetaFromMetadataSegment(mockMdSegment.get());
+
+    EXPECT_TRUE(md->IsXmlValid()) << "Expected valid XML.";
+
+    auto node = md->GetChildNodeReadonly("ImageDocument/Metadata/Information/Image/Dimensions/Channels/Channel[0]");
+    EXPECT_TRUE(node) << "expecting to find this node.";
+
+    node = md->GetChildNodeReadonly("ImageDocument/Metadata/Information/Image/Dimensions/Channels/Channel[3]");
+    EXPECT_FALSE(node) << "not expecting to find this node.";
+
+    node = md->GetChildNodeReadonly("ImageDocument/Metadata/XYZ/abc/DEF/kij/lmn[1]");
+    EXPECT_FALSE(node) << "not expecting to find this node.";
 }
