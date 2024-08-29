@@ -80,7 +80,6 @@ private:
     static pugi::xml_node GetOrCreateChildElementNode(pugi::xml_node& node, const wchar_t* sz);
     static pugi::xml_node GetOrCreateChildElementNodeWithAttributes(pugi::xml_node& node, const std::wstring& str);
     static pugi::xml_node GetOrCreateChildElementNodeWithAttributes(pugi::xml_node& node, const std::wstring& str, const std::map<std::wstring, std::wstring>& attribs);
-    static std::map<std::wstring, std::wstring> ParseAttributes(const std::wstring& str);
 
     void ThrowIfCannotSetValue();
     pugi::xml_node GetOrCreatePcDataChild();

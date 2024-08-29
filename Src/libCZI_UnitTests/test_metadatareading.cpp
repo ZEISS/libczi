@@ -711,14 +711,11 @@ TEST(MetadataReading, AccessNodeWithIndexTest)
 
 TEST(MetadataReading, AccessNodeWithInvalidIndexAndExpectExceptionTest)
 {
-    auto mockMdSegment = make_shared<MockMetadataSegment>();
-    auto md = CreateMetaFromMetadataSegment(mockMdSegment.get());
+    const auto mockMdSegment = make_shared<MockMetadataSegment>();
+    const auto md = CreateMetaFromMetadataSegment(mockMdSegment.get());
 
     EXPECT_TRUE(md->IsXmlValid()) << "Expected valid XML.";
 
-    /*EXPECT_THROW(
-        md->GetChildNodeReadonly("ImageDocument/Metadata/DisplaySetting/Channels/Channel[5]"),
-        libCZI::LibCZIMetadataException);*/
     // this path does not exist, but the path is syntactically correct - therefore we expect a nullptr (and not an exception)
     EXPECT_FALSE(md->GetChildNodeReadonly("ImageDocument/Metadata/DisplaySetting/Channels/Channel[5]"));
 
@@ -738,6 +735,9 @@ TEST(MetadataReading, AccessNodeWithInvalidIndexAndExpectExceptionTest)
     EXPECT_THROW(
         md->GetChildNodeReadonly("ImageDocument/Metadata/DisplaySetting/Channels/Channel[2 3]"),
         libCZI::LibCZIMetadataException);
+    EXPECT_THROW(
+        md->GetChildNodeReadonly("ImageDocument/Metadata/DisplaySetting/Channels/Channel[abc]"),
+        libCZI::LibCZIMetadataException);
 
     // index is not a number (we do not allow a sign)
     EXPECT_THROW(
@@ -748,12 +748,32 @@ TEST(MetadataReading, AccessNodeWithInvalidIndexAndExpectExceptionTest)
     EXPECT_THROW(
         md->GetChildNodeReadonly("ImageDocument/Metadata/DisplaySetting/Channels/Channel[-3]"),
         libCZI::LibCZIMetadataException);
+
+    // two consecutive slashes are not allowed
+    EXPECT_THROW(
+        md->GetChildNodeReadonly("ImageDocument//Metadata/DisplaySetting/Channels/Channel[1]"),
+        libCZI::LibCZIMetadataException);
+
+    // a slash at the end is not allowed
+    EXPECT_THROW(
+        md->GetChildNodeReadonly("ImageDocument/Metadata/DisplaySetting/Channels/Channel[1]/"),
+        libCZI::LibCZIMetadataException);
+
+    // a slash at the beginning is not allowed
+    EXPECT_THROW(
+        md->GetChildNodeReadonly("/ImageDocument/Metadata/DisplaySetting/Channels/Channel[1]"),
+        libCZI::LibCZIMetadataException);
+
+    // a slash at the beginning and the end is not allowed
+    EXPECT_THROW(
+        md->GetChildNodeReadonly("/ImageDocument/Metadata/DisplaySetting/Channels/Channel[1]/"),
+        libCZI::LibCZIMetadataException);
 }
- 
+
 TEST(MetadataReading, AccessNodeWithNonExistingPathAndExpectError)
 {
-    auto mockMdSegment = make_shared<MockMetadataSegment>(MockMetadataSegment::Type::Data5);
-    auto md = CreateMetaFromMetadataSegment(mockMdSegment.get());
+    const auto mockMdSegment = make_shared<MockMetadataSegment>(MockMetadataSegment::Type::Data5);
+    const auto md = CreateMetaFromMetadataSegment(mockMdSegment.get());
 
     EXPECT_TRUE(md->IsXmlValid()) << "Expected valid XML.";
 

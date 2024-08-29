@@ -337,7 +337,7 @@ pugi::xml_node CNodeWrapper::GetOrCreatePcDataChild()
                 }
                 else if (pieces_match[2].matched == true && pieces_match[3].matched == true)
                 {
-                    const auto attribValuePairs = CNodeWrapper::ParseAttributes(pieces_match[3]);
+                    const auto attribValuePairs = XmlPathSpecifierUtilities<MetadataBuilderXmlNodeWrapperThrowExcp>::ParseAttributes(pieces_match[3]);
                     return GetOrCreateChildElementNodeWithAttributes(node, nodeName, attribValuePairs);
                 }
             }
@@ -432,38 +432,6 @@ pugi::xml_node CNodeWrapper::GetOrCreateChildElementNode(const wchar_t* sz)
     }
 
     return c;
-}
-
-/*static*/std::map<wstring, wstring> CNodeWrapper::ParseAttributes(const std::wstring& str)
-{
-    map<wstring, wstring> attribMap;
-
-    std::wsmatch pieces_match;
-
-    // now we have string of the form Id=abc,Name=abc
-    vector<wstring> pairs;
-    Utilities::Tokenize(str, pairs, L",;");
-
-    std::wregex attribValuePairRegex(LR"(([^=]+)=([^,;]*))");
-    for (auto it = pairs.cbegin(); it != pairs.cend(); ++it)
-    {
-        bool parsedOk = false;
-        if (std::regex_match(*it, pieces_match, attribValuePairRegex))
-        {
-            if (pieces_match.size() == 3 && pieces_match[0].matched == true && pieces_match[1].matched == true && pieces_match[2].matched == true)
-            {
-                attribMap.insert(pair<wstring, wstring>(pieces_match[1], pieces_match[2]));
-                parsedOk = true;
-            }
-        }
-
-        if (!parsedOk)
-        {
-            throw LibCZIMetadataBuilderException("invalid path", LibCZIMetadataBuilderException::ErrorType::InvalidPath);
-        }
-    }
-
-    return attribMap;
 }
 
 //----------------------------------------------------------------------------------------------

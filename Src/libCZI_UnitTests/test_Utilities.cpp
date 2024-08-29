@@ -5,8 +5,10 @@
 #include "include_gtest.h"
 #include "inc_libCZI.h"
 #include "../libCZI/CziParse.h"
+#include "../libCZI/utilities.h"
 
 using namespace libCZI;
+using namespace std;
 
 TEST(Utilities, CompareCoordinates1)
 {
@@ -309,4 +311,93 @@ TEST(Utilities, CallGetLibCZIBuildInformationAndCheckResultForPlausibility)
         build_information.repositoryUrl.empty() &&
         build_information.repositoryBranch.empty() &&
         build_information.repositoryTag.empty());
+}
+
+TEST(Utilities, Tokenize)
+{
+    vector<wstring> tokens;
+    Utilities::Tokenize(L"a;b;c;d;e", tokens, L";");
+    ASSERT_EQ(tokens.size(), 5);
+    EXPECT_EQ(tokens[0], L"a");
+    EXPECT_EQ(tokens[1], L"b");
+    EXPECT_EQ(tokens[2], L"c");
+    EXPECT_EQ(tokens[3], L"d");
+    EXPECT_EQ(tokens[4], L"e");
+
+    tokens.clear();
+    Utilities::Tokenize(L"a;b; c x;d;e", tokens, L";");
+    ASSERT_EQ(tokens.size(), 5);
+    EXPECT_EQ(tokens[0], L"a");
+    EXPECT_EQ(tokens[1], L"b");
+    EXPECT_EQ(tokens[2], L" c x");
+    EXPECT_EQ(tokens[3], L"d");
+    EXPECT_EQ(tokens[4], L"e");
+
+    tokens.clear();
+    Utilities::Tokenize(L";;a;b;c;d;e", tokens, L";");
+    ASSERT_EQ(tokens.size(), 7);
+    EXPECT_EQ(tokens[0], L"");
+    EXPECT_EQ(tokens[1], L"");
+    EXPECT_EQ(tokens[2], L"a");
+    EXPECT_EQ(tokens[3], L"b");
+    EXPECT_EQ(tokens[4], L"c");
+    EXPECT_EQ(tokens[5], L"d");
+    EXPECT_EQ(tokens[6], L"e");
+
+    tokens.clear();
+    Utilities::Tokenize(L";;a ; b ; c;d;e", tokens, L";");
+    ASSERT_EQ(tokens.size(), 7);
+    EXPECT_EQ(tokens[0], L"");
+    EXPECT_EQ(tokens[1], L"");
+    EXPECT_EQ(tokens[2], L"a ");
+    EXPECT_EQ(tokens[3], L" b ");
+    EXPECT_EQ(tokens[4], L" c");
+    EXPECT_EQ(tokens[5], L"d");
+    EXPECT_EQ(tokens[6], L"e");
+
+    tokens.clear();
+    Utilities::Tokenize(L";;a ; b ; c;d;e; ;;", tokens, L";");
+    ASSERT_EQ(tokens.size(), 10);
+    EXPECT_EQ(tokens[0], L"");
+    EXPECT_EQ(tokens[1], L"");
+    EXPECT_EQ(tokens[2], L"a ");
+    EXPECT_EQ(tokens[3], L" b ");
+    EXPECT_EQ(tokens[4], L" c");
+    EXPECT_EQ(tokens[5], L"d");
+    EXPECT_EQ(tokens[6], L"e");
+    EXPECT_EQ(tokens[7], L" ");
+    EXPECT_EQ(tokens[8], L"");
+    EXPECT_EQ(tokens[9], L"");
+
+    tokens.clear();
+    Utilities::Tokenize(L";,a , b , c;d;e; ;;", tokens, L";,");
+    ASSERT_EQ(tokens.size(), 10);
+    EXPECT_EQ(tokens[0], L"");
+    EXPECT_EQ(tokens[1], L"");
+    EXPECT_EQ(tokens[2], L"a ");
+    EXPECT_EQ(tokens[3], L" b ");
+    EXPECT_EQ(tokens[4], L" c");
+    EXPECT_EQ(tokens[5], L"d");
+    EXPECT_EQ(tokens[6], L"e");
+    EXPECT_EQ(tokens[7], L" ");
+    EXPECT_EQ(tokens[8], L"");
+    EXPECT_EQ(tokens[9], L"");
+
+    tokens.clear();
+    Utilities::Tokenize(L";,", tokens, L";,");
+    ASSERT_EQ(tokens.size(), 3);
+    EXPECT_EQ(tokens[0], L"");
+    EXPECT_EQ(tokens[1], L"");
+    EXPECT_EQ(tokens[2], L"");
+
+    tokens.clear();
+    Utilities::Tokenize(L"", tokens, L";,");
+    ASSERT_EQ(tokens.size(), 1);
+    EXPECT_EQ(tokens[0], L"");
+
+    tokens.clear();
+    Utilities::Tokenize(L",", tokens, L";,");
+    ASSERT_EQ(tokens.size(), 2);
+    EXPECT_EQ(tokens[0], L"");
+    EXPECT_EQ(tokens[1], L"");
 }

@@ -60,6 +60,41 @@ public:
         tExcp::ThrowInvalidPath();
         throw std::logic_error("Must not get here.");
     }
+
+    /// Parse an "attributes definition string" of the form "Id=abc,Name=abc" into a map of name/value pairs.
+    /// \param  str The string to be parsed.
+    /// \returns    A std::map&lt;std::wstring,std::wstring&gt; containing the key-value pairs.
+    static std::map<std::wstring, std::wstring> ParseAttributes(const std::wstring& str)
+    {
+        std::map<std::wstring, std::wstring> attribMap;
+
+        std::wsmatch pieces_match;
+
+        // now we have string of the form Id=abc,Name=abc
+        std::vector<std::wstring> pairs;
+        Utilities::Tokenize(str, pairs, L",;");
+
+        std::wregex attribValuePairRegex(LR"(([^=]+)=([^,;]*))");
+        for (auto it = pairs.cbegin(); it != pairs.cend(); ++it)
+        {
+            bool parsedOk = false;
+            if (std::regex_match(*it, pieces_match, attribValuePairRegex))
+            {
+                if (pieces_match.size() == 3 && pieces_match[0].matched == true && pieces_match[1].matched == true && pieces_match[2].matched == true)
+                {
+                    attribMap.insert(std::pair<std::wstring, std::wstring>(pieces_match[1], pieces_match[2]));
+                    parsedOk = true;
+                }
+            }
+
+            if (!parsedOk)
+            {
+                tExcp::ThrowInvalidPath();
+            }
+        }
+
+        return attribMap;
+    }
 private:
     static pugi::xml_node GetChildElementWithSpecifier(pugi::xml_node& node, const std::wstring& nodeName, const std::wstring& specifier)
     {
@@ -103,11 +138,9 @@ private:
         auto child_node = node.child(node_name.c_str());
         if (!child_node)
         {
-            //tExcp::ThrowInvalidPath();
             return {};
         }
 
-        //for (std::uint32_t i = 0; i <= index; ++i)
         for (std::uint32_t i = 0; ; ++i)
         {
             if (i == index)
@@ -119,12 +152,8 @@ private:
             if (!child_node)
             {
                 return {};
-                //tExcp::ThrowInvalidPath();
             }
         }
-
-        //tExcp::ThrowInvalidPath();
-        //throw std::logic_error("Must not get here.");
     }
 
     static pugi::xml_node GetChildElementNodeWithAttributes(pugi::xml_node& node, const std::wstring& str, const std::map<std::wstring, std::wstring>& attribs)
@@ -203,40 +232,42 @@ private:
         return c;
     }
 
-    /// Parse an "attributes definition string" of the form "Id=abc,Name=abc" into a map of name/value pairs.
-    /// \param  str The string to be parsed.
-    /// \returns    A std::map&lt;std::wstring,std::wstring&gt; containing the key-value pairs.
-    static std::map<std::wstring, std::wstring> ParseAttributes(const std::wstring& str)
-    {
-        std::map<std::wstring, std::wstring> attribMap;
+public:
+    ///// Parse an "attributes definition string" of the form "Id=abc,Name=abc" into a map of name/value pairs.
+    ///// \param  str The string to be parsed.
+    ///// \returns    A std::map&lt;std::wstring,std::wstring&gt; containing the key-value pairs.
+    //static std::map<std::wstring, std::wstring> ParseAttributes(const std::wstring& str)
+    //{
+    //    std::map<std::wstring, std::wstring> attribMap;
 
-        std::wsmatch pieces_match;
+    //    std::wsmatch pieces_match;
 
-        // now we have string of the form Id=abc,Name=abc
-        std::vector<std::wstring> pairs;
-        Utilities::Tokenize(str, pairs, L",;");
+    //    // now we have string of the form Id=abc,Name=abc
+    //    std::vector<std::wstring> pairs;
+    //    //Utilities::Tokenize(str, pairs, L",;");
+    //    Utilities::TokenizeAllowingEmptyTokens(str, pairs, L",;");
 
-        std::wregex attribValuePairRegex(LR"(([^=]+)=([^,;]*))");
-        for (auto it = pairs.cbegin(); it != pairs.cend(); ++it)
-        {
-            bool parsedOk = false;
-            if (std::regex_match(*it, pieces_match, attribValuePairRegex))
-            {
-                if (pieces_match.size() == 3 && pieces_match[0].matched == true && pieces_match[1].matched == true && pieces_match[2].matched == true)
-                {
-                    attribMap.insert(std::pair<std::wstring, std::wstring>(pieces_match[1], pieces_match[2]));
-                    parsedOk = true;
-                }
-            }
+    //    std::wregex attribValuePairRegex(LR"(([^=]+)=([^,;]*))");
+    //    for (auto it = pairs.cbegin(); it != pairs.cend(); ++it)
+    //    {
+    //        bool parsedOk = false;
+    //        if (std::regex_match(*it, pieces_match, attribValuePairRegex))
+    //        {
+    //            if (pieces_match.size() == 3 && pieces_match[0].matched == true && pieces_match[1].matched == true && pieces_match[2].matched == true)
+    //            {
+    //                attribMap.insert(std::pair<std::wstring, std::wstring>(pieces_match[1], pieces_match[2]));
+    //                parsedOk = true;
+    //            }
+    //        }
 
-            if (!parsedOk)
-            {
-                tExcp::ThrowInvalidPath();
-            }
-        }
+    //        if (!parsedOk)
+    //        {
+    //            tExcp::ThrowInvalidPath();
+    //        }
+    //    }
 
-        return attribMap;
-    }
+    //    return attribMap;
+    //}
 };
 
 /// This implements a wrapper around a pugi-node struct (implementing the IXmlNodeRead-interface). It is initialized

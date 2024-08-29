@@ -108,19 +108,17 @@ tString trimImpl(const tString& str, const tString& whitespace)
 
 /*static*/void Utilities::Tokenize(const std::wstring& str, std::vector<std::wstring>& tokens, const std::wstring& delimiters)
 {
-    // Skip delimiters at beginning.
-    wstring::size_type lastPos = str.find_first_not_of(delimiters, 0);
-    // Find first "non-delimiter".
-    wstring::size_type pos = str.find_first_of(delimiters, lastPos);
+    size_t start = 0, end = 0;
 
-    while (wstring::npos != pos || wstring::npos != lastPos)
+    while (end != std::wstring::npos)
     {
-        // Found a token, add it to the vector.
-        tokens.push_back(str.substr(lastPos, pos - lastPos));
-        // Skip delimiters.  Note the "not_of"
-        lastPos = str.find_first_not_of(delimiters, pos);
-        // Find next "non-delimiter"
-        pos = str.find_first_of(delimiters, lastPos);
+        end = str.find_first_of(delimiters, start);
+
+        // Push the token, which could be empty if start == end
+        tokens.push_back(str.substr(start, end - start));
+
+        // Update start to one character after the found delimiter
+        start = end + 1;
     }
 }
 
