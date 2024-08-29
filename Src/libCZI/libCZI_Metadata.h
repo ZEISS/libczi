@@ -817,7 +817,9 @@ namespace libCZI
         ///   </B>
         /// </A>
         /// \endcode
-        /// the path "A/B/C[1]" will select the second node of name 'C'.        
+        /// the path "A/B/C[1]" will select the second node of name 'C'.      
+        /// If the path does not exist, then a nullptr is returned. This method may throw an exception if
+        /// the path is not well-formed and syntactically valid.
         /// \param path The path  (in UTF8-encoding).
         /// \return Either the requested node if it exists or nullptr.
         virtual std::shared_ptr<IXmlNodeRead> GetChildNodeReadonly(const char* path) = 0;
@@ -951,6 +953,8 @@ namespace libCZI
         /// </A>
         /// \endcode
         /// the path "A/B/C[1]" will select the second node of name 'C'.
+        /// If the path does not exist, then a nullptr is returned. This method may throw an exception if 
+        /// the path is not well-formed and syntactically valid.
         /// \param path The path (in UTF8-encoding).
         /// \return The existing node conforming to the path if it exists, null otherwise.
         virtual std::shared_ptr<IXmlNodeRw> GetChildNode(const char* path) = 0;
