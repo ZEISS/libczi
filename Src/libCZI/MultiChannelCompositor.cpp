@@ -17,13 +17,15 @@ class CMultiChannelCompositor2
 private:
     static bool IsUsingLut(const Compositors::ChannelInfo* channelInfo)
     {
-        return channelInfo->lookUpTableElementCount == 0 ? false : true;
+        return channelInfo->lookUpTableElementCount != 0;
     }
 
     static bool IsBlackWhitePointUsed(const Compositors::ChannelInfo* channelInfo)
     {
         if (channelInfo->blackPoint <= 0 && channelInfo->whitePoint >= 1)
+        {
             return false;
+        }
 
         return true;
     }
@@ -42,27 +44,27 @@ private:
 
     struct CGray8BytesPerPel
     {
-        static const uint8_t bytesPerPel = 1;
+        static constexpr uint8_t bytesPerPel = 1;
     };
 
     struct CGray16BytesPerPel
     {
-        static const uint8_t bytesPerPel = 2;
+        static constexpr uint8_t bytesPerPel = 2;
     };
 
     struct CBgr24BytesPerPel
     {
-        static const uint8_t bytesPerPel = 3;
+        static constexpr uint8_t bytesPerPel = 3;
     };
 
     struct CBgra32BytesPerPel
     {
-        static const uint8_t bytesPerPel = 4;
+        static constexpr uint8_t bytesPerPel = 4;
     };
 
     struct CBgr48BytesPerPel
     {
-        static const uint8_t bytesPerPel = 6;
+        static constexpr uint8_t bytesPerPel = 6;
     };
 
     struct CGetGray8 : CGray8BytesPerPel
@@ -77,7 +79,7 @@ private:
     {
         bgr8 operator()(const uint8_t* p) const
         {
-            uint8_t v = (uint8_t)((*((const uint16_t*)p)) >> 8);
+            uint8_t v = static_cast<uint8_t>((*reinterpret_cast<const uint16_t*>(p)) >> 8);
             return bgr8{ v,v,v };
         }
     };
@@ -102,8 +104,8 @@ private:
     {
         bgr8 operator()(const uint8_t* p) const
         {
-            const uint16_t* pUs = (const uint16_t*)p;
-            return bgr8{ (uint8_t)((*pUs) >> 8),(uint8_t)((*(pUs + 1)) >> 8),(uint8_t)((*(pUs + 2)) >> 8) };
+            const uint16_t* pUs = reinterpret_cast<const uint16_t*>(p);
+            return bgr8{ static_cast<uint8_t>((*pUs) >> 8),static_cast<uint8_t>((*(pUs + 1)) >> 8),static_cast<uint8_t>((*(pUs + 2)) >> 8) };
         }
     };
 
@@ -115,7 +117,7 @@ private:
 
     struct CGetTintedGray8 : CGetTintedBase, CGray8BytesPerPel
     {
-        explicit CGetTintedGray8(Rgb8Color tintingColor) :CGetTintedBase(tintingColor) {}
+        explicit CGetTintedGray8(Rgb8Color tintingColor) : CGetTintedBase(tintingColor) {}
         bgr8 operator()(const uint8_t* p) const
         {
             float f = *p;
@@ -137,7 +139,7 @@ private:
 
     struct CGetTintedBgr24 : CGetTintedBase, CBgr24BytesPerPel
     {
-        explicit CGetTintedBgr24(Rgb8Color tintingColor) :CGetTintedBase(tintingColor) {}
+        explicit CGetTintedBgr24(Rgb8Color tintingColor) : CGetTintedBase(tintingColor) {}
         bgr8 operator()(const uint8_t* p) const
         {
             float f = static_cast<float>(static_cast<int>(p[0]) + p[1] + p[2]);
@@ -273,35 +275,35 @@ private:
     struct CAddRgb
     {
         const int bytesPerPel = 3;
-        void operator ()(uint8_t* ptrDst, const bgr8& val)
+        void operator ()(uint8_t* ptrDst, const bgr8& val) const
         {
             int p = *(ptrDst + 0);
-            *(ptrDst + 0) = (uint8_t)(std::min)(p + val.b, 0xff);
+            *(ptrDst + 0) = static_cast<uint8_t>((std::min)(p + val.b, 0xff));
             p = *(ptrDst + 1);
-            *(ptrDst + 1) = (uint8_t)(std::min)(p + val.g, 0xff);
+            *(ptrDst + 1) = static_cast<uint8_t>((std::min)(p + val.g, 0xff));
             p = *(ptrDst + 2);
-            *(ptrDst + 2) = (uint8_t)(std::min)(p + val.r, 0xff);
+            *(ptrDst + 2) = static_cast<uint8_t>((std::min)(p + val.r, 0xff));
         }
     };
 
     struct CAddRgba
     {
         const int bytesPerPel = 4;
-        void operator ()(uint8_t* ptrDst, const bgr8& val)
+        void operator ()(uint8_t* ptrDst, const bgr8& val) const
         {
             int p = *(ptrDst + 0);
-            *(ptrDst + 0) = (uint8_t)(std::min)(p + val.b, 0xff);
+            *(ptrDst + 0) = static_cast<uint8_t>((std::min)(p + val.b, 0xff));
             p = *(ptrDst + 1);
-            *(ptrDst + 1) = (uint8_t)(std::min)(p + val.g, 0xff);
+            *(ptrDst + 1) = static_cast<uint8_t>((std::min)(p + val.g, 0xff));
             p = *(ptrDst + 2);
-            *(ptrDst + 2) = (uint8_t)(std::min)(p + val.r, 0xff);
+            *(ptrDst + 2) = static_cast<uint8_t>((std::min)(p + val.r, 0xff));
         }
     };
 
     struct CStoreBgr
     {
         const int bytesPerPel = 3;
-        void operator ()(uint8_t* ptrDst, const bgr8& val)
+        void operator ()(uint8_t* ptrDst, const bgr8& val) const
         {
             *(ptrDst + 0) = val.b;
             *(ptrDst + 1) = val.g;
@@ -315,7 +317,7 @@ private:
         std::uint8_t alphaVal;
         CStoreBgra() : CStoreBgra(0xff) {};
         CStoreBgra(std::uint8_t alphaVal) :alphaVal(alphaVal) {}
-        void operator ()(uint8_t* ptrDst, const bgr8& val)
+        void operator ()(uint8_t* ptrDst, const bgr8& val) const
         {
             *(ptrDst + 0) = val.b;
             *(ptrDst + 1) = val.g;
@@ -334,14 +336,14 @@ private:
     {
         const int bytesPerPel = 3;
         explicit CAddWithWeightRgb(float weight) : CStoreWithWeightBase(weight) {}
-        void operator ()(uint8_t* ptrDst, const bgr8& val)
+        void operator ()(uint8_t* ptrDst, const bgr8& val) const
         {
             int p = *(ptrDst + 0);
-            *(ptrDst + 0) = (uint8_t)(std::min)(p + toInt(val.b * this->weight), 0xff);
+            *(ptrDst + 0) = static_cast<uint8_t>((std::min)(p + toInt(val.b * this->weight), 0xff));
             p = *(ptrDst + 1);
-            *(ptrDst + 1) = (uint8_t)(std::min)(p + toInt(val.g * this->weight), 0xff);
+            *(ptrDst + 1) = static_cast<uint8_t>((std::min)(p + toInt(val.g * this->weight), 0xff));
             p = *(ptrDst + 2);
-            *(ptrDst + 2) = (uint8_t)(std::min)(p + toInt(val.r * this->weight), 0xff);
+            *(ptrDst + 2) = static_cast<uint8_t>((std::min)(p + toInt(val.r * this->weight), 0xff));
         }
     };
 
@@ -349,14 +351,14 @@ private:
     {
         const int bytesPerPel = 4;
         explicit CAddWithWeightRgba(float weight) : CStoreWithWeightBase(weight) {}
-        void operator ()(uint8_t* ptrDst, const bgr8& val)
+        void operator ()(uint8_t* ptrDst, const bgr8& val) const
         {
             int p = *(ptrDst + 0);
-            *(ptrDst + 0) = (uint8_t)(std::min)(p + toInt(val.b * this->weight), 0xff);
+            *(ptrDst + 0) = static_cast<uint8_t>((std::min)(p + toInt(val.b * this->weight), 0xff));
             p = *(ptrDst + 1);
-            *(ptrDst + 1) = (uint8_t)(std::min)(p + toInt(val.g * this->weight), 0xff);
+            *(ptrDst + 1) = static_cast<uint8_t>((std::min)(p + toInt(val.g * this->weight), 0xff));
             p = *(ptrDst + 2);
-            *(ptrDst + 2) = (uint8_t)(std::min)(p + toInt(val.r * this->weight), 0xff);
+            *(ptrDst + 2) = static_cast<uint8_t>((std::min)(p + toInt(val.r * this->weight), 0xff));
         }
     };
 
@@ -364,11 +366,11 @@ private:
     {
         const int bytesPerPel = 3;
         explicit CStoreWithWeightRgb(float weight) : CStoreWithWeightBase(weight) {}
-        void operator ()(uint8_t* ptrDst, const bgr8& val)
+        void operator ()(uint8_t* ptrDst, const bgr8& val) const
         {
-            *(ptrDst + 0) = (uint8_t)(std::min)(toInt(val.b * this->weight), 0xff);
-            *(ptrDst + 1) = (uint8_t)(std::min)(toInt(val.g * this->weight), 0xff);
-            *(ptrDst + 2) = (uint8_t)(std::min)(toInt(val.r * this->weight), 0xff);
+            *(ptrDst + 0) = static_cast<uint8_t>((std::min)(toInt(val.b * this->weight), 0xff));
+            *(ptrDst + 1) = static_cast<uint8_t>((std::min)(toInt(val.g * this->weight), 0xff));
+            *(ptrDst + 2) = static_cast<uint8_t>((std::min)(toInt(val.r * this->weight), 0xff));
         }
     };
 
@@ -377,11 +379,11 @@ private:
         const int bytesPerPel = 4;
         std::uint8_t alphaVal;
         explicit CStoreWithWeightRgba(float weight, std::uint8_t alphaVal) : CStoreWithWeightBase(weight), alphaVal(alphaVal) {}
-        void operator ()(uint8_t* ptrDst, const bgr8& val)
+        void operator ()(uint8_t* ptrDst, const bgr8& val) const
         {
-            *(ptrDst + 0) = (uint8_t)(std::min)(toInt(val.b * this->weight), 0xff);
-            *(ptrDst + 1) = (uint8_t)(std::min)(toInt(val.g * this->weight), 0xff);
-            *(ptrDst + 2) = (uint8_t)(std::min)(toInt(val.r * this->weight), 0xff);
+            *(ptrDst + 0) = static_cast<uint8_t>((std::min)(toInt(val.b * this->weight), 0xff));
+            *(ptrDst + 1) = static_cast<uint8_t>((std::min)(toInt(val.g * this->weight), 0xff));
+            *(ptrDst + 2) = static_cast<uint8_t>((std::min)(toInt(val.r * this->weight), 0xff));
             *(ptrDst + 3) = this->alphaVal;
         }
     };
@@ -473,8 +475,8 @@ private:
 
         CGetBlackWhitePtBase(float blackPt, float whitePt)
         {
-            this->blackPt = (tValue)std::ceil(blackPt * maxValue);
-            this->whitePt = (tValue)std::floor(whitePt * maxValue);
+            this->blackPt = static_cast<tValue>(std::ceil(blackPt * maxValue));
+            this->whitePt = static_cast<tValue>(std::floor(whitePt * maxValue));
         };
     };
 

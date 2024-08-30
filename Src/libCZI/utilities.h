@@ -15,10 +15,10 @@
 class Utilities
 {
 public:
-    static inline void Split(const std::wstring& text, wchar_t sep, const std::function<bool(const std::wstring&)>& funcToken)
+    static void Split(const std::wstring& text, wchar_t sep, const std::function<bool(const std::wstring&)>& funcToken)
     {
-        std::size_t start = 0, end = 0;
-        while (static_cast<std::size_t>(end = text.find(sep, start)) != static_cast<std::size_t>(std::wstring::npos))
+        std::size_t start = 0, end;
+        while ((end = text.find(sep, start)) != std::wstring::npos)
         {
             std::wstring temp = text.substr(start, end - start);
             if (!temp.empty())
@@ -44,7 +44,7 @@ public:
         str.erase(std::remove_if(str.begin(), str.end(), std::iswspace), str.end());
     }
 
-    static inline  libCZI::IntRect Intersect(const libCZI::IntRect& a, const libCZI::IntRect& b)
+    static libCZI::IntRect Intersect(const libCZI::IntRect& a, const libCZI::IntRect& b)
     {
         const int x1 = (std::max)(a.x, b.x);
         const int x2 = (std::min)(a.x + a.w, b.x + b.w);
@@ -59,13 +59,13 @@ public:
         return libCZI::IntRect{ 0,0,0,0 };
     }
 
-    static inline bool DoIntersect(const libCZI::IntRect& a, const libCZI::IntRect& b)
+    static bool DoIntersect(const libCZI::IntRect& a, const libCZI::IntRect& b)
     {
         const auto r = Intersect(a, b);
         return ((r.w > 0) && (r.h > 0));
     }
 
-    static inline std::uint8_t clampToByte(float f)
+    static std::uint8_t clampToByte(float f)
     {
         if (f <= 0)
         {
@@ -79,7 +79,7 @@ public:
         return static_cast<std::uint8_t>(f + .5f);
     }
 
-    static inline std::uint16_t clampToUShort(float f)
+    static std::uint16_t clampToUShort(float f)
     {
         if (f <= 0)
         {
@@ -103,7 +103,7 @@ public:
     static bool icasecmp(const std::wstring& l, const std::wstring& r);
 
     template<typename t>
-    inline static t clamp(t v, t min, t max)
+    static t clamp(t v, t min, t max)
     {
         if (v < min)
         {
