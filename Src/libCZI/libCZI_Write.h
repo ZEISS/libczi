@@ -440,10 +440,14 @@ namespace libCZI
         /// \return The "pre-filled" metadata object if successful.
         virtual std::shared_ptr<libCZI::ICziMetadataBuilder> GetPreparedMetadata(const PrepareMetadataInfo& info) = 0;
 
-        /// Finalizes the CZI (ie. writes out the final directory-segments) and closes the file.
+        /// Finalizes the CZI (i.e. writes out the final directory-segments) and closes the file.
         /// Note that this method must be called explicitely in order to get a valid CZI - calling the destructor alone will
         /// close the file immediately without finalization.
         virtual void Close() = 0;
+
+        /// Gets the statistics about the sub-blocks. This statistics is aggregated from the subblocks as they are added.
+        /// \return The sub-block statistics.
+        virtual libCZI::SubBlockStatistics GetStatistics() const = 0;
 
         virtual ~ICziWriter() = default;
 

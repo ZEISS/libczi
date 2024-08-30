@@ -1004,6 +1004,13 @@ CCziWriter::~CCziWriter()
     return spMdBuilder;
 }
 
+/*virtual*/SubBlockStatistics CCziWriter::GetStatistics() const
+{
+    this->ThrowIfNotOperational();
+    SubBlockStatistics s = this->sbBlkDirectory.GetStatistics();
+    return s;
+}
+
 /*virtual*/void CCziWriter::Close()
 {
     this->ThrowIfNotOperational();
@@ -1020,7 +1027,7 @@ CCziWriter::~CCziWriter()
 
 //------------------------------------------------------------------------------------------------
 
-void CCziWriter::ThrowIfNotOperational()
+void CCziWriter::ThrowIfNotOperational() const
 {
     if (!this->stream)
     {
@@ -1028,7 +1035,7 @@ void CCziWriter::ThrowIfNotOperational()
     }
 }
 
-void CCziWriter::ThrowIfAlreadyInitialized()
+void CCziWriter::ThrowIfAlreadyInitialized() const
 {
     if (this->stream)
     {

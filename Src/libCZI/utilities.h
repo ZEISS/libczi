@@ -120,6 +120,17 @@ public:
     static std::wstring convertUtf8ToWchar_t(const char* sz);
     static std::string convertWchar_tToUtf8(const wchar_t* szw);
 
+    /// Split the specified string at the specified delimiter characters, and add the individual tokens (=
+    /// parts between delimiters or between start/end and a delimiter) to the specified vector.
+    /// Note that:
+    /// - the function will add an empty string (to the result vector) in case of two consecutive delimiters  
+    /// - the result vector will contain the tokens in the order they appear in the input string, and the  
+    ///    vector is not cleared before adding the tokens.
+    /// - for an empty string, the result is one token, which is an empty string.
+    ///
+    /// \param          str         The string to tokenize.
+    /// \param [in,out] tokens      The vector to which the tokens are added.
+    /// \param          delimiters  A string defining the delimiter-characters.
     static void Tokenize(const std::wstring& str, std::vector<std::wstring>& tokens, const std::wstring& delimiters = L" ");
 
     static libCZI::GUID GenerateNewGuid();
