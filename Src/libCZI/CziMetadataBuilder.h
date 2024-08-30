@@ -59,6 +59,7 @@ public:
     std::shared_ptr<IXmlNodeRw> GetOrCreateChildNode(const char* path) override;
     std::shared_ptr<IXmlNodeRw> GetChildNode(const char* path) override;
     void SetAttribute(const char* name, const char* value) override;
+    void SetAttribute(const wchar_t* name, const wchar_t* value) override;
     void SetValue(const char* str) override;
     void SetValue(const wchar_t* str) override;
     void SetValueI32(int value) override;
@@ -79,7 +80,6 @@ private:
     static pugi::xml_node GetOrCreateChildElementNode(pugi::xml_node& node, const wchar_t* sz);
     static pugi::xml_node GetOrCreateChildElementNodeWithAttributes(pugi::xml_node& node, const std::wstring& str);
     static pugi::xml_node GetOrCreateChildElementNodeWithAttributes(pugi::xml_node& node, const std::wstring& str, const std::map<std::wstring, std::wstring>& attribs);
-    static std::map<std::wstring, std::wstring> ParseAttributes(const std::wstring& str);
 
     void ThrowIfCannotSetValue();
     pugi::xml_node GetOrCreatePcDataChild();
@@ -99,14 +99,14 @@ public:
         libCZI::ICziMetadataBuilder* builder,
         const libCZI::SubBlockStatistics& statistics,
         const PixelTypeForChannelIndexStatistic& pixelTypeForChannel,
-        std::function<std::tuple<std::string, std::tuple<bool, std::string>>(int channelIdx)> getIdAndName
+        const std::function<std::tuple<std::string, std::tuple<bool, std::string>>(int channelIdx)>& getIdAndName
     );
 
     static void FillDimensionChannel(
         libCZI::ICziMetadataBuilder* builder,
         int channelIdxStart, int channelIdxSize,
         const PixelTypeForChannelIndexStatistic& pixelTypeForChannel,
-        std::function<std::tuple<std::string, std::tuple<bool, std::string>>(int channelIdx)> getIdAndName);
+        const std::function<std::tuple<std::string, std::tuple<bool, std::string>>(int channelIdx)>& getIdAndName);
 
     static bool TryConvertToXmlMetadataPixelTypeString(libCZI::PixelType pxlType, std::string& str);
 

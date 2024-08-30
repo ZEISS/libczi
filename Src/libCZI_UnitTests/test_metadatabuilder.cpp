@@ -979,3 +979,37 @@ TEST(MetadataBuilder, WriteDisplaySettingsWithTintingModeNoneAndPixelTypeAndChec
     EXPECT_TRUE(node->TryGetValue(&pixel_type_element));
     EXPECT_STREQ(L"Bgr24", pixel_type_element.c_str()) << "Incorrect result";
 }
+
+TEST(MetadataBuilder, WriteDisplaySettingsAndCheckNameAndId)
+{
+    const auto metadata_builder = libCZI::CreateMetadataBuilder();
+
+    static const wchar_t* kChannelId = L"0";
+    static const wchar_t* kChannelName = L"ChannelName";
+
+    DisplaySettingsPOD display_settings;
+    ChannelDisplaySettingsPOD channel_display_settings;
+    channel_display_settings.Clear();
+    display_settings.channelDisplaySettings[0] = channel_display_settings;  // set the channel-display-settings for channel 0
+
+    MetadataUtils::WriteDisplaySettings(
+        metadata_builder.get(), 
+        DisplaySettingsPOD::CreateIDisplaySettingSp(display_settings).get(), 
+        1,
+        [](int channelNo, MetadataUtils::CoerceAdditionalInfoForChannelDisplaySettings& coerce_info)->void
+        {
+            coerce_info.idAttribute = kChannelId;
+            coerce_info.writeIdAttribute = true;
+            coerce_info.nameAttribute = kChannelName;
+            coerce_info.writeNameAttribute = true;
+        });
+
+    const auto node = metadata_builder->GetRootNode()->GetChildNodeReadonly("Metadata/DisplaySetting/Channels/Channel[0]");
+    ASSERT_TRUE(node != nullptr);
+    wstring channelIdActual;
+    wstring channelNameActual;
+    EXPECT_TRUE(node->TryGetAttribute(L"Id", &channelIdActual));
+    ASSERT_TRUE(channelIdActual == kChannelId);
+    EXPECT_TRUE(node->TryGetAttribute(L"Name", &channelNameActual));
+    ASSERT_TRUE(channelNameActual == kChannelName);
+}

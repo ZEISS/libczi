@@ -486,7 +486,7 @@ namespace libCZI
             LookUpTableExplicit = 2,    ///< (NOT YET IMPLEMENTED) There is an explicit look-up-table specified.
             LookUpTableWellKnown = 3    ///< (NOT YET IMPLEMENTED) We are using a "well-known" look-up-table, and it is identified by its name (which is a string).
         };
-        
+
         /// The coefficients of a cubic spline defined by \f$a\,x^3 + b\,x^2 + c\,x + d =y\f$.
         struct CubicSplineCoefficients
         {
@@ -602,7 +602,7 @@ namespace libCZI
         ///
         /// \param [in,out] data If non-null, the spline data will be written to this vector.
         ///
-        /// \return True if it the corresponding channels uses gradation curve mode <tt>Spline</tt>, false otherwise.
+        /// \return True if the corresponding channels uses gradation curve mode <tt>Spline</tt>, false otherwise.
         virtual bool    TryGetSplineData(std::vector<libCZI::IDisplaySettings::SplineData>* data) const = 0;
 
         virtual ~IChannelDisplaySetting() {}
@@ -817,7 +817,9 @@ namespace libCZI
         ///   </B>
         /// </A>
         /// \endcode
-        /// the path "A/B/C[1]" will select the second node of name 'C'.        
+        /// the path "A/B/C[1]" will select the second node of name 'C'.      
+        /// If the path does not exist, then a nullptr is returned. This method may throw an exception if
+        /// the path is not well-formed and syntactically valid.
         /// \param path The path  (in UTF8-encoding).
         /// \return Either the requested node if it exists or nullptr.
         virtual std::shared_ptr<IXmlNodeRead> GetChildNodeReadonly(const char* path) = 0;
@@ -951,6 +953,8 @@ namespace libCZI
         /// </A>
         /// \endcode
         /// the path "A/B/C[1]" will select the second node of name 'C'.
+        /// If the path does not exist, then a nullptr is returned. This method may throw an exception if 
+        /// the path is not well-formed and syntactically valid.
         /// \param path The path (in UTF8-encoding).
         /// \return The existing node conforming to the path if it exists, null otherwise.
         virtual std::shared_ptr<IXmlNodeRw> GetChildNode(const char* path) = 0;
@@ -967,6 +971,12 @@ namespace libCZI
         /// \param name  The name of the attribute (as UTF8-encoded string).
         /// \param value The value (as UTF8-encoded string).
         virtual void SetAttribute(const char* name, const char* value) = 0;
+
+        /// Sets the attribute with the specified name to the specified value.
+        ///
+        /// \param name  The name of the attribute.
+        /// \param value The value.
+        virtual void SetAttribute(const wchar_t* name, const wchar_t* value) = 0;
 
         /// Sets the node value - which is specified as an UTF8-string.
         ///
@@ -1274,6 +1284,17 @@ namespace libCZI
     class LIBCZI_API MetadataUtils
     {
     public:
+        /// This struct is used for controlling the operation of adding display-settings.
+        struct CoerceAdditionalInfoForChannelDisplaySettings
+        {
+            bool writePixelType{ false };       ///< Whether to write an element "PixelType".
+            libCZI::PixelType pixelType;        ///< The pixel-type to write to the element "PixelType" (if "writePixelType" is true).
+            bool writeIdAttribute{ false };     ///< Whether to write an attribute "Id".
+            std::wstring idAttribute;           ///< The value of the attribute "Id" (if "writeIdAttribute" is true).
+            bool writeNameAttribute{ false };   ///< Whether to write an attribute "Name".
+            std::wstring nameAttribute;         ///< The value of the attribute "Name" (if "writeNameAttribute" is true).
+        };
+
         /// Writes the nodes ""Metadata/Information/Image/SizeX" and ""Metadata/Information/Image/SizeY".
         ///
         /// \param [in,out] builder The metadata-builder object.
@@ -1387,6 +1408,18 @@ namespace libCZI
         /// \param      channel_count       The number of channels (which are constructed in the display-settings XML-metadata).
         /// \param      channel_pixel_type  The map of the channel and its corresponding pixel type.
         static void WriteDisplaySettings(libCZI::ICziMetadataBuilder* builder, const libCZI::IDisplaySettings* display_settings, int channel_count, const std::map<int, PixelType>* channel_pixel_type = nullptr);
+
+        /// Helper function which writes the specified display-settings into the specified metadata-builder. The display-settings
+        /// XML-metadata-node will have as many channel-items as specified with the argument 'channel_count'.
+        /// If there are nodes with name "Channel" existing (prior to calling this function) under the node
+        /// "Metadata/DisplaySetting/Channels", they are removed (before adding new content).
+        /// This function allows to coerce and control some additional information that is written to the XML-metadata-node.
+        ///
+        /// \param [in,out] builder                         The metadata-builder object.
+        /// \param          display_settings                The display settings.
+        /// \param          channel_count                   The number of channels (which are constructed in the display-settings XML-metadata).
+        /// \param          coerce_additional_info_functor  A functor which allows to mutate and/or control what additional information is written to the XML-metadata-node.
+        static void WriteDisplaySettings(libCZI::ICziMetadataBuilder* builder, const libCZI::IDisplaySettings* display_settings, int channel_count, const std::function<void(int, CoerceAdditionalInfoForChannelDisplaySettings&)>& coerce_additional_info_functor);
     };
 }
 

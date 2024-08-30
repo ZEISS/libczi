@@ -257,6 +257,7 @@ public:
     void SyncAddAttachment(const libCZI::AddAttachmentInfo& addAttachmentInfo) override;
     void SyncWriteMetadata(const libCZI::WriteMetadataInfo& metadataInfo) override;
     std::shared_ptr<libCZI::ICziMetadataBuilder> GetPreparedMetadata(const libCZI::PrepareMetadataInfo& info) override;
+    libCZI::SubBlockStatistics GetStatistics() const override;
     void Close() override;
 
 private:
@@ -302,8 +303,8 @@ private:
 
     void Finish();
 
-    void ThrowIfNotOperational();
-    void ThrowIfAlreadyInitialized();
+    void ThrowIfNotOperational() const;
+    void ThrowIfAlreadyInitialized() const;
 
     void ReserveMetadataSegment(size_t s);
     void ReserveSubBlockDirectory(size_t s);

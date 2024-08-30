@@ -1004,6 +1004,13 @@ CCziWriter::~CCziWriter()
     return spMdBuilder;
 }
 
+/*virtual*/SubBlockStatistics CCziWriter::GetStatistics() const
+{
+    this->ThrowIfNotOperational();
+    SubBlockStatistics s = this->sbBlkDirectory.GetStatistics();
+    return s;
+}
+
 /*virtual*/void CCziWriter::Close()
 {
     this->ThrowIfNotOperational();
@@ -1020,7 +1027,7 @@ CCziWriter::~CCziWriter()
 
 //------------------------------------------------------------------------------------------------
 
-void CCziWriter::ThrowIfNotOperational()
+void CCziWriter::ThrowIfNotOperational() const
 {
     if (!this->stream)
     {
@@ -1028,7 +1035,7 @@ void CCziWriter::ThrowIfNotOperational()
     }
 }
 
-void CCziWriter::ThrowIfAlreadyInitialized()
+void CCziWriter::ThrowIfAlreadyInitialized() const
 {
     if (this->stream)
     {
@@ -1047,7 +1054,7 @@ void CCziWriter::WriteSubBlock(const libCZI::AddSubBlockInfo& addSbBlkInfo)
 {
     CWriterUtils::WriteInfo writeInfo;
     writeInfo.segmentPos = this->nextSegmentPos;
-    writeInfo.writeFunc = std::bind(&CCziWriter::WriteToOutputStream, this, placeholders::_1, placeholders::_2, placeholders::_3, placeholders::_4, placeholders::_5); ;
+    writeInfo.writeFunc = std::bind(&CCziWriter::WriteToOutputStream, this, placeholders::_1, placeholders::_2, placeholders::_3, placeholders::_4, placeholders::_5);
     writeInfo.useSpecifiedAllocatedSize = false;
     this->nextSegmentPos += CWriterUtils::WriteSubBlock(writeInfo, addSbBlkInfo);
 }
@@ -1117,7 +1124,7 @@ void CCziWriter::WriteAttachment(const libCZI::AddAttachmentInfo& addAttachmentI
 {
     CWriterUtils::WriteInfo writeInfo;
     writeInfo.segmentPos = this->nextSegmentPos;
-    writeInfo.writeFunc = std::bind(&CCziWriter::WriteToOutputStream, this, placeholders::_1, placeholders::_2, placeholders::_3, placeholders::_4, placeholders::_5); ;
+    writeInfo.writeFunc = std::bind(&CCziWriter::WriteToOutputStream, this, placeholders::_1, placeholders::_2, placeholders::_3, placeholders::_4, placeholders::_5);
     writeInfo.useSpecifiedAllocatedSize = false;
     this->nextSegmentPos += CWriterUtils::WriteAttachment(writeInfo, addAttachmentInfo);
 }

@@ -1834,6 +1834,60 @@ TEST(CziWriter, WriterMinimalSubblock)
     EXPECT_EQ(ptr[0], 255);
 }
 
+TEST(CziWriter, CheckGetStatistics)
+{
+    auto writer = CreateCZIWriter();
+    auto outStream = make_shared<CMemOutputStream>(0);
+
+    auto spWriterInfo = make_shared<CCziWriterInfo >(GUID{ 0x1234567,0x89ab,0xcdef,{ 1,2,3,4,5,6,7,8 } });
+    writer->Create(outStream, spWriterInfo);
+
+    auto bitmap = CreateTestBitmap(PixelType::Gray8, 1, 1);
+    CBitmapOperations::Fill(bitmap.get(), { 1, 1, 1 });
+
+    for (int z = 0; z < 3; ++z)
+    {
+        ScopedBitmapLockerSP lockBm{ bitmap };
+        AddSubBlockInfoStridedBitmap addSbBlkInfo;
+        addSbBlkInfo.Clear();
+        addSbBlkInfo.coordinate = CDimCoordinate{ { { libCZI::DimensionIndex::C, 0 },{ libCZI::DimensionIndex::Z, z }  } };
+        addSbBlkInfo.mIndexValid = true;
+        addSbBlkInfo.mIndex = z;
+        addSbBlkInfo.x = 0;
+        addSbBlkInfo.y = 0;
+        addSbBlkInfo.logicalWidth = bitmap->GetWidth();
+        addSbBlkInfo.logicalHeight = bitmap->GetHeight();
+        addSbBlkInfo.physicalWidth = bitmap->GetWidth();
+        addSbBlkInfo.physicalHeight = bitmap->GetHeight();
+        addSbBlkInfo.PixelType = bitmap->GetPixelType();
+
+        addSbBlkInfo.ptrBitmap = lockBm.ptrDataRoi;
+        addSbBlkInfo.strideBitmap = lockBm.stride;
+        writer->SyncAddSubBlock(addSbBlkInfo);
+    }
+
+    auto statistics = writer->GetStatistics();
+
+    writer->Close();
+    writer.reset();
+
+    EXPECT_EQ(statistics.subBlockCount, 3) << "Expected three subblocks";
+    EXPECT_EQ(statistics.minMindex, 0) << "Expected minMindex to be 0";
+    EXPECT_EQ(statistics.maxMindex, 2) << "Expected maxMindex to be 2";
+    int z_start = -1, z_size = -1;
+    EXPECT_TRUE(statistics.dimBounds.TryGetInterval(DimensionIndex::Z, &z_start, &z_size));
+    EXPECT_EQ(z_start, 0) << "Expected z_start to be 0";
+    EXPECT_EQ(z_size, 3) << "Expected z_size to be 3";
+    int c_start = -1, c_size = -1;
+    EXPECT_TRUE(statistics.dimBounds.TryGetInterval(DimensionIndex::C, &c_start, &c_size));
+    EXPECT_EQ(c_start, 0) << "Expected c_start to be 0";
+    EXPECT_EQ(c_size, 1) << "Expected c_size to be 1";
+    EXPECT_EQ(statistics.boundingBox.x, 0) << "Expected bounding-box x to be 0";
+    EXPECT_EQ(statistics.boundingBox.y, 0) << "Expected bounding-box y to be 0";
+    EXPECT_EQ(statistics.boundingBox.w, 1) << "Expected bounding-box w to be 1";
+    EXPECT_EQ(statistics.boundingBox.h, 1) << "Expected bounding-box h to be 1";
+}
+
 //! Write ZSt0 compressed Gray8 image with no parameters
 TEST(CziWriter, WriteCompressedZStd0ImageGray8Basic)
 {
@@ -2212,7 +2266,7 @@ TEST(CziWriter, TryAddingDuplicateSubBlocksToCziWriterAndWhenCheckIsDisable)
     // now add it a second time - this should now work (since we configured the writer to ignore
     //  duplicate subblocks)
     writer->SyncAddSubBlock(addSbBlkInfo);
-    
+
     auto metadataBuilder = writer->GetPreparedMetadata(PrepareMetadataInfo());
     string xml = metadataBuilder->GetXml(true);
     WriteMetadataInfo writerMdInfo = { 0 };

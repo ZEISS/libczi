@@ -60,6 +60,41 @@ public:
         tExcp::ThrowInvalidPath();
         throw std::logic_error("Must not get here.");
     }
+
+    /// Parse an "attributes definition string" of the form "Id=abc,Name=abc" into a map of name/value pairs.
+    /// \param  str The string to be parsed.
+    /// \returns    A std::map&lt;std::wstring,std::wstring&gt; containing the key-value pairs.
+    static std::map<std::wstring, std::wstring> ParseAttributes(const std::wstring& str)
+    {
+        std::map<std::wstring, std::wstring> attribMap;
+
+        std::wsmatch pieces_match;
+
+        // now we have string of the form Id=abc,Name=abc
+        std::vector<std::wstring> pairs;
+        Utilities::Tokenize(str, pairs, L",;");
+
+        std::wregex attribValuePairRegex(LR"(([^=]+)=([^,;]*))");
+        for (auto it = pairs.cbegin(); it != pairs.cend(); ++it)
+        {
+            bool parsedOk = false;
+            if (std::regex_match(*it, pieces_match, attribValuePairRegex))
+            {
+                if (pieces_match.size() == 3 && pieces_match[0].matched == true && pieces_match[1].matched == true && pieces_match[2].matched == true)
+                {
+                    attribMap.insert(std::pair<std::wstring, std::wstring>(pieces_match[1], pieces_match[2]));
+                    parsedOk = true;
+                }
+            }
+
+            if (!parsedOk)
+            {
+                tExcp::ThrowInvalidPath();
+            }
+        }
+
+        return attribMap;
+    }
 private:
     static pugi::xml_node GetChildElementWithSpecifier(pugi::xml_node& node, const std::wstring& nodeName, const std::wstring& specifier)
     {
@@ -93,20 +128,20 @@ private:
     }
 
     /// Gets the n-th child node with name 'node_name' from the specified node. The index is zero-based.
-    /// If this node does not exist, an exception is thrown.
+    /// If this node does not exist, nullptr is returned.
     /// \param [in]     node        The node (to get the n-th child node).
     /// \param          node_name   Name of the child node to search for.
     /// \param          index       Zero-based index of the child node (with the specified name) to search for.
-    /// \returns    The child node with the specified index.
-    static pugi::xml_node GetChildElementNodeWithIndex(pugi::xml_node& node, const std::wstring& node_name, std::uint32_t index)
+    /// \returns    The child node with the specified index if it exists; nullptr otherwise.
+    static pugi::xml_node GetChildElementNodeWithIndex(const pugi::xml_node& node, const std::wstring& node_name, std::uint32_t index)
     {
         auto child_node = node.child(node_name.c_str());
         if (!child_node)
         {
-            tExcp::ThrowInvalidPath();
+            return {};
         }
 
-        for (std::uint32_t i = 0; i <= index; ++i)
+        for (std::uint32_t i = 0; ; ++i)
         {
             if (i == index)
             {
@@ -116,12 +151,9 @@ private:
             child_node = child_node.next_sibling(node_name.c_str());
             if (!child_node)
             {
-                tExcp::ThrowInvalidPath();
+                return {};
             }
         }
-
-        tExcp::ThrowInvalidPath();
-        throw std::logic_error("Must not get here.");
     }
 
     static pugi::xml_node GetChildElementNodeWithAttributes(pugi::xml_node& node, const std::wstring& str, const std::map<std::wstring, std::wstring>& attribs)
@@ -198,41 +230,6 @@ private:
         }
 
         return c;
-    }
-
-    /// Parse an "attributes definition string" of the form "Id=abc,Name=abc" into a map of name/value pairs.
-    /// \param  str The string to be parsed.
-    /// \returns    A std::map&lt;std::wstring,std::wstring&gt; containing the key-value pairs.
-    static std::map<std::wstring, std::wstring> ParseAttributes(const std::wstring& str)
-    {
-        std::map<std::wstring, std::wstring> attribMap;
-
-        std::wsmatch pieces_match;
-
-        // now we have string of the form Id=abc,Name=abc
-        std::vector<std::wstring> pairs;
-        Utilities::Tokenize(str, pairs, L",;");
-
-        std::wregex attribValuePairRegex(LR"(([^=]+)=([^,;]*))");
-        for (auto it = pairs.cbegin(); it != pairs.cend(); ++it)
-        {
-            bool parsedOk = false;
-            if (std::regex_match(*it, pieces_match, attribValuePairRegex))
-            {
-                if (pieces_match.size() == 3 && pieces_match[0].matched == true && pieces_match[1].matched == true && pieces_match[2].matched == true)
-                {
-                    attribMap.insert(std::pair<std::wstring, std::wstring>(pieces_match[1], pieces_match[2]));
-                    parsedOk = true;
-                }
-            }
-
-            if (!parsedOk)
-            {
-                tExcp::ThrowInvalidPath();
-            }
-        }
-
-        return attribMap;
     }
 };
 
