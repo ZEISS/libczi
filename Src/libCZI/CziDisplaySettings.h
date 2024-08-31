@@ -15,8 +15,8 @@ class CChannelDisplaySettingsOnPod : public libCZI::IChannelDisplaySetting
 private:
     libCZI::ChannelDisplaySettingsPOD cdsPod;
 public:
-    explicit CChannelDisplaySettingsOnPod(const libCZI::ChannelDisplaySettingsPOD& pod)
-        : cdsPod(pod)
+    explicit CChannelDisplaySettingsOnPod(libCZI::ChannelDisplaySettingsPOD pod)
+        : cdsPod(std::move(pod))
     {}
 
 public: // interface IChannelDisplaySetting

@@ -14,7 +14,7 @@ using namespace std;
 
 SimpleFileInputStream::SimpleFileInputStream(const wchar_t* filename)
 {
-    const errno_t err = _wfopen_s(&this->fp, filename, L"rb");
+    const errno_t err = _wfopen_s(&this->fp_, filename, L"rb");
     if (err != 0)
     {
         std::stringstream ss;
@@ -55,14 +55,14 @@ SimpleFileInputStream::SimpleFileInputStream(const std::string& filename)
 
 SimpleFileInputStream::~SimpleFileInputStream()
 {
-    fclose(this->fp);
+    fclose(this->fp_);
 }
 
 /*virtual*/void SimpleFileInputStream::Read(std::uint64_t offset, void* pv, std::uint64_t size, std::uint64_t* ptrBytesRead)
 {
     std::lock_guard<std::mutex> lck(this->request_mutex_);
 #if defined(_WIN32)
-    int r = _fseeki64(this->fp, offset, SEEK_SET);
+    int r = _fseeki64(this->fp_, offset, SEEK_SET);
 #else
     int r = fseeko(this->fp, offset, SEEK_SET);
 #endif
@@ -74,7 +74,7 @@ SimpleFileInputStream::~SimpleFileInputStream()
         throw std::runtime_error(ss.str());
     }
 
-    const std::uint64_t bytesRead = fread(pv, 1, static_cast<size_t>(size), this->fp);
+    const std::uint64_t bytesRead = fread(pv, 1, static_cast<size_t>(size), this->fp_);
     if (ptrBytesRead != nullptr)
     {
         *ptrBytesRead = bytesRead;

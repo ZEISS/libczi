@@ -15,8 +15,7 @@ private:
     std::uint64_t   dataSize;
     libCZI::AttachmentInfo  info;
 public:
-    CCziAttachment(const libCZI::AttachmentInfo& info, const CCZIParse::AttachmentData& data, std::function<void(void*)> deleter);
-    virtual ~CCziAttachment();
+    CCziAttachment(libCZI::AttachmentInfo info, const CCZIParse::AttachmentData& data, std::function<void(void*)> deleter);
 
     // interface IAttachment
     const libCZI::AttachmentInfo& GetAttachmentInfo() const override;
