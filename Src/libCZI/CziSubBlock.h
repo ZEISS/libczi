@@ -17,8 +17,7 @@ private:
     std::uint32_t   metaDataSize;
     libCZI::SubBlockInfo    info;
 public:
-    CCziSubBlock(const libCZI::SubBlockInfo& info, const CCZIParse::SubBlockData& data, std::function<void(void*)> deleter);
-    ~CCziSubBlock() override;
+    CCziSubBlock(const libCZI::SubBlockInfo& info, const CCZIParse::SubBlockData& data, const std::function<void(void*)>& deleter);
 
     // interface ISubBlock
     const libCZI::SubBlockInfo& GetSubBlockInfo() const override;

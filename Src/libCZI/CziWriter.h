@@ -277,7 +277,7 @@ private:
     void ThrowNotEnoughDataWritten(std::uint64_t offset, std::uint64_t bytesToWrite, std::uint64_t bytesActuallyWritten);
     void ThrowIfCoordinateIsOutOfBounds(const libCZI::AddSubBlockInfo& addSbBlkInfo) const;
 
-    enum class SbBlkCoordinateCheckResult
+    enum class SbBlkCoordinateCheckResult : std::uint8_t
     {
         Ok,
         OutOfBounds,
