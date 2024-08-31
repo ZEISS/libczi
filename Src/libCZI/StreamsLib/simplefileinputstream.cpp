@@ -48,7 +48,7 @@ SimpleFileInputStream::SimpleFileInputStream(const std::string& filename)
         throw runtime_error(ss.str());
     }
 
-    this->fp = file;
+    this->fp_ = file;
 }
 
 #endif
@@ -64,7 +64,7 @@ SimpleFileInputStream::~SimpleFileInputStream()
 #if defined(_WIN32)
     int r = _fseeki64(this->fp_, offset, SEEK_SET);
 #else
-    int r = fseeko(this->fp, offset, SEEK_SET);
+    int r = fseeko(this->fp_, offset, SEEK_SET);
 #endif
     if (r != 0)
     {
