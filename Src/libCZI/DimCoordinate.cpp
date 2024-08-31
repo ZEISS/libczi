@@ -99,7 +99,7 @@ public:
 private:
     static bool Int_ParseCoordinate(const char* str, int& charsParsedOk, DimensionIndex& dimIdx, int& value)
     {
-        // a 32-bit integer can have 10 digits at most, plus one for the +/- sign , that's 11 altogehter
+        // a 32-bit integer can have 10 digits at most, plus one for the +/- sign , that's 11 altogether
         // plus the trailing zero, which gives us 12
         const int MAX_CHARS_FOR_NUMBER = 11;
         char number[MAX_CHARS_FOR_NUMBER + 1];

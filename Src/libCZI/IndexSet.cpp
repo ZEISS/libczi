@@ -45,7 +45,7 @@ void CIndexSet::ParseString(const std::wstring& str)
 
 void CIndexSet::AddInterval(int start, int end)
 {
-    // TODO: we could check if we can "simplify" the intervals, e. g. if we are given {0,2} and {2,4} we could turn it in
+    // TODO: we could check if we can "simplify" the intervals, e.g. if we are given {0,2} and {2,4} we could turn it in
     //        one interval (->{0,4}) 
     this->intervals.emplace_back(interval{ start,end });
 }
