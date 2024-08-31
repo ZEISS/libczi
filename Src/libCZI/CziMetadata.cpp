@@ -17,8 +17,8 @@ CCziMetadata::CCziMetadata(libCZI::IMetadataSegment* pMdSeg)
     this->parseResult = this->doc.load_buffer(ptrData, size, pugi::parse_default, encoding_utf8);
     if (this->parseResult)
     {
-        this->wrapper = std::make_unique<XmlNodeWrapperReadonly<CCziMetadata, XmlNodeWrapperThrowExcp>>(
-            this->doc.internal_object());
+        this->wrapper = std::unique_ptr<XmlNodeWrapperReadonly<CCziMetadata, XmlNodeWrapperThrowExcp>>(
+            new XmlNodeWrapperReadonly<CCziMetadata, XmlNodeWrapperThrowExcp>(this->doc.internal_object()));
     }
 }
 
