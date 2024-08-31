@@ -58,26 +58,31 @@ const pugi::xml_document& CCziMetadata::GetXmlDoc() const
     this->ThrowIfXmlInvalid();
     return this->wrapper->TryGetAttribute(attributeName, attribValue);
 }
+
 /*virtual*/void CCziMetadata::EnumAttributes(const std::function<bool(const std::wstring& attribName, const std::wstring& attribValue)>& enumFunc) const
 {
     this->ThrowIfXmlInvalid();
     this->wrapper->EnumAttributes(enumFunc);
 }
+
 /*virtual*/bool CCziMetadata::TryGetValue(std::wstring* value) const
 {
     this->ThrowIfXmlInvalid();
     return this->wrapper->TryGetValue(value);
 }
+
 /*virtual*/std::shared_ptr<IXmlNodeRead> CCziMetadata::GetChildNodeReadonly(const char* path)
 {
     this->ThrowIfXmlInvalid();
     return this->wrapper->GetChildNodeReadonly(path, this->shared_from_this());
 }
+
 /*virtual*/std::wstring CCziMetadata::Name() const
 {
     this->ThrowIfXmlInvalid();
     return this->wrapper->Name();
 }
+
 void CCziMetadata::EnumChildren(const std::function<bool(std::shared_ptr<IXmlNodeRead>)>& enumChildren)
 {
     this->ThrowIfXmlInvalid();
@@ -165,7 +170,7 @@ bool IXmlNodeRead::TryGetValueAsFloat(float* p)
 
     if (p != nullptr)
     {
-        *p = (float)d;
+        *p = static_cast<float>(d);
     }
 
     return true;
