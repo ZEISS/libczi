@@ -24,3 +24,4 @@ version history                 {#version_history}
  0.59.0             | [99](https://github.com/ZEISS/libczi/pull/103)       | add a check for physical size for dimensions other than X,Y,M, they must not be >1, active for strict parsing.
  0.60.0             | [106](https://github.com/ZEISS/libczi/pull/106)      | with metadata-builder, by default copy the attributes "Id" and "Name" from the channel-node; allow to control the behavior fine-grained
  0.61.0             | [109](https://github.com/ZEISS/libczi/pull/109)      | fix behaviour of `IXmlNodeRead::GetChildNodeReadonly` (for non-existing nodes), new method `ICziWriter::GetStatistics` added
+ 0.61.1             | [110](https://github.com/ZEISS/libczi/pull/110)      | some code cleanup
