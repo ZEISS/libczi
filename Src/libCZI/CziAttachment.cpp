@@ -8,15 +8,11 @@
 
 using namespace libCZI;
 
-CCziAttachment::CCziAttachment(const libCZI::AttachmentInfo& info, const CCZIParse::AttachmentData& data, std::function<void(void*)> deleter)
+CCziAttachment::CCziAttachment(libCZI::AttachmentInfo info, const CCZIParse::AttachmentData& data, std::function<void(void*)> deleter)
     :
     spData(std::shared_ptr<const void>(data.ptrData, std::move(deleter))),
     dataSize(data.dataSize),
-    info(info)
-{
-}
-
-CCziAttachment::~CCziAttachment()
+    info(std::move(info))
 {
 }
 
@@ -28,14 +24,14 @@ CCziAttachment::~CCziAttachment()
 /*virtual*/void CCziAttachment::DangerousGetRawData(const void*& ptr, size_t& size) const
 {
     ptr = this->spData.get();
-    size = (size_t)this->dataSize;  // TODO: check the cast
+    size = static_cast<size_t>(this->dataSize);  // TODO: check the cast
 }
 
 /*virtual*/std::shared_ptr<const void> CCziAttachment::GetRawData(size_t* ptrSize)
 {
     if (ptrSize != nullptr)
     {
-        *ptrSize = (size_t)this->dataSize;
+        *ptrSize = static_cast<size_t>(this->dataSize);
     }
 
     return this->spData;

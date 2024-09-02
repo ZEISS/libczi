@@ -7,7 +7,7 @@
 
 using namespace libCZI;
 
-CCziSubBlock::CCziSubBlock(const libCZI::SubBlockInfo& info, const CCZIParse::SubBlockData& data, std::function<void(void*)> deleter)
+CCziSubBlock::CCziSubBlock(const libCZI::SubBlockInfo& info, const CCZIParse::SubBlockData& data, const std::function<void(void*)>& deleter)
     :
     spData(std::shared_ptr<const void>(data.ptrData, deleter)),
     spAttachment(std::shared_ptr<const void>(data.ptrAttachment, deleter)),
@@ -16,10 +16,6 @@ CCziSubBlock::CCziSubBlock(const libCZI::SubBlockInfo& info, const CCZIParse::Su
     attachmentSize(data.attachmentSize),
     metaDataSize(data.metaDataSize),
     info(info)
-{
-}
-
-CCziSubBlock::~CCziSubBlock()
 {
 }
 
@@ -34,15 +30,15 @@ CCziSubBlock::~CCziSubBlock()
     {
     case Metadata:
         ptr = this->spMetadata.get();
-        size = (size_t)this->metaDataSize;  // TODO: check the cast
+        size = static_cast<size_t>(this->metaDataSize);  // TODO: check the cast
         break;
     case Data:
         ptr = this->spData.get();
-        size = (size_t)this->dataSize;
+        size = static_cast<size_t>(this->dataSize);
         break;
     case Attachment:
         ptr = this->spAttachment.get();
-        size = (size_t)this->attachmentSize;
+        size = static_cast<size_t>(this->attachmentSize);
         break;
     default:
         throw std::logic_error("illegal value for type");

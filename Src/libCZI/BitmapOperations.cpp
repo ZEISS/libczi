@@ -49,7 +49,7 @@ using namespace std;
 #else
     for (uint32_t y = 0; y < bm->GetHeight(); ++y)
     {
-        const std::uint8_t* ptr = ((const std::uint8_t*)lck.ptrDataRoi) + y * ((ptrdiff_t)lck.stride);
+        const std::uint8_t* ptr = static_cast<const std::uint8_t*>(lck.ptrDataRoi) + y * static_cast<ptrdiff_t>(lck.stride);
         md5sum.update(ptr, lineLength);
     }
 #endif

@@ -30,7 +30,7 @@ namespace libCZI
         ///
         /// \param ptrDspSetting	  The display settings.
         /// \param funcEnabledChannel A functor which will be called for each active channel.
-        static void EnumEnabledChannels(const libCZI::IDisplaySettings* ptrDspSetting, std::function<bool(int)> funcEnabledChannel)
+        static void EnumEnabledChannels(const libCZI::IDisplaySettings* ptrDspSetting, const std::function<bool(int)>& funcEnabledChannel)
         {
             ptrDspSetting->EnumChannels(
                 [&](int chIndex)->bool
@@ -64,7 +64,7 @@ namespace libCZI
         ///
         /// \param ptrDspSetting A pointer to a display-settings object.
         /// \param getPixelTypeForChannelIndex A functor which is called in order to retrieve the pixeltype of the bitmap passed in for the channel with the specified channel index.
-        void Initialize(const libCZI::IDisplaySettings* ptrDspSetting, std::function<libCZI::PixelType(int chIndex)> getPixelTypeForChannelIndex)
+        void Initialize(const libCZI::IDisplaySettings* ptrDspSetting, const std::function<libCZI::PixelType(int chIndex)>& getPixelTypeForChannelIndex)
         {
             this->Clear();
             ptrDspSetting->EnumChannels(
@@ -82,8 +82,9 @@ namespace libCZI
         /// for all 'enabled' channels.
         ///
         /// \param getChDisplaySettingAndChannelIdx A functor which is used to retrieve a ChannelDisplaySetting-objects and its respective channels-index.
-        /// 										If the functor returns false, the enumeration is cancelled (and the functor is not called any more).
-        void Initialize(std::function<bool(int&, std::shared_ptr<libCZI::IChannelDisplaySetting>&)> getChDisplaySettingAndChannelIdx, std::function<libCZI::PixelType(int chIndex)> getPixelTypeForChannelIndex)
+        /// 										If the functor returns false, the enumeration is cancelled (and the functor is not called anymore). 
+        /// \param getPixelTypeForChannelIndex A functor which is called in order to retrieve the pixeltype of the bitmap passed in for the channel with the specified channel index.
+        void Initialize(const std::function<bool(int&, std::shared_ptr<libCZI::IChannelDisplaySetting>&)>& getChDisplaySettingAndChannelIdx, const std::function<libCZI::PixelType(int chIndex)>& getPixelTypeForChannelIndex)
         {
             this->Clear();
             for (;;)
@@ -129,9 +130,9 @@ namespace libCZI
         /// Also the behavior is undefined if this class has not been successfully initialized.
         ///
         /// \return A pointer to the channel-infos array (containing as many elements as determined by GetActiveChannelsCount).
-        const libCZI::Compositors::ChannelInfo* GetChannelInfosArray()
+        const libCZI::Compositors::ChannelInfo* GetChannelInfosArray() const
         {
-            return &this->channelInfos[0];
+            return this->channelInfos.data();
         }
     private:
         void Clear()
@@ -167,7 +168,7 @@ namespace libCZI
                 chDsplSetting->TryGetGamma(&gamma);
                 this->lutStore.emplace_back(
                     libCZI::Utils::Create8BitLookUpTableFromGamma(lutSize, ci.blackPoint, ci.whitePoint, gamma));
-                ci.ptrLookUpTable = &(this->lutStore.back()[0]);
+                ci.ptrLookUpTable = this->lutStore.back().data();
                 ci.lookUpTableElementCount = lutSize;
             }
             break;
@@ -178,7 +179,7 @@ namespace libCZI
                 chDsplSetting->TryGetSplineData(&splineData);
                 this->lutStore.emplace_back(
                     libCZI::Utils::Create8BitLookUpTableFromSplines(lutSize, ci.blackPoint, ci.whitePoint, splineData));
-                ci.ptrLookUpTable = &(this->lutStore.back()[0]);
+                ci.ptrLookUpTable = this->lutStore.back().data();
                 ci.lookUpTableElementCount = lutSize;
             }
             break;

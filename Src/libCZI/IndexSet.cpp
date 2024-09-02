@@ -45,7 +45,7 @@ void CIndexSet::ParseString(const std::wstring& str)
 
 void CIndexSet::AddInterval(int start, int end)
 {
-    // TODO: we could check if we can "simplify" the intervals, e. g. if we are given {0,2} and {2,4} we could turn it in
+    // TODO: we could check if we can "simplify" the intervals, e.g. if we are given {0,2} and {2,4} we could turn it in
     //        one interval (->{0,4}) 
     this->intervals.emplace_back(interval{ start,end });
 }
@@ -149,20 +149,20 @@ second_part_done:
     return make_tuple(v1, v2);
 }
 
-/*static*/int CIndexSet::ValueFromNumString(const std::wstring& num)
+/*static*/int CIndexSet::ValueFromNumString(const std::wstring& str)
 {
     int v;
-    if (num.compare(L"-inf") == 0)
+    if (str.compare(L"-inf") == 0)
     {
         v = (numeric_limits<int>::min)();
     }
-    else if (num.compare(L"+inf") == 0 || num.compare(L"inf") == 0)
+    else if (str.compare(L"+inf") == 0 || str.compare(L"inf") == 0)
     {
         v = (numeric_limits<int>::max)();
     }
     else
     {
-        long int liValue = wcstol(num.c_str(), nullptr, 10);
+        long int liValue = wcstol(str.c_str(), nullptr, 10);
         if (liValue == (std::numeric_limits<long int>::max)() || liValue == (std::numeric_limits<long int>::min)())
         {
             if (errno == ERANGE)

@@ -15,8 +15,7 @@ private:
     std::uint64_t   xmlDataSize;
     std::uint32_t   attachmentSize;
 public:
-    CCziMetadataSegment(const CCZIParse::MetadataSegmentData& data, std::function<void(void*)> deleter);
-    ~CCziMetadataSegment() override;
+    CCziMetadataSegment(const CCZIParse::MetadataSegmentData& data, const std::function<void(void*)>& deleter);
 
     // interface ISubBlock
     void DangerousGetRawData(MemBlkType type, const void*& ptr, size_t& size) const override;
