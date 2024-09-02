@@ -15,7 +15,7 @@ private:
     {
         int start, end;
 
-        bool IsContained(int index) const { return this->start <= index && index <= this->end ? true : false; }
+        bool IsContained(int index) const { return this->start <= index && index <= this->end; }
     };
 
     std::vector<interval> intervals;

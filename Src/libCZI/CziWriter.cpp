@@ -53,7 +53,7 @@ void libCZI::ICziWriter::SyncAddSubBlock(const libCZI::AddSubBlockInfoLinewiseBi
 {
     AddSubBlockInfo addSbInfo(addSbInfoLinewise);
 
-    size_t stride = addSbInfoLinewise.physicalWidth * (size_t)CziUtils::GetBytesPerPel(addSbInfoLinewise.PixelType);
+    size_t stride = addSbInfoLinewise.physicalWidth * static_cast<size_t>(CziUtils::GetBytesPerPel(addSbInfoLinewise.PixelType));
     addSbInfo.sizeData = addSbInfoLinewise.physicalHeight * stride;
     auto linesCnt = addSbInfoLinewise.physicalHeight;
     addSbInfo.getData = [&](int callCnt, size_t offset, const void*& ptr, size_t& size)->bool
@@ -87,13 +87,13 @@ void libCZI::ICziWriter::SyncAddSubBlock(const AddSubBlockInfoStridedBitmap& add
 {
     AddSubBlockInfo addSbInfo(addSbBlkInfoStrideBitmap);
 
-    addSbInfo.sizeData = addSbBlkInfoStrideBitmap.physicalHeight * (addSbBlkInfoStrideBitmap.physicalWidth * (size_t)CziUtils::GetBytesPerPel(addSbBlkInfoStrideBitmap.PixelType));
+    addSbInfo.sizeData = addSbBlkInfoStrideBitmap.physicalHeight * (addSbBlkInfoStrideBitmap.physicalWidth * static_cast<size_t>(CziUtils::GetBytesPerPel(addSbBlkInfoStrideBitmap.PixelType)));
     addSbInfo.getData = [&](int callCnt, size_t offset, const void*& ptr, size_t& size)->bool
         {
             if (callCnt < addSbBlkInfoStrideBitmap.physicalHeight)
             {
-                ptr = static_cast<const char*>(addSbBlkInfoStrideBitmap.ptrBitmap) + callCnt * (size_t)addSbBlkInfoStrideBitmap.strideBitmap;
-                size = addSbBlkInfoStrideBitmap.physicalWidth * (size_t)CziUtils::GetBytesPerPel(addSbBlkInfoStrideBitmap.PixelType);
+                ptr = static_cast<const char*>(addSbBlkInfoStrideBitmap.ptrBitmap) + callCnt * static_cast<size_t>(addSbBlkInfoStrideBitmap.strideBitmap);
+                size = addSbBlkInfoStrideBitmap.physicalWidth * static_cast<size_t>(CziUtils::GetBytesPerPel(addSbBlkInfoStrideBitmap.PixelType));
                 return true;
             }
 
@@ -131,7 +131,7 @@ void libCZI::ICziWriter::SyncAddSubBlock(const AddSubBlockInfoStridedBitmap& add
         CWriterUtils::FillSubBlockSegment(info, addSbBlkInfo, &sbBlkSegment);
         if (info.useSpecifiedAllocatedSize == true)
         {
-            if (uint64_t(sbBlkSegment.header.AllocatedSize) > info.specifiedAllocatedSize)
+            if (static_cast<uint64_t>(sbBlkSegment.header.AllocatedSize) > info.specifiedAllocatedSize)
             {
                 // TODO
                 throw runtime_error("specified segment-size not sufficient");
@@ -147,12 +147,12 @@ void libCZI::ICziWriter::SyncAddSubBlock(const AddSubBlockInfoStridedBitmap& add
     }
     else
     {
-        std::unique_ptr<SubBlockSegment, void(*)(SubBlockSegment*)> upSbBlkSegment((SubBlockSegment*)malloc(sbBlkSegmentSize), [](SubBlockSegment* p)->void {free(p); });
+        std::unique_ptr<SubBlockSegment, void(*)(SubBlockSegment*)> upSbBlkSegment(static_cast<SubBlockSegment*>(malloc(sbBlkSegmentSize)), [](SubBlockSegment* p)->void {free(p); });
         memset(upSbBlkSegment.get(), 0, sbBlkSegmentSize);
         CWriterUtils::FillSubBlockSegment(info, addSbBlkInfo, upSbBlkSegment.get());
         if (info.useSpecifiedAllocatedSize == true)
         {
-            if (uint64_t(upSbBlkSegment->header.AllocatedSize) > info.specifiedAllocatedSize)
+            if (static_cast<uint64_t>(upSbBlkSegment->header.AllocatedSize) > info.specifiedAllocatedSize)
             {
                 // TODO
                 throw runtime_error("specified segment-size not sufficient");
@@ -173,7 +173,7 @@ void libCZI::ICziWriter::SyncAddSubBlock(const AddSubBlockInfoStridedBitmap& add
 
     if (bytesWritten < allocatedSize)
     {
-        bytesWritten += (size_t)WriteZeroes(info, info.segmentPos + bytesWritten, size_t(allocatedSize - bytesWritten));
+        bytesWritten += (size_t)WriteZeroes(info, info.segmentPos + bytesWritten, static_cast<size_t>(allocatedSize - bytesWritten));
     }
 
     return bytesWritten;
@@ -235,7 +235,7 @@ void libCZI::ICziWriter::SyncAddSubBlock(const AddSubBlockInfoStridedBitmap& add
     if (b == true)
     {
         pSbBlkSegment->header.AllocatedSize = allocatedSize - sizeof(SegmentHeader);
-        pSbBlkSegment->header.UsedSize = usedSize - sizeof(SegmentHeader);;
+        pSbBlkSegment->header.UsedSize = usedSize - sizeof(SegmentHeader);
     }
 
     return b;
@@ -243,18 +243,18 @@ void libCZI::ICziWriter::SyncAddSubBlock(const AddSubBlockInfoStridedBitmap& add
 
 /*static*/void CWriterUtils::FillSubBlockSegmentData(const libCZI::AddSubBlockInfo& addSbBlkInfo, SubBlockSegmentData* ptr)
 {
-    if (addSbBlkInfo.sizeMetadata > (size_t)(numeric_limits<int>::max)())
+    if (addSbBlkInfo.sizeMetadata > static_cast<size_t>((numeric_limits<int>::max)()))
     {
         throw invalid_argument("sizeMetadata must be <= numeric_limits<int>::max()");
     }
 
-    if (addSbBlkInfo.sizeAttachment > (size_t)(numeric_limits<int>::max)())
+    if (addSbBlkInfo.sizeAttachment > static_cast<size_t>((numeric_limits<int>::max)()))
     {
         throw invalid_argument("sizeAttachment must be <= numeric_limits<int>::max()");
     }
 
-    ptr->MetadataSize = int(addSbBlkInfo.sizeMetadata);
-    ptr->AttachmentSize = int(addSbBlkInfo.sizeAttachment);
+    ptr->MetadataSize = static_cast<int>(addSbBlkInfo.sizeMetadata);
+    ptr->AttachmentSize = static_cast<int>(addSbBlkInfo.sizeAttachment);
     ptr->DataSize = addSbBlkInfo.sizeData;
 
     // now, write the SubBlockDirectoryEntryDV
@@ -624,7 +624,7 @@ void libCZI::ICziWriter::SyncAddSubBlock(const AddSubBlockInfoStridedBitmap& add
         });
 
     size_t subBlockDirectorySegmentSize = sizeof(SubBlockDirectorySegment) + totalSizeSubBlockDirectoryEntryDV;
-    std::unique_ptr<SubBlockDirectorySegment, void(*)(SubBlockDirectorySegment*)> upSbBlkDirSegment((SubBlockDirectorySegment*)malloc(subBlockDirectorySegmentSize), [](SubBlockDirectorySegment* p)->void {free(p); });
+    std::unique_ptr<SubBlockDirectorySegment, void(*)(SubBlockDirectorySegment*)> upSbBlkDirSegment(static_cast<SubBlockDirectorySegment*>(malloc(subBlockDirectorySegmentSize)), [](SubBlockDirectorySegment* p)->void {free(p); });
     memcpy(upSbBlkDirSegment->header.Id, CCZIParse::SUBBLKDIRMAGIC, 16);
 
     // the size must be AT LEAST 128 bytes (the _used_ size)
@@ -633,12 +633,12 @@ void libCZI::ICziWriter::SyncAddSubBlock(const AddSubBlockInfoStridedBitmap& add
     memset(upSbBlkDirSegment->data._spare, 0, sizeof(upSbBlkDirSegment->data._spare));
 
     size_t offset = 0;
-    std::uint8_t* ptr = ((std::uint8_t*)upSbBlkDirSegment.get()) + sizeof(SubBlockDirectorySegment);
+    std::uint8_t* ptr = reinterpret_cast<std::uint8_t*>(upSbBlkDirSegment.get()) + sizeof(SubBlockDirectorySegment);
     upSbBlkDirSegment->data.EntryCount = 0;
     info.enumEntriesFunc(
         [&upSbBlkDirSegment, ptr, &offset](size_t index, const CCziSubBlockDirectoryBase::SubBlkEntry& entry)->void
         {
-            offset += CWriterUtils::FillSubBlockDirectoryEntryDV((SubBlockDirectoryEntryDV*)(ptr + offset), entry);
+            offset += CWriterUtils::FillSubBlockDirectoryEntryDV(reinterpret_cast<SubBlockDirectoryEntryDV*>(ptr + offset), entry);
             ++upSbBlkDirSegment->data.EntryCount;
         });
 
@@ -647,7 +647,7 @@ void libCZI::ICziWriter::SyncAddSubBlock(const AddSubBlockInfoStridedBitmap& add
 
     // if we have already written a subblock-directory-segment (possibly a reservation), then we check here if the existing
     // segment is large enough, and if so we write our data into this segment
-    if (int64_t(info.sizeExistingSegmentPos) >= upSbBlkDirSegment->header.AllocatedSize)
+    if (static_cast<int64_t>(info.sizeExistingSegmentPos) >= upSbBlkDirSegment->header.AllocatedSize)
     {
         subBlkDirPos = info.existingSegmentPos;
         upSbBlkDirSegment->header.AllocatedSize = info.sizeExistingSegmentPos;
@@ -681,7 +681,7 @@ void libCZI::ICziWriter::SyncAddSubBlock(const AddSubBlockInfoStridedBitmap& add
         bytesWritten += CWriterUtils::WriteZeroes(info.writeFunc, subBlkDirPos + bytesWritten, sbBlkDirSegmentHeaderAllocatedSize + sizeof(SegmentHeader) - bytesWritten);
     }
 
-    return make_tuple(subBlkDirPos, std::uint64_t(sbBlkDirSegmentHeaderAllocatedSize));
+    return make_tuple(subBlkDirPos, static_cast<std::uint64_t>(sbBlkDirSegmentHeaderAllocatedSize));
 }
 
 /*static*/std::tuple<std::uint64_t, std::uint64_t> CWriterUtils::WriteAttachmentDirectory(const AttachmentDirWriteInfo& info)
@@ -694,7 +694,7 @@ void libCZI::ICziWriter::SyncAddSubBlock(const AddSubBlockInfoStridedBitmap& add
     attchmntDirSegment.header.UsedSize = sizeof(AttachmentDirectorySegmentData) + sizeAttchmntEntries;
     attchmntDirSegment.header.AllocatedSize = ((attchmntDirSegment.header.UsedSize + (SEGMENT_ALIGN - 1)) / SEGMENT_ALIGN) * SEGMENT_ALIGN;
 
-    attchmntDirSegment.data.EntryCount = (int)attchmntCnt;
+    attchmntDirSegment.data.EntryCount = static_cast<int>(attchmntCnt);
 
     bool reUsedExistingSegment = false;
     uint64_t attchmDirPos;
@@ -731,7 +731,7 @@ void libCZI::ICziWriter::SyncAddSubBlock(const AddSubBlockInfoStridedBitmap& add
     info.writeFunc(attchmDirPos, &attchmntDirSegment, sizeof(attchmntDirSegment), &bytesWritten, "AttachmentDirSegment");
     totalBytesWritten += bytesWritten;
 
-    std::unique_ptr<AttachmentEntryA1, void(*)(AttachmentEntryA1*)> upAttchmntData((AttachmentEntryA1*)malloc(sizeAttchmntEntries), [](AttachmentEntryA1* p)->void {free(p); });
+    std::unique_ptr<AttachmentEntryA1, void(*)(AttachmentEntryA1*)> upAttchmntData(static_cast<AttachmentEntryA1*>(malloc(sizeAttchmntEntries)), [](AttachmentEntryA1* p)->void {free(p); });
 
     size_t index_count = 0;
     info.enumEntriesFunc(
@@ -760,7 +760,7 @@ void libCZI::ICziWriter::SyncAddSubBlock(const AddSubBlockInfoStridedBitmap& add
         bytesWritten += CWriterUtils::WriteZeroes(info.writeFunc, attchmDirPos + bytesWritten, attchmntDirSegmentHeaderAllocatedSize + sizeof(SegmentHeader) - bytesWritten);
     }
 
-    return make_tuple(attchmDirPos, std::uint64_t(attchmntDirSegmentHeaderAllocatedSize));
+    return make_tuple(attchmDirPos, static_cast<std::uint64_t>(attchmntDirSegmentHeaderAllocatedSize));
 }
 
 /// Check the arguments used in the "SyncAddSubBlock"-methods. We throw an "invalid_argument"-exceptions in the case we

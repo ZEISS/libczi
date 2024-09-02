@@ -17,7 +17,7 @@ bool CSingleChannelAccessorBase::TryGetPixelType(const libCZI::IDimCoordinate* p
     // the idea is: for the cornerstone-case where we do not have a C-index, the call to "TryGetSubBlockInfoOfArbitrarySubBlockInChannel"
     // will ignore the specified index _if_ there are no C-indices at all
     pixeltype = Utils::TryDeterminePixelTypeForChannel(this->sbBlkRepository.get(), c);
-    return (pixeltype != PixelType::Invalid) ? true : false;
+    return pixeltype != PixelType::Invalid;
 }
 
 /*static*/void CSingleChannelAccessorBase::Clear(libCZI::IBitmapData* bm, const libCZI::RgbFloatColor& floatColor)

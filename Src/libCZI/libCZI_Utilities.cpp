@@ -188,7 +188,7 @@ static double CalcSplineValue(double x, const std::vector<libCZI::IDisplaySettin
         }
     }
 
-    double xPosNormalized = x - splineData.at(index).xPos;
+    const double xPosNormalized = x - splineData.at(index).xPos;
 
     return CSplines::CalculateSplineValue(xPosNormalized, splineData.at(index).coefficients);
 }
@@ -259,7 +259,7 @@ tFloat GetParameterForToeSlopeAdjustment(tFloat gamma)
         tFloat factor = 1 / (gamma2 * gamma2);
 
         const tFloat ResultTolerance = static_cast<tFloat>(0.000001);
-        const int MaxIterationCount = 200;
+        constexpr int MaxIterationCount = 200;
 
         for (int i = 0; i < MaxIterationCount; i++)
         {
@@ -552,8 +552,8 @@ std::vector<tOutput> InternalCreateLookUpTableFromGamma(int tableElementCnt, tFl
     for (auto i = static_cast<std::underlying_type<libCZI::DimensionIndex>::type>(libCZI::DimensionIndex::MinDim); i <= static_cast<std::underlying_type<libCZI::DimensionIndex>::type>(libCZI::DimensionIndex::MaxDim); ++i)
     {
         int coord1, coord2;
-        bool valida = a->TryGetPosition((DimensionIndex)i, &coord1);
-        bool validb = b->TryGetPosition((DimensionIndex)i, &coord2);
+        bool valida = a->TryGetPosition(static_cast<DimensionIndex>(i), &coord1);
+        bool validb = b->TryGetPosition(static_cast<DimensionIndex>(i), &coord2);
         if (valida == true && validb == true)
         {
             if (coord1 > coord2)

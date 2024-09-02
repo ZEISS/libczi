@@ -481,7 +481,7 @@ namespace libCZI
         /// is conveniently contained in the method "TryGetTintingColorRgb8".
         enum class TintingMode : std::uint8_t
         {
-            None = 0,                   ///< None - which gives the "original color", ie. in case of RGB the RGB-value is directly used, in case of grayscale we get a gray pixel.
+            None = 0,                   ///< None - which gives the "original color", i.e. in case of RGB the RGB-value is directly used, in case of grayscale we get a gray pixel.
             Color = 1,                  ///< The pixel value is multiplied with the tinting-color.
             LookUpTableExplicit = 2,    ///< (NOT YET IMPLEMENTED) There is an explicit look-up-table specified.
             LookUpTableWellKnown = 3    ///< (NOT YET IMPLEMENTED) We are using a "well-known" look-up-table, and it is identified by its name (which is a string).
@@ -513,7 +513,7 @@ namespace libCZI
             }
         };
 
-        /// The defintion of the (piecewise) spline. The spline starts at <tt>xPos</tt> which is the normalized position (between 0 and 1).
+        /// The definition of the (piecewise) spline. The spline starts at <tt>xPos</tt> which is the normalized position (between 0 and 1).
         struct SplineData
         {
             /// The (normalized) position for which this spline definition is valid.
@@ -537,7 +537,7 @@ namespace libCZI
         /// \return The channel display settings object (if the channel index was valid), and empty shared_ptr otherwise.
         virtual std::shared_ptr<libCZI::IChannelDisplaySetting> GetChannelDisplaySettings(int chIndex) const = 0;
 
-        virtual ~IDisplaySettings() {}
+        virtual ~IDisplaySettings() = default;
 
         /// Makes a deep copy of the information in this object and store the information in the POD.
         /// \param          disp The display-settings object.
@@ -605,7 +605,7 @@ namespace libCZI
         /// \return True if the corresponding channels uses gradation curve mode <tt>Spline</tt>, false otherwise.
         virtual bool    TryGetSplineData(std::vector<libCZI::IDisplaySettings::SplineData>* data) const = 0;
 
-        virtual ~IChannelDisplaySetting() {}
+        virtual ~IChannelDisplaySetting() = default;
 
         /// Makes a deep copy of the information in this object and store the information in the POD.
         /// \param          disp The channel-display-settings object.

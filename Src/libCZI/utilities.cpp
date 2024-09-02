@@ -183,8 +183,7 @@ tString trimImpl(const tString& str, const tString& whitespace)
     if (str.size() > 1 && str[0] == '#')
     {
         // TODO: do we have to deal with shorter string (e.g. without alpha, or just '#FF')?
-        std::uint8_t r, g, b, a;
-        r = g = b = a = 0;
+        std::uint8_t r = 0, g = 0, b = 0, a = 0;
         for (size_t i = 1; i < (std::max)(static_cast<size_t>(9), str.size()); ++i)
         {
             if (!isxdigit(str[i]))
@@ -195,13 +194,13 @@ tString trimImpl(const tString& str, const tString& whitespace)
             switch (i)
             {
             case 1: a = Utilities::HexCharToInt(static_cast<char>(str[i])); break;
-            case 2: a = (a << 4) + Utilities::HexCharToInt(static_cast<char>(str[i])); break;
+            case 2: a = static_cast<uint8_t>(a << 4) | Utilities::HexCharToInt(static_cast<char>(str[i])); break;
             case 3: r = Utilities::HexCharToInt(static_cast<char>(str[i])); break;
-            case 4: r = (r << 4) + Utilities::HexCharToInt(static_cast<char>(str[i])); break;
+            case 4: r = static_cast<uint8_t>(r << 4) | Utilities::HexCharToInt(static_cast<char>(str[i])); break;
             case 5: g = Utilities::HexCharToInt(static_cast<char>(str[i])); break;
-            case 6: g = (g << 4) + Utilities::HexCharToInt(static_cast<char>(str[i])); break;
+            case 6: g = static_cast<uint8_t>(g << 4) | Utilities::HexCharToInt(static_cast<char>(str[i])); break;
             case 7: b = Utilities::HexCharToInt(static_cast<char>(str[i])); break;
-            case 8: b = (b << 4) + Utilities::HexCharToInt(static_cast<char>(str[i])); break;
+            case 8: b = static_cast<uint8_t>(b << 4) | Utilities::HexCharToInt(static_cast<char>(str[i])); break;
             }
         }
 
