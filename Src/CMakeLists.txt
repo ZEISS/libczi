@@ -63,6 +63,30 @@ if (LIBCZI_BUILD_CURL_BASED_STREAM)
   endif(LIBCZI_BUILD_PREFER_EXTERNALPACKAGE_LIBCURL)
 endif(LIBCZI_BUILD_CURL_BASED_STREAM)
 
+
+if(LIBCZI_BUILD_AZURESDK_BASED_STREAM)
+  # -> https://github.com/Azure/azure-sdk-for-cpp#azure-sdk-for-c
+  # -> https://learn.microsoft.com/en-us/azure/storage/blobs/quickstart-blobs-c-plus-plus?tabs=managed-identity%2Croles-azure-portal
+  if (LIBCZI_BUILD_PREFER_EXTERNALPACKAGE_AZURESDK)
+    find_package(azure-identity-cpp CONFIG REQUIRED)
+    find_package(azure-storage-blobs-cpp CONFIG REQUIRED)
+  else()
+    # -> https://github.com/Azure/azure-sdk-for-cpp/tree/main/samples/integration/cmake-fetch-content/
+    include(FetchContent)
+    FetchContent_Declare(azuresdkforcpp
+        # Set the SDK URL path and release tag
+        GIT_REPOSITORY      https://github.com/Azure/azure-sdk-for-cpp.git
+        GIT_TAG             azure-storage-files-datalake_12.0.0-beta.6)
+    FetchContent_GetProperties(azuresdkforcpp)
+    if(NOT azuresdkforcpp_POPULATED)
+        FetchContent_Populate(azuresdkforcpp)
+        add_subdirectory(${azuresdkforcpp_SOURCE_DIR} ${azuresdkforcpp_BINARY_DIR} EXCLUDE_FROM_ALL)
+    endif()
+  endif()
+endif()
+
+
+
 add_subdirectory(libCZI)
 
 if (LIBCZI_BUILD_CZICMD)

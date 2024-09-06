@@ -30,7 +30,7 @@ jobs:
         # on Windows, we rely on vcpkg to pull in dependencies
         shell: bash
         run: |
-          vcpkg install rapidjson 'curl[ssl]' --triplet x64-windows
+          vcpkg install rapidjson 'curl[ssl]' azure-storage-blobs-cpp azure-identity-cpp --triplet x64-windows
 
       - name: Install dependencies (Linux)
         if: ${{ (matrix.OS == 'ubuntu-latest') }}

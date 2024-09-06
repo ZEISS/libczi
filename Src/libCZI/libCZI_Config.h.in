@@ -46,3 +46,6 @@
 
 // whether the curl-based stream implementations are available (and whether libCZI can use the libcurl library)
 #define LIBCZI_CURL_BASED_STREAM_AVAILABLE  @libCZI_libcurl_available@
+
+// whether the Azure-SDK stream implementation is available (and whether libCZI can use the Azure-Storage library)
+#define LIBCZI_AZURESDK_BASED_STREAM_AVAILABLE  @libCZI_AzureStorage_available@

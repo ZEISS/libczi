@@ -116,6 +116,8 @@ set(LIBCZISRCFILES
             StreamsLib/simplefileinputstream.h
             StreamsLib/preadfileinputstream.cpp
             StreamsLib/preadfileinputstream.h
+            StreamsLib/azureblobinputstream.h
+            StreamsLib/azureblobinputstream.cpp
             subblock_cache.h
             subblock_cache.cpp
 )
@@ -226,6 +228,13 @@ else()
   set(libCZI_libcurl_available 0)
 endif()
 
+if (LIBCZI_BUILD_AZURESDK_BASED_STREAM)
+  set(libCZI_AzureStorage_available 1)
+else()
+  set(libCZI_AzureStorage_available 0)
+endif()
+
+
 if (LIBCZI_BUILD_PREFER_EXTERNALPACKAGE_ZSTD)
   find_package(zstd CONFIG REQUIRED)
 else()
@@ -282,6 +291,9 @@ if (LIBCZI_BUILD_DYNLIB)
   if (LIBCZI_BUILD_CURL_BASED_STREAM)
     target_link_libraries(libCZI PRIVATE CURL::libcurl)
   endif()
+  if (LIBCZI_BUILD_AZURESDK_BASED_STREAM)
+    target_link_libraries(libCZI PRIVATE Azure::azure-identity Azure::azure-storage-blobs)
+  endif()
   if (LIBCZI_BUILD_PREFER_EXTERNALPACKAGE_EIGEN3)
    target_link_libraries(libCZI PRIVATE Eigen3::Eigen)
   else()
@@ -314,6 +326,9 @@ endif()
 
 if (LIBCZI_BUILD_CURL_BASED_STREAM)
   target_link_libraries(libCZIStatic PRIVATE CURL::libcurl)
+endif()
+if (LIBCZI_BUILD_AZURESDK_BASED_STREAM)
+  target_link_libraries(libCZIStatic PRIVATE Azure::azure-identity Azure::azure-storage-blobs)
 endif()
 
 if (LIBCZI_BUILD_PREFER_EXTERNALPACKAGE_EIGEN3)
