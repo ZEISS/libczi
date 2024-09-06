@@ -37,10 +37,16 @@ if (LIBCZI_BUILD_CURL_BASED_STREAM)
     # if (APPLE)  # for MacOS - let's choose Apple's native secure transport backend
     #    set(CURL_USE_SECTRANSP ON)
     # endif(APPLE)
+
+    # On Windows, we can enable the SChannel backend, as it is the native one, and it requires no additional dependencies.
+    if(WIN32)
+      set(CURL_USE_SCHANNEL ON CACHE BOOL "" FORCE)
+    endif(WIN32)
+
     FetchContent_Declare(
         libcurl
         GIT_REPOSITORY  "https://github.com/curl/curl.git"
-        GIT_TAG "curl-8_4_0"
+        GIT_TAG "curl-8_9_1"
         # Set the prefix to control where it's installed
         PREFIX "${CMAKE_BINARY_DIR}/vendor/curl"
         )
@@ -52,7 +58,7 @@ if (LIBCZI_BUILD_CURL_BASED_STREAM)
     set(BUILD_CURL_EXE OFF CACHE BOOL "" FORCE)
     set(CMAKE_POSITION_INDEPENDENT_CODE ON CACHE BOOL "" FORCE)
     set(ENABLE_UNICODE ON CACHE BOOL "" FORCE)
-
+   
     FetchContent_MakeAvailable(libcurl)
   endif(LIBCZI_BUILD_PREFER_EXTERNALPACKAGE_LIBCURL)
 endif(LIBCZI_BUILD_CURL_BASED_STREAM)

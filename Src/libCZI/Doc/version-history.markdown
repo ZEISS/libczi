@@ -25,3 +25,4 @@ version history                 {#version_history}
  0.60.0             | [106](https://github.com/ZEISS/libczi/pull/106)      | with metadata-builder, by default copy the attributes "Id" and "Name" from the channel-node; allow to control the behavior fine-grained
  0.61.0             | [109](https://github.com/ZEISS/libczi/pull/109)      | fix behaviour of `IXmlNodeRead::GetChildNodeReadonly` (for non-existing nodes), new method `ICziWriter::GetStatistics` added
  0.61.1             | [110](https://github.com/ZEISS/libczi/pull/110)      | some code cleanup
+ 0.61.2             | [111](https://github.com/ZEISS/libczi/pull/111)      | update libcurl to 8.9.1 (for build with `LIBCZI_BUILD_PREFER_EXTERNALPACKAGE_LIBCURL=OFF`), enable SChannel (on Windows) by default
