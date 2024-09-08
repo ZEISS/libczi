@@ -57,44 +57,52 @@ AzureBlobInputStream::AzureBlobInputStream(const std::string& url, const std::ma
 
     auto blobClient = containerClient.GetBlockBlobClient(blob_name);
 
-    try
-    {
-        std::cout << "*#******************************" << std::endl;
+    this->blockBlobClient_ = std::make_unique<Azure::Storage::Blobs::BlockBlobClient>(blobClient);
 
-        // Define the range you want to download (for example, bytes 0 to 99)
-        Azure::Storage::Blobs::DownloadBlobToOptions options;
-        options.Range = Azure::Core::Http::HttpRange{ 0,100 };
+    //try
+    //{
+    //    std::cout << "*#******************************" << std::endl;
 
-        // Prepare a buffer to hold the downloaded data
-        std::vector<uint8_t> buffer(100);
-        buffer.resize(100);
+    //    // Define the range you want to download (for example, bytes 0 to 99)
+    //    Azure::Storage::Blobs::DownloadBlobToOptions options;
+    //    options.Range = Azure::Core::Http::HttpRange{ 0,100 };
 
-        // Download the specified range into the buffer
-        auto downloadResponse = blobClient.DownloadTo(buffer.data(), buffer.size(), options);
+    //    // Prepare a buffer to hold the downloaded data
+    //    std::vector<uint8_t> buffer(100);
+    //    buffer.resize(100);
 
-        std::cout << "DONE" << std::endl;
+    //    // Download the specified range into the buffer
+    //    auto downloadResponse = blobClient.DownloadTo(buffer.data(), buffer.size(), options);
 
-        // Output the downloaded range content
-        std::cout << "Downloaded range (0-99): ";
-        for (auto byte : buffer) {
-            std::cout << static_cast<char>(byte);  // Assuming the blob content is text or convertible to char
-        }
-        std::cout << std::endl;
-    }
-    catch (const Azure::Core::RequestFailedException& e) {
-        // Handle any errors that occur during the download
-        std::cerr << "Failed to download range: " << e.Message << std::endl;
-    }
-    catch (const std::exception& e) {
-        // Handle any errors that occur during the download
-        std::cerr << "exception caught: " << e.what()<< std::endl;
-    }
+    //    std::cout << "DONE" << std::endl;
+
+    //    // Output the downloaded range content
+    //    std::cout << "Downloaded range (0-99): ";
+    //    for (auto byte : buffer) {
+    //        std::cout << static_cast<char>(byte);  // Assuming the blob content is text or convertible to char
+    //    }
+    //    std::cout << std::endl;
+    //}
+    //catch (const Azure::Core::RequestFailedException& e) {
+    //    // Handle any errors that occur during the download
+    //    std::cerr << "Failed to download range: " << e.Message << std::endl;
+    //}
+    //catch (const std::exception& e) {
+    //    // Handle any errors that occur during the download
+    //    std::cerr << "exception caught: " << e.what()<< std::endl;
+    //}
     
 }
 
 void AzureBlobInputStream::Read(std::uint64_t offset, void* pv, std::uint64_t size, std::uint64_t* ptrBytesRead)
 {
-
+    Azure::Storage::Blobs::DownloadBlobToOptions options;
+    options.Range = Azure::Core::Http::HttpRange{(int64_t)offset, (int64_t)size };
+    auto downloadResponse = this->blockBlobClient_->DownloadTo((uint8_t*)pv, (size_t)size, options);
+    if (ptrBytesRead != nullptr)
+    {
+        *ptrBytesRead = size;
+    }
 }
 
 AzureBlobInputStream::~AzureBlobInputStream()
