@@ -22,22 +22,22 @@ AzureBlobInputStream::AzureBlobInputStream(const std::string& url, const std::ma
     }*/
 
 
-    
+
     // Initialize an instance of DefaultAzureCredential
     auto defaultAzureCredential = std::make_shared<Azure::Identity::DefaultAzureCredential>();
-    cout << "DefaultAzureCredential"<<defaultAzureCredential->GetCredentialName() << endl;
+    cout << "DefaultAzureCredential" << defaultAzureCredential->GetCredentialName() << endl;
 
     //auto accountURL = "https://<storage-account-name>.blob.core.windows.net";
     auto accountURL = "https://libczirwtestdata.blob.core.windows.net/";
     Azure::Storage::Blobs::BlobServiceClient blobServiceClient(accountURL, defaultAzureCredential);
 
-    cout << "URL:" << blobServiceClient.GetUrl()<< endl;
+    cout << "URL:" << blobServiceClient.GetUrl() << endl;
 
 
-   // auto x = blobServiceClient.ListBlobContainers();
-    //cout << "List of blob containers in the account:" << x.Prefix << endl;
+    // auto x = blobServiceClient.ListBlobContainers();
+     //cout << "List of blob containers in the account:" << x.Prefix << endl;
 
-    // Specify the container and blob you want to access
+     // Specify the container and blob you want to access
     std::string container_name = "$web";
     std::string blob_name = "libczi/DCV_30MB.czi";
 
@@ -91,18 +91,23 @@ AzureBlobInputStream::AzureBlobInputStream(const std::string& url, const std::ma
     //    // Handle any errors that occur during the download
     //    std::cerr << "exception caught: " << e.what()<< std::endl;
     //}
-    
+
 }
 
 void AzureBlobInputStream::Read(std::uint64_t offset, void* pv, std::uint64_t size, std::uint64_t* ptrBytesRead)
 {
     Azure::Storage::Blobs::DownloadBlobToOptions options;
-    options.Range = Azure::Core::Http::HttpRange{(int64_t)offset, (int64_t)size };
+    options.Range = Azure::Core::Http::HttpRange{ (int64_t)offset, (int64_t)size };
     auto downloadResponse = this->blockBlobClient_->DownloadTo((uint8_t*)pv, (size_t)size, options);
-    if (ptrBytesRead != nullptr)
+    Azure::Core::Http::HttpStatusCode code = downloadResponse.RawResponse->GetStatusCode();
+    if (code == Azure::Core::Http::HttpStatusCode::Ok || code == Azure::Core::Http::HttpStatusCode::PartialContent)
     {
-        *ptrBytesRead = size;
+        *ptrBytesRead = downloadResponse.Value.ContentRange.Length.ValueOr(0);
     }
+    //if (ptrBytesRead != nullptr)
+    //{
+    //    *ptrBytesRead = size;
+    //}
 }
 
 AzureBlobInputStream::~AzureBlobInputStream()
