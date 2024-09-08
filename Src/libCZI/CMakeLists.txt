@@ -230,8 +230,10 @@ endif()
 
 if (LIBCZI_BUILD_AZURESDK_BASED_STREAM)
   set(libCZI_AzureStorage_available 1)
+  set(libCZI_AzureStorage_SDK_Version_Info "${LIBCZI_AZURESDK_VERSION_STRING}")
 else()
   set(libCZI_AzureStorage_available 0)
+  set(libCZI_AzureStorage_SDK_Version_Info "not available")
 endif()
 
 

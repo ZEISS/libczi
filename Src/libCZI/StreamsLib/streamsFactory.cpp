@@ -11,6 +11,7 @@
 #include "windowsfileinputstream.h"
 #include "simplefileinputstream.h"
 #include "preadfileinputstream.h"
+#include "azureblobinputstream.h"
 #include "../utilities.h"
 
 using namespace libCZI;
@@ -43,6 +44,16 @@ static const struct
             nullptr
         },
 #endif  // LIBCZI_CURL_BASED_STREAM_AVAILABLE
+#if LIBCZI_AZURESDK_BASED_STREAM_AVAILABLE
+        {
+            { "azure_blob_inputstream", "Azure-SDK-based stream", AzureBlobInputStream::GetBuildInformation, AzureBlobInputStream::GetClassProperty },
+            [](const StreamsFactory::CreateStreamInfo& stream_info, const std::string& file_name) -> std::shared_ptr<libCZI::IStream>
+            {
+                return std::make_shared<AzureBlobInputStream>(file_name, stream_info.property_bag);
+            },
+            nullptr
+        },
+#endif  // LIBCZI_AZURESDK_BASED_STREAM_AVAILABLE
 #if _WIN32
         {
             { "windows_file_inputstream", "stream implementation based on Windows-API", nullptr, nullptr },
