@@ -121,6 +121,10 @@ void libCZI::StreamsFactory::Initialize()
         {"CurlHttp_MaxRedirs", StreamsFactory::StreamProperties::kCurlHttp_MaxRedirs, StreamsFactory::Property::Type::Int32},
         {"CurlHttp_CaInfo", StreamsFactory::StreamProperties::kCurlHttp_CaInfo, StreamsFactory::Property::Type::String},
         {"CurlHttp_CaInfoBlob", StreamsFactory::StreamProperties::kCurlHttp_CaInfoBlob, StreamsFactory::Property::Type::String},
+        {"AzureBlob_AuthenticationMode", StreamsFactory::StreamProperties::kCurlHttp_CaInfoBlob, StreamsFactory::Property::Type::String},
+#endif
+#if LIBCZI_AZURESDK_BASED_STREAM_AVAILABLE
+        {"AzureBlob_AuthenticationMode", StreamsFactory::StreamProperties::kAzureBlob_AuthenticationMode, StreamsFactory::Property::Type::String},
 #endif
         {nullptr, 0, StreamsFactory::Property::Type::Invalid},
     };

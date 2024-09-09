@@ -6,6 +6,12 @@
 
 using namespace std;
 
+/*static*/const wchar_t* AzureBlobInputStream::kUriKey_ContainerName = L"containername";
+/*static*/const wchar_t* AzureBlobInputStream::kUriKey_BlobName = L"blobname";
+/*static*/const wchar_t* AzureBlobInputStream::kUriKey_Account = L"account";
+/*static*/const wchar_t* AzureBlobInputStream::kUriKey_AccountUrl = L"accounturl";
+/*static*/const wchar_t* AzureBlobInputStream::kUriKey_ConnectionString = L"connectionstring";
+
 AzureBlobInputStream::AzureBlobInputStream(const std::string& url, const std::map<int, libCZI::StreamsFactory::Property>& property_bag)
     : AzureBlobInputStream(Utilities::convertUtf8ToWchar_t(url.c_str()), property_bag)
 {
@@ -15,100 +21,19 @@ AzureBlobInputStream::AzureBlobInputStream(const std::wstring& url, const std::m
 {
     const auto key_value_uri = Utilities::TokenizeAzureUriString(url);
 
-    const auto authentication_mode = DetermineAuthenticationMode(property_bag);
+    const auto authentication_mode = AzureBlobInputStream::DetermineAuthenticationMode(property_bag);
 
     switch (authentication_mode)
     {
     case AuthenticationMode::DefaultAzureCredential:
         this->CreateWithDefaultAzureCredential(key_value_uri, property_bag);
         break;
+    case AuthenticationMode::ConnectionString:
+        this->CreateWithConnectionString(key_value_uri, property_bag);
+        break;
     default:
         throw std::runtime_error("Unsupported authentication mode");
     }
-    /*const std::string connectionString = "XXX";
-    const std::string containerName = "$web";
-    const std::string blobName = "libczi/DCV_30MB.czi";
-
-    auto containerClient = Azure::Storage::Blobs::BlobContainerClient::CreateFromConnectionString(connectionString, containerName);
-
-    for (auto blobPage = containerClient.ListBlobs(); blobPage.HasPage(); blobPage.MoveToNextPage()) {
-        for (auto& blob : blobPage.Blobs) {
-            // Below is what you want to do with each blob
-            std::cout << "blob: " << blob.Name << std::endl;
-        }
-    }*/
-
-
-#if 0
-    // Initialize an instance of DefaultAzureCredential
-    auto defaultAzureCredential = std::make_shared<Azure::Identity::DefaultAzureCredential>();
-    cout << "DefaultAzureCredential" << defaultAzureCredential->GetCredentialName() << endl;
-
-    //auto accountURL = "https://<storage-account-name>.blob.core.windows.net";
-    auto accountURL = "https://libczirwtestdata.blob.core.windows.net/";
-    Azure::Storage::Blobs::BlobServiceClient blobServiceClient(accountURL, defaultAzureCredential);
-
-    cout << "URL:" << blobServiceClient.GetUrl() << endl;
-
-
-    // auto x = blobServiceClient.ListBlobContainers();
-     //cout << "List of blob containers in the account:" << x.Prefix << endl;
-
-     // Specify the container and blob you want to access
-    std::string container_name = "$web";
-    std::string blob_name = "libczi/DCV_30MB.czi";
-
-    // Get a reference to the container and blob
-    auto containerClient = blobServiceClient.GetBlobContainerClient(container_name);
-
-    /*
-    auto list = containerClient.ListBlobs();
-    // Loop through the blobs and print information
-    for (const auto& blobItem : list.Blobs) {
-        std::cout << "Blob Name: " << blobItem.Name << std::endl;
-        std::cout << "Blob Size: " << blobItem.BlobSize << " bytes" << std::endl;
-
-
-        std::cout << "---------------------" << std::endl;
-    }*/
-
-    auto blobClient = containerClient.GetBlockBlobClient(blob_name);
-
-    this->blockBlobClient_ = std::make_unique<Azure::Storage::Blobs::BlockBlobClient>(blobClient);
-
-    //try
-    //{
-    //    std::cout << "*#******************************" << std::endl;
-
-    //    // Define the range you want to download (for example, bytes 0 to 99)
-    //    Azure::Storage::Blobs::DownloadBlobToOptions options;
-    //    options.Range = Azure::Core::Http::HttpRange{ 0,100 };
-
-    //    // Prepare a buffer to hold the downloaded data
-    //    std::vector<uint8_t> buffer(100);
-    //    buffer.resize(100);
-
-    //    // Download the specified range into the buffer
-    //    auto downloadResponse = blobClient.DownloadTo(buffer.data(), buffer.size(), options);
-
-    //    std::cout << "DONE" << std::endl;
-
-    //    // Output the downloaded range content
-    //    std::cout << "Downloaded range (0-99): ";
-    //    for (auto byte : buffer) {
-    //        std::cout << static_cast<char>(byte);  // Assuming the blob content is text or convertible to char
-    //    }
-    //    std::cout << std::endl;
-    //}
-    //catch (const Azure::Core::RequestFailedException& e) {
-    //    // Handle any errors that occur during the download
-    //    std::cerr << "Failed to download range: " << e.Message << std::endl;
-    //}
-    //catch (const std::exception& e) {
-    //    // Handle any errors that occur during the download
-    //    std::cerr << "exception caught: " << e.what()<< std::endl;
-    //}
-#endif
 }
 
 void AzureBlobInputStream::CreateWithDefaultAzureCredential(const std::map<std::wstring, std::wstring>& tokenized_file_name, const std::map<int, libCZI::StreamsFactory::Property>& property_bag)
@@ -119,18 +44,22 @@ void AzureBlobInputStream::CreateWithDefaultAzureCredential(const std::map<std::
     // 2. then, either account or accounturl must be present. If accounturl and account are present, account is ignored.
     //
     // Test-URI: account=libczirwtestdata;containername=$web;blobname=libczi/DCV_30MB.czi
-    auto iterator = tokenized_file_name.find(L"containername");
+    auto iterator = tokenized_file_name.find(AzureBlobInputStream::kUriKey_ContainerName);
     if (iterator == tokenized_file_name.end())
     {
-        throw std::runtime_error("The specified uri-string must specify a value for 'containername'.");
+        ostringstream string_stream;
+        string_stream << "The specified uri-string must specify a value for '" << Utilities::convertWchar_tToUtf8(AzureBlobInputStream::kUriKey_ContainerName) << "'.";
+        throw std::runtime_error(string_stream.str());
     }
 
     const string container_name = Utilities::convertWchar_tToUtf8(iterator->second.c_str());
 
-    iterator = tokenized_file_name.find(L"blobname");
+    iterator = tokenized_file_name.find(AzureBlobInputStream::kUriKey_BlobName);
     if (iterator == tokenized_file_name.end())
     {
-        throw std::runtime_error("The specified uri-string must specify a value for 'blobname'.");
+        ostringstream string_stream;
+        string_stream << "The specified uri-string must specify a value for '" << Utilities::convertWchar_tToUtf8(AzureBlobInputStream::kUriKey_BlobName) << "'.";
+        throw std::runtime_error(string_stream.str());
     }
 
     const string blob_name = Utilities::convertWchar_tToUtf8(iterator->second.c_str());
@@ -147,7 +76,49 @@ void AzureBlobInputStream::CreateWithDefaultAzureCredential(const std::map<std::
     auto blobClient = blob_container_client.GetBlockBlobClient(blob_name);
 
     // note: make_unique is not available in C++11
-    this->blockBlobClient_ = unique_ptr<Azure::Storage::Blobs::BlockBlobClient>(new Azure::Storage::Blobs::BlockBlobClient(blobClient));
+    this->block_blob_client_ = unique_ptr<Azure::Storage::Blobs::BlockBlobClient>(new Azure::Storage::Blobs::BlockBlobClient(blobClient));
+}
+
+void AzureBlobInputStream::CreateWithConnectionString(const std::map<std::wstring, std::wstring>& tokenized_file_name, const std::map<int, libCZI::StreamsFactory::Property>& property_bag)
+{
+    auto iterator = tokenized_file_name.find(AzureBlobInputStream::kUriKey_ConnectionString);
+    if (iterator == tokenized_file_name.end())
+    {
+        ostringstream string_stream;
+        string_stream << "The specified uri-string must specify a value for '" << Utilities::convertWchar_tToUtf8(AzureBlobInputStream::kUriKey_ConnectionString) << "'.";
+        throw std::runtime_error(string_stream.str());
+    }
+
+    const string connection_string = Utilities::convertWchar_tToUtf8(iterator->second.c_str());
+
+    iterator = tokenized_file_name.find(AzureBlobInputStream::kUriKey_ContainerName);
+    if (iterator == tokenized_file_name.end())
+    {
+        ostringstream string_stream;
+        string_stream << "The specified uri-string must specify a value for '" << Utilities::convertWchar_tToUtf8(AzureBlobInputStream::kUriKey_ContainerName) << "'.";
+        throw std::runtime_error(string_stream.str());
+    }
+
+    const string container_name = Utilities::convertWchar_tToUtf8(iterator->second.c_str());
+
+    iterator = tokenized_file_name.find(AzureBlobInputStream::kUriKey_BlobName);
+    if (iterator == tokenized_file_name.end())
+    {
+        ostringstream string_stream;
+        string_stream << "The specified uri-string must specify a value for '" << Utilities::convertWchar_tToUtf8(AzureBlobInputStream::kUriKey_BlobName) << "'.";
+        throw std::runtime_error(string_stream.str());
+    }
+
+    const string blob_name = Utilities::convertWchar_tToUtf8(iterator->second.c_str());
+
+    const auto blob_service_client = Azure::Storage::Blobs::BlobServiceClient::CreateFromConnectionString(connection_string);
+
+    // Get a reference to the container and blob
+    const auto blob_container_client = blob_service_client.GetBlobContainerClient(container_name);
+    auto blobClient = blob_container_client.GetBlockBlobClient(blob_name);
+
+    // note: make_unique is not available in C++11
+    this->block_blob_client_ = unique_ptr<Azure::Storage::Blobs::BlockBlobClient>(new Azure::Storage::Blobs::BlockBlobClient(blobClient));
 }
 
 void AzureBlobInputStream::Read(std::uint64_t offset, void* pv, std::uint64_t size, std::uint64_t* ptrBytesRead)
@@ -166,7 +137,7 @@ void AzureBlobInputStream::Read(std::uint64_t offset, void* pv, std::uint64_t si
 
     Azure::Storage::Blobs::DownloadBlobToOptions options;
     options.Range = Azure::Core::Http::HttpRange{ static_cast<int64_t>(offset), static_cast<int64_t>(size) };
-    auto download_response = this->blockBlobClient_->DownloadTo(static_cast<uint8_t*>(pv), static_cast<size_t>(size), options);
+    auto download_response = this->block_blob_client_->DownloadTo(static_cast<uint8_t*>(pv), static_cast<size_t>(size), options);
     const Azure::Core::Http::HttpStatusCode code = download_response.RawResponse->GetStatusCode();
     if (code == Azure::Core::Http::HttpStatusCode::Ok || code == Azure::Core::Http::HttpStatusCode::PartialContent)
     {
@@ -211,22 +182,43 @@ AzureBlobInputStream::~AzureBlobInputStream()
 
 /*static*/AzureBlobInputStream::AuthenticationMode AzureBlobInputStream::DetermineAuthenticationMode(const std::map<int, libCZI::StreamsFactory::Property>& property_bag)
 {
+    const auto iterator = property_bag.find(libCZI::StreamsFactory::StreamProperties::kAzureBlob_AuthenticationMode);
+    if (iterator != property_bag.end())
+    {
+        const auto& value = iterator->second.GetAsStringOrThrow();
+        if (value == "DefaultAzureCredential")
+        {
+            return AuthenticationMode::DefaultAzureCredential;
+        }
+
+        if (value == "ConnectionString")
+        {
+            return AuthenticationMode::ConnectionString;
+        }
+
+        throw std::runtime_error("Unsupported authentication mode");
+    }
+
     return AuthenticationMode::DefaultAzureCredential;
 }
 
 /*static*/std::string AzureBlobInputStream::DetermineServiceUrl(const std::map<std::wstring, std::wstring>& tokenized_file_name)
 {
-    if (tokenized_file_name.find(L"accounturl") != tokenized_file_name.end())
+    auto iterator = tokenized_file_name.find(AzureBlobInputStream::kUriKey_AccountUrl);
+    if (iterator != tokenized_file_name.end())
     {
-        return Utilities::convertWchar_tToUtf8(tokenized_file_name.at(L"accounturl").c_str());
+        return Utilities::convertWchar_tToUtf8(iterator->second.c_str());
     }
 
-    if (tokenized_file_name.find(L"account") != tokenized_file_name.end())
+    iterator = tokenized_file_name.find(AzureBlobInputStream::kUriKey_Account);
+    if (iterator != tokenized_file_name.end())
     {
         ostringstream account_url;
-        account_url << "https://" << Utilities::convertWchar_tToUtf8(tokenized_file_name.at(L"account").c_str()) << ".blob.core.windows.net";
+        account_url << "https://" << Utilities::convertWchar_tToUtf8(iterator->second.c_str()) << ".blob.core.windows.net";
         return account_url.str();
     }
 
-    throw std::runtime_error("The specified uri-string must specify a value for 'account' or 'accounturl'.");
+    ostringstream string_stream;
+    string_stream << "The specified uri-string must specify a value for '" << Utilities::convertWchar_tToUtf8(AzureBlobInputStream::kUriKey_Account) << "' or '" << Utilities::convertWchar_tToUtf8(AzureBlobInputStream::kUriKey_AccountUrl) << "'.";
+    throw std::runtime_error(string_stream.str());
 }

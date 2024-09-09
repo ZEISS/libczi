@@ -16,8 +16,13 @@
 class AzureBlobInputStream : public libCZI::IStream
 {
 private:
-    //std::unique_ptr<Azure::Storage::Blobs::BlobServiceClient> serviceClient_;
-    std::unique_ptr<Azure::Storage::Blobs::BlockBlobClient> blockBlobClient_;
+    static const wchar_t* kUriKey_ContainerName;
+    static const wchar_t* kUriKey_BlobName;
+    static const wchar_t* kUriKey_Account;
+    static const wchar_t* kUriKey_AccountUrl;
+    static const wchar_t* kUriKey_ConnectionString;
+
+    std::unique_ptr<Azure::Storage::Blobs::BlockBlobClient> block_blob_client_;
 
     enum class AuthenticationMode
     {
@@ -32,14 +37,13 @@ public:
 
     ~AzureBlobInputStream() override;
 
-
     static std::string GetBuildInformation();
     static libCZI::StreamsFactory::Property GetClassProperty(const char* property_name);
-
 private:
     static AuthenticationMode DetermineAuthenticationMode(const std::map<int, libCZI::StreamsFactory::Property>& property_bag);
     static std::string DetermineServiceUrl(const std::map<std::wstring, std::wstring>& tokenized_file_name);
     void CreateWithDefaultAzureCredential(const std::map<std::wstring, std::wstring>& tokenized_file_name, const std::map<int, libCZI::StreamsFactory::Property>& property_bag);
+    void CreateWithConnectionString(const std::map<std::wstring, std::wstring>& tokenized_file_name, const std::map<int, libCZI::StreamsFactory::Property>& property_bag);
     // https ://learn.microsoft.com/en-us/azure/storage/blobs/quickstart-blobs-c-plus-plus?tabs=managed-identity%2Croles-azure-portal#authenticate-to-azure-and-authorize-access-to-blob-data
 };
 
