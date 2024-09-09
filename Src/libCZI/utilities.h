@@ -9,6 +9,7 @@
 #include <cwctype>
 #include <functional>
 #include <vector>
+#include <map>
 #include "libCZI_Pixels.h"
 #include "libCZI_Utilities.h"
 
@@ -144,6 +145,8 @@ public:
 
     static bool TryGetRgb8ColorFromString(const std::wstring& strXml, libCZI::Rgb8Color& color);
     static std::string Rgb8ColorToString(const libCZI::Rgb8Color& color);
+
+    static std::map<std::wstring, std::wstring> TokenizeAzureUriString(const std::wstring& input);
 };
 
 class LoHiBytePackUnpack

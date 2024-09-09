@@ -794,21 +794,21 @@ using namespace libCZI;
     return (c == 'Y') ? true : false;
 }
 
-/*static*/void CCZIParse::ThrowNotEnoughDataRead(std::uint64_t offset, std::uint64_t bytesRequested, std::uint64_t bytesActuallyRead)
+[[noreturn]] /*static*/void CCZIParse::ThrowNotEnoughDataRead(std::uint64_t offset, std::uint64_t bytesRequested, std::uint64_t bytesActuallyRead)
 {
     stringstream ss;
     ss << "Not enough data read at offset " << offset << " -> requested: " << bytesRequested << " bytes, actually got " << bytesActuallyRead << " bytes.";
     throw LibCZICZIParseException(ss.str().c_str(), LibCZICZIParseException::ErrorCode::NotEnoughData);
 }
 
-/*static*/void CCZIParse::ThrowIllegalData(std::uint64_t offset, const char* sz)
+[[noreturn]] /*static*/void CCZIParse::ThrowIllegalData(std::uint64_t offset, const char* sz)
 {
     stringstream ss;
     ss << "Illegal data detected at offset " << offset << " -> " << sz;
     throw LibCZICZIParseException(ss.str().c_str(), LibCZICZIParseException::ErrorCode::CorruptedData);
 }
 
-/*static*/void CCZIParse::ThrowIllegalData(const char* sz)
+[[noreturn]] /*static*/void CCZIParse::ThrowIllegalData(const char* sz)
 {
     stringstream ss;
     ss << "Illegal data detected -> " << sz;

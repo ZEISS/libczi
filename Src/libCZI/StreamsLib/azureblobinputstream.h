@@ -20,6 +20,7 @@ private:
     std::unique_ptr<Azure::Storage::Blobs::BlockBlobClient> blockBlobClient_; 
 public:
     AzureBlobInputStream(const std::string& url, const std::map<int, libCZI::StreamsFactory::Property>& property_bag);
+    AzureBlobInputStream(const std::wstring& url, const std::map<int, libCZI::StreamsFactory::Property>& property_bag);
 
     void Read(std::uint64_t offset, void* pv, std::uint64_t size, std::uint64_t* ptrBytesRead) override;
 

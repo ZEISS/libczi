@@ -210,9 +210,9 @@ private:
     static bool IsYDimension(const char* ptr, size_t size);
     static char ToUpperCase(char c);
 
-    static void ThrowNotEnoughDataRead(std::uint64_t offset, std::uint64_t bytesRequested, std::uint64_t bytesActuallyRead);
-    static void ThrowIllegalData(std::uint64_t offset, const char* sz);
-    static void ThrowIllegalData(const char* sz);
+    [[noreturn]] static void ThrowNotEnoughDataRead(std::uint64_t offset, std::uint64_t bytesRequested, std::uint64_t bytesActuallyRead);
+    [[noreturn]] static void ThrowIllegalData(std::uint64_t offset, const char* sz);
+    [[noreturn]] static void ThrowIllegalData(const char* sz);
 
     static bool CheckAttachmentSchemaType(const char* p, size_t cnt);
 };

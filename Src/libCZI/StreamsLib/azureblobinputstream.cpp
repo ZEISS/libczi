@@ -3,11 +3,18 @@
 #include <azure/storage/blobs.hpp>
 #include <azure/identity/default_azure_credential.hpp>
 #include <iostream>
+#include "../utilities.h"
 
 using namespace std;
 
-AzureBlobInputStream::AzureBlobInputStream(const std::string& url, const std::map<int, libCZI::StreamsFactory::Property>& property_bag)
+AzureBlobInputStream::AzureBlobInputStream(const std::string& filename, const std::map<int, libCZI::StreamsFactory::Property>& property_bag)
+    : AzureBlobInputStream(Utilities::convertUtf8ToWchar_t(filename.c_str()), property_bag)
 {
+}
+
+AzureBlobInputStream::AzureBlobInputStream(const std::wstring& url, const std::map<int, libCZI::StreamsFactory::Property>& property_bag)
+{
+    const auto key_value_uri = Utilities::TokenizeAzureUriString(url);
     /*const std::string connectionString = "XXX";
     const std::string containerName = "$web";
     const std::string blobName = "libczi/DCV_30MB.czi";

@@ -323,6 +323,97 @@ tString trimImpl(const tString& str, const tString& whitespace)
 #endif
 }
 
+/*static*/std::map<std::wstring, std::wstring> Utilities::TokenizeAzureUriString(const std::wstring& input)
+{
+    std::map<std::wstring, std::wstring> tokens;  // Map to store key-value pairs
+    std::wstring key, value;                      // Temporary storage for current key and value
+    bool inValue = false;                         // Flag to track if we are processing the value part
+    bool foundEquals = false;                     // Track if we've encountered an '=' for a valid key-value pair
+
+    for (size_t i = 0; i < input.length(); ++i) {
+        wchar_t c = input[i];
+
+        // Handle escape sequences for semicolons (\;) and equals signs (\=)
+        if (c == L'\\' && i + 1 < input.length()) {
+            wchar_t next = input[i + 1];
+            if (next == L';') {
+                // Escaped semicolon (\;)
+                if (inValue) {
+                    value += L';';
+                }
+                else {
+                    key += L';';
+                }
+                ++i;  // Skip the semicolon after the backslash
+            }
+            else if (next == L'=') {
+                // Escaped equals sign (\=)
+                if (inValue) {
+                    value += L'=';
+                }
+                else {
+                    key += L'=';
+                }
+                ++i;  // Skip the equals sign after the backslash
+            }
+            else {
+                // If it's not an escape sequence we care about, treat the backslash literally
+                if (inValue) {
+                    value += c;  // Add the backslash to the value
+                }
+                else {
+                    key += c;    // Add the backslash to the key
+                }
+            }
+        }
+        else if (c == L'=' && !inValue) {
+            // Start processing the value part when we hit an unescaped '='
+            inValue = true;
+            foundEquals = true;
+        }
+        else if (c == L';' && inValue) {
+            // If we hit ';' while processing the value, it's the end of the current key-value pair
+            if (key.empty()) {
+                throw std::invalid_argument("Found a value without a corresponding key.");
+            }
+            tokens[key] = value;  // Store the key-value pair
+            key.clear();          // Reset key and value for the next pair
+            value.clear();
+            inValue = false;
+            foundEquals = false;
+        }
+        else {
+            // Collect characters for the key or value depending on the state
+            if (inValue) {
+                value += c;
+            }
+            else {
+                key += c;
+            }
+        }
+    }
+
+    // Handle the case where no '=' was found in the input (invalid input)
+    if (!foundEquals) {
+        throw std::invalid_argument("Input does not contain a valid key-value pair.");
+    }
+
+    // Add the last key-value pair (if any exists after the loop)
+    if (!key.empty()) {
+        if (value.empty() && inValue) {
+            throw std::invalid_argument("Found a key without a corresponding value.");
+        }
+        tokens[key] = value;
+    }
+
+    // Check if we have at least one valid key-value pair; if not, it's an error
+    if (tokens.empty()) {
+        throw std::invalid_argument("No complete key-value pair found in the input.");
+    }
+
+    return tokens;
+}
+
 //-----------------------------------------------------------------------------
 
 /*static*/void LoHiBytePackUnpack::CheckLoHiByteUnpackArgumentsAndThrow(std::uint32_t width, std::uint32_t stride, const void* source, void* dest)
