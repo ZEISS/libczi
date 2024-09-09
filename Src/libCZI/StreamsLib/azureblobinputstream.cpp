@@ -118,53 +118,37 @@ void AzureBlobInputStream::CreateWithDefaultAzureCredential(const std::map<std::
     //
     // 1. containername and blobname are required in any case
     // 2. then, either account or accounturl must be present. If accounturl and account are present, account is ignored.
-    if (tokenized_file_name.find(L"containername") == tokenized_file_name.end())
+    //
+    // Test-URI: account=libczirwtestdata;containername=$web;blobname=libczi/DCV_30MB.czi
+    auto iterator = tokenized_file_name.find(L"containername");
+    if (iterator == tokenized_file_name.end())
     {
         throw std::runtime_error("The specified uri-string must specify a value for 'containername'.");
     }
 
-    if (tokenized_file_name.find(L"blobname") == tokenized_file_name.end())
+    const string container_name = Utilities::convertWchar_tToUtf8(iterator->second.c_str());
+
+    iterator = tokenized_file_name.find(L"blobname");
+    if (iterator == tokenized_file_name.end())
     {
         throw std::runtime_error("The specified uri-string must specify a value for 'blobname'.");
     }
 
-    string service_url = DetermineServiceUrl(tokenized_file_name);
+    const string blob_name = Utilities::convertWchar_tToUtf8(iterator->second.c_str());
+
+    string service_url = AzureBlobInputStream::DetermineServiceUrl(tokenized_file_name);
 
     // Initialize an instance of DefaultAzureCredential
     auto defaultAzureCredential = std::make_shared<Azure::Identity::DefaultAzureCredential>();
-    cout << "DefaultAzureCredential" << defaultAzureCredential->GetCredentialName() << endl;
-
-    /*ostringstream account_url;
-    account_url << "https://" << Utilities::convertWchar_tToUtf8(tokenized_file_name.at(L"account").c_str()) << ".blob.core.windows.net";*/
-
-    //auto accountURL = "https://<storage-account-name>.blob.core.windows.net";
-    //auto accountURL = "https://libczirwtestdata.blob.core.windows.net/";
-    //Azure::Storage::Blobs::BlobServiceClient blobServiceClient(accountURL, defaultAzureCredential);
+    //cout << "DefaultAzureCredential" << defaultAzureCredential->GetCredentialName() << endl;
 
     // note: make_unique is not available in C++11
-    this->serviceClient_ = unique_ptr<Azure::Storage::Blobs::BlobServiceClient>(new Azure::Storage::Blobs::BlobServiceClient(service_url/*account_url.str()*/, defaultAzureCredential));
-    cout << "URL:" << this->serviceClient_->GetUrl() << endl;
-
-    // Specify the container and blob you want to access
-    std::string container_name = Utilities::convertWchar_tToUtf8(tokenized_file_name.at(L"containername").c_str());// "$web";
-    std::string blob_name = Utilities::convertWchar_tToUtf8(tokenized_file_name.at(L"blobname").c_str());// "libczi/DCV_30MB.czi";
+    this->serviceClient_ = unique_ptr<Azure::Storage::Blobs::BlobServiceClient>(new Azure::Storage::Blobs::BlobServiceClient(service_url, defaultAzureCredential));
+    //cout << "URL:" << this->serviceClient_->GetUrl() << endl;
 
     // Get a reference to the container and blob
     auto containerClient = this->serviceClient_->GetBlobContainerClient(container_name);
-
-    /*
-    auto list = containerClient.ListBlobs();
-    // Loop through the blobs and print information
-    for (const auto& blobItem : list.Blobs) {
-        std::cout << "Blob Name: " << blobItem.Name << std::endl;
-        std::cout << "Blob Size: " << blobItem.BlobSize << " bytes" << std::endl;
-
-
-        std::cout << "---------------------" << std::endl;
-    }*/
-
     auto blobClient = containerClient.GetBlockBlobClient(blob_name);
-
     this->blockBlobClient_ = unique_ptr<Azure::Storage::Blobs::BlockBlobClient>(new Azure::Storage::Blobs::BlockBlobClient(blobClient));
 }
 
