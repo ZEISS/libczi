@@ -16,7 +16,7 @@
 class AzureBlobInputStream : public libCZI::IStream
 {
 private:
-    std::unique_ptr<Azure::Storage::Blobs::BlobServiceClient> serviceClient_;
+    //std::unique_ptr<Azure::Storage::Blobs::BlobServiceClient> serviceClient_;
     std::unique_ptr<Azure::Storage::Blobs::BlockBlobClient> blockBlobClient_;
 
     enum class AuthenticationMode

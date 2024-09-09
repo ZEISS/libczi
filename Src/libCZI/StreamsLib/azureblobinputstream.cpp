@@ -2,7 +2,6 @@
 
 #include <azure/storage/blobs.hpp>
 #include <azure/identity/default_azure_credential.hpp>
-#include <iostream>
 #include "../utilities.h"
 
 using namespace std;
@@ -139,16 +138,15 @@ void AzureBlobInputStream::CreateWithDefaultAzureCredential(const std::map<std::
     string service_url = AzureBlobInputStream::DetermineServiceUrl(tokenized_file_name);
 
     // Initialize an instance of DefaultAzureCredential
-    auto defaultAzureCredential = std::make_shared<Azure::Identity::DefaultAzureCredential>();
-    //cout << "DefaultAzureCredential" << defaultAzureCredential->GetCredentialName() << endl;
+    auto defaultAzureCredential = make_shared<Azure::Identity::DefaultAzureCredential>();
 
-    // note: make_unique is not available in C++11
-    this->serviceClient_ = unique_ptr<Azure::Storage::Blobs::BlobServiceClient>(new Azure::Storage::Blobs::BlobServiceClient(service_url, defaultAzureCredential));
-    //cout << "URL:" << this->serviceClient_->GetUrl() << endl;
+    Azure::Storage::Blobs::BlobServiceClient blob_service_client(service_url, defaultAzureCredential);
 
     // Get a reference to the container and blob
-    auto containerClient = this->serviceClient_->GetBlobContainerClient(container_name);
-    auto blobClient = containerClient.GetBlockBlobClient(blob_name);
+    const auto blob_container_client = blob_service_client.GetBlobContainerClient(container_name);
+    auto blobClient = blob_container_client.GetBlockBlobClient(blob_name);
+
+    // note: make_unique is not available in C++11
     this->blockBlobClient_ = unique_ptr<Azure::Storage::Blobs::BlockBlobClient>(new Azure::Storage::Blobs::BlockBlobClient(blobClient));
 }
 
@@ -165,7 +163,6 @@ void AzureBlobInputStream::Read(std::uint64_t offset, void* pv, std::uint64_t si
     {
         throw std::runtime_error("offset is too large");
     }
-
 
     Azure::Storage::Blobs::DownloadBlobToOptions options;
     options.Range = Azure::Core::Http::HttpRange{ static_cast<int64_t>(offset), static_cast<int64_t>(size) };
@@ -199,7 +196,6 @@ void AzureBlobInputStream::Read(std::uint64_t offset, void* pv, std::uint64_t si
 
 AzureBlobInputStream::~AzureBlobInputStream()
 {
-
 }
 
 /*static*/std::string AzureBlobInputStream::GetBuildInformation()
