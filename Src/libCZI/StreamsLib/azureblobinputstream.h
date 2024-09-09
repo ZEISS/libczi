@@ -17,7 +17,13 @@ class AzureBlobInputStream : public libCZI::IStream
 {
 private:
     std::unique_ptr<Azure::Storage::Blobs::BlobServiceClient> serviceClient_;
-    std::unique_ptr<Azure::Storage::Blobs::BlockBlobClient> blockBlobClient_; 
+    std::unique_ptr<Azure::Storage::Blobs::BlockBlobClient> blockBlobClient_;
+
+    enum class AuthenticationMode
+    {
+        DefaultAzureCredential,
+        ConnectionString,
+    };
 public:
     AzureBlobInputStream(const std::string& url, const std::map<int, libCZI::StreamsFactory::Property>& property_bag);
     AzureBlobInputStream(const std::wstring& url, const std::map<int, libCZI::StreamsFactory::Property>& property_bag);
@@ -31,6 +37,9 @@ public:
     static libCZI::StreamsFactory::Property GetClassProperty(const char* property_name);
 
 private:
+    static AuthenticationMode DetermineAuthenticationMode(const std::map<int, libCZI::StreamsFactory::Property>& property_bag);
+    static std::string DetermineServiceUrl(const std::map<std::wstring, std::wstring>& tokenized_file_name);
+    void CreateWithDefaultAzureCredential(const std::map<std::wstring, std::wstring>& tokenized_file_name, const std::map<int, libCZI::StreamsFactory::Property>& property_bag);
     // https ://learn.microsoft.com/en-us/azure/storage/blobs/quickstart-blobs-c-plus-plus?tabs=managed-identity%2Croles-azure-portal#authenticate-to-azure-and-authorize-access-to-blob-data
 };
 
