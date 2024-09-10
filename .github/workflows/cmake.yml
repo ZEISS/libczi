@@ -80,7 +80,7 @@ jobs:
           mkdir release
           name="CZICmd-windows-x64-$(git describe --always)"
           mkdir "release/${name}"
-          ls -R Src/CZICmd/prosRelease/
+          ls -R Src/CZICmd/Release/
           cp Src/CZICmd/Release/CZIcmd.exe "release/${name}/"
           ls -R "release/${name}"
           #cp ./build/CZICheck/THIRD_PARTY_LICENSES.txt "release/${name}/"
