@@ -72,6 +72,20 @@ jobs:
         # Use debug flag to show all exeucted tests
         run: ctest --debug -C ${{matrix.build}}
 
+      - name: Upload CZICmd as artifact (Windows)
+        working-directory: ${{github.workspace}}/build
+        if: ${{ (matrix.OS == 'windows-latest') && ( matrix.build == 'Release') }}
+        shell: bash
+        run: |
+          mkdir release
+          name="CZICmd-windows-x64-$(git describe --always)"
+          mkdir "release/${name}"
+          ls -R Src/CZICmd
+          #cp ./build/CZICheck/${{ matrix.build }}/*.exe "release/${name}/"
+          #cp ./build/CZICheck/THIRD_PARTY_LICENSES.txt "release/${name}/"
+          echo "artifactName=${name}" >> "$GITHUB_ENV"
+          echo "artifactPath=release/${name}" >> "$GITHUB_ENV"
+
       # Coverage collection based on https://about.codecov.io/blog/how-to-set-up-codecov-with-c-plus-plus-and-github-actions/
       - name: Prepare Coverage
         if: ${{ (matrix.OS == 'windows-latest') && ( matrix.build == 'Debug') }}
