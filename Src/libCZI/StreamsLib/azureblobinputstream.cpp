@@ -1,5 +1,6 @@
 #include "azureblobinputstream.h"
 
+#if LIBCZI_AZURESDK_BASED_STREAM_AVAILABLE
 #include <azure/storage/blobs.hpp>
 #include <azure/identity/default_azure_credential.hpp>
 #include "../utilities.h"
@@ -139,6 +140,9 @@ void AzureBlobInputStream::Read(std::uint64_t offset, void* pv, std::uint64_t si
     options.Range = Azure::Core::Http::HttpRange{ static_cast<int64_t>(offset), static_cast<int64_t>(size) };
     auto download_response = this->block_blob_client_->DownloadTo(static_cast<uint8_t*>(pv), static_cast<size_t>(size), options);
     const Azure::Core::Http::HttpStatusCode code = download_response.RawResponse->GetStatusCode();
+
+    // TODO(JBL): I am not sure about what we can expect here as return code. The Azure SDK documentation is not very clear about this,
+    //             at least I am not aware of an authorative text on this.
     if (code == Azure::Core::Http::HttpStatusCode::Ok || code == Azure::Core::Http::HttpStatusCode::PartialContent)
     {
         // the reported position should match the requested offset
@@ -178,7 +182,6 @@ AzureBlobInputStream::~AzureBlobInputStream()
 {
     return libCZI::StreamsFactory::Property();
 }
-
 
 /*static*/AzureBlobInputStream::AuthenticationMode AzureBlobInputStream::DetermineAuthenticationMode(const std::map<int, libCZI::StreamsFactory::Property>& property_bag)
 {
@@ -222,3 +225,4 @@ AzureBlobInputStream::~AzureBlobInputStream()
     string_stream << "The specified uri-string must specify a value for '" << Utilities::convertWchar_tToUtf8(AzureBlobInputStream::kUriKey_Account) << "' or '" << Utilities::convertWchar_tToUtf8(AzureBlobInputStream::kUriKey_AccountUrl) << "'.";
     throw std::runtime_error(string_stream.str());
 }
+#endif  
