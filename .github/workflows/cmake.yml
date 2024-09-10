@@ -80,11 +80,18 @@ jobs:
           mkdir release
           name="CZICmd-windows-x64-$(git describe --always)"
           mkdir "release/${name}"
-          ls -R Src/CZICmd
-          #cp ./build/CZICheck/${{ matrix.build }}/*.exe "release/${name}/"
+          #ls -R Src/CZICmd
+          cp Src/CZICmd/Release/CZIcmd.exe "release/${name}/"
           #cp ./build/CZICheck/THIRD_PARTY_LICENSES.txt "release/${name}/"
           echo "artifactName=${name}" >> "$GITHUB_ENV"
           echo "artifactPath=release/${name}" >> "$GITHUB_ENV"
+
+      - name: Upload artifacts
+        if: ${{ (matrix.OS == 'windows-latest') && ( matrix.build == 'Release') }}
+        uses: actions/upload-artifact@v4
+        with:
+          path: ${{ env.artifactPath }}/
+          name: ${{ env.artifactName }}
 
       # Coverage collection based on https://about.codecov.io/blog/how-to-set-up-codecov-with-c-plus-plus-and-github-actions/
       - name: Prepare Coverage
