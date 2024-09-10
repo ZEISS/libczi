@@ -80,12 +80,12 @@ jobs:
           mkdir release
           name="CZICmd-windows-x64-$(git describe --always)"
           mkdir "release/${name}"
-          ls -R Src/CZICmd/Release/
+          ls -R Src/CZICmd/prosRelease/
           cp Src/CZICmd/Release/CZIcmd.exe "release/${name}/"
           ls -R "release/${name}"
           #cp ./build/CZICheck/THIRD_PARTY_LICENSES.txt "release/${name}/"
           echo "artifactName=${name}" >> "$GITHUB_ENV"
-          echo "artifactPath=release/${name}" >> "$GITHUB_ENV"
+          echo "artifactPath=${{github.workspace}}/build/release/${name}" >> "$GITHUB_ENV"
 
       - name: Upload artifacts
         if: ${{ (matrix.OS == 'windows-latest') && ( matrix.build == 'Release') }}
