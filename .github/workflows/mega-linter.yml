@@ -5,7 +5,7 @@ name: MegaLinter
 
 on:
   push:
-    branches: ["main"]
+    branches: ["main","jbl/azure_sdk_experimental"]
   pull_request:
     branches: ["main"]
   workflow_dispatch:
