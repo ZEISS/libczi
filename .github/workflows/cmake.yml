@@ -2,7 +2,7 @@ name: CMake
 
 on:
   push:
-    branches: ["main","jbl/azure_sdk_experimental"]
+    branches: ["main", "jbl/azure_sdk_experimental"]
   pull_request:
     branches: ["main"]
   workflow_dispatch:
