@@ -3,6 +3,8 @@
 #if LIBCZI_AZURESDK_BASED_STREAM_AVAILABLE
 #include <azure/storage/blobs.hpp>
 #include <azure/identity/default_azure_credential.hpp>
+#include <azure/identity/environment_credential.hpp>
+#include <azure/identity/azure_cli_credential.hpp>    
 #include "../utilities.h"
 
 using namespace std;
@@ -29,6 +31,12 @@ AzureBlobInputStream::AzureBlobInputStream(const std::wstring& url, const std::m
     case AuthenticationMode::DefaultAzureCredential:
         this->CreateWithDefaultAzureCredential(key_value_uri, property_bag);
         break;
+    case AuthenticationMode::EnvironmentCredential:
+        this->CreateWithEnvironmentCredential(key_value_uri, property_bag);
+        break;
+    case AuthenticationMode::AzureCliCredential:
+        this->CreateWithCreateAzureCliCredential(key_value_uri, property_bag);
+        break;
     case AuthenticationMode::ConnectionString:
         this->CreateWithConnectionString(key_value_uri, property_bag);
         break;
@@ -37,7 +45,7 @@ AzureBlobInputStream::AzureBlobInputStream(const std::wstring& url, const std::m
     }
 }
 
-void AzureBlobInputStream::CreateWithDefaultAzureCredential(const std::map<std::wstring, std::wstring>& tokenized_file_name, const std::map<int, libCZI::StreamsFactory::Property>& property_bag)
+void AzureBlobInputStream::CreateWithCredential(const std::map<std::wstring, std::wstring>& tokenized_file_name, const std::map<int, libCZI::StreamsFactory::Property>& property_bag, const std::function<std::shared_ptr<Azure::Core::Credentials::TokenCredential>()>& create_credentials_functor)
 {
     // check whether the required arguments are present in the tokenized_file_name-property-bag
     //
@@ -68,7 +76,7 @@ void AzureBlobInputStream::CreateWithDefaultAzureCredential(const std::map<std::
     string service_url = AzureBlobInputStream::DetermineServiceUrl(tokenized_file_name);
 
     // Initialize an instance of DefaultAzureCredential
-    auto defaultAzureCredential = make_shared<Azure::Identity::DefaultAzureCredential>();
+    auto defaultAzureCredential = create_credentials_functor();
 
     Azure::Storage::Blobs::BlobServiceClient blob_service_client(service_url, defaultAzureCredential);
 
@@ -78,6 +86,21 @@ void AzureBlobInputStream::CreateWithDefaultAzureCredential(const std::map<std::
 
     // note: make_unique is not available in C++11
     this->block_blob_client_ = unique_ptr<Azure::Storage::Blobs::BlockBlobClient>(new Azure::Storage::Blobs::BlockBlobClient(blobClient));
+}
+
+void AzureBlobInputStream::CreateWithDefaultAzureCredential(const std::map<std::wstring, std::wstring>& tokenized_file_name, const std::map<int, libCZI::StreamsFactory::Property>& property_bag)
+{
+    this->CreateWithCredential(tokenized_file_name, property_bag, AzureBlobInputStream::CreateDefaultAzureCredential);
+}
+
+void AzureBlobInputStream::CreateWithEnvironmentCredential(const std::map<std::wstring, std::wstring>& tokenized_file_name, const std::map<int, libCZI::StreamsFactory::Property>& property_bag)
+{
+    this->CreateWithCredential(tokenized_file_name, property_bag, AzureBlobInputStream::CreateEnvironmentCredential);
+}
+
+void AzureBlobInputStream::CreateWithCreateAzureCliCredential(const std::map<std::wstring, std::wstring>& tokenized_file_name, const std::map<int, libCZI::StreamsFactory::Property>& property_bag)
+{
+    this->CreateWithCredential(tokenized_file_name, property_bag, AzureBlobInputStream::CreateAzureCliCredential);
 }
 
 void AzureBlobInputStream::CreateWithConnectionString(const std::map<std::wstring, std::wstring>& tokenized_file_name, const std::map<int, libCZI::StreamsFactory::Property>& property_bag)
@@ -188,15 +211,26 @@ AzureBlobInputStream::~AzureBlobInputStream()
     const auto iterator = property_bag.find(libCZI::StreamsFactory::StreamProperties::kAzureBlob_AuthenticationMode);
     if (iterator != property_bag.end())
     {
-        const auto& value = iterator->second.GetAsStringOrThrow();
-        if (value == "DefaultAzureCredential")
-        {
-            return AuthenticationMode::DefaultAzureCredential;
-        }
+        const string& value = iterator->second.GetAsStringOrThrow();
 
-        if (value == "ConnectionString")
+        static constexpr struct
         {
-            return AuthenticationMode::ConnectionString;
+            const char* name;
+            AuthenticationMode mode;
+        } kModeStringAndEnum[] = 
+        {
+            { "DefaultAzureCredential", AuthenticationMode::DefaultAzureCredential },
+            { "EnvironmentCredential", AuthenticationMode::EnvironmentCredential },
+            { "AzureCliCredential", AuthenticationMode::AzureCliCredential },
+            { "ConnectionString", AuthenticationMode::ConnectionString }
+        };
+
+        for (const auto& mode : kModeStringAndEnum)
+        {
+            if (value == mode.name)
+            {
+                return mode.mode;
+            }
         }
 
         throw std::runtime_error("Unsupported authentication mode");
@@ -224,5 +258,20 @@ AzureBlobInputStream::~AzureBlobInputStream()
     ostringstream string_stream;
     string_stream << "The specified uri-string must specify a value for '" << Utilities::convertWchar_tToUtf8(AzureBlobInputStream::kUriKey_Account) << "' or '" << Utilities::convertWchar_tToUtf8(AzureBlobInputStream::kUriKey_AccountUrl) << "'.";
     throw std::runtime_error(string_stream.str());
+}
+
+/*static*/std::shared_ptr<Azure::Core::Credentials::TokenCredential> AzureBlobInputStream::CreateDefaultAzureCredential()
+{
+    return make_shared<Azure::Identity::DefaultAzureCredential>();
+}
+
+/*static*/std::shared_ptr<Azure::Core::Credentials::TokenCredential> AzureBlobInputStream::CreateEnvironmentCredential()
+{
+    return make_shared<Azure::Identity::EnvironmentCredential>();
+}
+
+/*static*/std::shared_ptr<Azure::Core::Credentials::TokenCredential> AzureBlobInputStream::CreateAzureCliCredential()
+{
+    return make_shared<Azure::Identity::AzureCliCredential>();
 }
 #endif  

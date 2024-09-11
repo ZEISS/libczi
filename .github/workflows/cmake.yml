@@ -80,15 +80,12 @@ jobs:
           mkdir release
           name="CZICmd-windows-x64-$(git describe --always)"
           mkdir "release/${name}"
-          ls -R Src/CZICmd/Release/
           cp Src/CZICmd/Release/CZIcmd.exe "release/${name}/"
-          ls -R "release/${name}"
-          #cp ./build/CZICheck/THIRD_PARTY_LICENSES.txt "release/${name}/"
           echo "artifactName=${name}" >> "$GITHUB_ENV"
           echo "artifactPath=${{github.workspace}}/build/release/${name}" >> "$GITHUB_ENV"
 
       - name: Upload artifacts
-        if: ${{ (matrix.OS == 'windows-latest') && ( matrix.build == 'Release') }}
+        if: ${{ (matrix.OS == 'windows-latest') && (matrix.build == 'Release') }}
         uses: actions/upload-artifact@v4
         with:
           path: ${{ env.artifactPath }}/
@@ -96,20 +93,20 @@ jobs:
 
       # Coverage collection based on https://about.codecov.io/blog/how-to-set-up-codecov-with-c-plus-plus-and-github-actions/
       - name: Prepare Coverage
-        if: ${{ (matrix.OS == 'windows-latest') && ( matrix.build == 'Debug') }}
+        if: ${{ (matrix.OS == 'windows-latest') && (matrix.build == 'Debug') }}
         run: |
           choco install OpenCppCoverage -y --no-progress
           echo "C:\Program Files\OpenCppCoverage" >> "$env:GITHUB_PATH"
 
       - name: Get Coverage
-        if: ${{ (matrix.OS == 'windows-latest') && ( matrix.build == 'Debug') }}
+        if: ${{ (matrix.OS == 'windows-latest') && (matrix.build == 'Debug') }}
         working-directory: ${{github.workspace}}/build/Src/libCZI_UnitTests/${{matrix.build}}
         shell: cmd
         run: OpenCppCoverage.exe --export_type cobertura:${{github.workspace}}\coverage.xml --config_file "${{github.workspace}}\opencppcoverage.txt" -- libCZI_UnitTests.exe
 
       - name: Upload Coverage
         uses: codecov/codecov-action@v4
-        if: ${{ (github.ref == 'refs/heads/main') && (matrix.OS == 'windows-latest') && ( matrix.build == 'Debug') }}
+        if: ${{ (github.ref == 'refs/heads/main') && (matrix.OS == 'windows-latest') && (matrix.build == 'Debug') }}
         with:
           files: ./coverage.xml
           fail_ci_if_error: true
