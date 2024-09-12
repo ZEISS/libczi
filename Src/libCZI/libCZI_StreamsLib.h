@@ -234,7 +234,8 @@ namespace libCZI
                 kCurlHttp_CaInfoBlob = 111, ///< For CurlHttpInputStream, type string: give PEM encoded content holding one or more certificates to verify the HTTPS server with, c.f. https://curl.se/libcurl/c/CURLOPT_CAINFO_BLOB.html for more information.
 
                 /// For AzureBlobInputStream, type string: specifies how authentication is to be done (c.f. https://learn.microsoft.com/en-us/azure/storage/blobs/quickstart-blobs-c-plus-plus?tabs=managed-identity%2Croles-azure-portal#authenticate-to-azure-and-authorize-access-to-blob-data).
-                /// Possible values are: "DefaultAzureCredential" and "ConnectionString".
+                /// Possible values are: "DefaultAzureCredential", "EnvironmentCredential", "AzureCliCredential", "ManagedIdentityCredential", "WorkloadIdentityCredential", "ConnectionString".
+                /// The default is: "DefaultAzureCredential".
                 kAzureBlob_AuthenticationMode = 200,
             };
         };

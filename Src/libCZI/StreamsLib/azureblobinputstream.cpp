@@ -4,7 +4,9 @@
 #include <azure/storage/blobs.hpp>
 #include <azure/identity/default_azure_credential.hpp>
 #include <azure/identity/environment_credential.hpp>
-#include <azure/identity/azure_cli_credential.hpp>    
+#include <azure/identity/azure_cli_credential.hpp>
+#include <azure/identity/workload_identity_credential.hpp>
+#include <azure/identity/managed_identity_credential.hpp>
 #include "../utilities.h"
 
 using namespace std;
@@ -36,6 +38,12 @@ AzureBlobInputStream::AzureBlobInputStream(const std::wstring& url, const std::m
         break;
     case AuthenticationMode::AzureCliCredential:
         this->CreateWithCreateAzureCliCredential(key_value_uri, property_bag);
+        break;
+    case AuthenticationMode::WorkloadIdentityCredential:
+        this->CreateWithWorkloadIdentityCredential(key_value_uri, property_bag);
+        break;
+    case AuthenticationMode::ManagedIdentityCredential:
+        this->CreateWithManagedIdentityCredential(key_value_uri, property_bag);
         break;
     case AuthenticationMode::ConnectionString:
         this->CreateWithConnectionString(key_value_uri, property_bag);
@@ -101,6 +109,16 @@ void AzureBlobInputStream::CreateWithEnvironmentCredential(const std::map<std::w
 void AzureBlobInputStream::CreateWithCreateAzureCliCredential(const std::map<std::wstring, std::wstring>& tokenized_file_name, const std::map<int, libCZI::StreamsFactory::Property>& property_bag)
 {
     this->CreateWithCredential(tokenized_file_name, property_bag, AzureBlobInputStream::CreateAzureCliCredential);
+}
+
+void AzureBlobInputStream::CreateWithWorkloadIdentityCredential(const std::map<std::wstring, std::wstring>& tokenized_file_name, const std::map<int, libCZI::StreamsFactory::Property>& property_bag)
+{
+    this->CreateWithCredential(tokenized_file_name, property_bag, AzureBlobInputStream::CreateAzureCliCredential);
+}
+
+void AzureBlobInputStream::CreateWithManagedIdentityCredential(const std::map<std::wstring, std::wstring>& tokenized_file_name, const std::map<int, libCZI::StreamsFactory::Property>& property_bag)
+{
+    this->CreateWithCredential(tokenized_file_name, property_bag, AzureBlobInputStream::CreateManagedIdentityCredential);
 }
 
 void AzureBlobInputStream::CreateWithConnectionString(const std::map<std::wstring, std::wstring>& tokenized_file_name, const std::map<int, libCZI::StreamsFactory::Property>& property_bag)
@@ -222,6 +240,8 @@ AzureBlobInputStream::~AzureBlobInputStream()
             { "DefaultAzureCredential", AuthenticationMode::DefaultAzureCredential },
             { "EnvironmentCredential", AuthenticationMode::EnvironmentCredential },
             { "AzureCliCredential", AuthenticationMode::AzureCliCredential },
+            { "ManagedIdentityCredential", AuthenticationMode::ManagedIdentityCredential },
+            { "WorkloadIdentityCredential", AuthenticationMode::WorkloadIdentityCredential },
             { "ConnectionString", AuthenticationMode::ConnectionString }
         };
 
@@ -273,5 +293,15 @@ AzureBlobInputStream::~AzureBlobInputStream()
 /*static*/std::shared_ptr<Azure::Core::Credentials::TokenCredential> AzureBlobInputStream::CreateAzureCliCredential()
 {
     return make_shared<Azure::Identity::AzureCliCredential>();
+}
+
+/*static*/std::shared_ptr<Azure::Core::Credentials::TokenCredential> AzureBlobInputStream::CreateWorkloadIdentityCredential()
+{
+    return make_shared<Azure::Identity::WorkloadIdentityCredential>();
+}
+
+/*static*/std::shared_ptr<Azure::Core::Credentials::TokenCredential> AzureBlobInputStream::CreateManagedIdentityCredential()
+{
+    return std::make_shared<Azure::Identity::ManagedIdentityCredential>();
 }
 #endif  
