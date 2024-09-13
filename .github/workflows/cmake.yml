@@ -93,8 +93,8 @@ jobs:
           mkdir release
           name="CZICmd-linux-x64-$(git describe --always)"
           mkdir "release/${name}"
-          ls -R Src/CZICmd/Release
-          cp Src/CZICmd/Release/CZIcmd "release/${name}/"
+          ls -R Src/CZICmd/
+          cp Src/CZICmd/CZIcmd "release/${name}/"
           echo "artifactName=${name}" >> "$GITHUB_ENV"
           echo "artifactPath=${{github.workspace}}/build/release/${name}" >> "$GITHUB_ENV"
 
