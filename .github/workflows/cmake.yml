@@ -85,6 +85,19 @@ jobs:
           echo "artifactName=${name}" >> "$GITHUB_ENV"
           echo "artifactPath=${{github.workspace}}/build/release/${name}" >> "$GITHUB_ENV"
 
+      - name: Upload CZICmd as artifact (Linux)
+        working-directory: ${{github.workspace}}/build
+        if: ${{ (matrix.OS == 'ubuntu-latest') && ( matrix.build == 'Release') }}
+        shell: bash
+        run: |
+          mkdir release
+          name="CZICmd-linux-x64-$(git describe --always)"
+          mkdir "release/${name}"
+          ls -R Src/CZICmd/Release
+          cp Src/CZICmd/Release/CZIcmd "release/${name}/"
+          echo "artifactName=${name}" >> "$GITHUB_ENV"
+          echo "artifactPath=${{github.workspace}}/build/release/${name}" >> "$GITHUB_ENV"
+
       - name: Upload artifacts
         if: ${{ (matrix.OS == 'windows-latest') && (matrix.build == 'Release') }}
         uses: actions/upload-artifact@v4
