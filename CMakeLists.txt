@@ -85,11 +85,10 @@ option(LIBCZI_BUILD_CURL_BASED_STREAM "include curl-based http-/https-stream obj
 # during the CMake-run (and build and use this one).
 option(LIBCZI_BUILD_PREFER_EXTERNALPACKAGE_LIBCURL "Prefer a libcurl package present on the system" OFF)
 
-
+# This option controls whether to build the Azure-SDK-based-reader object. The Azure-SDK must be externally
+# available (and accessible to CMake's find_package()-command). If using vcpkg, the packages "azure-storage-blobs-cpp"
+# and "azure-identity-cpp" need to be available.
 option(LIBCZI_BUILD_AZURESDK_BASED_STREAM "include AzureSDK-based http-/https-stream object" OFF)
-
-option(LIBCZI_BUILD_PREFER_EXTERNALPACKAGE_AZURESDK "include AzureSDK-based http-/https-stream object" ON)
-
 
 # This option allows to exclude the unit-tests from the build. The unit-tests are using the
 # Google-Test-framework which is downloaded from GitHub during the CMake-run.
