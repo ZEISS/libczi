@@ -26,3 +26,4 @@ version history                 {#version_history}
  0.61.0             | [109](https://github.com/ZEISS/libczi/pull/109)      | fix behaviour of `IXmlNodeRead::GetChildNodeReadonly` (for non-existing nodes), new method `ICziWriter::GetStatistics` added
  0.61.1             | [110](https://github.com/ZEISS/libczi/pull/110)      | some code cleanup
  0.61.2             | [111](https://github.com/ZEISS/libczi/pull/111)      | update libcurl to 8.9.1 (for build with `LIBCZI_BUILD_PREFER_EXTERNALPACKAGE_LIBCURL=OFF`), enable SChannel (on Windows) by default
+ 0.62.0             | to be added                                          | add Azure-SDK based reader for reading from Azure Blob Storage, raise requirement to C++14 for building libCZI (previously C++11 was sufficient) because Azure-SDK requires C++14
