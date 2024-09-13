@@ -68,6 +68,7 @@ ADD_EXECUTABLE(libCZI_UnitTests
 										test_azureblobstream.cpp)
 
 TARGET_LINK_LIBRARIES(libCZI_UnitTests PRIVATE libCZIStatic GTest::gtest GTest::gmock)
+set_target_properties(libCZI_UnitTests PROPERTIES CXX_STANDARD 14)
 
 target_compile_definitions(libCZI_UnitTests PRIVATE _LIBCZISTATICLIB)
 

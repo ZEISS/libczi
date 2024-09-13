@@ -45,6 +45,7 @@ jobs:
           sudo apt-get install libfreetype6-dev -y
           sudo apt-get install rapidjson-dev -y
           sudo apt-get install libssl-dev -y
+          vcpkg install azure-storage-blobs-cpp azure-identity-cpp
 
       - name: Configure CMake (Windows)
         if: ${{ (matrix.OS == 'windows-latest') }}
@@ -59,7 +60,7 @@ jobs:
         if: ${{ (matrix.OS == 'ubuntu-latest') }}
         shell: bash
         run: |
-          cmake -B "${{github.workspace}}/build" -DCMAKE_BUILD_TYPE=${{matrix.build}} -DLIBCZI_BUILD_CZICMD=ON -DLIBCZI_BUILD_CURL_BASED_STREAM=ON -DLIBCZI_BUILD_PREFER_EXTERNALPACKAGE_LIBCURL=OFF
+          cmake -B "${{github.workspace}}/build" -DCMAKE_BUILD_TYPE=${{matrix.build}} -DLIBCZI_BUILD_CZICMD=ON -DLIBCZI_BUILD_CURL_BASED_STREAM=ON -DLIBCZI_BUILD_PREFER_EXTERNALPACKAGE_LIBCURL=OFF -DLIBCZI_BUILD_AZURESDK_BASED_STREAM=ON -DCMAKE_TOOLCHAIN_FILE="${VCPKG_INSTALLATION_ROOT}/scripts/buildsystems/vcpkg.cmake"
 
       - name: Build
         # Build your program with the given configuration
