@@ -47,11 +47,6 @@ jobs:
           sudo apt-get install libssl-dev -y
           vcpkg install azure-storage-blobs-cpp azure-identity-cpp
 
-      - name: Install Azurite (for Azure SDK based stream tests)
-        shell: bash
-        run: |
-          npm install --location=global azurite@3.30.0
-
       - name: Configure CMake (Windows)
         if: ${{ (matrix.OS == 'windows-latest') }}
         shell: bash
