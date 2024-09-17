@@ -73,11 +73,12 @@ jobs:
 
       - name: Setup Azurite
         shell: bash
+        working-directory: ${{github.workspace}}
         run: |
           # find the CZIcmd executable (we just built it)
-          czicmd=$(find ${{github.workspace}}/build \( -name CZIcmd -o -name CZIcmd.exe \) )
-          mkdir -p ${{github.workspace}}/azurite
-          cd ${{github.workspace}}/azurite
+          czicmd=$(find ./build \( -name CZIcmd -o -name CZIcmd.exe \) | xargs realpath)
+          mkdir -p azurite
+          cd azurite
           # now use the CZIcmd executable to create a test CZI file
           $czicmd --command CreateCZI --createbounds "C0:2T0:2" --generatorpixeltype Gray8 --compressionopts "zstd1:ExplicitLevel=2;PreProcess=HiLoByteUnpack"  --createsubblocksize "1024x1024" -o test  --bitmapgenerator default
           ls -l
