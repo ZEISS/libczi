@@ -47,6 +47,11 @@ jobs:
           sudo apt-get install libssl-dev -y
           vcpkg install azure-storage-blobs-cpp azure-identity-cpp
 
+      - name: Install Azurite (for Azure SDK based stream tests) 
+        shell: bash 
+        run: | 
+          npm install --location=global azurite@3.30.0 
+
       - name: Configure CMake (Windows)
         if: ${{ (matrix.OS == 'windows-latest') }}
         shell: bash
@@ -65,6 +70,18 @@ jobs:
       - name: Build
         # Build your program with the given configuration
         run: cmake --build ${{github.workspace}}/build --config ${{matrix.build}}
+
+      - name: Setup Azurite
+        shell: bash
+        run: |
+          # find the CZIcmd executable (we just built it)
+          czicmd=$(find ${{github.workspace}}/build \( -name CZIcmd -o -name CZIcmd.exe \) )
+          mkdir -p ${{github.workspace}}/azurite
+          cd ${{github.workspace}}/azurite
+          # now use the CZIcmd executable to create a test CZI file
+          $czicmd --command CreateCZI --createbounds "C0:2T0:2" --generatorpixeltype Gray8 --compressionopts "zstd1:ExplicitLevel=2;PreProcess=HiLoByteUnpack"  --createsubblocksize "1024x1024" -o test  --bitmapgenerator default
+          ls -l
+          #azurite-blob --silent &
 
       - name: Test
         working-directory: ${{github.workspace}}/build
