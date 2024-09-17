@@ -59,21 +59,14 @@ static bool IsAzureBlobInputStreamAvailable()
 {
     StreamsFactory::CreateStreamInfo create_info;
     create_info.class_name = "azure_blob_inputstream";
-    bool IsAzureBlobInputStreamAvailable()
+
+    for (int i = 0; i < StreamsFactory::GetStreamClassesCount(); ++i)
     {
-        StreamsFactory::CreateStreamInfo create_info;
-        create_info.class_name = "azure_blob_inputstream";
-
-        for (int i = 0; i < StreamsFactory::GetStreamClassesCount(); ++i)
+        StreamsFactory::StreamClassInfo info;
+        if (StreamsFactory::GetStreamInfoForClass(i, info) && info.class_name == create_info.class_name)
         {
-            StreamsFactory::StreamClassInfo info;
-            if (StreamsFactory::GetStreamInfoForClass(i, info) && info.class_name == create_info.class_name)
-            {
-                return true;
-            }
+            return true;
         }
-
-        return false;
     }
 
     return false;

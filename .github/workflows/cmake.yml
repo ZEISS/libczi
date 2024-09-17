@@ -69,7 +69,7 @@ jobs:
 
       - name: Build
         # Build your program with the given configuration
-        run: cmake --build ${{github.workspace}}/build --config ${{matrix.build}}
+        run: cmake --build ${{github.workspace}}/build --config ${{matrix.build}} -j
 
       - name: Setup Azurite
         shell: bash
