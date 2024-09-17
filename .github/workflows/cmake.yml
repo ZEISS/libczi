@@ -80,10 +80,11 @@ jobs:
           mkdir -p azurite
           cd azurite
           # now use the CZIcmd executable to create a test CZI file
-          $czicmd --command CreateCZI --createbounds "C0:2T0:2" --generatorpixeltype Gray8 --compressionopts "zstd1:ExplicitLevel=2;PreProcess=HiLoByteUnpack"  --createsubblocksize "1024x1024" -o test  --bitmapgenerator default
+          "$czicmd" --command CreateCZI --createbounds "C0:2T0:2" --generatorpixeltype Gray8 --compressionopts "zstd1:ExplicitLevel=2;PreProcess=HiLoByteUnpack"  --createsubblocksize "1024x1024" -o test  --bitmapgenerator default
           ls -l
           # start Azurite in the background
           azurite --inMemoryPersistence --silent  &
+          disown # Disown the process so it persists after this step
           # this is the "default connection string" for Azurite
           connectionstring="DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://127.0.0.1:10000/devstoreaccount1;"
           # create a blob container "testcontainer"

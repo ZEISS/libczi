@@ -59,16 +59,21 @@ static bool IsAzureBlobInputStreamAvailable()
 {
     StreamsFactory::CreateStreamInfo create_info;
     create_info.class_name = "azure_blob_inputstream";
-    for (int i=0;i< StreamsFactory::GetStreamClassesCount();++i)
+    bool IsAzureBlobInputStreamAvailable()
     {
-        StreamsFactory::StreamClassInfo info;
-        if (StreamsFactory::GetStreamInfoForClass(i, info))
+        StreamsFactory::CreateStreamInfo create_info;
+        create_info.class_name = "azure_blob_inputstream";
+
+        for (int i = 0; i < StreamsFactory::GetStreamClassesCount(); ++i)
         {
-            if (info.class_name == create_info.class_name)
+            StreamsFactory::StreamClassInfo info;
+            if (StreamsFactory::GetStreamInfoForClass(i, info) && info.class_name == create_info.class_name)
             {
                 return true;
             }
         }
+
+        return false;
     }
 
     return false;
@@ -96,6 +101,13 @@ static string EscapeForUri(const char* str)
     return result;
 }
 
+static const char* GetAzureBlobStoreConnectionString()
+{
+    // return R"(DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://127.0.0.1:10000/devstoreaccount1;)";
+    const char* azure_blob_store_connection_string = std::getenv("AZURE_BLOB_STORE_CONNECTION_STRING");
+    return azure_blob_store_connection_string;
+}
+
 TEST(AzureBlobStream, ReadFromBlobConnectionString)
 {
     if (!IsAzureBlobInputStreamAvailable())
@@ -103,7 +115,7 @@ TEST(AzureBlobStream, ReadFromBlobConnectionString)
         GTEST_SKIP() << "The stream-class 'azure_blob_inputstream' is not available/configured, skipping this test therefore.";
     }
 
-    const char* azure_blob_store_connection_string = std::getenv("AZURE_BLOB_STORE_CONNECTION_STRING");
+    const char* azure_blob_store_connection_string = GetAzureBlobStoreConnectionString();
     if (!azure_blob_store_connection_string)
     {
         GTEST_SKIP() << "The environment variable 'AZURE_BLOB_STORE_CONNECTION_STRING' is not set, skipping this test therefore.";
@@ -119,7 +131,6 @@ TEST(AzureBlobStream, ReadFromBlobConnectionString)
     const auto stream = StreamsFactory::CreateStream(
         create_info,
         string_stream_uri.str());
-        // LR"(containername=testcontainer;blobname=testblob;connectionstring=DefaultEndpointsProtocol\=http\;AccountName\=devstoreaccount1\;AccountKey\=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw\=\=\;BlobEndpoint\=http://127.0.0.1:10000/devstoreaccount1\;)");
 
     ASSERT_TRUE(stream);
 
