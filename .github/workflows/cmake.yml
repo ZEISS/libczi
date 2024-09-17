@@ -90,7 +90,7 @@ jobs:
           az storage container create --name testcontainer  --connection-string "$connectionstring"
           # upload the test CZI file to the container
           az storage blob upload --container-name testcontainer --file "./test.czi" --name testblob --connection-string "$connectionstring"
-          echo "UNITTEST_AZUREBLOBSTORE_CONNECTIONSTRING=$(printf '%q' "$connectionstring")" >> $GITHUB_ENV
+          echo "UNITTEST_AZUREBLOBSTORE_CONNECTIONSTRING=\"$connectionstring\"" >> $GITHUB_ENV
 
       - name: Test
         working-directory: ${{github.workspace}}/build
