@@ -81,7 +81,12 @@ jobs:
           # now use the CZIcmd executable to create a test CZI file
           $czicmd --command CreateCZI --createbounds "C0:2T0:2" --generatorpixeltype Gray8 --compressionopts "zstd1:ExplicitLevel=2;PreProcess=HiLoByteUnpack"  --createsubblocksize "1024x1024" -o test  --bitmapgenerator default
           ls -l
-          #azurite-blob --silent &
+          # start Azurite in the background
+          azurite --inMemoryPersistence --silent  &
+          # create a blob container "testcontainer"
+          az storage container create --name testcontainer  --connection-string "DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://127.0.0.1:10000/devstoreaccount1;"
+          # upload the test CZI file to the container
+          az storage blob upload  --container-name testcontainer --file ./test.czi" --name testblob --connection-string "DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://127.0.0.1:10000/devstoreaccount1;"
 
       - name: Test
         working-directory: ${{github.workspace}}/build
