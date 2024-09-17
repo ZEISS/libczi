@@ -54,3 +54,78 @@ INSTANTIATE_TEST_SUITE_P(
     LR"(\=\;)",
     L"a=b;c=d;k="
 ));
+
+static bool IsAzureBlobInputStreamAvailable()
+{
+    StreamsFactory::CreateStreamInfo create_info;
+    create_info.class_name = "azure_blob_inputstream";
+    for (int i=0;i< StreamsFactory::GetStreamClassesCount();++i)
+    {
+        StreamsFactory::StreamClassInfo info;
+        if (StreamsFactory::GetStreamInfoForClass(i, info))
+        {
+            if (info.class_name == create_info.class_name)
+            {
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
+
+static string EscapeForUri(const char* str)
+{
+    string result;
+    for (const char* p = str; *p; ++p)
+    {
+        if (*p == ';')
+        {
+            result += "\\;";
+        }
+        else if (*p == '=')
+        {
+            result += "\\=";
+        }
+        else
+        {
+            result += *p;
+        }
+    }
+
+    return result;
+}
+
+TEST(AzureBlobStream, ReadFromBlobConnectionString)
+{
+    if (!IsAzureBlobInputStreamAvailable())
+    {
+        GTEST_SKIP() << "The stream-class 'azure_blob_inputstream' is not available/configured, skipping this test therefore.";
+    }
+
+    const char* azure_blob_store_connection_string = std::getenv("AZURE_BLOB_STORE_CONNECTION_STRING");
+    if (!azure_blob_store_connection_string)
+    {
+        GTEST_SKIP() << "The environment variable 'AZURE_BLOB_STORE_CONNECTION_STRING' is not set, skipping this test therefore.";
+    }
+
+    StreamsFactory::CreateStreamInfo create_info;
+    create_info.class_name = "azure_blob_inputstream";
+    create_info.property_bag = { {StreamsFactory::StreamProperties::kAzureBlob_AuthenticationMode, StreamsFactory::Property("ConnectionString")} };
+
+    stringstream string_stream_uri;
+    string_stream_uri << "containername=testcontainer;blobname=testblob;connectionstring=" << EscapeForUri(azure_blob_store_connection_string);
+
+    const auto stream = StreamsFactory::CreateStream(
+        create_info,
+        string_stream_uri.str());
+        // LR"(containername=testcontainer;blobname=testblob;connectionstring=DefaultEndpointsProtocol\=http\;AccountName\=devstoreaccount1\;AccountKey\=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw\=\=\;BlobEndpoint\=http://127.0.0.1:10000/devstoreaccount1\;)");
+
+    ASSERT_TRUE(stream);
+
+    const auto reader = CreateCZIReader();
+    reader->Open(stream);
+
+    const auto statistics = reader->GetStatistics();
+    EXPECT_EQ(statistics.subBlockCount, 4);
+}

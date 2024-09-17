@@ -76,7 +76,7 @@ jobs:
         working-directory: ${{github.workspace}}
         run: |
           # find the CZIcmd executable (we just built it)
-          czicmd=$(find ./build \( -name CZIcmd -o -name CZIcmd.exe \) | xargs realpath)
+          czicmd=$(find ./build \( -name CZIcmd -o -name CZIcmd.exe \) -print0 | xargs -0 realpath)
           mkdir -p azurite
           cd azurite
           # now use the CZIcmd executable to create a test CZI file
@@ -84,13 +84,18 @@ jobs:
           ls -l
           # start Azurite in the background
           azurite --inMemoryPersistence --silent  &
+          # this is the "default connection string" for Azurite
+          connectionstring="DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://127.0.0.1:10000/devstoreaccount1;"
           # create a blob container "testcontainer"
-          az storage container create --name testcontainer  --connection-string "DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://127.0.0.1:10000/devstoreaccount1;"
+          az storage container create --name testcontainer  --connection-string "$connectionstring"
           # upload the test CZI file to the container
-          az storage blob upload  --container-name testcontainer --file "./test.czi" --name testblob --connection-string "DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://127.0.0.1:10000/devstoreaccount1;"
+          az storage blob upload --container-name testcontainer --file "./test.czi" --name testblob --connection-string "$connectionstring"
+          echo "UNITTEST_AZUREBLOBSTORE_CONNECTIONSTRING=$(printf '%q' "$connectionstring")" >> $GITHUB_ENV
 
       - name: Test
         working-directory: ${{github.workspace}}/build
+        env:
+          AZURE_BLOB_STORE_CONNECTION_STRING: ${{ env.UNITTEST_AZUREBLOBSTORE_CONNECTIONSTRING }}
         # Execute tests defined by the CMake configuration.
         # See https://cmake.org/cmake/help/latest/manual/ctest.1.html for more detail
         # Use debug flag to show all exeucted tests
