@@ -81,7 +81,7 @@ jobs:
         # Use debug flag to show all exeucted tests
         run: |
           # find the CZIcmd executable (we just built it)
-          czicmd="$(find ./build \( -name CZIcmd -o -name CZIcmd.exe \) -print0 | xargs -0 realpath)"
+          czicmd="$(find . \( -name CZIcmd -o -name CZIcmd.exe \) -print0 | xargs -0 realpath)"
           mkdir -p azurite
           cd azurite
           # now use the CZIcmd executable to create a test CZI file
