@@ -94,6 +94,7 @@ jobs:
           # upload the test CZI file to the container
           az storage blob upload --container-name testcontainer --file "./test.czi" --name testblob --connection-string "$AZURE_BLOB_STORE_CONNECTION_STRING"
           cd ..
+          az storage container list --connection-string "DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://127.0.0.1:10000/devstoreaccount1;"
           ctest --debug -C ${{matrix.build}}
 
       - name: Upload CZICmd as artifact (Windows)
