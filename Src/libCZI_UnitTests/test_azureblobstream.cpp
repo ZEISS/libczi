@@ -96,9 +96,9 @@ static string EscapeForUri(const char* str)
 
 static const char* GetAzureBlobStoreConnectionString()
 {
-    // return R"(DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://127.0.0.1:10000/devstoreaccount1;)";
-    const char* azure_blob_store_connection_string = std::getenv("AZURE_BLOB_STORE_CONNECTION_STRING");
-    return azure_blob_store_connection_string;
+     return R"(DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://127.0.0.1:10000/devstoreaccount1;)";
+    //const char* azure_blob_store_connection_string = std::getenv("AZURE_BLOB_STORE_CONNECTION_STRING");
+    //return azure_blob_store_connection_string;
 }
 
 TEST(AzureBlobStream, ReadFromBlobConnectionString)
