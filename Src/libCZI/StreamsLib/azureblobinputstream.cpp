@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2024 Carl Zeiss Microscopy GmbH
+//
+// SPDX-License-Identifier: LGPL-3.0-or-later
+
 #include "azureblobinputstream.h"
 
 #if LIBCZI_AZURESDK_BASED_STREAM_AVAILABLE
