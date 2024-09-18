@@ -93,6 +93,7 @@ jobs:
           echo "UNITTEST_AZUREBLOBSTORE_CONNECTIONSTRING=$connectionstring" >> $GITHUB_ENV
 
       - name: Test
+        shell: bash
         working-directory: ${{github.workspace}}/build
         env:
           AZURE_BLOB_STORE_CONNECTION_STRING: ${{ env.UNITTEST_AZUREBLOBSTORE_CONNECTIONSTRING }}
@@ -100,7 +101,7 @@ jobs:
         # See https://cmake.org/cmake/help/latest/manual/ctest.1.html for more detail
         # Use debug flag to show all exeucted tests
         run: |
-          ps -a
+          echo "AZURE_BLOB_STORE_CONNECTION_STRING=$AZURE_BLOB_STORE_CONNECTION_STRING"
           ctest --debug -C ${{matrix.build}}
 
       - name: Upload CZICmd as artifact (Windows)
