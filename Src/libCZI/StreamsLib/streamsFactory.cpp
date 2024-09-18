@@ -46,7 +46,7 @@ static const struct
 #endif  // LIBCZI_CURL_BASED_STREAM_AVAILABLE
 #if LIBCZI_AZURESDK_BASED_STREAM_AVAILABLE
         {
-            { "azure_blob_inputstream", "Azure-SDK-based stream", AzureBlobInputStream::GetBuildInformation, AzureBlobInputStream::GetClassProperty },
+            { "azure_blob_inputstream", "Azure-SDK-based stream", AzureBlobInputStream::GetBuildInformation, nullptr },
             [](const StreamsFactory::CreateStreamInfo& stream_info, const std::string& file_name) -> std::shared_ptr<libCZI::IStream>
             {
                 return std::make_shared<AzureBlobInputStream>(file_name, stream_info.property_bag);

@@ -117,10 +117,7 @@ public:
 
     void Read(std::uint64_t offset, void* pv, std::uint64_t size, std::uint64_t* ptrBytesRead) override;
 
-    ~AzureBlobInputStream() override;
-
     static std::string GetBuildInformation();
-    static libCZI::StreamsFactory::Property GetClassProperty(const char* property_name);
 private:
     static AuthenticationMode DetermineAuthenticationMode(const std::map<int, libCZI::StreamsFactory::Property>& property_bag);
     static std::string DetermineServiceUrl(const std::map<std::wstring, std::wstring>& tokenized_file_name);

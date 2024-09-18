@@ -210,18 +210,9 @@ void AzureBlobInputStream::Read(std::uint64_t offset, void* pv, std::uint64_t si
     }
 }
 
-AzureBlobInputStream::~AzureBlobInputStream()
-{
-}
-
 /*static*/std::string AzureBlobInputStream::GetBuildInformation()
 {
     return { LIBCZI_AZURESDK_VERSION_INFO };
-}
-
-/*static*/libCZI::StreamsFactory::Property AzureBlobInputStream::GetClassProperty(const char* property_name)
-{
-    return libCZI::StreamsFactory::Property();
 }
 
 /*static*/AzureBlobInputStream::AuthenticationMode AzureBlobInputStream::DetermineAuthenticationMode(const std::map<int, libCZI::StreamsFactory::Property>& property_bag)
