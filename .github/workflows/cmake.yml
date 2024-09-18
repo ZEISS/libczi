@@ -76,9 +76,6 @@ jobs:
         working-directory: ${{github.workspace}}/build
         env:
           AZURE_BLOB_STORE_CONNECTION_STRING: "DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://127.0.0.1:10000/devstoreaccount1;"
-        # Execute tests defined by the CMake configuration.
-        # See https://cmake.org/cmake/help/latest/manual/ctest.1.html for more detail
-        # Use debug flag to show all exeucted tests
         run: |
           # find the CZIcmd executable (we just built it)
           czicmd="$(find . \( -name CZIcmd -o -name CZIcmd.exe \) -print0 | xargs -0 realpath)"
@@ -94,11 +91,17 @@ jobs:
           # upload the test CZI file to the container
           az storage blob upload --container-name testcontainer --file "./test.czi" --name testblob --connection-string "$AZURE_BLOB_STORE_CONNECTION_STRING"
           cd ..
-          az storage container list --connection-string "DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://127.0.0.1:10000/devstoreaccount1;"
-          echo "******* TESTING CZIcmd *******"
-          "$czicmd" --command PrintInformation --source-stream-class azure_blob_inputstream --source 'account=libczirwtestdata;containername=testcontainer;blobname=testblob;connectionstring=DefaultEndpointsProtocol\=http\;AccountName\=devstoreaccount1\;AccountKey\=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw\=\=\;BlobEndpoint\=http://127.0.0.1:10000/devstoreaccount1\;' --propbag-source-stream-creation  '{"AzureBlob_AuthenticationMode":"ConnectionString"}'
-          echo "####### TESTING CZIcmd #######"
+          #"$czicmd" --command PrintInformation --source-stream-class azure_blob_inputstream --source 'account=libczirwtestdata;containername=testcontainer;blobname=testblob;connectionstring=DefaultEndpointsProtocol\=http\;AccountName\=devstoreaccount1\;AccountKey\=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw\=\=\;BlobEndpoint\=http://127.0.0.1:10000/devstoreaccount1\;' --propbag-source-stream-creation  '{"AzureBlob_AuthenticationMode":"ConnectionString"}'
+          # Execute tests defined by the CMake configuration.
+          # See https://cmake.org/cmake/help/latest/manual/ctest.1.html for more detail
+          # Use debug flag to show all executed tests
           ctest --debug -C ${{matrix.build}}
+          # now, kill the Azurite process as we don't need it anymore
+          if [[ "$OSTYPE" == "linux-gnu"* || "$OSTYPE" == "darwin"* ]]; then
+              pkill -f azurite  # Terminate on Linux
+          elif [[ "$OSTYPE" == "msys" || "$OSTYPE" == "cygwin" ]]; then
+              taskkill //IM node.exe //F  # Terminate on Windows
+          fi
 
       - name: Upload CZICmd as artifact (Windows)
         working-directory: ${{github.workspace}}/build

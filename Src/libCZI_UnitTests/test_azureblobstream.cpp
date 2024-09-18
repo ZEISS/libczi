@@ -96,9 +96,9 @@ static string EscapeForUri(const char* str)
 
 static const char* GetAzureBlobStoreConnectionString()
 {
-     return R"(DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://localhost:10000/devstoreaccount1;)";
-    //const char* azure_blob_store_connection_string = std::getenv("AZURE_BLOB_STORE_CONNECTION_STRING");
-    //return azure_blob_store_connection_string;
+    //return R"(DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://localhost:10000/devstoreaccount1;)";
+    const char* azure_blob_store_connection_string = std::getenv("AZURE_BLOB_STORE_CONNECTION_STRING");
+    return azure_blob_store_connection_string;
 }
 
 TEST(AzureBlobStream, ReadFromBlobConnectionString)
@@ -129,34 +129,20 @@ TEST(AzureBlobStream, ReadFromBlobConnectionString)
 
     const auto reader = CreateCZIReader();
 
-    try
-    {
-        reader->Open(stream);
-    }
-    catch (libCZI::LibCZIIOException& libCZI_io_exception)
-    {
-        std::stringstream ss;
-        string what(libCZI_io_exception.what() != nullptr ? libCZI_io_exception.what() : "");
-        ss << "LibCZIIOException caught -> \"" << what << "\"";
-        try
-        {
-            libCZI_io_exception.rethrow_nested();
-        }
-        catch (std::exception& inner_exception)
-        {
-            what = inner_exception.what() != nullptr ? inner_exception.what() : "";
-            ss << endl << " nested exception -> \"" << what << "\"";
-        }
-
-        cout << ss.str() << endl;
-    }
-    catch (std::exception& excp)
-    {
-        std::stringstream ss;
-        ss << "Exception caught -> \"" << excp.what() << "\"";
-        cout << ss.str() << endl;
-    }
+    reader->Open(stream);
 
     const auto statistics = reader->GetStatistics();
+
+    // we expect to find CZI with 4 subblocks, 1024x1024, and C=0..1 and T=0..1
     EXPECT_EQ(statistics.subBlockCount, 4);
+    EXPECT_EQ(statistics.boundingBox.w, 1024);
+    EXPECT_EQ(statistics.boundingBox.h, 1024);
+    int start_c, size_c;
+    EXPECT_TRUE(statistics.dimBounds.TryGetInterval(DimensionIndex::C, &start_c, &size_c));
+    EXPECT_EQ(start_c, 0);
+    EXPECT_EQ(size_c, 2);
+    int start_t, size_t;
+    EXPECT_TRUE(statistics.dimBounds.TryGetInterval(DimensionIndex::T, &start_t, &size_t));
+    EXPECT_EQ(start_t, 0);
+    EXPECT_EQ(size_t, 2);
 }
