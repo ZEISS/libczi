@@ -77,6 +77,13 @@ jobs:
         env:
           AZURE_BLOB_STORE_CONNECTION_STRING: "DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://127.0.0.1:10000/devstoreaccount1;"
         run: |
+          # What we do here:
+          # - we create a test CZI file (using the CZIcmd executable)
+          # - we start Azurite (in the background)
+          # - we then upload the test CZI file to Azurite as a blob in the container "testcontainer" with name "testblob"
+          # - we then run the unit-tests - the environment variable AZURE_BLOB_STORE_CONNECTION_STRING is used to configure the Azure SDK based stream tests
+          # - finally, we kill the Azurite process
+          #
           # find the CZIcmd executable (we just built it)
           czicmd="$(find . \( -name CZIcmd -o -name CZIcmd.exe \) -print0 | xargs -0 realpath)"
           mkdir -p azurite

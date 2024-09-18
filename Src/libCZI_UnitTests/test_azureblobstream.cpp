@@ -96,12 +96,17 @@ static string EscapeForUri(const char* str)
 
 static const char* GetAzureBlobStoreConnectionString()
 {
-    //return R"(DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://localhost:10000/devstoreaccount1;)";
-    const char* azure_blob_store_connection_string = std::getenv("AZURE_BLOB_STORE_CONNECTION_STRING");
-    return azure_blob_store_connection_string;
+    // We use the environment variable 'AZURE_BLOB_STORE_CONNECTION_STRING' to communicate a connection string.
+
+    //const char* azure_blob_store_connection_string = std::getenv("AZURE_BLOB_STORE_CONNECTION_STRING");
+    //return azure_blob_store_connection_string;
+
+    
+    return R"(DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://localhost:10000/devstoreaccount1;)";
+    
 }
 
-TEST(AzureBlobStream, ReadFromBlobConnectionString)
+TEST(AzureBlobStream, GetStatisticsFromBlobUsingConnectionString)
 {
     if (!IsAzureBlobInputStreamAvailable())
     {
@@ -121,14 +126,10 @@ TEST(AzureBlobStream, ReadFromBlobConnectionString)
     stringstream string_stream_uri;
     string_stream_uri << "containername=testcontainer;blobname=testblob;connectionstring=" << EscapeForUri(azure_blob_store_connection_string);
 
-    const auto stream = StreamsFactory::CreateStream(
-        create_info,
-        string_stream_uri.str());
-
+    const auto stream = StreamsFactory::CreateStream(create_info, string_stream_uri.str());
     ASSERT_TRUE(stream);
 
     const auto reader = CreateCZIReader();
-
     reader->Open(stream);
 
     const auto statistics = reader->GetStatistics();
@@ -145,4 +146,42 @@ TEST(AzureBlobStream, ReadFromBlobConnectionString)
     EXPECT_TRUE(statistics.dimBounds.TryGetInterval(DimensionIndex::T, &start_t, &size_t));
     EXPECT_EQ(start_t, 0);
     EXPECT_EQ(size_t, 2);
+}
+
+TEST(AzureBlobStream, ReadSubBlockFromBlobUsingConnectionString)
+{
+    if (!IsAzureBlobInputStreamAvailable())
+    {
+        GTEST_SKIP() << "The stream-class 'azure_blob_inputstream' is not available/configured, skipping this test therefore.";
+    }
+
+    const char* azure_blob_store_connection_string = GetAzureBlobStoreConnectionString();
+    if (!azure_blob_store_connection_string)
+    {
+        GTEST_SKIP() << "The environment variable 'AZURE_BLOB_STORE_CONNECTION_STRING' is not set, skipping this test therefore.";
+    }
+
+    StreamsFactory::CreateStreamInfo create_info;
+    create_info.class_name = "azure_blob_inputstream";
+    create_info.property_bag = { {StreamsFactory::StreamProperties::kAzureBlob_AuthenticationMode, StreamsFactory::Property("ConnectionString")} };
+
+    stringstream string_stream_uri;
+    string_stream_uri << "containername=testcontainer;blobname=testblob;connectionstring=" << EscapeForUri(azure_blob_store_connection_string);
+
+    const auto stream = StreamsFactory::CreateStream(create_info, string_stream_uri.str());
+    ASSERT_TRUE(stream);
+
+    const auto reader = CreateCZIReader();
+    reader->Open(stream);
+
+    reader->EnumerateSubBlocks(
+        [&](int index, const SubBlockInfo& subBlockInfo)
+        {
+            const auto subBlock = reader->ReadSubBlock(index);
+            EXPECT_TRUE(subBlock);
+
+            // get the bitmap from the subblock (which decompresses the data, thus testing for correctness of the data)
+            const auto bitmap = subBlock->CreateBitmap();
+            return true;
+        });
 }
