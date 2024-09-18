@@ -6,7 +6,7 @@ stream objects                 {#stream_objects_}
 All input/output operations in libCZI are done through stream objects. Stream objects are used by the CZIReader to access the data in a CZI-file.
 The stream object is an abstraction of a random-access stream.   
 libCZI defines three different stream objects - read-only streams, write-only streams and read-write streams. The respective 
-interfaces are: IStream, IOutputStream and IInputOutputStream.
+interfaces are: IStream, IOutputStream and IInputOutputStream.  
 libCZI provides implementations for reading from a file and for writing to a file in the file-system.  
 There is an experimental implementation for reading from an http(s)-server. This implementation is based on [libcurl](https://curl.se/libcurl/) and allows 
 reading from a CZI-file which is located on a web-server.  
