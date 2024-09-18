@@ -128,7 +128,34 @@ TEST(AzureBlobStream, ReadFromBlobConnectionString)
     ASSERT_TRUE(stream);
 
     const auto reader = CreateCZIReader();
-    reader->Open(stream);
+
+    try
+    {
+        reader->Open(stream);
+    }
+    catch (libCZI::LibCZIIOException& libCZI_io_exception)
+    {
+        std::stringstream ss;
+        string what(libCZI_io_exception.what() != nullptr ? libCZI_io_exception.what() : "");
+        ss << "LibCZIIOException caught -> \"" << what << "\"";
+        try
+        {
+            libCZI_io_exception.rethrow_nested();
+        }
+        catch (std::exception& inner_exception)
+        {
+            what = inner_exception.what() != nullptr ? inner_exception.what() : "";
+            ss << endl << " nested exception -> \"" << what << "\"";
+        }
+
+        cout << ss.str() << endl;
+    }
+    catch (std::exception& excp)
+    {
+        std::stringstream ss;
+        ss << "Exception caught -> \"" << excp.what() << "\"";
+        cout << ss.str() << endl;
+    }
 
     const auto statistics = reader->GetStatistics();
     EXPECT_EQ(statistics.subBlockCount, 4);
