@@ -59,8 +59,6 @@ void AzureBlobInputStream::CreateWithCredential(const std::map<std::wstring, std
     //
     // 1. containername and blobname are required in any case
     // 2. then, either account or accounturl must be present. If accounturl and account are present, account is ignored.
-    //
-    // Test-URI: account=libczirwtestdata;containername=$web;blobname=libczi/DCV_30MB.czi
     auto iterator = tokenized_file_name.find(AzureBlobInputStream::kUriKey_ContainerName);
     if (iterator == tokenized_file_name.end())
     {
