@@ -95,6 +95,9 @@ jobs:
           az storage blob upload --container-name testcontainer --file "./test.czi" --name testblob --connection-string "$AZURE_BLOB_STORE_CONNECTION_STRING"
           cd ..
           az storage container list --connection-string "DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://127.0.0.1:10000/devstoreaccount1;"
+          echo "******* TESTING CZIcmd *******"
+          "$czicmd" --command PrintInformation --source-stream-class azure_blob_inputstream --source 'account=libczirwtestdata;containername=testcontainer;blobname=testblob;connectionstring=DefaultEndpointsProtocol\=http\;AccountName\=devstoreaccount1\;AccountKey\=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw\=\=\;BlobEndpoint\=http://127.0.0.1:10000/devstoreaccount1\;' --propbag-source-stream-creation  '{"AzureBlob_AuthenticationMode":"ConnectionString"}'
+          echo "####### TESTING CZIcmd #######"
           ctest --debug -C ${{matrix.build}}
 
       - name: Upload CZICmd as artifact (Windows)
