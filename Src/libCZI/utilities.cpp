@@ -522,7 +522,7 @@ tString trimImpl(const tString& str, const tString& whitespace)
             ++pSrc;
         }
     }
-        }
+}
 
 #if !LIBCZI_HAS_NEOININTRINSICS && !LIBCZI_HAS_AVXINTRINSICS
 /*static*/void LoHiBytePackUnpack::LoHiByteUnpackStrided(const void* ptrSrc, std::uint32_t wordCount, std::uint32_t stride, std::uint32_t lineCount, void* ptrDst)

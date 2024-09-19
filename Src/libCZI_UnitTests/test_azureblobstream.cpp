@@ -98,12 +98,10 @@ static const char* GetAzureBlobStoreConnectionString()
 {
     // We use the environment variable 'AZURE_BLOB_STORE_CONNECTION_STRING' to communicate a connection string.
 
-    //const char* azure_blob_store_connection_string = std::getenv("AZURE_BLOB_STORE_CONNECTION_STRING");
-    //return azure_blob_store_connection_string;
-
+    const char* azure_blob_store_connection_string = std::getenv("AZURE_BLOB_STORE_CONNECTION_STRING");
+    return azure_blob_store_connection_string;
     
-    return R"(DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://localhost:10000/devstoreaccount1;)";
-    
+    //return R"(DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://localhost:10000/devstoreaccount1;)";
 }
 
 TEST(AzureBlobStream, GetStatisticsFromBlobUsingConnectionString)
