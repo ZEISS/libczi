@@ -5,6 +5,7 @@ on:
     branches: ["main"]
   pull_request:
     branches: ["main"]
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -23,14 +24,16 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Install dependencies (Windows)
         if: ${{ (matrix.OS == 'windows-latest') }}
         # on Windows, we rely on vcpkg to pull in dependencies
         shell: bash
         run: |
-          vcpkg install rapidjson 'curl[ssl]' --triplet x64-windows
+          vcpkg install azure-storage-blobs-cpp:x64-windows-static
+          vcpkg install azure-identity-cpp:x64-windows-static
+          vcpkg install rapidjson 'curl[ssl]' --triplet x64-windows-static
 
       - name: Install dependencies (Linux)
         if: ${{ (matrix.OS == 'ubuntu-latest') }}
@@ -42,6 +45,12 @@ jobs:
           sudo apt-get install libfreetype6-dev -y
           sudo apt-get install rapidjson-dev -y
           sudo apt-get install libssl-dev -y
+          vcpkg install azure-storage-blobs-cpp azure-identity-cpp
+
+      - name: Install Azurite (for Azure SDK based stream tests)
+        shell: bash
+        run: |
+          npm install --location=global azurite
 
       - name: Configure CMake (Windows)
         if: ${{ (matrix.OS == 'windows-latest') }}
@@ -49,42 +58,102 @@ jobs:
         run: |
           # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
           # See https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type
-          # on Windows, we need to point CMake to the vcpkg-toolchain-file
-          cmake -B "${{github.workspace}}/build" -DCMAKE_BUILD_TYPE=${{matrix.build}} -DLIBCZI_BUILD_CZICMD=ON -DLIBCZI_BUILD_CURL_BASED_STREAM=ON -DLIBCZI_BUILD_PREFER_EXTERNALPACKAGE_LIBCURL=ON -DCMAKE_TOOLCHAIN_FILE="${VCPKG_INSTALLATION_ROOT}/scripts/buildsystems/vcpkg.cmake"
+          # Note that we need to point CMake to the vcpkg-toolchain-file
+          cmake -B "${{github.workspace}}/build" -DCMAKE_BUILD_TYPE=${{matrix.build}} -DLIBCZI_BUILD_CZICMD=ON -DLIBCZI_BUILD_CURL_BASED_STREAM=ON -DLIBCZI_BUILD_AZURESDK_BASED_STREAM=ON -DLIBCZI_BUILD_PREFER_EXTERNALPACKAGE_LIBCURL=ON -DCMAKE_TOOLCHAIN_FILE="${VCPKG_INSTALLATION_ROOT}/scripts/buildsystems/vcpkg.cmake" -DVCPKG_TARGET_TRIPLET=x64-windows-static
 
       - name: Configure CMake (Linux)
         if: ${{ (matrix.OS == 'ubuntu-latest') }}
         shell: bash
         run: |
-          cmake -B "${{github.workspace}}/build" -DCMAKE_BUILD_TYPE=${{matrix.build}} -DLIBCZI_BUILD_CZICMD=ON -DLIBCZI_BUILD_CURL_BASED_STREAM=ON -DLIBCZI_BUILD_PREFER_EXTERNALPACKAGE_LIBCURL=OFF
+          cmake -B "${{github.workspace}}/build" -DCMAKE_BUILD_TYPE=${{matrix.build}} -DLIBCZI_BUILD_CZICMD=ON -DLIBCZI_BUILD_CURL_BASED_STREAM=ON -DLIBCZI_BUILD_PREFER_EXTERNALPACKAGE_LIBCURL=OFF -DLIBCZI_BUILD_AZURESDK_BASED_STREAM=ON -DCMAKE_TOOLCHAIN_FILE="${VCPKG_INSTALLATION_ROOT}/scripts/buildsystems/vcpkg.cmake"
 
       - name: Build
         # Build your program with the given configuration
-        run: cmake --build ${{github.workspace}}/build --config ${{matrix.build}}
+        run: cmake --build ${{github.workspace}}/build --config ${{matrix.build}} -j
 
       - name: Test
+        shell: bash
         working-directory: ${{github.workspace}}/build
-        # Execute tests defined by the CMake configuration.
-        # See https://cmake.org/cmake/help/latest/manual/ctest.1.html for more detail
-        # Use debug flag to show all exeucted tests
-        run: ctest --debug -C ${{matrix.build}}
+        env:
+          # This is the "default-Azurite-connection string", we put it here into the environment (so that it can be picked up by the unittest later on)
+          AZURE_BLOB_STORE_CONNECTION_STRING: "DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://127.0.0.1:10000/devstoreaccount1;"
+        run: |
+          # What we do here:
+          # - we create a test CZI file (using the CZIcmd executable)
+          # - we start Azurite (in the background)
+          # - we then upload the test CZI file to Azurite as a blob in the container "testcontainer" with name "testblob"
+          # - we then run the unit-tests - the environment variable AZURE_BLOB_STORE_CONNECTION_STRING is used to configure the Azure SDK based stream tests
+          # - finally, we kill the Azurite process
+          #
+          # find the CZIcmd executable (we just built it)
+          czicmd="$(find . \( -name CZIcmd -o -name CZIcmd.exe \) -print0 | xargs -0 realpath)"
+          mkdir -p azurite
+          cd azurite
+          # now use the CZIcmd executable to create a test CZI file
+          "$czicmd" --command CreateCZI --createbounds "C0:2T0:2" --generatorpixeltype Gray8 --compressionopts "zstd1:ExplicitLevel=2;PreProcess=HiLoByteUnpack" --createsubblocksize "1024x1024" -o test --bitmapgenerator default
+          # start Azurite in the background
+          azurite --inMemoryPersistence --silent &
+          # create a blob container "testcontainer"
+          az storage container create --name testcontainer  --connection-string "$AZURE_BLOB_STORE_CONNECTION_STRING"
+          # upload the test CZI file to the container
+          az storage blob upload --container-name testcontainer --file "./test.czi" --name testblob --connection-string "$AZURE_BLOB_STORE_CONNECTION_STRING"
+          cd ..
+          #"$czicmd" --command PrintInformation --source-stream-class azure_blob_inputstream --source 'account=libczirwtestdata;containername=testcontainer;blobname=testblob;connectionstring=DefaultEndpointsProtocol\=http\;AccountName\=devstoreaccount1\;AccountKey\=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw\=\=\;BlobEndpoint\=http://127.0.0.1:10000/devstoreaccount1\;'
+          #    --propbag-source-stream-creation '{"AzureBlob_AuthenticationMode":"ConnectionString"}'
+          #
+          # Execute tests defined by the CMake configuration.
+          # See https://cmake.org/cmake/help/latest/manual/ctest.1.html for more detail
+          # Use debug flag to show all executed tests
+          ctest --debug -C ${{matrix.build}}
+          # note that we leave the Azurite process running, as we want to use it with the code-coverage step as well
+
+      - name: Upload CZICmd as artifact (Windows)
+        working-directory: ${{github.workspace}}/build
+        if: ${{ (matrix.OS == 'windows-latest') && ( matrix.build == 'Release') }}
+        shell: bash
+        run: |
+          mkdir release
+          name="CZICmd-windows-x64-$(git describe --always)"
+          mkdir "release/${name}"
+          cp Src/CZICmd/Release/CZIcmd.exe "release/${name}/"
+          echo "artifactName=${name}" >> "$GITHUB_ENV"
+          echo "artifactPath=${{github.workspace}}/build/release/${name}" >> "$GITHUB_ENV"
+
+      - name: Upload CZICmd as artifact (Linux)
+        working-directory: ${{github.workspace}}/build
+        if: ${{ (matrix.OS == 'ubuntu-latest') && ( matrix.build == 'Release') }}
+        shell: bash
+        run: |
+          mkdir release
+          name="CZICmd-linux-x64-$(git describe --always)"
+          mkdir "release/${name}"
+          cp Src/CZICmd/CZIcmd "release/${name}/"
+          echo "artifactName=${name}" >> "$GITHUB_ENV"
+          echo "artifactPath=${{github.workspace}}/build/release/${name}" >> "$GITHUB_ENV"
+
+      - name: Upload artifacts
+        if: ${{ ( (matrix.OS == 'windows-latest') || (matrix.OS == 'ubuntu-latest') ) && (matrix.build == 'Release') }}
+        uses: actions/upload-artifact@v4
+        with:
+          path: ${{ env.artifactPath }}/
+          name: ${{ env.artifactName }}
 
       # Coverage collection based on https://about.codecov.io/blog/how-to-set-up-codecov-with-c-plus-plus-and-github-actions/
       - name: Prepare Coverage
-        if: ${{ (matrix.OS == 'windows-latest') && ( matrix.build == 'Debug') }}
+        if: ${{ (matrix.OS == 'windows-latest') && (matrix.build == 'Debug') }}
         run: |
           choco install OpenCppCoverage -y --no-progress
           echo "C:\Program Files\OpenCppCoverage" >> "$env:GITHUB_PATH"
 
       - name: Get Coverage
-        if: ${{ (matrix.OS == 'windows-latest') && ( matrix.build == 'Debug') }}
+        if: ${{ (matrix.OS == 'windows-latest') && (matrix.build == 'Debug') }}
         working-directory: ${{github.workspace}}/build/Src/libCZI_UnitTests/${{matrix.build}}
         shell: cmd
         run: OpenCppCoverage.exe --export_type cobertura:${{github.workspace}}\coverage.xml --config_file "${{github.workspace}}\opencppcoverage.txt" -- libCZI_UnitTests.exe
 
       - name: Upload Coverage
         uses: codecov/codecov-action@v4
-        if: ${{ (matrix.OS == 'windows-latest') && ( matrix.build == 'Debug') }}
+        if: ${{ (matrix.OS == 'windows-latest') && (matrix.build == 'Debug') }}
         with:
           files: ./coverage.xml
           fail_ci_if_error: true

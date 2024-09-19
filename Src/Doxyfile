@@ -966,6 +966,7 @@ INPUT                  = ./libCZI/libCZI.h \
                          ./libCZI/Doc/using_libCZI.markdown \
                          ./libCZI/Doc/accessors.markdown \
                          ./libCZI/Doc/multichannelcomposition.markdown \
+                         ./libCZI/Doc/stream_objects.markdown \
                          ./libCZI/Doc/CZICmd_usage.markdown \
                          ./libCZI/Doc/write_czi.markdown \
                          ./libCZI/Doc/Todos.markdown \

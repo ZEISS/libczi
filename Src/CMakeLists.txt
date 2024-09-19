@@ -63,6 +63,15 @@ if (LIBCZI_BUILD_CURL_BASED_STREAM)
   endif(LIBCZI_BUILD_PREFER_EXTERNALPACKAGE_LIBCURL)
 endif(LIBCZI_BUILD_CURL_BASED_STREAM)
 
+if(LIBCZI_BUILD_AZURESDK_BASED_STREAM)
+  # -> https://github.com/Azure/azure-sdk-for-cpp#azure-sdk-for-c
+  # -> https://learn.microsoft.com/en-us/azure/storage/blobs/quickstart-blobs-c-plus-plus?tabs=managed-identity%2Croles-azure-portal
+  find_package(azure-identity-cpp CONFIG REQUIRED)
+  find_package(azure-storage-blobs-cpp CONFIG REQUIRED)
+  set(LIBCZI_AZURESDK_VERSION_STRING "core:${azure-core-cpp_VERSION} identity:${azure-identity-cpp_VERSION} storage-blobs:${azure-storage-blobs-cpp_VERSION}")
+  message(STATUS "AZURE-SDK available, version-info: ${LIBCZI_AZURESDK_VERSION_STRING}")
+endif()
+
 add_subdirectory(libCZI)
 
 if (LIBCZI_BUILD_CZICMD)
