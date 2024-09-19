@@ -50,7 +50,7 @@ The reader has multiple modes of operation - mainly differing in how the authent
 
    key              | description
  -------------------|---------------------------------------------------
-  account           | The storage-account name. It will be used to create the account-URL as https://<acount>.blob.core.windows.net". This key is relevant for all authentication modes except "ConnectionString".
+  account           | The storage-account name. It will be used to create the account-URL as https://<account>.blob.core.windows.net". This key is relevant for all authentication modes except "ConnectionString".
   acountURL         | The complete base-URL for the storage account. If this is given, then the key 'account' is ignored (and this URL is used instead). This key is relevant for all authentication modes except  "ConnectionString".
   containername     | The container name.
   blobname          | The name of the blob.
