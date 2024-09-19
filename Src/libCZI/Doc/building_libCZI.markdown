@@ -47,6 +47,7 @@ LIBCZI_BUILD_PREFER_EXTERNALPACKAGE_EIGEN3 | Whether to use an existing Eigen3-l
 LIBCZI_BUILD_PREFER_EXTERNALPACKAGE_ZSTD   | Whether to use an existing zstd-library on the system (included via find_package). If this is OFF, then a copy of zstd is downloaded as part of the build. Default is **OFF**.
 LIBCZI_BUILD_CURL_BASED_STREAM             | Whether a curl-based stream object should be built (and be available in the stream factory). Default is **OFF**.
 LIBCZI_BUILD_PREFER_EXTERNALPACKAGE_LIBCURL| Whether to use an existing libcurl-library on the system (included via find_package). If this is OFF, then a copy of libcurl is downloaded as part of the build. Default is **OFF**.
+LIBCZI_BUILD_AZURESDK_BASED_STREAM         | Whether the Azure-SDK-based stream object should be built (and be available in the stream factory). Default is **OFF**.
 
 If building CZICmd is desired, then running CMake with this command line will enable building CZICmd:
     

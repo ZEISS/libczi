@@ -11,6 +11,7 @@
 #include "windowsfileinputstream.h"
 #include "simplefileinputstream.h"
 #include "preadfileinputstream.h"
+#include "azureblobinputstream.h"
 #include "../utilities.h"
 
 using namespace libCZI;
@@ -43,6 +44,16 @@ static const struct
             nullptr
         },
 #endif  // LIBCZI_CURL_BASED_STREAM_AVAILABLE
+#if LIBCZI_AZURESDK_BASED_STREAM_AVAILABLE
+        {
+            { "azure_blob_inputstream", "Azure-SDK-based stream", AzureBlobInputStream::GetBuildInformation, nullptr },
+            [](const StreamsFactory::CreateStreamInfo& stream_info, const std::string& file_name) -> std::shared_ptr<libCZI::IStream>
+            {
+                return std::make_shared<AzureBlobInputStream>(file_name, stream_info.property_bag);
+            },
+            nullptr
+        },
+#endif  // LIBCZI_AZURESDK_BASED_STREAM_AVAILABLE
 #if _WIN32
         {
             { "windows_file_inputstream", "stream implementation based on Windows-API", nullptr, nullptr },
@@ -110,6 +121,9 @@ void libCZI::StreamsFactory::Initialize()
         {"CurlHttp_MaxRedirs", StreamsFactory::StreamProperties::kCurlHttp_MaxRedirs, StreamsFactory::Property::Type::Int32},
         {"CurlHttp_CaInfo", StreamsFactory::StreamProperties::kCurlHttp_CaInfo, StreamsFactory::Property::Type::String},
         {"CurlHttp_CaInfoBlob", StreamsFactory::StreamProperties::kCurlHttp_CaInfoBlob, StreamsFactory::Property::Type::String},
+#endif
+#if LIBCZI_AZURESDK_BASED_STREAM_AVAILABLE
+        {"AzureBlob_AuthenticationMode", StreamsFactory::StreamProperties::kAzureBlob_AuthenticationMode, StreamsFactory::Property::Type::String},
 #endif
         {nullptr, 0, StreamsFactory::Property::Type::Invalid},
     };

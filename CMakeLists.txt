@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.15)
 cmake_policy(SET CMP0091 NEW) # enable new "MSVC runtime library selection" (https://cmake.org/cmake/help/latest/variable/CMAKE_MSVC_RUNTIME_LIBRARY.html)
 
 project(libCZI 
-      VERSION 0.61.2
+      VERSION 0.62.0
       HOMEPAGE_URL "https://github.com/ZEISS/libczi"
       DESCRIPTION "libCZI is an Open Source Cross-Platform C++ library to read and write CZI")
 
@@ -84,6 +84,11 @@ option(LIBCZI_BUILD_CURL_BASED_STREAM "include curl-based http-/https-stream obj
 # found with the find_package()-command). If this option is "OFF", we will download a private copy of libcurl
 # during the CMake-run (and build and use this one).
 option(LIBCZI_BUILD_PREFER_EXTERNALPACKAGE_LIBCURL "Prefer a libcurl package present on the system" OFF)
+
+# This option controls whether to build the Azure-SDK-based-reader object. The Azure-SDK must be externally
+# available (and accessible to CMake's find_package()-command). If using vcpkg, the packages "azure-storage-blobs-cpp"
+# and "azure-identity-cpp" need to be available.
+option(LIBCZI_BUILD_AZURESDK_BASED_STREAM "include AzureSDK-based stream object for accessing Azure-Blob-Store" OFF)
 
 # This option allows to exclude the unit-tests from the build. The unit-tests are using the
 # Google-Test-framework which is downloaded from GitHub during the CMake-run.
