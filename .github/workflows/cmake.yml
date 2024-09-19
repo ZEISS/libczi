@@ -74,7 +74,7 @@ jobs:
       - name: Test
         shell: bash
         working-directory: ${{github.workspace}}/build
-        env:  
+        env:
           # This is the "default-Azurite-connection string", we put it here into the environment (so that it can be picked up by the unittest later on)
           AZURE_BLOB_STORE_CONNECTION_STRING: "DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://127.0.0.1:10000/devstoreaccount1;"
         run: |
