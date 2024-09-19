@@ -110,7 +110,7 @@ TEST(AzureBlobStream, GetStatisticsFromBlobUsingConnectionString)
 {
     if (!IsAzureBlobInputStreamAvailable())
     {
-        GTEST_SKIP() << "The stream-class 'azure_blob_inputstream' is not available/configured, skipping this test therefore.";
+        GTEST_SKIP() << "The stream-class 'azure_blob_inputstream' is not available/configured, therefore skipping this test.";
     }
 
     const char* azure_blob_store_connection_string = GetAzureBlobStoreConnectionString();
