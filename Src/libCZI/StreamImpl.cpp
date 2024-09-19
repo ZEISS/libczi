@@ -72,7 +72,7 @@ COutputStreamImplPwrite::~COutputStreamImplPwrite()
 
 //----------------------------------------------------------------------------
 
-#if defined(_WIN32)
+#if LIBCZI_WINDOWSAPI_AVAILABLE
 
 CSimpleOutputStreamImplWindows::CSimpleOutputStreamImplWindows(const wchar_t* filename, bool overwriteExisting)
     : handle(INVALID_HANDLE_VALUE)
@@ -316,7 +316,7 @@ CInputOutputStreamImplPreadPwrite::~CInputOutputStreamImplPreadPwrite()
 
 //-----------------------------------------------------------------------------
 
-#if defined(_WIN32)
+#if LIBCZI_WINDOWSAPI_AVAILABLE
 CSimpleInputOutputStreamImplWindows::CSimpleInputOutputStreamImplWindows(const wchar_t* filename)
     : handle(INVALID_HANDLE_VALUE)
 {

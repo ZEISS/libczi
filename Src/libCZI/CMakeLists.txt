@@ -259,6 +259,14 @@ else()
   endif()
 endif()
 
+if (WIN32 OR CYGWIN OR MSYS OR MINGW)
+  set(libCZI_WINDOWSAPIAVAILABLE 1)
+  message(STATUS "*********** Windows-API available WIN32 is true ***********")
+else()
+  set(libCZI_WINDOWSAPIAVAILABLE 0)
+  message(STATUS "*********** Windows-API NOT available WIN32 is false ***********")
+endif()
+
 configure_file (
   "${CMAKE_CURRENT_SOURCE_DIR}/libCZI_Config.h.in"
   "${CMAKE_CURRENT_BINARY_DIR}/libCZI_Config.h"
@@ -304,6 +312,9 @@ if (LIBCZI_BUILD_DYNLIB)
   IF(UNIX)
     target_compile_options(libCZI PRIVATE -D_FILE_OFFSET_BITS=64)
   ENDIF(UNIX)
+  if( libCZI_WINDOWSAPIAVAILABLE)
+    target_link_libraries(libCZI PRIVATE ole32 Windowscodecs)
+  endif()
 endif(LIBCZI_BUILD_DYNLIB)
 
 #
@@ -342,7 +353,9 @@ IF(UNIX)
   target_compile_options(libCZIStatic PRIVATE -D_FILE_OFFSET_BITS=64)
   set_property(TARGET libCZIStatic PROPERTY POSITION_INDEPENDENT_CODE ON)
 ENDIF(UNIX)
-
+if( libCZI_WINDOWSAPIAVAILABLE)
+    target_link_libraries(libCZIStatic PUBLIC ole32 Windowscodecs)
+endif()
 
 #
 # Notes: - the variables CMAKE_INSTALL_<...> have been defined in the module "GNUInstallDirs"

@@ -4,7 +4,7 @@
 
 #include "windowsfileinputstream.h"
 
-#if defined(_WIN32)
+#if LIBCZI_WINDOWSAPI_AVAILABLE
 #include <limits>
 #include <iomanip>
 #include "../utilities.h"

@@ -2,14 +2,15 @@
 //
 // SPDX-License-Identifier: LGPL-3.0-or-later
 
-#if defined(_WIN32)
 #include "decoder_wic.h"
+
+#if LIBCZI_WINDOWSAPI_AVAILABLE
 #include "BitmapOperations.h"
 #include <wincodec.h>
 
 #include "Site.h"
-
-#pragma comment(lib, "Windowscodecs.lib")
+//
+//#pragma comment(lib, "Windowscodecs.lib")
 
 using namespace std;
 using namespace libCZI;
