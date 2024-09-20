@@ -1452,7 +1452,7 @@ bool CCmdLineOptions::TryParseDisplaySettings(const std::string& s, std::map<int
 
         string tk(s.c_str() + offset, length);
         string tktr = trim(tk);
-        if (tktr.length() > 0)
+        if (!tktr.empty())
         {
             bool token_found = false;
             for (size_t i = 0; i < sizeof(info_levels) / sizeof(info_levels[0]); ++i)
