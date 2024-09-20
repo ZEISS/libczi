@@ -246,17 +246,15 @@ else()
     GIT_TAG "v1.5.6"
   )
 
-  if(NOT zstd_POPULATED)
-    message(STATUS "Fetching zstd...")
-    set(ZSTD_BUILD_PROGRAMS  OFF CACHE BOOL "" FORCE)
-    set(ZSTD_BUILD_SHARED    OFF CACHE BOOL "" FORCE)
-    set(ZSTD_BUILD_TESTS     OFF CACHE BOOL "" FORCE)
-    set(ZSTD_BUILD_CONTRIB   OFF CACHE BOOL "" FORCE)
+  message(STATUS "Fetching zstd...")
+  set(ZSTD_BUILD_PROGRAMS  OFF CACHE BOOL "" FORCE)
+  set(ZSTD_BUILD_SHARED    OFF CACHE BOOL "" FORCE)
+  set(ZSTD_BUILD_TESTS     OFF CACHE BOOL "" FORCE)
+  set(ZSTD_BUILD_CONTRIB   OFF CACHE BOOL "" FORCE)
 
-    FetchContent_Populate(zstd)
+  FetchContent_MakeAvailable(zstd)
 
-    add_subdirectory(${zstd_SOURCE_DIR}/build/cmake ${zstd_BINARY_DIR})
-  endif()
+  add_subdirectory(${zstd_SOURCE_DIR}/build/cmake ${zstd_BINARY_DIR})
 endif()
 
 if (LIBCZI_HAVE_WIN32_API)

@@ -1,0 +1,14 @@
+# Target labels
+ zstd-populate
+# Source files and their labels
+/d/dev/Github/libczi-zeiss-ptahmose/buildmsys2/msys/_deps/zstd-subbuild/CMakeFiles/zstd-populate
+/d/dev/Github/libczi-zeiss-ptahmose/buildmsys2/msys/_deps/zstd-subbuild/CMakeFiles/zstd-populate.rule
+/d/dev/Github/libczi-zeiss-ptahmose/buildmsys2/msys/_deps/zstd-subbuild/CMakeFiles/zstd-populate-complete.rule
+/d/dev/Github/libczi-zeiss-ptahmose/buildmsys2/msys/_deps/zstd-subbuild/zstd-populate-prefix/src/zstd-populate-stamp/zstd-populate-build.rule
+/d/dev/Github/libczi-zeiss-ptahmose/buildmsys2/msys/_deps/zstd-subbuild/zstd-populate-prefix/src/zstd-populate-stamp/zstd-populate-configure.rule
+/d/dev/Github/libczi-zeiss-ptahmose/buildmsys2/msys/_deps/zstd-subbuild/zstd-populate-prefix/src/zstd-populate-stamp/zstd-populate-download.rule
+/d/dev/Github/libczi-zeiss-ptahmose/buildmsys2/msys/_deps/zstd-subbuild/zstd-populate-prefix/src/zstd-populate-stamp/zstd-populate-install.rule
+/d/dev/Github/libczi-zeiss-ptahmose/buildmsys2/msys/_deps/zstd-subbuild/zstd-populate-prefix/src/zstd-populate-stamp/zstd-populate-mkdir.rule
+/d/dev/Github/libczi-zeiss-ptahmose/buildmsys2/msys/_deps/zstd-subbuild/zstd-populate-prefix/src/zstd-populate-stamp/zstd-populate-patch.rule
+/d/dev/Github/libczi-zeiss-ptahmose/buildmsys2/msys/_deps/zstd-subbuild/zstd-populate-prefix/src/zstd-populate-stamp/zstd-populate-test.rule
+/d/dev/Github/libczi-zeiss-ptahmose/buildmsys2/msys/_deps/zstd-subbuild/zstd-populate-prefix/src/zstd-populate-stamp/zstd-populate-update.rule

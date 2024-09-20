@@ -1,0 +1,73 @@
+# This file will be configured to contain variables for CPack. These variables
+# should be set in the CMake list file of the project before CPack module is
+# included. The list of available CPACK_xxx variables and their associated
+# documentation may be obtained using
+#  cpack --help-variable-list
+#
+# Some variables are common to all generators (e.g. CPACK_PACKAGE_NAME)
+# and some are specific to a generator
+# (e.g. CPACK_NSIS_EXTRA_INSTALL_COMMANDS). The generator specific variables
+# usually begin with CPACK_<GENNAME>_xxxx.
+
+
+set(CPACK_BINARY_CYGWIN "ON")
+set(CPACK_BINARY_IFW "OFF")
+set(CPACK_BUILD_SOURCE_DIRS "/d/dev/Github/libczi-zeiss-ptahmose;/d/dev/Github/libczi-zeiss-ptahmose/buildmsys2/msys")
+set(CPACK_CMAKE_GENERATOR "Unix Makefiles")
+set(CPACK_COMPONENTS_ALL "Unspecified;dev;doc;examples;pkgconfig")
+set(CPACK_COMPONENT_UNSPECIFIED_HIDDEN "TRUE")
+set(CPACK_COMPONENT_UNSPECIFIED_REQUIRED "TRUE")
+set(CPACK_DEBIAN_COMPRESSION_TYPE "xz")
+set(CPACK_DEBIAN_PACKAGE_ARCHITECTURE "all")
+set(CPACK_DEBIAN_PACKAGE_NAME "libcli11-dev")
+set(CPACK_DEFAULT_PACKAGE_DESCRIPTION_FILE "/usr/share/cmake/Templates/CPack.GenericDescription.txt")
+set(CPACK_DEFAULT_PACKAGE_DESCRIPTION_SUMMARY "libCZI built using CMake")
+set(CPACK_GENERATOR "CygwinBinary")
+set(CPACK_INNOSETUP_ARCHITECTURE "x64")
+set(CPACK_INSTALL_CMAKE_PROJECTS "/d/dev/Github/libczi-zeiss-ptahmose/buildmsys2/msys;libCZI;ALL;/")
+set(CPACK_INSTALL_PREFIX "/usr/local")
+set(CPACK_MODULE_PATH "/d/dev/Github/libczi-zeiss-ptahmose/cmake;/d/dev/Github/libczi-zeiss-ptahmose/buildmsys2/msys/_deps/cli11-src/cmake")
+set(CPACK_NSIS_DISPLAY_NAME "libCZI 2.3.2")
+set(CPACK_NSIS_INSTALLER_ICON_CODE "")
+set(CPACK_NSIS_INSTALLER_MUI_ICON_CODE "")
+set(CPACK_NSIS_INSTALL_ROOT "$PROGRAMFILES")
+set(CPACK_NSIS_PACKAGE_NAME "libCZI 2.3.2")
+set(CPACK_NSIS_UNINSTALL_NAME "Uninstall")
+set(CPACK_OBJCOPY_EXECUTABLE "/usr/bin/objcopy.exe")
+set(CPACK_OBJDUMP_EXECUTABLE "/usr/bin/objdump.exe")
+set(CPACK_OUTPUT_CONFIG_FILE "/d/dev/Github/libczi-zeiss-ptahmose/buildmsys2/msys/CPackConfig.cmake")
+set(CPACK_PACKAGE_CONTACT "https://github.com/CLIUtils/CLI11")
+set(CPACK_PACKAGE_DEFAULT_LOCATION "/")
+set(CPACK_PACKAGE_DESCRIPTION_FILE "/d/dev/Github/libczi-zeiss-ptahmose/buildmsys2/msys/_deps/cli11-src/CLI11.CPack.Description.txt")
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Command line parser with simple and intuitive interface")
+set(CPACK_PACKAGE_FILE_NAME "libCZI-2.3.2-MSYS")
+set(CPACK_PACKAGE_HOMEPAGE_URL "https://github.com/ZEISS/libczi")
+set(CPACK_PACKAGE_INSTALL_DIRECTORY "libCZI 2.3.2")
+set(CPACK_PACKAGE_INSTALL_REGISTRY_KEY "libCZI 2.3.2")
+set(CPACK_PACKAGE_NAME "libCZI")
+set(CPACK_PACKAGE_RELOCATABLE "true")
+set(CPACK_PACKAGE_VENDOR "github.com/CLIUtils/CLI11")
+set(CPACK_PACKAGE_VERSION "2.3.2")
+set(CPACK_PACKAGE_VERSION_MAJOR "2")
+set(CPACK_PACKAGE_VERSION_MINOR "3")
+set(CPACK_PACKAGE_VERSION_PATCH "2")
+set(CPACK_READELF_EXECUTABLE "/usr/bin/readelf.exe")
+set(CPACK_RESOURCE_FILE_LICENSE "/d/dev/Github/libczi-zeiss-ptahmose/buildmsys2/msys/_deps/cli11-src/LICENSE")
+set(CPACK_RESOURCE_FILE_README "/d/dev/Github/libczi-zeiss-ptahmose/buildmsys2/msys/_deps/cli11-src/README.md")
+set(CPACK_RESOURCE_FILE_WELCOME "/usr/share/cmake/Templates/CPack.GenericWelcome.txt")
+set(CPACK_SET_DESTDIR "OFF")
+set(CPACK_SOURCE_GENERATOR "TGZ;ZIP")
+set(CPACK_SOURCE_IGNORE_FILES "/.git;/dist;/.*build.*;/\\.DS_Store;/.*\\.egg-info;/var;/azure-pipelines.yml;/.ci;/docs;/examples;/test_package;/book;/.travis.yml;.swp;/.all-contributorsrc;/.appveyor.yml;/.pre-commit.*yaml")
+set(CPACK_SOURCE_OUTPUT_CONFIG_FILE "/d/dev/Github/libczi-zeiss-ptahmose/buildmsys2/msys/CPackSourceConfig.cmake")
+set(CPACK_SYSTEM_NAME "MSYS")
+set(CPACK_THREADS "1")
+set(CPACK_TOPLEVEL_TAG "MSYS")
+set(CPACK_WIX_SIZEOF_VOID_P "8")
+
+if(NOT CPACK_PROPERTIES_FILE)
+  set(CPACK_PROPERTIES_FILE "/d/dev/Github/libczi-zeiss-ptahmose/buildmsys2/msys/CPackProperties.cmake")
+endif()
+
+if(EXISTS ${CPACK_PROPERTIES_FILE})
+  include(${CPACK_PROPERTIES_FILE})
+endif()

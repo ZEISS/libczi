@@ -7,6 +7,8 @@
 #if LIBCZI_WINDOWSAPI_AVAILABLE
 #include "BitmapOperations.h"
 #include <wincodec.h>
+#include <sstream>
+#include <iomanip>
 
 #include "Site.h"
 
@@ -29,9 +31,9 @@ static void ThrowIfFailed(const char* function, HRESULT hr)
 {
     if (FAILED(hr))
     {
-        char errorMsg[255];
-        _snprintf_s(errorMsg, _TRUNCATE, "COM-ERROR hr=0x%08X (%s)", hr, function);
-        throw std::runtime_error(errorMsg);
+        ostringstream string_stream;
+        string_stream << "COM-ERROR hr=0x" << std::hex << std::uppercase << std::setw(8) << std::setfill('0') << hr << " (" << function << ")";
+        throw std::runtime_error(string_stream.str());
     }
 }
 

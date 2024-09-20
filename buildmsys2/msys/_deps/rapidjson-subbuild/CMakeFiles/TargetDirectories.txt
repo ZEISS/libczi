@@ -1,0 +1,3 @@
+/d/dev/Github/libczi-zeiss-ptahmose/buildmsys2/msys/_deps/rapidjson-subbuild/CMakeFiles/rapidjson-populate.dir
+/d/dev/Github/libczi-zeiss-ptahmose/buildmsys2/msys/_deps/rapidjson-subbuild/CMakeFiles/edit_cache.dir
+/d/dev/Github/libczi-zeiss-ptahmose/buildmsys2/msys/_deps/rapidjson-subbuild/CMakeFiles/rebuild_cache.dir

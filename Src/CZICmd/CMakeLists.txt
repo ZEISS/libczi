@@ -50,22 +50,24 @@ else()
             PREFIX "${CMAKE_BINARY_DIR}/vendor/rapidjson"
     )
 
-    if (NOT rapidjson_POPULATED)
-      FetchContent_Populate(RapidJSON)
-      set(RAPIDJSON_INCLUDE_DIRS ${rapidjson_SOURCE_DIR}/include)
-    endif()
+    set(RAPIDJSON_BUILD_DOC OFF CACHE BOOL "" FORCE)
+    set(RAPIDJSON_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+    set(RAPIDJSON_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+    FetchContent_MakeAvailable(RapidJSON)
+
+    set(RAPIDJSON_INCLUDE_DIRS ${rapidjson_SOURCE_DIR}/include)
 endif()
 
 # make "CLI11" available
 FetchContent_Declare(
   cli11
   GIT_REPOSITORY https://github.com/CLIUtils/CLI11
-  GIT_TAG        v2.3.2
+  GIT_TAG        v2.4.2
 )
 
-if (NOT cli11_POPULATED)
-  FetchContent_MakeAvailable(cli11)
-endif()
+set(CLI11_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+set(CLI11_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+FetchContent_MakeAvailable(cli11)
 
 set (CZICMDSRCFILES
          BitmapGen.cpp          

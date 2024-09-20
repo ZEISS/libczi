@@ -1,0 +1,14 @@
+# Target labels
+ rapidjson-populate
+# Source files and their labels
+/d/dev/Github/libczi-zeiss-ptahmose/buildmsys2/msys/_deps/rapidjson-subbuild/CMakeFiles/rapidjson-populate
+/d/dev/Github/libczi-zeiss-ptahmose/buildmsys2/msys/_deps/rapidjson-subbuild/CMakeFiles/rapidjson-populate.rule
+/d/dev/Github/libczi-zeiss-ptahmose/buildmsys2/msys/_deps/rapidjson-subbuild/CMakeFiles/rapidjson-populate-complete.rule
+/d/dev/Github/libczi-zeiss-ptahmose/buildmsys2/msys/vendor/rapidjson/src/rapidjson-populate-stamp/rapidjson-populate-build.rule
+/d/dev/Github/libczi-zeiss-ptahmose/buildmsys2/msys/vendor/rapidjson/src/rapidjson-populate-stamp/rapidjson-populate-configure.rule
+/d/dev/Github/libczi-zeiss-ptahmose/buildmsys2/msys/vendor/rapidjson/src/rapidjson-populate-stamp/rapidjson-populate-download.rule
+/d/dev/Github/libczi-zeiss-ptahmose/buildmsys2/msys/vendor/rapidjson/src/rapidjson-populate-stamp/rapidjson-populate-install.rule
+/d/dev/Github/libczi-zeiss-ptahmose/buildmsys2/msys/vendor/rapidjson/src/rapidjson-populate-stamp/rapidjson-populate-mkdir.rule
+/d/dev/Github/libczi-zeiss-ptahmose/buildmsys2/msys/vendor/rapidjson/src/rapidjson-populate-stamp/rapidjson-populate-patch.rule
+/d/dev/Github/libczi-zeiss-ptahmose/buildmsys2/msys/vendor/rapidjson/src/rapidjson-populate-stamp/rapidjson-populate-test.rule
+/d/dev/Github/libczi-zeiss-ptahmose/buildmsys2/msys/vendor/rapidjson/src/rapidjson-populate-stamp/rapidjson-populate-update.rule

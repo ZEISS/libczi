@@ -1,0 +1,1 @@
+cmd='/usr/bin/cmake.exe;-DEIGEN_BUILD_PKGCONFIG=OFF;-DBUILD_TESTING=OFF;-GUnix Makefiles;-C<TMP_DIR>/eigen_ext-cache-$<CONFIG>.cmake;-S;<SOURCE_DIR><SOURCE_SUBDIR>;-B;<BINARY_DIR>'

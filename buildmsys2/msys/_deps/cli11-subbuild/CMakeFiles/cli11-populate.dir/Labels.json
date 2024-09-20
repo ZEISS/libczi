@@ -1,0 +1,46 @@
+{
+	"sources" : 
+	[
+		{
+			"file" : "/d/dev/Github/libczi-zeiss-ptahmose/buildmsys2/msys/_deps/cli11-subbuild/CMakeFiles/cli11-populate"
+		},
+		{
+			"file" : "/d/dev/Github/libczi-zeiss-ptahmose/buildmsys2/msys/_deps/cli11-subbuild/CMakeFiles/cli11-populate.rule"
+		},
+		{
+			"file" : "/d/dev/Github/libczi-zeiss-ptahmose/buildmsys2/msys/_deps/cli11-subbuild/CMakeFiles/cli11-populate-complete.rule"
+		},
+		{
+			"file" : "/d/dev/Github/libczi-zeiss-ptahmose/buildmsys2/msys/_deps/cli11-subbuild/cli11-populate-prefix/src/cli11-populate-stamp/cli11-populate-build.rule"
+		},
+		{
+			"file" : "/d/dev/Github/libczi-zeiss-ptahmose/buildmsys2/msys/_deps/cli11-subbuild/cli11-populate-prefix/src/cli11-populate-stamp/cli11-populate-configure.rule"
+		},
+		{
+			"file" : "/d/dev/Github/libczi-zeiss-ptahmose/buildmsys2/msys/_deps/cli11-subbuild/cli11-populate-prefix/src/cli11-populate-stamp/cli11-populate-download.rule"
+		},
+		{
+			"file" : "/d/dev/Github/libczi-zeiss-ptahmose/buildmsys2/msys/_deps/cli11-subbuild/cli11-populate-prefix/src/cli11-populate-stamp/cli11-populate-install.rule"
+		},
+		{
+			"file" : "/d/dev/Github/libczi-zeiss-ptahmose/buildmsys2/msys/_deps/cli11-subbuild/cli11-populate-prefix/src/cli11-populate-stamp/cli11-populate-mkdir.rule"
+		},
+		{
+			"file" : "/d/dev/Github/libczi-zeiss-ptahmose/buildmsys2/msys/_deps/cli11-subbuild/cli11-populate-prefix/src/cli11-populate-stamp/cli11-populate-patch.rule"
+		},
+		{
+			"file" : "/d/dev/Github/libczi-zeiss-ptahmose/buildmsys2/msys/_deps/cli11-subbuild/cli11-populate-prefix/src/cli11-populate-stamp/cli11-populate-test.rule"
+		},
+		{
+			"file" : "/d/dev/Github/libczi-zeiss-ptahmose/buildmsys2/msys/_deps/cli11-subbuild/cli11-populate-prefix/src/cli11-populate-stamp/cli11-populate-update.rule"
+		}
+	],
+	"target" : 
+	{
+		"labels" : 
+		[
+			"cli11-populate"
+		],
+		"name" : "cli11-populate"
+	}
+}

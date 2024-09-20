@@ -1,0 +1,12 @@
+file(REMOVE_RECURSE
+  "CMakeFiles/compile_SelfAdjointEigenSolver_SelfAdjointEigenSolver_MatrixType.dir/compile_SelfAdjointEigenSolver_SelfAdjointEigenSolver_MatrixType.cpp.o"
+  "CMakeFiles/compile_SelfAdjointEigenSolver_SelfAdjointEigenSolver_MatrixType.dir/compile_SelfAdjointEigenSolver_SelfAdjointEigenSolver_MatrixType.cpp.o.d"
+  "compile_SelfAdjointEigenSolver_SelfAdjointEigenSolver_MatrixType.exe"
+  "compile_SelfAdjointEigenSolver_SelfAdjointEigenSolver_MatrixType.pdb"
+  "libcompile_SelfAdjointEigenSolver_SelfAdjointEigenSolver_MatrixType.dll.a"
+)
+
+# Per-language clean rules from dependency scanning.
+foreach(lang CXX)
+  include(CMakeFiles/compile_SelfAdjointEigenSolver_SelfAdjointEigenSolver_MatrixType.dir/cmake_clean_${lang}.cmake OPTIONAL)
+endforeach()
