@@ -75,7 +75,11 @@ check_cxx_symbol_exists(pwrite unistd.h HAVE_UNISTD_H_PWRITE)
 BoolToFoundNotFound(HAVE_UNISTD_H_PWRITE HAVE_UNISTD_H_PWRITE_TEXT)
 message("check for open -> ${HAVE_FCNTL_H_OPEN_TEXT} ; check for pread -> ${HAVE_UNISTD_H_PREAD_TEXT} ; check for pwrite -> ${HAVE_UNISTD_H_PWRITE_TEXT}")
 
-# determine whether the Win32-API can be used (in other words: whether we are on a Windows-platform or targetting the Windows-platform)
+# Determine whether the Win32-API can be used (in other words: whether we are on a Windows-platform or targetting the Windows-platform).
+# Note that just checking for WIN32 is not sufficient here, as this is not defined with environments such as msys2. In those cases, UNIX is defined.
+# The meaning of this switch is: whether Win32-API can be used (and this affects not only compilation but e.g. also linking to the Win32-API, as
+# it is not automatically linked to when using MinGW or Cygwin).
+# TODO(JBL): check how we can make cross-compiling to Windows work
 if (WIN32 OR CYGWIN OR MSYS OR MINGW)
   set(LIBCZI_HAVE_WIN32_API ON)
 else()

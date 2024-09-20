@@ -39,8 +39,10 @@ if (LIBCZI_BUILD_PREFER_EXTERNALPACKAGE_RAPIDJSON)
         ]=])
     endif()
 else()
-    # since "RapidJSON" is a header-only library, we just have to download it and point to the include directory
-     FetchContent_Declare(
+    # Since "RapidJSON" is a header-only library, we just have to download it and point to the include directory.
+    # Note: when using v1.1.0 of RapidJSON (the latest release) there we problems (with GCC14.2 with msys2), so
+    #        we use a later version from the master branch.
+    FetchContent_Declare(
             RapidJSON
             GIT_REPOSITORY https://github.com/Tencent/rapidjson.git
             GIT_TAG        7c73dd7de7c4f14379b781418c6e947ad464c818 # master as of 2024-08-16
