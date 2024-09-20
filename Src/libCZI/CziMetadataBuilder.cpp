@@ -1104,7 +1104,7 @@ static bool TryRetrieveIdAndNameAttributeFromChannels(IXmlNodeRw* root, int chan
 /*static*/void libCZI::MetadataUtils::SetOrAddCustomKeyValuePair(libCZI::ICziMetadataBuilder* builder, const string& key, const libCZI::CustomValueVariant& value)
 {
     auto root = builder->GetRootNode();
-    const regex isValidNodename(R"(^([_a-z][\w]?|[a-w_yz][\w]{2,}|[_a-z][a-l_n-z\d][\w]+|[_a-z][\w][a-k_m-z\d][\w]*)$)", regex_constants::icase);
+    const regex isValidNodename(R"(^([_a-zA-Z][\w]?|[a-wA-W_yzYZ][\w]{2,}|[_a-zA-Z][a-lA-L_n-zN-Z\d][\w]+|[_a-zA-Z][\w][a-kA-K_m-zM-Z\d][\w]*)$)");
 
     if (!regex_match(key, isValidNodename))
     {
