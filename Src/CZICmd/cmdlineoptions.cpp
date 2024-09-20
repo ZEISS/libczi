@@ -12,9 +12,9 @@
 #include <utility>
 #include <cstring>
 #include <cmath>
-//#if defined(LINUXENV)
-//#include <libgen.h>
-//#endif
+#if !_WIN32
+#include <libgen.h>
+#endif
 #include "inc_rapidjson.h"
 #include "IBitmapGen.h"
 #include <iomanip>
