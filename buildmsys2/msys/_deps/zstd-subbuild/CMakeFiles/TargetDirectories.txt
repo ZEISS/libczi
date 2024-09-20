@@ -1,3 +1,0 @@
-/d/dev/Github/libczi-zeiss-ptahmose/buildmsys2/msys/_deps/zstd-subbuild/CMakeFiles/zstd-populate.dir
-/d/dev/Github/libczi-zeiss-ptahmose/buildmsys2/msys/_deps/zstd-subbuild/CMakeFiles/edit_cache.dir
-/d/dev/Github/libczi-zeiss-ptahmose/buildmsys2/msys/_deps/zstd-subbuild/CMakeFiles/rebuild_cache.dir
