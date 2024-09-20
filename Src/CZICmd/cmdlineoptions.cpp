@@ -2,6 +2,7 @@
 //
 // SPDX-License-Identifier: LGPL-3.0-or-later
 
+#include "inc_CZIcmd_Config.h"
 #include "cmdlineoptions.h"
 #include "inc_libCZI.h"
 #include <clocale>
@@ -11,9 +12,9 @@
 #include <utility>
 #include <cstring>
 #include <cmath>
-#if defined(LINUXENV)
-#include <libgen.h>
-#endif
+//#if defined(LINUXENV)
+//#include <libgen.h>
+//#endif
 #include "inc_rapidjson.h"
 #include "IBitmapGen.h"
 #include <iomanip>
@@ -726,7 +727,7 @@ CCmdLineOptions::ParseResult CCmdLineOptions::Parse(int argc, char** argv)
         ->check(createtileinfo_validator);
     cli_app.add_option("--font", argument_truetypefontname,
         "Only used for 'CreateCZI': (on Linux) specify the filename of a TrueType-font (.ttf) to be used for generating text in the subblocks; (on Windows) name of the font.")
-#if defined(LINUXENV)
+#if CZICMD_USE_FREETYPE
         ->check(CLI::ExistingFile)
 #endif
         ->option_text("NAME/FILENAME");
@@ -1133,7 +1134,7 @@ bool CCmdLineOptions::IsLogLevelEnabled(int level) const
 
 void CCmdLineOptions::SetOutputFilename(const std::wstring& s)
 {
-#if defined(WIN32ENV)
+#if _WIN32
     wchar_t drive[_MAX_DRIVE];
     wchar_t dir[_MAX_DIR];
     wchar_t fname[_MAX_FNAME];
@@ -1146,8 +1147,7 @@ void CCmdLineOptions::SetOutputFilename(const std::wstring& s)
     this->outputPath = path;
     this->outputFilename = fname;
     this->outputFilename += ext;
-#endif
-#if defined(LINUXENV)
+#else
     std::string sutf8 = convertToUtf8(s);
     char* dirName = strdup(sutf8.c_str());
     char* fname = strdup(sutf8.c_str());
