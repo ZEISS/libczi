@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: LGPL-3.0-or-later
 
-IF(UNIX)
+IF(NOT LIBCZI_HAVE_WIN32_API)
  find_package(ZLIB QUIET)
  if (NOT ZLIB_FOUND)
     message(FATAL_ERROR [=[
@@ -24,7 +24,7 @@ IF(UNIX)
     message("** FreeType was not found, CZICmd with the option \"CreateCZI\" will create only empty images.")
 	  message("   (consider installing FreeType with e.g. 'sudo apt-get install libfreetype6-dev')")
  ENDIF()
-ENDIF(UNIX)
+ENDIF()
 
 include(FetchContent)
 
@@ -43,7 +43,7 @@ else()
      FetchContent_Declare(
             RapidJSON
             GIT_REPOSITORY https://github.com/Tencent/rapidjson.git
-            GIT_TAG        "v1.1.0"
+            GIT_TAG        7c73dd7de7c4f14379b781418c6e947ad464c818 # master as of 2024-08-16
             GIT_SHALLOW    TRUE
             PREFIX "${CMAKE_BINARY_DIR}/vendor/rapidjson"
     )
@@ -68,7 +68,6 @@ endif()
 set (CZICMDSRCFILES
          BitmapGen.cpp          
          DisplaySettingsHelper.h  
-         targetver.h
          BitmapGenFreeType.cpp  
          cmdlineoptions.cpp  
          execute.cpp              
@@ -84,17 +83,14 @@ set (CZICMDSRCFILES
          consoleio.cpp       
          executeCreateCzi.h       
          inc_CZIcmd_Config.h  
-         stdafx.cpp
          BitmapGenGdiplus.h     
          consoleio.h         
          execute.h                
          inc_libCZI.h         
-         stdafx.h
          BitmapGenNull.cpp      
          inc_rapidjson.h      
          BitmapGenNull.h        
          CZIcmd.cpp          
-         platform_defines.h
          executePlaneScan.h
          executePlaneScan.cpp
          executeBase.h
@@ -108,8 +104,8 @@ target_compile_definitions(CZIcmd PRIVATE _LIBCZISTATICLIB)
 target_link_libraries(CZIcmd PRIVATE ${ZLIB_LIBRARIES}  ${PNG_LIBRARIES} CLI11::CLI11 libCZIStatic)
 target_include_directories(CZIcmd PRIVATE ${CMAKE_CURRENT_BINARY_DIR} ${RAPIDJSON_INCLUDE_DIRS})
 
-IF(WIN32)
-  target_link_libraries(CZIcmd PRIVATE gdiplus Windowscodecs)
+IF(LIBCZI_HAVE_WIN32_API)
+  target_link_libraries(CZIcmd PRIVATE gdiplus Windowscodecs ole32)
 ENDIF()
 
 IF (FREETYPE_FOUND)
@@ -118,16 +114,17 @@ IF (FREETYPE_FOUND)
     target_link_libraries(CZIcmd PRIVATE ${FREETYPE_LIBRARIES})
 ENDIF()
 
-IF(UNIX)
+IF(NOT LIBCZI_HAVE_WIN32_API)
   target_include_directories(CZIcmd PRIVATE ${ZLIB_INCLUDE_DIR} ${PNG_INCLUDE_DIR})
   # seems to be problem with glibc I'd reckon -> https://stackoverflow.com/questions/51584960/stdcall-once-throws-stdsystem-error-unknown-error-1
   target_link_libraries(CZIcmd  PUBLIC pthread)
-ENDIF(UNIX)
+ENDIF()
 
 set(CZICMD_USE_FREETYPE 0)
 set(CZICMD_USE_WIC 0)
 set(CZICMD_USE_GDIPLUS 0)
 set(CZICMD_USE_LIBPNG 0)
+set(CZICMD_WINDOWSAPIAVAILABLE 0)
 
 IF (FREETYPE_FOUND)
 	set(CZICMD_USE_FREETYPE 1)
@@ -139,7 +136,8 @@ IF(PNG_FOUND)
 	set(CZICMD_LIBPNG_VERSION_STRING "${PNG_VERSION_STRING}")
 ENDIF()
 
-IF(WIN32)
+IF(LIBCZI_HAVE_WIN32_API)
+  set(CZICMD_WINDOWSAPIAVAILABLE 1)
 	set(CZICMD_USE_WIC 1)
 	set(CZICMD_USE_GDIPLUS 1)
 ENDIF()

@@ -2,18 +2,13 @@
 //
 // SPDX-License-Identifier: LGPL-3.0-or-later
 
-#include "stdafx.h"
+#include "inc_CZIcmd_Config.h"
 #include "consoleio.h"
 #include "cmdlineoptions.h"
 #include "execute.h"
 #include "inc_libCZI.h"
-
-#if defined(LINUXENV)
 #include <clocale>
-#endif
-
-#if defined(WIN32ENV)
-#define NOMINMAX
+#if CZICMD_WINDOWSAPI_AVAILABLE
 #include <Windows.h>
 #endif
 
@@ -24,7 +19,7 @@ class CLibCZISite : public libCZI::ISite
 public:
     explicit CLibCZISite(const CCmdLineOptions& opts) : options(opts)
     {
-#if defined(WIN32ENV)
+#if CZICMD_WINDOWSAPI_AVAILABLE
         if (options.GetUseWICJxrDecoder())
         {
             this->pSite = libCZI::GetDefaultSiteObject(libCZI::SiteObjectType::WithWICDecoder);
@@ -61,11 +56,10 @@ public:
 
 int main(int argc, char** _argv)
 {
-#if defined(WIN32ENV)
+#if CZICMD_WINDOWSAPI_AVAILABLE
     CoInitialize(NULL);
     CommandlineArgsWindowsHelper args_helper;
-#endif
-#if defined(LINUXENV)
+#else
     setlocale(LC_CTYPE, "");
 #endif
 
@@ -74,7 +68,7 @@ int main(int argc, char** _argv)
     try
     {
         CCmdLineOptions options(log);
-#if defined(WIN32ENV)
+#if CZICMD_WINDOWSAPI_AVAILABLE
         auto cmdLineParseResult = options.Parse(args_helper.GetArgc(), args_helper.GetArgv());
 #else
         auto cmdLineParseResult = options.Parse(argc, _argv);
@@ -110,7 +104,7 @@ int main(int argc, char** _argv)
         retVal = 1;
     }
 
-#if defined(WIN32ENV)
+#if CZICMD_WINDOWSAPI_AVAILABLE
     CoUninitialize();
 #endif
 

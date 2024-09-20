@@ -9,8 +9,6 @@
 #include <wincodec.h>
 
 #include "Site.h"
-//
-//#pragma comment(lib, "Windowscodecs.lib")
 
 using namespace std;
 using namespace libCZI;

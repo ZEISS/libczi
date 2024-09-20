@@ -2,13 +2,13 @@
 //
 // SPDX-License-Identifier: LGPL-3.0-or-later
 
-#include "stdafx.h"
+#include "inc_CZIcmd_Config.h"
 #include "utils.h"
 #include <cwctype>
 #include <iomanip>
 #include <regex>
 
-#if defined(WIN32ENV)
+#if CZICMD_WINDOWSAPI_AVAILABLE
 #define HAS_CODECVT
 #include <Windows.h>
 #endif
@@ -434,7 +434,7 @@ bool TryParseGuid(const std::wstring& str, libCZI::GUID* outGuid)
     return false;
 }
 
-#if defined(WIN32ENV)
+#if CZICMD_WINDOWSAPI_AVAILABLE
 CommandlineArgsWindowsHelper::CommandlineArgsWindowsHelper()
 {
     int number_arguments;

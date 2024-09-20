@@ -4,6 +4,9 @@
 
 #pragma once
 
+#include <string>
+#include <memory>
+
 class ILog
 {
 public:
