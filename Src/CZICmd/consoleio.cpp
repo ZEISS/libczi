@@ -2,7 +2,6 @@
 //
 // SPDX-License-Identifier: LGPL-3.0-or-later
 
-#include <cstdarg>
 #include "consoleio.h"
 #include <iostream>
 

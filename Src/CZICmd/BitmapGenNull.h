@@ -59,16 +59,22 @@ private:
         // TODO: posX/posY must be positive for this code to work correctly
         for (int y = posY; y < posY + height; ++y)
         {
-            if (y >= (int)this->height) break;
+            if (y >= static_cast<int>(this->height))
+            {
+                break;
+            }
 
-            const std::uint8_t* ptr = ((const std::uint8_t*)ptrData) + (y - posY) * stride;
-            std::uint8_t* ptrDst = ((std::uint8_t*)this->ptrData) + y * this->stride + tBytesPerPel * posX;
+            const std::uint8_t* ptr = static_cast<const std::uint8_t*>(ptrData) + static_cast<size_t>(y - posY) * stride;
+            std::uint8_t* ptrDst = static_cast<std::uint8_t*>(this->ptrData) + static_cast<size_t>(y) * this->stride + tBytesPerPel * static_cast<size_t>(posX);
             int v = 0x80;
             for (int x = posX; x < posX + width; ++x)
             {
-                if (x >= (int)this->width) break;
+                if (x >= static_cast<int>(this->width))
+                {
+                    break;
+                }
 
-                bool pixel = (*ptr & v);
+                const bool pixel = (*ptr & v);
                 if (pixel)
                 {
                     setPixel.setPixel(ptrDst);

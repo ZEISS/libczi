@@ -46,7 +46,7 @@ public:
     {
         auto gdiplusPxlFmt = this->bitmap->GetPixelFormat();
         libCZI::BitmapLockInfo bitmapLockInfo;
-        Rect rect(0, 0, (INT)this->bitmap->GetWidth(), (INT)this->bitmap->GetHeight());
+        Rect rect(0, 0, static_cast<INT>(this->bitmap->GetWidth()), static_cast<INT>(this->bitmap->GetHeight()));
         this->bitmap->LockBits(&rect, ImageLockModeRead, gdiplusPxlFmt, &this->bd);
         bitmapLockInfo.ptrData = this->bd.Scan0;
         bitmapLockInfo.ptrDataRoi = this->bd.Scan0;
@@ -120,7 +120,7 @@ CBitmapGenGdiplus::CBitmapGenGdiplus(const IBitmapGenParameters* params) : fonth
     Graphics g(bitmap.get());
     g.Clear(Color(255, 0, 0));
 
-    Font font(this->fontname.c_str(), (REAL)this->fontheight, FontStyle::FontStyleBold, UnitPoint);
+    Font font(this->fontname.c_str(), static_cast<REAL>(this->fontheight), FontStyle::FontStyleBold, UnitPoint);
     SolidBrush brush(Color(0, 0, 0));
 
     auto text = IBitmapGen::CreateTextW(info);
