@@ -172,7 +172,7 @@ CBitmapGenGdiplus::CBitmapGenGdiplus(const IBitmapGenParameters* params) : fonth
     else if (pixeltype == PixelType::Gray8)
     {
         auto bw = make_shared<CNullBitmapWrapper>(PixelType::Gray8, width, height);
-        Rect rect(0, 0, width, height);
+        Rect rect(0, 0, static_cast<INT>(width), static_cast<INT>(height));
         BitmapData bd;
         bitmap->LockBits(&rect, ImageLockModeRead, PixelFormat24bppRGB, &bd);
         auto _ = finally([&] { bitmap->UnlockBits(&bd); });	// execute "UnlockBits" when leaving scope
@@ -209,7 +209,7 @@ CBitmapGenGdiplus::CBitmapGenGdiplus(const IBitmapGenParameters* params) : fonth
     else if (pixeltype == PixelType::Bgr48)
     {
         auto bw = make_shared<CNullBitmapWrapper>(PixelType::Bgr48, width, height);
-        Rect rect(0, 0, width, height);
+        Rect rect(0, 0, static_cast<INT>(width), static_cast<INT>(height));
         BitmapData bd;
         bitmap->LockBits(&rect, ImageLockModeRead, PixelFormat24bppRGB, &bd);
         auto _ = finally([&] { bitmap->UnlockBits(&bd); });
