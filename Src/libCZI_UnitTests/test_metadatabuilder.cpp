@@ -523,8 +523,8 @@ TEST(MetadataBuilder, MetadataUtils11)
 
     for (auto valid_it = ValidCA.begin(); valid_it != ValidCA.end(); ++valid_it)
     {
-        auto key = valid_it->first;
-        auto value = valid_it->second;
+        const auto& key = valid_it->first;
+        const auto& value = valid_it->second;
 
         MetadataUtils::SetOrAddCustomKeyValuePair(mdBldr.get(), key, value);
     }
