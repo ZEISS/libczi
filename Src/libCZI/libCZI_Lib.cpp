@@ -118,7 +118,7 @@ std::shared_ptr<IOutputStream> libCZI::CreateOutputStreamForFile(const wchar_t* 
 
 std::shared_ptr<IInputOutputStream> libCZI::CreateInputOutputStreamForFile(const wchar_t* szFilename)
 {
-#ifdef LIBCZI_WINDOWSAPI_AVAILABLE
+#if LIBCZI_WINDOWSAPI_AVAILABLE
     return make_shared<CSimpleInputOutputStreamImplWindows>(szFilename);
 #else
 #if LIBCZI_USE_PREADPWRITEBASED_STREAMIMPL

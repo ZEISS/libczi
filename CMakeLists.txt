@@ -75,6 +75,13 @@ check_cxx_symbol_exists(pwrite unistd.h HAVE_UNISTD_H_PWRITE)
 BoolToFoundNotFound(HAVE_UNISTD_H_PWRITE HAVE_UNISTD_H_PWRITE_TEXT)
 message("check for open -> ${HAVE_FCNTL_H_OPEN_TEXT} ; check for pread -> ${HAVE_UNISTD_H_PREAD_TEXT} ; check for pwrite -> ${HAVE_UNISTD_H_PWRITE_TEXT}")
 
+# determine whether the Win32-API can be used (in other words: whether we are on a Windows-platform or targetting the Windows-platform)
+if (WIN32 OR CYGWIN OR MSYS OR MINGW)
+  set(LIBCZI_HAVE_WIN32_API ON)
+else()
+  set(LIBCZI_HAVE_WIN32_API OFF)
+endif()
+
 # This option controls whether to build the curl-based http-/https-stream object. If this option is
 # "ON", the build will fail if the curl-library is not available (either as an external package or
 # as a private copy downloaded during the CMake-run).
