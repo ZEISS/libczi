@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include "inc_CZIcmd_Config.h"
 #include <string>
 #include <vector>
 #include "inc_libCZI.h"
@@ -78,7 +79,7 @@ inline final_act<F> finally(F&& f) noexcept
     return final_act<F>(std::forward<F>(f));
 }
 
-#if defined(WIN32ENV)
+#if CZICMD_WINDOWSAPI_AVAILABLE
 /// A utility which is providing the command-line arguments (on Windows) as UTF8-encoded strings.
 class CommandlineArgsWindowsHelper
 {

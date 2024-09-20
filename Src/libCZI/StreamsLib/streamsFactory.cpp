@@ -54,7 +54,7 @@ static const struct
             nullptr
         },
 #endif  // LIBCZI_AZURESDK_BASED_STREAM_AVAILABLE
-#if _WIN32
+#if LIBCZI_WINDOWSAPI_AVAILABLE
         {
             { "windows_file_inputstream", "stream implementation based on Windows-API", nullptr, nullptr },
             [](const StreamsFactory::CreateStreamInfo& stream_info, const std::string& file_name) -> std::shared_ptr<libCZI::IStream>
@@ -66,7 +66,7 @@ static const struct
                 return std::make_shared<WindowsFileInputStream>(file_name.c_str());
             }
         },
-#endif  // _WIN32
+#endif  // LIBCZI_WINDOWSAPI_AVAILABLE
 #if LIBCZI_USE_PREADPWRITEBASED_STREAMIMPL
         {
             { "pread_file_inputstream", "stream implementation based on pread-API", nullptr, nullptr },
@@ -200,8 +200,8 @@ std::shared_ptr<libCZI::IStream> libCZI::StreamsFactory::CreateStream(const Crea
 template<typename t_charactertype>
 std::shared_ptr<libCZI::IStream> CreateDefaultStreamForFileGeneric(const t_charactertype* filename)
 {
-#if _WIN32
-    // if we are on Windows, then "WindowsFileInputStream" should give best performance/features
+#if LIBCZI_WINDOWSAPI_AVAILABLE
+    // if we are on Windows, then "WindowsFileInputStream" should give the best performance/features
     return std::make_shared<WindowsFileInputStream>(filename);
 #elif LIBCZI_USE_PREADPWRITEBASED_STREAMIMPL
     // otherwise (and if pread is available), then "PreadFileInputStream" is the best choice

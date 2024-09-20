@@ -4,7 +4,9 @@
 
 #pragma once
 
-#if defined(_WIN32)
+#include <libCZI_Config.h>
+
+#if LIBCZI_WINDOWSAPI_AVAILABLE
 
 #include <memory>
 #include "libCZI_Pixels.h"

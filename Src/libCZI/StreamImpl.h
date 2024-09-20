@@ -4,11 +4,11 @@
 
 #pragma once
 
-#include <memory>
 #include "libCZI.h"
 #include "inc_libCZI_Config.h"
-#if defined(_WIN32)
-    #include <Windows.h>
+#include <memory>
+#if LIBCZI_WINDOWSAPI_AVAILABLE
+#include <Windows.h>
 #endif
 
 /// <summary>   A simplistic output-stream implementation (based on C-runtime fopen). Note that this implementation is NOT thread-safe.</summary>
@@ -40,7 +40,7 @@ public: // interface libCZI::IOutputStream
 };
 #endif
 
-#if defined(_WIN32)
+#if LIBCZI_WINDOWSAPI_AVAILABLE
 
 class CSimpleOutputStreamImplWindows : public libCZI::IOutputStream
 {
@@ -84,7 +84,7 @@ public:
 };
 #endif
 
-#if defined(_WIN32)
+#if LIBCZI_WINDOWSAPI_AVAILABLE
 class CSimpleInputOutputStreamImplWindows : public libCZI::IInputOutputStream
 {
 private:

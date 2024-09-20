@@ -2,7 +2,6 @@
 //
 // SPDX-License-Identifier: LGPL-3.0-or-later
 
-#include "stdafx.h"
 #include "BitmapGenGdiplus.h"
 #include "BitmapGenNull.h"
 #include "utils.h"
@@ -47,7 +46,7 @@ public:
     {
         auto gdiplusPxlFmt = this->bitmap->GetPixelFormat();
         libCZI::BitmapLockInfo bitmapLockInfo;
-        Rect rect(0, 0, (INT)this->bitmap->GetWidth(), (INT)this->bitmap->GetHeight());
+        Rect rect(0, 0, static_cast<INT>(this->bitmap->GetWidth()), static_cast<INT>(this->bitmap->GetHeight()));
         this->bitmap->LockBits(&rect, ImageLockModeRead, gdiplusPxlFmt, &this->bd);
         bitmapLockInfo.ptrData = this->bd.Scan0;
         bitmapLockInfo.ptrDataRoi = this->bd.Scan0;
@@ -121,7 +120,7 @@ CBitmapGenGdiplus::CBitmapGenGdiplus(const IBitmapGenParameters* params) : fonth
     Graphics g(bitmap.get());
     g.Clear(Color(255, 0, 0));
 
-    Font font(this->fontname.c_str(), (REAL)this->fontheight, FontStyle::FontStyleBold, UnitPoint);
+    Font font(this->fontname.c_str(), static_cast<REAL>(this->fontheight), FontStyle::FontStyleBold, UnitPoint);
     SolidBrush brush(Color(0, 0, 0));
 
     auto text = IBitmapGen::CreateTextW(info);
@@ -173,7 +172,7 @@ CBitmapGenGdiplus::CBitmapGenGdiplus(const IBitmapGenParameters* params) : fonth
     else if (pixeltype == PixelType::Gray8)
     {
         auto bw = make_shared<CNullBitmapWrapper>(PixelType::Gray8, width, height);
-        Rect rect(0, 0, width, height);
+        Rect rect(0, 0, static_cast<INT>(width), static_cast<INT>(height));
         BitmapData bd;
         bitmap->LockBits(&rect, ImageLockModeRead, PixelFormat24bppRGB, &bd);
         auto _ = finally([&] { bitmap->UnlockBits(&bd); });	// execute "UnlockBits" when leaving scope
@@ -210,7 +209,7 @@ CBitmapGenGdiplus::CBitmapGenGdiplus(const IBitmapGenParameters* params) : fonth
     else if (pixeltype == PixelType::Bgr48)
     {
         auto bw = make_shared<CNullBitmapWrapper>(PixelType::Bgr48, width, height);
-        Rect rect(0, 0, width, height);
+        Rect rect(0, 0, static_cast<INT>(width), static_cast<INT>(height));
         BitmapData bd;
         bitmap->LockBits(&rect, ImageLockModeRead, PixelFormat24bppRGB, &bd);
         auto _ = finally([&] { bitmap->UnlockBits(&bd); });

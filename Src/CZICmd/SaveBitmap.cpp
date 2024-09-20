@@ -2,7 +2,6 @@
 //
 // SPDX-License-Identifier: LGPL-3.0-or-later
 
-#include "stdafx.h"
 #include "SaveBitmap.h"
 #include <fstream>
 #include <stdexcept>
@@ -14,6 +13,8 @@
 #if CZICMD_USE_WIC == 1
 #include <memory>
 #include <wincodec.h>
+#include <sstream>
+#include <iomanip>
 
 using namespace std;
 
@@ -150,9 +151,9 @@ private:
     {
         if (!checkFunc(hr))
         {
-            char errorMsg[255];
-            _snprintf_s(errorMsg, _TRUNCATE, "COM-ERROR hr=0x%08X (%s)", hr, function);
-            throw std::runtime_error(errorMsg);
+            ostringstream string_stream;
+            string_stream << "COM-ERROR hr=0x" << std::hex << std::uppercase << std::setw(8) << std::setfill('0') << hr << " (" << function << ")";
+            throw std::runtime_error(string_stream.str());
         }
     }
 };
@@ -212,11 +213,11 @@ private:
             [](std::uint32_t width, void* ptrData)->void
             {
                 char* p = (char*)ptrData;
-        for (std::uint32_t x = 0; x < width; ++x)
-        {
-            std::swap(*p, *(p + 2));
-            p += 3;
-        }
+                for (std::uint32_t x = 0; x < width; ++x)
+                {
+                    std::swap(*p, *(p + 2));
+                    p += 3;
+                }
             });
     }
 
@@ -226,11 +227,11 @@ private:
             [](std::uint32_t width, void* ptrData)->void
             {
                 char* p = (char*)ptrData;
-        for (std::uint32_t x = 0; x < width; ++x)
-        {
-            std::swap(*p, *(p + 2));
-            p += 4;
-        }
+                for (std::uint32_t x = 0; x < width; ++x)
+                {
+                    std::swap(*p, *(p + 2));
+                    p += 4;
+                }
             });
     }
 
@@ -240,11 +241,11 @@ private:
             [](std::uint32_t width, void* ptrData)->void
             {
                 unsigned short* p = (unsigned short*)ptrData;
-        for (std::uint32_t x = 0; x < width; ++x)
-        {
-            std::swap(*p, *(p + 2));
-            p += 3;
-        }
+                for (std::uint32_t x = 0; x < width; ++x)
+                {
+                    std::swap(*p, *(p + 2));
+                    p += 3;
+                }
             });
     }
 
@@ -277,7 +278,8 @@ private:
 
         {
             libCZI::ScopedBitmapLockerP lckScoped{ bitmap };
-            for (std::uint32_t h = 0; h < bitmap->GetHeight(); ++h) {
+            for (std::uint32_t h = 0; h < bitmap->GetHeight(); ++h) 
+            {
                 png_bytep ptr = (png_bytep)(((char*)lckScoped.ptrDataRoi) + h * lckScoped.stride);
                 png_write_row(pngStructInfo.png_ptr, ptr);
             }
@@ -306,7 +308,8 @@ private:
         {
             libCZI::ScopedBitmapLockerP lckScoped{ bitmap };
             std::unique_ptr<void, decltype(&free)> lineToTweak(malloc(lckScoped.stride), &free);
-            for (std::uint32_t h = 0; h < bitmap->GetHeight(); ++h) {
+            for (std::uint32_t h = 0; h < bitmap->GetHeight(); ++h) 
+            {
                 void* ptr = (((char*)lckScoped.ptrDataRoi) + h * lckScoped.stride);
                 memcpy(lineToTweak.get(), ptr, lckScoped.stride);
                 tweakLine(bitmap->GetWidth(), lineToTweak.get());

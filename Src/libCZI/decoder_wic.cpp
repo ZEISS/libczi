@@ -2,14 +2,15 @@
 //
 // SPDX-License-Identifier: LGPL-3.0-or-later
 
-#if defined(_WIN32)
 #include "decoder_wic.h"
+
+#if LIBCZI_WINDOWSAPI_AVAILABLE
 #include "BitmapOperations.h"
 #include <wincodec.h>
+#include <sstream>
+#include <iomanip>
 
 #include "Site.h"
-
-#pragma comment(lib, "Windowscodecs.lib")
 
 using namespace std;
 using namespace libCZI;
@@ -30,9 +31,9 @@ static void ThrowIfFailed(const char* function, HRESULT hr)
 {
     if (FAILED(hr))
     {
-        char errorMsg[255];
-        _snprintf_s(errorMsg, _TRUNCATE, "COM-ERROR hr=0x%08X (%s)", hr, function);
-        throw std::runtime_error(errorMsg);
+        ostringstream string_stream;
+        string_stream << "COM-ERROR hr=0x" << std::hex << std::uppercase << std::setw(8) << std::setfill('0') << hr << " (" << function << ")";
+        throw std::runtime_error(string_stream.str());
     }
 }
 
@@ -293,7 +294,7 @@ static bool DeterminePixelType(const WICPixelFormatGUID& wicPxlFmt, GUID* destPi
     if (wicPxlFmt == wicDestPxlFmt)
     {
         // in this case we do not need to create a converter
-        hr = up_wicBitmapFrameDecode->CopyPixels(NULL, bmLckInfo.stride, bmLckInfo.stride * sizeBitmap.h, (BYTE*)bmLckInfo.ptrDataRoi);
+        hr = up_wicBitmapFrameDecode->CopyPixels(NULL, bmLckInfo.stride, bmLckInfo.stride * sizeBitmap.h, static_cast<BYTE*>(bmLckInfo.ptrDataRoi));
         ThrowIfFailed("wicBitmapFrameDecode->CopyPixels", hr);
     }
     else
@@ -317,7 +318,7 @@ static bool DeterminePixelType(const WICPixelFormatGUID& wicPxlFmt, GUID* destPi
     // WIC-codec does not directly support "BGR48", so we need to convert (#36)
     if (px_type == PixelType::Bgr48)
     {
-        CBitmapOperations::RGB48ToBGR48(sizeBitmap.w, sizeBitmap.h, (uint16_t*)bmLckInfo.ptrDataRoi, bmLckInfo.stride);
+        CBitmapOperations::RGB48ToBGR48(sizeBitmap.w, sizeBitmap.h, static_cast<uint16_t*>(bmLckInfo.ptrDataRoi), bmLckInfo.stride);
     }
 
     if (GetSite()->IsEnabled(LOGLEVEL_CHATTYINFORMATION))

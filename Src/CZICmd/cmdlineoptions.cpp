@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: LGPL-3.0-or-later
 
-#include "stdafx.h"
+#include "inc_CZIcmd_Config.h"
 #include "cmdlineoptions.h"
 #include "inc_libCZI.h"
 #include <clocale>
@@ -12,7 +12,7 @@
 #include <utility>
 #include <cstring>
 #include <cmath>
-#if defined(LINUXENV)
+#if !_WIN32
 #include <libgen.h>
 #endif
 #include "inc_rapidjson.h"
@@ -727,7 +727,7 @@ CCmdLineOptions::ParseResult CCmdLineOptions::Parse(int argc, char** argv)
         ->check(createtileinfo_validator);
     cli_app.add_option("--font", argument_truetypefontname,
         "Only used for 'CreateCZI': (on Linux) specify the filename of a TrueType-font (.ttf) to be used for generating text in the subblocks; (on Windows) name of the font.")
-#if defined(LINUXENV)
+#if CZICMD_USE_FREETYPE
         ->check(CLI::ExistingFile)
 #endif
         ->option_text("NAME/FILENAME");
@@ -1134,7 +1134,7 @@ bool CCmdLineOptions::IsLogLevelEnabled(int level) const
 
 void CCmdLineOptions::SetOutputFilename(const std::wstring& s)
 {
-#if defined(WIN32ENV)
+#if _WIN32
     wchar_t drive[_MAX_DRIVE];
     wchar_t dir[_MAX_DIR];
     wchar_t fname[_MAX_FNAME];
@@ -1147,8 +1147,7 @@ void CCmdLineOptions::SetOutputFilename(const std::wstring& s)
     this->outputPath = path;
     this->outputFilename = fname;
     this->outputFilename += ext;
-#endif
-#if defined(LINUXENV)
+#else
     std::string sutf8 = convertToUtf8(s);
     char* dirName = strdup(sutf8.c_str());
     char* fname = strdup(sutf8.c_str());
@@ -1453,7 +1452,7 @@ bool CCmdLineOptions::TryParseDisplaySettings(const std::string& s, std::map<int
 
         string tk(s.c_str() + offset, length);
         string tktr = trim(tk);
-        if (tktr.length() > 0)
+        if (!tktr.empty())
         {
             bool token_found = false;
             for (size_t i = 0; i < sizeof(info_levels) / sizeof(info_levels[0]); ++i)

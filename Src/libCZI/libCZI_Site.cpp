@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: LGPL-3.0-or-later
 
 #include "libCZI.h"
+#include "inc_libCZI_Config.h"
 #include "decoder.h"
 #include "decoder_zstd.h"
 #include <mutex>
@@ -37,7 +38,7 @@ public:
     }
 };
 
-#if defined(_WIN32)
+#if LIBCZI_WINDOWSAPI_AVAILABLE
 class CSiteImpWic : public CSiteImpBase
 {
 private:
@@ -139,7 +140,7 @@ public:
     }
 };
 
-#if defined(_WIN32)
+#if LIBCZI_WINDOWSAPI_AVAILABLE
 static CSiteImpWic theWicSite;
 #endif
 static CSiteImpJxrLib theJxrLibSite;
@@ -168,7 +169,7 @@ libCZI::ISite* libCZI::GetDefaultSiteObject(SiteObjectType type)
 {
     switch (type)
     {
-#if defined(_WIN32)
+#if LIBCZI_WINDOWSAPI_AVAILABLE
     case SiteObjectType::WithWICDecoder:
         return &theWicSite;
 #endif

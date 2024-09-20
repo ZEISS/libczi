@@ -4,6 +4,9 @@
 
 #pragma once
 
+// whether Win32-API can be used
+#define CZICMD_WINDOWSAPI_AVAILABLE     @CZICMD_WINDOWSAPIAVAILABLE@
+
 #define CZICMD_USE_WIC						      @CZICMD_USE_WIC@
 
 #define CZICMD_USE_LIBPNG					      @CZICMD_USE_LIBPNG@

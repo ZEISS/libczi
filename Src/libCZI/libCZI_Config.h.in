@@ -10,6 +10,9 @@
 #define LIBCZI_VERSION_PATCH "@libCZI_VERSION_PATCH@"
 #define LIBCZI_VERSION_TWEAK "@libCZI_VERSION_TWEAK@"
 
+// whether the libCZI library is built with support for the Windows-API, i.e. whether it is being built for a Windows-environment
+#define LIBCZI_WINDOWSAPI_AVAILABLE @libCZI_WINDOWSAPIAVAILABLE@
+
 // if the host system is a big-endian system, this is "1", otherwise 0
 #define LIBCZI_ISBIGENDIANHOST @libCZI_ISBIGENDIANHOST@
 

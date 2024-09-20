@@ -2,7 +2,6 @@
 //
 // SPDX-License-Identifier: LGPL-3.0-or-later
 
-#include "stdafx.h"
 #include "BitmapGenNull.h"
 #include "utils.h"
 #include "inc_libCZI.h"
@@ -37,14 +36,14 @@ void CNullBitmapWrapper::Clear(const ColorSpecification& color)
     case libCZI::PixelType::Gray8:
         for (std::uint32_t y = 0; y < this->height; ++y)
         {
-            memset(((std::uint8_t*)this->ptrData) + static_cast<size_t>(y) * this->stride, color.Gray8.value, this->width);
+            memset(static_cast<std::uint8_t*>(this->ptrData) + static_cast<size_t>(y) * this->stride, color.Gray8.value, this->width);
         }
 
         break;
     case libCZI::PixelType::Bgr24:
         for (std::uint32_t y = 0; y < this->height; ++y)
         {
-            std::uint8_t* ptr = ((std::uint8_t*)this->ptrData) + static_cast<size_t>(y) * this->stride;
+            std::uint8_t* ptr = static_cast<std::uint8_t*>(this->ptrData) + static_cast<size_t>(y) * this->stride;
             for (std::uint32_t x = 0; x < this->height; ++x)
             {
                 *ptr++ = color.Bgr24.b;
@@ -57,7 +56,7 @@ void CNullBitmapWrapper::Clear(const ColorSpecification& color)
     case libCZI::PixelType::Gray16:
         for (std::uint32_t y = 0; y < this->height; ++y)
         {
-            std::uint16_t* ptr = (std::uint16_t*)(((std::uint8_t*)this->ptrData) + static_cast<size_t>(y) * this->stride);
+            std::uint16_t* ptr = reinterpret_cast<std::uint16_t*>(static_cast<std::uint8_t*>(this->ptrData) + static_cast<size_t>(y) * this->stride);
             for (std::uint32_t x = 0; x < this->height; ++x)
             {
                 *ptr++ = color.Gray16.value;
@@ -68,7 +67,7 @@ void CNullBitmapWrapper::Clear(const ColorSpecification& color)
     case libCZI::PixelType::Bgr48:
         for (std::uint32_t y = 0; y < this->height; ++y)
         {
-            std::uint16_t* ptr = ((std::uint16_t*)this->ptrData) + static_cast<size_t>(y) * this->stride;
+            std::uint16_t* ptr = static_cast<std::uint16_t*>(this->ptrData) + static_cast<size_t>(y) * this->stride;
             for (std::uint32_t x = 0; x < this->height; ++x)
             {
                 *ptr++ = color.Bgr48.b;

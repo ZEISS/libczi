@@ -5,7 +5,7 @@
 #pragma once
 #include <libCZI_Config.h>
 
-#if defined(_WIN32)
+#if LIBCZI_WINDOWSAPI_AVAILABLE
 #include <string>
 #include "../libCZI.h"
 #include <Windows.h>

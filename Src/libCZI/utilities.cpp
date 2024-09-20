@@ -3,18 +3,17 @@
 // SPDX-License-Identifier: LGPL-3.0-or-later
 
 #include "utilities.h"
+#include "inc_libCZI_Config.h"
 #include <locale>
 #include <codecvt>
 #include <sstream>
 #include <cstring>
 #include <array>
-#if !defined(_WIN32)
+#if LIBCZI_WINDOWSAPI_AVAILABLE
+#include <Windows.h>
+#else
 #include <random>
 #endif
-#if defined(_WIN32)
-#include <Windows.h>
-#endif
-#include "inc_libCZI_Config.h"
 #if LIBCZI_HAVE_ENDIAN_H
 #include "endian.h"
 #endif
@@ -124,7 +123,7 @@ tString trimImpl(const tString& str, const tString& whitespace)
 
 /*static*/libCZI::GUID Utilities::GenerateNewGuid()
 {
-#if defined(_WIN32)
+#if LIBCZI_WINDOWSAPI_AVAILABLE
     ::GUID guid;
     CoCreateGuid(&guid);
     libCZI::GUID guid_value

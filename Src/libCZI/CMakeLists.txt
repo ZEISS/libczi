@@ -246,17 +246,21 @@ else()
     GIT_TAG "v1.5.6"
   )
 
-  if(NOT zstd_POPULATED)
-    message(STATUS "Fetching zstd...")
-    set(ZSTD_BUILD_PROGRAMS  OFF CACHE BOOL "" FORCE)
-    set(ZSTD_BUILD_SHARED    OFF CACHE BOOL "" FORCE)
-    set(ZSTD_BUILD_TESTS     OFF CACHE BOOL "" FORCE)
-    set(ZSTD_BUILD_CONTRIB   OFF CACHE BOOL "" FORCE)
+  message(STATUS "Fetching zstd...")
+  set(ZSTD_BUILD_PROGRAMS  OFF CACHE BOOL "" FORCE)
+  set(ZSTD_BUILD_SHARED    OFF CACHE BOOL "" FORCE)
+  set(ZSTD_BUILD_TESTS     OFF CACHE BOOL "" FORCE)
+  set(ZSTD_BUILD_CONTRIB   OFF CACHE BOOL "" FORCE)
 
-    FetchContent_Populate(zstd)
+  FetchContent_MakeAvailable(zstd)
 
-    add_subdirectory(${zstd_SOURCE_DIR}/build/cmake ${zstd_BINARY_DIR})
-  endif()
+  add_subdirectory(${zstd_SOURCE_DIR}/build/cmake ${zstd_BINARY_DIR})
+endif()
+
+if (LIBCZI_HAVE_WIN32_API)
+  set(libCZI_WINDOWSAPIAVAILABLE 1)
+else()
+  set(libCZI_WINDOWSAPIAVAILABLE 0)
 endif()
 
 configure_file (
@@ -304,6 +308,9 @@ if (LIBCZI_BUILD_DYNLIB)
   IF(UNIX)
     target_compile_options(libCZI PRIVATE -D_FILE_OFFSET_BITS=64)
   ENDIF(UNIX)
+  if(LIBCZI_HAVE_WIN32_API)
+    target_link_libraries(libCZI PRIVATE ole32 Windowscodecs)
+  endif()
 endif(LIBCZI_BUILD_DYNLIB)
 
 #
@@ -342,7 +349,9 @@ IF(UNIX)
   target_compile_options(libCZIStatic PRIVATE -D_FILE_OFFSET_BITS=64)
   set_property(TARGET libCZIStatic PROPERTY POSITION_INDEPENDENT_CODE ON)
 ENDIF(UNIX)
-
+if(LIBCZI_HAVE_WIN32_API)
+    target_link_libraries(libCZIStatic PUBLIC ole32 Windowscodecs)
+endif()
 
 #
 # Notes: - the variables CMAKE_INSTALL_<...> have been defined in the module "GNUInstallDirs"
