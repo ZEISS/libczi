@@ -294,7 +294,7 @@ static bool DeterminePixelType(const WICPixelFormatGUID& wicPxlFmt, GUID* destPi
     if (wicPxlFmt == wicDestPxlFmt)
     {
         // in this case we do not need to create a converter
-        hr = up_wicBitmapFrameDecode->CopyPixels(NULL, bmLckInfo.stride, bmLckInfo.stride * sizeBitmap.h, (BYTE*)bmLckInfo.ptrDataRoi);
+        hr = up_wicBitmapFrameDecode->CopyPixels(NULL, bmLckInfo.stride, bmLckInfo.stride * sizeBitmap.h, static_cast<BYTE*>(bmLckInfo.ptrDataRoi));
         ThrowIfFailed("wicBitmapFrameDecode->CopyPixels", hr);
     }
     else
@@ -318,7 +318,7 @@ static bool DeterminePixelType(const WICPixelFormatGUID& wicPxlFmt, GUID* destPi
     // WIC-codec does not directly support "BGR48", so we need to convert (#36)
     if (px_type == PixelType::Bgr48)
     {
-        CBitmapOperations::RGB48ToBGR48(sizeBitmap.w, sizeBitmap.h, (uint16_t*)bmLckInfo.ptrDataRoi, bmLckInfo.stride);
+        CBitmapOperations::RGB48ToBGR48(sizeBitmap.w, sizeBitmap.h, static_cast<uint16_t*>(bmLckInfo.ptrDataRoi), bmLckInfo.stride);
     }
 
     if (GetSite()->IsEnabled(LOGLEVEL_CHATTYINFORMATION))
