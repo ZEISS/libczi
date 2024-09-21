@@ -154,7 +154,7 @@ jobs:
 
       - name: Upload Coverage
         uses: codecov/codecov-action@v4
-        if: ${{ (matrix.OS == 'windows-latest') && (matrix.build == 'Debug') }}
+        if: ${{ github.repository == 'ZEISS/libczi' && (matrix.OS == 'windows-latest') && (matrix.build == 'Debug') }}
         with:
           files: ./coverage.xml
           fail_ci_if_error: true
