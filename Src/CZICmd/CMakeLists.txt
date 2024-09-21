@@ -156,6 +156,9 @@ configure_file (
   )
 
 set(czicmd_PROJECT_DESCRIPTION ${CMAKE_PROJECT_DESCRIPTION})  # the string given for the project description in the main CMakeLists.txt
+set(czicmd_VERSION_MAJOR ${libCZI_VERSION_MAJOR})
+set(czicmd_VERSION_MINOR ${libCZI_VERSION_MINOR})
+set(czicmd_VERSION_PATCH ${libCZI_VERSION_PATCH})
 configure_file (
   "${CMAKE_CURRENT_SOURCE_DIR}/resource_data.h.in"
   "${CMAKE_CURRENT_BINARY_DIR}/resource_data.h"
