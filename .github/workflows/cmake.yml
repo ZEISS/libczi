@@ -56,7 +56,7 @@ jobs:
         run: |
           npm install --location=global azurite
 
-      - name: Configure CMake (Windows)
+      - name: Configure CMake (Windows x64)
         if: ${{ (matrix.OS == 'windows-latest') }}
         shell: bash
         run: |
@@ -65,14 +65,14 @@ jobs:
           # Note that we need to point CMake to the vcpkg-toolchain-file
           cmake -B "${{github.workspace}}/build" -DCMAKE_BUILD_TYPE=${{matrix.build}} -DLIBCZI_BUILD_CZICMD=ON -DLIBCZI_BUILD_CURL_BASED_STREAM=ON -DLIBCZI_BUILD_AZURESDK_BASED_STREAM=ON -DLIBCZI_BUILD_PREFER_EXTERNALPACKAGE_LIBCURL=ON -DCMAKE_TOOLCHAIN_FILE="${VCPKG_INSTALLATION_ROOT}/scripts/buildsystems/vcpkg.cmake" -DVCPKG_TARGET_TRIPLET=x64-windows-static
 
-      - name: Configure CMake (Windows)
+      - name: Configure CMake (Windows ARM64)
         if: ${{ (matrix.OS == 'windows-latest') }}
         shell: bash
         run: |
           # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
           # See https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type
           # Note that we need to point CMake to the vcpkg-toolchain-file
-          cmake -B "${{github.workspace}}/arm64build" -A ARM64 -DCMAKE_BUILD_TYPE=${{matrix.build}} -DLIBCZI_BUILD_CZICMD=ON -DLIBCZI_BUILD_CURL_BASED_STREAM=ON -DLIBCZI_BUILD_AZURESDK_BASED_STREAM=ON -DLIBCZI_BUILD_PREFER_EXTERNALPACKAGE_LIBCURL=ON -DCMAKE_TOOLCHAIN_FILE="${VCPKG_INSTALLATION_ROOT}/scripts/buildsystems/vcpkg.cmake" -DVCPKG_TARGET_TRIPLET=x64-windows-static
+          cmake -B "${{github.workspace}}/arm64build" -A ARM64 -DCMAKE_BUILD_TYPE=${{matrix.build}} -DLIBCZI_BUILD_CZICMD=ON -DLIBCZI_BUILD_CURL_BASED_STREAM=ON -DLIBCZI_BUILD_AZURESDK_BASED_STREAM=ON -DLIBCZI_BUILD_PREFER_EXTERNALPACKAGE_LIBCURL=ON -DCMAKE_TOOLCHAIN_FILE="${VCPKG_INSTALLATION_ROOT}/scripts/buildsystems/vcpkg.cmake" -DVCPKG_TARGET_TRIPLET=arm64-windows-static
 
       - name: Configure CMake (Linux)
         if: ${{ (matrix.OS == 'ubuntu-latest') }}
@@ -80,9 +80,20 @@ jobs:
         run: |
           cmake -B "${{github.workspace}}/build" -DCMAKE_BUILD_TYPE=${{matrix.build}} -DLIBCZI_BUILD_CZICMD=ON -DLIBCZI_BUILD_CURL_BASED_STREAM=ON -DLIBCZI_BUILD_PREFER_EXTERNALPACKAGE_LIBCURL=OFF -DLIBCZI_BUILD_AZURESDK_BASED_STREAM=ON -DCMAKE_TOOLCHAIN_FILE="${VCPKG_INSTALLATION_ROOT}/scripts/buildsystems/vcpkg.cmake"
 
-      - name: Build
-        # Build your program with the given configuration
+      - name: Build (Linux)
+        if: ${{ (matrix.OS == 'ubuntu-latest') }}
+        shell: bash
         run: cmake --build ${{github.workspace}}/build --config ${{matrix.build}} -j
+
+      - name: Build (Windows x64)
+        if: ${{ (matrix.OS == 'windows-latest') }}
+        shell: bash
+        run: cmake --build ${{github.workspace}}/build --config ${{matrix.build}} -j
+
+      - name: Build (Windows ARM64)
+        if: ${{ (matrix.OS == 'windows-latest') }}
+        shell: bash
+        run: cmake --build ${{github.workspace}}/arm64build --config ${{matrix.build}} -j
 
       - name: Test
         shell: bash
