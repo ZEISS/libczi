@@ -2,8 +2,7 @@ name: CMake
 
 on:
   push:
-    branches:
-      - '**'  # This matches pushes to any branch
+    branches: ["main"]
   pull_request:
     branches: ["main"]
   workflow_dispatch:
