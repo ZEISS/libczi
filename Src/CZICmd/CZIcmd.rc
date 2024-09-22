@@ -1,6 +1,6 @@
 // SPDX-FileCopyrightText: 2024 Carl Zeiss Microscopy GmbH
 //
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier:  LGPL-3.0-or-later
 
 #include <resource_data.h>
 
