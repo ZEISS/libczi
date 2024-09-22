@@ -173,7 +173,7 @@ jobs:
           mkdir "release/${name}"
           cp Src/CZICmd/Release/CZIcmd.exe "release/${name}/"
           echo "artifactName=${name}" >> "$GITHUB_ENV"
-          echo "artifactPath=${{github.workspace}}/build/release/${name}" >> "$GITHUB_ENV"
+          echo "artifactPath=${{github.workspace}}/arm64build/release/${name}" >> "$GITHUB_ENV"
 
       - name: Upload artifacts (Windows ARM64)
         if: ${{ (matrix.OS == 'windows-latest') && (matrix.build == 'Release') }}
