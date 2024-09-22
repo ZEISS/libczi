@@ -63,7 +63,7 @@ jobs:
           # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
           # See https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type
           # Note that we need to point CMake to the vcpkg-toolchain-file
-          cmake -B "${{github.workspace}}/build" -DCMAKE_BUILD_TYPE=${{matrix.build}} -DLIBCZI_BUILD_CZICMD=ON -DLIBCZI_BUILD_CURL_BASED_STREAM=ON -DLIBCZI_BUILD_AZURESDK_BASED_STREAM=ON -DLIBCZI_BUILD_PREFER_EXTERNALPACKAGE_LIBCURL=ON -DCMAKE_TOOLCHAIN_FILE="$env:VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake" -DVCPKG_TARGET_TRIPLET=x64-windows-static
+          cmake -B "${{github.workspace}}/build" -A x64 -DCMAKE_BUILD_TYPE=${{matrix.build}} -DLIBCZI_BUILD_CZICMD=ON -DLIBCZI_BUILD_CURL_BASED_STREAM=ON -DLIBCZI_BUILD_AZURESDK_BASED_STREAM=ON -DLIBCZI_BUILD_PREFER_EXTERNALPACKAGE_LIBCURL=ON -DCMAKE_TOOLCHAIN_FILE="$env:VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake" -DVCPKG_TARGET_TRIPLET=x64-windows-static
 
       - name: Configure CMake (Windows ARM64)
         if: ${{ (matrix.OS == 'windows-latest') }}
@@ -116,8 +116,8 @@ jobs:
           cd azurite
           # now use the CZIcmd executable to create a test CZI file
           "$czicmd" --command CreateCZI --createbounds "C0:2T0:2" --generatorpixeltype Gray8 --compressionopts "zstd1:ExplicitLevel=2;PreProcess=HiLoByteUnpack" --createsubblocksize "1024x1024" -o test --bitmapgenerator default
-          # start Azurite in the background
-          azurite --inMemoryPersistence --silent &
+          # start Azurite in the background (we start only the blob-service, as we only need this for the tests)
+          azurite-blob --inMemoryPersistence --silent &
           # create a blob container "testcontainer"
           az storage container create --name testcontainer  --connection-string "$AZURE_BLOB_STORE_CONNECTION_STRING"
           # upload the test CZI file to the container
@@ -165,7 +165,7 @@ jobs:
 
       - name: Prepare CZICmd as artifact (Windows ARM64)
         working-directory: ${{github.workspace}}/arm64build
-        if: ${{ (matrix.OS == 'windows-latest') && ( matrix.build == 'Release') }}
+        if: ${{ (matrix.OS == 'windows-latest') && (matrix.build == 'Release') }}
         shell: bash
         run: |
           mkdir release
