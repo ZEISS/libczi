@@ -58,7 +58,7 @@ jobs:
 
       - name: Configure CMake (Windows x64)
         if: ${{ (matrix.OS == 'windows-latest') }}
-        shell: bash
+        shell: pwsh
         run: |
           # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
           # See https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type
@@ -67,7 +67,7 @@ jobs:
 
       - name: Configure CMake (Windows ARM64)
         if: ${{ (matrix.OS == 'windows-latest') }}
-        shell: bash
+        shell: pwsh
         run: |
           # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
           # See https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type
@@ -87,12 +87,12 @@ jobs:
 
       - name: Build (Windows x64)
         if: ${{ (matrix.OS == 'windows-latest') }}
-        shell: bash
+        shell: pwsh
         run: cmake --build ${{github.workspace}}/build --config ${{matrix.build}} -j
 
       - name: Build (Windows ARM64)
         if: ${{ (matrix.OS == 'windows-latest') }}
-        shell: bash
+        shell: pwsh
         run: cmake --build ${{github.workspace}}/arm64build --config ${{matrix.build}} -j
 
       - name: Test
