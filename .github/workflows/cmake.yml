@@ -131,7 +131,7 @@ jobs:
           ctest --debug -C ${{matrix.build}}
           # note that we leave the Azurite process running, as we want to use it with the code-coverage step as well
 
-      - name: Upload CZICmd as artifact (Windows)
+      - name: Prepare CZICmd as artifact (Windows x64)
         working-directory: ${{github.workspace}}/build
         if: ${{ (matrix.OS == 'windows-latest') && ( matrix.build == 'Release') }}
         shell: bash
@@ -157,6 +157,25 @@ jobs:
 
       - name: Upload artifacts
         if: ${{ ( (matrix.OS == 'windows-latest') || (matrix.OS == 'ubuntu-latest') ) && (matrix.build == 'Release') }}
+        uses: actions/upload-artifact@v4
+        with:
+          path: ${{ env.artifactPath }}/
+          name: ${{ env.artifactName }}
+
+      - name: Prepare CZICmd as artifact (Windows ARM64)
+        working-directory: ${{github.workspace}}/arm64build
+        if: ${{ (matrix.OS == 'windows-latest') && ( matrix.build == 'Release') }}
+        shell: bash
+        run: |
+          mkdir release
+          name="CZICmd-windows-arm64-$(git describe --always)"
+          mkdir "release/${name}"
+          cp Src/CZICmd/Release/CZIcmd.exe "release/${name}/"
+          echo "artifactName=${name}" >> "$GITHUB_ENV"
+          echo "artifactPath=${{github.workspace}}/build/release/${name}" >> "$GITHUB_ENV"
+
+      - name: Upload artifacts (Windows ARM64)
+        if: ${{ (matrix.OS == 'windows-latest') && (matrix.build == 'Release') }}
         uses: actions/upload-artifact@v4
         with:
           path: ${{ env.artifactPath }}/
