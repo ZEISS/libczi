@@ -34,6 +34,7 @@ jobs:
           vcpkg install azure-storage-blobs-cpp:x64-windows-static
           vcpkg install azure-identity-cpp:x64-windows-static
           vcpkg install rapidjson 'curl[ssl]' --triplet x64-windows-static
+          # for the ARM64 cross-compilation build, we also need to install the ARM64 versions of the dependencies
           vcpkg install azure-storage-blobs-cpp:arm64-windows-static
           vcpkg install azure-identity-cpp:arm64-windows-static
           vcpkg install rapidjson 'curl[ssl]' --triplet arm64-windows-static
@@ -61,7 +62,8 @@ jobs:
         run: |
           # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
           # See https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type
-          # Note that we need to point CMake to the vcpkg-toolchain-file
+          # Note that we need to point CMake to the vcpkg-toolchain-file, and also specify the target triplet, c.f. https://learn.microsoft.com/en-us/vcpkg/concepts/triplets
+          # since we aim for a static build.
           cmake -B "${{github.workspace}}/build" -A x64 -DCMAKE_BUILD_TYPE=${{matrix.build}} -DLIBCZI_BUILD_CZICMD=ON -DLIBCZI_BUILD_CURL_BASED_STREAM=ON -DLIBCZI_BUILD_AZURESDK_BASED_STREAM=ON -DLIBCZI_BUILD_PREFER_EXTERNALPACKAGE_LIBCURL=ON -DCMAKE_TOOLCHAIN_FILE="$env:VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake" -DVCPKG_TARGET_TRIPLET=x64-windows-static
 
       - name: Configure CMake (Windows ARM64)
