@@ -28,3 +28,4 @@ version history                 {#version_history}
  0.61.2             | [111](https://github.com/ZEISS/libczi/pull/111)      | update libcurl to 8.9.1 (for build with `LIBCZI_BUILD_PREFER_EXTERNALPACKAGE_LIBCURL=OFF`), enable SChannel (on Windows) by default
  0.62.0             | [112](https://github.com/ZEISS/libczi/pull/112)      | add Azure-SDK based reader for reading from Azure Blob Storage, raise requirement to C++14 for building libCZI (previously C++11 was sufficient) because Azure-SDK requires C++14
  0.62.1             | [114](https://github.com/ZEISS/libczi/pull/114)      | improve build system fixing issues with msys2 and mingw-w64, cosmetic changes
+ 0.62.2             | [115](https://github.com/ZEISS/libczi/pull/115)      | enabling building with clang on windows
