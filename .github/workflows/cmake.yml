@@ -34,6 +34,10 @@ jobs:
           vcpkg install azure-storage-blobs-cpp:x64-windows-static
           vcpkg install azure-identity-cpp:x64-windows-static
           vcpkg install rapidjson 'curl[ssl]' --triplet x64-windows-static
+          # for the ARM64 cross-compilation build, we also need to install the ARM64 versions of the dependencies
+          vcpkg install azure-storage-blobs-cpp:arm64-windows-static
+          vcpkg install azure-identity-cpp:arm64-windows-static
+          vcpkg install rapidjson 'curl[ssl]' --triplet arm64-windows-static
 
       - name: Install dependencies (Linux)
         if: ${{ (matrix.OS == 'ubuntu-latest') }}
@@ -52,14 +56,25 @@ jobs:
         run: |
           npm install --location=global azurite
 
-      - name: Configure CMake (Windows)
+      - name: Configure CMake (Windows x64)
         if: ${{ (matrix.OS == 'windows-latest') }}
-        shell: bash
+        shell: pwsh
         run: |
           # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
           # See https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type
-          # Note that we need to point CMake to the vcpkg-toolchain-file
-          cmake -B "${{github.workspace}}/build" -DCMAKE_BUILD_TYPE=${{matrix.build}} -DLIBCZI_BUILD_CZICMD=ON -DLIBCZI_BUILD_CURL_BASED_STREAM=ON -DLIBCZI_BUILD_AZURESDK_BASED_STREAM=ON -DLIBCZI_BUILD_PREFER_EXTERNALPACKAGE_LIBCURL=ON -DCMAKE_TOOLCHAIN_FILE="${VCPKG_INSTALLATION_ROOT}/scripts/buildsystems/vcpkg.cmake" -DVCPKG_TARGET_TRIPLET=x64-windows-static
+          # Note that we need to point CMake to the vcpkg-toolchain-file, and also specify the target triplet, c.f. https://learn.microsoft.com/en-us/vcpkg/concepts/triplets
+          # since we aim for a static build.
+          cmake -B "${{github.workspace}}/build" -A x64 -DCMAKE_BUILD_TYPE=${{matrix.build}} -DLIBCZI_BUILD_CZICMD=ON -DLIBCZI_BUILD_CURL_BASED_STREAM=ON -DLIBCZI_BUILD_AZURESDK_BASED_STREAM=ON -DLIBCZI_BUILD_PREFER_EXTERNALPACKAGE_LIBCURL=ON -DCMAKE_TOOLCHAIN_FILE="$env:VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake" -DVCPKG_TARGET_TRIPLET=x64-windows-static
+
+      - name: Configure CMake (Windows ARM64)
+        if: ${{ (matrix.OS == 'windows-latest') }}
+        shell: pwsh
+        run: |
+          # Configure for a cross-compilation to ARM64.
+          # Note that since we are doing a cross compilation, we cannot execute code in order to determine platform
+          # characteristics like endianess and whether unaligned access is allowed. Therefore, we need to set the following
+          # variables manually: CRASH_ON_UNALIGNED_ACCESS=OFF and IS_BIG_ENDIAN=FALSE.
+          cmake -B "${{github.workspace}}/arm64build" -A ARM64 -DCMAKE_BUILD_TYPE=${{matrix.build}} -DLIBCZI_BUILD_CZICMD=ON -DLIBCZI_BUILD_CURL_BASED_STREAM=ON -DLIBCZI_BUILD_AZURESDK_BASED_STREAM=ON -DLIBCZI_BUILD_PREFER_EXTERNALPACKAGE_LIBCURL=ON -DCMAKE_TOOLCHAIN_FILE="$env:VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake" -DVCPKG_TARGET_TRIPLET=arm64-windows-static -DCRASH_ON_UNALIGNED_ACCESS=OFF -DIS_BIG_ENDIAN=FALSE
 
       - name: Configure CMake (Linux)
         if: ${{ (matrix.OS == 'ubuntu-latest') }}
@@ -67,9 +82,20 @@ jobs:
         run: |
           cmake -B "${{github.workspace}}/build" -DCMAKE_BUILD_TYPE=${{matrix.build}} -DLIBCZI_BUILD_CZICMD=ON -DLIBCZI_BUILD_CURL_BASED_STREAM=ON -DLIBCZI_BUILD_PREFER_EXTERNALPACKAGE_LIBCURL=OFF -DLIBCZI_BUILD_AZURESDK_BASED_STREAM=ON -DCMAKE_TOOLCHAIN_FILE="${VCPKG_INSTALLATION_ROOT}/scripts/buildsystems/vcpkg.cmake"
 
-      - name: Build
-        # Build your program with the given configuration
+      - name: Build (Linux)
+        if: ${{ (matrix.OS == 'ubuntu-latest') }}
+        shell: bash
         run: cmake --build ${{github.workspace}}/build --config ${{matrix.build}} -j
+
+      - name: Build (Windows x64)
+        if: ${{ (matrix.OS == 'windows-latest') }}
+        shell: pwsh
+        run: cmake --build ${{github.workspace}}/build --config ${{matrix.build}} -j
+
+      - name: Build (Windows ARM64)
+        if: ${{ (matrix.OS == 'windows-latest') }}
+        shell: pwsh
+        run: cmake --build ${{github.workspace}}/arm64build --config ${{matrix.build}} -j
 
       - name: Test
         shell: bash
@@ -91,8 +117,8 @@ jobs:
           cd azurite
           # now use the CZIcmd executable to create a test CZI file
           "$czicmd" --command CreateCZI --createbounds "C0:2T0:2" --generatorpixeltype Gray8 --compressionopts "zstd1:ExplicitLevel=2;PreProcess=HiLoByteUnpack" --createsubblocksize "1024x1024" -o test --bitmapgenerator default
-          # start Azurite in the background
-          azurite --inMemoryPersistence --silent &
+          # start Azurite in the background (we start only the blob-service, as we only need this for the tests)
+          azurite-blob --inMemoryPersistence --silent &
           # create a blob container "testcontainer"
           az storage container create --name testcontainer  --connection-string "$AZURE_BLOB_STORE_CONNECTION_STRING"
           # upload the test CZI file to the container
@@ -107,9 +133,9 @@ jobs:
           ctest --debug -C ${{matrix.build}}
           # note that we leave the Azurite process running, as we want to use it with the code-coverage step as well
 
-      - name: Upload CZICmd as artifact (Windows)
+      - name: Prepare CZICmd as artifact (Windows x64)
         working-directory: ${{github.workspace}}/build
-        if: ${{ (matrix.OS == 'windows-latest') && ( matrix.build == 'Release') }}
+        if: ${{ (matrix.OS == 'windows-latest') && (matrix.build == 'Release') }}
         shell: bash
         run: |
           mkdir release
@@ -121,7 +147,7 @@ jobs:
 
       - name: Upload CZICmd as artifact (Linux)
         working-directory: ${{github.workspace}}/build
-        if: ${{ (matrix.OS == 'ubuntu-latest') && ( matrix.build == 'Release') }}
+        if: ${{ (matrix.OS == 'ubuntu-latest') && (matrix.build == 'Release') }}
         shell: bash
         run: |
           mkdir release
@@ -133,6 +159,25 @@ jobs:
 
       - name: Upload artifacts
         if: ${{ ( (matrix.OS == 'windows-latest') || (matrix.OS == 'ubuntu-latest') ) && (matrix.build == 'Release') }}
+        uses: actions/upload-artifact@v4
+        with:
+          path: ${{ env.artifactPath }}/
+          name: ${{ env.artifactName }}
+
+      - name: Prepare CZICmd as artifact (Windows ARM64)
+        working-directory: ${{github.workspace}}/arm64build
+        if: ${{ (matrix.OS == 'windows-latest') && (matrix.build == 'Release') }}
+        shell: bash
+        run: |
+          mkdir release
+          name="CZICmd-windows-arm64-$(git describe --always)"
+          mkdir "release/${name}"
+          cp Src/CZICmd/Release/CZIcmd.exe "release/${name}/"
+          echo "artifactName=${name}" >> "$GITHUB_ENV"
+          echo "artifactPath=${{github.workspace}}/arm64build/release/${name}" >> "$GITHUB_ENV"
+
+      - name: Upload artifacts (Windows ARM64)
+        if: ${{ (matrix.OS == 'windows-latest') && (matrix.build == 'Release') }}
         uses: actions/upload-artifact@v4
         with:
           path: ${{ env.artifactPath }}/
@@ -153,7 +198,8 @@ jobs:
 
       - name: Upload Coverage
         uses: codecov/codecov-action@v4
-        if: ${{ (matrix.OS == 'windows-latest') && (matrix.build == 'Debug') }}
+        # Note: we want to upload coverage only for the upstream-repository, not for forks
+        if: ${{ (github.repository == 'ZEISS/libczi') && (matrix.OS == 'windows-latest') && (matrix.build == 'Debug') }}
         with:
           files: ./coverage.xml
           fail_ci_if_error: true

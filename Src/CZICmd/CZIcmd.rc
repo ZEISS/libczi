@@ -1,0 +1,73 @@
+// SPDX-FileCopyrightText: 2024 Carl Zeiss Microscopy GmbH
+//
+// SPDX-License-Identifier: LGPL-3.0-or-later
+
+#include <resource_data.h>
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "winres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// English (United States) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+FILEVERSION RC_FILEVERSION_1ST_NUMBER, RC_FILEVERSION_2ND_NUMBER, RC_FILEVERSION_3RD_NUMBER, RC_FILEVERSION_4TH_NUMBER
+PRODUCTVERSION RC_PRODUCTVERSION_1ST_NUMBER, RC_PRODUCTVERSION_2ND_NUMBER, RC_PRODUCTVERSION_3RD_NUMBER, RC_PRODUCTVERSION_4TH_NUMBER
+FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+FILEFLAGS 0x1L
+#else
+FILEFLAGS 0x0L
+#endif
+FILEOS 0x40004L
+FILETYPE 0x0L
+FILESUBTYPE 0x0L
+BEGIN
+BLOCK "StringFileInfo"
+BEGIN
+BLOCK "0c0004b0"
+BEGIN
+VALUE "CompanyName", "Carl Zeiss Microscopy GmbH"
+VALUE "FileDescription", RC_FILEDESCRIPTION_STR
+VALUE "FileVersion", RC_FILEVERSION_STRING
+VALUE "InternalName", "CZIcmd.exe"
+VALUE "LegalCopyright", "Copyright (C) 2024"
+VALUE "OriginalFilename", "CZIcmd.exe"
+VALUE "ProductName", "CZIcmd - test and demo application for libCZI"
+VALUE "ProductVersion", RC_PRODUCTVERSION_STRING
+END
+END
+BLOCK "VarFileInfo"
+BEGIN
+VALUE "Translation", 0xc00, 1200
+END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDI_APPLICATION_ICON    ICON                    "CZIcmd.ico"
+
+#endif    // English (United States) resources
+/////////////////////////////////////////////////////////////////////////////

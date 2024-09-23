@@ -98,7 +98,11 @@ set (CZICMDSRCFILES
          executePlaneScan.h
          executePlaneScan.cpp
          executeBase.h
-         executeBase.cpp)
+         executeBase.cpp
+         CZIcmd.manifest    # the manifest is needed to allow long paths on windows, see https://docs.microsoft.com/en-us/windows/win32/fileio/maximum-file-path-limitation?tabs=cmd
+                            # CMake will merge the manifest with a linker generated one (and ignore it on non-Windows platforms)
+         CZIcmd.rc          # the rc file (containing version information, only relevant for Windows)
+)
 
 add_executable(CZIcmd ${CZICMDSRCFILES})
 
@@ -149,6 +153,15 @@ ENDIF()
 configure_file (
   "${CMAKE_CURRENT_SOURCE_DIR}/CZIcmd_Config.h.in"
   "${CMAKE_CURRENT_BINARY_DIR}/CZIcmd_Config.h"
+  )
+
+set(czicmd_PROJECT_DESCRIPTION ${CMAKE_PROJECT_DESCRIPTION})  # the string given for the project description in the main CMakeLists.txt
+set(czicmd_VERSION_MAJOR ${libCZI_VERSION_MAJOR})
+set(czicmd_VERSION_MINOR ${libCZI_VERSION_MINOR})
+set(czicmd_VERSION_PATCH ${libCZI_VERSION_PATCH})
+configure_file (
+  "${CMAKE_CURRENT_SOURCE_DIR}/resource_data.h.in"
+  "${CMAKE_CURRENT_BINARY_DIR}/resource_data.h"
   )
 
 
