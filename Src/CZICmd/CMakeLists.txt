@@ -45,8 +45,7 @@ else()
     FetchContent_Declare(
             RapidJSON
             GIT_REPOSITORY https://github.com/Tencent/rapidjson.git
-            GIT_TAG        7c73dd7de7c4f14379b781418c6e947ad464c818 # master as of 2024-08-16
-            GIT_SHALLOW    TRUE
+            GIT_TAG        815e6e7e7e14be44a6c15d9aefed232ff064cad0 # master as of 2024-09-26
             PREFIX "${CMAKE_BINARY_DIR}/vendor/rapidjson"
     )
 
