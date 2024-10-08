@@ -31,6 +31,12 @@ jobs:
         # on Windows, we rely on vcpkg to pull in dependencies
         shell: bash
         run: |
+          # Temporary workaround for the vcpkg internal issue
+          # See https://github.com/microsoft/vcpkg/issues/41199#issuecomment-2378255699 for details
+          export SystemDrive=$SYSTEMDRIVE
+          export SystemRoot=$SYSTEMROOT
+          export windir=$WINDIR
+
           vcpkg install azure-storage-blobs-cpp:x64-windows-static
           vcpkg install azure-identity-cpp:x64-windows-static
           vcpkg install rapidjson 'curl[ssl]' --triplet x64-windows-static
