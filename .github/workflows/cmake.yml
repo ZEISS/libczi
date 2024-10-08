@@ -33,9 +33,9 @@ jobs:
         run: |
           # Temporary workaround for the vcpkg internal issue
           # See https://github.com/microsoft/vcpkg/issues/41199#issuecomment-2378255699 for details
-          export SystemDrive=$SYSTEMDRIVE # actionlint-ignore SC2153
-          export SystemRoot=$SYSTEMROOT   # actionlint-ignore SC2153
-          export windir=$WINDIR           # actionlint-ignore SC2153
+          export SystemDrive=$SYSTEMDRIVE # actionlint-ignore 2153
+          export SystemRoot=$SYSTEMROOT   # actionlint-ignore 2153
+          export windir=$WINDIR           # actionlint-ignore 2153
 
           vcpkg install azure-storage-blobs-cpp:x64-windows-static
           vcpkg install azure-identity-cpp:x64-windows-static
