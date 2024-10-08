@@ -210,6 +210,12 @@ void AzureBlobInputStream::Read(std::uint64_t offset, void* pv, std::uint64_t si
             *ptrBytesRead = download_response.Value.ContentRange.Length.Value();
         }
     }
+    else
+    {
+        ostringstream string_stream;
+        string_stream << "'DownloadTo' failed with status code " << static_cast<int>(code) << ".";
+        throw runtime_error(string_stream.str());
+    }
 }
 
 /*static*/std::string AzureBlobInputStream::GetBuildInformation()
