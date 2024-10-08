@@ -37,7 +37,7 @@ jobs:
           export SystemDrive=$SYSTEMDRIVE
           # shellcheck disable=SC2153
           export SystemRoot=$SYSTEMROOT
-          export windir=$WINDIRt
+          export windir=$WINDIR
 
           vcpkg install azure-storage-blobs-cpp:x64-windows-static
           vcpkg install azure-identity-cpp:x64-windows-static
