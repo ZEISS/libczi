@@ -35,6 +35,7 @@ jobs:
           # See https://github.com/microsoft/vcpkg/issues/41199#issuecomment-2378255699 for details
           # shellcheck disable=SC2153
           export SystemDrive=$SYSTEMDRIVE
+          # shellcheck disable=SC2153
           export SystemRoot=$SYSTEMROOT
           export windir=$WINDIRt
 
