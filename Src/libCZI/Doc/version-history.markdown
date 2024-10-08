@@ -31,3 +31,4 @@ version history                 {#version_history}
  0.62.2             | [115](https://github.com/ZEISS/libczi/pull/115)      | enabling building with clang on windows
  0.62.3             | [116](https://github.com/ZEISS/libczi/pull/116)      | enable long paths on Windows for CZIcmd, add Windows-ARM64 build
  0.62.4             | [117](https://github.com/ZEISS/libczi/pull/117)      | fix build with private RapidJSON library
+ 0.62.5             | [119](https://github.com/ZEISS/libczi/pull/119)      | fix a discrepancy between code and documentation
