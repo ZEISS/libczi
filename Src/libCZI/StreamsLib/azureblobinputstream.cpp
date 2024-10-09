@@ -185,7 +185,7 @@ void AzureBlobInputStream::Read(std::uint64_t offset, void* pv, std::uint64_t si
     const Azure::Core::Http::HttpStatusCode code = download_response.RawResponse->GetStatusCode();
 
     // TODO(JBL): I am not sure about what we can expect here as return code. The Azure SDK documentation is not very clear about this,
-    //             at least I am not aware of an authorative text on this.
+    //             at least I am not aware of an authoritative text on this.
     if (code == Azure::Core::Http::HttpStatusCode::Ok || code == Azure::Core::Http::HttpStatusCode::PartialContent)
     {
         // the reported position should match the requested offset
@@ -209,6 +209,12 @@ void AzureBlobInputStream::Read(std::uint64_t offset, void* pv, std::uint64_t si
         {
             *ptrBytesRead = download_response.Value.ContentRange.Length.Value();
         }
+    }
+    else
+    {
+        ostringstream string_stream;
+        string_stream << "'DownloadTo' failed with status code " << static_cast<int>(code) << ".";
+        throw runtime_error(string_stream.str());
     }
 }
 
