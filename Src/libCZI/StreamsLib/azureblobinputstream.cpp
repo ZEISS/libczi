@@ -115,7 +115,7 @@ void AzureBlobInputStream::CreateWithCreateAzureCliCredential(const std::map<std
 
 void AzureBlobInputStream::CreateWithWorkloadIdentityCredential(const std::map<std::wstring, std::wstring>& tokenized_file_name, const std::map<int, libCZI::StreamsFactory::Property>& property_bag)
 {
-    this->CreateWithCredential(tokenized_file_name, property_bag, AzureBlobInputStream::CreateAzureCliCredential);
+    this->CreateWithCredential(tokenized_file_name, property_bag, AzureBlobInputStream::CreateWorkloadIdentityCredential);
 }
 
 void AzureBlobInputStream::CreateWithManagedIdentityCredential(const std::map<std::wstring, std::wstring>& tokenized_file_name, const std::map<int, libCZI::StreamsFactory::Property>& property_bag)
