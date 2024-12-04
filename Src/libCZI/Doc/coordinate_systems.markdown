@@ -42,10 +42,10 @@ The primary source of information regarding the "placement of subblocks on the X
 The structure [SubBlockStatistics](https://zeiss.github.io/libczi/structlib_c_z_i_1_1_sub_block_statistics.html) contains two
 rectangles:
 
-| property | description |
-| | |
-|boundingBox| The minimal AABB (= axis-aligned-bounding-box) of the logicalRects of all subblocks (in all pyramid-layers). 
-|boundingBoxLayer0Only | The minimal AABB of the logicalRects of all subblocks in pyramid-layer 0.
+| property             | description                                                                 |
+|----------------------|-----------------------------------------------------------------------------|
+| boundingBox          | The minimal AABB (= axis-aligned-bounding-box) of the logicalRects of all subblocks (in all pyramid-layers). |
+| boundingBoxLayer0Only| The minimal AABB of the logicalRects of all subblocks in pyramid-layer 0.    |
 
 Converting from the _raw-subblock-coordinate-system_ to the _CZI-Pixel-Coordinate-System_ is now straightforward:
 subtract the top-left point of the boundingBoxLayer0Only rectangle. The translation vector between the coordinate systems
