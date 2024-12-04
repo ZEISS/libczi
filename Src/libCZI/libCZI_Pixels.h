@@ -74,6 +74,21 @@ namespace libCZI
         }
     };
 
+
+    enum class CZIFrameOfReference : std::uint8_t
+    {
+        Invalid,
+        Default,
+        RawSubBlockCoordinateSystem,    ///< The raw sub-block coordinate system.
+        PixelCoordinateSystem,          ///< The pixel coordinate system.
+    };
+
+    struct IntRectAndFrameOfReference
+    {
+        libCZI::CZIFrameOfReference frame_of_reference{ libCZI::CZIFrameOfReference::Invalid };
+        libCZI::IntRect rectangle;
+    };
+
     /// A rectangle (with double coordinates).
     struct DblRect
     {

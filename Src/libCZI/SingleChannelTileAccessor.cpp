@@ -17,7 +17,7 @@ CSingleChannelTileAccessor::CSingleChannelTileAccessor(const std::shared_ptr<ISu
 {
 }
 
-/*virtual*/std::shared_ptr<libCZI::IBitmapData> CSingleChannelTileAccessor::Get(const libCZI::IntRect& roi, const IDimCoordinate* planeCoordinate, const Options* pOptions)
+/*virtual*/std::shared_ptr<libCZI::IBitmapData> CSingleChannelTileAccessor::Get(const libCZI::IntRectAndFrameOfReference& roi, const IDimCoordinate* planeCoordinate, const Options* pOptions)
 {
     // first, we need to determine the pixeltype, which we do from the repository
     libCZI::PixelType pixelType;
