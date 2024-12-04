@@ -33,3 +33,4 @@ version history                 {#version_history}
  0.62.4             | [117](https://github.com/ZEISS/libczi/pull/117)      | fix build with private RapidJSON library
  0.62.5             | [119](https://github.com/ZEISS/libczi/pull/119)      | fix a discrepancy between code and documentation
  0.62.6             | [120](https://github.com/ZEISS/libczi/pull/120)      | fix workload identity in the azure blob inputstream
+ 0.62.7             | [122](https://github.com/ZEISS/libczi/pull/122)      | documentation update
