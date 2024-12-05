@@ -267,7 +267,7 @@ void RandomSubblocksAndCompareRenderingWithAndWithoutVisibilityOptimization(tAcc
 
 class SingleChannelTileAccessorHandler
 {
-    shared_ptr<CSingleChannelTileAccessor> accessor_;
+    shared_ptr<ISingleChannelTileAccessor> accessor_;
     bool sort_by_m_;
 public:
     explicit SingleChannelTileAccessorHandler(bool sortByM = true) : sort_by_m_(sortByM)

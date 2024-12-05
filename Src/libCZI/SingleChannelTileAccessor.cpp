@@ -30,10 +30,11 @@ CSingleChannelTileAccessor::CSingleChannelTileAccessor(const std::shared_ptr<ISu
     return this->Get(pixelType, roi, planeCoordinate, pOptions);
 }
 
-/*virtual*/std::shared_ptr<libCZI::IBitmapData> CSingleChannelTileAccessor::Get(libCZI::PixelType pixeltype, const libCZI::IntRect& roi, const IDimCoordinate* planeCoordinate, const Options* pOptions)
+/*virtual*/std::shared_ptr<libCZI::IBitmapData> CSingleChannelTileAccessor::Get(libCZI::PixelType pixeltype, const  libCZI::IntRectAndFrameOfReference& roi, const IDimCoordinate* planeCoordinate, const Options* pOptions)
 {
-    auto bmDest = GetSite()->CreateBitmap(pixeltype, roi.w, roi.h);
-    this->InternalGet(roi.x, roi.y, bmDest.get(), planeCoordinate, pOptions);
+    IntRect roi_raw_subblock_cs = Utils::ConvertToFrameOfReference(roi, this->sbBlkRepository.get(), CZIFrameOfReference::RawSubBlockCoordinateSystem);
+    auto bmDest = GetSite()->CreateBitmap(pixeltype, roi_raw_subblock_cs.w, roi_raw_subblock_cs.h);
+    this->InternalGet(roi_raw_subblock_cs.x, roi_raw_subblock_cs.y, bmDest.get(), planeCoordinate, pOptions);
     return bmDest;
 }
 
