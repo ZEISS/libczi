@@ -447,12 +447,14 @@ namespace libCZI
         /// If no valid M-index was present, then this member will have the value std::numeric_limits<int>::min().
         int maxMindex;
 
-        /// The bounding box determined from all sub-blocks in the 
+        /// The minimal axis-aligned-bounding-box determined from all logical coordinates of all sub-blocks in the 
         /// document.
         IntRect boundingBox;
 
-        /// The bounding box determined only from the sub-blocks of pyramid-layer0 in the 
-        /// document.
+        /// The minimal axis-aligned-bounding box determined only from the logical coordinates of the sub-blocks on pyramid-layer0 in the 
+        /// document. The top-left corner of this bounding-box gives the coordinate of the origin of the 'CZI-Pixel-Coordinate-System' in
+        /// the coordinate system used by libCZI (which is refered to as 'raw-subblock-coordinate-system'). See @ref coordinatesystems for
+        /// additional information.
         IntRect boundingBoxLayer0Only;
 
         /// The dimension bounds - the minimum and maximum dimension index determined
