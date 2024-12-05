@@ -5,10 +5,10 @@ Coordinate Systems                 {#coordinatesystems}
 
 As far as libCZI is concerned, there are two coordinate systems that are of interest:
 
-1. The _raw-subblock-coordinate-system_. This is the coordinate system in which the X-Y-positions of the subblocks
+1. The _raw-subblock-coordinate-system_ is the coordinate system in which the X-Y-positions of the subblocks
     are physically stored in the file, and it is also the coordinate system which is used in libCZI.
     The API [ISubBlock::GetSubBlockInfo](https://zeiss.github.io/libczi/classlib_c_z_i_1_1_i_sub_block.html#a557108549db08e25b1df1ef8fae37a07) is returning the X-Y-position of the subblock in this 
-    coordinate system ([SubBlockInfo::logicalRect](https://zeiss.github.io/libczi/structlib_c_z_i_1_1_sub_block_info.html)), and
+    coordinate system ([SubBlockInfo::logicalRect](https://zeiss.github.io/libczi/structlib_c_z_i_1_1_sub_block_info.html)), which is
     unmodified wrt to the actual file content.   
     Conceptually, the _raw-subblock-coordinate-system_ has the following characteristics:   
     * The X and Y-axis are such that the subblock's logicalRect are axis-aligned.
