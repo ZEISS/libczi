@@ -587,7 +587,20 @@ namespace libCZI
         /// \return The pyramid statistics.
         virtual PyramidStatistics GetPyramidStatistics() = 0;
 
+        virtual libCZI::IntPoint TransformPoint(const libCZI::IntPointAndFrameOfReference& source_point, libCZI::CZIFrameOfReference destination_frame_of_reference) = 0;
+
         virtual ~ISubBlockRepository() = default;
+
+        libCZI::IntRect TransformRectangle(const libCZI::IntRectAndFrameOfReference& source_rectangle, libCZI::CZIFrameOfReference destination_frame_of_reference)
+        {
+            libCZI::IntPointAndFrameOfReference source_point_and_frame_of_reference;
+            source_point_and_frame_of_reference.frame_of_reference = source_rectangle.frame_of_reference;
+            source_point_and_frame_of_reference.point = { source_rectangle.rectangle.x, source_rectangle.rectangle.y };
+            libCZI::IntPoint transformed_point_upper_left = TransformPoint(source_point_and_frame_of_reference, destination_frame_of_reference);
+            source_point_and_frame_of_reference.point = { source_rectangle.rectangle.x + source_rectangle.rectangle.w, source_rectangle.rectangle.y + source_rectangle.rectangle.h };
+            libCZI::IntPoint transformed_point_lower_right = TransformPoint(source_point_and_frame_of_reference, destination_frame_of_reference);
+            return { transformed_point_upper_left.x, transformed_point_upper_left.y, transformed_point_lower_right.x - transformed_point_upper_left.x, transformed_point_lower_right.y - transformed_point_upper_left.y };
+        }
     };
 
     /// Additional functionality for the subblock-repository, providing some specialized and not commonly used functionality.
@@ -667,7 +680,7 @@ namespace libCZI
             /// This is useful as some versions of software creating CZI-files used to write bogus values for size-M, and those files
             /// would otherwise not be usable with strict validation enabled. If this bogus size-M is ignored, then the files can be used
             /// without problems.
-            bool ignore_sizem_for_pyramid_subblocks{ false };   
+            bool ignore_sizem_for_pyramid_subblocks{ false };
 
             /// Sets the the default.
             void SetDefault()

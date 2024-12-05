@@ -96,6 +96,29 @@ CCZIReader::CCZIReader() : isOperational(false)
     return this->subBlkDir.GetPyramidStatistics();
 }
 
+/*virtual*/libCZI::IntPoint CCZIReader::TransformPoint(const libCZI::IntPointAndFrameOfReference& source_point, libCZI::CZIFrameOfReference destination_frame_of_reference)
+{
+    if ((source_point.frame_of_reference == CZIFrameOfReference::PixelCoordinateSystem || source_point.frame_of_reference == CZIFrameOfReference::RawSubBlockCoordinateSystem) &&
+    destination_frame_of_reference == source_point.frame_of_reference)
+    {
+        return source_point.point;
+    }
+
+    if (source_point.frame_of_reference == CZIFrameOfReference::PixelCoordinateSystem && destination_frame_of_reference == CZIFrameOfReference::RawSubBlockCoordinateSystem)
+    {
+        const auto& statistics = this->subBlkDir.GetStatistics();
+        return libCZI::IntPoint{ source_point.point.x + statistics.boundingBoxLayer0Only.x, source_point.point.y + statistics.boundingBoxLayer0Only.y };
+    }
+    if (source_point.frame_of_reference == CZIFrameOfReference::RawSubBlockCoordinateSystem && destination_frame_of_reference == CZIFrameOfReference::PixelCoordinateSystem)
+    {
+        const auto& statistics = this->subBlkDir.GetStatistics();
+        return libCZI::IntPoint{ source_point.point.x - statistics.boundingBoxLayer0Only.x, source_point.point.y - statistics.boundingBoxLayer0Only.y };
+
+    }
+
+    throw logic_error("Unsupported frame-of-reference transformation.");
+}
+
 /*virtual*/void CCZIReader::EnumerateSubBlocks(const std::function<bool(int index, const SubBlockInfo& info)>& funcEnum)
 {
     this->ThrowIfNotOperational();
@@ -205,8 +228,8 @@ CCZIReader::CCZIReader() : isOperational(false)
     this->ThrowIfNotOperational();
     CziReaderCommon::EnumerateSubset(
         std::bind(&CCziAttachmentsDirectory::EnumAttachments, &this->attachmentDir, std::placeholders::_1),
-        contentFileType, 
-        name, 
+        contentFileType,
+        name,
         funcEnum);
 }
 

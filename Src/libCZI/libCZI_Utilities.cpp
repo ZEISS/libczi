@@ -727,35 +727,36 @@ Utils::CompressionOption Utils::ParseCompressionOptions(const std::string& optio
     throw logic_error("The specified string could not be processed.");
 }
 
-/*static*/libCZI::IntRect Utils::ConvertToFrameOfReference(const libCZI::IntRectAndFrameOfReference& source_rect, libCZI::ISubBlockRepository* sub_block_repository, libCZI::CZIFrameOfReference destination_frame_of_reference)
-{
-    if ((source_rect.frame_of_reference == CZIFrameOfReference::PixelCoordinateSystem || source_rect.frame_of_reference == CZIFrameOfReference::RawSubBlockCoordinateSystem) &&
-        destination_frame_of_reference == source_rect.frame_of_reference)
-    {
-        return source_rect.rectangle;
-    }
-
-    if (source_rect.frame_of_reference == CZIFrameOfReference::PixelCoordinateSystem && destination_frame_of_reference == CZIFrameOfReference::RawSubBlockCoordinateSystem)
-    {
-        auto statistics = sub_block_repository->GetStatistics();
-        return libCZI::IntRect
-        {
-            source_rect.rectangle.x + statistics.boundingBoxLayer0Only.x,
-            source_rect.rectangle.y + statistics.boundingBoxLayer0Only.y,
-            source_rect.rectangle.w,
-            source_rect.rectangle.h
-        };
-    }
-
-    if (source_rect.frame_of_reference == CZIFrameOfReference::PixelCoordinateSystem && destination_frame_of_reference == CZIFrameOfReference::RawSubBlockCoordinateSystem)
-    {
-        auto statistics = sub_block_repository->GetStatistics();
-        return libCZI::IntRect
-        {
-            source_rect.rectangle.x - statistics.boundingBoxLayer0Only.x,
-            source_rect.rectangle.y - statistics.boundingBoxLayer0Only.y,
-            source_rect.rectangle.w,
-            source_rect.rectangle.h
-        };
-    }
-}
+///*static*/libCZI::IntRect Utils::ConvertToFrameOfReference(const libCZI::IntRectAndFrameOfReference& source_rect, libCZI::ISubBlockRepository* sub_block_repository, libCZI::CZIFrameOfReference destination_frame_of_reference)
+//{
+//    if ((source_rect.frame_of_reference == CZIFrameOfReference::PixelCoordinateSystem || source_rect.frame_of_reference == CZIFrameOfReference::RawSubBlockCoordinateSystem) &&
+//        destination_frame_of_reference == source_rect.frame_of_reference)
+//    {
+//        return source_rect.rectangle;
+//    }
+//
+//    if (source_rect.frame_of_reference == CZIFrameOfReference::PixelCoordinateSystem && destination_frame_of_reference == CZIFrameOfReference::RawSubBlockCoordinateSystem)
+//    {
+//        auto statistics = sub_block_repository->GetStatistics();
+//        return libCZI::IntRect
+//        {
+//            source_rect.rectangle.x + statistics.boundingBoxLayer0Only.x,
+//            source_rect.rectangle.y + statistics.boundingBoxLayer0Only.y,
+//            source_rect.rectangle.w,
+//            source_rect.rectangle.h
+//        };
+//    }
+//
+//    if (source_rect.frame_of_reference == CZIFrameOfReference::PixelCoordinateSystem && destination_frame_of_reference == CZIFrameOfReference::RawSubBlockCoordinateSystem)
+//    {
+//        auto statistics = sub_block_repository->GetStatistics();
+//        return libCZI::IntRect
+//        {
+//            source_rect.rectangle.x - statistics.boundingBoxLayer0Only.x,
+//            source_rect.rectangle.y - statistics.boundingBoxLayer0Only.y,
+//            source_rect.rectangle.w,
+//            source_rect.rectangle.h
+//        };
+//    }
+//
+//}

@@ -74,6 +74,11 @@ namespace libCZI
         }
     };
 
+    struct IntPoint
+    {
+        int x;
+        int y;
+    };
 
     enum class CZIFrameOfReference : std::uint8_t
     {
@@ -87,6 +92,12 @@ namespace libCZI
     {
         libCZI::CZIFrameOfReference frame_of_reference{ libCZI::CZIFrameOfReference::Invalid };
         libCZI::IntRect rectangle;
+    };
+
+    struct IntPointAndFrameOfReference
+    {
+        libCZI::CZIFrameOfReference frame_of_reference{ libCZI::CZIFrameOfReference::Invalid };
+        IntPoint point;
     };
 
     /// A rectangle (with double coordinates).
