@@ -70,6 +70,10 @@ public:
     {
         return this->subblock_repository_->GetPyramidStatistics();
     }
+    libCZI::IntPointAndFrameOfReference TransformPoint(const libCZI::IntPointAndFrameOfReference& source_point, libCZI::CZIFrameOfReference destination_frame_of_reference) override
+    {
+        return this->subblock_repository_->TransformPoint(source_point, destination_frame_of_reference);
+    }
 };
 
 /// This struct is used for creating a test CZI document - it contains the X-Y-position/width/height

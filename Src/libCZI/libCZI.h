@@ -587,7 +587,7 @@ namespace libCZI
         /// \return The pyramid statistics.
         virtual PyramidStatistics GetPyramidStatistics() = 0;
 
-        virtual libCZI::IntPoint TransformPoint(const libCZI::IntPointAndFrameOfReference& source_point, libCZI::CZIFrameOfReference destination_frame_of_reference) = 0;
+        virtual libCZI::IntPointAndFrameOfReference TransformPoint(const libCZI::IntPointAndFrameOfReference& source_point, libCZI::CZIFrameOfReference destination_frame_of_reference) = 0;
 
         virtual ~ISubBlockRepository() = default;
 
@@ -596,9 +596,9 @@ namespace libCZI
             libCZI::IntPointAndFrameOfReference source_point_and_frame_of_reference;
             source_point_and_frame_of_reference.frame_of_reference = source_rectangle.frame_of_reference;
             source_point_and_frame_of_reference.point = { source_rectangle.rectangle.x, source_rectangle.rectangle.y };
-            libCZI::IntPoint transformed_point_upper_left = TransformPoint(source_point_and_frame_of_reference, destination_frame_of_reference);
+            libCZI::IntPoint transformed_point_upper_left = this->TransformPoint(source_point_and_frame_of_reference, destination_frame_of_reference).point;
             source_point_and_frame_of_reference.point = { source_rectangle.rectangle.x + source_rectangle.rectangle.w, source_rectangle.rectangle.y + source_rectangle.rectangle.h };
-            libCZI::IntPoint transformed_point_lower_right = TransformPoint(source_point_and_frame_of_reference, destination_frame_of_reference);
+            libCZI::IntPoint transformed_point_lower_right = this->TransformPoint(source_point_and_frame_of_reference, destination_frame_of_reference).point;
             return { transformed_point_upper_left.x, transformed_point_upper_left.y, transformed_point_lower_right.x - transformed_point_upper_left.x, transformed_point_lower_right.y - transformed_point_upper_left.y };
         }
     };
@@ -682,10 +682,18 @@ namespace libCZI
             /// without problems.
             bool ignore_sizem_for_pyramid_subblocks{ false };
 
+            /// The default frame-of-reference which is to be used by the reader-object. This determines which frame-of-reference
+            /// is used when the enum value "CZIFrameOfReference::Default" is used with an operation of the reader-object.
+            /// If the value specified here is "CZIFrameOfReference::Invalid" or "CZIFrameOfReference::Default", then 
+            /// "CZIFrameOfReference::RawSubBlockCoordinateSystem" will be used.
+            libCZI::CZIFrameOfReference default_frame_of_reference{ libCZI::CZIFrameOfReference::Invalid };
+
             /// Sets the the default.
             void SetDefault()
             {
                 this->lax_subblock_coordinate_checks = true;
+                this->ignore_sizem_for_pyramid_subblocks = false;
+                this->default_frame_of_reference = libCZI::CZIFrameOfReference::Invalid;
             }
         };
 

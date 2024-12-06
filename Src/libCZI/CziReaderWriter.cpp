@@ -712,6 +712,12 @@ void CCziReaderWriter::WriteToOutputStream(std::uint64_t offset, const void* pv,
     return this->sbBlkDirectory.GetPyramidStatistics();
 }
 
+/*virtual*/libCZI::IntPointAndFrameOfReference CCziReaderWriter::TransformPoint(const libCZI::IntPointAndFrameOfReference& source_point, libCZI::CZIFrameOfReference destination_frame_of_reference)
+{
+    // TODO(JBL): Implement this method
+    throw runtime_error("The method or operation is not implemented.");
+}
+
 /*virtual*/void CCziReaderWriter::EnumerateAttachments(const std::function<bool(int index, const libCZI::AttachmentInfo& info)>& funcEnum)
 {
     this->ThrowIfNotOperational();

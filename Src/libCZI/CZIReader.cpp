@@ -60,6 +60,7 @@ CCZIReader::CCZIReader() : isOperational(false)
     }
 
     this->stream = stream;
+    this->default_frame_of_reference = options->default_frame_of_reference;
     this->SetOperationalState(true);
 }
 
@@ -96,23 +97,28 @@ CCZIReader::CCZIReader() : isOperational(false)
     return this->subBlkDir.GetPyramidStatistics();
 }
 
-/*virtual*/libCZI::IntPoint CCZIReader::TransformPoint(const libCZI::IntPointAndFrameOfReference& source_point, libCZI::CZIFrameOfReference destination_frame_of_reference)
+/*virtual*/libCZI::IntPointAndFrameOfReference CCZIReader::TransformPoint(const libCZI::IntPointAndFrameOfReference& source_point, libCZI::CZIFrameOfReference destination_frame_of_reference)
 {
     if ((source_point.frame_of_reference == CZIFrameOfReference::PixelCoordinateSystem || source_point.frame_of_reference == CZIFrameOfReference::RawSubBlockCoordinateSystem) &&
     destination_frame_of_reference == source_point.frame_of_reference)
     {
-        return source_point.point;
+        return source_point;
     }
 
-    if (source_point.frame_of_reference == CZIFrameOfReference::PixelCoordinateSystem && destination_frame_of_reference == CZIFrameOfReference::RawSubBlockCoordinateSystem)
+    if (source_point.frame_of_reference == CZIFrameOfReference::PixelCoordinateSystem && 
+        (destination_frame_of_reference == CZIFrameOfReference::RawSubBlockCoordinateSystem || 
+            (destination_frame_of_reference== CZIFrameOfReference::Default && this->default_frame_of_reference == CZIFrameOfReference::RawSubBlockCoordinateSystem)))
     {
         const auto& statistics = this->subBlkDir.GetStatistics();
-        return libCZI::IntPoint{ source_point.point.x + statistics.boundingBoxLayer0Only.x, source_point.point.y + statistics.boundingBoxLayer0Only.y };
+        return libCZI::IntPointAndFrameOfReference{ CZIFrameOfReference::RawSubBlockCoordinateSystem, source_point.point.x + statistics.boundingBoxLayer0Only.x, source_point.point.y + statistics.boundingBoxLayer0Only.y };
     }
-    if (source_point.frame_of_reference == CZIFrameOfReference::RawSubBlockCoordinateSystem && destination_frame_of_reference == CZIFrameOfReference::PixelCoordinateSystem)
+    
+    if (source_point.frame_of_reference == CZIFrameOfReference::RawSubBlockCoordinateSystem && 
+        (destination_frame_of_reference == CZIFrameOfReference::PixelCoordinateSystem ||
+            (destination_frame_of_reference == CZIFrameOfReference::Default && this->default_frame_of_reference == CZIFrameOfReference::PixelCoordinateSystem)))
     {
         const auto& statistics = this->subBlkDir.GetStatistics();
-        return libCZI::IntPoint{ source_point.point.x - statistics.boundingBoxLayer0Only.x, source_point.point.y - statistics.boundingBoxLayer0Only.y };
+        return libCZI::IntPointAndFrameOfReference{ CZIFrameOfReference::PixelCoordinateSystem, source_point.point.x - statistics.boundingBoxLayer0Only.x, source_point.point.y - statistics.boundingBoxLayer0Only.y };
 
     }
 
