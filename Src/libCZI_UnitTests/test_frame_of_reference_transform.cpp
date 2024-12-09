@@ -32,9 +32,9 @@ namespace
         auto mem_output_stream = make_shared<CMemOutputStream>(0);
 
         auto spWriterInfo = make_shared<libCZI::CCziWriterInfo>(
-          libCZI::GUID{ 0x1234567, 0x89ab, 0xcdef, {1, 2, 3, 4, 5, 6, 7, 8} },  // NOLINT
-          libCZI::CDimBounds{ {libCZI::DimensionIndex::C, 0, 1} },  // set a bounds for C
-          0, static_cast<int>(mosaic_info.tiles.size() - 1));  // set a bounds M : 0<=m<=0
+            libCZI::GUID{ 0x1234567, 0x89ab, 0xcdef, {1, 2, 3, 4, 5, 6, 7, 8} },  // NOLINT
+            libCZI::CDimBounds{ {libCZI::DimensionIndex::C, 0, 1} },  // set a bounds for C
+            0, static_cast<int>(mosaic_info.tiles.size() - 1));  // set a bounds M : 0<=m<=0
         writer->Create(mem_output_stream, spWriterInfo);
 
         for (size_t i = 0; i < mosaic_info.tiles.size(); ++i)

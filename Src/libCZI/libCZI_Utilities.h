@@ -381,7 +381,5 @@ namespace libCZI
         //! Examples: "zstd0:ExplicitLevel=3", "zstd1:ExplicitLevel=2;PreProcess=HiLoByteUnpack"
         //! If parsing fails an excpetion of type "Logic_error" is thrown.
         static CompressionOption ParseCompressionOptions(const std::string& options);
-
-       // static libCZI::IntRect ConvertToFrameOfReference(const libCZI::IntRectAndFrameOfReference& source_rect, libCZI::ISubBlockRepository* sub_block_repository, libCZI::CZIFrameOfReference destination_frame_of_reference);
     };
 }
