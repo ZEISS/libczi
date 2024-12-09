@@ -32,7 +32,7 @@ static CCZIParse::SubblockDirectoryParseOptions GetParseOptionsFromOpenOptions(c
     return parse_options;
 }
 
-CCZIReader::CCZIReader() : isOperational(false)
+CCZIReader::CCZIReader() : isOperational(false), default_frame_of_reference(CZIFrameOfReference::Invalid)
 {
 }
 
@@ -60,7 +60,17 @@ CCZIReader::CCZIReader() : isOperational(false)
     }
 
     this->stream = stream;
-    this->default_frame_of_reference = options->default_frame_of_reference;
+    switch (options->default_frame_of_reference)
+    {
+    case CZIFrameOfReference::Invalid:
+    case CZIFrameOfReference::Default:
+        this->default_frame_of_reference = CZIFrameOfReference::RawSubBlockCoordinateSystem;
+        break;
+    default:
+        this->default_frame_of_reference = options->default_frame_of_reference;
+        break;
+    }
+
     this->SetOperationalState(true);
 }
 

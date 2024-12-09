@@ -591,15 +591,24 @@ namespace libCZI
 
         virtual ~ISubBlockRepository() = default;
 
-        libCZI::IntRect TransformRectangle(const libCZI::IntRectAndFrameOfReference& source_rectangle, libCZI::CZIFrameOfReference destination_frame_of_reference)
+        libCZI::IntRectAndFrameOfReference TransformRectangle(const libCZI::IntRectAndFrameOfReference& source_rectangle, libCZI::CZIFrameOfReference destination_frame_of_reference)
         {
             libCZI::IntPointAndFrameOfReference source_point_and_frame_of_reference;
             source_point_and_frame_of_reference.frame_of_reference = source_rectangle.frame_of_reference;
             source_point_and_frame_of_reference.point = { source_rectangle.rectangle.x, source_rectangle.rectangle.y };
             libCZI::IntPoint transformed_point_upper_left = this->TransformPoint(source_point_and_frame_of_reference, destination_frame_of_reference).point;
             source_point_and_frame_of_reference.point = { source_rectangle.rectangle.x + source_rectangle.rectangle.w, source_rectangle.rectangle.y + source_rectangle.rectangle.h };
-            libCZI::IntPoint transformed_point_lower_right = this->TransformPoint(source_point_and_frame_of_reference, destination_frame_of_reference).point;
-            return { transformed_point_upper_left.x, transformed_point_upper_left.y, transformed_point_lower_right.x - transformed_point_upper_left.x, transformed_point_lower_right.y - transformed_point_upper_left.y };
+            libCZI::IntPointAndFrameOfReference transformed_point_lower_right = this->TransformPoint(source_point_and_frame_of_reference, destination_frame_of_reference);
+            return
+            {
+                transformed_point_lower_right.frame_of_reference,
+                {
+                    transformed_point_upper_left.x,
+                    transformed_point_upper_left.y,
+                    transformed_point_lower_right.point.x - transformed_point_upper_left.x,
+                    transformed_point_lower_right.point.y - transformed_point_upper_left.y
+                }
+            };
         }
     };
 
