@@ -109,26 +109,51 @@ CCZIReader::CCZIReader() : isOperational(false), default_frame_of_reference(CZIF
 
 /*virtual*/libCZI::IntPointAndFrameOfReference CCZIReader::TransformPoint(const libCZI::IntPointAndFrameOfReference& source_point, libCZI::CZIFrameOfReference destination_frame_of_reference)
 {
-    if ((source_point.frame_of_reference == CZIFrameOfReference::PixelCoordinateSystem || source_point.frame_of_reference == CZIFrameOfReference::RawSubBlockCoordinateSystem) &&
-    destination_frame_of_reference == source_point.frame_of_reference)
+    CZIFrameOfReference source_frame_of_reference_consolidated;
+    switch (source_point.frame_of_reference)
     {
-        return source_point;
+    case CZIFrameOfReference::RawSubBlockCoordinateSystem:
+    case CZIFrameOfReference::PixelCoordinateSystem:
+        source_frame_of_reference_consolidated = source_point.frame_of_reference;
+        break;
+    case CZIFrameOfReference::Default:
+        source_frame_of_reference_consolidated = this->default_frame_of_reference;
+        break;
+    default:
+        throw invalid_argument("Unsupported frame-of-reference.");
     }
 
-    if (source_point.frame_of_reference == CZIFrameOfReference::PixelCoordinateSystem && 
-        (destination_frame_of_reference == CZIFrameOfReference::RawSubBlockCoordinateSystem || 
-            (destination_frame_of_reference== CZIFrameOfReference::Default && this->default_frame_of_reference == CZIFrameOfReference::RawSubBlockCoordinateSystem)))
+    CZIFrameOfReference destination_frame_of_reference_consolidated;
+    switch (destination_frame_of_reference)
     {
-        const auto& statistics = this->subBlkDir.GetStatistics();
-        return libCZI::IntPointAndFrameOfReference{ CZIFrameOfReference::RawSubBlockCoordinateSystem, source_point.point.x + statistics.boundingBoxLayer0Only.x, source_point.point.y + statistics.boundingBoxLayer0Only.y };
+    case CZIFrameOfReference::RawSubBlockCoordinateSystem:
+    case CZIFrameOfReference::PixelCoordinateSystem:
+        destination_frame_of_reference_consolidated = destination_frame_of_reference;
+        break;
+    case CZIFrameOfReference::Default:
+        destination_frame_of_reference_consolidated = this->default_frame_of_reference;
+        break;
+    default:
+        throw invalid_argument("Unsupported frame-of-reference.");
     }
-    
-    if (source_point.frame_of_reference == CZIFrameOfReference::RawSubBlockCoordinateSystem && 
-        (destination_frame_of_reference == CZIFrameOfReference::PixelCoordinateSystem ||
-            (destination_frame_of_reference == CZIFrameOfReference::Default && this->default_frame_of_reference == CZIFrameOfReference::PixelCoordinateSystem)))
+
+    if (destination_frame_of_reference_consolidated == source_frame_of_reference_consolidated)
+    {
+        return { source_frame_of_reference_consolidated, source_point.point };
+    }
+
+    if (source_frame_of_reference_consolidated == CZIFrameOfReference::PixelCoordinateSystem &&
+        destination_frame_of_reference_consolidated == CZIFrameOfReference::RawSubBlockCoordinateSystem)
     {
         const auto& statistics = this->subBlkDir.GetStatistics();
-        return libCZI::IntPointAndFrameOfReference{ CZIFrameOfReference::PixelCoordinateSystem, source_point.point.x - statistics.boundingBoxLayer0Only.x, source_point.point.y - statistics.boundingBoxLayer0Only.y };
+        return libCZI::IntPointAndFrameOfReference{ CZIFrameOfReference::RawSubBlockCoordinateSystem, {source_point.point.x + statistics.boundingBoxLayer0Only.x, source_point.point.y + statistics.boundingBoxLayer0Only.y} };
+    }
+
+    if (source_frame_of_reference_consolidated == CZIFrameOfReference::RawSubBlockCoordinateSystem &&
+        destination_frame_of_reference_consolidated == CZIFrameOfReference::PixelCoordinateSystem)
+    {
+        const auto& statistics = this->subBlkDir.GetStatistics();
+        return libCZI::IntPointAndFrameOfReference{ CZIFrameOfReference::PixelCoordinateSystem, {source_point.point.x - statistics.boundingBoxLayer0Only.x, source_point.point.y - statistics.boundingBoxLayer0Only.y} };
 
     }
 

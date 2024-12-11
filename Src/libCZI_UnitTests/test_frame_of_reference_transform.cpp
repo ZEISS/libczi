@@ -6,6 +6,7 @@
 #include "inc_libCZI.h"
 #include "MemOutputStream.h"
 #include "utils.h"
+#include <array>
 
 using namespace libCZI;
 using namespace std;
@@ -79,6 +80,29 @@ namespace
         const shared_ptr<void> czi_document_data = mem_output_stream->GetCopy(&czi_document_size);
         return make_tuple(czi_document_data, czi_document_size);
     }
+
+    bool Check2x2Gray8Bitmap(IBitmapData* bitmap, const array<uint8_t,4>& expected)
+    {
+        if (bitmap->GetWidth() != 2 || bitmap->GetHeight() != 2 || bitmap->GetPixelType() != PixelType::Gray8)
+        {
+            return false;
+        }
+
+        ScopedBitmapLockerP locker_bitmap{ bitmap };
+        const uint8_t* p = static_cast<const uint8_t*>(locker_bitmap.ptrDataRoi);
+        if (p[0] != expected[0] || p[1] != expected[1])
+        {
+            return false;
+        }
+
+        p += locker_bitmap.stride;
+        if (p[0] != expected[2] || p[1] != expected[3])
+        {
+            return false;
+        }
+
+        return true;
+    }
 }  // namespace
 
 TEST(FrameOfReferenceTransform, UseCziWhichIsNotZeroAlignedAndCallCheckTransformPoint)
@@ -149,3 +173,98 @@ TEST(FrameOfReferenceTransform, UseCziWhichIsNotZeroAlignedAndCallCheckTransform
 
     EXPECT_ANY_THROW(reader->TransformRectangle(rect_and_frame_of_reference, CZIFrameOfReference::Invalid));
 }
+
+TEST(FrameOfReferenceTransform, SetDefaultFrameOfReferenceToPixelCoordinateSystemAndCheckTransform)
+{
+    MosaicInfo mosaic_info;
+    mosaic_info.tile_width = 1;
+    mosaic_info.tile_height = 1;
+    mosaic_info.tiles = { {-1, -1, 10}, {0, -1, 20}, {-1, 0, 30}, {0, 0, 40} };
+    auto czi_document_as_blob = CreateMosaicCzi(mosaic_info);
+    auto reader = libCZI::CreateCZIReader();
+    auto mem_input_stream = make_shared<CMemInputOutputStream>(get<0>(czi_document_as_blob).get(), get<1>(czi_document_as_blob));
+
+    ICZIReader::OpenOptions options;
+    options.SetDefault();
+    options.default_frame_of_reference = CZIFrameOfReference::PixelCoordinateSystem;
+    reader->Open(mem_input_stream, &options);
+
+    IntPointAndFrameOfReference point_and_frame_of_reference;
+    point_and_frame_of_reference.point = { 0, 0 };
+    point_and_frame_of_reference.frame_of_reference = CZIFrameOfReference::RawSubBlockCoordinateSystem;
+    auto transformed_point_pixel_coordinate_system = reader->TransformPoint(point_and_frame_of_reference, CZIFrameOfReference::PixelCoordinateSystem);
+    EXPECT_EQ(transformed_point_pixel_coordinate_system.point.x, 1);
+    EXPECT_EQ(transformed_point_pixel_coordinate_system.point.y, 1);
+    EXPECT_EQ(transformed_point_pixel_coordinate_system.frame_of_reference, CZIFrameOfReference::PixelCoordinateSystem);
+
+    auto transformed_point_default_coordinate_system = reader->TransformPoint(point_and_frame_of_reference, CZIFrameOfReference::Default);
+    EXPECT_EQ(transformed_point_default_coordinate_system.point.x, 1);
+    EXPECT_EQ(transformed_point_default_coordinate_system.point.y, 1);
+    EXPECT_EQ(transformed_point_default_coordinate_system.frame_of_reference, CZIFrameOfReference::PixelCoordinateSystem);
+}
+
+TEST(FrameOfReferenceTransform, SetDefaultFrameOfReferenceToRawSubblockCoordinateSystemAndCheckTransform)
+{
+    MosaicInfo mosaic_info;
+    mosaic_info.tile_width = 1;
+    mosaic_info.tile_height = 1;
+    mosaic_info.tiles = { {-1, -1, 10}, {0, -1, 20}, {-1, 0, 30}, {0, 0, 40} };
+    auto czi_document_as_blob = CreateMosaicCzi(mosaic_info);
+    auto reader = libCZI::CreateCZIReader();
+    auto mem_input_stream = make_shared<CMemInputOutputStream>(get<0>(czi_document_as_blob).get(), get<1>(czi_document_as_blob));
+
+    ICZIReader::OpenOptions options;
+    options.SetDefault();
+    options.default_frame_of_reference = CZIFrameOfReference::RawSubBlockCoordinateSystem;
+    reader->Open(mem_input_stream, &options);
+
+    IntPointAndFrameOfReference point_and_frame_of_reference;
+    point_and_frame_of_reference.point = { 0, 0 };
+    point_and_frame_of_reference.frame_of_reference = CZIFrameOfReference::PixelCoordinateSystem;
+    auto transformed_rect_pixel_coordinate_system = reader->TransformPoint(point_and_frame_of_reference, CZIFrameOfReference::RawSubBlockCoordinateSystem);
+    EXPECT_EQ(transformed_rect_pixel_coordinate_system.point.x, -1);
+    EXPECT_EQ(transformed_rect_pixel_coordinate_system.point.y, -1);
+    EXPECT_EQ(transformed_rect_pixel_coordinate_system.frame_of_reference, CZIFrameOfReference::RawSubBlockCoordinateSystem);
+
+    auto transformed_point_default_coordinate_system = reader->TransformPoint(point_and_frame_of_reference, CZIFrameOfReference::Default);
+    EXPECT_EQ(transformed_point_default_coordinate_system.point.x, -1);
+    EXPECT_EQ(transformed_point_default_coordinate_system.point.y, -1);
+    EXPECT_EQ(transformed_point_default_coordinate_system.frame_of_reference, CZIFrameOfReference::RawSubBlockCoordinateSystem);
+}
+
+TEST(FrameOfReferenceTransform, GetTileCompositeAndCheckResult)
+{
+    MosaicInfo mosaic_info;
+    mosaic_info.tile_width = 1;
+    mosaic_info.tile_height = 1;
+    mosaic_info.tiles = { {-1, -1, 10}, {0, -1, 20}, {-1, 0, 30}, {0, 0, 40} };
+    auto czi_document_as_blob = CreateMosaicCzi(mosaic_info);
+    auto reader = libCZI::CreateCZIReader();
+    auto mem_input_stream = make_shared<CMemInputOutputStream>(get<0>(czi_document_as_blob).get(), get<1>(czi_document_as_blob));
+
+    ICZIReader::OpenOptions options;
+    options.SetDefault();
+    options.default_frame_of_reference = CZIFrameOfReference::RawSubBlockCoordinateSystem;
+    reader->Open(mem_input_stream, &options);
+
+    auto accessor = reader->CreateSingleChannelTileAccessor();
+    IntRectAndFrameOfReference rect_and_frame_of_reference;
+    rect_and_frame_of_reference.rectangle = { 0, 0, 2, 2 };
+    rect_and_frame_of_reference.frame_of_reference = CZIFrameOfReference::PixelCoordinateSystem;
+    ISingleChannelTileAccessor::Options accessor_options;
+    accessor_options.Clear();
+    accessor_options.backGroundColor = RgbFloatColor{ 0, 0, 0 };
+    CDimCoordinate plane_coordinate{ {DimensionIndex::C, 0} };
+    auto tile_composite_bitmap = accessor->Get(rect_and_frame_of_reference, &plane_coordinate, &accessor_options);
+    EXPECT_TRUE(Check2x2Gray8Bitmap(tile_composite_bitmap.get(), array<uint8_t, 4>{10, 20, 30, 40}));
+
+    rect_and_frame_of_reference.rectangle = { -1, -1, 2, 2 };
+    rect_and_frame_of_reference.frame_of_reference = CZIFrameOfReference::RawSubBlockCoordinateSystem;
+    tile_composite_bitmap = accessor->Get(rect_and_frame_of_reference, &plane_coordinate, &accessor_options);
+    EXPECT_TRUE(Check2x2Gray8Bitmap(tile_composite_bitmap.get(), array<uint8_t, 4>{10, 20, 30, 40}));
+
+    rect_and_frame_of_reference.frame_of_reference = CZIFrameOfReference::Default;
+    tile_composite_bitmap = accessor->Get(rect_and_frame_of_reference, &plane_coordinate, &accessor_options);
+    EXPECT_TRUE(Check2x2Gray8Bitmap(tile_composite_bitmap.get(), array<uint8_t, 4>{10, 20, 30, 40}));
+}
+

@@ -18,10 +18,10 @@ namespace libCZI
     class IDimCoordinate;
 
     /// Values that represent the accessor types.
-    enum class AccessorType
+    enum class AccessorType : std::uint8_t
     {
         SingleChannelTileAccessor,              ///< The single-channel-tile accessor (associated interface: ISingleChannelTileAccessor).
-        SingleChannelPyramidLayerTileAccessor,  ///< The single-channel-pyramidlayer-tile accessor (associated interface: ISingleChannelPyramidLayerTileAccessor).
+        SingleChannelPyramidLayerTileAccessor,  ///< The single-channel-pyramid-layer-tile accessor (associated interface: ISingleChannelPyramidLayerTileAccessor).
         SingleChannelScalingTileAccessor        ///< The scaling-single-channel-tile accessor (associated interface: ISingleChannelScalingTileAccessor).
     };
 
@@ -174,7 +174,7 @@ namespace libCZI
         /// Options for controlling the composition operation.
         struct Options
         {
-            /// The back ground color. If the destination bitmap is a grayscale-type, then the mean from R, G and B is calculated and multiplied
+            /// The background color. If the destination bitmap is a grayscale-type, then the mean from R, G and B is calculated and multiplied
             /// with the maximum pixel value (of the specific pixeltype). If it is a RGB-color type, then R, G and B are separately multiplied with
             /// the maximum pixel value.
             /// If any of R, G or B is NaN, then the background is not cleared.
