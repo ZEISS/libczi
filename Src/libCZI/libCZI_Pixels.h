@@ -202,14 +202,14 @@ namespace libCZI
         /// \return The pixel type.
         virtual PixelType       GetPixelType() const = 0;
 
-        /// Gets the size of the bitmap (i. e. its width and height in pixels).
+        /// Gets the size of the bitmap (i.e. its width and height in pixels).
         ///
         /// \return The size (in pixels).
         virtual IntSize         GetSize() const = 0;
 
         /// Gets a data structure allowing for direct access of the bitmap.
         /// 
-        /// The BitmapLockInfo returned must only considered to be valid until Unlock is called.
+        /// The BitmapLockInfo returned must only be considered to be valid until Unlock is called.
         /// It is legal to call Lock multiple time (also from different threads concurrently).
         /// In any case, calls to Lock and Unlock must be balanced. It is considered to be a
         /// fatal error if the object is destroyed when it is locked.
@@ -220,7 +220,7 @@ namespace libCZI
         /// Inform the bitmap object that the data (previously retrieved by a call to Lock)
         /// is not longer used.
         /// 
-        /// The BitmapLockInfo returned must only considered to be valid until Unlock is called.
+        /// The BitmapLockInfo returned must only be considered to be valid until Unlock is called.
         virtual void            Unlock() = 0;
 
         virtual ~IBitmapData() {}
