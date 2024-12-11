@@ -221,9 +221,68 @@ namespace libCZI
         };
 
     public:
-        virtual std::shared_ptr<libCZI::IBitmapData> Get(const libCZI::IntRectAndFrameOfReference& roi, const IDimCoordinate* planeCoordinate, const Options* pOptions) = 0;
         /// Gets the tile composite of the specified plane and the specified ROI. The pixeltype is
-        /// determined by examing the first subblock found in the specified plane (which is an
+        /// determined by examining the first subblock found in the specified plane (which is an
+        /// arbitrary subblock). A newly allocated bitmap is returned.
+        ///
+        /// \param  roi             The ROI and the coordinate system it is defined in.
+        /// \param  planeCoordinate The plane coordinate.
+        /// \param  pOptions        Options for controlling the operation.
+        ///
+        /// \returns    A std::shared_ptr<libCZI::IBitmapData> containing the tile-composite.
+        virtual std::shared_ptr<libCZI::IBitmapData> Get(const libCZI::IntRectAndFrameOfReference& roi, const IDimCoordinate* planeCoordinate, const Options* pOptions) = 0;
+
+        /// Gets the tile composite of the specified plane and the specified ROI. 
+        ///
+        /// \param pixeltype       The pixeltype.
+        /// \param roi             The ROI and the coordinate system it is defined in.
+        /// \param planeCoordinate The plane coordinate.
+        /// \param pOptions        Options for controlling the operation.
+        ///
+        /// \return A std::shared_ptr<libCZI::IBitmapData> containing the tile-composite.
+        virtual std::shared_ptr<libCZI::IBitmapData> Get(libCZI::PixelType pixeltype, const libCZI::IntRectAndFrameOfReference& roi, const IDimCoordinate* planeCoordinate, const Options* pOptions) = 0;
+
+        /// Copy the tile composite into the specified bitmap. The bitmap passed in here determines the width and the height of the ROI
+        /// (and the pixeltype).
+        ///
+        /// \param [in] pDest      The destination bitmap.
+        /// \param position        The x-position and y-position of the ROI (width and height are given by pDest), and the coordinate system they are defined in.
+        /// \param planeCoordinate The plane coordinate.
+        /// \param pOptions        Options for controlling the operation.
+        virtual void Get(libCZI::IBitmapData* pDest, const IntPointAndFrameOfReference& position, const IDimCoordinate* planeCoordinate, const Options* pOptions) = 0;
+
+        /// Gets the tile composite of the specified plane and the specified ROI.
+        /// The pixeltype is determined by examining the first subblock found in the
+        /// specified plane (which is an arbitrary subblock). A newly allocated
+        /// bitmap is returned.
+        /// \param xPos            The x-position (given in _raw-subblock-coordinate-system_, c.f. @ref coordinatesystems).
+        /// \param yPos            The y-position (given in _raw-subblock-coordinate-system_, c.f. @ref coordinatesystems).
+        /// \param width           The width.
+        /// \param height          The height.
+        /// \param planeCoordinate The plane coordinate.
+        /// \param pOptions        Options for controlling the operation.
+        /// \return A std::shared_ptr<libCZI::IBitmapData> containing the tile-composite.
+        std::shared_ptr<libCZI::IBitmapData> Get(int xPos, int yPos, int width, int height, const IDimCoordinate* planeCoordinate, const Options* pOptions)
+        {
+            return this->Get(libCZI::IntRect{ xPos,yPos,width,height }, planeCoordinate, pOptions);
+        }
+
+        /// Gets the tile composite of the specified plane and the specified ROI.
+        /// \param pixeltype       The pixeltype.
+        /// \param xPos            The x-position (given in _raw-subblock-coordinate-system_, c.f. @ref coordinatesystems).
+        /// \param yPos            The y-position (given in _raw-subblock-coordinate-system_, c.f. @ref coordinatesystems).
+        /// \param width           The width.
+        /// \param height          The height.
+        /// \param planeCoordinate The plane coordinate.
+        /// \param pOptions        Options for controlling the operation.
+        /// \return A std::shared_ptr<libCZI::IBitmapData> containing the tile-composite.
+        std::shared_ptr<libCZI::IBitmapData> Get(libCZI::PixelType pixeltype, int xPos, int yPos, int width, int height, const IDimCoordinate* planeCoordinate, const Options* pOptions)
+        {
+            return this->Get(pixeltype, libCZI::IntRect{ xPos,yPos,width,height }, planeCoordinate, pOptions);
+        }
+
+        /// Gets the tile composite of the specified plane and the specified ROI. The pixeltype is
+        /// determined by examining the first subblock found in the specified plane (which is an
         /// arbitrary subblock). A newly allocated bitmap is returned.
         ///
         /// \param  roi             The ROI (given in _raw-subblock-coordinate-system_, c.f. @ref coordinatesystems).
@@ -231,15 +290,11 @@ namespace libCZI
         /// \param  pOptions        Options for controlling the operation.
         ///
         /// \returns    A std::shared_ptr<libCZI::IBitmapData> containing the tile-composite.
-        ///
-        /// ### remarks It needs to be defined what is supposed to happen if there is no subblock found
-        ///     in the specified plane.
         std::shared_ptr<libCZI::IBitmapData> Get(const libCZI::IntRect& roi, const IDimCoordinate* planeCoordinate, const Options* pOptions)
         {
             return this->Get(libCZI::IntRectAndFrameOfReference{ libCZI::CZIFrameOfReference::RawSubBlockCoordinateSystem, roi }, planeCoordinate, pOptions);
         }
 
-        virtual std::shared_ptr<libCZI::IBitmapData> Get(libCZI::PixelType pixeltype, const libCZI::IntRectAndFrameOfReference& roi, const IDimCoordinate* planeCoordinate, const Options* pOptions) = 0;
         /// Gets the tile composite of the specified plane and the specified ROI. 
         ///
         /// \param pixeltype       The pixeltype.
@@ -261,33 +316,13 @@ namespace libCZI
         /// \param yPos            The y-position of the ROI (width and height are given by pDest) - given in _raw-subblock-coordinate-system_, c.f. @ref coordinatesystems.
         /// \param planeCoordinate The plane coordinate.
         /// \param pOptions        Options for controlling the operation.
-        virtual void Get(libCZI::IBitmapData* pDest, int xPos, int yPos, const IDimCoordinate* planeCoordinate, const Options* pOptions) = 0;
+        void Get(libCZI::IBitmapData* pDest, int xPos, int yPos, const IDimCoordinate* planeCoordinate, const Options* pOptions)
+        {
+            this->Get(pDest, libCZI::IntPointAndFrameOfReference{ libCZI::CZIFrameOfReference::RawSubBlockCoordinateSystem, { xPos, yPos } }, planeCoordinate, pOptions);
+        }
 
-        /// Gets the tile composite of the specified plane and the specified ROI.
-        /// The pixeltype is determined by examining the first subblock found in the
-        /// specified plane (which is an arbitrary subblock). A newly allocated
-        /// bitmap is returned.
-        /// \param xPos            The x-position (given in _raw-subblock-coordinate-system_, c.f. @ref coordinatesystems).
-        /// \param yPos            The y-position (given in _raw-subblock-coordinate-system_, c.f. @ref coordinatesystems).
-        /// \param width           The width (given in _raw-subblock-coordinate-system_, c.f. @ref coordinatesystems).
-        /// \param height          The height (given in _raw-subblock-coordinate-system_, c.f. @ref coordinatesystems).
-        /// \param planeCoordinate The plane coordinate.
-        /// \param pOptions        Options for controlling the operation.
-        /// \return A std::shared_ptr<libCZI::IBitmapData> containing the tile-composite.
-        inline std::shared_ptr<libCZI::IBitmapData> Get(int xPos, int yPos, int width, int height, const IDimCoordinate* planeCoordinate, const Options* pOptions) { return this->Get(libCZI::IntRect{ xPos,yPos,width,height }, planeCoordinate, pOptions); }
-
-        /// Gets the tile composite of the specified plane and the specified ROI.
-        /// \param pixeltype       The pixeltype.
-        /// \param xPos            The x-position.
-        /// \param yPos            The y-position.
-        /// \param width           The width.
-        /// \param height          The height.
-        /// \param planeCoordinate The plane coordinate.
-        /// \param pOptions        Options for controlling the operation.
-        /// \return A std::shared_ptr<libCZI::IBitmapData> containing the tile-composite.
-        inline std::shared_ptr<libCZI::IBitmapData> Get(libCZI::PixelType pixeltype, int xPos, int yPos, int width, int height, const IDimCoordinate* planeCoordinate, const Options* pOptions) { return this->Get(pixeltype, libCZI::IntRect{ xPos,yPos,width,height }, planeCoordinate, pOptions); }
     protected:
-        virtual ~ISingleChannelTileAccessor() = default;
+        ~ISingleChannelTileAccessor() override = default;
     };
 
     /// Interface for single-channel-pyramidlayer tile accessors. 

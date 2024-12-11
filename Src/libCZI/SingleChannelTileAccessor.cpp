@@ -38,9 +38,10 @@ CSingleChannelTileAccessor::CSingleChannelTileAccessor(const std::shared_ptr<ISu
     return bmDest;
 }
 
-/*virtual*/void CSingleChannelTileAccessor::Get(libCZI::IBitmapData* pDest, int xPos, int yPos, const IDimCoordinate* planeCoordinate, const Options* pOptions)
+/*virtual*/void CSingleChannelTileAccessor::Get(libCZI::IBitmapData* pDest, const IntPointAndFrameOfReference& position, const IDimCoordinate* planeCoordinate, const Options* pOptions)
 {
-    this->InternalGet(xPos, yPos, pDest, planeCoordinate, pOptions);
+    const IntPoint point_raw_sub_block_cs = this->sbBlkRepository->TransformPoint(position, CZIFrameOfReference::RawSubBlockCoordinateSystem).point;
+    this->InternalGet(point_raw_sub_block_cs.x, point_raw_sub_block_cs.y, pDest, planeCoordinate, pOptions);
 }
 
 void CSingleChannelTileAccessor::ComposeTiles(libCZI::IBitmapData* pBm, int xPos, int yPos, const std::vector<IndexAndM>& subBlocksSet, const ISingleChannelTileAccessor::Options& options)
