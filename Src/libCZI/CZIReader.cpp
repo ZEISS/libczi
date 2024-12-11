@@ -110,7 +110,7 @@ CCZIReader::CCZIReader() : isOperational(false), default_frame_of_reference(CZIF
 /*virtual*/libCZI::IntPointAndFrameOfReference CCZIReader::TransformPoint(const libCZI::IntPointAndFrameOfReference& source_point, libCZI::CZIFrameOfReference destination_frame_of_reference)
 {
     CZIFrameOfReference source_frame_of_reference_consolidated;
-    switch (source_point.frame_of_reference)  // NOLINT(clang-diagnostic-switch-enum)
+    switch (source_point.frame_of_reference)
     {
     case CZIFrameOfReference::RawSubBlockCoordinateSystem:
     case CZIFrameOfReference::PixelCoordinateSystem:
@@ -124,7 +124,7 @@ CCZIReader::CCZIReader() : isOperational(false), default_frame_of_reference(CZIF
     }
 
     CZIFrameOfReference destination_frame_of_reference_consolidated;
-    switch (destination_frame_of_reference)  // NOLINT(clang-diagnostic-switch-enum)
+    switch (destination_frame_of_reference)
     {
     case CZIFrameOfReference::RawSubBlockCoordinateSystem:
     case CZIFrameOfReference::PixelCoordinateSystem:
