@@ -74,30 +74,34 @@ namespace libCZI
         }
     };
 
+    /// A point (with integer coordinates).
     struct IntPoint
     {
         int x;
         int y;
     };
 
+    /// Values that represent different frame of reference.
     enum class CZIFrameOfReference : std::uint8_t
     {
-        Invalid,
-        Default,
+        Invalid,                        ///< Invalid frame of reference.
+        Default,                        ///< The default frame of reference.
         RawSubBlockCoordinateSystem,    ///< The raw sub-block coordinate system.
         PixelCoordinateSystem,          ///< The pixel coordinate system.
     };
 
+    /// This structure combines a rectangle with a specification of the frame of reference.
     struct IntRectAndFrameOfReference
     {
-        libCZI::CZIFrameOfReference frame_of_reference{ libCZI::CZIFrameOfReference::Invalid };
-        libCZI::IntRect rectangle;
+        libCZI::CZIFrameOfReference frame_of_reference{ libCZI::CZIFrameOfReference::Invalid }; ///< The frame of reference.
+        libCZI::IntRect rectangle;  ///< The rectangle.
     };
 
+    /// This structure combines a point with a specification of the frame of reference.
     struct IntPointAndFrameOfReference
     {
-        libCZI::CZIFrameOfReference frame_of_reference{ libCZI::CZIFrameOfReference::Invalid };
-        IntPoint point;
+        libCZI::CZIFrameOfReference frame_of_reference{ libCZI::CZIFrameOfReference::Invalid }; ///< The frame of reference.
+        IntPoint point;  ///< The point.
     };
 
     /// A rectangle (with double coordinates).
