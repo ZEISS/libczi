@@ -423,8 +423,8 @@ namespace libCZI
         /// Options used for this accessor.
         struct Options
         {
-            /// The back ground color. If the destination bitmap is a grayscale-type, then the mean from R, G and B is calculated and multiplied
-            /// with the maximum pixel value (of the specific pixeltype). If it is a RGB-color type, then R, G and B are separately multiplied with
+            /// The background color. If the destination bitmap is a grayscale-type, then the mean from R, G and B is calculated and multiplied
+            /// with the maximum pixel value (of the specific pixeltype). If it is an RGB-color type, then R, G and B are separately multiplied with
             /// the maximum pixel value.
             /// If any of R, G or B is NaN, then the background is not cleared.
             RgbFloatColor backGroundColor;
@@ -471,10 +471,40 @@ namespace libCZI
         /// Calculates the size a bitmap will have (when created by this accessor) for the specified ROI and the specified Zoom.
         /// Since the exact size if subject to rounding errors, one should always use this method if the exact size must be known beforehand.
         /// The Get-method which operates on a pre-allocated bitmap will only work if the size (of the bitmap passed in) exactly matches.
-        /// \param roi  The ROI (given in _raw-subblock-coordinate-system_, c.f. @ref coordinatesystems).
+        /// \param roi  The ROI (since only the size is relevant here currently, the coordinate system it is given in does not matter).
         /// \param zoom The zoom factor.
         /// \return The size of the composite created by this accessor (for these parameters).
         virtual libCZI::IntSize CalcSize(const libCZI::IntRect& roi, float zoom) const = 0;
+
+        /// Gets the scaled tile composite of the specified plane and the specified ROI with the specified zoom factor.\n
+        /// The pixeltype is determined by examining the first subblock found in the
+        /// specified plane (which is an arbitrary subblock). A newly allocated
+        /// bitmap is returned.
+        /// \param roi             The ROI and the coordinate system it is defined in.
+        /// \param planeCoordinate The plane coordinate.
+        /// \param zoom            The zoom.
+        /// \param pOptions        Options for controlling the operation (may be nullptr).
+        /// \return A `std::shared_ptr<libCZI::IBitmapData>` containing the composite.
+        virtual std::shared_ptr<libCZI::IBitmapData> Get(const libCZI::IntRectAndFrameOfReference& roi, const libCZI::IDimCoordinate* planeCoordinate, float zoom, const libCZI::ISingleChannelScalingTileAccessor::Options* pOptions) = 0;
+
+        /// Gets the scaled tile composite of the specified plane and the specified ROI with the specified zoom factor.
+        /// \param pixeltype       The pixeltype (of the destination bitmap).
+        /// \param roi             The ROI and the coordinate system it is defined in.
+        /// \param planeCoordinate The plane coordinate.
+        /// \param zoom            The zoom factor.
+        /// \param pOptions        Options for controlling the operation (may be nullptr).
+        /// \return A `std::shared_ptr<libCZI::IBitmapData>` containing the composite.
+        virtual std::shared_ptr<libCZI::IBitmapData> Get(libCZI::PixelType pixeltype, const libCZI::IntRectAndFrameOfReference& roi, const libCZI::IDimCoordinate* planeCoordinate, float zoom, const libCZI::ISingleChannelScalingTileAccessor::Options* pOptions) = 0;
+
+        /// Copy the composite to the specified bitmap.
+        /// The size of the bitmap must exactly match the size reported by the method "CalcSize" (for the same ROI and zoom),
+        /// otherwise an invalid_argument-exception is thrown.
+        /// \param [in,out] pDest   The destination bitmap.
+        /// \param roi              The ROI and the coordinate system it is defined in.
+        /// \param planeCoordinate  The plane coordinate.
+        /// \param zoom             The zoom factor.
+        /// \param pOptions         Options controlling the operation. May be nullptr.
+        virtual void Get(libCZI::IBitmapData* pDest, const libCZI::IntRectAndFrameOfReference& roi, const libCZI::IDimCoordinate* planeCoordinate, float zoom, const libCZI::ISingleChannelScalingTileAccessor::Options* pOptions) = 0;
 
         /// Gets the scaled tile composite of the specified plane and the specified ROI with the specified zoom factor.\n
         /// The pixeltype is determined by examining the first subblock found in the
@@ -485,7 +515,10 @@ namespace libCZI
         /// \param zoom            The zoom.
         /// \param pOptions        Options for controlling the operation (may be nullptr).
         /// \return A `std::shared_ptr<libCZI::IBitmapData>` containing the composite.
-        virtual std::shared_ptr<libCZI::IBitmapData> Get(const libCZI::IntRect& roi, const libCZI::IDimCoordinate* planeCoordinate, float zoom, const libCZI::ISingleChannelScalingTileAccessor::Options* pOptions) = 0;
+        std::shared_ptr<libCZI::IBitmapData> Get(const libCZI::IntRect& roi, const libCZI::IDimCoordinate* planeCoordinate, float zoom, const libCZI::ISingleChannelScalingTileAccessor::Options* pOptions)
+        {
+            return this->Get(libCZI::IntRectAndFrameOfReference{ libCZI::CZIFrameOfReference::RawSubBlockCoordinateSystem, roi }, planeCoordinate, zoom, pOptions);
+        }
 
         /// Gets the scaled tile composite of the specified plane and the specified ROI with the specified zoom factor.
         /// \param pixeltype       The pixeltype (of the destination bitmap).
@@ -494,7 +527,10 @@ namespace libCZI
         /// \param zoom            The zoom factor.
         /// \param pOptions        Options for controlling the operation (may be nullptr).
         /// \return A `std::shared_ptr<libCZI::IBitmapData>` containing the composite.
-        virtual std::shared_ptr<libCZI::IBitmapData> Get(libCZI::PixelType pixeltype, const libCZI::IntRect& roi, const libCZI::IDimCoordinate* planeCoordinate, float zoom, const libCZI::ISingleChannelScalingTileAccessor::Options* pOptions) = 0;
+        std::shared_ptr<libCZI::IBitmapData> Get(libCZI::PixelType pixeltype, const libCZI::IntRect& roi, const libCZI::IDimCoordinate* planeCoordinate, float zoom, const libCZI::ISingleChannelScalingTileAccessor::Options* pOptions)
+        {
+            return this->Get(pixeltype, libCZI::IntRectAndFrameOfReference{ libCZI::CZIFrameOfReference::RawSubBlockCoordinateSystem, roi }, planeCoordinate, zoom, pOptions);
+        }
 
         /// Copy the composite to the specified bitmap.
         /// The size of the bitmap must exactly match the size reported by the method "CalcSize" (for the same ROI and zoom),
@@ -504,7 +540,10 @@ namespace libCZI
         /// \param planeCoordinate  The plane coordinate.
         /// \param zoom             The zoom factor.
         /// \param pOptions         Options controlling the operation. May be nullptr.
-        virtual void Get(libCZI::IBitmapData* pDest, const libCZI::IntRect& roi, const libCZI::IDimCoordinate* planeCoordinate, float zoom, const libCZI::ISingleChannelScalingTileAccessor::Options* pOptions) = 0;
+        void Get(libCZI::IBitmapData* pDest, const libCZI::IntRect& roi, const libCZI::IDimCoordinate* planeCoordinate, float zoom, const libCZI::ISingleChannelScalingTileAccessor::Options* pOptions)
+        {
+            this->Get(pDest, libCZI::IntRectAndFrameOfReference{ libCZI::CZIFrameOfReference::RawSubBlockCoordinateSystem, roi }, planeCoordinate, zoom, pOptions);
+        }
     };
 
     /// Composition operations are found in this class: multi-tile compositor and multi-channel compositor.

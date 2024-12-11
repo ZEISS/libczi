@@ -310,7 +310,7 @@ public:
 
 class SingleChannelScalingTileAccessorHandler
 {
-    shared_ptr<CSingleChannelScalingTileAccessor> accessor_;
+    shared_ptr<ISingleChannelScalingTileAccessor> accessor_;
     bool sort_by_m_;
 public:
     explicit SingleChannelScalingTileAccessorHandler(bool sortByM = true) : sort_by_m_(sortByM)
