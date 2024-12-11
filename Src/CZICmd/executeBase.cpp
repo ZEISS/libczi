@@ -61,8 +61,8 @@ IntRect CExecuteBase::GetRoiFromOptions(const CCmdLineOptions& options, const Su
     IntRect roi{ options.GetRectX(), options.GetRectY(), options.GetRectW(), options.GetRectH() };
     if (options.GetIsRelativeRectCoordinate())
     {
-        roi.x += subBlockStatistics.boundingBox.x;
-        roi.y += subBlockStatistics.boundingBox.y;
+        roi.x += subBlockStatistics.boundingBoxLayer0Only.x;
+        roi.y += subBlockStatistics.boundingBoxLayer0Only.y;
     }
 
     return roi;
