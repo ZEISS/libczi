@@ -386,30 +386,67 @@ namespace libCZI
         /// The pixeltype is determined by examining the first subblock found in the
         /// specified plane (which is an arbitrary subblock). A newly allocated
         /// bitmap is returned.
-        /// \param roi             The ROI.
+        /// \param roi             The ROI and the coordinate system it is defined in.
         /// \param planeCoordinate The plane coordinate.
         /// \param pyramidInfo     Information describing the pyramid-layer.
         /// \param pOptions        Options for controlling the operation.
-        /// \return A std::shared_ptr&lt;libCZI::IBitmapData&gt;
-        virtual std::shared_ptr<libCZI::IBitmapData> Get(const libCZI::IntRect& roi, const libCZI::IDimCoordinate* planeCoordinate, const PyramidLayerInfo& pyramidInfo, const libCZI::ISingleChannelPyramidLayerTileAccessor::Options* pOptions) = 0;
+        /// \return A std::shared_ptr<libCZI::IBitmapData> containing the tile-composite.
+        virtual std::shared_ptr<libCZI::IBitmapData> Get(const libCZI::IntRectAndFrameOfReference& roi, const libCZI::IDimCoordinate* planeCoordinate, const PyramidLayerInfo& pyramidInfo, const libCZI::ISingleChannelPyramidLayerTileAccessor::Options* pOptions) = 0;
 
         /// Gets the tile composite of the specified plane and the specified ROI and the specified pyramid-layer.
         /// \param pixeltype       The pixeltype (of the destination bitmap).
-        /// \param roi             The ROI.
+        /// \param roi             The ROI and the coordinate system it is defined in.
         /// \param planeCoordinate The plane coordinate.
         /// \param pyramidInfo     Information describing the pyramid-layer.
         /// \param pOptions        Options for controlling the operation.
-        /// \return A std::shared_ptr&lt;libCZI::IBitmapData&gt;
-        virtual std::shared_ptr<libCZI::IBitmapData> Get(libCZI::PixelType pixeltype, const libCZI::IntRect& roi, const libCZI::IDimCoordinate* planeCoordinate, const PyramidLayerInfo& pyramidInfo, const libCZI::ISingleChannelPyramidLayerTileAccessor::Options* pOptions) = 0;
+        /// \return A std::shared_ptr<libCZI::IBitmapData> containing the tile-composite.
+        virtual std::shared_ptr<libCZI::IBitmapData> Get(libCZI::PixelType pixeltype, const libCZI::IntRectAndFrameOfReference& roi, const libCZI::IDimCoordinate* planeCoordinate, const PyramidLayerInfo& pyramidInfo, const libCZI::ISingleChannelPyramidLayerTileAccessor::Options* pOptions) = 0;
 
         /// Copy the composite to the specified bitmap.
         /// \param [out] pDest     The destination bitmap (also defining the width and height)
-        /// \param xPos            The x-position.
-        /// \param yPos            The y-position.
+        /// \param position        The x- and y-position and the coordinate system it is defined in.
         /// \param planeCoordinate The plane coordinate.
         /// \param pyramidInfo     Information describing the pyramid-layer.
         /// \param pOptions        Options for controlling the operation.
-        virtual void Get(libCZI::IBitmapData* pDest, int xPos, int yPos, const IDimCoordinate* planeCoordinate, const PyramidLayerInfo& pyramidInfo, const Options* pOptions) = 0;
+        virtual void Get(libCZI::IBitmapData* pDest, const libCZI::IntPointAndFrameOfReference& position, const IDimCoordinate* planeCoordinate, const PyramidLayerInfo& pyramidInfo, const Options* pOptions) = 0;
+
+        /// Gets the tile composite of the specified plane and the specified ROI and the specified pyramid-layer.
+        /// The pixeltype is determined by examining the first subblock found in the
+        /// specified plane (which is an arbitrary subblock). A newly allocated
+        /// bitmap is returned.
+        /// \param roi             The ROI (given in _raw-subblock-coordinate-system_, c.f. @ref coordinatesystems).
+        /// \param planeCoordinate The plane coordinate.
+        /// \param pyramidInfo     Information describing the pyramid-layer.
+        /// \param pOptions        Options for controlling the operation.
+        /// \return A std::shared_ptr<libCZI::IBitmapData> containing the tile-composite.
+        std::shared_ptr<libCZI::IBitmapData> Get(const libCZI::IntRect& roi, const libCZI::IDimCoordinate* planeCoordinate, const PyramidLayerInfo& pyramidInfo, const libCZI::ISingleChannelPyramidLayerTileAccessor::Options* pOptions)
+        {
+            return this->Get(libCZI::IntRectAndFrameOfReference{ libCZI::CZIFrameOfReference::RawSubBlockCoordinateSystem, roi }, planeCoordinate, pyramidInfo, pOptions);
+        }
+
+        /// Gets the tile composite of the specified plane and the specified ROI and the specified pyramid-layer.
+        /// \param pixeltype       The pixeltype (of the destination bitmap).
+        /// \param roi             The ROI (given in _raw-subblock-coordinate-system_, c.f. @ref coordinatesystems).
+        /// \param planeCoordinate The plane coordinate.
+        /// \param pyramidInfo     Information describing the pyramid-layer.
+        /// \param pOptions        Options for controlling the operation.
+        /// \return A std::shared_ptr<libCZI::IBitmapData> containing the tile-composite.
+        std::shared_ptr<libCZI::IBitmapData> Get(libCZI::PixelType pixeltype, const libCZI::IntRect& roi, const libCZI::IDimCoordinate* planeCoordinate, const PyramidLayerInfo& pyramidInfo, const libCZI::ISingleChannelPyramidLayerTileAccessor::Options* pOptions)
+        {
+            return this->Get(pixeltype, libCZI::IntRectAndFrameOfReference{ libCZI::CZIFrameOfReference::RawSubBlockCoordinateSystem, roi }, planeCoordinate, pyramidInfo, pOptions);
+        }
+
+        /// Copy the composite to the specified bitmap.
+        /// \param [out] pDest     The destination bitmap (also defining the width and height)
+        /// \param xPos            The x-position (given in _raw-subblock-coordinate-system_, c.f. @ref coordinatesystems).
+        /// \param yPos            The y-position (given in _raw-subblock-coordinate-system_, c.f. @ref coordinatesystems).
+        /// \param planeCoordinate The plane coordinate.
+        /// \param pyramidInfo     Information describing the pyramid-layer.
+        /// \param pOptions        Options for controlling the operation.
+        void Get(libCZI::IBitmapData* pDest, int xPos, int yPos, const IDimCoordinate* planeCoordinate, const PyramidLayerInfo& pyramidInfo, const Options* pOptions)
+        {
+            this->Get(pDest, libCZI::IntPointAndFrameOfReference{ libCZI::CZIFrameOfReference::RawSubBlockCoordinateSystem, { xPos, yPos } }, planeCoordinate, pyramidInfo, pOptions);
+        }
     };
 
     /// Interface for single channel scaling tile accessors.
