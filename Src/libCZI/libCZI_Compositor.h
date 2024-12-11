@@ -430,7 +430,7 @@ namespace libCZI
             RgbFloatColor backGroundColor;
 
             /// If true, then the tiles are sorted by their M-index (tile with highest M-index will be 'on top').
-            /// Otherwise the Z-order is arbitrary.
+            /// Otherwise, the Z-order is arbitrary.
             bool sortByM;
 
             /// If true, then a one-pixel wide boundary will be drawn around 
