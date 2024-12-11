@@ -268,3 +268,57 @@ TEST(FrameOfReferenceTransform, GetTileCompositeAndCheckResult)
     EXPECT_TRUE(Check2x2Gray8Bitmap(tile_composite_bitmap.get(), array<uint8_t, 4>{10, 20, 30, 40}));
 }
 
+TEST(FrameOfReferenceTransform, UseReaderWriterAndCallAndCheckTransformPoint)
+{
+    MosaicInfo mosaic_info;
+    mosaic_info.tile_width = 1;
+    mosaic_info.tile_height = 1;
+    mosaic_info.tiles = { {-1, -1, 10}, {0, -1, 20}, {-1, 0, 30}, {0, 0, 40} };
+    auto czi_document_as_blob = CreateMosaicCzi(mosaic_info);
+
+    const auto in_out_stream = make_shared<CMemInputOutputStream>(get<0>(czi_document_as_blob).get(), get<1>(czi_document_as_blob));
+    const auto reader_writer = CreateCZIReaderWriter();
+    reader_writer->Create(in_out_stream);
+
+    IntPointAndFrameOfReference point_and_frame_of_reference;
+    point_and_frame_of_reference.point = { 0, 0 };
+    point_and_frame_of_reference.frame_of_reference = CZIFrameOfReference::PixelCoordinateSystem;
+    auto transformed_point = reader_writer->TransformPoint(point_and_frame_of_reference, CZIFrameOfReference::RawSubBlockCoordinateSystem);
+    EXPECT_EQ(transformed_point.point.x, -1);
+    EXPECT_EQ(transformed_point.point.y, -1);
+    EXPECT_EQ(transformed_point.frame_of_reference, CZIFrameOfReference::RawSubBlockCoordinateSystem);
+
+    // ok, now we remove the subblocks at (-1, -1) and (0, -1) - the bounding-box is now (0, 0, 1, 1), so the point (0, 0) should be transformed to (0, 0)
+    reader_writer->RemoveSubBlock(0);
+    reader_writer->RemoveSubBlock(2);
+    transformed_point = reader_writer->TransformPoint(point_and_frame_of_reference, CZIFrameOfReference::RawSubBlockCoordinateSystem);
+    EXPECT_EQ(transformed_point.point.x, 0);
+    EXPECT_EQ(transformed_point.point.y, 0);
+    EXPECT_EQ(transformed_point.frame_of_reference, CZIFrameOfReference::RawSubBlockCoordinateSystem);
+
+    // and now, add a subblock at (-5,-5) and check the transformation
+    auto bitmap = CreateGray8BitmapAndFill(mosaic_info.tile_width, mosaic_info.tile_height, 50);
+    libCZI::AddSubBlockInfoStridedBitmap addSbBlkInfo;
+    addSbBlkInfo.Clear();
+    addSbBlkInfo.coordinate.Set(libCZI::DimensionIndex::C, 0);
+    addSbBlkInfo.mIndexValid = true;
+    addSbBlkInfo.mIndex = 4;
+    addSbBlkInfo.x = -5;
+    addSbBlkInfo.y = -5;
+    addSbBlkInfo.logicalWidth = static_cast<int>(bitmap->GetWidth());
+    addSbBlkInfo.logicalHeight = static_cast<int>(bitmap->GetHeight());
+    addSbBlkInfo.physicalWidth = static_cast<int>(bitmap->GetWidth());
+    addSbBlkInfo.physicalHeight = static_cast<int>(bitmap->GetHeight());
+    addSbBlkInfo.PixelType = bitmap->GetPixelType();
+    {
+        const libCZI::ScopedBitmapLockerSP lock_info_bitmap{ bitmap };
+        addSbBlkInfo.ptrBitmap = lock_info_bitmap.ptrDataRoi;
+        addSbBlkInfo.strideBitmap = lock_info_bitmap.stride;
+        reader_writer->SyncAddSubBlock(addSbBlkInfo);
+    }
+
+    transformed_point = reader_writer->TransformPoint(point_and_frame_of_reference, CZIFrameOfReference::RawSubBlockCoordinateSystem);
+    EXPECT_EQ(transformed_point.point.x, -5);
+    EXPECT_EQ(transformed_point.point.y, -5);
+    EXPECT_EQ(transformed_point.frame_of_reference, CZIFrameOfReference::RawSubBlockCoordinateSystem);
+}

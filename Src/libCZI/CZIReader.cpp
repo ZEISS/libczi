@@ -110,7 +110,7 @@ CCZIReader::CCZIReader() : isOperational(false), default_frame_of_reference(CZIF
 /*virtual*/libCZI::IntPointAndFrameOfReference CCZIReader::TransformPoint(const libCZI::IntPointAndFrameOfReference& source_point, libCZI::CZIFrameOfReference destination_frame_of_reference)
 {
     CZIFrameOfReference source_frame_of_reference_consolidated;
-    switch (source_point.frame_of_reference)
+    switch (source_point.frame_of_reference)  // NOLINT(clang-diagnostic-switch-enum)
     {
     case CZIFrameOfReference::RawSubBlockCoordinateSystem:
     case CZIFrameOfReference::PixelCoordinateSystem:
@@ -124,7 +124,7 @@ CCZIReader::CCZIReader() : isOperational(false), default_frame_of_reference(CZIF
     }
 
     CZIFrameOfReference destination_frame_of_reference_consolidated;
-    switch (destination_frame_of_reference)
+    switch (destination_frame_of_reference)  // NOLINT(clang-diagnostic-switch-enum)
     {
     case CZIFrameOfReference::RawSubBlockCoordinateSystem:
     case CZIFrameOfReference::PixelCoordinateSystem:
@@ -154,7 +154,6 @@ CCZIReader::CCZIReader() : isOperational(false), default_frame_of_reference(CZIF
     {
         const auto& statistics = this->subBlkDir.GetStatistics();
         return libCZI::IntPointAndFrameOfReference{ CZIFrameOfReference::PixelCoordinateSystem, {source_point.point.x - statistics.boundingBoxLayer0Only.x, source_point.point.y - statistics.boundingBoxLayer0Only.y} };
-
     }
 
     throw logic_error("Unsupported frame-of-reference transformation.");

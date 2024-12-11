@@ -81,6 +81,7 @@ private:
     void UpdateFileHeader();
     void ThrowIfNotOperational() const;
     void ThrowIfAlreadyInitialized() const;
+    libCZI::CZIFrameOfReference GetDefaultFrameOfReference() const;
 private:
     class CNextSegment
     {
