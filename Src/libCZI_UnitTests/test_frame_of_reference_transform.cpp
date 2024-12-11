@@ -288,12 +288,12 @@ TEST(FrameOfReferenceTransform, UseReaderWriterAndCallAndCheckTransformPoint)
     EXPECT_EQ(transformed_point.point.y, -1);
     EXPECT_EQ(transformed_point.frame_of_reference, CZIFrameOfReference::RawSubBlockCoordinateSystem);
 
-    // ok, now we remove the subblocks at (-1, -1) and (0, -1) - the bounding-box is now (0, 0, 1, 1), so the point (0, 0) should be transformed to (0, 0)
+    // ok, now we remove the subblocks at (-1, -1) and (0, -1) - the bounding-box is now (0, -1, 1, 1), so the point (0, 0) should be transformed to (0, -1)
     reader_writer->RemoveSubBlock(0);
     reader_writer->RemoveSubBlock(2);
     transformed_point = reader_writer->TransformPoint(point_and_frame_of_reference, CZIFrameOfReference::RawSubBlockCoordinateSystem);
     EXPECT_EQ(transformed_point.point.x, 0);
-    EXPECT_EQ(transformed_point.point.y, 0);
+    EXPECT_EQ(transformed_point.point.y, -1);
     EXPECT_EQ(transformed_point.frame_of_reference, CZIFrameOfReference::RawSubBlockCoordinateSystem);
 
     // and now, add a subblock at (-5,-5) and check the transformation
