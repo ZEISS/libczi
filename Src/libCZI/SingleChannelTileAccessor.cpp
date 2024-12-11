@@ -32,8 +32,7 @@ CSingleChannelTileAccessor::CSingleChannelTileAccessor(const std::shared_ptr<ISu
 
 /*virtual*/std::shared_ptr<libCZI::IBitmapData> CSingleChannelTileAccessor::Get(libCZI::PixelType pixeltype, const  libCZI::IntRectAndFrameOfReference& roi, const IDimCoordinate* planeCoordinate, const Options* pOptions)
 {
-    //IntRect roi_raw_sub_block_cs = Utils::ConvertToFrameOfReference(roi, this->sbBlkRepository.get(), CZIFrameOfReference::RawSubBlockCoordinateSystem);
-    IntRect roi_raw_sub_block_cs = this->sbBlkRepository->TransformRectangle(roi, CZIFrameOfReference::RawSubBlockCoordinateSystem).rectangle;
+    const IntRect roi_raw_sub_block_cs = this->sbBlkRepository->TransformRectangle(roi, CZIFrameOfReference::RawSubBlockCoordinateSystem).rectangle;
     auto bmDest = GetSite()->CreateBitmap(pixeltype, roi_raw_sub_block_cs.w, roi_raw_sub_block_cs.h);
     this->InternalGet(roi_raw_sub_block_cs.x, roi_raw_sub_block_cs.y, bmDest.get(), planeCoordinate, pOptions);
     return bmDest;
