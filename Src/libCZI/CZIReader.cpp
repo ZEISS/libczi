@@ -146,14 +146,14 @@ CCZIReader::CCZIReader() : isOperational(false), default_frame_of_reference(CZIF
         destination_frame_of_reference_consolidated == CZIFrameOfReference::RawSubBlockCoordinateSystem)
     {
         const auto& statistics = this->subBlkDir.GetStatistics();
-        return libCZI::IntPointAndFrameOfReference{ CZIFrameOfReference::RawSubBlockCoordinateSystem, {source_point.point.x + statistics.boundingBoxLayer0Only.x, source_point.point.y + statistics.boundingBoxLayer0Only.y} };
+        return { CZIFrameOfReference::RawSubBlockCoordinateSystem, {source_point.point.x + statistics.boundingBoxLayer0Only.x, source_point.point.y + statistics.boundingBoxLayer0Only.y} };
     }
 
     if (source_frame_of_reference_consolidated == CZIFrameOfReference::RawSubBlockCoordinateSystem &&
         destination_frame_of_reference_consolidated == CZIFrameOfReference::PixelCoordinateSystem)
     {
         const auto& statistics = this->subBlkDir.GetStatistics();
-        return libCZI::IntPointAndFrameOfReference{ CZIFrameOfReference::PixelCoordinateSystem, {source_point.point.x - statistics.boundingBoxLayer0Only.x, source_point.point.y - statistics.boundingBoxLayer0Only.y} };
+        return { CZIFrameOfReference::PixelCoordinateSystem, {source_point.point.x - statistics.boundingBoxLayer0Only.x, source_point.point.y - statistics.boundingBoxLayer0Only.y} };
     }
 
     throw logic_error("Unsupported frame-of-reference transformation.");
