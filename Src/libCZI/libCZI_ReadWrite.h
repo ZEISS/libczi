@@ -161,7 +161,7 @@ namespace libCZI
         libCZI::CZIFrameOfReference defaultFrameOfReference;
     public:
         /// Default constructor - sets all information to "invalid" and sets fileGuid to GUID_NULL.
-        CCziReaderWriterInfo() : CCziReaderWriterInfo(GUID{ 0,0,0,{ 0,0,0,0,0,0,0,0 } })
+        CCziReaderWriterInfo() : CCziReaderWriterInfo(GUID{ 0, 0, 0, { 0, 0, 0, 0, 0, 0, 0, 0 } })
         {}
 
         /// Constructor.
