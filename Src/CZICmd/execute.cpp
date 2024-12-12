@@ -556,7 +556,7 @@ public:
         sctaOptions.sceneFilter = options.GetSceneIndexSet();
         sctaOptions.useVisibilityCheckOptimization = options.GetUseVisibilityCheckOptimization();
 
-        IntRect roi{ options.GetRectX() ,options.GetRectY(), options.GetRectW(), options.GetRectH() };
+        IntRect roi{ options.GetRectX(), options.GetRectY(), options.GetRectW(), options.GetRectH() };
         if (options.GetIsRelativeRectCoordinate())
         {
             auto statistics = spReader->GetStatistics();
