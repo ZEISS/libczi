@@ -23,7 +23,15 @@ namespace libCZI
         /// \return The file's unique identifier.
         virtual const GUID& GetFileGuid() const = 0;
 
-        virtual ~ICziReaderWriterInfo() {}
+        /// Gets the default frame-of-reference which is to be used by the reader-writer-object. This determines which frame-of-reference
+        /// is used when the enum value "CZIFrameOfReference::Default" is used with an operation of the reader-writer-object.
+        /// If the value specified here is "CZIFrameOfReference::Invalid" or "CZIFrameOfReference::Default", then 
+        /// "CZIFrameOfReference::RawSubBlockCoordinateSystem" will be used.
+        ///
+        /// \returns    The default frame of reference.
+        virtual libCZI::CZIFrameOfReference GetDefaultFrameOfReference() const = 0;
+
+        virtual ~ICziReaderWriterInfo() = default;
     };
 
     /// Interface for "in-place-editing" of a CZI. All write-operations immediately go into the file. If the data does not fit into the
@@ -39,7 +47,6 @@ namespace libCZI
     class LIBCZI_API ICziReaderWriter : public ISubBlockRepository, public IAttachmentRepository
     {
     public:
-
         /// Initialize the object.
         ///
         /// \param stream The read-write stream to operate on.
@@ -151,21 +158,26 @@ namespace libCZI
     private:
         bool forceFileGuid;
         GUID fileGuid;          ///< The GUID to be set as the CZI's file-guid.
+        libCZI::CZIFrameOfReference defaultFrameOfReference;
     public:
         /// Default constructor - sets all information to "invalid" and sets fileGuid to GUID_NULL.
-        CCziReaderWriterInfo() : CCziReaderWriterInfo(GUID{ 0,0,0,{ 0,0,0,0,0,0,0,0 } })
+        CCziReaderWriterInfo() : CCziReaderWriterInfo(GUID{ 0, 0, 0, { 0, 0, 0, 0, 0, 0, 0, 0 } })
         {}
 
         /// Constructor.
         ///
         /// \param fileGuid Unique identifier for the file.
-        explicit CCziReaderWriterInfo(const GUID& fileGuid) : forceFileGuid(false)
-        {
-            this->fileGuid = fileGuid;
-        }
+        explicit CCziReaderWriterInfo(const GUID& fileGuid) : forceFileGuid(false), fileGuid(fileGuid), defaultFrameOfReference(libCZI::CZIFrameOfReference::Invalid)
+        {}
 
+        /// \copydoc libCZI::ICziReaderWriterInfo::GetForceFileGuid
         bool GetForceFileGuid() const override { return this->forceFileGuid; }
+
+        /// \copydoc libCZI::ICziReaderWriterInfo::GetFileGuid
         const GUID& GetFileGuid() const override { return this->fileGuid; }
+
+        /// \copydoc libCZI::ICziReaderWriterInfo::GetDefaultFrameOfReference
+        libCZI::CZIFrameOfReference GetDefaultFrameOfReference() const override { return this->defaultFrameOfReference; }
 
         /// Sets "force file GUID" flag.
         ///

@@ -15,7 +15,7 @@ CSingleChannelPyramidLevelTileAccessor::CSingleChannelPyramidLevelTileAccessor(c
 {
 }
 
-/*virtual*/std::shared_ptr<libCZI::IBitmapData> CSingleChannelPyramidLevelTileAccessor::Get(const libCZI::IntRect& roi, const libCZI::IDimCoordinate* planeCoordinate, const PyramidLayerInfo& pyramidInfo, const ISingleChannelPyramidLayerTileAccessor::Options* pOptions)
+/*virtual*/std::shared_ptr<libCZI::IBitmapData> CSingleChannelPyramidLevelTileAccessor::Get(const libCZI::IntRectAndFrameOfReference& roi, const libCZI::IDimCoordinate* planeCoordinate, const PyramidLayerInfo& pyramidInfo, const ISingleChannelPyramidLayerTileAccessor::Options* pOptions)
 {
     if (pOptions == nullptr)
     {
@@ -34,7 +34,7 @@ CSingleChannelPyramidLevelTileAccessor::CSingleChannelPyramidLevelTileAccessor(c
     return this->Get(pixelType, roi, planeCoordinate, pyramidInfo, pOptions);
 }
 
-/*virtual*/std::shared_ptr<libCZI::IBitmapData> CSingleChannelPyramidLevelTileAccessor::Get(libCZI::PixelType pixeltype, const libCZI::IntRect& roi, const libCZI::IDimCoordinate* planeCoordinate, const PyramidLayerInfo& pyramidInfo, const libCZI::ISingleChannelPyramidLayerTileAccessor::Options* pOptions)
+/*virtual*/std::shared_ptr<libCZI::IBitmapData> CSingleChannelPyramidLevelTileAccessor::Get(libCZI::PixelType pixeltype, const libCZI::IntRectAndFrameOfReference& roi, const libCZI::IDimCoordinate* planeCoordinate, const PyramidLayerInfo& pyramidInfo, const libCZI::ISingleChannelPyramidLayerTileAccessor::Options* pOptions)
 {
     if (pOptions == nullptr)
     {
@@ -43,8 +43,9 @@ CSingleChannelPyramidLevelTileAccessor::CSingleChannelPyramidLevelTileAccessor(c
         return this->Get(pixeltype, roi, planeCoordinate, pyramidInfo, &opt);
     }
 
+    const IntRect roi_raw_sub_block_cs = this->sbBlkRepository->TransformRectangle(roi, CZIFrameOfReference::RawSubBlockCoordinateSystem).rectangle;
     const int sizeOfPixel = CalcSizeOfPixelOnLayer0(pyramidInfo);
-    const IntSize sizeOfBitmap{ static_cast<std::uint32_t>(roi.w / sizeOfPixel),static_cast<std::uint32_t>(roi.h / sizeOfPixel) };
+    const IntSize sizeOfBitmap{ static_cast<std::uint32_t>(roi_raw_sub_block_cs.w / sizeOfPixel),static_cast<std::uint32_t>(roi_raw_sub_block_cs.h / sizeOfPixel) };
     if (sizeOfBitmap.w == 0 || sizeOfBitmap.h == 0)
     {
         // TODO
@@ -52,22 +53,23 @@ CSingleChannelPyramidLevelTileAccessor::CSingleChannelPyramidLevelTileAccessor(c
     }
 
     auto bmDest = GetSite()->CreateBitmap(pixeltype, sizeOfBitmap.w, sizeOfBitmap.h);
-    this->InternalGet(bmDest.get(), roi.x, roi.y, sizeOfPixel, planeCoordinate, pyramidInfo, *pOptions);
+    this->InternalGet(bmDest.get(), roi_raw_sub_block_cs.x, roi_raw_sub_block_cs.y, sizeOfPixel, planeCoordinate, pyramidInfo, *pOptions);
     return bmDest;
 }
 
-/*virtual*/void CSingleChannelPyramidLevelTileAccessor::Get(libCZI::IBitmapData* pDest, int xPos, int yPos, const libCZI::IDimCoordinate* planeCoordinate, const PyramidLayerInfo& pyramidInfo, const Options* pOptions)
+/*virtual*/void CSingleChannelPyramidLevelTileAccessor::Get(libCZI::IBitmapData* pDest, const libCZI::IntPointAndFrameOfReference& position, const libCZI::IDimCoordinate* planeCoordinate, const PyramidLayerInfo& pyramidInfo, const Options* pOptions)
 {
     if (pOptions == nullptr)
     {
         Options opt;
         opt.Clear();
-        this->Get(pDest, xPos, yPos, planeCoordinate, pyramidInfo, &opt);
+        this->Get(pDest, position, planeCoordinate, pyramidInfo, &opt);
         return;
     }
 
+    const IntPoint point_raw_sub_block_cs = this->sbBlkRepository->TransformPoint(position, CZIFrameOfReference::RawSubBlockCoordinateSystem).point;
     const int sizeOfPixel = CalcSizeOfPixelOnLayer0(pyramidInfo);
-    this->InternalGet(pDest, xPos, yPos, sizeOfPixel, planeCoordinate, pyramidInfo, *pOptions);
+    this->InternalGet(pDest, point_raw_sub_block_cs.x, point_raw_sub_block_cs.y, sizeOfPixel, planeCoordinate, pyramidInfo, *pOptions);
 }
 
 void CSingleChannelPyramidLevelTileAccessor::InternalGet(libCZI::IBitmapData* pDest, int xPos, int yPos, int sizeOfPixelOnLayer0, const libCZI::IDimCoordinate* planeCoordinate, const PyramidLayerInfo& pyramidInfo, const Options& options)

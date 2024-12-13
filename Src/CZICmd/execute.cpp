@@ -556,12 +556,12 @@ public:
         sctaOptions.sceneFilter = options.GetSceneIndexSet();
         sctaOptions.useVisibilityCheckOptimization = options.GetUseVisibilityCheckOptimization();
 
-        IntRect roi{ options.GetRectX() ,options.GetRectY(),options.GetRectW(),options.GetRectH() };
+        IntRect roi{ options.GetRectX(), options.GetRectY(), options.GetRectW(), options.GetRectH() };
         if (options.GetIsRelativeRectCoordinate())
         {
             auto statistics = spReader->GetStatistics();
-            roi.x += statistics.boundingBox.x;
-            roi.y += statistics.boundingBox.y;
+            roi.x += statistics.boundingBoxLayer0Only.x;
+            roi.y += statistics.boundingBoxLayer0Only.y;
         }
 
         auto re = accessor->Get(roi, &coordinate, &sctaOptions);
@@ -676,8 +676,8 @@ private:
         IntRect roi{ options.GetRectX() ,options.GetRectY() ,options.GetRectW(),options.GetRectH() };
         if (options.GetIsRelativeRectCoordinate())
         {
-            roi.x += subBlockStatistics.boundingBox.x;
-            roi.y += subBlockStatistics.boundingBox.y;
+            roi.x += subBlockStatistics.boundingBoxLayer0Only.x;
+            roi.y += subBlockStatistics.boundingBoxLayer0Only.y;
         }
 
         auto accessor = reader->CreateSingleChannelTileAccessor();
@@ -861,8 +861,8 @@ private:
         IntRect roi{ options.GetRectX() ,options.GetRectY() ,options.GetRectW(),options.GetRectH() };
         if (options.GetIsRelativeRectCoordinate())
         {
-            roi.x += subBlockStatistics.boundingBox.x;
-            roi.y += subBlockStatistics.boundingBox.y;
+            roi.x += subBlockStatistics.boundingBoxLayer0Only.x;
+            roi.y += subBlockStatistics.boundingBoxLayer0Only.y;
         }
 
         auto accessor = reader->CreateSingleChannelScalingTileAccessor();

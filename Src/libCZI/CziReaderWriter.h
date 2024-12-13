@@ -47,6 +47,7 @@ public:
     bool TryGetSubBlockInfo(int index, libCZI::SubBlockInfo* info) const override;
     libCZI::SubBlockStatistics GetStatistics() override;
     libCZI::PyramidStatistics GetPyramidStatistics() override;
+    libCZI::IntPointAndFrameOfReference TransformPoint(const libCZI::IntPointAndFrameOfReference& source_point, libCZI::CZIFrameOfReference destination_frame_of_reference) override;
 
     // interface IAttachmentRepository
     void EnumerateAttachments(const std::function<bool(int index, const libCZI::AttachmentInfo& info)>& funcEnum) override;
@@ -80,6 +81,7 @@ private:
     void UpdateFileHeader();
     void ThrowIfNotOperational() const;
     void ThrowIfAlreadyInitialized() const;
+    libCZI::CZIFrameOfReference GetDefaultFrameOfReference() const;
 private:
     class CNextSegment
     {

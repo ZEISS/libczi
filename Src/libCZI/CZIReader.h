@@ -21,6 +21,7 @@ private:
     CCziSubBlockDirectory subBlkDir;
     CCziAttachmentsDirectory attachmentDir;
     bool    isOperational;  ///<    If true, then stream, hdrSegmentData and subBlkDir can be considered valid and operational
+    libCZI::CZIFrameOfReference default_frame_of_reference;
 public:
     CCZIReader();
     ~CCZIReader() override = default;
@@ -33,6 +34,7 @@ public:
     bool TryGetSubBlockInfo(int index, libCZI::SubBlockInfo* info) const override;
     libCZI::SubBlockStatistics GetStatistics() override;
     libCZI::PyramidStatistics GetPyramidStatistics() override;
+    libCZI::IntPointAndFrameOfReference TransformPoint(const libCZI::IntPointAndFrameOfReference& source_point, libCZI::CZIFrameOfReference destination_frame_of_reference) override;
 
     // interface ISubBlockRepositoryEx
     void EnumerateSubBlocksEx(const std::function<bool(int index, const libCZI::DirectorySubBlockInfo& info)>& funcEnum) override;

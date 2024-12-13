@@ -74,6 +74,36 @@ namespace libCZI
         }
     };
 
+    /// A point (with integer coordinates).
+    struct IntPoint
+    {
+        int x;
+        int y;
+    };
+
+    /// Values that represent different frame of reference.
+    enum class CZIFrameOfReference : std::uint8_t
+    {
+        Invalid,                        ///< Invalid frame of reference.
+        Default,                        ///< The default frame of reference.
+        RawSubBlockCoordinateSystem,    ///< The raw sub-block coordinate system.
+        PixelCoordinateSystem,          ///< The pixel coordinate system.
+    };
+
+    /// This structure combines a rectangle with a specification of the frame of reference.
+    struct IntRectAndFrameOfReference
+    {
+        libCZI::CZIFrameOfReference frame_of_reference{ libCZI::CZIFrameOfReference::Invalid }; ///< The frame of reference.
+        libCZI::IntRect rectangle;  ///< The rectangle.
+    };
+
+    /// This structure combines a point with a specification of the frame of reference.
+    struct IntPointAndFrameOfReference
+    {
+        libCZI::CZIFrameOfReference frame_of_reference{ libCZI::CZIFrameOfReference::Invalid }; ///< The frame of reference.
+        IntPoint point;  ///< The point.
+    };
+
     /// A rectangle (with double coordinates).
     struct DblRect
     {
@@ -172,14 +202,14 @@ namespace libCZI
         /// \return The pixel type.
         virtual PixelType       GetPixelType() const = 0;
 
-        /// Gets the size of the bitmap (i. e. its width and height in pixels).
+        /// Gets the size of the bitmap (i.e. its width and height in pixels).
         ///
         /// \return The size (in pixels).
         virtual IntSize         GetSize() const = 0;
 
         /// Gets a data structure allowing for direct access of the bitmap.
         /// 
-        /// The BitmapLockInfo returned must only considered to be valid until Unlock is called.
+        /// The BitmapLockInfo returned must only be considered to be valid until Unlock is called.
         /// It is legal to call Lock multiple time (also from different threads concurrently).
         /// In any case, calls to Lock and Unlock must be balanced. It is considered to be a
         /// fatal error if the object is destroyed when it is locked.
@@ -190,7 +220,7 @@ namespace libCZI
         /// Inform the bitmap object that the data (previously retrieved by a call to Lock)
         /// is not longer used.
         /// 
-        /// The BitmapLockInfo returned must only considered to be valid until Unlock is called.
+        /// The BitmapLockInfo returned must only be considered to be valid until Unlock is called.
         virtual void            Unlock() = 0;
 
         virtual ~IBitmapData() {}

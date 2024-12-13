@@ -629,8 +629,8 @@ std::vector<tOutput> InternalCreateLookUpTableFromGamma(int tableElementCnt, tFl
         [&](libCZI::DimensionIndex dim, int start, int size)->bool
         {
             coord.Set(dim, start);
-    dims.push_back(dim);
-    return true;
+            dims.push_back(dim);
+            return true;
         });
 
     uint64_t coordNo = 0;

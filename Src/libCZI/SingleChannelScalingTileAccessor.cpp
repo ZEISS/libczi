@@ -20,7 +20,7 @@ CSingleChannelScalingTileAccessor::CSingleChannelScalingTileAccessor(const std::
     return InternalCalcSize(roi, zoom);
 }
 
-/*virtual*/ std::shared_ptr<libCZI::IBitmapData> CSingleChannelScalingTileAccessor::Get(const libCZI::IntRect& roi, const libCZI::IDimCoordinate* planeCoordinate, float zoom, const libCZI::ISingleChannelScalingTileAccessor::Options* pOptions)
+/*virtual*/ std::shared_ptr<libCZI::IBitmapData> CSingleChannelScalingTileAccessor::Get(const libCZI::IntRectAndFrameOfReference& roi, const libCZI::IDimCoordinate* planeCoordinate, float zoom, const libCZI::ISingleChannelScalingTileAccessor::Options* pOptions)
 {
     if (pOptions == nullptr)
     {
@@ -38,7 +38,7 @@ CSingleChannelScalingTileAccessor::CSingleChannelScalingTileAccessor(const std::
     return this->Get(pixelType, roi, planeCoordinate, zoom, pOptions);
 }
 
-/*virtual*/std::shared_ptr<libCZI::IBitmapData> CSingleChannelScalingTileAccessor::Get(libCZI::PixelType pixeltype, const libCZI::IntRect& roi, const libCZI::IDimCoordinate* planeCoordinate, float zoom, const libCZI::ISingleChannelScalingTileAccessor::Options* pOptions)
+/*virtual*/std::shared_ptr<libCZI::IBitmapData> CSingleChannelScalingTileAccessor::Get(libCZI::PixelType pixeltype, const libCZI::IntRectAndFrameOfReference& roi, const libCZI::IDimCoordinate* planeCoordinate, float zoom, const libCZI::ISingleChannelScalingTileAccessor::Options* pOptions)
 {
     if (pOptions == nullptr)
     {
@@ -46,13 +46,14 @@ CSingleChannelScalingTileAccessor::CSingleChannelScalingTileAccessor(const std::
         return this->Get(pixeltype, roi, planeCoordinate, zoom, &opt);
     }
 
-    const IntSize sizeOfBitmap = InternalCalcSize(roi, zoom);
+    const IntRect roi_raw_sub_block_cs = this->sbBlkRepository->TransformRectangle(roi, CZIFrameOfReference::RawSubBlockCoordinateSystem).rectangle;
+    const IntSize sizeOfBitmap = InternalCalcSize(roi_raw_sub_block_cs, zoom);
     auto bmDest = GetSite()->CreateBitmap(pixeltype, sizeOfBitmap.w, sizeOfBitmap.h);
-    this->InternalGet(bmDest.get(), roi, planeCoordinate, zoom, *pOptions);
+    this->InternalGet(bmDest.get(), roi_raw_sub_block_cs, planeCoordinate, zoom, *pOptions);
     return bmDest;
 }
 
-/*virtual*/void CSingleChannelScalingTileAccessor::Get(libCZI::IBitmapData* pDest, const libCZI::IntRect& roi, const libCZI::IDimCoordinate* planeCoordinate, float zoom, const libCZI::ISingleChannelScalingTileAccessor::Options* pOptions)
+/*virtual*/void CSingleChannelScalingTileAccessor::Get(libCZI::IBitmapData* pDest, const libCZI::IntRectAndFrameOfReference& roi, const libCZI::IDimCoordinate* planeCoordinate, float zoom, const libCZI::ISingleChannelScalingTileAccessor::Options* pOptions)
 {
     if (pOptions == nullptr)
     {
@@ -60,7 +61,8 @@ CSingleChannelScalingTileAccessor::CSingleChannelScalingTileAccessor(const std::
         return this->Get(pDest, roi, planeCoordinate, zoom, &opt);
     }
 
-    const IntSize sizeOfBitmap = InternalCalcSize(roi, zoom);
+    const IntRect roi_raw_sub_block_cs = this->sbBlkRepository->TransformRectangle(roi, CZIFrameOfReference::RawSubBlockCoordinateSystem).rectangle;
+    const IntSize sizeOfBitmap = InternalCalcSize(roi_raw_sub_block_cs, zoom);
     if (sizeOfBitmap.w != pDest->GetWidth() || sizeOfBitmap.h != pDest->GetHeight())
     {
         stringstream ss;
@@ -68,7 +70,7 @@ CSingleChannelScalingTileAccessor::CSingleChannelScalingTileAccessor(const std::
         throw invalid_argument(ss.str().c_str());
     }
 
-    this->InternalGet(pDest, roi, planeCoordinate, zoom, *pOptions);
+    this->InternalGet(pDest, roi_raw_sub_block_cs, planeCoordinate, zoom, *pOptions);
 }
 
 // ----------------------------------------------------------------------------------------------------------------------
@@ -164,7 +166,7 @@ int CSingleChannelScalingTileAccessor::GetIdxOf1stSubBlockWithZoomGreater(const 
 }
 
 /// <summary>	
-/// Create an vector with indices (into the specified vector with SubBlock-infos) so that the indices give 
+/// Create a vector with indices (into the specified vector with SubBlock-infos) so that the indices give 
 /// the items sorted by their "zoom"-factor. (A zoom of "1" means that the subblock is on layer-0). Subblocks of
 /// a higher pyramid-layer are at the end of the list.
 /// </summary>

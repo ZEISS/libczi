@@ -70,6 +70,10 @@ public:
     {
         return this->subblock_repository_->GetPyramidStatistics();
     }
+    libCZI::IntPointAndFrameOfReference TransformPoint(const libCZI::IntPointAndFrameOfReference& source_point, libCZI::CZIFrameOfReference destination_frame_of_reference) override
+    {
+        return this->subblock_repository_->TransformPoint(source_point, destination_frame_of_reference);
+    }
 };
 
 /// This struct is used for creating a test CZI document - it contains the X-Y-position/width/height
@@ -267,7 +271,7 @@ void RandomSubblocksAndCompareRenderingWithAndWithoutVisibilityOptimization(tAcc
 
 class SingleChannelTileAccessorHandler
 {
-    shared_ptr<CSingleChannelTileAccessor> accessor_;
+    shared_ptr<ISingleChannelTileAccessor> accessor_;
     bool sort_by_m_;
 public:
     explicit SingleChannelTileAccessorHandler(bool sortByM = true) : sort_by_m_(sortByM)
@@ -306,7 +310,7 @@ public:
 
 class SingleChannelScalingTileAccessorHandler
 {
-    shared_ptr<CSingleChannelScalingTileAccessor> accessor_;
+    shared_ptr<ISingleChannelScalingTileAccessor> accessor_;
     bool sort_by_m_;
 public:
     explicit SingleChannelScalingTileAccessorHandler(bool sortByM = true) : sort_by_m_(sortByM)

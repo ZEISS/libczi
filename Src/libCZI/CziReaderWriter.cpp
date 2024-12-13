@@ -33,7 +33,8 @@ struct ReplaceHelper
     int key;
     ICziReaderWriter* t;
     ReplaceHelper(int key, ICziReaderWriter* t)
-        :key(key), t(t) {}
+        :key(key), t(t)
+    {}
 
     void operator()(const AddSubBlockInfo& addSbBlkInfo) const
     {
@@ -60,17 +61,17 @@ void ICziReaderWriter::SyncAddSubBlock(const libCZI::AddSubBlockInfoStridedBitma
 void ICziReaderWriter::ReplaceSubBlock(int key, const libCZI::AddSubBlockInfoMemPtr& addSbBlkInfoMemPtr)
 {
     struct ReplaceHelper f(key, this);
-    AddSubBlockHelper::SyncAddSubBlock<ReplaceHelper >(f, addSbBlkInfoMemPtr);
+    AddSubBlockHelper::SyncAddSubBlock<ReplaceHelper>(f, addSbBlkInfoMemPtr);
 }
 void ICziReaderWriter::ReplaceSubBlock(int key, const libCZI::AddSubBlockInfoLinewiseBitmap& addSbInfoLinewise)
 {
     struct ReplaceHelper f(key, this);
-    AddSubBlockHelper::SyncAddSubBlock<ReplaceHelper >(f, addSbInfoLinewise);
+    AddSubBlockHelper::SyncAddSubBlock<ReplaceHelper>(f, addSbInfoLinewise);
 }
 void ICziReaderWriter::ReplaceSubBlock(int key, const libCZI::AddSubBlockInfoStridedBitmap& addSbBlkInfoStrideBitmap)
 {
     struct ReplaceHelper f(key, this);
-    AddSubBlockHelper::SyncAddSubBlock<ReplaceHelper >(f, addSbBlkInfoStrideBitmap);
+    AddSubBlockHelper::SyncAddSubBlock<ReplaceHelper>(f, addSbBlkInfoStrideBitmap);
 }
 
 //--------------------------------------------------------------------------------------------------------
@@ -335,7 +336,7 @@ void CCziReaderWriter::Finish()
 
 void CCziReaderWriter::UpdateFileHeader()
 {
-    FileHeaderSegment fhs = { 0 };
+    FileHeaderSegment fhs = {};
 
     fhs.header.AllocatedSize = fhs.header.UsedSize = sizeof(fhs.data);
     memcpy(&fhs.header.Id, &CCZIParse::FILEHDRMAGIC, 16);
@@ -430,7 +431,7 @@ void CCziReaderWriter::ReadCziStructure()
     else
     {
         // if there is no valid CZI-file-header, we now write one
-        FileHeaderSegment fhs = { 0 };
+        FileHeaderSegment fhs = {};
         fhs.header.AllocatedSize = fhs.header.UsedSize = sizeof(fhs.data);
         memcpy(&fhs.header.Id, &CCZIParse::FILEHDRMAGIC, 16);
 
@@ -489,7 +490,7 @@ void CCziReaderWriter::DetermineNextSubBlockOffset()
     this->attachmentDirectory.EnumEntries(
         [&](size_t index, const CCziAttachmentsDirectoryBase::AttachmentEntry& attEntry)->bool
         {
-            if (uint64_t(attEntry.FilePosition) > lastSegmentPos)
+            if (static_cast<uint64_t>(attEntry.FilePosition) > lastSegmentPos)
             {
                 lastSegmentPos = attEntry.FilePosition;
             }
@@ -712,6 +713,58 @@ void CCziReaderWriter::WriteToOutputStream(std::uint64_t offset, const void* pv,
     return this->sbBlkDirectory.GetPyramidStatistics();
 }
 
+/*virtual*/libCZI::IntPointAndFrameOfReference CCziReaderWriter::TransformPoint(const libCZI::IntPointAndFrameOfReference& source_point, libCZI::CZIFrameOfReference destination_frame_of_reference)
+{
+    CZIFrameOfReference source_frame_of_reference_consolidated;
+    switch (source_point.frame_of_reference)
+    {
+    case CZIFrameOfReference::RawSubBlockCoordinateSystem:
+    case CZIFrameOfReference::PixelCoordinateSystem:
+        source_frame_of_reference_consolidated = source_point.frame_of_reference;
+        break;
+    case CZIFrameOfReference::Default:
+        source_frame_of_reference_consolidated = this->GetDefaultFrameOfReference();
+        break;
+    default:
+        throw invalid_argument("Unsupported frame-of-reference.");
+    }
+
+    CZIFrameOfReference destination_frame_of_reference_consolidated;
+    switch (destination_frame_of_reference)
+    {
+    case CZIFrameOfReference::RawSubBlockCoordinateSystem:
+    case CZIFrameOfReference::PixelCoordinateSystem:
+        destination_frame_of_reference_consolidated = destination_frame_of_reference;
+        break;
+    case CZIFrameOfReference::Default:
+        destination_frame_of_reference_consolidated = this->GetDefaultFrameOfReference();
+        break;
+    default:
+        throw invalid_argument("Unsupported frame-of-reference.");
+    }
+
+    if (destination_frame_of_reference_consolidated == source_frame_of_reference_consolidated)
+    {
+        return { source_frame_of_reference_consolidated, source_point.point };
+    }
+
+    if (source_frame_of_reference_consolidated == CZIFrameOfReference::PixelCoordinateSystem &&
+        destination_frame_of_reference_consolidated == CZIFrameOfReference::RawSubBlockCoordinateSystem)
+    {
+        const auto& statistics = this->GetStatistics();
+        return libCZI::IntPointAndFrameOfReference{ CZIFrameOfReference::RawSubBlockCoordinateSystem, {source_point.point.x + statistics.boundingBoxLayer0Only.x, source_point.point.y + statistics.boundingBoxLayer0Only.y} };
+    }
+
+    if (source_frame_of_reference_consolidated == CZIFrameOfReference::RawSubBlockCoordinateSystem &&
+        destination_frame_of_reference_consolidated == CZIFrameOfReference::PixelCoordinateSystem)
+    {
+        const auto& statistics = this->GetStatistics();
+        return libCZI::IntPointAndFrameOfReference{ CZIFrameOfReference::PixelCoordinateSystem, {source_point.point.x - statistics.boundingBoxLayer0Only.x, source_point.point.y - statistics.boundingBoxLayer0Only.y} };
+    }
+
+    throw logic_error("Unsupported frame-of-reference transformation.");
+}
+
 /*virtual*/void CCziReaderWriter::EnumerateAttachments(const std::function<bool(int index, const libCZI::AttachmentInfo& info)>& funcEnum)
 {
     this->ThrowIfNotOperational();
@@ -872,5 +925,18 @@ void CCziReaderWriter::ThrowIfAlreadyInitialized() const
     if (this->stream)
     {
         throw logic_error("CCziReaderWriter is already operational.");
+    }
+}
+
+libCZI::CZIFrameOfReference CCziReaderWriter::GetDefaultFrameOfReference() const
+{
+    const auto default_frame_of_reference_from_info = this->info->GetDefaultFrameOfReference();
+    switch (default_frame_of_reference_from_info)
+    {
+    case CZIFrameOfReference::RawSubBlockCoordinateSystem:
+    case CZIFrameOfReference::PixelCoordinateSystem:
+        return default_frame_of_reference_from_info;
+    default:
+        return CZIFrameOfReference::RawSubBlockCoordinateSystem;
     }
 }

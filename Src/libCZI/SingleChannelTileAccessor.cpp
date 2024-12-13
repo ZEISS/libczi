@@ -17,7 +17,7 @@ CSingleChannelTileAccessor::CSingleChannelTileAccessor(const std::shared_ptr<ISu
 {
 }
 
-/*virtual*/std::shared_ptr<libCZI::IBitmapData> CSingleChannelTileAccessor::Get(const libCZI::IntRect& roi, const IDimCoordinate* planeCoordinate, const Options* pOptions)
+/*virtual*/std::shared_ptr<libCZI::IBitmapData> CSingleChannelTileAccessor::Get(const libCZI::IntRectAndFrameOfReference& roi, const IDimCoordinate* planeCoordinate, const Options* pOptions)
 {
     // first, we need to determine the pixeltype, which we do from the repository
     libCZI::PixelType pixelType;
@@ -30,16 +30,18 @@ CSingleChannelTileAccessor::CSingleChannelTileAccessor(const std::shared_ptr<ISu
     return this->Get(pixelType, roi, planeCoordinate, pOptions);
 }
 
-/*virtual*/std::shared_ptr<libCZI::IBitmapData> CSingleChannelTileAccessor::Get(libCZI::PixelType pixeltype, const libCZI::IntRect& roi, const IDimCoordinate* planeCoordinate, const Options* pOptions)
+/*virtual*/std::shared_ptr<libCZI::IBitmapData> CSingleChannelTileAccessor::Get(libCZI::PixelType pixeltype, const  libCZI::IntRectAndFrameOfReference& roi, const IDimCoordinate* planeCoordinate, const Options* pOptions)
 {
-    auto bmDest = GetSite()->CreateBitmap(pixeltype, roi.w, roi.h);
-    this->InternalGet(roi.x, roi.y, bmDest.get(), planeCoordinate, pOptions);
+    const IntRect roi_raw_sub_block_cs = this->sbBlkRepository->TransformRectangle(roi, CZIFrameOfReference::RawSubBlockCoordinateSystem).rectangle;
+    auto bmDest = GetSite()->CreateBitmap(pixeltype, roi_raw_sub_block_cs.w, roi_raw_sub_block_cs.h);
+    this->InternalGet(roi_raw_sub_block_cs.x, roi_raw_sub_block_cs.y, bmDest.get(), planeCoordinate, pOptions);
     return bmDest;
 }
 
-/*virtual*/void CSingleChannelTileAccessor::Get(libCZI::IBitmapData* pDest, int xPos, int yPos, const IDimCoordinate* planeCoordinate, const Options* pOptions)
+/*virtual*/void CSingleChannelTileAccessor::Get(libCZI::IBitmapData* pDest, const IntPointAndFrameOfReference& position, const IDimCoordinate* planeCoordinate, const Options* pOptions)
 {
-    this->InternalGet(xPos, yPos, pDest, planeCoordinate, pOptions);
+    const IntPoint point_raw_sub_block_cs = this->sbBlkRepository->TransformPoint(position, CZIFrameOfReference::RawSubBlockCoordinateSystem).point;
+    this->InternalGet(point_raw_sub_block_cs.x, point_raw_sub_block_cs.y, pDest, planeCoordinate, pOptions);
 }
 
 void CSingleChannelTileAccessor::ComposeTiles(libCZI::IBitmapData* pBm, int xPos, int yPos, const std::vector<IndexAndM>& subBlocksSet, const ISingleChannelTileAccessor::Options& options)

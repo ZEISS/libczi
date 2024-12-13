@@ -32,7 +32,7 @@ static CCZIParse::SubblockDirectoryParseOptions GetParseOptionsFromOpenOptions(c
     return parse_options;
 }
 
-CCZIReader::CCZIReader() : isOperational(false)
+CCZIReader::CCZIReader() : isOperational(false), default_frame_of_reference(CZIFrameOfReference::Invalid)
 {
 }
 
@@ -60,6 +60,17 @@ CCZIReader::CCZIReader() : isOperational(false)
     }
 
     this->stream = stream;
+    switch (options->default_frame_of_reference)
+    {
+    case CZIFrameOfReference::Invalid:
+    case CZIFrameOfReference::Default:
+        this->default_frame_of_reference = CZIFrameOfReference::RawSubBlockCoordinateSystem;
+        break;
+    default:
+        this->default_frame_of_reference = options->default_frame_of_reference;
+        break;
+    }
+
     this->SetOperationalState(true);
 }
 
@@ -94,6 +105,58 @@ CCZIReader::CCZIReader() : isOperational(false)
 {
     this->ThrowIfNotOperational();
     return this->subBlkDir.GetPyramidStatistics();
+}
+
+/*virtual*/libCZI::IntPointAndFrameOfReference CCZIReader::TransformPoint(const libCZI::IntPointAndFrameOfReference& source_point, libCZI::CZIFrameOfReference destination_frame_of_reference)
+{
+    CZIFrameOfReference source_frame_of_reference_consolidated;
+    switch (source_point.frame_of_reference)
+    {
+    case CZIFrameOfReference::RawSubBlockCoordinateSystem:
+    case CZIFrameOfReference::PixelCoordinateSystem:
+        source_frame_of_reference_consolidated = source_point.frame_of_reference;
+        break;
+    case CZIFrameOfReference::Default:
+        source_frame_of_reference_consolidated = this->default_frame_of_reference;
+        break;
+    default:
+        throw invalid_argument("Unsupported frame-of-reference.");
+    }
+
+    CZIFrameOfReference destination_frame_of_reference_consolidated;
+    switch (destination_frame_of_reference)
+    {
+    case CZIFrameOfReference::RawSubBlockCoordinateSystem:
+    case CZIFrameOfReference::PixelCoordinateSystem:
+        destination_frame_of_reference_consolidated = destination_frame_of_reference;
+        break;
+    case CZIFrameOfReference::Default:
+        destination_frame_of_reference_consolidated = this->default_frame_of_reference;
+        break;
+    default:
+        throw invalid_argument("Unsupported frame-of-reference.");
+    }
+
+    if (destination_frame_of_reference_consolidated == source_frame_of_reference_consolidated)
+    {
+        return { source_frame_of_reference_consolidated, source_point.point };
+    }
+
+    if (source_frame_of_reference_consolidated == CZIFrameOfReference::PixelCoordinateSystem &&
+        destination_frame_of_reference_consolidated == CZIFrameOfReference::RawSubBlockCoordinateSystem)
+    {
+        const auto& statistics = this->subBlkDir.GetStatistics();
+        return { CZIFrameOfReference::RawSubBlockCoordinateSystem, {source_point.point.x + statistics.boundingBoxLayer0Only.x, source_point.point.y + statistics.boundingBoxLayer0Only.y} };
+    }
+
+    if (source_frame_of_reference_consolidated == CZIFrameOfReference::RawSubBlockCoordinateSystem &&
+        destination_frame_of_reference_consolidated == CZIFrameOfReference::PixelCoordinateSystem)
+    {
+        const auto& statistics = this->subBlkDir.GetStatistics();
+        return { CZIFrameOfReference::PixelCoordinateSystem, {source_point.point.x - statistics.boundingBoxLayer0Only.x, source_point.point.y - statistics.boundingBoxLayer0Only.y} };
+    }
+
+    throw logic_error("Unsupported frame-of-reference transformation.");
 }
 
 /*virtual*/void CCZIReader::EnumerateSubBlocks(const std::function<bool(int index, const SubBlockInfo& info)>& funcEnum)
@@ -205,8 +268,8 @@ CCZIReader::CCZIReader() : isOperational(false)
     this->ThrowIfNotOperational();
     CziReaderCommon::EnumerateSubset(
         std::bind(&CCziAttachmentsDirectory::EnumAttachments, &this->attachmentDir, std::placeholders::_1),
-        contentFileType, 
-        name, 
+        contentFileType,
+        name,
         funcEnum);
 }
 
