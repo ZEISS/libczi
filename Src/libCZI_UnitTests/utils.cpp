@@ -5,6 +5,8 @@
 #include "utils.h"
 #include "../libCZI/bitmapData.h"
 
+#include <time.h>
+
 using namespace std;
 using namespace libCZI;
 
