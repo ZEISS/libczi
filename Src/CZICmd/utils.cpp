@@ -9,7 +9,6 @@
 #include <regex>
 
 #if CZICMD_WINDOWSAPI_AVAILABLE
-#define HAS_CODECVT
 #include <Windows.h>
 #endif
 
@@ -23,6 +22,28 @@ using namespace std;
 
 std::string convertToUtf8(const std::wstring& str)
 {
+#if CZICMD_WINDOWSAPI_AVAILABLE
+    if (str.empty())
+    {
+        return {};
+    }
+
+    // Determine the size of the resulting UTF-8 string
+    int sizeNeeded = WideCharToMultiByte(CP_UTF8, 0, str.c_str(), static_cast<int>(str.size()), NULL, 0, NULL, NULL);
+    if (sizeNeeded == 0)
+    {
+        throw std::runtime_error("Error in WideCharToMultiByte");
+    }
+
+    // Allocate a string to hold the result
+    std::string strUtf8(sizeNeeded, 0);
+
+    // Perform the conversion from wide string (UTF-16) to UTF-8
+    WideCharToMultiByte(CP_UTF8, 0, str.c_str(), static_cast<int>(str.size()), &strUtf8[0], sizeNeeded, NULL, NULL);
+
+    return strUtf8;
+#else
+
 #if defined(HAS_CODECVT)
     std::wstring_convert<std::codecvt_utf8<wchar_t>> utf8_conv;
     std::string conv = utf8_conv.to_bytes(str);
@@ -33,10 +54,29 @@ std::string convertToUtf8(const std::wstring& str)
     conv.resize(std::wcstombs(&conv[0], str.c_str(), requiredSize));
     return conv;
 #endif
+
+#endif
 }
 
 std::wstring convertUtf8ToUCS2(const std::string& str)
 {
+#if CZICMD_WINDOWSAPI_AVAILABLE
+    if (str.empty())
+    {
+        return L"";
+    }
+
+    const int size = MultiByteToWideChar(CP_UTF8, 0, str.c_str(), static_cast<int>(str.size()), nullptr, 0);
+    if (size <= 0)
+    {
+        return L"";
+    }
+
+    std::wstring result(size, 0);
+    MultiByteToWideChar(CP_UTF8, 0, str.c_str(), static_cast<int>(str.size()), &result[0], static_cast<int>(result.size()));
+    return result;
+#else
+
 #if defined(HAS_CODECVT)
     std::wstring_convert<std::codecvt_utf8<wchar_t>> utf8conv;
     std::wstring conv = utf8conv.from_bytes(str);
@@ -46,6 +86,8 @@ std::wstring convertUtf8ToUCS2(const std::string& str)
     size_t size = std::mbstowcs(&conv[0], str.c_str(), str.size());
     conv.resize(size);
     return conv;
+#endif
+
 #endif
 }
 
@@ -339,15 +381,15 @@ std::ostream& operator<<(std::ostream& os, const libCZI::GUID& guid)
 
     // editorconfig-checker-disable
     os << std::hex
-       << std::setw(2) << static_cast<short>(guid.Data4[0])
-       << std::setw(2) << static_cast<short>(guid.Data4[1])
-       << '-'
-       << std::setw(2) << static_cast<short>(guid.Data4[2])
-       << std::setw(2) << static_cast<short>(guid.Data4[3])
-       << std::setw(2) << static_cast<short>(guid.Data4[4])
-       << std::setw(2) << static_cast<short>(guid.Data4[5])
-       << std::setw(2) << static_cast<short>(guid.Data4[6])
-       << std::setw(2) << static_cast<short>(guid.Data4[7]);
+        << std::setw(2) << static_cast<short>(guid.Data4[0])
+        << std::setw(2) << static_cast<short>(guid.Data4[1])
+        << '-'
+        << std::setw(2) << static_cast<short>(guid.Data4[2])
+        << std::setw(2) << static_cast<short>(guid.Data4[3])
+        << std::setw(2) << static_cast<short>(guid.Data4[4])
+        << std::setw(2) << static_cast<short>(guid.Data4[5])
+        << std::setw(2) << static_cast<short>(guid.Data4[6])
+        << std::setw(2) << static_cast<short>(guid.Data4[7]);
     // editorconfig-checker-enable
     os << std::nouppercase;
     return os;
