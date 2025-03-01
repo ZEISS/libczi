@@ -81,7 +81,7 @@ if (NOT LIBCZI_HAVE_WIN32_API)
     like 'sudo apt-get install libiconv-dev'.
     ]=])
   else()
-      message(STATUS "Found iconv library (version ${ICONV_VERSION}) - include directory ${ICONV_INCLUDE_DIRS}")
+      message(STATUS "iconv library found and enabled.")
   endif()
 endif()
 
