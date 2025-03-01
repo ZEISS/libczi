@@ -122,13 +122,13 @@ tString trimImpl(const tString& str, const tString& whitespace)
     }
 
     const iconv_t cd = iconv_open("WCHAR_T", "UTF-8");
-    if (cd == (iconv_t)-1) 
+    if (cd == reinterpret_cast<iconv_t>(-1))
     {
         throw std::runtime_error("iconv_open failed: " + std::string(strerror(errno)));
     }
 
-    size_t in_size = strlen(sz);
-    size_t out_size = (in_size + 1) * sizeof(wchar_t); // Ensure space for null terminator
+    const size_t in_size = strlen(sz);
+    const size_t out_size = (in_size + 1) * sizeof(wchar_t); // Ensure space for null terminator
     std::vector<char> output(out_size, 0);
 
     char* in_buf = const_cast<char*>(sz);
@@ -136,14 +136,14 @@ tString trimImpl(const tString& str, const tString& whitespace)
     size_t in_bytes_left = in_size;
     size_t out_bytes_left = out_size;
 
-    if (iconv(cd, &in_buf, &in_bytes_left, &out_buf, &out_bytes_left) == (size_t)-1) 
+    if (iconv(cd, &in_buf, &in_bytes_left, &out_buf, &out_bytes_left) == static_cast<size_t>(-1))
     {
         iconv_close(cd);
         throw std::runtime_error("iconv conversion failed: " + std::string(strerror(errno)));
     }
 
     iconv_close(cd);
-    return std::wstring(reinterpret_cast<wchar_t*>(output.data()));
+    return { reinterpret_cast<wchar_t*>(output.data()) };
 #else
     std::wstring_convert<std::codecvt_utf8<wchar_t>> utf8conv;
     std::wstring conv = utf8conv.from_bytes(sz);
@@ -179,7 +179,7 @@ tString trimImpl(const tString& str, const tString& whitespace)
     }
 
     const iconv_t cd = iconv_open("UTF-8", "WCHAR_T");
-    if (cd == (iconv_t)-1) 
+    if (cd == reinterpret_cast<iconv_t>(-1))
     {
         throw std::runtime_error("iconv_open failed: " + std::string(strerror(errno)));
     }
@@ -193,7 +193,7 @@ tString trimImpl(const tString& str, const tString& whitespace)
     size_t in_bytes_left = in_size;
     size_t out_bytes_left = out_size;
 
-    if (iconv(cd, &in_buf, &in_bytes_left, &out_buf, &out_bytes_left) == (size_t)-1) 
+    if (iconv(cd, &in_buf, &in_bytes_left, &out_buf, &out_bytes_left) == static_cast<size_t>(-1))
     {
         iconv_close(cd);
         throw std::runtime_error("iconv conversion failed: " + std::string(strerror(errno)));
