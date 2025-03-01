@@ -119,15 +119,15 @@ IF (FREETYPE_FOUND)
     target_compile_definitions(CZIcmd PRIVATE _USE_FREETYPE)
     target_include_directories(CZIcmd PRIVATE ${FREETYPE_INCLUDE_DIRS})
     target_link_libraries(CZIcmd PRIVATE ${FREETYPE_LIBRARIES})
-    IF (ICONV_FOUND)
-      target_link_libraries(CZIcmd PRIVATE Iconv::Iconv)
-    ENDIF()
 ENDIF()
 
 IF(NOT LIBCZI_HAVE_WIN32_API)
   target_include_directories(CZIcmd PRIVATE ${ZLIB_INCLUDE_DIR} ${PNG_INCLUDE_DIR})
   # seems to be problem with glibc I'd reckon -> https://stackoverflow.com/questions/51584960/stdcall-once-throws-stdsystem-error-unknown-error-1
   target_link_libraries(CZIcmd  PUBLIC pthread)
+  IF (ICONV_FOUND)
+    target_link_libraries(CZIcmd PRIVATE Iconv::Iconv)
+  ENDIF()
 ENDIF()
 
 set(CZICMD_USE_FREETYPE 0)

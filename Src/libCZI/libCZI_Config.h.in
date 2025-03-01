@@ -54,3 +54,6 @@
 #define LIBCZI_AZURESDK_BASED_STREAM_AVAILABLE  @libCZI_AzureStorage_available@
 
 #define LIBCZI_AZURESDK_VERSION_INFO "@libCZI_AzureStorage_SDK_Version_Info@"
+
+// whether the iconv library is available
+#define LIBCZI_ICONV_AVAILABLE          @libCZI_ICONVAVAILABLE@

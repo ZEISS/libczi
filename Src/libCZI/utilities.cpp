@@ -17,6 +17,9 @@
 #if LIBCZI_HAVE_ENDIAN_H
 #include "endian.h"
 #endif
+#if LIBCZI_ICONV_AVAILABLE
+#include <iconv.h>
+#endif
 
 using namespace std;
 
@@ -93,16 +96,116 @@ tString trimImpl(const tString& str, const tString& whitespace)
 
 /*static*/std::wstring Utilities::convertUtf8ToWchar_t(const char* sz)
 {
+#if LIBCZI_WINDOWSAPI_AVAILABLE
+    if (*sz == '\0')
+    {
+        return L"";
+    }
+
+    const int size_needed = MultiByteToWideChar(CP_UTF8, 0, sz, -1, nullptr, 0);
+    if (size_needed <= 0) 
+    {
+        throw std::runtime_error("MultiByteToWideChar failed: " + std::to_string(GetLastError()));
+    }
+
+    std::wstring wide_string(size_needed, 0);
+    if (MultiByteToWideChar(CP_UTF8, 0, sz, -1, &wide_string[0], size_needed) == 0) 
+    {
+        throw std::runtime_error("MultiByteToWideChar conversion failed: " + std::to_string(GetLastError()));
+    }
+
+    return wide_string;
+#elif LIBCZI_ICONV_AVAILABLE
+    if (*sz == '\0')
+    {
+        return L"";
+    }
+
+    const iconv_t cd = iconv_open("WCHAR_T", "UTF-8");
+    if (cd == (iconv_t)-1) 
+    {
+        throw std::runtime_error("iconv_open failed: " + std::string(strerror(errno)));
+    }
+
+    size_t in_size = strlen(sz);
+    size_t out_size = (in_size + 1) * sizeof(wchar_t); // Ensure space for null terminator
+    std::vector<char> output(out_size, 0);
+
+    char* in_buf = const_cast<char*>(sz);
+    char* out_buf = output.data();
+    size_t in_bytes_left = in_size;
+    size_t out_bytes_left = out_size;
+
+    if (iconv(cd, &in_buf, &in_bytes_left, &out_buf, &out_bytes_left) == (size_t)-1) 
+    {
+        iconv_close(cd);
+        throw std::runtime_error("iconv conversion failed: " + std::string(strerror(errno)));
+    }
+
+    iconv_close(cd);
+    return std::wstring(reinterpret_cast<wchar_t*>(output.data()));
+#else
     std::wstring_convert<std::codecvt_utf8<wchar_t>> utf8conv;
     std::wstring conv = utf8conv.from_bytes(sz);
     return conv;
+#endif
 }
 
 /*static*/std::string Utilities::convertWchar_tToUtf8(const wchar_t* szw)
 {
+#if LIBCZI_WINDOWSAPI_AVAILABLE
+    if (*szw == L'\0')
+    {
+        return "";
+    }
+
+    const int size_needed = WideCharToMultiByte(CP_UTF8, 0, szw, -1, nullptr, 0, nullptr, nullptr);
+    if (size_needed <= 0) 
+    {
+        throw std::runtime_error("WideCharToMultiByte failed: " + std::to_string(GetLastError()));
+    }
+
+    std::string utf8_str(size_needed, 0);
+    if (WideCharToMultiByte(CP_UTF8, 0, szw, -1, &utf8_str[0], size_needed, nullptr, nullptr) == 0) 
+    {
+        throw std::runtime_error("WideCharToMultiByte conversion failed: " + std::to_string(GetLastError()));
+    }
+
+    return utf8_str;
+#elif LIBCZI_ICONV_AVAILABLE
+    if (*szw == L'\0')
+    {
+        return "";
+    }
+
+    const iconv_t cd = iconv_open("UTF-8", "WCHAR_T");
+    if (cd == (iconv_t)-1) 
+    {
+        throw std::runtime_error("iconv_open failed: " + std::string(strerror(errno)));
+    }
+
+    size_t in_size = wcslen(szw) * sizeof(wchar_t);
+    size_t out_size = in_size * 4 + 1; // Worst case: every wchar_t becomes 4 UTF-8 bytes
+    std::vector<char> output(out_size, 0);
+
+    char* in_buf = reinterpret_cast<char*>(const_cast<wchar_t*>(szw));
+    char* out_buf = output.data();
+    size_t in_bytes_left = in_size;
+    size_t out_bytes_left = out_size;
+
+    if (iconv(cd, &in_buf, &in_bytes_left, &out_buf, &out_bytes_left) == (size_t)-1) 
+    {
+        iconv_close(cd);
+        throw std::runtime_error("iconv conversion failed: " + std::string(strerror(errno)));
+    }
+
+    iconv_close(cd);
+    return { output.data() };
+#else
     std::wstring_convert<std::codecvt_utf8<wchar_t>> utf8_conv;
     std::string conv = utf8_conv.to_bytes(szw);
     return conv;
+#endif
 }
 
 /*static*/void Utilities::Tokenize(const std::wstring& str, std::vector<std::wstring>& tokens, const std::wstring& delimiters)

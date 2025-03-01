@@ -263,6 +263,12 @@ else()
   set(libCZI_WINDOWSAPIAVAILABLE 0)
 endif()
 
+if (ICONV_FOUND)
+  set(libCZI_ICONVAVAILABLE 1)
+else()
+  set(libCZI_ICONVAVAILABLE 0)
+endif()
+
 configure_file (
   "${CMAKE_CURRENT_SOURCE_DIR}/libCZI_Config.h.in"
   "${CMAKE_CURRENT_BINARY_DIR}/libCZI_Config.h"
