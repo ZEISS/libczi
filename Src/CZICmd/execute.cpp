@@ -910,21 +910,21 @@ public:
     {
         SelectionInfo selectionInfo = CreateSelectionInfo(options);
 
-        auto spReader = CreateAndOpenCziReader(options);
+        const auto spReader = CreateAndOpenCziReader(options);
 
         spReader->EnumerateAttachments(
             [&](int index, const AttachmentInfo& info)->bool
             {
                 if (IsSelection(index, info, selectionInfo))
                 {
-                    auto filename = GenerateFilename(index, info, options);
-                    auto attchmnt = spReader->ReadAttachment(index);
-                    WriteFile(filename, attchmnt.get());
+                    const auto filename = GenerateFilename(index, info, options);
+                    const auto attachment = spReader->ReadAttachment(index);
+                    WriteFile(filename, attachment.get());
                     HandleHashOfResult(
                         [&](uint8_t* ptrHash, size_t sizeHash)->bool
                         {
                             const void* ptr; size_t size;
-                            attchmnt->DangerousGetRawData(ptr, size);
+                            attachment->DangerousGetRawData(ptr, size);
                             Utils::CalcMd5SumHash(ptr, size, ptrHash, (int)sizeHash);
                             return true;
                         },
@@ -1016,25 +1016,15 @@ private:
 
         size_t size;
         auto spData = attchment->GetRawData(&size);
-        fwrite(spData.get(), 1, size, file_handle);
-        fclose(file_handle);
-        
-//        size_t size;
-//        auto spData = attchment->GetRawData(&size);
-//
-//        std::wofstream output;
-//        output.exceptions(std::ifstream::badbit | std::ifstream::failbit);
-//        output.open(filename.c_str(), ios::out | ios::binary);
-//        /*
-//#if defined(WIN32ENV)
-//        output.open(filename.c_str(), ios::out | ios::binary);
-//#endif
-//#if defined(LINUXENV)
-//        output.open(convertToUtf8(filename), ios::out | ios::binary);
-//#endif
-//*/
-//        output.write(static_cast<const char*>(spData.get()), size);
-//        output.close();
+        if (fwrite(spData.get(), 1, size, file_handle) != size)
+        {
+            throw std::runtime_error("Error writing file");
+        }
+
+        if (fclose(file_handle) != 0)
+        {
+            throw std::runtime_error("Error closing file");
+        }
     }
 };
 
