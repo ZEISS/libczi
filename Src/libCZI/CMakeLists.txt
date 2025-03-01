@@ -317,6 +317,9 @@ if (LIBCZI_BUILD_DYNLIB)
   if(LIBCZI_HAVE_WIN32_API)
     target_link_libraries(libCZI PRIVATE ole32 Windowscodecs)
   endif()
+  if (ICONV_FOUND)
+    target_link_libraries(libCZI PRIVATE Iconv::Iconv)
+  endif()
 endif(LIBCZI_BUILD_DYNLIB)
 
 #
@@ -357,6 +360,9 @@ IF(UNIX)
 ENDIF(UNIX)
 if(LIBCZI_HAVE_WIN32_API)
     target_link_libraries(libCZIStatic PUBLIC ole32 Windowscodecs)
+endif()
+if (ICONV_FOUND)
+  target_link_libraries(libCZIStatic PRIVATE Iconv::Iconv)
 endif()
 
 #
