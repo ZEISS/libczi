@@ -120,7 +120,7 @@ IF (FREETYPE_FOUND)
     target_include_directories(CZIcmd PRIVATE ${FREETYPE_INCLUDE_DIRS})
     target_link_libraries(CZIcmd PRIVATE ${FREETYPE_LIBRARIES})
     IF (ICONV_FOUND)
-      target_link_libraries(ifc-lib PRIVATE Iconv::Iconv)
+      target_link_libraries(CZIcmd PRIVATE Iconv::Iconv)
     ENDIF()
 ENDIF()
 

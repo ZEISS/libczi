@@ -80,6 +80,8 @@ if (NOT LIBCZI_HAVE_WIN32_API)
     which may be incomplete and have limited Unicode support. Consider installing
     like 'sudo apt-get install libiconv-dev'.
     ]=])
+  else()
+      message(STATUS "Found iconv library: ${ICONV_LIBRARIES}")
   endif()
 endif()
 
