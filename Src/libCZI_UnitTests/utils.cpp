@@ -519,8 +519,8 @@ std::tuple<float, float> CalculateMaxDifferenceMeanDifference(const std::shared_
 
     for (uint32_t y = 0; y < bmp1->GetHeight(); ++y)
     {
-        const uint8_t* bufBmp1 = reinterpret_cast<const uint8_t*>(lockBmp1.ptrDataRoi) + y * lockBmp1.stride;
-        const uint8_t* bufBmp2 = reinterpret_cast<const uint8_t*>(lockBmp2.ptrDataRoi) + y * lockBmp2.stride;
+        const uint8_t* bufBmp1 = static_cast<const uint8_t*>(lockBmp1.ptrDataRoi) + y * lockBmp1.stride;
+        const uint8_t* bufBmp2 = static_cast<const uint8_t*>(lockBmp2.ptrDataRoi) + y * lockBmp2.stride;
 
         for (uint32_t x = 0; x < bmp1->GetWidth(); ++x)
         {
