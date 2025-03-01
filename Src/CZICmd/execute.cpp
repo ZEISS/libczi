@@ -2,6 +2,7 @@
 //
 // SPDX-License-Identifier: LGPL-3.0-or-later
 
+#include "inc_CZIcmd_Config.h"
 #include "execute.h"
 #include "executeBase.h"
 #include "executeCreateCzi.h"
@@ -1002,19 +1003,38 @@ private:
 
     static void WriteFile(const wstring& filename, IAttachment* attchment)
     {
+        FILE* file_handle;
+#ifdef _WIN32
+        file_handle = _wfopen(filename.c_str(), L"wb");
+#else
+        file_handle = fopen(convertToUtf8(filename).c_str(), "wb");
+#endif
+        if (file_handle == nullptr)
+        {
+            throw std::runtime_error("Cannot open file for writing");
+        }
+
         size_t size;
         auto spData = attchment->GetRawData(&size);
-
-        std::ofstream  output;
-        output.exceptions(std::ifstream::badbit | std::ifstream::failbit);
-#if defined(WIN32ENV)
-        output.open(filename.c_str(), ios::out | ios::binary);
-#endif
-#if defined(LINUXENV)
-        output.open(convertToUtf8(filename), ios::out | ios::binary);
-#endif
-        output.write(static_cast<const char*>(spData.get()), size);
-        output.close();
+        fwrite(spData.get(), 1, size, file_handle);
+        fclose(file_handle);
+        
+//        size_t size;
+//        auto spData = attchment->GetRawData(&size);
+//
+//        std::wofstream output;
+//        output.exceptions(std::ifstream::badbit | std::ifstream::failbit);
+//        output.open(filename.c_str(), ios::out | ios::binary);
+//        /*
+//#if defined(WIN32ENV)
+//        output.open(filename.c_str(), ios::out | ios::binary);
+//#endif
+//#if defined(LINUXENV)
+//        output.open(convertToUtf8(filename), ios::out | ios::binary);
+//#endif
+//*/
+//        output.write(static_cast<const char*>(spData.get()), size);
+//        output.close();
     }
 };
 
