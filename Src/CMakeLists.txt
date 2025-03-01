@@ -72,6 +72,17 @@ if(LIBCZI_BUILD_AZURESDK_BASED_STREAM)
   message(STATUS "AZURE-SDK available, version-info: ${LIBCZI_AZURESDK_VERSION_STRING}")
 endif()
 
+if (NOT LIBCZI_HAVE_WIN32_API)
+  find_package(Iconv)
+  if (NOT ICONV_FOUND)
+    message(FATAL_ERROR [=[
+    iconv library not found! Falling back to an alternative implementation,
+    which may be incomplete and have limited Unicode support. Consider installing
+    like 'sudo apt-get install libiconv-dev'.
+    ]=])
+  endif()
+endif()
+
 add_subdirectory(libCZI)
 
 if (LIBCZI_BUILD_CZICMD)

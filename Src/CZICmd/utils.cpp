@@ -12,6 +12,10 @@
 #include <Windows.h>
 #endif
 
+#if CZICMD_ICONV_AVAILABLE
+#include <iconv.h>
+#endif
+
 #if defined(HAS_CODECVT)
 #include <locale>
 #include <codecvt>
@@ -42,6 +46,30 @@ std::string convertToUtf8(const std::wstring& str)
     WideCharToMultiByte(CP_UTF8, 0, str.c_str(), static_cast<int>(str.size()), &strUtf8[0], sizeNeeded, NULL, NULL);
 
     return strUtf8;
+#elif CZICMD_ICONV_AVAILABLE
+    if (str.empty()) return ""; // Handle empty input safely
+
+    iconv_t cd = iconv_open("UTF-8", "WCHAR_T");
+    if (cd == (iconv_t)-1) {
+        throw std::runtime_error("iconv_open failed: " + std::string(strerror(errno)));
+    }
+
+    size_t in_size = str.size() * sizeof(wchar_t);
+    size_t out_size = in_size * 4 + 1; // Worst case: every wchar_t becomes 4 UTF-8 bytes
+    std::vector<char> output(out_size, 0);
+
+    char* in_buf = reinterpret_cast<char*>(const_cast<wchar_t*>(str.data()));
+    char* out_buf = output.data();
+    size_t in_bytes_left = in_size;
+    size_t out_bytes_left = out_size;
+
+    if (iconv(cd, &in_buf, &in_bytes_left, &out_buf, &out_bytes_left) == (size_t)-1) {
+        iconv_close(cd);
+        throw std::runtime_error("iconv conversion failed: " + std::string(strerror(errno)));
+    }
+
+    iconv_close(cd);
+    return std::string(output.data());
 #else
 
 #if defined(HAS_CODECVT)
