@@ -47,10 +47,14 @@ std::string convertToUtf8(const std::wstring& str)
 
     return strUtf8;
 #elif CZICMD_ICONV_AVAILABLE
-    if (str.empty()) return ""; // Handle empty input safely
+    if (str.empty())  // Handle empty input safely
+    {
+        return "";
+    }
 
     iconv_t cd = iconv_open("UTF-8", "WCHAR_T");
-    if (cd == (iconv_t)-1) {
+    if (cd == (iconv_t)-1) 
+    {
         throw std::runtime_error("iconv_open failed: " + std::string(strerror(errno)));
     }
 
@@ -63,7 +67,8 @@ std::string convertToUtf8(const std::wstring& str)
     size_t in_bytes_left = in_size;
     size_t out_bytes_left = out_size;
 
-    if (iconv(cd, &in_buf, &in_bytes_left, &out_buf, &out_bytes_left) == (size_t)-1) {
+    if (iconv(cd, &in_buf, &in_bytes_left, &out_buf, &out_bytes_left) == (size_t)-1) 
+    {
         iconv_close(cd);
         throw std::runtime_error("iconv conversion failed: " + std::string(strerror(errno)));
     }
@@ -86,7 +91,7 @@ std::string convertToUtf8(const std::wstring& str)
 #endif
 }
 
-std::wstring convertUtf8ToUCS2(const std::string& str)
+std::wstring convertUtf8ToWide(const std::string& str)
 {
 #if CZICMD_WINDOWSAPI_AVAILABLE
     if (str.empty())
@@ -103,6 +108,35 @@ std::wstring convertUtf8ToUCS2(const std::string& str)
     std::wstring result(size, 0);
     MultiByteToWideChar(CP_UTF8, 0, str.c_str(), static_cast<int>(str.size()), &result[0], static_cast<int>(result.size()));
     return result;
+#elif CZICMD_ICONV_AVAILABLE
+    if (str.empty()) // Handle empty input safely
+    {
+        return L"";
+    }
+
+    iconv_t cd = iconv_open("WCHAR_T", "UTF-8");
+    if (cd == (iconv_t)-1) 
+    {
+        throw std::runtime_error("iconv_open failed: " + std::string(strerror(errno)));
+    }
+
+    size_t in_size = str.size();
+    size_t out_size = (in_size + 1) * sizeof(wchar_t); // Ensure space for null terminator
+    std::vector<char> output(out_size, 0); // Buffer for wide characters
+
+    char* in_buf = const_cast<char*>(str.data());
+    char* out_buf = output.data();
+    size_t in_bytes_left = in_size;
+    size_t out_bytes_left = out_size;
+
+    if (iconv(cd, &in_buf, &in_bytes_left, &out_buf, &out_bytes_left) == (size_t)-1) 
+    {
+        iconv_close(cd);
+        throw std::runtime_error("iconv conversion failed: " + std::string(strerror(errno)));
+    }
+
+    iconv_close(cd);
+    return std::wstring(reinterpret_cast<wchar_t*>(output.data()));
 #else
 
 #if defined(HAS_CODECVT)

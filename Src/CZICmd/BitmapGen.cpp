@@ -126,7 +126,7 @@ using namespace libCZI;
     ss << L"COORD";
     if (info.coord != nullptr)
     {
-        ss << L": " << convertUtf8ToUCS2(Utils::DimCoordinateToString(info.coord));
+        ss << L": " << convertUtf8ToWide(Utils::DimCoordinateToString(info.coord));
     }
     else
     {

@@ -813,7 +813,7 @@ CCmdLineOptions::ParseResult CCmdLineOptions::Parse(int argc, char** argv)
     {
         if (!argument_source_filename.empty())
         {
-            this->cziFilename = convertUtf8ToUCS2(argument_source_filename);
+            this->cziFilename = convertUtf8ToWide(argument_source_filename);
         }
 
         if (!argument_source_stream_class.empty())
@@ -829,7 +829,7 @@ CCmdLineOptions::ParseResult CCmdLineOptions::Parse(int argc, char** argv)
 
         if (!argument_output_filename.empty())
         {
-            this->SetOutputFilename(convertUtf8ToUCS2(argument_output_filename));
+            this->SetOutputFilename(convertUtf8ToWide(argument_output_filename));
         }
 
         if (!argument_plane_coordinate.empty())
@@ -924,7 +924,7 @@ CCmdLineOptions::ParseResult CCmdLineOptions::Parse(int argc, char** argv)
 
         if (!argument_truetypefontname.empty())
         {
-            this->fontnameOrFile = convertUtf8ToUCS2(argument_truetypefontname);
+            this->fontnameOrFile = convertUtf8ToWide(argument_truetypefontname);
         }
 
         if (!argument_fontheight.empty())
@@ -1155,9 +1155,9 @@ void CCmdLineOptions::SetOutputFilename(const std::wstring& s)
     // 'dirname' might modify the string passed in, it might also return a pointer to internally allocated memory
     char* dirNameResult = dirname(dirName);
     char* filename = basename(fname);
-    this->outputPath = convertUtf8ToUCS2(dirNameResult);
+    this->outputPath = convertUtf8ToWide(dirNameResult);
     this->outputPath += L'/';
-    this->outputFilename = convertUtf8ToUCS2(filename);
+    this->outputFilename = convertUtf8ToWide(filename);
     free(dirName);
     free(fname);
 #endif
@@ -1664,7 +1664,7 @@ ItemValue CCmdLineOptions::GetSelectionItemValue(const char* sz) const
     shared_ptr<libCZI::IIndexSet> index_set;
     try
     {
-        index_set = libCZI::Utils::IndexSetFromString(convertUtf8ToUCS2(s));
+        index_set = libCZI::Utils::IndexSetFromString(convertUtf8ToWide(s));
     }
     catch (exception&)
     {
@@ -1923,7 +1923,7 @@ std::shared_ptr<libCZI::IIndexSet> CCmdLineOptions::GetSceneIndexSet() const
 /*static*/bool CCmdLineOptions::TryParseNewCziFileguid(const std::string& s, libCZI::GUID* guid)
 {
     libCZI::GUID g;
-    bool b = TryParseGuid(convertUtf8ToUCS2(s), &g);
+    bool b = TryParseGuid(convertUtf8ToWide(s), &g);
     if (!b)
     {
         return false;

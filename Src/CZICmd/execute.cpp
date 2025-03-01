@@ -985,13 +985,13 @@ private:
         }
         else
         {
-            extension = convertUtf8ToUCS2(info.contentFileType);
+            extension = convertUtf8ToWide(info.contentFileType);
         }
 
         std::wstring suffix(L"_");
         if (info.name.length() > 0)
         {
-            suffix += convertUtf8ToUCS2(info.name);
+            suffix += convertUtf8ToWide(info.name);
             suffix += L'_';
         }
 
@@ -1152,7 +1152,7 @@ bool execute(const CCmdLineOptions& options)
     {
         std::wstringstream ss;
         string what(libCZI_io_exception.what() != nullptr ? libCZI_io_exception.what() : "");
-        ss << "LibCZIIOException caught -> \"" << convertUtf8ToUCS2(what) << "\"";
+        ss << "LibCZIIOException caught -> \"" << convertUtf8ToWide(what) << "\"";
         try
         {
             libCZI_io_exception.rethrow_nested();
@@ -1160,7 +1160,7 @@ bool execute(const CCmdLineOptions& options)
         catch (std::exception& inner_exception)
         {
             what = inner_exception.what() != nullptr ? inner_exception.what() : "";
-            ss << endl << " nested exception -> \"" << convertUtf8ToUCS2(what) << "\"";
+            ss << endl << " nested exception -> \"" << convertUtf8ToWide(what) << "\"";
         }
 
         options.GetLog()->WriteLineStdErr(ss.str());
@@ -1170,7 +1170,7 @@ bool execute(const CCmdLineOptions& options)
     {
         wstringstream ss;
         string what(excp.what() != nullptr ? excp.what() : "");
-        ss << "FATAL ERROR: std::exception caught" << endl << " -> " << convertUtf8ToUCS2(what);
+        ss << "FATAL ERROR: std::exception caught" << endl << " -> " << convertUtf8ToWide(what);
         options.GetLog()->WriteLineStdErr(ss.str());
         success = false;
     }

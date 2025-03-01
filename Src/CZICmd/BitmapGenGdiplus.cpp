@@ -82,7 +82,7 @@ CBitmapGenGdiplus::CBitmapGenGdiplus(const IBitmapGenParameters* params) : fonth
 {
     if (params != nullptr)
     {
-        this->fontname = convertUtf8ToUCS2(params->GetFontFilename());
+        this->fontname = convertUtf8ToWide(params->GetFontFilename());
         this->fontheight = params->GetFontHeight();
     }
 
