@@ -123,7 +123,7 @@ tString trimImpl(const tString& str, const tString& whitespace)
         return {};
     }
 
-    const iconv_t converter = iconv_open("WCHAR_T", "UTF-8");
+    const iconv_t converter = iconv_open(LIBCZI_ICONV_WCHAR_T_ENCODING, "UTF-8");
     if (converter == reinterpret_cast<iconv_t>(-1))
     {
         throw std::runtime_error("Failed to initialize iconv converter");
@@ -189,7 +189,7 @@ tString trimImpl(const tString& str, const tString& whitespace)
         return {};
     }
 
-    const iconv_t converter = iconv_open("UTF-8", "WCHAR_T");
+    const iconv_t converter = iconv_open("UTF-8", LIBCZI_ICONV_WCHAR_T_ENCODING);
     if (converter == reinterpret_cast<iconv_t>(-1))
     {
         throw std::runtime_error("Failed to initialize iconv converter");

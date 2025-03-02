@@ -19,3 +19,4 @@
 
 // whether the iconv library is available
 #define CZICMD_ICONV_AVAILABLE          @CZICMD_ICONVAVAILABLE@
+#define CZICMD_ICONV_WCHAR_T_ENCODING   "@CZICMD_ICONV_WCHAR_T_ENCODING@"

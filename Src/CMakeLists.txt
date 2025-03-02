@@ -84,7 +84,14 @@ if (NOT LIBCZI_HAVE_WIN32_API)
     ]=])
   else()
       message(STATUS "iconv library found and enabled.")
+      if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
+        # On MacOS, "WCHAR_T" is problematic, so we use "UTF-32LE" instead."
+        set(LIBCZI_ICONV_WCHAR_T_ENCODING "UTF-32LE")
+      else()
+        set(LIBCZI_ICONV_WCHAR_T_ENCODING "WCHAR_T")
+      endif()
   endif()
+
 endif()
 
 add_subdirectory(libCZI)

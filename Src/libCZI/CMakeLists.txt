@@ -265,8 +265,10 @@ endif()
 
 if (ICONV_FOUND)
   set(libCZI_ICONVAVAILABLE 1)
+  set(libCZI_ICONV_WCHAR_T_ENCODING "${LIBCZI_ICONV_WCHAR_T_ENCODING}")
 else()
   set(libCZI_ICONVAVAILABLE 0)
+  set(libCZI_ICONV_WCHAR_T_ENCODING "")
 endif()
 
 configure_file (

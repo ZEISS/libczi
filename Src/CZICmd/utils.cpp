@@ -58,7 +58,7 @@ std::string convertToUtf8(const std::wstring& str)
         return {};
     }
 
-    const iconv_t converter = iconv_open("UTF-8", "WCHAR_T");
+    const iconv_t converter = iconv_open("UTF-8", CZICMD_ICONV_WCHAR_T_ENCODING);
     if (converter == reinterpret_cast<iconv_t>(-1))
     {
         throw std::runtime_error("Failed to initialize iconv converter");
@@ -131,7 +131,7 @@ std::wstring convertUtf8ToWide(const std::string& str)
         return {};
     }
 
-    const iconv_t converter = iconv_open("WCHAR_T", "UTF-8");
+    const iconv_t converter = iconv_open(CZICMD_ICONV_WCHAR_T_ENCODING, "UTF-8");
     if (converter == reinterpret_cast<iconv_t>(-1))
     {
         throw std::runtime_error("Failed to initialize iconv converter");

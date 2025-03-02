@@ -57,3 +57,4 @@
 
 // whether the iconv library is available
 #define LIBCZI_ICONV_AVAILABLE          @libCZI_ICONVAVAILABLE@
+#define LIBCZI_ICONV_WCHAR_T_ENCODING   "@libCZI_ICONV_WCHAR_T_ENCODING@"
