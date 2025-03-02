@@ -105,15 +105,15 @@ tString trimImpl(const tString& str, const tString& whitespace)
     const int size_needed = MultiByteToWideChar(CP_UTF8, 0, sz, -1, nullptr, 0);
     if (size_needed <= 0) 
     {
-        throw std::runtime_error("MultiByteToWideChar failed: " + std::to_string(GetLastError()));
+        throw runtime_error("MultiByteToWideChar failed: " + std::to_string(GetLastError()));
     }
 
-    std::wstring wide_string;
+    wstring wide_string;
     wide_string.resize(size_needed - 1); // Exclude the null terminator
 
     if (MultiByteToWideChar(CP_UTF8, 0, sz, -1, &wide_string[0], size_needed) == 0) 
     {
-        throw std::runtime_error("MultiByteToWideChar conversion failed: " + std::to_string(GetLastError()));
+        throw runtime_error("MultiByteToWideChar conversion failed: " + std::to_string(GetLastError()));
     }
 
     return wide_string;
@@ -165,16 +165,16 @@ tString trimImpl(const tString& str, const tString& whitespace)
     const int size_needed = WideCharToMultiByte(CP_UTF8, 0, szw, -1, nullptr, 0, nullptr, nullptr);
     if (size_needed <= 0) 
     {
-        throw std::runtime_error("WideCharToMultiByte failed: " + std::to_string(GetLastError()));
+        throw runtime_error("WideCharToMultiByte failed: " + std::to_string(GetLastError()));
     }
 
     // Allocate buffer for the UTF-8 string
-    std::string utf8_str;
+    string utf8_str;
     utf8_str.resize(size_needed - 1); // Exclude the null terminator
 
     if (WideCharToMultiByte(CP_UTF8, 0, szw, -1, &utf8_str[0], size_needed, nullptr, nullptr) == 0) 
     {
-        throw std::runtime_error("WideCharToMultiByte conversion failed: " + std::to_string(GetLastError()));
+        throw runtime_error("WideCharToMultiByte conversion failed: " + std::to_string(GetLastError()));
     }
 
     return utf8_str;
