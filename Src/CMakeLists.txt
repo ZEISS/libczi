@@ -72,6 +72,8 @@ if(LIBCZI_BUILD_AZURESDK_BASED_STREAM)
   message(STATUS "AZURE-SDK available, version-info: ${LIBCZI_AZURESDK_VERSION_STRING}")
 endif()
 
+# On Unix/MacOS, we check whether the iconv library is available. On Windows, we use the Windows-API for this.
+# If iconv is not available, we fall back to an alternative implementation.
 if (NOT LIBCZI_HAVE_WIN32_API)
   find_package(Iconv)
   if (NOT ICONV_FOUND)
