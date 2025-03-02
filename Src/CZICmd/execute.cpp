@@ -1003,27 +1003,30 @@ private:
 
     static void WriteFile(const wstring& filename, IAttachment* attchment)
     {
-        FILE* file_handle;
+        auto file_deleter = [](FILE* file)
+        {
+            if (file) 
+            {
+                fclose(file);
+            }
+        };
+
+        std::unique_ptr<FILE, decltype(file_deleter)> file_handle(nullptr, file_deleter);
 #ifdef _WIN32
-        file_handle = _wfopen(filename.c_str(), L"wb");
+        file_handle.reset(_wfopen(filename.c_str(), L"wb"));
 #else
-        file_handle = fopen(convertToUtf8(filename).c_str(), "wb");
+        file_handle.reset(fopen(convertToUtf8(filename).c_str(), "wb"));
 #endif
-        if (file_handle == nullptr)
+        if (!file_handle)
         {
             throw std::runtime_error("Cannot open file for writing");
         }
 
         size_t size;
         auto spData = attchment->GetRawData(&size);
-        if (fwrite(spData.get(), 1, size, file_handle) != size)
+        if (fwrite(spData.get(), 1, size, file_handle.get()) != size)
         {
             throw std::runtime_error("Error writing file");
-        }
-
-        if (fclose(file_handle) != 0)
-        {
-            throw std::runtime_error("Error closing file");
         }
     }
 };
