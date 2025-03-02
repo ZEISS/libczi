@@ -120,32 +120,37 @@ tString trimImpl(const tString& str, const tString& whitespace)
 #elif LIBCZI_ICONV_AVAILABLE
     if (*sz == '\0')
     {
-        return L"";
+        return {};
     }
 
-    const iconv_t cd = iconv_open("WCHAR_T", "UTF-8");
-    if (cd == reinterpret_cast<iconv_t>(-1))
+    const iconv_t converter = iconv_open("WCHAR_T", "UTF-8");
+    if (converter == reinterpret_cast<iconv_t>(-1))
     {
-        throw std::runtime_error("iconv_open failed: " + std::string(strerror(errno)));
+        throw std::runtime_error("Failed to initialize iconv converter");
     }
 
-    const size_t in_size = strlen(sz);
-    const size_t out_size = (in_size + 1) * sizeof(wchar_t); // Ensure space for null terminator
-    std::vector<char> output(out_size, 0);
-
+    // Input buffer and length
+    size_t in_bytes_left = strlen(sz);
     char* in_buf = const_cast<char*>(sz);
-    char* out_buf = output.data();
-    size_t in_bytes_left = in_size;
-    size_t out_bytes_left = out_size;
 
-    if (iconv(cd, &in_buf, &in_bytes_left, &out_buf, &out_bytes_left) == static_cast<size_t>(-1))
+    // Output buffer and length
+    size_t out_bytes_left = (in_bytes_left + 1) * sizeof(wchar_t); // estimate output size
+    wstring result;
+    result.resize(out_bytes_left / sizeof(wchar_t));
+    char* out_buf = reinterpret_cast<char*>(&result[0]);
+
+    // Perform the conversion
+    const size_t result_size = iconv(converter, &in_buf, &in_bytes_left, &out_buf, &out_bytes_left);
+    iconv_close(converter);
+
+    if (result_size == static_cast<size_t>(-1))
     {
-        iconv_close(cd);
-        throw std::runtime_error("iconv conversion failed: " + std::string(strerror(errno)));
+        throw runtime_error("Failed to convert UTF-8 string to wchar_t");
     }
 
-    iconv_close(cd);
-    return { reinterpret_cast<wchar_t*>(output.data()) };
+    // Resize the result to the actual converted size
+    result.resize((result.size() * sizeof(wchar_t) - out_bytes_left) / sizeof(wchar_t));
+    return result;
 #else
     std::wstring_convert<std::codecvt_utf8<wchar_t>> utf8conv;
     std::wstring conv = utf8conv.from_bytes(sz);
@@ -181,32 +186,37 @@ tString trimImpl(const tString& str, const tString& whitespace)
 #elif LIBCZI_ICONV_AVAILABLE
     if (*szw == L'\0')
     {
-        return "";
+        return {};
     }
 
-    const iconv_t cd = iconv_open("UTF-8", "WCHAR_T");
-    if (cd == reinterpret_cast<iconv_t>(-1))
+    const iconv_t converter = iconv_open("UTF-8", "WCHAR_T");
+    if (converter == reinterpret_cast<iconv_t>(-1))
     {
-        throw std::runtime_error("iconv_open failed: " + std::string(strerror(errno)));
+        throw std::runtime_error("Failed to initialize iconv converter");
     }
 
-    size_t in_size = wcslen(szw) * sizeof(wchar_t);
-    size_t out_size = in_size * 4 + 1; // Worst case: every wchar_t becomes 4 UTF-8 bytes
-    std::vector<char> output(out_size, 0);
-
+    // Input buffer and length
+    size_t in_bytes_left = wcslen(szw) * sizeof(wchar_t);
     char* in_buf = reinterpret_cast<char*>(const_cast<wchar_t*>(szw));
-    char* out_buf = output.data();
-    size_t in_bytes_left = in_size;
-    size_t out_bytes_left = out_size;
 
-    if (iconv(cd, &in_buf, &in_bytes_left, &out_buf, &out_bytes_left) == static_cast<size_t>(-1))
+    // Output buffer and length
+    size_t out_bytes_left = (in_bytes_left + 1) * sizeof(wchar_t); // estimate output size (UTF8 can use to 4 bytes per character)
+    string result;
+    result.resize(out_bytes_left);
+    char* out_buf = &result[0];
+
+    // Perform the conversion
+    const size_t result_size = iconv(converter, &in_buf, &in_bytes_left, &out_buf, &out_bytes_left);
+    iconv_close(converter);
+
+    if (result_size == static_cast<size_t>(-1))
     {
-        iconv_close(cd);
-        throw std::runtime_error("iconv conversion failed: " + std::string(strerror(errno)));
+        throw runtime_error("Failed to convert wchar_t string to UTF8");
     }
 
-    iconv_close(cd);
-    return { output.data() };
+    // Resize the result to the actual converted size
+    result.resize(result.size() - out_bytes_left);
+    return result;
 #else
     std::wstring_convert<std::codecvt_utf8<wchar_t>> utf8_conv;
     std::string conv = utf8_conv.to_bytes(szw);
