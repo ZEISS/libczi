@@ -33,19 +33,25 @@ std::string convertToUtf8(const std::wstring& str)
     }
 
     // Determine the size of the resulting UTF-8 string
-    int sizeNeeded = WideCharToMultiByte(CP_UTF8, 0, str.c_str(), static_cast<int>(str.size()), NULL, 0, NULL, NULL);
-    if (sizeNeeded == 0)
+    int sizeNeeded = WideCharToMultiByte(CP_UTF8, 0, str.c_str(), -1, NULL, 0, NULL, NULL);
+    if (sizeNeeded <= 0)
     {
-        throw std::runtime_error("Error in WideCharToMultiByte");
+        throw runtime_error("Error in WideCharToMultiByte");
     }
 
-    // Allocate a string to hold the result
-    std::string strUtf8(sizeNeeded, 0);
+    // Allocate buffer for the UTF-8 string
+    string result(sizeNeeded, '\0');
 
     // Perform the conversion from wide string (UTF-16) to UTF-8
-    WideCharToMultiByte(CP_UTF8, 0, str.c_str(), static_cast<int>(str.size()), &strUtf8[0], sizeNeeded, NULL, NULL);
+    if (WideCharToMultiByte(CP_UTF8, 0, str.c_str(), -1, &result[0], sizeNeeded, NULL, NULL) <= 0)
+    {
+        throw runtime_error("Error in WideCharToMultiByte");
+    }
 
-    return strUtf8;
+    // Remove the null terminator added by WideCharToMultiByte
+    result.resize(sizeNeeded - 1);
+
+    return result;
 #elif CZICMD_ICONV_AVAILABLE
     if (str.empty())  // Handle empty input safely
     {
@@ -74,7 +80,7 @@ std::string convertToUtf8(const std::wstring& str)
     }
 
     iconv_close(cd);
-    return {output.data()};
+    return { output.data() };
 #else
 
 #if defined(HAS_CODECVT)
@@ -96,17 +102,23 @@ std::wstring convertUtf8ToWide(const std::string& str)
 #if CZICMD_WINDOWSAPI_AVAILABLE
     if (str.empty())
     {
-        return L"";
+        return {};
     }
 
-    const int size = MultiByteToWideChar(CP_UTF8, 0, str.c_str(), static_cast<int>(str.size()), nullptr, 0);
-    if (size <= 0)
+    const int buffer_size = MultiByteToWideChar(CP_UTF8, 0, str.c_str(), -1, NULL, 0);
+    if (buffer_size <= 0)
     {
-        return L"";
+        throw runtime_error("Error in MultiByteToWideChar");
     }
 
-    std::wstring result(size, 0);
-    MultiByteToWideChar(CP_UTF8, 0, str.c_str(), static_cast<int>(str.size()), &result[0], static_cast<int>(result.size()));
+    wstring result(buffer_size, L'\0');
+    if (MultiByteToWideChar(CP_UTF8, 0, str.c_str(), -1, &result[0], buffer_size) <= 0)
+    {
+        throw runtime_error("Error in MultiByteToWideChar");
+    }
+
+    // Remove the null terminator added by MultiByteToWideChar
+    result.resize(buffer_size - 1);
     return result;
 #elif CZICMD_ICONV_AVAILABLE
     if (str.empty()) // Handle empty input safely
@@ -136,7 +148,7 @@ std::wstring convertUtf8ToWide(const std::string& str)
     }
 
     iconv_close(cd);
-    return {reinterpret_cast<wchar_t*>(output.data())};
+    return { reinterpret_cast<wchar_t*>(output.data()) };
 #else
 
 #if defined(HAS_CODECVT)

@@ -99,7 +99,7 @@ tString trimImpl(const tString& str, const tString& whitespace)
 #if LIBCZI_WINDOWSAPI_AVAILABLE
     if (*sz == '\0')
     {
-        return L"";
+        return {};
     }
 
     const int size_needed = MultiByteToWideChar(CP_UTF8, 0, sz, -1, nullptr, 0);
@@ -108,7 +108,9 @@ tString trimImpl(const tString& str, const tString& whitespace)
         throw std::runtime_error("MultiByteToWideChar failed: " + std::to_string(GetLastError()));
     }
 
-    std::wstring wide_string(size_needed, 0);
+    std::wstring wide_string;
+    wide_string.resize(size_needed - 1); // Exclude the null terminator
+
     if (MultiByteToWideChar(CP_UTF8, 0, sz, -1, &wide_string[0], size_needed) == 0) 
     {
         throw std::runtime_error("MultiByteToWideChar conversion failed: " + std::to_string(GetLastError()));
@@ -156,16 +158,20 @@ tString trimImpl(const tString& str, const tString& whitespace)
 #if LIBCZI_WINDOWSAPI_AVAILABLE
     if (*szw == L'\0')
     {
-        return "";
+        return {};
     }
 
+    // Calculate the required buffer size
     const int size_needed = WideCharToMultiByte(CP_UTF8, 0, szw, -1, nullptr, 0, nullptr, nullptr);
     if (size_needed <= 0) 
     {
         throw std::runtime_error("WideCharToMultiByte failed: " + std::to_string(GetLastError()));
     }
 
-    std::string utf8_str(size_needed, 0);
+    // Allocate buffer for the UTF-8 string
+    std::string utf8_str;
+    utf8_str.resize(size_needed - 1); // Exclude the null terminator
+
     if (WideCharToMultiByte(CP_UTF8, 0, szw, -1, &utf8_str[0], size_needed, nullptr, nullptr) == 0) 
     {
         throw std::runtime_error("WideCharToMultiByte conversion failed: " + std::to_string(GetLastError()));
