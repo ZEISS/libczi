@@ -11,7 +11,7 @@
 
 
 std::string convertToUtf8(const std::wstring& str);
-std::wstring convertUtf8ToUCS2(const std::string& str);
+std::wstring convertUtf8ToWide(const std::string& str);
 
 std::string trim(const std::string& str, const std::string& whitespace = " \t");
 std::wstring trim(const std::wstring& str, const std::wstring& whitespace = L" \t");
@@ -45,7 +45,8 @@ class final_act
 {
 public:
     explicit final_act(F f) noexcept
-        : f_(std::move(f)), invoke_(true) {}
+        : f_(std::move(f)), invoke_(true) {
+    }
 
     final_act(final_act&& other) noexcept
         : f_(std::move(other.f_)),

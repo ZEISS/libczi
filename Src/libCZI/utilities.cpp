@@ -93,16 +93,64 @@ tString trimImpl(const tString& str, const tString& whitespace)
 
 /*static*/std::wstring Utilities::convertUtf8ToWchar_t(const char* sz)
 {
+#if LIBCZI_WINDOWSAPI_AVAILABLE
+    if (*sz == '\0')
+    {
+        return {};
+    }
+
+    const int size_needed = MultiByteToWideChar(CP_UTF8, 0, sz, -1, nullptr, 0);
+    if (size_needed <= 0) 
+    {
+        throw runtime_error("MultiByteToWideChar failed: " + std::to_string(GetLastError()));
+    }
+
+    wstring wide_string;
+    wide_string.resize(size_needed - 1); // Exclude the null terminator
+
+    if (MultiByteToWideChar(CP_UTF8, 0, sz, -1, &wide_string[0], size_needed) == 0) 
+    {
+        throw runtime_error("MultiByteToWideChar conversion failed: " + std::to_string(GetLastError()));
+    }
+
+    return wide_string;
+#else
     std::wstring_convert<std::codecvt_utf8<wchar_t>> utf8conv;
     std::wstring conv = utf8conv.from_bytes(sz);
     return conv;
+#endif
 }
 
 /*static*/std::string Utilities::convertWchar_tToUtf8(const wchar_t* szw)
 {
+#if LIBCZI_WINDOWSAPI_AVAILABLE
+    if (*szw == L'\0')
+    {
+        return {};
+    }
+
+    // Calculate the required buffer size
+    const int size_needed = WideCharToMultiByte(CP_UTF8, 0, szw, -1, nullptr, 0, nullptr, nullptr);
+    if (size_needed <= 0) 
+    {
+        throw runtime_error("WideCharToMultiByte failed: " + std::to_string(GetLastError()));
+    }
+
+    // Allocate buffer for the UTF-8 string
+    string utf8_str;
+    utf8_str.resize(size_needed - 1); // Exclude the null terminator
+
+    if (WideCharToMultiByte(CP_UTF8, 0, szw, -1, &utf8_str[0], size_needed, nullptr, nullptr) == 0) 
+    {
+        throw runtime_error("WideCharToMultiByte conversion failed: " + std::to_string(GetLastError()));
+    }
+
+    return utf8_str;
+#else
     std::wstring_convert<std::codecvt_utf8<wchar_t>> utf8_conv;
     std::string conv = utf8_conv.to_bytes(szw);
     return conv;
+#endif
 }
 
 /*static*/void Utilities::Tokenize(const std::wstring& str, std::vector<std::wstring>& tokens, const std::wstring& delimiters)
