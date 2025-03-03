@@ -12,10 +12,6 @@
 #include <Windows.h>
 #endif
 
-#if CZICMD_ICONV_AVAILABLE
-#include <iconv.h>
-#endif
-
 #if defined(HAS_CODECVT)
 #include <locale>
 #include <codecvt>
@@ -51,40 +47,6 @@ std::string convertToUtf8(const std::wstring& str)
     // Remove the null terminator added by WideCharToMultiByte
     result.resize(sizeNeeded - 1);
 
-    return result;
-#elif CZICMD_ICONV_AVAILABLE
-    if (str.empty())  // Handle empty input safely
-    {
-        return {};
-    }
-
-    const iconv_t converter = iconv_open("UTF-8", CZICMD_ICONV_WCHAR_T_ENCODING);
-    if (converter == reinterpret_cast<iconv_t>(-1))
-    {
-        throw std::runtime_error("Failed to initialize iconv converter");
-    }
-
-    // Input buffer and length
-    size_t in_bytes_left = str.size() * sizeof(wchar_t);
-    char* in_buf = reinterpret_cast<char*>(const_cast<wchar_t*>(str.c_str()));
-
-    // Output buffer and length
-    size_t out_bytes_left = (in_bytes_left + 1) * 4; // estimate output size (UTF8 can use up to 4 bytes per character)
-    string result;
-    result.resize(out_bytes_left);
-    char* out_buf = &result[0];
-
-    // Perform the conversion
-    const size_t result_size = iconv(converter, &in_buf, &in_bytes_left, &out_buf, &out_bytes_left);
-    iconv_close(converter);
-
-    if (result_size == static_cast<size_t>(-1))
-    {
-        throw runtime_error("Failed to convert wchar_t to UTF8");
-    }
-
-    // Resize the result to the actual converted size
-    result.resize(result.size() - out_bytes_left);
     return result;
 #else
 
@@ -124,39 +86,6 @@ std::wstring convertUtf8ToWide(const std::string& str)
 
     // Remove the null terminator added by MultiByteToWideChar
     result.resize(buffer_size - 1);
-    return result;
-#elif CZICMD_ICONV_AVAILABLE
-    if (str.empty()) // Handle empty input safely
-    {
-        return {};
-    }
-
-    const iconv_t converter = iconv_open(CZICMD_ICONV_WCHAR_T_ENCODING, "UTF-8");
-    if (converter == reinterpret_cast<iconv_t>(-1))
-    {
-        throw std::runtime_error("Failed to initialize iconv converter");
-    }
-
-    // Input buffer and length
-    size_t in_bytes_left = str.size();
-    char* in_buf = const_cast<char*>(str.c_str());
-
-    // Output buffer and length
-    size_t out_bytes_left = (in_bytes_left + 1) * sizeof(wchar_t);  // estimate output size
-    wstring result;
-    result.resize(out_bytes_left / sizeof(wchar_t));
-    char* out_buf = reinterpret_cast<char*>(&result[0]);
-
-    // Perform the conversion
-    size_t result_size = iconv(converter, &in_buf, &in_bytes_left, &out_buf, &out_bytes_left);
-    iconv_close(converter);
-
-    if (result_size == static_cast<size_t>(-1))
-    {
-        throw runtime_error("Failed to convert UTF8 to wchar_t");
-    }
-
-    result.resize((result.size() * sizeof(wchar_t) - out_bytes_left) / sizeof(wchar_t));
     return result;
 #else
 

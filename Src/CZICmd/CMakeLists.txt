@@ -125,9 +125,6 @@ IF(NOT LIBCZI_HAVE_WIN32_API)
   target_include_directories(CZIcmd PRIVATE ${ZLIB_INCLUDE_DIR} ${PNG_INCLUDE_DIR})
   # seems to be problem with glibc I'd reckon -> https://stackoverflow.com/questions/51584960/stdcall-once-throws-stdsystem-error-unknown-error-1
   target_link_libraries(CZIcmd  PUBLIC pthread)
-  IF (ICONV_FOUND)
-    target_link_libraries(CZIcmd PRIVATE Iconv::Iconv)
-  ENDIF()
 ENDIF()
 
 set(CZICMD_USE_FREETYPE 0)
@@ -135,13 +132,6 @@ set(CZICMD_USE_WIC 0)
 set(CZICMD_USE_GDIPLUS 0)
 set(CZICMD_USE_LIBPNG 0)
 set(CZICMD_WINDOWSAPIAVAILABLE 0)
-set(CZICMD_ICONVAVAILABLE 0)
-set(CZICMD_ICONV_WCHAR_T_ENCODING "")
-
-IF (ICONV_FOUND)
-  set(CZICMD_ICONVAVAILABLE 1)
-  set(CZICMD_ICONV_WCHAR_T_ENCODING "${LIBCZI_ICONV_WCHAR_T_ENCODING}")
-ENDIF()
 
 IF (FREETYPE_FOUND)
 	set(CZICMD_USE_FREETYPE 1)

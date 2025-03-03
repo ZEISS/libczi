@@ -263,14 +263,6 @@ else()
   set(libCZI_WINDOWSAPIAVAILABLE 0)
 endif()
 
-if (ICONV_FOUND)
-  set(libCZI_ICONVAVAILABLE 1)
-  set(libCZI_ICONV_WCHAR_T_ENCODING "${LIBCZI_ICONV_WCHAR_T_ENCODING}")
-else()
-  set(libCZI_ICONVAVAILABLE 0)
-  set(libCZI_ICONV_WCHAR_T_ENCODING "")
-endif()
-
 configure_file (
   "${CMAKE_CURRENT_SOURCE_DIR}/libCZI_Config.h.in"
   "${CMAKE_CURRENT_BINARY_DIR}/libCZI_Config.h"
@@ -319,9 +311,6 @@ if (LIBCZI_BUILD_DYNLIB)
   if(LIBCZI_HAVE_WIN32_API)
     target_link_libraries(libCZI PRIVATE ole32 Windowscodecs)
   endif()
-  if (ICONV_FOUND)
-    target_link_libraries(libCZI PRIVATE Iconv::Iconv)
-  endif()
 endif(LIBCZI_BUILD_DYNLIB)
 
 #
@@ -362,9 +351,6 @@ IF(UNIX)
 ENDIF(UNIX)
 if(LIBCZI_HAVE_WIN32_API)
     target_link_libraries(libCZIStatic PUBLIC ole32 Windowscodecs)
-endif()
-if (ICONV_FOUND)
-  target_link_libraries(libCZIStatic PRIVATE Iconv::Iconv)
 endif()
 
 #

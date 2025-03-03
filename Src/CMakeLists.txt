@@ -72,28 +72,6 @@ if(LIBCZI_BUILD_AZURESDK_BASED_STREAM)
   message(STATUS "AZURE-SDK available, version-info: ${LIBCZI_AZURESDK_VERSION_STRING}")
 endif()
 
-# On Unix/MacOS, we check whether the iconv library is available. On Windows, we use the Windows-API for this.
-# If iconv is not available, we fall back to an alternative implementation.
-if (NOT LIBCZI_HAVE_WIN32_API)
-  find_package(Iconv)
-  if (NOT ICONV_FOUND)
-    message(FATAL_ERROR [=[
-    iconv library not found! Falling back to an alternative implementation,
-    which may be incomplete and have limited Unicode support. Consider installing
-    like 'sudo apt-get install libiconv-dev'.
-    ]=])
-  else()
-      message(STATUS "iconv library found and enabled.")
-      if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
-        # On MacOS, "WCHAR_T" is problematic, so we use "UTF-32LE" instead."
-        set(LIBCZI_ICONV_WCHAR_T_ENCODING "UTF-32LE")
-      else()
-        set(LIBCZI_ICONV_WCHAR_T_ENCODING "WCHAR_T")
-      endif()
-  endif()
-
-endif()
-
 add_subdirectory(libCZI)
 
 if (LIBCZI_BUILD_CZICMD)
