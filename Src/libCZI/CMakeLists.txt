@@ -243,7 +243,7 @@ else()
   FetchContent_Declare(
     zstd
     GIT_REPOSITORY https://github.com/facebook/zstd.git
-    GIT_TAG "v1.5.6"
+    GIT_TAG "v1.5.7"
   )
 
   message(STATUS "Fetching zstd...")

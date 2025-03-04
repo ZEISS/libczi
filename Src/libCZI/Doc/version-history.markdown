@@ -36,4 +36,4 @@ version history                 {#version_history}
  0.62.7             | [122](https://github.com/ZEISS/libczi/pull/122)      | documentation update
  0.63.0             | [123](https://github.com/ZEISS/libczi/pull/123)      | introduce "frames-of-reference"
  0.63.1             | [128](https://github.com/ZEISS/libczi/pull/128)      | fix for CZICmd (command "ExtractAttachment"), improve UTF8-handling (on Windows)
- 
+ 0.63.2             | [129](https://github.com/ZEISS/libczi/pull/129)      | update zstd to [version 1.5.7](https://github.com/facebook/zstd/releases/tag/v1.5.7)
