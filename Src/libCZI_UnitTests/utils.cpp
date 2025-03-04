@@ -5,6 +5,8 @@
 #include "utils.h"
 #include "../libCZI/bitmapData.h"
 
+#include <random>
+
 using namespace std;
 using namespace libCZI;
 
@@ -46,7 +48,7 @@ public:
     virtual ~CMemBitmapWrapper()
     {
         free(this->ptrData);
-    };
+    }
 
     virtual libCZI::PixelType GetPixelType() const
     {
@@ -292,7 +294,7 @@ std::shared_ptr<libCZI::IBitmapData> CreateTestBitmap(libCZI::PixelType pixeltyp
         uint8_t v = 0;
         for (std::uint64_t i = 0; i < lckBm.size; ++i)
         {
-            ((uint8_t*)lckBm.ptrDataRoi)[i] = v++;
+            static_cast<uint8_t*>(lckBm.ptrDataRoi)[i] = v++;
         }
 
         break;
@@ -309,7 +311,7 @@ std::shared_ptr<libCZI::IBitmapData> CreateGray8BitmapAndFill(std::uint32_t widt
 {
     auto bm = make_shared<CMemBitmapWrapper>(PixelType::Gray8, width, height);
     ScopedBitmapLockerSP lckBm{ bm };
-    uint8_t* data = reinterpret_cast<uint8_t*>(lckBm.ptrDataRoi);
+    uint8_t* data = static_cast<uint8_t*>(lckBm.ptrDataRoi);
     for (uint32_t y = 0; y < height; ++y)
     {
         uint8_t* dst = data + (static_cast<size_t>(lckBm.stride) * y);
@@ -321,7 +323,9 @@ std::shared_ptr<libCZI::IBitmapData> CreateGray8BitmapAndFill(std::uint32_t widt
 
 std::shared_ptr<libCZI::IBitmapData> CreateRandomBitmap(libCZI::PixelType pixeltype, std::uint32_t width, std::uint32_t height)
 {
-    ::srand(::time(nullptr));
+    std::random_device random_device;
+    std::mt19937 random_generator(random_device());
+    std::uniform_int_distribution<uint32_t> distribution(0, UINT32_MAX);
 
     std::shared_ptr<libCZI::IBitmapData> bm = CStdBitmapData::Create(pixeltype, width, height);
     ScopedBitmapLockerSP lckBm{ bm };
@@ -330,14 +334,13 @@ std::shared_ptr<libCZI::IBitmapData> CreateRandomBitmap(libCZI::PixelType pixelt
     {
     case PixelType::Gray8:
     {
-        constexpr uint8_t maxGray8 = 0xff;
-        uint8_t* data = reinterpret_cast<uint8_t*>(lckBm.ptrDataRoi);
+        uint8_t* data = static_cast<uint8_t*>(lckBm.ptrDataRoi);
         for (uint64_t y = 0; y < height; ++y)
         {
             uint8_t* dst = data + (lckBm.stride * y);
             for (uint64_t x = 0; x < width; ++x)
             {
-                *dst++ = static_cast<uint8_t>(rand() % maxGray8);
+                *dst++ = static_cast<uint8_t>(distribution(random_generator));
             }
         }
     }
@@ -345,14 +348,13 @@ std::shared_ptr<libCZI::IBitmapData> CreateRandomBitmap(libCZI::PixelType pixelt
 
     case PixelType::Gray16:
     {
-        constexpr uint16_t maxGray16 = 0xffff;
-        uint8_t* data = reinterpret_cast<uint8_t*>(lckBm.ptrDataRoi);
+        uint8_t* data = static_cast<uint8_t*>(lckBm.ptrDataRoi);
         for (uint64_t y = 0; y < height; ++y)
         {
             uint16_t* dst = reinterpret_cast<uint16_t*>(data + (lckBm.stride * y));
             for (uint64_t x = 0; x < width; ++x)
             {
-                *dst++ = static_cast<uint16_t>(rand() % maxGray16);
+                *dst++ = static_cast<uint16_t>(distribution(random_generator));
             }
         }
     }
@@ -360,17 +362,17 @@ std::shared_ptr<libCZI::IBitmapData> CreateRandomBitmap(libCZI::PixelType pixelt
 
     case PixelType::Bgr24:
     {
-        constexpr uint8_t maxPixel8 = 0xff;
-        uint8_t* data = reinterpret_cast<uint8_t*>(lckBm.ptrDataRoi);
+        uint8_t* data = static_cast<uint8_t*>(lckBm.ptrDataRoi);
         for (uint64_t y = 0; y < height; ++y)
         {
             uint8_t* dst = data + (lckBm.stride * y);
             for (uint64_t x = 0; x < width; ++x)
             {
                 // set RBG values, 8-bits each
-                *dst++ = static_cast<uint8_t>(rand() % maxPixel8);
-                *dst++ = static_cast<uint8_t>(rand() % maxPixel8);
-                *dst++ = static_cast<uint8_t>(rand() % maxPixel8);
+                const uint32_t random_number = distribution(random_generator);
+                *dst++ = static_cast<uint8_t>(random_number);
+                *dst++ = static_cast<uint8_t>(random_number >> 8);
+                *dst++ = static_cast<uint8_t>(random_number >> 16);
             }
         }
     }
@@ -378,17 +380,17 @@ std::shared_ptr<libCZI::IBitmapData> CreateRandomBitmap(libCZI::PixelType pixelt
 
     case PixelType::Bgr48:
     {
-        constexpr uint16_t maxPixel16 = 0xffff;
-        uint8_t* data = reinterpret_cast<uint8_t*>(lckBm.ptrDataRoi);
+        uint8_t* data = static_cast<uint8_t*>(lckBm.ptrDataRoi);
         for (uint64_t y = 0; y < height; ++y)
         {
             uint16_t* dst = reinterpret_cast<uint16_t*>(data + (lckBm.stride * y));
             for (uint64_t x = 0; x < width; ++x)
             {
                 // set RBG values, 16-bits each
-                *dst++ = static_cast<uint16_t>(rand() % maxPixel16);
-                *dst++ = static_cast<uint16_t>(rand() % maxPixel16);
-                *dst++ = static_cast<uint16_t>(rand() % maxPixel16);
+                const uint32_t random_number = distribution(random_generator);
+                *dst++ = static_cast<uint16_t>(random_number);
+                *dst++ = static_cast<uint16_t>(random_number >> 16);
+                *dst++ = static_cast<uint16_t>(distribution(random_generator));
             }
         }
     }
@@ -410,7 +412,7 @@ std::shared_ptr<libCZI::IBitmapData> GetZeissLogoBitmap(void)
 
     auto bm = make_shared<CMemBitmapWrapper>(pixelType, ZEISS_LOGO_WIDTH, ZEISS_LOGO_HEIGHT);
     ScopedBitmapLockerSP lckBm{ bm };
-    uint8_t* dst = reinterpret_cast<uint8_t*>(lckBm.ptrDataRoi);
+    uint8_t* dst = static_cast<uint8_t*>(lckBm.ptrDataRoi);
 
     for (uint32_t i = 0; i < ZEISS_LOGO_HEIGHT; ++i)
     {
@@ -436,8 +438,8 @@ bool AreBitmapDataEqual(const std::shared_ptr<libCZI::IBitmapData>& bmp1, const 
             ScopedBitmapLockerSP lockBmp1{ bmp1 };
             ScopedBitmapLockerSP lockBmp2{ bmp2 };
 
-            const uint8_t* bufBmp1 = reinterpret_cast<const uint8_t*>(lockBmp1.ptrDataRoi);
-            const uint8_t* bufBmp2 = reinterpret_cast<const uint8_t*>(lockBmp2.ptrDataRoi);
+            const uint8_t* bufBmp1 = static_cast<const uint8_t*>(lockBmp1.ptrDataRoi);
+            const uint8_t* bufBmp2 = static_cast<const uint8_t*>(lockBmp2.ptrDataRoi);
 
             const uint32_t height = bmp1->GetHeight();
             size_t line = bmp1->GetWidth() * static_cast<size_t>(Utils::GetBytesPerPixel(bmp1->GetPixelType()));
@@ -517,8 +519,8 @@ std::tuple<float, float> CalculateMaxDifferenceMeanDifference(const std::shared_
 
     for (uint32_t y = 0; y < bmp1->GetHeight(); ++y)
     {
-        const uint8_t* bufBmp1 = reinterpret_cast<const uint8_t*>(lockBmp1.ptrDataRoi) + y * lockBmp1.stride;
-        const uint8_t* bufBmp2 = reinterpret_cast<const uint8_t*>(lockBmp2.ptrDataRoi) + y * lockBmp2.stride;
+        const uint8_t* bufBmp1 = static_cast<const uint8_t*>(lockBmp1.ptrDataRoi) + y * lockBmp1.stride;
+        const uint8_t* bufBmp2 = static_cast<const uint8_t*>(lockBmp2.ptrDataRoi) + y * lockBmp2.stride;
 
         for (uint32_t x = 0; x < bmp1->GetWidth(); ++x)
         {
