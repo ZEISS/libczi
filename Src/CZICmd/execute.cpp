@@ -2,6 +2,7 @@
 //
 // SPDX-License-Identifier: LGPL-3.0-or-later
 
+#include "inc_CZIcmd_Config.h"
 #include "execute.h"
 #include "executeBase.h"
 #include "executeCreateCzi.h"
@@ -909,21 +910,21 @@ public:
     {
         SelectionInfo selectionInfo = CreateSelectionInfo(options);
 
-        auto spReader = CreateAndOpenCziReader(options);
+        const auto spReader = CreateAndOpenCziReader(options);
 
         spReader->EnumerateAttachments(
             [&](int index, const AttachmentInfo& info)->bool
             {
                 if (IsSelection(index, info, selectionInfo))
                 {
-                    auto filename = GenerateFilename(index, info, options);
-                    auto attchmnt = spReader->ReadAttachment(index);
-                    WriteFile(filename, attchmnt.get());
+                    const auto filename = GenerateFilename(index, info, options);
+                    const auto attachment = spReader->ReadAttachment(index);
+                    WriteFile(filename, attachment.get());
                     HandleHashOfResult(
                         [&](uint8_t* ptrHash, size_t sizeHash)->bool
                         {
                             const void* ptr; size_t size;
-                            attchmnt->DangerousGetRawData(ptr, size);
+                            attachment->DangerousGetRawData(ptr, size);
                             Utils::CalcMd5SumHash(ptr, size, ptrHash, (int)sizeHash);
                             return true;
                         },
@@ -984,13 +985,13 @@ private:
         }
         else
         {
-            extension = convertUtf8ToUCS2(info.contentFileType);
+            extension = convertUtf8ToWide(info.contentFileType);
         }
 
         std::wstring suffix(L"_");
         if (info.name.length() > 0)
         {
-            suffix += convertUtf8ToUCS2(info.name);
+            suffix += convertUtf8ToWide(info.name);
             suffix += L'_';
         }
 
@@ -1002,19 +1003,31 @@ private:
 
     static void WriteFile(const wstring& filename, IAttachment* attchment)
     {
+        auto file_deleter = [](FILE* file)
+        {
+            if (file) 
+            {
+                fclose(file);
+            }
+        };
+
+        std::unique_ptr<FILE, decltype(file_deleter)> file_handle(nullptr, file_deleter);
+#ifdef _WIN32
+        file_handle.reset(_wfopen(filename.c_str(), L"wb"));
+#else
+        file_handle.reset(fopen(convertToUtf8(filename).c_str(), "wb"));
+#endif
+        if (!file_handle)
+        {
+            throw std::runtime_error("Cannot open file for writing");
+        }
+
         size_t size;
         auto spData = attchment->GetRawData(&size);
-
-        std::ofstream  output;
-        output.exceptions(std::ifstream::badbit | std::ifstream::failbit);
-#if defined(WIN32ENV)
-        output.open(filename.c_str(), ios::out | ios::binary);
-#endif
-#if defined(LINUXENV)
-        output.open(convertToUtf8(filename), ios::out | ios::binary);
-#endif
-        output.write(static_cast<const char*>(spData.get()), size);
-        output.close();
+        if (fwrite(spData.get(), 1, size, file_handle.get()) != size)
+        {
+            throw std::runtime_error("Error writing file");
+        }
     }
 };
 
@@ -1142,7 +1155,7 @@ bool execute(const CCmdLineOptions& options)
     {
         std::wstringstream ss;
         string what(libCZI_io_exception.what() != nullptr ? libCZI_io_exception.what() : "");
-        ss << "LibCZIIOException caught -> \"" << convertUtf8ToUCS2(what) << "\"";
+        ss << "LibCZIIOException caught -> \"" << convertUtf8ToWide(what) << "\"";
         try
         {
             libCZI_io_exception.rethrow_nested();
@@ -1150,7 +1163,7 @@ bool execute(const CCmdLineOptions& options)
         catch (std::exception& inner_exception)
         {
             what = inner_exception.what() != nullptr ? inner_exception.what() : "";
-            ss << endl << " nested exception -> \"" << convertUtf8ToUCS2(what) << "\"";
+            ss << endl << " nested exception -> \"" << convertUtf8ToWide(what) << "\"";
         }
 
         options.GetLog()->WriteLineStdErr(ss.str());
@@ -1160,7 +1173,7 @@ bool execute(const CCmdLineOptions& options)
     {
         wstringstream ss;
         string what(excp.what() != nullptr ? excp.what() : "");
-        ss << "FATAL ERROR: std::exception caught" << endl << " -> " << convertUtf8ToUCS2(what);
+        ss << "FATAL ERROR: std::exception caught" << endl << " -> " << convertUtf8ToWide(what);
         options.GetLog()->WriteLineStdErr(ss.str());
         success = false;
     }

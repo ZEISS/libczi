@@ -181,7 +181,7 @@ private:
 /*static*/wstring CExecuteCreateCzi::GetCreateCziInformalTaskDescription(const CCmdLineOptions& options, const wchar_t* linebreak)
 {
     wstringstream ss;
-    ss << L"Bounds:    " << convertUtf8ToUCS2(Utils::DimBoundsToString(&options.GetCreateBounds())) << linebreak;
+    ss << L"Bounds:    " << convertUtf8ToWide(Utils::DimBoundsToString(&options.GetCreateBounds())) << linebreak;
     const auto& tileSize = options.GetCreateBitmapSize();
     ss << L"Tile-size: " << get<0>(tileSize) << L" x " << get<1>(tileSize) << linebreak;
     const auto tileInfo = options.GetCreateTileInfo();
