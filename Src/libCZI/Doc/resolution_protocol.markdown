@@ -34,11 +34,11 @@ It is now conceivable that the information in the DirectoryEntry is not consiste
 1) If Compression is "uncompressed", then the expected size of the payload content can be calculated. In this case, a mismatch between the actual payload size and the expected size (calculated from pixel type and width and height) is possible.
 2) If Compression is JPGXR, then the compressed data (in the payload) also contains information about the width and height of the bitmap. Or - when the payload content is decompressed, its width and height is determined (from the compressed data), and there might be a mismatch between this size and the width/height given in the DirectoryEntry.
 
-Note that in cases with Compression other than JPGXR, e.g. zstd0 or zstd1, it is not true that the width/height is not reduntantly found in the compressed data. For zstd0/zstd1 compression, the decompression gives an unstructured blob of data, only described by its size. This case is therefore to be treated similar to case 1).
+Note that in cases with Compression other than JPGXR, e.g. zstd0 or zstd1, it is not true that the width/height is reduntantly found in the compressed data. For zstd0/zstd1 compression, the decompression gives an unstructured blob of data, only described by its size. This case is therefore to be treated similar to case 1).
 
 ### case 1: payload-data size mismatch for uncompressed subblocks
 
-The information in the DirectoyEntry is to be considered authoritative, i.e. the data is to be interpreted a as bitmap with width/height and pixel type as specified in the DirectoryEntry, and with a minimal stride.  
+The information in the DirectoyEntry is to be considered authoritative, i.e. the data is to be interpreted as a bitmap with width/height and pixel type as specified in the DirectoryEntry, and with a minimal stride.  
 
 If the payload size is larger than what is calculated from width, height and pixel type, the additional data is to be discarded.   
 
