@@ -32,7 +32,10 @@ static CCZIParse::SubblockDirectoryParseOptions GetParseOptionsFromOpenOptions(c
     return parse_options;
 }
 
-CCZIReader::CCZIReader() : isOperational(false), default_frame_of_reference(CZIFrameOfReference::Invalid)
+CCZIReader::CCZIReader() :
+    isOperational(false),
+    default_frame_of_reference(CZIFrameOfReference::Invalid),
+    sub_block_directory_info_policy_(ICZIReader::OpenOptions::SubBlockDirectoryInfoPolicy::SubBlockDirectoryPrecedence)
 {
 }
 
@@ -70,6 +73,8 @@ CCZIReader::CCZIReader() : isOperational(false), default_frame_of_reference(CZIF
         this->default_frame_of_reference = options->default_frame_of_reference;
         break;
     }
+
+    this->sub_block_directory_info_policy_ = options->subBlockDirectoryInfoPolicy;
 
     this->SetOperationalState(true);
 }
@@ -305,14 +310,55 @@ std::shared_ptr<ISubBlock> CCZIReader::ReadSubBlock(const CCziSubBlockDirectory:
 
     auto subBlkData = CCZIParse::ReadSubBlock(stream_reference.get(), entry.FilePosition, allocateInfo);
 
+    // TODO(JBL):
+    // OK, plan is now:
+    // - use the information from "entry" as authoritative information
+    // - maybe... allow to report a discrepancy
+
+    if (!((uint8_t)this->sub_block_directory_info_policy_ & (uint8_t)OpenOptions::SubBlockDirectoryInfoPolicy::IgnoreDiscrepancy))
+    {
+        if (entry.PixelType != subBlkData.pixelType ||
+            entry.Compression != subBlkData.compression ||
+            Utils::Compare(&entry.coordinate, &subBlkData.coordinate) != 0 ||
+            entry.mIndex != subBlkData.mIndex ||
+            entry.x != subBlkData.logicalRect.x || entry.y != subBlkData.logicalRect.y || entry.width != subBlkData.logicalRect.w || entry.height != subBlkData.logicalRect.h ||
+            entry.storedWidth != subBlkData.physicalSize.w || entry.storedHeight != subBlkData.physicalSize.h)
+        {
+            throw LibCZICZIParseException(
+                "CZIReader::ReadSubBlock: SubBlock-directory and sub-block information do not match.",
+                LibCZICZIParseException::ErrorCode::SubBlockDirectoryToSubBlockHeaderMismatch);
+        }
+    }
+
     libCZI::SubBlockInfo info;
-    info.pixelType = CziUtils::PixelTypeFromInt(subBlkData.pixelType);
-    info.compressionModeRaw = subBlkData.compression;
-    info.coordinate = subBlkData.coordinate;
-    info.mIndex = subBlkData.mIndex;
-    info.logicalRect = subBlkData.logicalRect;
-    info.physicalSize = subBlkData.physicalSize;
-    info.pyramidType = CziUtils::PyramidTypeFromByte(subBlkData.spare[0]);
+    if (((uint8_t)this->sub_block_directory_info_policy_ & 1) == (uint8_t)OpenOptions::SubBlockDirectoryInfoPolicy::SubBlockHeaderPrecedence)
+    {
+        info.pixelType = CziUtils::PixelTypeFromInt(entry.PixelType);
+        info.compressionModeRaw = entry.Compression;
+        info.coordinate = entry.coordinate;
+        info.mIndex = entry.mIndex;
+        info.logicalRect = IntRect{ entry.x,entry.y,entry.width,entry.height };
+        info.physicalSize = IntSize{ static_cast<std::uint32_t>(entry.storedWidth), static_cast<std::uint32_t>(entry.storedHeight) };
+        info.pyramidType = CziUtils::PyramidTypeFromByte(entry.pyramid_type_from_spare);
+    }
+    else
+    {
+        info.pixelType = CziUtils::PixelTypeFromInt(subBlkData.pixelType);
+        info.compressionModeRaw = subBlkData.compression;
+        info.coordinate = subBlkData.coordinate;
+        info.mIndex = subBlkData.mIndex;
+        info.logicalRect = subBlkData.logicalRect;
+        info.physicalSize = subBlkData.physicalSize;
+        info.pyramidType = CziUtils::PyramidTypeFromByte(subBlkData.spare[0]);
+    }
+
+    /*info.pixelType = CziUtils::PixelTypeFromInt(entry.PixelType);
+    info.compressionModeRaw = entry.Compression;
+    info.coordinate = entry.coordinate;
+    info.mIndex = entry.mIndex;
+    info.logicalRect = IntRect{ entry.x,entry.y,entry.width,entry.height };
+    info.physicalSize = IntSize{ static_cast<std::uint32_t>(entry.storedWidth), static_cast<std::uint32_t>(entry.storedHeight) };
+    info.pyramidType = CziUtils::PyramidTypeFromByte(entry.pyramid_type_from_spare);*/
 
     return std::make_shared<CCziSubBlock>(info, subBlkData, free);
 }

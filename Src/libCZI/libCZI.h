@@ -675,6 +675,13 @@ namespace libCZI
         /// This structure gathers the settings for controlling the 'Open' operation of the CZIReader-class.
         struct LIBCZI_API OpenOptions
         {
+            enum class SubBlockDirectoryInfoPolicy : std::uint8_t
+            {
+                SubBlockDirectoryPrecedence = 0, ///< The sub-block-directory information is used for the sub-blocks.
+                SubBlockHeaderPrecedence = 1,    ///< The sub-block information is used for the sub-blocks.
+                IgnoreDiscrepancy = 0x80
+            };
+
             /// This option controls whether the lax parameter validation when parsing the dimension-entry of a subblock is to be used.
             /// Previous versions of libCZI did not check whether certain values in the file have the expected value. If those values
             /// are different than expected, this meant that libCZI would not be able to deal with the document properly.  
@@ -697,12 +704,15 @@ namespace libCZI
             /// "CZIFrameOfReference::RawSubBlockCoordinateSystem" will be used.
             libCZI::CZIFrameOfReference default_frame_of_reference{ libCZI::CZIFrameOfReference::Invalid };
 
+            SubBlockDirectoryInfoPolicy subBlockDirectoryInfoPolicy{ SubBlockDirectoryInfoPolicy::SubBlockDirectoryPrecedence };
+
             /// Sets the the default.
             void SetDefault()
             {
                 this->lax_subblock_coordinate_checks = true;
                 this->ignore_sizem_for_pyramid_subblocks = false;
                 this->default_frame_of_reference = libCZI::CZIFrameOfReference::Invalid;
+                this->subBlockDirectoryInfoPolicy = SubBlockDirectoryInfoPolicy::SubBlockDirectoryPrecedence;
             }
         };
 
