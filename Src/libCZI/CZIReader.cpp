@@ -352,14 +352,6 @@ std::shared_ptr<ISubBlock> CCZIReader::ReadSubBlock(const CCziSubBlockDirectory:
         info.pyramidType = CziUtils::PyramidTypeFromByte(subBlkData.spare[0]);
     }
 
-    /*info.pixelType = CziUtils::PixelTypeFromInt(entry.PixelType);
-    info.compressionModeRaw = entry.Compression;
-    info.coordinate = entry.coordinate;
-    info.mIndex = entry.mIndex;
-    info.logicalRect = IntRect{ entry.x,entry.y,entry.width,entry.height };
-    info.physicalSize = IntSize{ static_cast<std::uint32_t>(entry.storedWidth), static_cast<std::uint32_t>(entry.storedHeight) };
-    info.pyramidType = CziUtils::PyramidTypeFromByte(entry.pyramid_type_from_spare);*/
-
     return std::make_shared<CCziSubBlock>(info, subBlkData, free);
 }
 
