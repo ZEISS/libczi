@@ -13,7 +13,7 @@
 using namespace libCZI;
 using namespace std;
 
-namespace 
+namespace
 {
     tuple<shared_ptr<void>, size_t> CreateCziDocumentOneSubblock4x4Gray8()
     {
@@ -168,44 +168,18 @@ TEST(CziReader, ReaderStateException)
     EXPECT_TRUE(expectedExceptionCaught) << "Incorrect behavior";
 }
 
-TEST(CziReader, CheckThatSubBlockInfoFromSubBlockDirectoryIsAuthorativeNoException)
+TEST(CziReader, CheckThatSubBlockInfoFromSubBlockDirectoryIsAuthorativeByDefaultNoException)
 {
     // with this test we verify that the information in the subblock-directory is used, not
     //  the information in the subblock-header.
 
-    // arrange
-    /*auto writer = CreateCZIWriter();
-    auto outStream = make_shared<CMemOutputStream>(0);
-    auto spWriterInfo = make_shared<CCziWriterInfo >(GUID{ 0x1234567,0x89ab,0xcdef,{ 1,2,3,4,5,6,7,8 } });
-    writer->Create(outStream, spWriterInfo);
-    auto bitmap = CreateTestBitmap(PixelType::Gray8, 4, 4);
-    ScopedBitmapLockerSP lockBm{ bitmap };
-    AddSubBlockInfoStridedBitmap addSbBlkInfo;
-    addSbBlkInfo.Clear();
-    addSbBlkInfo.coordinate = CDimCoordinate::Parse("C0");
-    addSbBlkInfo.mIndexValid = true;
-    addSbBlkInfo.mIndex = 0;
-    addSbBlkInfo.x = 0;
-    addSbBlkInfo.y = 0;
-    addSbBlkInfo.logicalWidth = bitmap->GetWidth();
-    addSbBlkInfo.logicalHeight = bitmap->GetHeight();
-    addSbBlkInfo.physicalWidth = bitmap->GetWidth();
-    addSbBlkInfo.physicalHeight = bitmap->GetHeight();
-    addSbBlkInfo.PixelType = bitmap->GetPixelType();
-    addSbBlkInfo.ptrBitmap = lockBm.ptrDataRoi;
-    addSbBlkInfo.strideBitmap = lockBm.stride;
-    writer->SyncAddSubBlock(addSbBlkInfo);
-    writer->Close();*/
-
-    // now, we modify the information in the subblock-header
-    //size_t size_czi_data;
-    //auto czi_data = outStream->GetCopy(&size_czi_data);
+    // now, we modify the information in the sub-block-header
     auto test_czi = CreateCziDocumentOneSubblock4x4Gray8();
     uint8_t* p = static_cast<uint8_t*>(get<0>(test_czi).get());
     ASSERT_TRUE(*(p + 0x250) == 'D' && *(p + 0x251) == 'V') << "The CZI-document does not have the expected content.";
     ASSERT_TRUE(*(p + 0x2ac) == 'C') << "The CZI-document does not have the expected content.";
-    // change pixeltype
-    *(p + 0x252) = static_cast<uint8_t>(PixelType::Gray16);
+
+    *(p + 0x252) = static_cast<uint8_t>(PixelType::Gray16); // change pixel type
     *(p + 0x2b0) = 0x01;    // set the C-coordinate to '1'
     *(p + 0x278) = *(p + 0x280) = 0x05;    // set  Size-X to '5'
     *(p + 0x28c) = *(p + 0x294) = 0x06;    // set  Size-Y to '6'
@@ -214,16 +188,16 @@ TEST(CziReader, CheckThatSubBlockInfoFromSubBlockDirectoryIsAuthorativeNoExcepti
     auto inputStream = CreateStreamFromMemory(get<0>(test_czi), get<1>(test_czi));
     auto reader = CreateCZIReader();
     ICZIReader::OpenOptions openOptions;
-    openOptions.subBlockDirectoryInfoPolicy = static_cast<ICZIReader::OpenOptions::SubBlockDirectoryInfoPolicy>(
-        static_cast<uint8_t>(ICZIReader::OpenOptions::SubBlockDirectoryInfoPolicy::SubBlockHeaderPrecedence) | 
-        static_cast<uint8_t>(ICZIReader::OpenOptions::SubBlockDirectoryInfoPolicy::IgnoreDiscrepancy));
+    // instruct to "ignore" a discrepancy between the sub-block-header and the sub-block-directory, and use default for "which information
+    //  takes precedence", where default is "sub-block-directory"
+    openOptions.subBlockDirectoryInfoPolicy = openOptions.subBlockDirectoryInfoPolicy | ICZIReader::OpenOptions::SubBlockDirectoryInfoPolicy::IgnoreDiscrepancy;
     reader->Open(inputStream, &openOptions);
-    auto sbBlkRead = reader->ReadSubBlock(0);
+    auto sub_block = reader->ReadSubBlock(0);
 
     // assert
 
     // now, we expect that we get the information from the subblock-directory
-    const auto sub_block_info = sbBlkRead->GetSubBlockInfo();
+    const auto sub_block_info = sub_block->GetSubBlockInfo();
     EXPECT_EQ(sub_block_info.pixelType, PixelType::Gray8) << "Incorrect behavior, this information is to be retrieved from sub-block directory";
     EXPECT_EQ(sub_block_info.physicalSize.w, 4) << "Incorrect behavior, this information is to be retrieved from sub-block directory";
     EXPECT_EQ(sub_block_info.physicalSize.h, 4) << "Incorrect behavior, this information is to be retrieved from sub-block directory";
@@ -235,17 +209,57 @@ TEST(CziReader, CheckThatSubBlockInfoFromSubBlockDirectoryIsAuthorativeNoExcepti
     EXPECT_EQ(c_index, 0) << "Incorrect behavior, this information is to be retrieved from sub-block directory";
 }
 
+TEST(CziReader, CheckThatSubBlockInfoFromSubBlockHeaderIsUsedIfConfiguredNoException)
+{
+    // with this test we verify that the information in the subblock-directory is used, not
+    //  the information in the subblock-header.
+
+    // now, we modify the information in the sub-block-header
+    auto test_czi = CreateCziDocumentOneSubblock4x4Gray8();
+    uint8_t* p = static_cast<uint8_t*>(get<0>(test_czi).get());
+    ASSERT_TRUE(*(p + 0x250) == 'D' && *(p + 0x251) == 'V') << "The CZI-document does not have the expected content.";
+    ASSERT_TRUE(*(p + 0x2ac) == 'C') << "The CZI-document does not have the expected content.";
+
+    *(p + 0x252) = static_cast<uint8_t>(PixelType::Gray16); // change pixel type
+    *(p + 0x2b0) = 0x01;    // set the C-coordinate to '1'
+    *(p + 0x278) = *(p + 0x280) = 0x05;    // set  Size-X to '5'
+    *(p + 0x28c) = *(p + 0x294) = 0x06;    // set  Size-Y to '6'
+
+    // act
+    auto inputStream = CreateStreamFromMemory(get<0>(test_czi), get<1>(test_czi));
+    auto reader = CreateCZIReader();
+    ICZIReader::OpenOptions openOptions;
+    // instruct to "ignore" a discrepancy between the sub-block-header and the sub-block-directory, and give precedence to the sub-block-header
+    openOptions.subBlockDirectoryInfoPolicy = ICZIReader::OpenOptions::SubBlockDirectoryInfoPolicy::SubBlockHeaderPrecedence | ICZIReader::OpenOptions::SubBlockDirectoryInfoPolicy::IgnoreDiscrepancy;
+    reader->Open(inputStream, &openOptions);
+    auto sub_block = reader->ReadSubBlock(0);
+
+    // assert
+
+    // now, we expect that we get the information from the subblock-directory
+    const auto sub_block_info = sub_block->GetSubBlockInfo();
+    EXPECT_EQ(sub_block_info.pixelType, PixelType::Gray16) << "Incorrect behavior, this information is to be retrieved from sub-block header";
+    EXPECT_EQ(sub_block_info.physicalSize.w, 5) << "Incorrect behavior, this information is to be retrieved from sub-block header";
+    EXPECT_EQ(sub_block_info.physicalSize.h, 6) << "Incorrect behavior, this information is to be retrieved from sub-block header";
+    EXPECT_EQ(sub_block_info.logicalRect.w, 5) << "Incorrect behavior, this information is to be retrieved from sub-block header";
+    EXPECT_EQ(sub_block_info.logicalRect.h, 6) << "Incorrect behavior, this information is to be retrieved from sub-block header";
+    int c_index = -1;
+    const bool b = sub_block_info.coordinate.TryGetPosition(DimensionIndex::C, &c_index);
+    EXPECT_TRUE(b) << "Incorrect behavior, this information is to be retrieved from sub-block header";
+    EXPECT_EQ(c_index, 1) << "Incorrect behavior, this information is to be retrieved from sub-block header";
+}
+
 TEST(CziReader, CheckThatExceptionIsThrownWhenEnabledIfSubBlockDirectoryAndSubblockHeaderDiffer)
 {
     auto test_czi = CreateCziDocumentOneSubblock4x4Gray8();
     uint8_t* p = static_cast<uint8_t*>(get<0>(test_czi).get());
     ASSERT_TRUE(*(p + 0x250) == 'D' && *(p + 0x251) == 'V') << "The CZI-document does not have the expected content.";
     ASSERT_TRUE(*(p + 0x2ac) == 'C') << "The CZI-document does not have the expected content.";
-    // change pixeltype
-    *(p + 0x252) = static_cast<uint8_t>(PixelType::Gray16);
-    *(p + 0x2b0) = 0x01;    // set the C-coordinate to '1'
-    *(p + 0x278) = *(p + 0x280) = 0x05;    // set  Size-X to '5'
-    *(p + 0x28c) = *(p + 0x294) = 0x06;    // set  Size-Y to '6'
+
+    *(p + 0x252) = static_cast<uint8_t>(PixelType::Gray16);     // change pixel type
+    *(p + 0x2b0) = 0x01;                                        // set the C-coordinate to '1'
+    *(p + 0x278) = *(p + 0x280) = 0x05;                         // set  Size-X to '5'
+    *(p + 0x28c) = *(p + 0x294) = 0x06;                         // set  Size-Y to '6'
 
     // act
     auto inputStream = CreateStreamFromMemory(get<0>(test_czi), get<1>(test_czi));
@@ -255,19 +269,18 @@ TEST(CziReader, CheckThatExceptionIsThrownWhenEnabledIfSubBlockDirectoryAndSubbl
     reader->Open(inputStream);
     try
     {
-        auto sbBlkRead = reader->ReadSubBlock(0);
+        auto sub_block = reader->ReadSubBlock(0);
         FAIL() << "Expected LibCZICZIParseException to be thrown";
     }
     catch (const LibCZICZIParseException& exception)
     {
         EXPECT_EQ(exception.GetErrorCode(), LibCZICZIParseException::ErrorCode::SubBlockDirectoryToSubBlockHeaderMismatch) << "not the correct errorcode";
     }
-    catch (...) 
+    catch (...)
     {
         FAIL() << "Expected LibCZICZIParseException";
     }
 }
-
 
 static tuple<shared_ptr<void>, size_t> CreateTestCzi()
 {

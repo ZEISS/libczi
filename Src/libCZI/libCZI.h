@@ -675,6 +675,9 @@ namespace libCZI
         /// This structure gathers the settings for controlling the 'Open' operation of the CZIReader-class.
         struct LIBCZI_API OpenOptions
         {
+            /// \enum   SubBlockDirectoryInfoPolicy
+            ///
+            /// \brief  Values that represent sub block directory Information policies
             enum class SubBlockDirectoryInfoPolicy : std::uint8_t
             {
                 SubBlockDirectoryPrecedence = 0, ///< The sub-block-directory information is used for the sub-blocks.
@@ -778,6 +781,29 @@ namespace libCZI
             return std::dynamic_pointer_cast<ISingleChannelScalingTileAccessor, IAccessor>(this->CreateAccessor(libCZI::AccessorType::SingleChannelScalingTileAccessor));
         }
     };
+
+
+    // Overload operator| for combining flags.
+    constexpr ICZIReader::OpenOptions::SubBlockDirectoryInfoPolicy operator|(ICZIReader::OpenOptions::SubBlockDirectoryInfoPolicy lhs, ICZIReader::OpenOptions::SubBlockDirectoryInfoPolicy rhs)
+    {
+        return static_cast<ICZIReader::OpenOptions::SubBlockDirectoryInfoPolicy>(
+            static_cast<std::uint8_t>(lhs) | static_cast<std::uint8_t>(rhs)
+        );
+    }
+
+    // Overload operator& for checking flags.
+    constexpr ICZIReader::OpenOptions::SubBlockDirectoryInfoPolicy operator&(ICZIReader::OpenOptions::SubBlockDirectoryInfoPolicy lhs, ICZIReader::OpenOptions::SubBlockDirectoryInfoPolicy rhs)
+    {
+        return static_cast<ICZIReader::OpenOptions::SubBlockDirectoryInfoPolicy>(
+            static_cast<std::uint8_t>(lhs) & static_cast<std::uint8_t>(rhs)
+        );
+    }
+
+    //// Optionally, overload operator|= for convenience.
+    //constexpr MyFlags& operator|=(MyFlags& lhs, MyFlags rhs) {
+    //    lhs = lhs | rhs;
+    //    return lhs;
+    //}
 }
 
 #include "libCZI_Helpers.h"

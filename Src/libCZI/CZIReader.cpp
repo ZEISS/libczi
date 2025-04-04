@@ -320,7 +320,7 @@ std::shared_ptr<ISubBlock> CCZIReader::ReadSubBlock(const CCziSubBlockDirectory:
         if (entry.PixelType != subBlkData.pixelType ||
             entry.Compression != subBlkData.compression ||
             Utils::Compare(&entry.coordinate, &subBlkData.coordinate) != 0 ||
-            entry.mIndex != subBlkData.mIndex ||
+            (Utils::IsValidMindex(entry.mIndex) != Utils::IsValidMindex(subBlkData.mIndex) || (Utils::IsValidMindex(subBlkData.mIndex) && entry.mIndex != subBlkData.mIndex)) ||
             entry.x != subBlkData.logicalRect.x || entry.y != subBlkData.logicalRect.y || entry.width != subBlkData.logicalRect.w || entry.height != subBlkData.logicalRect.h ||
             entry.storedWidth != subBlkData.physicalSize.w || entry.storedHeight != subBlkData.physicalSize.h)
         {
@@ -331,8 +331,9 @@ std::shared_ptr<ISubBlock> CCZIReader::ReadSubBlock(const CCziSubBlockDirectory:
     }
 
     libCZI::SubBlockInfo info;
-    if (((uint8_t)this->sub_block_directory_info_policy_ & 1) == (uint8_t)OpenOptions::SubBlockDirectoryInfoPolicy::SubBlockHeaderPrecedence)
+    if (((uint8_t)this->sub_block_directory_info_policy_ & 1) == (uint8_t)OpenOptions::SubBlockDirectoryInfoPolicy::SubBlockDirectoryPrecedence)
     {
+        // the sub-block-directory information takes precedence, which is default and specified to be the authoritative information
         info.pixelType = CziUtils::PixelTypeFromInt(entry.PixelType);
         info.compressionModeRaw = entry.Compression;
         info.coordinate = entry.coordinate;
