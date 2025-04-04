@@ -211,8 +211,9 @@ TEST(CziReader, CheckThatSubBlockInfoFromSubBlockDirectoryIsAuthorativeByDefault
 
 TEST(CziReader, CheckThatSubBlockInfoFromSubBlockHeaderIsUsedIfConfiguredNoException)
 {
-    // with this test we verify that the information in the subblock-directory is used, not
-    //  the information in the subblock-header.
+    // With this test we verify that the information in the subblock-header is used, not
+    //  the information from the subblock-directory. Note that this is *not* the default behavior,
+    //  and not the recommended behavior.
 
     // now, we modify the information in the sub-block-header
     auto test_czi = CreateCziDocumentOneSubblock4x4Gray8();
