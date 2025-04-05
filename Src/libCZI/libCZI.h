@@ -109,6 +109,12 @@ namespace libCZI
         bool allow_duplicate_subblocks{ false };
     };
 
+    struct CreateBitmapOptions
+    {
+        bool handle_uncompressed_data_size_mismatch{ true };
+        bool handle_jpgxr_bitmap_mismatch{ true };
+    };
+
     /// Creates a new instance of the CZI-writer class.
     /// \param  options (Optional) Options for controlling the operation. This argument may
     ///                 be null, in which case default options are used.
@@ -122,7 +128,7 @@ namespace libCZI
     /// Creates bitmap from sub block.
     /// \param [in] subBlk The sub-block.
     /// \return The newly allocated bitmap containing the image from the sub-block.
-    LIBCZI_API std::shared_ptr<IBitmapData>  CreateBitmapFromSubBlock(ISubBlock* subBlk);
+    LIBCZI_API std::shared_ptr<IBitmapData>  CreateBitmapFromSubBlock(ISubBlock* subBlk, const CreateBitmapOptions* options = nullptr);
 
     /// Creates metadata-object from a metadata segment.
     /// \param [in] metadataSegment The metadata segment object.
@@ -307,6 +313,12 @@ namespace libCZI
             Attachment  ///< An enum constant representing the attachment (of a sub-block).
         };
 
+        //struct CreateBitmapOptions
+        //{
+        //    bool handle_payload_data_size_mismatch{ true };
+        //    bool handle_jpgxr_bitmap_mismatch{ true };
+        //};
+
         /// Gets sub-block information.
         /// \return The sub-block information.
         virtual const SubBlockInfo& GetSubBlockInfo() const = 0;
@@ -333,7 +345,7 @@ namespace libCZI
         /// keep a reference (and return the same bitmap if called twice).
         /// In current version this method is equivalent to calling CreateBitmapFromSubBlock.
         /// \return The bitmap (contained in this sub-block).
-        virtual std::shared_ptr<IBitmapData> CreateBitmap() = 0;
+        virtual std::shared_ptr<IBitmapData> CreateBitmap(const CreateBitmapOptions* options = nullptr) = 0;
 
         virtual ~ISubBlock() = default;
 
