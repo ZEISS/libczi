@@ -44,9 +44,14 @@ namespace libCZI
         /// \param height               The height of the expected bitmap, used for validation purposes only.
         ///
         /// \return A bitmap object with the decoded data.
-        virtual std::shared_ptr<libCZI::IBitmapData> Decode(const void* ptrData, size_t size, libCZI::PixelType pixelType, std::uint32_t width, std::uint32_t height) = 0;
+        virtual std::shared_ptr<libCZI::IBitmapData> Decode(const void* ptrData, size_t size, const libCZI::PixelType* pixelType, const std::uint32_t* width, const std::uint32_t* height) = 0;
 
         virtual ~IDecoder() = default;
+
+        std::shared_ptr<libCZI::IBitmapData> Decode(const void* ptrData, size_t size, libCZI::PixelType pixelType, std::uint32_t width, std::uint32_t height)
+        {
+            return this->Decode(ptrData, size, &pixelType, &width, &height);
+        }
     };
 
     const int LOGLEVEL_CATASTROPHICERROR = 0;   ///< Identifies a catastrophic error (i. e. the program cannot continue).

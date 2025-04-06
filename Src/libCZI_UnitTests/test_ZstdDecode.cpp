@@ -15,7 +15,7 @@ TEST(ZstdDecode, Decode1)
     auto dec = CZstd1Decoder::Create();
     size_t sizeEncoded; int expectedWidth, expectedHeight;
     auto ptrEncodedData = CTestImage::GetZStd1CompressedImage(&sizeEncoded, &expectedWidth, &expectedHeight);
-    auto bmDecoded = dec->Decode(ptrEncodedData, sizeEncoded, PixelType::Gray8, 1024, 1024);
+    auto bmDecoded = dec->IDecoder::Decode(ptrEncodedData, sizeEncoded, PixelType::Gray8, 1024, 1024);
     EXPECT_EQ((uint32_t)expectedWidth, bmDecoded->GetWidth()) << "Width is expected to be equal";
     EXPECT_EQ((uint32_t)expectedHeight, bmDecoded->GetHeight()) << "Height is expected to be equal";
     EXPECT_EQ(bmDecoded->GetPixelType(), PixelType::Gray8) << "Not the correct pixeltype.";
@@ -32,7 +32,7 @@ TEST(ZstdDecode, TryDecodeInvalidData)
     auto dec = CZstd1Decoder::Create();
     static const uint8_t invalidData[] = { 10,20,30,40,50,60,70,80,90,100 };
     EXPECT_THROW(
-        auto bmDecoded = dec->Decode(invalidData, sizeof(invalidData), libCZI::PixelType::Gray8, 10, 10),
+        auto bmDecoded = dec->IDecoder::Decode(invalidData, sizeof(invalidData), libCZI::PixelType::Gray8, 10, 10),
         exception);
 }
 
@@ -41,7 +41,7 @@ TEST(ZstdDecode, DecodeAndHiLoBytePacking)
     auto dec = CZstd1Decoder::Create();
     size_t sizeEncoded; int expectedWidth, expectedHeight;
     auto ptrEncodedData = CTestImage::GetZStd1CompressedImageWithHiLoPacking(&sizeEncoded, &expectedWidth, &expectedHeight);
-    auto bmDecoded = dec->Decode(ptrEncodedData, sizeEncoded, PixelType::Gray16, 32, 32);
+    auto bmDecoded = dec->IDecoder::Decode(ptrEncodedData, sizeEncoded, PixelType::Gray16, 32, 32);
     EXPECT_EQ((uint32_t)expectedWidth, bmDecoded->GetWidth()) << "Width is expected to be equal";
     EXPECT_EQ((uint32_t)expectedHeight, bmDecoded->GetHeight()) << "Height is expected to be equal";
     EXPECT_EQ(bmDecoded->GetPixelType(), PixelType::Gray16) << "Not the correct pixeltype.";

@@ -277,7 +277,7 @@ static void _testWriteReadCompressedImageZStd0(uint32_t width, uint32_t height, 
         EXPECT_TRUE(memcmp(compressed, imgBlock.get(), sizeCompressed) == 0) << "Unexpected image block";
 
         std::shared_ptr<CZstd0Decoder> dec = CZstd0Decoder::Create();
-        std::shared_ptr<libCZI::IBitmapData> decImg = dec->Decode(imgBlock.get(), sizeBlock, pixelType, width, height);
+        std::shared_ptr<libCZI::IBitmapData> decImg = dec->IDecoder::Decode(imgBlock.get(), sizeBlock, pixelType, width, height);
         ScopedBitmapLockerSP lockDecode{ decImg };
         ScopedBitmapLockerSP lockOrigin{ img };
 
@@ -404,7 +404,7 @@ static void _testWriteReadCompressedImageZStd1(uint32_t width, uint32_t height, 
         EXPECT_TRUE(memcmp(compressed, imgBlock.get(), sizeCompressed) == 0) << "Unexpected image block";
 
         std::shared_ptr<CZstd1Decoder> dec = CZstd1Decoder::Create();
-        std::shared_ptr<libCZI::IBitmapData> decImg = dec->Decode(imgBlock.get(), sizeBlock, pixelType, width, height);
+        std::shared_ptr<libCZI::IBitmapData> decImg = dec->IDecoder::Decode(imgBlock.get(), sizeBlock, pixelType, width, height);
 
         EXPECT_TRUE(decImg != nullptr) << "Failed to create decoded image";
         EXPECT_TRUE(decImg->GetHeight() == height) << "The decoded image has wrong height";
@@ -419,7 +419,9 @@ static void _testWriteReadCompressedImageZStd1(uint32_t width, uint32_t height, 
     while (false);
 
     if (compressed != nullptr)
+    {
         delete[] compressed;
+    }
 }
 
 /**

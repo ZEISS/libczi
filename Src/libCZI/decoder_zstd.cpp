@@ -36,9 +36,14 @@ static void ZstdDecompressAndThrowIfError(const void* ptrData, size_t size, void
     return make_shared<CZstd0Decoder>();
 }
 
-/*virtual*/std::shared_ptr<libCZI::IBitmapData> CZstd0Decoder::Decode(const void* ptrData, size_t size, libCZI::PixelType pixelType, uint32_t width, uint32_t height)
+/*virtual*/std::shared_ptr<libCZI::IBitmapData> CZstd0Decoder::Decode(const void* ptrData, size_t size, const libCZI::PixelType* pixelType, const uint32_t* width, const uint32_t* height)
 {
-    return DecodeAndProcessNoHiLoByteUnpacking(ptrData, size, pixelType, width, height);
+    if (pixelType == nullptr || width == nullptr || height == nullptr)
+    {
+        throw invalid_argument("pixeltype, width and height must be specified.");
+    }
+
+    return DecodeAndProcessNoHiLoByteUnpacking(ptrData, size, *pixelType, *width, *height);
 }
 
 /*static*/std::shared_ptr<CZstd1Decoder> CZstd1Decoder::Create()
@@ -46,8 +51,13 @@ static void ZstdDecompressAndThrowIfError(const void* ptrData, size_t size, void
     return make_shared<CZstd1Decoder>();
 }
 
-/*virtual*/std::shared_ptr<libCZI::IBitmapData> CZstd1Decoder::Decode(const void* ptrData, size_t size, libCZI::PixelType pixelType, uint32_t width, std::uint32_t height)
+/*virtual*/std::shared_ptr<libCZI::IBitmapData> CZstd1Decoder::Decode(const void* ptrData, size_t size, const libCZI::PixelType* pixelType, const uint32_t* width, const std::uint32_t* height)
 {
+    if (pixelType == nullptr || width == nullptr || height == nullptr)
+    {
+        throw invalid_argument("pixeltype, width and height must be specified.");
+    }
+
     const ZStd1HeaderParsingResult zStd1Header = ParseZStd1Header(static_cast<const uint8_t*>(ptrData), size);
     if (zStd1Header.headerSize == 0)
     {
@@ -65,19 +75,19 @@ static void ZstdDecompressAndThrowIfError(const void* ptrData, size_t size, void
     }
 
     if (zStd1Header.hiLoByteUnpackPreprocessing == true &&
-        (pixelType != PixelType::Gray16 && pixelType != PixelType::Bgr48))
+        (*pixelType != PixelType::Gray16 && *pixelType != PixelType::Bgr48))
     {
         stringstream ss;
-        ss << "The preprocessing \"LoHiBytePacking\" is only supported for pixeltypes \"Gray16\" or \"Bgr48\", but was requested for pixeltype \"" << Utils::PixelTypeToInformalString(pixelType) << "\".";
+        ss << "The preprocessing \"LoHiBytePacking\" is only supported for pixeltypes \"Gray16\" or \"Bgr48\", but was requested for pixeltype \"" << Utils::PixelTypeToInformalString(*pixelType) << "\".";
         throw runtime_error(ss.str());
     }
 
     return DecodeAndProcess(
         static_cast<const char*>(ptrData) + zStd1Header.headerSize,
         size - zStd1Header.headerSize,
-        pixelType,
-        width,
-        height,
+        *pixelType,
+        *width,
+        *height,
         zStd1Header.hiLoByteUnpackPreprocessing);
 }
 
@@ -93,7 +103,7 @@ ZStd1HeaderParsingResult ParseZStd1Header(const uint8_t* ptrData, size_t size)
     }
 
     // the only possible values currently are: either 1 (i. e. not chunk) or 3 (so we expect the only existing chunk-type "1", which has
-    //  a fixed size of 2 bytes
+    //  a fixed size of 2 bytes)
     if (*ptrData == 1)
     {
         // this is valid, and it means that the size of the header is 1 byte

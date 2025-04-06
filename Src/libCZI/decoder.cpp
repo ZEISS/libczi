@@ -37,7 +37,7 @@ static libCZI::PixelType PixelTypeFromJxrPixelFormat(JxrDecode::PixelFormat pixe
     return make_shared<CJxrLibDecoder>();
 }
 
-std::shared_ptr<libCZI::IBitmapData> CJxrLibDecoder::Decode(const void* ptrData, size_t size, libCZI::PixelType pixelType, uint32_t width, uint32_t height)
+std::shared_ptr<libCZI::IBitmapData> CJxrLibDecoder::Decode(const void* ptrData, size_t size, const libCZI::PixelType* pixelType, const uint32_t* width, const uint32_t* height)
 {
     std::shared_ptr<IBitmapData> bitmap;
     bool bitmap_is_locked = false;
@@ -56,19 +56,33 @@ std::shared_ptr<libCZI::IBitmapData> CJxrLibDecoder::Decode(const void* ptrData,
                     throw std::logic_error("unsupported pixel type");
                 }
 
-                if (pixel_type_from_compressed_data != pixelType)
+                if (pixelType != nullptr && pixel_type_from_compressed_data != *pixelType)
                 {
                     ostringstream ss;
-                    ss << "pixel type mismatch: expected \"" << Utils::PixelTypeToInformalString(pixelType) << "\", but got \"" << Utils::PixelTypeToInformalString(pixel_type_from_compressed_data) << "\"";
+                    ss << "pixel type mismatch: expected \"" << Utils::PixelTypeToInformalString(*pixelType) << "\", but got \"" << Utils::PixelTypeToInformalString(pixel_type_from_compressed_data) << "\"";
                     throw std::logic_error(ss.str());
                 }
 
-                if (actual_width != width || actual_height != height)
+                if (width != nullptr && actual_width != *width)
                 {
                     ostringstream ss;
-                    ss << "size mismatch: expected " << width << "x" << height << ", but got " << actual_width << "x" << actual_height;
+                    ss << "width mismatch: expected " << *width << ", but got " << actual_width;
                     throw std::logic_error(ss.str());
                 }
+
+                if (height != nullptr && actual_height != *height)
+                {
+                    ostringstream ss;
+                    ss << "height mismatch: expected " << *height << ", but got " << actual_height;
+                    throw std::logic_error(ss.str());
+                }
+
+                //if (actual_width != width || actual_height != height)
+                //{
+                //    ostringstream ss;
+                //    ss << "size mismatch: expected " << width << "x" << height << ", but got " << actual_width << "x" << actual_height;
+                //    throw std::logic_error(ss.str());
+                //}
 
                 bitmap = GetSite()->CreateBitmap(pixel_type_from_compressed_data, actual_width, actual_height);
                 const auto lock_info = bitmap->Lock();

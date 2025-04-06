@@ -20,7 +20,7 @@ TEST(JxrlibCodec, DecodeBgr24)
     const auto dec = CJxrLibDecoder::Create();
     size_t sizeEncoded; int expectedWidth, expectedHeight;
     const auto ptrEncodedData = CTestImage::GetJpgXrCompressedImage_Bgr24(&sizeEncoded, &expectedWidth, &expectedHeight);
-    const auto bmDecoded = dec->Decode(ptrEncodedData, sizeEncoded, libCZI::PixelType::Bgr24, expectedWidth, expectedHeight);
+    const auto bmDecoded = dec->IDecoder::Decode(ptrEncodedData, sizeEncoded, libCZI::PixelType::Bgr24, expectedWidth, expectedHeight);
     EXPECT_EQ((uint32_t)expectedWidth, bmDecoded->GetWidth()) << "Width is expected to be equal";
     EXPECT_EQ((uint32_t)expectedHeight, bmDecoded->GetHeight()) << "Height is expected to be equal";
     EXPECT_EQ(bmDecoded->GetPixelType(), PixelType::Bgr24) << "Not the correct pixeltype.";
@@ -37,7 +37,7 @@ TEST(JxrlibCodec, DecodeGray8)
     const auto dec = CJxrLibDecoder::Create();
     size_t sizeEncoded; int expectedWidth, expectedHeight;
     const auto ptrEncodedData = CTestImage::GetJpgXrCompressedImage_Gray8(&sizeEncoded, &expectedWidth, &expectedHeight);
-    const auto bmDecoded = dec->Decode(ptrEncodedData, sizeEncoded, libCZI::PixelType::Gray8, expectedWidth, expectedHeight);
+    const auto bmDecoded = dec->IDecoder::Decode(ptrEncodedData, sizeEncoded, libCZI::PixelType::Gray8, expectedWidth, expectedHeight);
     EXPECT_EQ(static_cast<uint32_t>(expectedWidth), bmDecoded->GetWidth()) << "Width is expected to be equal";
     EXPECT_EQ(static_cast<uint32_t>(expectedHeight), bmDecoded->GetHeight()) << "Height is expected to be equal";
     EXPECT_EQ(bmDecoded->GetPixelType(), PixelType::Gray8) << "Not the correct pixeltype.";
@@ -60,7 +60,7 @@ TEST(JxrlibCodec, TryDecodeInvalidDataExpectException)
         encoded_data.get()[i] = static_cast<uint8_t>(i);
     }
 
-    EXPECT_ANY_THROW(dec->Decode(encoded_data.get(), sizeEncoded, libCZI::PixelType::Invalid, 0, 0));
+    EXPECT_ANY_THROW(dec->IDecoder::Decode(encoded_data.get(), sizeEncoded, libCZI::PixelType::Invalid, 0, 0));
 }
 
 TEST(JxrlibCodec, CompressNonLossyAndDecompressCheckForSameContent_Bgr24)
@@ -91,7 +91,7 @@ TEST(JxrlibCodec, CompressNonLossyAndDecompressCheckForSameContent_Bgr24)
         "Encoded data is too large (larger than the original data), which is unexpected.";
 
     const auto codec = CJxrLibDecoder::Create();
-    const auto bitmap_decoded = codec->Decode(
+    const auto bitmap_decoded = codec->IDecoder::Decode(
         encodedData->GetPtr(),
         encodedData->GetSizeOfData(),
         libCZI::PixelType::Bgr24,
@@ -140,7 +140,7 @@ TEST(JxrlibCodec, CompressNonLossyAndDecompressCheckForSameContent_Gray8)
         "Encoded data is too large (larger than the original data), which is unexpected.";
 
     const auto codec = CJxrLibDecoder::Create();
-    const auto bitmap_decoded = codec->Decode(
+    const auto bitmap_decoded = codec->IDecoder::Decode(
         encodedData->GetPtr(),
         encodedData->GetSizeOfData(),
         libCZI::PixelType::Gray8,
@@ -192,7 +192,7 @@ TEST(JxrlibCodec, CompressNonLossyAndDecompressCheckForSameContent_Gray16)
         "Encoded data is too large (larger than the original data), which is unexpected.";
 
     const auto codec = CJxrLibDecoder::Create();
-    const auto bitmap_decoded = codec->Decode(
+    const auto bitmap_decoded = codec->IDecoder::Decode(
         encodedData->GetPtr(),
         encodedData->GetSizeOfData(),
         libCZI::PixelType::Gray16,
@@ -244,7 +244,7 @@ TEST(JxrlibCodec, CompressNonLossyAndDecompressCheckForSameContent_Gray32Float)
         "Encoded data is too large (larger than the original data), which is unexpected.";
 
     const auto codec = CJxrLibDecoder::Create();
-    const auto bitmap_decoded = codec->Decode(
+    const auto bitmap_decoded = codec->IDecoder::Decode(
         encodedData->GetPtr(),
         encodedData->GetSizeOfData(),
         libCZI::PixelType::Gray32Float,
@@ -298,7 +298,7 @@ TEST(JxrlibCodec, CompressNonLossyAndDecompressCheckForSameContent_Bgr48)
         "Encoded data is too large (larger than the original data), which is unexpected.";
 
     const auto codec = CJxrLibDecoder::Create();
-    const auto bitmap_decoded = codec->Decode(
+    const auto bitmap_decoded = codec->IDecoder::Decode(
         encodedData->GetPtr(),
         encodedData->GetSizeOfData(),
         libCZI::PixelType::Bgr48,
@@ -355,7 +355,7 @@ TEST(JxrlibCodec, CompressLossyAndDecompressCheckForSimilarity_Gray8)
     */
 
     const auto codec = CJxrLibDecoder::Create();
-    const auto bitmap_decoded = codec->Decode(
+    const auto bitmap_decoded = codec->IDecoder::Decode(
         encodedData->GetPtr(),
         encodedData->GetSizeOfData(),
         libCZI::PixelType::Gray8,
@@ -443,7 +443,7 @@ TEST(JxrlibCodec, CallDecoderWithInvalidArgumentsExpectException)
     const auto codec = CJxrLibDecoder::Create();
     EXPECT_THROW(
         {
-            codec->Decode(
+            codec->IDecoder::Decode(
                 encoded_data.get(),
                 kSizeOfEncodedData,
                 libCZI::PixelType::Gray8,
@@ -453,7 +453,7 @@ TEST(JxrlibCodec, CallDecoderWithInvalidArgumentsExpectException)
         exception);
     EXPECT_THROW(
         {
-            codec->Decode(
+            codec->IDecoder::Decode(
                 nullptr,
                 kSizeOfEncodedData,
                 libCZI::PixelType::Gray8,
@@ -463,7 +463,7 @@ TEST(JxrlibCodec, CallDecoderWithInvalidArgumentsExpectException)
         exception);
     EXPECT_THROW(
         {
-            codec->Decode(
+            codec->IDecoder::Decode(
                 encoded_data.get(),
                 0,
                 libCZI::PixelType::Gray8,
@@ -486,7 +486,7 @@ TEST(JxrlibCodec, CallDecoderExpectingADifferentBitmapTypeAndExpectException)
     {
         EXPECT_THROW(
             {
-                codec->Decode(
+                codec->IDecoder::Decode(
                     ptrEncodedData,
                     size_encoded_data,
                     pixel_type,

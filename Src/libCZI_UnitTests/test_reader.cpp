@@ -47,11 +47,14 @@ namespace
 
     tuple<shared_ptr<void>, size_t> CreateCziDocumentContainingOneSubblockWhichIsTooShort()
     {
+        constexpr int kBitmapWidth = 4;
+        constexpr int kBitmapHeight = 4;
+        constexpr PixelType kBitmapPixelType = PixelType::Gray8;
         auto writer = CreateCZIWriter();
         auto outStream = make_shared<CMemOutputStream>(0);
         auto spWriterInfo = make_shared<CCziWriterInfo >(GUID{ 0x1234567,0x89ab,0xcdef,{ 1,2,3,4,5,6,7,8 } });
         writer->Create(outStream, spWriterInfo);
-        auto bitmap = CreateTestBitmap(PixelType::Gray8, 4, 4);
+        //auto bitmap = CreateTestBitmap(PixelType::Gray8, 4, 4);
         uint8_t data_too_short[11] = { 0,1,2,3,4,5,6,7,8,9,10 };
         AddSubBlockInfoMemPtr addSbBlkInfo;
         addSbBlkInfo.Clear();
@@ -60,14 +63,129 @@ namespace
         addSbBlkInfo.mIndex = 0;
         addSbBlkInfo.x = 0;
         addSbBlkInfo.y = 0;
-        addSbBlkInfo.logicalWidth = bitmap->GetWidth();
-        addSbBlkInfo.logicalHeight = bitmap->GetHeight();
-        addSbBlkInfo.physicalWidth = bitmap->GetWidth();
-        addSbBlkInfo.physicalHeight = bitmap->GetHeight();
-        addSbBlkInfo.PixelType = bitmap->GetPixelType();
+        addSbBlkInfo.logicalWidth = kBitmapWidth;// bitmap->GetWidth();
+        addSbBlkInfo.logicalHeight = kBitmapHeight;// bitmap->GetHeight();
+        addSbBlkInfo.physicalWidth = kBitmapWidth;// bitmap->GetWidth();
+        addSbBlkInfo.physicalHeight = kBitmapHeight;// bitmap->GetHeight();
+        addSbBlkInfo.PixelType = kBitmapPixelType;// bitmap->GetPixelType();
         addSbBlkInfo.ptrData = data_too_short;
         addSbBlkInfo.dataSize = sizeof(data_too_short);
         addSbBlkInfo.SetCompressionMode(CompressionMode::UnCompressed);
+        writer->SyncAddSubBlock(addSbBlkInfo);
+        writer->Close();
+
+        size_t size_data;
+        const auto data = outStream->GetCopy(&size_data);
+        return make_tuple(data, size_data);
+    }
+
+    tuple<shared_ptr<void>, size_t> CreateCziDocumentContainingOneSubblockJpgXrCompressedWhichIsTooSmall()
+    {
+        constexpr int kBitmapWidth = 4;
+        constexpr int kBitmapHeight = 4;
+        constexpr PixelType kBitmapPixelType = PixelType::Gray8;
+
+        auto writer = CreateCZIWriter();
+        auto outStream = make_shared<CMemOutputStream>(0);
+        auto spWriterInfo = make_shared<CCziWriterInfo >(GUID{ 0x1234567,0x89ab,0xcdef,{ 1,2,3,4,5,6,7,8 } });
+        writer->Create(outStream, spWriterInfo);
+        auto bitmap = CreateTestBitmap(PixelType::Gray8, 2, 3);
+        {
+            ScopedBitmapLockerSP lockBm{ bitmap };
+            uint8_t* bitmap_pointer = reinterpret_cast<uint8_t*>(lockBm.ptrDataRoi);
+            bitmap_pointer[0 + 0 * lockBm.stride] = 1;
+            bitmap_pointer[1 + 0 * lockBm.stride] = 2;
+            bitmap_pointer[0 + 1 * lockBm.stride] = 3;
+            bitmap_pointer[1 + 1 * lockBm.stride] = 4;
+            bitmap_pointer[0 + 2 * lockBm.stride] = 5;
+            bitmap_pointer[1 + 2 * lockBm.stride] = 6;
+        }
+
+        shared_ptr<IMemoryBlock> encodedData;
+        {
+            const ScopedBitmapLockerSP lck{ bitmap };
+            encodedData = JxrLibCompress::Compress(
+                bitmap->GetPixelType(),
+                bitmap->GetWidth(),
+                bitmap->GetHeight(),
+                lck.stride,
+                lck.ptrDataRoi,
+                nullptr);
+        }
+        
+        AddSubBlockInfoMemPtr addSbBlkInfo;
+        addSbBlkInfo.Clear();
+        addSbBlkInfo.coordinate = CDimCoordinate::Parse("C0");
+        addSbBlkInfo.mIndexValid = true;
+        addSbBlkInfo.mIndex = 0;
+        addSbBlkInfo.x = 0;
+        addSbBlkInfo.y = 0;
+        addSbBlkInfo.logicalWidth = kBitmapWidth;
+        addSbBlkInfo.logicalHeight = kBitmapHeight;
+        addSbBlkInfo.physicalWidth = kBitmapWidth;
+        addSbBlkInfo.physicalHeight = kBitmapHeight;
+        addSbBlkInfo.PixelType = kBitmapPixelType;
+        addSbBlkInfo.ptrData = encodedData->GetPtr();
+        addSbBlkInfo.dataSize = encodedData->GetSizeOfData();
+        addSbBlkInfo.SetCompressionMode(CompressionMode::JpgXr);
+        writer->SyncAddSubBlock(addSbBlkInfo);
+        writer->Close();
+
+        size_t size_data;
+        const auto data = outStream->GetCopy(&size_data);
+        return make_tuple(data, size_data);
+    }
+
+    tuple<shared_ptr<void>, size_t> CreateCziDocumentContainingOneSubblockJpgXrCompressedWhichIsTooLarge()
+    {
+        constexpr int kBitmapWidth = 4;
+        constexpr int kBitmapHeight = 4;
+        constexpr PixelType kBitmapPixelType = PixelType::Gray8;
+
+        auto writer = CreateCZIWriter();
+        auto outStream = make_shared<CMemOutputStream>(0);
+        auto spWriterInfo = make_shared<CCziWriterInfo >(GUID{ 0x1234567,0x89ab,0xcdef,{ 1,2,3,4,5,6,7,8 } });
+        writer->Create(outStream, spWriterInfo);
+        auto bitmap = CreateTestBitmap(PixelType::Gray8, 5, 5);
+        {
+            ScopedBitmapLockerSP lockBm{ bitmap };
+            uint8_t* bitmap_pointer = reinterpret_cast<uint8_t*>(lockBm.ptrDataRoi);
+            for (int y = 0; y < 5; ++y)
+            {
+                for (int x = 0; x < 5; ++x)
+                {
+                    bitmap_pointer[x + y * lockBm.stride] = static_cast<uint8_t>(1+ x + y * 5);
+                }
+            }
+        }
+
+        shared_ptr<IMemoryBlock> encodedData;
+        {
+            const ScopedBitmapLockerSP lck{ bitmap };
+            encodedData = JxrLibCompress::Compress(
+                bitmap->GetPixelType(),
+                bitmap->GetWidth(),
+                bitmap->GetHeight(),
+                lck.stride,
+                lck.ptrDataRoi,
+                nullptr);
+        }
+
+        AddSubBlockInfoMemPtr addSbBlkInfo;
+        addSbBlkInfo.Clear();
+        addSbBlkInfo.coordinate = CDimCoordinate::Parse("C0");
+        addSbBlkInfo.mIndexValid = true;
+        addSbBlkInfo.mIndex = 0;
+        addSbBlkInfo.x = 0;
+        addSbBlkInfo.y = 0;
+        addSbBlkInfo.logicalWidth = kBitmapWidth;
+        addSbBlkInfo.logicalHeight = kBitmapHeight;
+        addSbBlkInfo.physicalWidth = kBitmapWidth;
+        addSbBlkInfo.physicalHeight = kBitmapHeight;
+        addSbBlkInfo.PixelType = kBitmapPixelType;
+        addSbBlkInfo.ptrData = encodedData->GetPtr();
+        addSbBlkInfo.dataSize = encodedData->GetSizeOfData();
+        addSbBlkInfo.SetCompressionMode(CompressionMode::JpgXr);
         writer->SyncAddSubBlock(addSbBlkInfo);
         writer->Close();
 
@@ -447,4 +565,121 @@ TEST(CziReader, ReadSubBlockThatHasTooShortPayloadAndCheckResolutionProtocol)
     EXPECT_EQ(bitmap_pointer[2 + 3 * locked_bitmap.stride], 0);
     EXPECT_EQ(bitmap_pointer[3 + 3 * locked_bitmap.stride], 0);
     bitmap->Unlock();
+}
+
+TEST(CziReader, ReadSubBlockThatHasTooLargePayloadAndCheckResolutionProtocol)
+{
+    // arrange
+    auto test_czi = CreateCziDocumentContainingOneSubblockJpgXrCompressedWhichIsTooLarge();
+
+    // act
+    auto input_stream = CreateStreamFromMemory(get<0>(test_czi), get<1>(test_czi));
+    const auto reader = CreateCZIReader();
+    reader->Open(input_stream);
+
+    // assert
+    const auto sub_block = reader->ReadSubBlock(0);
+
+    CreateBitmapOptions options;
+    options.handle_uncompressed_data_size_mismatch = true;
+    auto bitmap = sub_block->CreateBitmap(&options);
+    ASSERT_EQ(bitmap->GetWidth(), 4) << "Incorrect width";
+    ASSERT_EQ(bitmap->GetHeight(), 4) << "Incorrect height";
+    ASSERT_EQ(bitmap->GetPixelType(), PixelType::Gray8) << "Incorrect pixel type";
+    auto locked_bitmap = bitmap->Lock();
+    const uint8_t* bitmap_pointer = static_cast<const uint8_t*>(locked_bitmap.ptrDataRoi);
+    EXPECT_EQ(bitmap_pointer[0 + 0 * locked_bitmap.stride], 1);
+    EXPECT_EQ(bitmap_pointer[1 + 0 * locked_bitmap.stride], 2);
+    EXPECT_EQ(bitmap_pointer[2 + 0 * locked_bitmap.stride], 3);
+    EXPECT_EQ(bitmap_pointer[3 + 0 * locked_bitmap.stride], 4);
+    EXPECT_EQ(bitmap_pointer[0 + 1 * locked_bitmap.stride], 6);
+    EXPECT_EQ(bitmap_pointer[1 + 1 * locked_bitmap.stride], 7);
+    EXPECT_EQ(bitmap_pointer[2 + 1 * locked_bitmap.stride], 8);
+    EXPECT_EQ(bitmap_pointer[3 + 1 * locked_bitmap.stride], 9);
+    EXPECT_EQ(bitmap_pointer[0 + 2 * locked_bitmap.stride], 11); 
+    EXPECT_EQ(bitmap_pointer[1 + 2 * locked_bitmap.stride], 12);
+    EXPECT_EQ(bitmap_pointer[2 + 2 * locked_bitmap.stride], 13);
+    EXPECT_EQ(bitmap_pointer[3 + 2 * locked_bitmap.stride], 14);
+    EXPECT_EQ(bitmap_pointer[0 + 3 * locked_bitmap.stride], 16); 
+    EXPECT_EQ(bitmap_pointer[1 + 3 * locked_bitmap.stride], 17);
+    EXPECT_EQ(bitmap_pointer[2 + 3 * locked_bitmap.stride], 18);
+    EXPECT_EQ(bitmap_pointer[3 + 3 * locked_bitmap.stride], 19);
+    bitmap->Unlock();
+}
+
+TEST(CziReader, ReadSubBlockWithJpxrCompressionTooSmallAndCheckResolutionProtocol)
+{
+    // arrange
+    auto test_czi = CreateCziDocumentContainingOneSubblockJpgXrCompressedWhichIsTooSmall();
+
+    // act
+    auto input_stream = CreateStreamFromMemory(get<0>(test_czi), get<1>(test_czi));
+    const auto reader = CreateCZIReader();
+    reader->Open(input_stream);
+
+    // assert
+    const auto sub_block = reader->ReadSubBlock(0);
+
+    CreateBitmapOptions options;
+    options.handle_jpgxr_bitmap_mismatch = true;
+    auto bitmap = sub_block->CreateBitmap(&options);
+    ASSERT_EQ(bitmap->GetWidth(), 4) << "Incorrect width";
+    ASSERT_EQ(bitmap->GetHeight(), 4) << "Incorrect height";
+    ASSERT_EQ(bitmap->GetPixelType(), PixelType::Gray8) << "Incorrect pixel type";
+    auto locked_bitmap = bitmap->Lock();
+    const uint8_t* bitmap_pointer = static_cast<const uint8_t*>(locked_bitmap.ptrDataRoi);
+    EXPECT_EQ(bitmap_pointer[0 + 0 * locked_bitmap.stride], 1);
+    EXPECT_EQ(bitmap_pointer[1 + 0 * locked_bitmap.stride], 2);
+    EXPECT_EQ(bitmap_pointer[2 + 0 * locked_bitmap.stride], 0);
+    EXPECT_EQ(bitmap_pointer[3 + 0 * locked_bitmap.stride], 0);
+    EXPECT_EQ(bitmap_pointer[0 + 1 * locked_bitmap.stride], 3);
+    EXPECT_EQ(bitmap_pointer[1 + 1 * locked_bitmap.stride], 4);
+    EXPECT_EQ(bitmap_pointer[2 + 1 * locked_bitmap.stride], 0);
+    EXPECT_EQ(bitmap_pointer[3 + 1 * locked_bitmap.stride], 0);
+    EXPECT_EQ(bitmap_pointer[0 + 2 * locked_bitmap.stride], 5); 
+    EXPECT_EQ(bitmap_pointer[1 + 2 * locked_bitmap.stride], 6);
+    EXPECT_EQ(bitmap_pointer[2 + 2 * locked_bitmap.stride], 0);
+    EXPECT_EQ(bitmap_pointer[3 + 2 * locked_bitmap.stride], 0);
+    EXPECT_EQ(bitmap_pointer[0 + 3 * locked_bitmap.stride], 0); 
+    EXPECT_EQ(bitmap_pointer[1 + 3 * locked_bitmap.stride], 0);
+    EXPECT_EQ(bitmap_pointer[2 + 3 * locked_bitmap.stride], 0);
+    EXPECT_EQ(bitmap_pointer[3 + 3 * locked_bitmap.stride], 0);
+    bitmap->Unlock();
+}
+
+TEST(CziReader, ReadSubBlockWithJpxrCompressionTooSmallDisableResolutionAndCheckException)
+{
+    // arrange
+    auto test_czi = CreateCziDocumentContainingOneSubblockJpgXrCompressedWhichIsTooSmall();
+
+    // act
+    auto input_stream = CreateStreamFromMemory(get<0>(test_czi), get<1>(test_czi));
+    const auto reader = CreateCZIReader();
+    reader->Open(input_stream);
+
+    // assert
+    const auto sub_block = reader->ReadSubBlock(0);
+
+    CreateBitmapOptions options;
+    options.handle_jpgxr_bitmap_mismatch = false;
+    EXPECT_THROW(sub_block->CreateBitmap(&options), logic_error);
+}
+
+
+TEST(CziReader, ReadSubBlockWithJpxrCompressionTooLargeDisableResolutionAndCheckException)
+{
+    // arrange
+    auto test_czi = CreateCziDocumentContainingOneSubblockJpgXrCompressedWhichIsTooLarge();
+
+    // act
+    auto input_stream = CreateStreamFromMemory(get<0>(test_czi), get<1>(test_czi));
+    const auto reader = CreateCZIReader();
+    reader->Open(input_stream);
+
+    // assert
+    const auto sub_block = reader->ReadSubBlock(0);
+
+    CreateBitmapOptions options;
+    options.handle_jpgxr_bitmap_mismatch = false;
+    EXPECT_THROW(sub_block->CreateBitmap(&options), logic_error);
 }

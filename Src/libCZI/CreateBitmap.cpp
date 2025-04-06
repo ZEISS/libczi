@@ -11,13 +11,57 @@
 
 using namespace libCZI;
 
-static std::shared_ptr<libCZI::IBitmapData> CreateBitmapFromSubBlock_JpgXr(ISubBlock* subBlk)
+static std::shared_ptr<libCZI::IBitmapData> CreateBitmapFromSubBlock_JpgXr(ISubBlock* subBlk, bool handle_jxr_bitmap_mismatch)
 {
     auto dec = GetSite()->GetDecoder(ImageDecoderType::JPXR_JxrLib, nullptr);
-    const void* ptr; size_t size;
+    const void* ptr;
+    size_t size;
     subBlk->DangerousGetRawData(ISubBlock::MemBlkType::Data, ptr, size);
-    SubBlockInfo subBlockInfo = subBlk->GetSubBlockInfo();
-    return dec->Decode(ptr, size, subBlockInfo.pixelType, subBlockInfo.physicalSize.w, subBlockInfo.physicalSize.h);
+    const SubBlockInfo& sub_block_info = subBlk->GetSubBlockInfo();
+
+    if (!handle_jxr_bitmap_mismatch)
+    {
+        return dec->Decode(ptr, size, sub_block_info.pixelType, sub_block_info.physicalSize.w, sub_block_info.physicalSize.h);
+    }
+    else
+    {
+        // This means - according to the "resolution protocol", if there is a mismatch between the bitmap encoded as JpgXR and the
+        //  description in the subblock, we have to crop or pad the bitmap to the size described in the subblock.
+        // Note: for the time being, we do not support dealing with a different pixel type, so if there is a mismatch with it, we throw an exception
+        auto decoded_bitmap = dec->Decode(ptr, size, &sub_block_info.pixelType, nullptr, nullptr);
+        if (decoded_bitmap->GetWidth() == sub_block_info.physicalSize.w && decoded_bitmap->GetHeight() == sub_block_info.physicalSize.h)
+        {
+            return decoded_bitmap;
+        }
+        else
+        {
+            // ok, we have a discrepancy between the size of the bitmap and the size described in the subblock, so let's crop or pad the bitmap
+
+            // create a bitmap of the size described in the subblock
+            auto adjusted_bitmap = CStdBitmapData::Create(sub_block_info.pixelType, sub_block_info.physicalSize.w, sub_block_info.physicalSize.w);
+            CBitmapOperations::Fill(adjusted_bitmap.get(), RgbFloatColor{ 0,0,0 });
+            auto adjusted_bitmap_lock = adjusted_bitmap->Lock();
+            auto decoded_bitmap_lock = decoded_bitmap->Lock();
+            CBitmapOperations::CopyWithOffsetInfo copy_info;
+            copy_info.xOffset = 0;
+            copy_info.yOffset = 0;
+            copy_info.srcPixelType = sub_block_info.pixelType;
+            copy_info.srcPtr = decoded_bitmap_lock.ptrDataRoi;
+            copy_info.srcStride = decoded_bitmap_lock.stride;
+            copy_info.srcWidth = decoded_bitmap->GetWidth();
+            copy_info.srcHeight = decoded_bitmap->GetHeight();
+            copy_info.dstPixelType = sub_block_info.pixelType;
+            copy_info.dstPtr = adjusted_bitmap_lock.ptrDataRoi;
+            copy_info.dstStride = adjusted_bitmap_lock.stride;
+            copy_info.dstWidth = adjusted_bitmap->GetWidth();
+            copy_info.dstHeight = adjusted_bitmap->GetHeight();
+            copy_info.drawTileBorder = false;
+            CBitmapOperations::CopyWithOffset(copy_info);
+            adjusted_bitmap->Unlock();
+            decoded_bitmap->Unlock();
+            return adjusted_bitmap;
+        }
+    }
 }
 
 static std::shared_ptr<libCZI::IBitmapData> CreateBitmapFromSubBlock_ZStd0(ISubBlock* subBlk)
@@ -49,7 +93,6 @@ static std::shared_ptr<libCZI::IBitmapData> CreateBitmapFromSubBlock_Uncompresse
 
     size_t size;
     auto sub_block_data = subBlk->GetRawData(ISubBlock::MemBlkType::Data, &size);
-    //CSharedPtrAllocator sharedPtrAllocator(subBlk->GetRawData(ISubBlock::MemBlkType::Data, &size));
 
     if (expected_size <= size)
     {
@@ -111,42 +154,6 @@ static std::shared_ptr<libCZI::IBitmapData> CreateBitmapFromSubBlock_Uncompresse
 
         return bitmap;
     }
-/*
-    if (handle_uncompressed_data_size_mismatch)
-    {
-        
-    }
-    else
-    {
-        size_t size;
-        CSharedPtrAllocator sharedPtrAllocator(subBlk->GetRawData(ISubBlock::MemBlkType::Data, &size));
-
-      //  const auto& sbBlkInfo = subBlk->GetSubBlockInfo();
-
-        // The stride with an uncompressed bitmap in CZI is exactly the linesize.
-        //const std::uint32_t stride = sbBlkInfo.physicalSize.w * CziUtils::GetBytesPerPel(sbBlkInfo.pixelType);
-        //if (static_cast<size_t>(stride) * sbBlkInfo.physicalSize.h > size)
-        if (expected_size > size)
-        {
-            throw std::logic_error("insufficient size of subblock");
-        }
-
-        auto sb = CBitmapData<CSharedPtrAllocator>::Create(
-            sharedPtrAllocator,
-            sub_block_info.pixelType,
-            sub_block_info.physicalSize.w,
-            sub_block_info.physicalSize.h,
-            stride);
-
-#if LIBCZI_ISBIGENDIANHOST
-        if (!CziUtils::IsPixelTypeEndianessAgnostic(subBlk->GetSubBlockInfo().pixelType))
-        {
-            return CBitmapOperations::ConvertToBigEndian(sb.get());
-        }
-#endif
-
-        return sb;
-    }*/
 }
 
 std::shared_ptr<libCZI::IBitmapData> libCZI::CreateBitmapFromSubBlock(ISubBlock* subBlk, const CreateBitmapOptions* options)
@@ -154,7 +161,7 @@ std::shared_ptr<libCZI::IBitmapData> libCZI::CreateBitmapFromSubBlock(ISubBlock*
     switch (subBlk->GetSubBlockInfo().GetCompressionMode())
     {
     case CompressionMode::JpgXr:
-        return CreateBitmapFromSubBlock_JpgXr(subBlk);
+        return CreateBitmapFromSubBlock_JpgXr(subBlk, options != nullptr ? options->handle_jpgxr_bitmap_mismatch : true);
     case CompressionMode::Zstd0:
         return CreateBitmapFromSubBlock_ZStd0(subBlk);
     case CompressionMode::Zstd1:
