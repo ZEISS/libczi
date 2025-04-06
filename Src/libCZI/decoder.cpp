@@ -77,13 +77,6 @@ std::shared_ptr<libCZI::IBitmapData> CJxrLibDecoder::Decode(const void* ptrData,
                     throw std::logic_error(ss.str());
                 }
 
-                //if (actual_width != width || actual_height != height)
-                //{
-                //    ostringstream ss;
-                //    ss << "size mismatch: expected " << width << "x" << height << ", but got " << actual_width << "x" << actual_height;
-                //    throw std::logic_error(ss.str());
-                //}
-
                 bitmap = GetSite()->CreateBitmap(pixel_type_from_compressed_data, actual_width, actual_height);
                 const auto lock_info = bitmap->Lock();
                 bitmap_is_locked = true;

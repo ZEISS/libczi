@@ -27,9 +27,10 @@ static std::shared_ptr<libCZI::IBitmapData> CreateBitmapFromSubBlock_JpgXr(ISubB
     {
         // This means - according to the "resolution protocol", if there is a mismatch between the bitmap encoded as JpgXR and the
         //  description in the subblock, we have to crop or pad the bitmap to the size described in the subblock.
-        // Note: for the time being, we do not support dealing with a different pixel type, so if there is a mismatch with it, we throw an exception
-        auto decoded_bitmap = dec->Decode(ptr, size, &sub_block_info.pixelType, nullptr, nullptr);
-        if (decoded_bitmap->GetWidth() == sub_block_info.physicalSize.w && decoded_bitmap->GetHeight() == sub_block_info.physicalSize.h)
+        auto decoded_bitmap = dec->Decode(ptr, size, nullptr, nullptr, nullptr);
+        if (decoded_bitmap->GetWidth() == sub_block_info.physicalSize.w && 
+            decoded_bitmap->GetHeight() == sub_block_info.physicalSize.h && 
+            decoded_bitmap->GetPixelType() == sub_block_info.pixelType)
         {
             return decoded_bitmap;
         }
@@ -45,7 +46,7 @@ static std::shared_ptr<libCZI::IBitmapData> CreateBitmapFromSubBlock_JpgXr(ISubB
             CBitmapOperations::CopyWithOffsetInfo copy_info;
             copy_info.xOffset = 0;
             copy_info.yOffset = 0;
-            copy_info.srcPixelType = sub_block_info.pixelType;
+            copy_info.srcPixelType = decoded_bitmap->GetPixelType();
             copy_info.srcPtr = decoded_bitmap_lock.ptrDataRoi;
             copy_info.srcStride = decoded_bitmap_lock.stride;
             copy_info.srcWidth = decoded_bitmap->GetWidth();
