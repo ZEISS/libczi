@@ -35,6 +35,106 @@ static void ZstdDecompressAndThrowIfError(const void* ptrData, size_t size, void
 static bool ContainsToken(const char* str, const char* token);
 static bool IsTokenMatch(const char* start, const char* token, size_t token_len);
 
+namespace
+{
+    shared_ptr<libCZI::IBitmapData> DecodeRequireCorrectSize(const void* ptrData, size_t size, libCZI::PixelType pixelType, uint32_t width, uint32_t height)
+    {
+        // calculate the expected size of the uncompressed data
+        size_t stride = width * static_cast<size_t>(Utils::GetBytesPerPixel(pixelType));
+        size_t expectedSize = height * stride;
+        const auto zstd_frame_content_size = ZSTD_getFrameContentSize(ptrData, size);
+        if (zstd_frame_content_size == ZSTD_CONTENTSIZE_ERROR)
+        {
+            throw runtime_error("Zstd-compressed data is invalid.");
+        }
+        else if (zstd_frame_content_size == ZSTD_CONTENTSIZE_UNKNOWN)
+        {
+            throw runtime_error("Zstd-compressed data is invalid.");
+        }
+
+        if (zstd_frame_content_size != expectedSize)
+        {
+            stringstream ss;
+            ss << "Zstd-compressed data has unexpected size. Expected: " << expectedSize << ", actual: " << zstd_frame_content_size;
+            throw runtime_error(ss.str());
+        }
+
+        auto bitmap = CStdBitmapData::Create(pixelType, width, height, stride);
+        auto bmLckInfo = libCZI::ScopedBitmapLockerSP(bitmap);
+        const size_t decompressedSize = ZSTD_decompress(bmLckInfo.ptrDataRoi, expectedSize, ptrData, size);
+        if (ZSTD_isError(decompressedSize))
+        {
+            stringstream ss;
+            ss << "Zstd-decompression failed with error: " << ZSTD_getErrorName(decompressedSize);
+            throw runtime_error(ss.str());
+        }
+    }
+
+    shared_ptr<libCZI::IBitmapData> DecodeAndHandleSizeMismatch(const void* ptrData, size_t size, libCZI::PixelType pixelType, uint32_t width, uint32_t height)
+    {
+        // calculate the expected size of the uncompressed data
+        size_t stride = width * static_cast<size_t>(Utils::GetBytesPerPixel(pixelType));
+        size_t expectedSize = height * stride;
+        const auto zstd_frame_content_size = ZSTD_getFrameContentSize(ptrData, size);
+        if (zstd_frame_content_size == ZSTD_CONTENTSIZE_ERROR)
+        {
+            throw runtime_error("Zstd-compressed data is invalid.");
+        }
+        else if (zstd_frame_content_size == ZSTD_CONTENTSIZE_UNKNOWN)
+        {
+            throw runtime_error("Zstd-compressed data is invalid.");
+        }
+
+        auto bitmap = CStdBitmapData::Create(pixelType, width, height, stride);
+        if (zstd_frame_content_size == expectedSize)
+        {
+            // sizes match, so we can decode normally
+            auto bmLckInfo = libCZI::ScopedBitmapLockerSP(bitmap);
+            size_t decompressedSize = ZSTD_decompress(bmLckInfo.ptrDataRoi, expectedSize, ptrData, size);
+            return bitmap;
+        }
+        else if (zstd_frame_content_size < expectedSize)
+        {
+            // sizes mismatch, and the decoded size is less than expected - so we need to decode and then fill up with zeroes
+            auto bmLckInfo = libCZI::ScopedBitmapLockerSP(bitmap);
+            size_t decompressedSize = ZSTD_decompress(bmLckInfo.ptrDataRoi, zstd_frame_content_size, ptrData, size);
+            if (ZSTD_isError(decompressedSize))
+            {
+                stringstream ss;
+                ss << "Zstd-decompression failed with error: " << ZSTD_getErrorName(decompressedSize);
+                throw runtime_error(ss.str());
+            }
+
+            // fill up the rest with zeroes
+            memset(static_cast<uint8_t*>(bmLckInfo.ptrDataRoi) + decompressedSize, 0, expectedSize - decompressedSize);
+            return bitmap;
+        }
+        else
+        {
+            // sizes mismatch, and the decoded size is larger than expected - we need to decode to a temporary buffer, and
+            // copy from there into the bitmap
+            unique_ptr<void, decltype(&free)> temporary_buffer(malloc(zstd_frame_content_size), free);
+            if (temporary_buffer == nullptr)
+            {
+                throw runtime_error("Failed to allocate temporary buffer for Zstd-decompression.");
+            }
+
+            size_t decompressedSize = ZSTD_decompress(temporary_buffer.get(), zstd_frame_content_size, ptrData, size);
+            if (ZSTD_isError(decompressedSize))
+            {
+                stringstream ss;
+                ss << "Zstd-decompression failed with error: " << ZSTD_getErrorName(decompressedSize);
+                throw runtime_error(ss.str());
+            }
+
+            auto bmLckInfo = libCZI::ScopedBitmapLockerSP(bitmap);
+            memcpy(bmLckInfo.ptrDataRoi, temporary_buffer.get(), expectedSize);
+
+            return bitmap;
+        }
+    }
+}
+
 /*static*/std::shared_ptr<CZstd0Decoder> CZstd0Decoder::Create()
 {
     return make_shared<CZstd0Decoder>();
@@ -49,7 +149,11 @@ static bool IsTokenMatch(const char* start, const char* token, size_t token_len)
         throw invalid_argument("pixeltype, width and height must be specified.");
     }
 
-    return DecodeAndProcessNoHiLoByteUnpacking(ptrData, size, *pixelType, *width, *height);
+    const bool handle_data_size_mismatch = ContainsToken(additional_arguments, kOption_handle_data_size_mismatch);
+    return handle_data_size_mismatch ?
+        DecodeAndHandleSizeMismatch(ptrData, size, *pixelType, *width, *height) :
+        DecodeRequireCorrectSize(ptrData, size, *pixelType, *width, *height);
+    //    return DecodeAndProcessNoHiLoByteUnpacking(ptrData, size, *pixelType, *width, *height, handle_data_size_mismatch);
 }
 
 /*static*/std::shared_ptr<CZstd1Decoder> CZstd1Decoder::Create()

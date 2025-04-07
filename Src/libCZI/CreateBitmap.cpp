@@ -76,8 +76,8 @@ static std::shared_ptr<libCZI::IBitmapData> CreateBitmapFromSubBlock_ZStd0(ISubB
                     ptr, 
                     size, 
                     subBlockInfo.pixelType, 
-                subBlockInfo.physicalSize.w, 
-                subBlockInfo.physicalSize.h, 
+                    subBlockInfo.physicalSize.w, 
+                    subBlockInfo.physicalSize.h, 
                     handle_zstd_data_size_mismatch ? CZstd0Decoder::kOption_handle_data_size_mismatch : nullptr);
 }
 

@@ -902,7 +902,7 @@ TEST(CziReader, ReadSubBlockWithZstd0CompressionTooSmallDisableResolutionAndChec
 
     CreateBitmapOptions options;
     options.handle_zstd_data_size_mismatch = false;
-    EXPECT_THROW(sub_block->CreateBitmap(&options), logic_error);
+    EXPECT_THROW(sub_block->CreateBitmap(&options), exception);
 }
 
 TEST(CziReader, ReadSubBlockWithZstd0CompressionTooLargeDisableResolutionAndCheckException)
@@ -920,5 +920,76 @@ TEST(CziReader, ReadSubBlockWithZstd0CompressionTooLargeDisableResolutionAndChec
 
     CreateBitmapOptions options;
     options.handle_zstd_data_size_mismatch = false;
-    EXPECT_THROW(sub_block->CreateBitmap(&options), logic_error);
+    EXPECT_THROW(sub_block->CreateBitmap(&options), exception);
+}
+
+TEST(CziReader, ReadSubBlockWithZstd0CompressionTooSmallDisableResolutionAndCheckResolutionProtocol)
+{
+    // arrange
+    auto test_czi = CreateCziDocumentContainingOneSubblockZstd0CompressedWhichIsTooSmall();
+
+    // act
+    auto input_stream = CreateStreamFromMemory(get<0>(test_czi), get<1>(test_czi));
+    const auto reader = CreateCZIReader();
+    reader->Open(input_stream);
+
+    // assert
+    const auto sub_block = reader->ReadSubBlock(0);
+
+    CreateBitmapOptions options;
+    options.handle_zstd_data_size_mismatch = true;
+    auto bitmap = sub_block->CreateBitmap(&options);
+    ASSERT_EQ(bitmap->GetWidth(), 4) << "Incorrect width";
+    ASSERT_EQ(bitmap->GetHeight(), 4) << "Incorrect height";
+    ASSERT_EQ(bitmap->GetPixelType(), PixelType::Gray8) << "Incorrect pixel type";
+
+    ScopedBitmapLockerSP locked_bitmap{ bitmap };
+    const uint8_t* bitmap_pointer = static_cast<uint8_t*>(locked_bitmap.ptrDataRoi);
+    EXPECT_EQ(bitmap_pointer[0 + 0 * locked_bitmap.stride], 1);
+    EXPECT_EQ(bitmap_pointer[1 + 0 * locked_bitmap.stride], 2);
+    EXPECT_EQ(bitmap_pointer[2 + 0 * locked_bitmap.stride], 3);
+    EXPECT_EQ(bitmap_pointer[3 + 0 * locked_bitmap.stride], 4);
+    EXPECT_EQ(bitmap_pointer[0 + 1 * locked_bitmap.stride], 5);
+    EXPECT_EQ(bitmap_pointer[1 + 1 * locked_bitmap.stride], 6);
+
+    // and the remainder has to be zero-filled
+    for (int y = 1; y < 4; ++y)
+    {
+        bitmap_pointer = static_cast<const uint8_t*>(locked_bitmap.ptrDataRoi) + static_cast<size_t>(y) * locked_bitmap.stride;
+        for (int x = y == 1 ? 2 : 0; x < 4; ++x)
+        {
+            EXPECT_EQ(bitmap_pointer[x], 0);
+        }
+    }
+}
+
+TEST(CziReader, ReadSubBlockWithZstd0CompressionTooLargeDisableResolutionAndCheckResolutionProtocol)
+{
+    // arrange
+    auto test_czi = CreateCziDocumentContainingOneSubblockZstd0CompressedWhichIsTooLarge();
+
+    // act
+    auto input_stream = CreateStreamFromMemory(get<0>(test_czi), get<1>(test_czi));
+    const auto reader = CreateCZIReader();
+    reader->Open(input_stream);
+
+    // assert
+    const auto sub_block = reader->ReadSubBlock(0);
+
+    CreateBitmapOptions options;
+    options.handle_zstd_data_size_mismatch = true;
+    auto bitmap = sub_block->CreateBitmap(&options);
+    ASSERT_EQ(bitmap->GetWidth(), 4) << "Incorrect width";
+    ASSERT_EQ(bitmap->GetHeight(), 4) << "Incorrect height";
+    ASSERT_EQ(bitmap->GetPixelType(), PixelType::Gray8) << "Incorrect pixel type";
+
+    ScopedBitmapLockerSP locked_bitmap{ bitmap };
+    for (int y = 0; y < 4; ++y)
+    {
+        const uint8_t* bitmap_pointer = static_cast<const uint8_t*>(locked_bitmap.ptrDataRoi) + static_cast<size_t>(y) * locked_bitmap.stride;
+        for (int x = 0; x < 4; ++x)
+        {
+            EXPECT_EQ(bitmap_pointer[x], y * 4 + x + 1);
+        }
+    }
 }
