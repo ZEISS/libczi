@@ -447,7 +447,7 @@ TEST(CziReader, CheckThatSubBlockInfoFromSubBlockHeaderIsUsedIfConfiguredNoExcep
 
     // assert
 
-    // now, we expect that we get the information from the subblock-directory
+    // now, we expect that we get the information from the sub-block header
     const auto sub_block_info = sub_block->GetSubBlockInfo();
     EXPECT_EQ(sub_block_info.pixelType, PixelType::Gray16) << "Incorrect behavior, this information is to be retrieved from sub-block header";
     EXPECT_EQ(sub_block_info.physicalSize.w, 5) << "Incorrect behavior, this information is to be retrieved from sub-block header";
