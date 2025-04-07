@@ -687,14 +687,22 @@ namespace libCZI
         /// This structure gathers the settings for controlling the 'Open' operation of the CZIReader-class.
         struct LIBCZI_API OpenOptions
         {
-            /// \enum   SubBlockDirectoryInfoPolicy
-            ///
-            /// \brief  Values that represent sub block directory Information policies
+            /// This enum is used to specify the policy which information is considered authoritative (in the description
+            /// of a sub-block) - either the information in the sub-block directory or in the sub-block header. Also, it
+            /// controls how to handle a discrepancy here - either throw an exception if a discrepancy is encountered or ignore
+            /// a discrepancy (and go with the respective information for decoding a bitmap as is).
+            /// Note that the values defined here are used to define a bit-field. The first bit (bit 0) is used to
+            /// distinguish between sub-block-directory precedence and sub-block-header precedence. The value 'PrecedenceMask'
+            /// is used to mask this bit. Bit 7 is used to indicate whether a discrepancy is to be ignored or whether an error
+            /// is to be reported.
+            /// Historically, libCZI used to give precedence fo the sub-block header information, and it did not report a discrepancy.
             enum class SubBlockDirectoryInfoPolicy : std::uint8_t
             {
                 SubBlockDirectoryPrecedence = 0, ///< The sub-block-directory information is used for the sub-blocks.
                 SubBlockHeaderPrecedence = 1,    ///< The sub-block information is used for the sub-blocks.
-                IgnoreDiscrepancy = 0x80
+                PrecedenceMask = 1,              ///< Bit-mask allowing to extract the relevant bits for "precedence".
+                IgnoreDiscrepancy = 0x80,        ///< Flag allowing to choose whether a discrepancy is to be ignored (true) or
+                                                 ///< whether an exception is to be thrown (false) when accessing the sub-block.
             };
 
             /// This option controls whether the lax parameter validation when parsing the dimension-entry of a subblock is to be used.
@@ -757,7 +765,7 @@ namespace libCZI
         /// Creates an accessor for the sub-blocks.
         /// See also the various typed methods: `CreateSingleChannelTileAccessor`, `CreateSingleChannelPyramidLayerTileAccessor` and `CreateSingleChannelScalingTileAccessor`.
         /// \remark
-        /// If the class is not operational (i. e. Open was not called or Open was not successful), then an exception of type std::logic_error is thrown.
+        /// If the class is not operational (i.e. Open was not called or Open was not successful), then an exception of type std::logic_error is thrown.
         ///
         /// \param accessorType The type of the accessor.
         ///
