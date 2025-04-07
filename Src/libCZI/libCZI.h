@@ -701,8 +701,7 @@ namespace libCZI
                 SubBlockDirectoryPrecedence = 0, ///< The sub-block-directory information is used for the sub-blocks.
                 SubBlockHeaderPrecedence = 1,    ///< The sub-block information is used for the sub-blocks.
                 PrecedenceMask = 1,              ///< Bit-mask allowing to extract the relevant bits for "precedence".
-                IgnoreDiscrepancy = 0x80,        ///< Flag allowing to choose whether a discrepancy is to be ignored (true) or
-                                                 ///< whether an exception is to be thrown (false) when accessing the sub-block.
+                IgnoreDiscrepancy = 0x80,        ///< Flag allowing to choose whether a discrepancy is to be ignored (true) or whether an exception is to be thrown (false) when accessing the sub-block.
             };
 
             /// This option controls whether the lax parameter validation when parsing the dimension-entry of a subblock is to be used.
