@@ -13,6 +13,8 @@
 #include "libCZI_Utilities.h"
 #include "utilities.h"
 
+#include <cstring>
+
 using namespace std;
 using namespace libCZI;
 
