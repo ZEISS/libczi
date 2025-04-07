@@ -22,9 +22,9 @@ private:
 
     std::map<int, CacheEntry> cache_;
     mutable std::mutex mutex_;
-    std::atomic_uint64_t lru_counter_{ 0 }; ///< The "LRU counter" - when marking a cache entry as "used", this counter is incremented and the new value is stored in the cache entry.
-    std::atomic_uint64_t cache_size_in_bytes_{ 0 }; ////< The current size of the cache in bytes.
-    std::atomic_uint32_t cache_subblock_count_{ 0 }; ///< The current number of sub-blocks in the cache.
+    std::atomic<std::uint64_t> lru_counter_{ 0 };           ///< The "LRU counter" - when marking a cache entry as "used", this counter is incremented and the new value is stored in the cache entry.
+    std::atomic<std::uint64_t> cache_size_in_bytes_{ 0 };   ////< The current size of the cache in bytes.
+    std::atomic<std::uint32_t> cache_subblock_count_{ 0 };  ///< The current number of sub-blocks in the cache.
 public:
     SubBlockCache() = default;
     ~SubBlockCache() override = default;

@@ -32,6 +32,10 @@ namespace libCZI
         /// \remark
         /// This method is intended to be called concurrently, implementors should make no assumption
         /// about concurrency.
+        /// The parameters `pixelType`, `width` and `height` are used for validation purposes only. The decoder
+        /// is expected to check if the data passed in is of the expected type and size. If not, it should throw an exception.
+        /// If instead nullptr is passed for any of `pixelType`, `width` or `height`, then this means that this parameter
+        /// is not to be validated. The decoder is expected to decode the data and return a bitmap object.
         ///
         /// \remark
         /// In case of an error (of whatever kind) the method is expected to throw an exception.
@@ -48,6 +52,17 @@ namespace libCZI
 
         virtual ~IDecoder() = default;
 
+        /// Decodes the specified data and returns a bitmap object. This is a convenience method, where the parameters
+        /// `pixelType`, `width` and `height` are passed in as references and as required parameters (as opposed to optional).
+        ///
+        /// \param  ptrData             Pointer to a block of memory (which contains the encoded image).
+        /// \param  size                The size of the memory block pointed by `ptrData`.
+        /// \param  pixelType           The pixel type which is expected.
+        /// \param  width               The width which is expected.
+        /// \param  height              The height which is expected.
+        /// \param additional_arguments If non-null, additional arguments for the decoder. This is a null-terminated string, where the syntax is defined class specifically.
+        ///
+        /// \return A bitmap object with the decoded data.
         std::shared_ptr<libCZI::IBitmapData> Decode(const void* ptrData, size_t size, libCZI::PixelType pixelType, std::uint32_t width, std::uint32_t height, const char* additional_arguments = nullptr)
         {
             return this->Decode(ptrData, size, &pixelType, &width, &height, additional_arguments);
