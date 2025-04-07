@@ -39,7 +39,7 @@ static std::shared_ptr<libCZI::IBitmapData> CreateBitmapFromSubBlock_JpgXr(ISubB
             // ok, we have a discrepancy between the size of the bitmap and the size described in the subblock, so let's crop or pad the bitmap
 
             // create a bitmap of the size described in the subblock
-            auto adjusted_bitmap = CStdBitmapData::Create(sub_block_info.pixelType, sub_block_info.physicalSize.w, sub_block_info.physicalSize.w);
+            auto adjusted_bitmap = CStdBitmapData::Create(sub_block_info.pixelType, sub_block_info.physicalSize.w, sub_block_info.physicalSize.h);
             CBitmapOperations::Fill(adjusted_bitmap.get(), RgbFloatColor{ 0,0,0 });
             auto adjusted_bitmap_lock = adjusted_bitmap->Lock();
             auto decoded_bitmap_lock = decoded_bitmap->Lock();
