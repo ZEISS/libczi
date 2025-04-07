@@ -310,13 +310,13 @@ std::shared_ptr<ISubBlock> CCZIReader::ReadSubBlock(const CCziSubBlockDirectory:
 
     auto subBlkData = CCZIParse::ReadSubBlock(stream_reference.get(), entry.FilePosition, allocateInfo);
 
-    // TODO(JBL):
-    // OK, plan is now:
-    // - use the information from "entry" as authoritative information
-    // - maybe... allow to report a discrepancy
+    // We now use configuration options to determine 
+    // - whether we want to use the information from the sub-block-directory or the sub-block-header.
+    // - whether we want to ignore discrepancies between the two.
 
-    if (!((uint8_t)this->sub_block_directory_info_policy_ & (uint8_t)OpenOptions::SubBlockDirectoryInfoPolicy::IgnoreDiscrepancy))
+    if (static_cast<std::underlying_type<OpenOptions::SubBlockDirectoryInfoPolicy>::type>(this->sub_block_directory_info_policy_ & OpenOptions::SubBlockDirectoryInfoPolicy::IgnoreDiscrepancy) == 0)
     {
+        // check whether the information in the sub-block-directory and the sub-block-header match, and if not, throw an exception
         if (entry.PixelType != subBlkData.pixelType ||
             entry.Compression != subBlkData.compression ||
             Utils::Compare(&entry.coordinate, &subBlkData.coordinate) != 0 ||
@@ -331,7 +331,7 @@ std::shared_ptr<ISubBlock> CCZIReader::ReadSubBlock(const CCziSubBlockDirectory:
     }
 
     libCZI::SubBlockInfo info;
-    if (((uint8_t)this->sub_block_directory_info_policy_ & 1) == (uint8_t)OpenOptions::SubBlockDirectoryInfoPolicy::SubBlockDirectoryPrecedence)
+    if ((this->sub_block_directory_info_policy_ & OpenOptions::SubBlockDirectoryInfoPolicy::PrecedenceMask) == OpenOptions::SubBlockDirectoryInfoPolicy::SubBlockDirectoryPrecedence)
     {
         // the sub-block-directory information takes precedence, which is default and specified to be the authoritative information
         info.pixelType = CziUtils::PixelTypeFromInt(entry.PixelType);
