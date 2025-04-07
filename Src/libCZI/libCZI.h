@@ -109,10 +109,23 @@ namespace libCZI
         bool allow_duplicate_subblocks{ false };
     };
 
+    /// This structure defines how to handle mismatches and discrepancies between sub-block information and the
+    /// actual pixel data. Please see the documentation about "Resolution Protocol for Ambiguous or Contradictory Information"
+    /// for details. For libCZI until version 0.63.2 the behavior was to throw an exception in case of a discrepancy
+    /// detected.
     struct CreateBitmapOptions
     {
+        /// In case of uncompressed pixel data, apply the resolution protocol for uncompressed data.
+        /// If false, an exception is thrown  (in case of a discrepancy).
         bool handle_uncompressed_data_size_mismatch{ true };
+
+        /// In case of JpgXR compressed pixel data, apply the resolution protocol for uncompressed data.
+        /// If false, an exception is thrown  (in case of a discrepancy).
         bool handle_jpgxr_bitmap_mismatch{ true };
+
+        /// In case of zstd compressed pixel data, apply the resolution protocol for uncompressed data.
+        /// If false, an exception is thrown  (in case of a discrepancy).
+        bool handle_zstd_data_size_mismatch{ true };
     };
 
     /// Creates a new instance of the CZI-writer class.
@@ -695,7 +708,8 @@ namespace libCZI
             /// distinguish between sub-block-directory precedence and sub-block-header precedence. The value 'PrecedenceMask'
             /// is used to mask this bit. Bit 7 is used to indicate whether a discrepancy is to be ignored or whether an error
             /// is to be reported.
-            /// Historically, libCZI used to give precedence fo the sub-block header information, and it did not report a discrepancy.
+            /// Historically, libCZI (up to version 0.63.2) used to give precedence fo the sub-block header information,
+            /// and it did not report a discrepancy.
             enum class SubBlockDirectoryInfoPolicy : std::uint8_t
             {
                 SubBlockDirectoryPrecedence = 0, ///< The sub-block-directory information is used for the sub-blocks.
@@ -728,7 +742,7 @@ namespace libCZI
 
             SubBlockDirectoryInfoPolicy subBlockDirectoryInfoPolicy{ SubBlockDirectoryInfoPolicy::SubBlockDirectoryPrecedence };
 
-            /// Sets the the default.
+            /// Sets the default.
             void SetDefault()
             {
                 this->lax_subblock_coordinate_checks = true;

@@ -30,13 +30,17 @@ static shared_ptr<libCZI::IBitmapData> DecodeAndProcess(const void* pData, size_
 static shared_ptr<libCZI::IBitmapData> DecodeAndProcessNoHiLoByteUnpacking(const void* ptrData, size_t size, libCZI::PixelType pixelType, uint32_t width, uint32_t height);
 static shared_ptr<libCZI::IBitmapData> DecodeAndProcessWithHiLoByteUnpacking(const void* ptrData, size_t size, libCZI::PixelType pixelType, uint32_t width, uint32_t height);
 static void ZstdDecompressAndThrowIfError(const void* ptrData, size_t size, void* ptrDst, size_t dstSize);
+static bool ContainsToken(const char* str, const char* token);
+static bool IsTokenMatch(const char* start, const char* token, size_t token_len);
 
 /*static*/std::shared_ptr<CZstd0Decoder> CZstd0Decoder::Create()
 {
     return make_shared<CZstd0Decoder>();
 }
 
-/*virtual*/std::shared_ptr<libCZI::IBitmapData> CZstd0Decoder::Decode(const void* ptrData, size_t size, const libCZI::PixelType* pixelType, const uint32_t* width, const uint32_t* height)
+/*static*/const char* CZstd0Decoder::kOption_handle_data_size_mismatch = "handle_data_size_mismatch";
+
+/*virtual*/std::shared_ptr<libCZI::IBitmapData> CZstd0Decoder::Decode(const void* ptrData, size_t size, const libCZI::PixelType* pixelType, const uint32_t* width, const uint32_t* height, const char* additional_arguments)
 {
     if (pixelType == nullptr || width == nullptr || height == nullptr)
     {
@@ -51,7 +55,9 @@ static void ZstdDecompressAndThrowIfError(const void* ptrData, size_t size, void
     return make_shared<CZstd1Decoder>();
 }
 
-/*virtual*/std::shared_ptr<libCZI::IBitmapData> CZstd1Decoder::Decode(const void* ptrData, size_t size, const libCZI::PixelType* pixelType, const uint32_t* width, const std::uint32_t* height)
+/*static*/const char* CZstd1Decoder::kOption_handle_data_size_mismatch = "handle_data_size_mismatch";
+
+/*virtual*/std::shared_ptr<libCZI::IBitmapData> CZstd1Decoder::Decode(const void* ptrData, size_t size, const libCZI::PixelType* pixelType, const uint32_t* width, const std::uint32_t* height, const char* additional_arguments)
 {
     if (pixelType == nullptr || width == nullptr || height == nullptr)
     {
@@ -102,7 +108,7 @@ ZStd1HeaderParsingResult ParseZStd1Header(const uint8_t* ptrData, size_t size)
         return retVal;
     }
 
-    // the only possible values currently are: either 1 (i. e. not chunk) or 3 (so we expect the only existing chunk-type "1", which has
+    // the only possible values currently are: either 1 (i.e. no chunk) or 3 (so we expect the only existing chunk-type "1", which has
     //  a fixed size of 2 bytes)
     if (*ptrData == 1)
     {
@@ -192,4 +198,52 @@ void ZstdDecompressAndThrowIfError(const void* ptrData, size_t size, void* ptrDs
             throw std::runtime_error(errorText);
         }
     }
+}
+
+bool IsTokenMatch(const char* start, const char* token, size_t token_len)
+{
+    // Match string content
+    if (std::strncmp(start, token, token_len) != 0)
+    {
+        return false;
+    }
+
+    // Must be followed by ;, space, or null
+    char after = start[token_len];
+    if (after != '\0' && after != ';' && !std::isspace(static_cast<unsigned char>(after)))
+    {
+        return false;
+    }
+
+    return true;
+}
+
+bool ContainsToken(const char* input, const char* token)
+{
+    if (!input || !token || *token == '\0') return false;
+
+    const size_t token_len = std::strlen(token);
+    const char* current = input;
+
+    while ((current = std::strstr(current, token)))
+    {
+        // Check that we're at token boundary: either start or preceded by ; or whitespace
+        if (current != input) {
+            const char before = *(current - 1);
+            if (before != ';' && !std::isspace(static_cast<unsigned char>(before)))
+            {
+                ++current;
+                continue;
+            }
+        }
+
+        if (IsTokenMatch(current, token, token_len))
+        {
+            return true;
+        }
+
+        ++current;
+    }
+
+    return false;
 }
