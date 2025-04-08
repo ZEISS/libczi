@@ -69,26 +69,33 @@ static std::shared_ptr<libCZI::IBitmapData> CreateBitmapFromSubBlock_JpgXr(ISubB
 static std::shared_ptr<libCZI::IBitmapData> CreateBitmapFromSubBlock_ZStd0(ISubBlock* subBlk, bool handle_zstd_data_size_mismatch)
 {
     auto dec = GetSite()->GetDecoder(ImageDecoderType::ZStd0, nullptr);
-    const void* ptr; size_t size;
+    const void* ptr;
+    size_t size;
     subBlk->DangerousGetRawData(ISubBlock::MemBlkType::Data, ptr, size);
-    SubBlockInfo subBlockInfo = subBlk->GetSubBlockInfo();
+    const SubBlockInfo& sub_block_info = subBlk->GetSubBlockInfo();
     return dec->Decode(
                     ptr, 
                     size, 
-                    subBlockInfo.pixelType, 
-                    subBlockInfo.physicalSize.w, 
-                    subBlockInfo.physicalSize.h, 
+                    sub_block_info.pixelType, 
+                    sub_block_info.physicalSize.w, 
+                    sub_block_info.physicalSize.h, 
                     handle_zstd_data_size_mismatch ? CZstd0Decoder::kOption_handle_data_size_mismatch : nullptr);
 }
 
-static std::shared_ptr<libCZI::IBitmapData> CreateBitmapFromSubBlock_ZStd1(ISubBlock* subBlk)
+static std::shared_ptr<libCZI::IBitmapData> CreateBitmapFromSubBlock_ZStd1(ISubBlock* subBlk, bool handle_zstd_data_size_mismatch)
 {
     auto dec = GetSite()->GetDecoder(ImageDecoderType::ZStd1, nullptr);
-    const void* ptr; size_t size;
+    const void* ptr;
+    size_t size;
     subBlk->DangerousGetRawData(ISubBlock::MemBlkType::Data, ptr, size);
-    SubBlockInfo subBlockInfo = subBlk->GetSubBlockInfo();
-
-    return dec->Decode(ptr, size, subBlockInfo.pixelType, subBlockInfo.physicalSize.w, subBlockInfo.physicalSize.h);
+    const SubBlockInfo& sub_block_info = subBlk->GetSubBlockInfo();
+    return dec->Decode(
+                    ptr, 
+                    size, 
+                    sub_block_info.pixelType, 
+                    sub_block_info.physicalSize.w, 
+                    sub_block_info.physicalSize.h,
+                    handle_zstd_data_size_mismatch ? CZstd1Decoder::kOption_handle_data_size_mismatch : nullptr);
 }
 
 static std::shared_ptr<libCZI::IBitmapData> CreateBitmapFromSubBlock_Uncompressed(ISubBlock* subBlk, bool handle_uncompressed_data_size_mismatch)
@@ -173,7 +180,7 @@ std::shared_ptr<libCZI::IBitmapData> libCZI::CreateBitmapFromSubBlock(ISubBlock*
     case CompressionMode::Zstd0:
         return CreateBitmapFromSubBlock_ZStd0(subBlk, options != nullptr ? options->handle_zstd_data_size_mismatch : true);
     case CompressionMode::Zstd1:
-        return CreateBitmapFromSubBlock_ZStd1(subBlk);
+        return CreateBitmapFromSubBlock_ZStd1(subBlk, options != nullptr ? options->handle_zstd_data_size_mismatch : true);
     case CompressionMode::UnCompressed:
         return CreateBitmapFromSubBlock_Uncompressed(subBlk, options != nullptr ? options->handle_uncompressed_data_size_mismatch : true);
     default:    // silence warnings

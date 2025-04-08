@@ -369,6 +369,248 @@ namespace
         const auto data = outStream->GetCopy(&size_data);
         return make_tuple(data, size_data);
     }
+
+    tuple<shared_ptr<void>, size_t> CreateCziDocumentContainingOneSubblockZstd1CompressedWhichIsTooLarge()
+    {
+        // this creates a one-subblock CZI file, with a Zstd1-compressed subblock of characteristics "4x4, Gray8";
+        //  where the actual bitmap is only 5x5, and the subblock info says that it is 4x4.
+        constexpr int kBitmapWidth = 4;
+        constexpr int kBitmapHeight = 4;
+        constexpr PixelType kBitmapPixelType = PixelType::Gray8;
+
+        auto writer = CreateCZIWriter();
+        auto outStream = make_shared<CMemOutputStream>(0);
+        auto spWriterInfo = make_shared<CCziWriterInfo >(GUID{ 0x1234567,0x89ab,0xcdef,{ 1,2,3,4,5,6,7,8 } });
+        writer->Create(outStream, spWriterInfo);
+        auto bitmap = CreateTestBitmap(PixelType::Gray8, 5, 5);
+        {
+            ScopedBitmapLockerSP lockBm{ bitmap };
+            uint8_t* bitmap_pointer = static_cast<uint8_t*>(lockBm.ptrDataRoi);
+            for (int y = 0; y < 5; ++y)
+            {
+                for (int x = 0; x < 5; ++x)
+                {
+                    bitmap_pointer[x + y * lockBm.stride] = static_cast<uint8_t>(1 + x + y * 5);
+                }
+            }
+        }
+
+        shared_ptr<IMemoryBlock> encodedData;
+        {
+            const ScopedBitmapLockerSP lck{ bitmap };
+            encodedData = ZstdCompress::CompressZStd1Alloc(
+                bitmap->GetWidth(),
+                bitmap->GetHeight(),
+                lck.stride,
+                bitmap->GetPixelType(),
+                lck.ptrDataRoi,
+                nullptr);
+        }
+
+        AddSubBlockInfoMemPtr addSbBlkInfo;
+        addSbBlkInfo.Clear();
+        addSbBlkInfo.coordinate = CDimCoordinate::Parse("C0");
+        addSbBlkInfo.mIndexValid = true;
+        addSbBlkInfo.mIndex = 0;
+        addSbBlkInfo.x = 0;
+        addSbBlkInfo.y = 0;
+        addSbBlkInfo.logicalWidth = kBitmapWidth;
+        addSbBlkInfo.logicalHeight = kBitmapHeight;
+        addSbBlkInfo.physicalWidth = kBitmapWidth;
+        addSbBlkInfo.physicalHeight = kBitmapHeight;
+        addSbBlkInfo.PixelType = kBitmapPixelType;
+        addSbBlkInfo.ptrData = encodedData->GetPtr();
+        addSbBlkInfo.dataSize = encodedData->GetSizeOfData();
+        addSbBlkInfo.SetCompressionMode(CompressionMode::Zstd1);
+        writer->SyncAddSubBlock(addSbBlkInfo);
+        writer->Close();
+
+        size_t size_data;
+        const auto data = outStream->GetCopy(&size_data);
+        return make_tuple(data, size_data);
+    }
+
+    tuple<shared_ptr<void>, size_t> CreateCziDocumentContainingOneSubblockZstd1CompressedWhichIsTooSmall()
+    {
+        // this creates a one-subblock CZI file, with a Zstd1-compressed subblock of characteristics "4x4, Gray8";
+        //  where the actual bitmap is only 2x3, and the subblock info says that it is 4x4.
+        constexpr int kBitmapWidth = 4;
+        constexpr int kBitmapHeight = 4;
+        constexpr PixelType kBitmapPixelType = PixelType::Gray8;
+
+        auto writer = CreateCZIWriter();
+        auto outStream = make_shared<CMemOutputStream>(0);
+        auto spWriterInfo = make_shared<CCziWriterInfo >(GUID{ 0x1234567,0x89ab,0xcdef,{ 1,2,3,4,5,6,7,8 } });
+        writer->Create(outStream, spWriterInfo);
+        auto bitmap = CreateTestBitmap(PixelType::Gray8, 2, 3);
+        {
+            ScopedBitmapLockerSP lockBm{ bitmap };
+            uint8_t* bitmap_pointer = static_cast<uint8_t*>(lockBm.ptrDataRoi);
+            bitmap_pointer[0 + 0 * lockBm.stride] = 1;
+            bitmap_pointer[1 + 0 * lockBm.stride] = 2;
+            bitmap_pointer[0 + 1 * lockBm.stride] = 3;
+            bitmap_pointer[1 + 1 * lockBm.stride] = 4;
+            bitmap_pointer[0 + 2 * lockBm.stride] = 5;
+            bitmap_pointer[1 + 2 * lockBm.stride] = 6;
+        }
+
+        shared_ptr<IMemoryBlock> encodedData;
+        {
+            const ScopedBitmapLockerSP lck{ bitmap };
+            encodedData = ZstdCompress::CompressZStd1Alloc(
+                bitmap->GetWidth(),
+                bitmap->GetHeight(),
+                lck.stride,
+                bitmap->GetPixelType(),
+                lck.ptrDataRoi,
+                nullptr);
+        }
+
+        AddSubBlockInfoMemPtr addSbBlkInfo;
+        addSbBlkInfo.Clear();
+        addSbBlkInfo.coordinate = CDimCoordinate::Parse("C0");
+        addSbBlkInfo.mIndexValid = true;
+        addSbBlkInfo.mIndex = 0;
+        addSbBlkInfo.x = 0;
+        addSbBlkInfo.y = 0;
+        addSbBlkInfo.logicalWidth = kBitmapWidth;
+        addSbBlkInfo.logicalHeight = kBitmapHeight;
+        addSbBlkInfo.physicalWidth = kBitmapWidth;
+        addSbBlkInfo.physicalHeight = kBitmapHeight;
+        addSbBlkInfo.PixelType = kBitmapPixelType;
+        addSbBlkInfo.ptrData = encodedData->GetPtr();
+        addSbBlkInfo.dataSize = encodedData->GetSizeOfData();
+        addSbBlkInfo.SetCompressionMode(CompressionMode::Zstd1);
+        writer->SyncAddSubBlock(addSbBlkInfo);
+        writer->Close();
+
+        size_t size_data;
+        const auto data = outStream->GetCopy(&size_data);
+        return make_tuple(data, size_data);
+    }
+
+    tuple<shared_ptr<void>, size_t> CreateCziDocumentContainingOneSubblockZstd1CompressedWhichIsTooSmallWithHiLoBytePack()
+    {
+        // this creates a one-subblock CZI file, with a Zstd1-compressed subblock of characteristics "4x4, Gray16";
+        //  where the actual bitmap is only 2x3, and the subblock info says that it is 4x4.
+        constexpr int kBitmapWidth = 4;
+        constexpr int kBitmapHeight = 4;
+        constexpr PixelType kBitmapPixelType = PixelType::Gray16;
+
+        auto writer = CreateCZIWriter();
+        auto outStream = make_shared<CMemOutputStream>(0);
+        auto spWriterInfo = make_shared<CCziWriterInfo >(GUID{ 0x1234567,0x89ab,0xcdef,{ 1,2,3,4,5,6,7,8 } });
+        writer->Create(outStream, spWriterInfo);
+        auto bitmap = CreateTestBitmap(PixelType::Gray16, 2, 3);
+        {
+            ScopedBitmapLockerSP lockBm{ bitmap };
+            uint16_t* bitmap_pointer = static_cast<uint16_t*>(lockBm.ptrDataRoi);
+            bitmap_pointer[0] = 1;
+            bitmap_pointer[1] = 2;
+            bitmap_pointer = reinterpret_cast<uint16_t*>(static_cast<uint8_t*>(lockBm.ptrDataRoi) + lockBm.stride);
+            bitmap_pointer[0] = 3;
+            bitmap_pointer[1] = 4;
+            bitmap_pointer = reinterpret_cast<uint16_t*>(static_cast<uint8_t*>(lockBm.ptrDataRoi) + static_cast<size_t>(2) * lockBm.stride);
+            bitmap_pointer[0] = 5;
+            bitmap_pointer[1] = 6;
+        }
+
+        shared_ptr<IMemoryBlock> encodedData;
+        {
+            const ScopedBitmapLockerSP lck{ bitmap };
+            CompressParametersOnMap compression_parameters;
+            compression_parameters.map[static_cast<int>(CompressionParameterKey::ZSTD_PREPROCESS_DOLOHIBYTEPACKING)] = CompressParameter(true);
+            encodedData = ZstdCompress::CompressZStd1Alloc(
+                bitmap->GetWidth(),
+                bitmap->GetHeight(),
+                lck.stride,
+                bitmap->GetPixelType(),
+                lck.ptrDataRoi,
+                &compression_parameters);
+        }
+
+        AddSubBlockInfoMemPtr addSbBlkInfo;
+        addSbBlkInfo.Clear();
+        addSbBlkInfo.coordinate = CDimCoordinate::Parse("C0");
+        addSbBlkInfo.mIndexValid = true;
+        addSbBlkInfo.mIndex = 0;
+        addSbBlkInfo.x = 0;
+        addSbBlkInfo.y = 0;
+        addSbBlkInfo.logicalWidth = kBitmapWidth;
+        addSbBlkInfo.logicalHeight = kBitmapHeight;
+        addSbBlkInfo.physicalWidth = kBitmapWidth;
+        addSbBlkInfo.physicalHeight = kBitmapHeight;
+        addSbBlkInfo.PixelType = kBitmapPixelType;
+        addSbBlkInfo.ptrData = encodedData->GetPtr();
+        addSbBlkInfo.dataSize = encodedData->GetSizeOfData();
+        addSbBlkInfo.SetCompressionMode(CompressionMode::Zstd1);
+        writer->SyncAddSubBlock(addSbBlkInfo);
+        writer->Close();
+
+        size_t size_data;
+        const auto data = outStream->GetCopy(&size_data);
+        return make_tuple(data, size_data);
+    }
+
+    tuple<shared_ptr<void>, size_t> CreateCziDocumentContainingOneSubblockZstd1CompressedWhichIsTooLargeWithHiLoBytePack()
+    {
+        // this creates a one-subblock CZI file, with a Zstd1-compressed subblock of characteristics "4x4, Gray16";
+        //  where the actual bitmap is 5x5, and the subblock info says that it is 4x4.
+        constexpr int kBitmapWidth = 4;
+        constexpr int kBitmapHeight = 4;
+        constexpr PixelType kBitmapPixelType = PixelType::Gray16;
+
+        auto writer = CreateCZIWriter();
+        auto outStream = make_shared<CMemOutputStream>(0);
+        auto spWriterInfo = make_shared<CCziWriterInfo >(GUID{ 0x1234567,0x89ab,0xcdef,{ 1,2,3,4,5,6,7,8 } });
+        writer->Create(outStream, spWriterInfo);
+        auto bitmap = CreateTestBitmap(PixelType::Gray16, 5, 5);
+        {
+            ScopedBitmapLockerSP lockBm{ bitmap };
+            for (int y = 0; y < 5; ++y)
+            {
+                uint16_t* bitmap_pointer = reinterpret_cast<uint16_t*>(static_cast<uint8_t*>(lockBm.ptrDataRoi) + static_cast<size_t>(y) * lockBm.stride);
+                for (int x = 0; x < 5; ++x)
+                {
+                    bitmap_pointer[x] = static_cast<uint16_t>(1 + x + y * 5);
+                }
+            }
+        }
+
+        shared_ptr<IMemoryBlock> encodedData;
+        {
+            const ScopedBitmapLockerSP lck{ bitmap };
+            encodedData = ZstdCompress::CompressZStd1Alloc(
+                bitmap->GetWidth(),
+                bitmap->GetHeight(),
+                lck.stride,
+                bitmap->GetPixelType(),
+                lck.ptrDataRoi,
+                nullptr);
+        }
+
+        AddSubBlockInfoMemPtr addSbBlkInfo;
+        addSbBlkInfo.Clear();
+        addSbBlkInfo.coordinate = CDimCoordinate::Parse("C0");
+        addSbBlkInfo.mIndexValid = true;
+        addSbBlkInfo.mIndex = 0;
+        addSbBlkInfo.x = 0;
+        addSbBlkInfo.y = 0;
+        addSbBlkInfo.logicalWidth = kBitmapWidth;
+        addSbBlkInfo.logicalHeight = kBitmapHeight;
+        addSbBlkInfo.physicalWidth = kBitmapWidth;
+        addSbBlkInfo.physicalHeight = kBitmapHeight;
+        addSbBlkInfo.PixelType = kBitmapPixelType;
+        addSbBlkInfo.ptrData = encodedData->GetPtr();
+        addSbBlkInfo.dataSize = encodedData->GetSizeOfData();
+        addSbBlkInfo.SetCompressionMode(CompressionMode::Zstd1);
+        writer->SyncAddSubBlock(addSbBlkInfo);
+        writer->Close();
+
+        size_t size_data;
+        const auto data = outStream->GetCopy(&size_data);
+        return make_tuple(data, size_data);
+    }
 }
 
 TEST(CziReader, ReaderException)
@@ -923,7 +1165,7 @@ TEST(CziReader, ReadSubBlockWithZstd0CompressionTooLargeDisableResolutionAndChec
     EXPECT_THROW(sub_block->CreateBitmap(&options), exception);
 }
 
-TEST(CziReader, ReadSubBlockWithZstd0CompressionTooSmallDisableResolutionAndCheckResolutionProtocol)
+TEST(CziReader, ReadSubBlockWithZstd0CompressionTooSmallEnableResolutionAndCheckResolutionProtocol)
 {
     // arrange
     auto test_czi = CreateCziDocumentContainingOneSubblockZstd0CompressedWhichIsTooSmall();
@@ -963,7 +1205,7 @@ TEST(CziReader, ReadSubBlockWithZstd0CompressionTooSmallDisableResolutionAndChec
     }
 }
 
-TEST(CziReader, ReadSubBlockWithZstd0CompressionTooLargeDisableResolutionAndCheckResolutionProtocol)
+TEST(CziReader, ReadSubBlockWithZstd0CompressionTooLargeEnableResolutionAndCheckResolutionProtocol)
 {
     // arrange
     auto test_czi = CreateCziDocumentContainingOneSubblockZstd0CompressedWhichIsTooLarge();
@@ -987,6 +1229,186 @@ TEST(CziReader, ReadSubBlockWithZstd0CompressionTooLargeDisableResolutionAndChec
     for (int y = 0; y < 4; ++y)
     {
         const uint8_t* bitmap_pointer = static_cast<const uint8_t*>(locked_bitmap.ptrDataRoi) + static_cast<size_t>(y) * locked_bitmap.stride;
+        for (int x = 0; x < 4; ++x)
+        {
+            EXPECT_EQ(bitmap_pointer[x], y * 4 + x + 1);
+        }
+    }
+}
+
+TEST(CziReader, ReadSubBlockWithZstd1CompressionTooSmallDisableResolutionAndCheckException)
+{
+    // arrange
+    auto test_czi = CreateCziDocumentContainingOneSubblockZstd1CompressedWhichIsTooSmall();
+
+    // act
+    auto input_stream = CreateStreamFromMemory(get<0>(test_czi), get<1>(test_czi));
+    const auto reader = CreateCZIReader();
+    reader->Open(input_stream);
+
+    // assert
+    const auto sub_block = reader->ReadSubBlock(0);
+
+    CreateBitmapOptions options;
+    options.handle_zstd_data_size_mismatch = false;
+    EXPECT_THROW(sub_block->CreateBitmap(&options), exception);
+}
+
+TEST(CziReader, ReadSubBlockWithZstd1CompressionTooLargeDisableResolutionAndCheckException)
+{
+    // arrange
+    auto test_czi = CreateCziDocumentContainingOneSubblockZstd1CompressedWhichIsTooLarge();
+
+    // act
+    auto input_stream = CreateStreamFromMemory(get<0>(test_czi), get<1>(test_czi));
+    const auto reader = CreateCZIReader();
+    reader->Open(input_stream);
+
+    // assert
+    const auto sub_block = reader->ReadSubBlock(0);
+
+    CreateBitmapOptions options;
+    options.handle_zstd_data_size_mismatch = false;
+    EXPECT_THROW(sub_block->CreateBitmap(&options), exception);
+}
+
+TEST(CziReader, ReadSubBlockWithZstd1CompressionTooSmallEnableResolutionAndCheckResolutionProtocol)
+{
+    // arrange
+    auto test_czi = CreateCziDocumentContainingOneSubblockZstd1CompressedWhichIsTooSmall();
+
+    // act
+    auto input_stream = CreateStreamFromMemory(get<0>(test_czi), get<1>(test_czi));
+    const auto reader = CreateCZIReader();
+    reader->Open(input_stream);
+
+    // assert
+    const auto sub_block = reader->ReadSubBlock(0);
+
+    CreateBitmapOptions options;
+    options.handle_zstd_data_size_mismatch = true;
+    auto bitmap = sub_block->CreateBitmap(&options);
+    ASSERT_EQ(bitmap->GetWidth(), 4) << "Incorrect width";
+    ASSERT_EQ(bitmap->GetHeight(), 4) << "Incorrect height";
+    ASSERT_EQ(bitmap->GetPixelType(), PixelType::Gray8) << "Incorrect pixel type";
+
+    ScopedBitmapLockerSP locked_bitmap{ bitmap };
+    const uint8_t* bitmap_pointer = static_cast<uint8_t*>(locked_bitmap.ptrDataRoi);
+    EXPECT_EQ(bitmap_pointer[0 + 0 * locked_bitmap.stride], 1);
+    EXPECT_EQ(bitmap_pointer[1 + 0 * locked_bitmap.stride], 2);
+    EXPECT_EQ(bitmap_pointer[2 + 0 * locked_bitmap.stride], 3);
+    EXPECT_EQ(bitmap_pointer[3 + 0 * locked_bitmap.stride], 4);
+    EXPECT_EQ(bitmap_pointer[0 + 1 * locked_bitmap.stride], 5);
+    EXPECT_EQ(bitmap_pointer[1 + 1 * locked_bitmap.stride], 6);
+
+    // and the remainder has to be zero-filled
+    for (int y = 1; y < 4; ++y)
+    {
+        bitmap_pointer = static_cast<const uint8_t*>(locked_bitmap.ptrDataRoi) + static_cast<size_t>(y) * locked_bitmap.stride;
+        for (int x = y == 1 ? 2 : 0; x < 4; ++x)
+        {
+            EXPECT_EQ(bitmap_pointer[x], 0);
+        }
+    }
+}
+
+TEST(CziReader, ReadSubBlockWithZstd1CompressionTooLargeEnableResolutionAndCheckResolutionProtocol)
+{
+    // arrange
+    auto test_czi = CreateCziDocumentContainingOneSubblockZstd1CompressedWhichIsTooLarge();
+
+    // act
+    auto input_stream = CreateStreamFromMemory(get<0>(test_czi), get<1>(test_czi));
+    const auto reader = CreateCZIReader();
+    reader->Open(input_stream);
+
+    // assert
+    const auto sub_block = reader->ReadSubBlock(0);
+
+    CreateBitmapOptions options;
+    options.handle_zstd_data_size_mismatch = true;
+    auto bitmap = sub_block->CreateBitmap(&options);
+    ASSERT_EQ(bitmap->GetWidth(), 4) << "Incorrect width";
+    ASSERT_EQ(bitmap->GetHeight(), 4) << "Incorrect height";
+    ASSERT_EQ(bitmap->GetPixelType(), PixelType::Gray8) << "Incorrect pixel type";
+
+    ScopedBitmapLockerSP locked_bitmap{ bitmap };
+    for (int y = 0; y < 4; ++y)
+    {
+        const uint8_t* bitmap_pointer = static_cast<const uint8_t*>(locked_bitmap.ptrDataRoi) + static_cast<size_t>(y) * locked_bitmap.stride;
+        for (int x = 0; x < 4; ++x)
+        {
+            EXPECT_EQ(bitmap_pointer[x], y * 4 + x + 1);
+        }
+    }
+}
+
+TEST(CziReader, ReadSubBlockWithZstd1CompressionWithHiLoBytePackTooSmallEnableResolutionAndCheckResolutionProtocol)
+{
+    // arrange
+    auto test_czi = CreateCziDocumentContainingOneSubblockZstd1CompressedWhichIsTooSmallWithHiLoBytePack();
+
+    // act
+    auto input_stream = CreateStreamFromMemory(get<0>(test_czi), get<1>(test_czi));
+    const auto reader = CreateCZIReader();
+    reader->Open(input_stream);
+
+    // assert
+    const auto sub_block = reader->ReadSubBlock(0);
+
+    CreateBitmapOptions options;
+    options.handle_zstd_data_size_mismatch = true;
+    auto bitmap = sub_block->CreateBitmap(&options);
+    ASSERT_EQ(bitmap->GetWidth(), 4) << "Incorrect width";
+    ASSERT_EQ(bitmap->GetHeight(), 4) << "Incorrect height";
+    ASSERT_EQ(bitmap->GetPixelType(), PixelType::Gray16) << "Incorrect pixel type";
+
+    ScopedBitmapLockerSP locked_bitmap{ bitmap };
+    const uint16_t* bitmap_pointer = static_cast<const uint16_t*>(locked_bitmap.ptrDataRoi);
+    EXPECT_EQ(bitmap_pointer[0], 1);
+    EXPECT_EQ(bitmap_pointer[1], 2);
+    EXPECT_EQ(bitmap_pointer[2], 3);
+    EXPECT_EQ(bitmap_pointer[3], 4);
+    bitmap_pointer = reinterpret_cast<const uint16_t*>(static_cast<const uint8_t*>(locked_bitmap.ptrDataRoi) + locked_bitmap.stride);
+    EXPECT_EQ(bitmap_pointer[0], 5);
+    EXPECT_EQ(bitmap_pointer[1], 6);
+
+    // and the remainder has to be zero-filled
+    for (int y = 1; y < 4; ++y)
+    {
+        bitmap_pointer = reinterpret_cast<const uint16_t*>(static_cast<const uint8_t*>(locked_bitmap.ptrDataRoi) + static_cast<size_t>(y) * locked_bitmap.stride);
+        for (int x = y == 1 ? 2 : 0; x < 4; ++x)
+        {
+            EXPECT_EQ(bitmap_pointer[x], 0);
+        }
+    }
+}
+
+TEST(CziReader, ReadSubBlockWithZstd1CompressionWithHiLoBytePackTooLargeEnableResolutionAndCheckResolutionProtocol)
+{
+    // arrange
+    auto test_czi = CreateCziDocumentContainingOneSubblockZstd1CompressedWhichIsTooLargeWithHiLoBytePack();
+
+    // act
+    auto input_stream = CreateStreamFromMemory(get<0>(test_czi), get<1>(test_czi));
+    const auto reader = CreateCZIReader();
+    reader->Open(input_stream);
+
+    // assert
+    const auto sub_block = reader->ReadSubBlock(0);
+
+    CreateBitmapOptions options;
+    options.handle_zstd_data_size_mismatch = true;
+    auto bitmap = sub_block->CreateBitmap(&options);
+    ASSERT_EQ(bitmap->GetWidth(), 4) << "Incorrect width";
+    ASSERT_EQ(bitmap->GetHeight(), 4) << "Incorrect height";
+    ASSERT_EQ(bitmap->GetPixelType(), PixelType::Gray16) << "Incorrect pixel type";
+
+
+    ScopedBitmapLockerSP locked_bitmap{ bitmap };
+    for (int y = 0; y < 4; ++y)
+    {
+        const uint16_t* bitmap_pointer = (const uint16_t*)(static_cast<const uint8_t*>(locked_bitmap.ptrDataRoi) + static_cast<size_t>(y) * locked_bitmap.stride);
         for (int x = 0; x < 4; ++x)
         {
             EXPECT_EQ(bitmap_pointer[x], y * 4 + x + 1);
