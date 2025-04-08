@@ -12,36 +12,77 @@
 #include "bitmapData.h"
 #include "libCZI_Utilities.h"
 #include "utilities.h"
-
 #include <cstring>
 
 using namespace std;
 using namespace libCZI;
 
-struct ZStd1HeaderParsingResult
-{
-    /// Size of the header in bytes. If this is zero, the header did not parse correctly.
-    size_t headerSize;
-
-    /// A boolean indicating whether a hi-lo-byte packing is to be done.
-    bool hiLoByteUnpackPreprocessing;
-};
-
-static ZStd1HeaderParsingResult ParseZStd1Header(const uint8_t* ptrData, size_t size);
-static shared_ptr<libCZI::IBitmapData> DecodeAndProcess(const void* pData, size_t size, libCZI::PixelType pixelType, uint32_t width, uint32_t height, bool doHiLoByteUnpacking);
-static shared_ptr<libCZI::IBitmapData> DecodeAndProcessNoHiLoByteUnpacking(const void* ptrData, size_t size, libCZI::PixelType pixelType, uint32_t width, uint32_t height);
-static shared_ptr<libCZI::IBitmapData> DecodeAndProcessWithHiLoByteUnpacking(const void* ptrData, size_t size, libCZI::PixelType pixelType, uint32_t width, uint32_t height);
-static void ZstdDecompressAndThrowIfError(const void* ptrData, size_t size, void* ptrDst, size_t dstSize);
-static bool ContainsToken(const char* str, const char* token);
-static bool IsTokenMatch(const char* start, const char* token, size_t token_len);
-
 namespace
 {
+    bool IsTokenMatch(const char* start, const char* token, size_t token_len)
+    {
+        // Match string content
+        if (std::strncmp(start, token, token_len) != 0)
+        {
+            return false;
+        }
+
+        // Must be followed by ;, space, or null
+        const char after = start[token_len];
+        if (after != '\0' && after != ';' && !std::isspace(static_cast<unsigned char>(after)))
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+    /// Parse the options string and check if it contains the specified token. The syntax for the
+    /// options string is a semicolon-separated list of items.
+    ///
+    /// \param  input   The options string to parse. If nullptr, the function returns false.
+    /// \param  token   The string to search for. If nullptr or empty, the function returns false.
+    ///
+    /// \returns    True if the specified string is found; false otherwise.
+    bool ContainsToken(const char* input, const char* token)
+    {
+        if (!input || !token || *token == '\0')
+        {
+            return false;
+        }
+
+        const size_t token_len = std::strlen(token);
+        const char* current = input;
+
+        while ((current = std::strstr(current, token)))
+        {
+            // Check that we're at token boundary: either start or preceded by ; or whitespace
+            if (current != input) 
+            {
+                const char before = *(current - 1);
+                if (before != ';' && !std::isspace(static_cast<unsigned char>(before)))
+                {
+                    ++current;
+                    continue;
+                }
+            }
+
+            if (IsTokenMatch(current, token, token_len))
+            {
+                return true;
+            }
+
+            ++current;
+        }
+
+        return false;
+    }
+
     shared_ptr<libCZI::IBitmapData> DecodeRequireCorrectSize(const void* ptrData, size_t size, libCZI::PixelType pixelType, uint32_t width, uint32_t height)
     {
         // calculate the expected size of the uncompressed data
-        size_t stride = width * static_cast<size_t>(Utils::GetBytesPerPixel(pixelType));
-        size_t expectedSize = height * stride;
+        const size_t stride = width * static_cast<size_t>(Utils::GetBytesPerPixel(pixelType));
+        const size_t expectedSize = height * stride;
         const auto zstd_frame_content_size = ZSTD_getFrameContentSize(ptrData, size);
         if (zstd_frame_content_size == ZSTD_CONTENTSIZE_ERROR)
         {
@@ -276,6 +317,59 @@ namespace
             return bitmap;
         }
     }
+
+    struct ZStd1HeaderParsingResult
+    {
+        /// Size of the header in bytes. If this is zero, the header did not parse correctly.
+        size_t headerSize;
+
+        /// A boolean indicating whether a hi-lo-byte packing is to be done.
+        bool hiLoByteUnpackPreprocessing;
+    };
+    
+    ZStd1HeaderParsingResult ParseZStd1Header(const uint8_t* ptrData, size_t size)
+    {
+        // set the out-parameter to the default value (which is false)
+        ZStd1HeaderParsingResult retVal{ 0, false };
+
+        if (size < 1)
+        {
+            // 1 byte is the absolute minimum of data we need
+            return retVal;
+        }
+
+        // the only possible values currently are: either 1 (i.e. no chunk) or 3 (so we expect the only existing chunk-type "1", which has
+        //  a fixed size of 2 bytes)
+        if (*ptrData == 1)
+        {
+            // this is valid, and it means that the size of the header is 1 byte
+            retVal.headerSize = 1;
+            return retVal;
+        }
+
+        if (*ptrData == 3)
+        {
+            // in this case... the size must be at least 3 
+            if (size < 3)
+            {
+                return retVal;
+            }
+        }
+
+        // is "chunk type 1" next?
+        if (*(ptrData + 1) == 1)
+        {
+            // yes, so now the LSB gives the information about "hiLoByteUnpackPreprocessing"
+            retVal.hiLoByteUnpackPreprocessing = ((*(ptrData + 2)) & 1) == 1;
+
+            retVal.headerSize = 3;
+            return retVal;
+        }
+
+        // we currently don't have any other chunk-type, so we fall through to "error return"
+        // otherwise - this is not a valid "zstd1"-header
+        return retVal;
+    }
 }
 
 /*static*/std::shared_ptr<CZstd0Decoder> CZstd0Decoder::Create()
@@ -360,164 +454,6 @@ namespace
             return DecodeRequireCorrectSize(static_cast<const char*>(ptrData) + zStd1Header.headerSize, size - zStd1Header.headerSize, *pixelType, *width, *height);
         }
     }
-
-    /*
-    return DecodeAndProcess(
-        static_cast<const char*>(ptrData) + zStd1Header.headerSize,
-        size - zStd1Header.headerSize,
-        *pixelType,
-        *width,
-        *height,
-        zStd1Header.hiLoByteUnpackPreprocessing);*/
 }
 
-ZStd1HeaderParsingResult ParseZStd1Header(const uint8_t* ptrData, size_t size)
-{
-    // set the out-parameter to the default value (which is false)
-    ZStd1HeaderParsingResult retVal{ 0, false };
 
-    if (size < 1)
-    {
-        // 1 byte is the absolute minimum of data we need
-        return retVal;
-    }
-
-    // the only possible values currently are: either 1 (i.e. no chunk) or 3 (so we expect the only existing chunk-type "1", which has
-    //  a fixed size of 2 bytes)
-    if (*ptrData == 1)
-    {
-        // this is valid, and it means that the size of the header is 1 byte
-        retVal.headerSize = 1;
-        return retVal;
-    }
-
-    if (*ptrData == 3)
-    {
-        // in this case... the size must be at least 3 
-        if (size < 3)
-        {
-            return retVal;
-        }
-    }
-
-    // is "chunk type 1" next?
-    if (*(ptrData + 1) == 1)
-    {
-        // yes, so now the LSB gives the information about "hiLoByteUnpackPreprocessing"
-        retVal.hiLoByteUnpackPreprocessing = ((*(ptrData + 2)) & 1) == 1;
-
-        retVal.headerSize = 3;
-        return retVal;
-    }
-
-    // we currently don't have any other chunk-type, so we fall through to "error return"
-    // otherwise - this is not a valid "zstd1"-header
-    return retVal;
-}
-
-//shared_ptr<libCZI::IBitmapData> DecodeAndProcess(const void* ptrData, size_t size, libCZI::PixelType pixelType, uint32_t width, uint32_t height, bool doHiLoByteUnpacking)
-//{
-//    const unsigned long long uncompressedSize = ZSTD_getFrameContentSize(ptrData, size);
-//    if (uncompressedSize == ZSTD_CONTENTSIZE_UNKNOWN)
-//    {
-//        throw std::runtime_error("The decompressed size cannot be determined.");
-//    }
-//    else if (uncompressedSize == ZSTD_CONTENTSIZE_ERROR)
-//    {
-//        throw std::runtime_error("The compressed data is not recognized.");
-//    }
-//
-//    if (uncompressedSize != static_cast<uint64_t>(height) * width * Utils::GetBytesPerPixel(pixelType))
-//    {
-//        throw std::runtime_error("The compressed data is not valid.");
-//    }
-//
-//    return doHiLoByteUnpacking ?
-//        DecodeAndProcessWithHiLoByteUnpacking(ptrData, size, pixelType, width, height) :
-//        DecodeAndProcessNoHiLoByteUnpacking(ptrData, size, pixelType, width, height);
-//}
-
-//shared_ptr<libCZI::IBitmapData> DecodeAndProcessWithHiLoByteUnpacking(const void* ptrData, size_t size, libCZI::PixelType pixelType, uint32_t width, uint32_t height)
-//{
-//    const size_t uncompressedSize = static_cast<size_t>(height) * width * Utils::GetBytesPerPixel(pixelType);
-//    unique_ptr<void, void(*)(void*)> tmpBuffer(malloc(uncompressedSize), free);
-//    ZstdDecompressAndThrowIfError(ptrData, size, tmpBuffer.get(), uncompressedSize);
-//    const auto bytesPerPel = Utils::GetBytesPerPixel(pixelType);
-//    auto bitmap = CStdBitmapData::Create(pixelType, width, height);
-//    auto bmLckInfo = libCZI::ScopedBitmapLockerSP(bitmap);
-//    LoHiBytePackUnpack::LoHiBytePackStrided(tmpBuffer.get(), uncompressedSize, width * bytesPerPel / 2, height, bmLckInfo.stride, bmLckInfo.ptrDataRoi);
-//    return bitmap;
-//}
-
-//shared_ptr<libCZI::IBitmapData> DecodeAndProcessNoHiLoByteUnpacking(const void* ptrData, size_t size, libCZI::PixelType pixelType, uint32_t width, uint32_t height)
-//{
-//    const size_t uncompressedSize = static_cast<size_t>(height) * width * Utils::GetBytesPerPixel(pixelType);
-//    auto bitmap = CStdBitmapData::Create(pixelType, width, height, width * Utils::GetBytesPerPixel(pixelType));
-//    auto bmLckInfo = libCZI::ScopedBitmapLockerSP(bitmap);
-//    ZstdDecompressAndThrowIfError(ptrData, size, bmLckInfo.ptrDataRoi, uncompressedSize);
-//    return bitmap;
-//}
-
-//void ZstdDecompressAndThrowIfError(const void* ptrData, size_t size, void* ptrDst, size_t dstSize)
-//{
-//    const size_t decompressedSize = ZSTD_decompress(ptrDst, dstSize, ptrData, size);
-//    if (ZSTD_isError(decompressedSize))
-//    {
-//        switch (ZSTD_ErrorCode ec = ZSTD_getErrorCode(decompressedSize))
-//        {
-//        case ZSTD_error_dstSize_tooSmall:
-//            throw std::runtime_error("The size of the output-buffer is too small.");
-//        default:
-//            const std::string errorText = "\"ZSTD_decompress\" returned with error-code " + std::to_string(ec) + ".";
-//            throw std::runtime_error(errorText);
-//        }
-//    }
-//}
-
-bool IsTokenMatch(const char* start, const char* token, size_t token_len)
-{
-    // Match string content
-    if (std::strncmp(start, token, token_len) != 0)
-    {
-        return false;
-    }
-
-    // Must be followed by ;, space, or null
-    char after = start[token_len];
-    if (after != '\0' && after != ';' && !std::isspace(static_cast<unsigned char>(after)))
-    {
-        return false;
-    }
-
-    return true;
-}
-
-bool ContainsToken(const char* input, const char* token)
-{
-    if (!input || !token || *token == '\0') return false;
-
-    const size_t token_len = std::strlen(token);
-    const char* current = input;
-
-    while ((current = std::strstr(current, token)))
-    {
-        // Check that we're at token boundary: either start or preceded by ; or whitespace
-        if (current != input) {
-            const char before = *(current - 1);
-            if (before != ';' && !std::isspace(static_cast<unsigned char>(before)))
-            {
-                ++current;
-                continue;
-            }
-        }
-
-        if (IsTokenMatch(current, token, token_len))
-        {
-            return true;
-        }
-
-        ++current;
-    }
-
-    return false;
-}
