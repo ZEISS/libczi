@@ -194,7 +194,6 @@ namespace
         return make_tuple(data, size_data);
     }
 
-
     tuple<shared_ptr<void>, size_t> CreateCziDocumentContainingOneSubblockJpgXrCompressedWrongPixelType()
     {
         // We create a CZI containing a subblock which contains a JpgXr-compressed bitmap of type Gray8, but the
