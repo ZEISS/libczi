@@ -1408,10 +1408,46 @@ TEST(CziReader, ReadSubBlockWithZstd1CompressionWithHiLoBytePackTooLargeEnableRe
     ScopedBitmapLockerSP locked_bitmap{ bitmap };
     for (int y = 0; y < 4; ++y)
     {
-        const uint16_t* bitmap_pointer = (const uint16_t*)(static_cast<const uint8_t*>(locked_bitmap.ptrDataRoi) + static_cast<size_t>(y) * locked_bitmap.stride);
+        const uint16_t* bitmap_pointer = reinterpret_cast<const uint16_t*>(static_cast<const uint8_t*>(locked_bitmap.ptrDataRoi) + static_cast<size_t>(y) * locked_bitmap.stride);
         for (int x = 0; x < 4; ++x)
         {
             EXPECT_EQ(bitmap_pointer[x], y * 4 + x + 1);
         }
     }
+}
+
+TEST(CziReader, ReadSubBlockWithZstd1CompressionWithHiLoBytePackTooSmallDisableResolutionAndCheckException)
+{
+    // arrange
+    auto test_czi = CreateCziDocumentContainingOneSubblockZstd1CompressedWhichIsTooSmallWithHiLoBytePack();
+
+    // act
+    auto input_stream = CreateStreamFromMemory(get<0>(test_czi), get<1>(test_czi));
+    const auto reader = CreateCZIReader();
+    reader->Open(input_stream);
+
+    // assert
+    const auto sub_block = reader->ReadSubBlock(0);
+
+    CreateBitmapOptions options;
+    options.handle_zstd_data_size_mismatch = false;
+    EXPECT_THROW(sub_block->CreateBitmap(&options), exception);
+}
+
+TEST(CziReader, ReadSubBlockWithZstd1CompressionWithHiLoBytePackTooLargeDisableResolutionAndCheckException)
+{
+    // arrange
+    auto test_czi = CreateCziDocumentContainingOneSubblockZstd1CompressedWhichIsTooLargeWithHiLoBytePack();
+
+    // act
+    auto input_stream = CreateStreamFromMemory(get<0>(test_czi), get<1>(test_czi));
+    const auto reader = CreateCZIReader();
+    reader->Open(input_stream);
+
+    // assert
+    const auto sub_block = reader->ReadSubBlock(0);
+
+    CreateBitmapOptions options;
+    options.handle_zstd_data_size_mismatch = false;
+    EXPECT_THROW(sub_block->CreateBitmap(&options), exception);
 }

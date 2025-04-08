@@ -179,7 +179,7 @@ namespace
         }
     }
 
-    shared_ptr<libCZI::IBitmapData> DecodeAndHiLoByteUnpackAndHandleSizeMismatch(const void* ptrData, size_t size, libCZI::PixelType pixelType, uint32_t width, uint32_t height)
+    shared_ptr<libCZI::IBitmapData> DecodeAndHiLoBytePackAndHandleSizeMismatch(const void* ptrData, size_t size, libCZI::PixelType pixelType, uint32_t width, uint32_t height)
     {
         // calculate the expected size of the uncompressed data
         const auto bytes_per_pel = Utils::GetBytesPerPixel(pixelType);
@@ -342,7 +342,7 @@ namespace
     {
         if (zStd1Header.hiLoByteUnpackPreprocessing)
         {
-            return DecodeAndHiLoByteUnpackAndHandleSizeMismatch(static_cast<const char*>(ptrData) + zStd1Header.headerSize, size - zStd1Header.headerSize, *pixelType, *width, *height);
+            return DecodeAndHiLoBytePackAndHandleSizeMismatch(static_cast<const char*>(ptrData) + zStd1Header.headerSize, size - zStd1Header.headerSize, *pixelType, *width, *height);
         }
         else
         {
@@ -415,64 +415,64 @@ ZStd1HeaderParsingResult ParseZStd1Header(const uint8_t* ptrData, size_t size)
     return retVal;
 }
 
-shared_ptr<libCZI::IBitmapData> DecodeAndProcess(const void* ptrData, size_t size, libCZI::PixelType pixelType, uint32_t width, uint32_t height, bool doHiLoByteUnpacking)
-{
-    const unsigned long long uncompressedSize = ZSTD_getFrameContentSize(ptrData, size);
-    if (uncompressedSize == ZSTD_CONTENTSIZE_UNKNOWN)
-    {
-        throw std::runtime_error("The decompressed size cannot be determined.");
-    }
-    else if (uncompressedSize == ZSTD_CONTENTSIZE_ERROR)
-    {
-        throw std::runtime_error("The compressed data is not recognized.");
-    }
+//shared_ptr<libCZI::IBitmapData> DecodeAndProcess(const void* ptrData, size_t size, libCZI::PixelType pixelType, uint32_t width, uint32_t height, bool doHiLoByteUnpacking)
+//{
+//    const unsigned long long uncompressedSize = ZSTD_getFrameContentSize(ptrData, size);
+//    if (uncompressedSize == ZSTD_CONTENTSIZE_UNKNOWN)
+//    {
+//        throw std::runtime_error("The decompressed size cannot be determined.");
+//    }
+//    else if (uncompressedSize == ZSTD_CONTENTSIZE_ERROR)
+//    {
+//        throw std::runtime_error("The compressed data is not recognized.");
+//    }
+//
+//    if (uncompressedSize != static_cast<uint64_t>(height) * width * Utils::GetBytesPerPixel(pixelType))
+//    {
+//        throw std::runtime_error("The compressed data is not valid.");
+//    }
+//
+//    return doHiLoByteUnpacking ?
+//        DecodeAndProcessWithHiLoByteUnpacking(ptrData, size, pixelType, width, height) :
+//        DecodeAndProcessNoHiLoByteUnpacking(ptrData, size, pixelType, width, height);
+//}
 
-    if (uncompressedSize != static_cast<uint64_t>(height) * width * Utils::GetBytesPerPixel(pixelType))
-    {
-        throw std::runtime_error("The compressed data is not valid.");
-    }
+//shared_ptr<libCZI::IBitmapData> DecodeAndProcessWithHiLoByteUnpacking(const void* ptrData, size_t size, libCZI::PixelType pixelType, uint32_t width, uint32_t height)
+//{
+//    const size_t uncompressedSize = static_cast<size_t>(height) * width * Utils::GetBytesPerPixel(pixelType);
+//    unique_ptr<void, void(*)(void*)> tmpBuffer(malloc(uncompressedSize), free);
+//    ZstdDecompressAndThrowIfError(ptrData, size, tmpBuffer.get(), uncompressedSize);
+//    const auto bytesPerPel = Utils::GetBytesPerPixel(pixelType);
+//    auto bitmap = CStdBitmapData::Create(pixelType, width, height);
+//    auto bmLckInfo = libCZI::ScopedBitmapLockerSP(bitmap);
+//    LoHiBytePackUnpack::LoHiBytePackStrided(tmpBuffer.get(), uncompressedSize, width * bytesPerPel / 2, height, bmLckInfo.stride, bmLckInfo.ptrDataRoi);
+//    return bitmap;
+//}
 
-    return doHiLoByteUnpacking ?
-        DecodeAndProcessWithHiLoByteUnpacking(ptrData, size, pixelType, width, height) :
-        DecodeAndProcessNoHiLoByteUnpacking(ptrData, size, pixelType, width, height);
-}
+//shared_ptr<libCZI::IBitmapData> DecodeAndProcessNoHiLoByteUnpacking(const void* ptrData, size_t size, libCZI::PixelType pixelType, uint32_t width, uint32_t height)
+//{
+//    const size_t uncompressedSize = static_cast<size_t>(height) * width * Utils::GetBytesPerPixel(pixelType);
+//    auto bitmap = CStdBitmapData::Create(pixelType, width, height, width * Utils::GetBytesPerPixel(pixelType));
+//    auto bmLckInfo = libCZI::ScopedBitmapLockerSP(bitmap);
+//    ZstdDecompressAndThrowIfError(ptrData, size, bmLckInfo.ptrDataRoi, uncompressedSize);
+//    return bitmap;
+//}
 
-shared_ptr<libCZI::IBitmapData> DecodeAndProcessWithHiLoByteUnpacking(const void* ptrData, size_t size, libCZI::PixelType pixelType, uint32_t width, uint32_t height)
-{
-    const size_t uncompressedSize = static_cast<size_t>(height) * width * Utils::GetBytesPerPixel(pixelType);
-    unique_ptr<void, void(*)(void*)> tmpBuffer(malloc(uncompressedSize), free);
-    ZstdDecompressAndThrowIfError(ptrData, size, tmpBuffer.get(), uncompressedSize);
-    const auto bytesPerPel = Utils::GetBytesPerPixel(pixelType);
-    auto bitmap = CStdBitmapData::Create(pixelType, width, height);
-    auto bmLckInfo = libCZI::ScopedBitmapLockerSP(bitmap);
-    LoHiBytePackUnpack::LoHiBytePackStrided(tmpBuffer.get(), uncompressedSize, width * bytesPerPel / 2, height, bmLckInfo.stride, bmLckInfo.ptrDataRoi);
-    return bitmap;
-}
-
-shared_ptr<libCZI::IBitmapData> DecodeAndProcessNoHiLoByteUnpacking(const void* ptrData, size_t size, libCZI::PixelType pixelType, uint32_t width, uint32_t height)
-{
-    const size_t uncompressedSize = static_cast<size_t>(height) * width * Utils::GetBytesPerPixel(pixelType);
-    auto bitmap = CStdBitmapData::Create(pixelType, width, height, width * Utils::GetBytesPerPixel(pixelType));
-    auto bmLckInfo = libCZI::ScopedBitmapLockerSP(bitmap);
-    ZstdDecompressAndThrowIfError(ptrData, size, bmLckInfo.ptrDataRoi, uncompressedSize);
-    return bitmap;
-}
-
-void ZstdDecompressAndThrowIfError(const void* ptrData, size_t size, void* ptrDst, size_t dstSize)
-{
-    const size_t decompressedSize = ZSTD_decompress(ptrDst, dstSize, ptrData, size);
-    if (ZSTD_isError(decompressedSize))
-    {
-        switch (ZSTD_ErrorCode ec = ZSTD_getErrorCode(decompressedSize))
-        {
-        case ZSTD_error_dstSize_tooSmall:
-            throw std::runtime_error("The size of the output-buffer is too small.");
-        default:
-            const std::string errorText = "\"ZSTD_decompress\" returned with error-code " + std::to_string(ec) + ".";
-            throw std::runtime_error(errorText);
-        }
-    }
-}
+//void ZstdDecompressAndThrowIfError(const void* ptrData, size_t size, void* ptrDst, size_t dstSize)
+//{
+//    const size_t decompressedSize = ZSTD_decompress(ptrDst, dstSize, ptrData, size);
+//    if (ZSTD_isError(decompressedSize))
+//    {
+//        switch (ZSTD_ErrorCode ec = ZSTD_getErrorCode(decompressedSize))
+//        {
+//        case ZSTD_error_dstSize_tooSmall:
+//            throw std::runtime_error("The size of the output-buffer is too small.");
+//        default:
+//            const std::string errorText = "\"ZSTD_decompress\" returned with error-code " + std::to_string(ec) + ".";
+//            throw std::runtime_error(errorText);
+//        }
+//    }
+//}
 
 bool IsTokenMatch(const char* start, const char* token, size_t token_len)
 {
