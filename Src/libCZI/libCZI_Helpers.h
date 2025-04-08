@@ -10,9 +10,9 @@
 
 namespace libCZI
 {
-    /// This is an utility in order to prepare the information
+    /// This is a utility in order to prepare the information
     /// required for the multi-channel-composition functions from
-    /// the display-settings (e. g. retrieved from metadata).
+    /// the display-settings (e.g.  retrieved from metadata).
     /// If the gradation curve is given as gamma or as a spline,
     /// we calculate here the lookup-table. In addition, we 
     /// make sure that only channels which are "enabled" (in the
@@ -204,4 +204,28 @@ namespace libCZI
             }
         }
     };
+    
+    /// This operator allows combining multiple `SubBlockDirectoryInfoPolicy` flags into a single value
+    /// using the bitwise OR operation. It is useful for specifying multiple policies simultaneously
+    /// when configuring the behavior of the `ICZIReader::OpenOptions` class.
+    ///
+    /// \param lhs The left-hand side `SubBlockDirectoryInfoPolicy` value.
+    /// \param rhs The right-hand side `SubBlockDirectoryInfoPolicy` value.
+    /// \return A `SubBlockDirectoryInfoPolicy` value that represents the combination of the two input flags.
+    constexpr ICZIReader::OpenOptions::SubBlockDirectoryInfoPolicy operator|(ICZIReader::OpenOptions::SubBlockDirectoryInfoPolicy lhs, ICZIReader::OpenOptions::SubBlockDirectoryInfoPolicy rhs)
+    {
+        return static_cast<ICZIReader::OpenOptions::SubBlockDirectoryInfoPolicy>(static_cast<std::uint8_t>(lhs) | static_cast<std::uint8_t>(rhs));
+    }
+
+    /// This operator allows combining multiple `SubBlockDirectoryInfoPolicy` flags into a single value
+    /// using the bitwise AND operation. It is useful for checking whether specific policies are enabled
+    /// when configuring the behavior of the `ICZIReader::OpenOptions` class.
+    ///
+    /// \param lhs The left-hand side `SubBlockDirectoryInfoPolicy` value.
+    /// \param rhs The right-hand side `SubBlockDirectoryInfoPolicy` value.
+    /// \return A `SubBlockDirectoryInfoPolicy` value that represents the intersection of the two input flags.
+    constexpr ICZIReader::OpenOptions::SubBlockDirectoryInfoPolicy operator&(ICZIReader::OpenOptions::SubBlockDirectoryInfoPolicy lhs, ICZIReader::OpenOptions::SubBlockDirectoryInfoPolicy rhs)
+    {
+        return static_cast<ICZIReader::OpenOptions::SubBlockDirectoryInfoPolicy>(static_cast<std::uint8_t>(lhs) & static_cast<std::uint8_t>(rhs));
+    }
 }

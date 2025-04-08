@@ -109,25 +109,6 @@ namespace libCZI
         bool allow_duplicate_subblocks{ false };
     };
 
-    /// This structure defines how to handle mismatches and discrepancies between sub-block information and the
-    /// actual pixel data. Please see the documentation about "Resolution Protocol for Ambiguous or Contradictory Information"
-    /// for details. For libCZI until version 0.63.2 the behavior was to throw an exception in case of a discrepancy
-    /// detected.
-    struct CreateBitmapOptions
-    {
-        /// In case of uncompressed pixel data, apply the resolution protocol for uncompressed data.
-        /// If false, an exception is thrown  (in case of a discrepancy).
-        bool handle_uncompressed_data_size_mismatch{ true };
-
-        /// In case of JpgXR compressed pixel data, apply the resolution protocol for uncompressed data.
-        /// If false, an exception is thrown  (in case of a discrepancy).
-        bool handle_jpgxr_bitmap_mismatch{ true };
-
-        /// In case of zstd compressed pixel data, apply the resolution protocol for uncompressed data.
-        /// If false, an exception is thrown  (in case of a discrepancy).
-        bool handle_zstd_data_size_mismatch{ true };
-    };
-
     /// Creates a new instance of the CZI-writer class.
     /// \param  options (Optional) Options for controlling the operation. This argument may
     ///                 be null, in which case default options are used.
@@ -138,9 +119,30 @@ namespace libCZI
     /// \return The newly created CZI-reader-writer.
     LIBCZI_API std::shared_ptr<ICziReaderWriter> CreateCZIReaderWriter();
 
+    /// This structure defines how to handle mismatches and discrepancies between sub-block information and the
+    /// actual pixel data. Please see the documentation about "Resolution Protocol for Ambiguous or Contradictory Information"
+    /// for details. For libCZI until version 0.63.2 the behavior was to throw an exception in case of a discrepancy
+    /// detected.
+    struct CreateBitmapOptions
+    {
+        /// In case of uncompressed pixel data, apply the resolution protocol for uncompressed data.
+        /// If false, an exception is thrown  (in case of a discrepancy).
+        bool handle_uncompressed_data_size_mismatch{ true };
+
+        /// In case of JpgXR compressed pixel data, apply the resolution protocol for JpgXR-compressed data.
+        /// If false, an exception is thrown  (in case of a discrepancy).
+        bool handle_jpgxr_bitmap_mismatch{ true };
+
+        /// In case of zstd compressed pixel data, apply the resolution protocol for zstd-compressed data.
+        /// If false, an exception is thrown  (in case of a discrepancy).
+        bool handle_zstd_data_size_mismatch{ true };
+    };
+
     /// Creates bitmap from sub block.
-    /// \param [in] subBlk The sub-block.
-    /// \return The newly allocated bitmap containing the image from the sub-block.
+    /// \param      subBlk  The sub-block.
+    /// \param      options (Optional) Options for controlling the operation. This controls how discrepancies
+    ///                     between the actual pixel data and the information in the sub-block are handled.
+    /// \returns    The newly allocated bitmap containing the image from the sub-block.
     LIBCZI_API std::shared_ptr<IBitmapData>  CreateBitmapFromSubBlock(ISubBlock* subBlk, const CreateBitmapOptions* options = nullptr);
 
     /// Creates metadata-object from a metadata segment.
@@ -325,12 +327,6 @@ namespace libCZI
             Data,       ///< An enum constant representing the bitmap-data.
             Attachment  ///< An enum constant representing the attachment (of a sub-block).
         };
-
-        //struct CreateBitmapOptions
-        //{
-        //    bool handle_payload_data_size_mismatch{ true };
-        //    bool handle_jpgxr_bitmap_mismatch{ true };
-        //};
 
         /// Gets sub-block information.
         /// \return The sub-block information.
@@ -740,6 +736,9 @@ namespace libCZI
             /// "CZIFrameOfReference::RawSubBlockCoordinateSystem" will be used.
             libCZI::CZIFrameOfReference default_frame_of_reference{ libCZI::CZIFrameOfReference::Invalid };
 
+            /// This bitfield is used to specify the policy which information is considered authoritative in the construction of a sub-block -
+            /// either the information in the sub-block directory or in the sub-block header. Also, it controls how to handle a discrepancy 
+            /// in this respect - either throw an exception if a discrepancy is encountered or ignore it.
             SubBlockDirectoryInfoPolicy subBlockDirectoryInfoPolicy{ SubBlockDirectoryInfoPolicy::SubBlockDirectoryPrecedence };
 
             /// Sets the default.
@@ -814,29 +813,6 @@ namespace libCZI
             return std::dynamic_pointer_cast<ISingleChannelScalingTileAccessor, IAccessor>(this->CreateAccessor(libCZI::AccessorType::SingleChannelScalingTileAccessor));
         }
     };
-
-
-    // Overload operator| for combining flags.
-    constexpr ICZIReader::OpenOptions::SubBlockDirectoryInfoPolicy operator|(ICZIReader::OpenOptions::SubBlockDirectoryInfoPolicy lhs, ICZIReader::OpenOptions::SubBlockDirectoryInfoPolicy rhs)
-    {
-        return static_cast<ICZIReader::OpenOptions::SubBlockDirectoryInfoPolicy>(
-            static_cast<std::uint8_t>(lhs) | static_cast<std::uint8_t>(rhs)
-        );
-    }
-
-    // Overload operator& for checking flags.
-    constexpr ICZIReader::OpenOptions::SubBlockDirectoryInfoPolicy operator&(ICZIReader::OpenOptions::SubBlockDirectoryInfoPolicy lhs, ICZIReader::OpenOptions::SubBlockDirectoryInfoPolicy rhs)
-    {
-        return static_cast<ICZIReader::OpenOptions::SubBlockDirectoryInfoPolicy>(
-            static_cast<std::uint8_t>(lhs) & static_cast<std::uint8_t>(rhs)
-        );
-    }
-
-    //// Optionally, overload operator|= for convenience.
-    //constexpr MyFlags& operator|=(MyFlags& lhs, MyFlags rhs) {
-    //    lhs = lhs | rhs;
-    //    return lhs;
-    //}
 }
 
 #include "libCZI_Helpers.h"
