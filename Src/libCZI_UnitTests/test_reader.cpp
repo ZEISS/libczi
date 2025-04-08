@@ -1065,10 +1065,10 @@ TEST(CziReader, ReadSubBlockWithJpxrCompressionTooSmallAndCheckResolutionProtoco
 TEST(CziReader, ReadSubBlockWithJpxrCompressionTooSmallDisableResolutionAndCheckException)
 {
     // arrange
-    auto test_czi = CreateCziDocumentContainingOneSubblockJpgXrCompressedWhichIsTooSmall();
+    const auto test_czi = CreateCziDocumentContainingOneSubblockJpgXrCompressedWhichIsTooSmall();
 
     // act
-    auto input_stream = CreateStreamFromMemory(get<0>(test_czi), get<1>(test_czi));
+    const auto input_stream = CreateStreamFromMemory(get<0>(test_czi), get<1>(test_czi));
     const auto reader = CreateCZIReader();
     reader->Open(input_stream);
 
@@ -1083,10 +1083,10 @@ TEST(CziReader, ReadSubBlockWithJpxrCompressionTooSmallDisableResolutionAndCheck
 TEST(CziReader, ReadSubBlockWithJpxrCompressionTooLargeDisableResolutionAndCheckException)
 {
     // arrange
-    auto test_czi = CreateCziDocumentContainingOneSubblockJpgXrCompressedWhichIsTooLarge();
+    const auto test_czi = CreateCziDocumentContainingOneSubblockJpgXrCompressedWhichIsTooLarge();
 
     // act
-    auto input_stream = CreateStreamFromMemory(get<0>(test_czi), get<1>(test_czi));
+    const auto input_stream = CreateStreamFromMemory(get<0>(test_czi), get<1>(test_czi));
     const auto reader = CreateCZIReader();
     reader->Open(input_stream);
 
@@ -1101,10 +1101,10 @@ TEST(CziReader, ReadSubBlockWithJpxrCompressionTooLargeDisableResolutionAndCheck
 TEST(CziReader, ReadSubBlockWithJpxrCompressionWhichHasWrongPixeltypeAndCheckResolutionProtocol)
 {
     // arrange
-    auto test_czi = CreateCziDocumentContainingOneSubblockJpgXrCompressedWrongPixelType();
+    const auto test_czi = CreateCziDocumentContainingOneSubblockJpgXrCompressedWrongPixelType();
 
     // act
-    auto input_stream = CreateStreamFromMemory(get<0>(test_czi), get<1>(test_czi));
+    const auto input_stream = CreateStreamFromMemory(get<0>(test_czi), get<1>(test_czi));
     const auto reader = CreateCZIReader();
     reader->Open(input_stream);
 
@@ -1113,7 +1113,7 @@ TEST(CziReader, ReadSubBlockWithJpxrCompressionWhichHasWrongPixeltypeAndCheckRes
 
     CreateBitmapOptions options;
     options.handle_jpgxr_bitmap_mismatch = true;
-    auto bitmap = sub_block->CreateBitmap(&options);
+    const auto bitmap = sub_block->CreateBitmap(&options);
     ASSERT_EQ(bitmap->GetWidth(), 5) << "Incorrect width";
     ASSERT_EQ(bitmap->GetHeight(), 5) << "Incorrect height";
     ASSERT_EQ(bitmap->GetPixelType(), PixelType::Gray16) << "Incorrect pixel type";
@@ -1132,10 +1132,10 @@ TEST(CziReader, ReadSubBlockWithJpxrCompressionWhichHasWrongPixeltypeAndCheckRes
 TEST(CziReader, ReadSubBlockWithZstd0CompressionTooSmallDisableResolutionAndCheckException)
 {
     // arrange
-    auto test_czi = CreateCziDocumentContainingOneSubblockZstd0CompressedWhichIsTooSmall();
+    const auto test_czi = CreateCziDocumentContainingOneSubblockZstd0CompressedWhichIsTooSmall();
 
     // act
-    auto input_stream = CreateStreamFromMemory(get<0>(test_czi), get<1>(test_czi));
+    const auto input_stream = CreateStreamFromMemory(get<0>(test_czi), get<1>(test_czi));
     const auto reader = CreateCZIReader();
     reader->Open(input_stream);
 
@@ -1150,10 +1150,10 @@ TEST(CziReader, ReadSubBlockWithZstd0CompressionTooSmallDisableResolutionAndChec
 TEST(CziReader, ReadSubBlockWithZstd0CompressionTooLargeDisableResolutionAndCheckException)
 {
     // arrange
-    auto test_czi = CreateCziDocumentContainingOneSubblockZstd0CompressedWhichIsTooLarge();
+    const auto test_czi = CreateCziDocumentContainingOneSubblockZstd0CompressedWhichIsTooLarge();
 
     // act
-    auto input_stream = CreateStreamFromMemory(get<0>(test_czi), get<1>(test_czi));
+    const auto input_stream = CreateStreamFromMemory(get<0>(test_czi), get<1>(test_czi));
     const auto reader = CreateCZIReader();
     reader->Open(input_stream);
 
@@ -1168,10 +1168,10 @@ TEST(CziReader, ReadSubBlockWithZstd0CompressionTooLargeDisableResolutionAndChec
 TEST(CziReader, ReadSubBlockWithZstd0CompressionTooSmallEnableResolutionAndCheckResolutionProtocol)
 {
     // arrange
-    auto test_czi = CreateCziDocumentContainingOneSubblockZstd0CompressedWhichIsTooSmall();
+    const auto test_czi = CreateCziDocumentContainingOneSubblockZstd0CompressedWhichIsTooSmall();
 
     // act
-    auto input_stream = CreateStreamFromMemory(get<0>(test_czi), get<1>(test_czi));
+    const auto input_stream = CreateStreamFromMemory(get<0>(test_czi), get<1>(test_czi));
     const auto reader = CreateCZIReader();
     reader->Open(input_stream);
 
@@ -1180,7 +1180,7 @@ TEST(CziReader, ReadSubBlockWithZstd0CompressionTooSmallEnableResolutionAndCheck
 
     CreateBitmapOptions options;
     options.handle_zstd_data_size_mismatch = true;
-    auto bitmap = sub_block->CreateBitmap(&options);
+    const auto bitmap = sub_block->CreateBitmap(&options);
     ASSERT_EQ(bitmap->GetWidth(), 4) << "Incorrect width";
     ASSERT_EQ(bitmap->GetHeight(), 4) << "Incorrect height";
     ASSERT_EQ(bitmap->GetPixelType(), PixelType::Gray8) << "Incorrect pixel type";
@@ -1208,10 +1208,10 @@ TEST(CziReader, ReadSubBlockWithZstd0CompressionTooSmallEnableResolutionAndCheck
 TEST(CziReader, ReadSubBlockWithZstd0CompressionTooLargeEnableResolutionAndCheckResolutionProtocol)
 {
     // arrange
-    auto test_czi = CreateCziDocumentContainingOneSubblockZstd0CompressedWhichIsTooLarge();
+    const auto test_czi = CreateCziDocumentContainingOneSubblockZstd0CompressedWhichIsTooLarge();
 
     // act
-    auto input_stream = CreateStreamFromMemory(get<0>(test_czi), get<1>(test_czi));
+    const auto input_stream = CreateStreamFromMemory(get<0>(test_czi), get<1>(test_czi));
     const auto reader = CreateCZIReader();
     reader->Open(input_stream);
 
@@ -1220,7 +1220,7 @@ TEST(CziReader, ReadSubBlockWithZstd0CompressionTooLargeEnableResolutionAndCheck
 
     CreateBitmapOptions options;
     options.handle_zstd_data_size_mismatch = true;
-    auto bitmap = sub_block->CreateBitmap(&options);
+    const auto bitmap = sub_block->CreateBitmap(&options);
     ASSERT_EQ(bitmap->GetWidth(), 4) << "Incorrect width";
     ASSERT_EQ(bitmap->GetHeight(), 4) << "Incorrect height";
     ASSERT_EQ(bitmap->GetPixelType(), PixelType::Gray8) << "Incorrect pixel type";
@@ -1239,10 +1239,10 @@ TEST(CziReader, ReadSubBlockWithZstd0CompressionTooLargeEnableResolutionAndCheck
 TEST(CziReader, ReadSubBlockWithZstd1CompressionTooSmallDisableResolutionAndCheckException)
 {
     // arrange
-    auto test_czi = CreateCziDocumentContainingOneSubblockZstd1CompressedWhichIsTooSmall();
+    const auto test_czi = CreateCziDocumentContainingOneSubblockZstd1CompressedWhichIsTooSmall();
 
     // act
-    auto input_stream = CreateStreamFromMemory(get<0>(test_czi), get<1>(test_czi));
+    const auto input_stream = CreateStreamFromMemory(get<0>(test_czi), get<1>(test_czi));
     const auto reader = CreateCZIReader();
     reader->Open(input_stream);
 
@@ -1257,10 +1257,10 @@ TEST(CziReader, ReadSubBlockWithZstd1CompressionTooSmallDisableResolutionAndChec
 TEST(CziReader, ReadSubBlockWithZstd1CompressionTooLargeDisableResolutionAndCheckException)
 {
     // arrange
-    auto test_czi = CreateCziDocumentContainingOneSubblockZstd1CompressedWhichIsTooLarge();
+    const auto test_czi = CreateCziDocumentContainingOneSubblockZstd1CompressedWhichIsTooLarge();
 
     // act
-    auto input_stream = CreateStreamFromMemory(get<0>(test_czi), get<1>(test_czi));
+    const auto input_stream = CreateStreamFromMemory(get<0>(test_czi), get<1>(test_czi));
     const auto reader = CreateCZIReader();
     reader->Open(input_stream);
 
@@ -1275,10 +1275,10 @@ TEST(CziReader, ReadSubBlockWithZstd1CompressionTooLargeDisableResolutionAndChec
 TEST(CziReader, ReadSubBlockWithZstd1CompressionTooSmallEnableResolutionAndCheckResolutionProtocol)
 {
     // arrange
-    auto test_czi = CreateCziDocumentContainingOneSubblockZstd1CompressedWhichIsTooSmall();
+    const auto test_czi = CreateCziDocumentContainingOneSubblockZstd1CompressedWhichIsTooSmall();
 
     // act
-    auto input_stream = CreateStreamFromMemory(get<0>(test_czi), get<1>(test_czi));
+    const auto input_stream = CreateStreamFromMemory(get<0>(test_czi), get<1>(test_czi));
     const auto reader = CreateCZIReader();
     reader->Open(input_stream);
 
@@ -1287,7 +1287,7 @@ TEST(CziReader, ReadSubBlockWithZstd1CompressionTooSmallEnableResolutionAndCheck
 
     CreateBitmapOptions options;
     options.handle_zstd_data_size_mismatch = true;
-    auto bitmap = sub_block->CreateBitmap(&options);
+    const auto bitmap = sub_block->CreateBitmap(&options);
     ASSERT_EQ(bitmap->GetWidth(), 4) << "Incorrect width";
     ASSERT_EQ(bitmap->GetHeight(), 4) << "Incorrect height";
     ASSERT_EQ(bitmap->GetPixelType(), PixelType::Gray8) << "Incorrect pixel type";
@@ -1315,10 +1315,10 @@ TEST(CziReader, ReadSubBlockWithZstd1CompressionTooSmallEnableResolutionAndCheck
 TEST(CziReader, ReadSubBlockWithZstd1CompressionTooLargeEnableResolutionAndCheckResolutionProtocol)
 {
     // arrange
-    auto test_czi = CreateCziDocumentContainingOneSubblockZstd1CompressedWhichIsTooLarge();
+    const auto test_czi = CreateCziDocumentContainingOneSubblockZstd1CompressedWhichIsTooLarge();
 
     // act
-    auto input_stream = CreateStreamFromMemory(get<0>(test_czi), get<1>(test_czi));
+    const auto input_stream = CreateStreamFromMemory(get<0>(test_czi), get<1>(test_czi));
     const auto reader = CreateCZIReader();
     reader->Open(input_stream);
 
@@ -1332,7 +1332,7 @@ TEST(CziReader, ReadSubBlockWithZstd1CompressionTooLargeEnableResolutionAndCheck
     ASSERT_EQ(bitmap->GetHeight(), 4) << "Incorrect height";
     ASSERT_EQ(bitmap->GetPixelType(), PixelType::Gray8) << "Incorrect pixel type";
 
-    ScopedBitmapLockerSP locked_bitmap{ bitmap };
+    const ScopedBitmapLockerSP locked_bitmap{ bitmap };
     for (int y = 0; y < 4; ++y)
     {
         const uint8_t* bitmap_pointer = static_cast<const uint8_t*>(locked_bitmap.ptrDataRoi) + static_cast<size_t>(y) * locked_bitmap.stride;
@@ -1387,10 +1387,10 @@ TEST(CziReader, ReadSubBlockWithZstd1CompressionWithHiLoBytePackTooSmallEnableRe
 TEST(CziReader, ReadSubBlockWithZstd1CompressionWithHiLoBytePackTooLargeEnableResolutionAndCheckResolutionProtocol)
 {
     // arrange
-    auto test_czi = CreateCziDocumentContainingOneSubblockZstd1CompressedWhichIsTooLargeWithHiLoBytePack();
+    const auto test_czi = CreateCziDocumentContainingOneSubblockZstd1CompressedWhichIsTooLargeWithHiLoBytePack();
 
     // act
-    auto input_stream = CreateStreamFromMemory(get<0>(test_czi), get<1>(test_czi));
+    const auto input_stream = CreateStreamFromMemory(get<0>(test_czi), get<1>(test_czi));
     const auto reader = CreateCZIReader();
     reader->Open(input_stream);
 
@@ -1399,13 +1399,13 @@ TEST(CziReader, ReadSubBlockWithZstd1CompressionWithHiLoBytePackTooLargeEnableRe
 
     CreateBitmapOptions options;
     options.handle_zstd_data_size_mismatch = true;
-    auto bitmap = sub_block->CreateBitmap(&options);
+    const auto bitmap = sub_block->CreateBitmap(&options);
     ASSERT_EQ(bitmap->GetWidth(), 4) << "Incorrect width";
     ASSERT_EQ(bitmap->GetHeight(), 4) << "Incorrect height";
     ASSERT_EQ(bitmap->GetPixelType(), PixelType::Gray16) << "Incorrect pixel type";
 
 
-    ScopedBitmapLockerSP locked_bitmap{ bitmap };
+    const ScopedBitmapLockerSP locked_bitmap{ bitmap };
     for (int y = 0; y < 4; ++y)
     {
         const uint16_t* bitmap_pointer = reinterpret_cast<const uint16_t*>(static_cast<const uint8_t*>(locked_bitmap.ptrDataRoi) + static_cast<size_t>(y) * locked_bitmap.stride);
@@ -1419,10 +1419,10 @@ TEST(CziReader, ReadSubBlockWithZstd1CompressionWithHiLoBytePackTooLargeEnableRe
 TEST(CziReader, ReadSubBlockWithZstd1CompressionWithHiLoBytePackTooSmallDisableResolutionAndCheckException)
 {
     // arrange
-    auto test_czi = CreateCziDocumentContainingOneSubblockZstd1CompressedWhichIsTooSmallWithHiLoBytePack();
+    const auto test_czi = CreateCziDocumentContainingOneSubblockZstd1CompressedWhichIsTooSmallWithHiLoBytePack();
 
     // act
-    auto input_stream = CreateStreamFromMemory(get<0>(test_czi), get<1>(test_czi));
+    const auto input_stream = CreateStreamFromMemory(get<0>(test_czi), get<1>(test_czi));
     const auto reader = CreateCZIReader();
     reader->Open(input_stream);
 
@@ -1437,7 +1437,7 @@ TEST(CziReader, ReadSubBlockWithZstd1CompressionWithHiLoBytePackTooSmallDisableR
 TEST(CziReader, ReadSubBlockWithZstd1CompressionWithHiLoBytePackTooLargeDisableResolutionAndCheckException)
 {
     // arrange
-    auto test_czi = CreateCziDocumentContainingOneSubblockZstd1CompressedWhichIsTooLargeWithHiLoBytePack();
+    const auto test_czi = CreateCziDocumentContainingOneSubblockZstd1CompressedWhichIsTooLargeWithHiLoBytePack();
 
     // act
     auto input_stream = CreateStreamFromMemory(get<0>(test_czi), get<1>(test_czi));
