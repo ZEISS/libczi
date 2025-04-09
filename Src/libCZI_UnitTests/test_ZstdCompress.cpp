@@ -58,7 +58,7 @@ static void _testImageCompressDecompressZStd0Param(uint32_t imgWidth, uint32_t i
     EXPECT_TRUE(maxSize >= imgSize) << "Unexpected compress image size";
 
     std::shared_ptr<CZstd0Decoder> dec = CZstd0Decoder::Create();
-    std::shared_ptr<libCZI::IBitmapData> decImg = dec->IDecoder::Decode(buffer.get(), imgSize, pixelType, img->GetWidth(), img->GetHeight());
+    std::shared_ptr<libCZI::IBitmapData> decImg = dec->Decode(buffer.get(), imgSize, pixelType, img->GetWidth(), img->GetHeight());
 
     EXPECT_TRUE(decImg != nullptr) << "Failed to create decoded image";
     EXPECT_TRUE(decImg->GetHeight() == imgHeight) << "The decoded image has wrong height";
@@ -94,7 +94,7 @@ static void _testImageCompressDecompressZStd1Param(uint32_t imgWidth, uint32_t i
     EXPECT_TRUE(maxSize >= imgSize) << "Unexpected compress image size";
 
     std::shared_ptr<CZstd1Decoder> dec = CZstd1Decoder::Create();
-    std::shared_ptr<libCZI::IBitmapData> decImg = dec->IDecoder::Decode(buffer.get(), imgSize, pixelType, img->GetWidth(), img->GetHeight());
+    std::shared_ptr<libCZI::IBitmapData> decImg = dec->Decode(buffer.get(), imgSize, pixelType, img->GetWidth(), img->GetHeight());
 
     EXPECT_TRUE(decImg != nullptr) << "Failed to create decoded image";
     EXPECT_TRUE(decImg->GetHeight() == imgHeight) << "The decoded image has wrong height";
