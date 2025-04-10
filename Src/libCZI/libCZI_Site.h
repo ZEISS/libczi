@@ -45,7 +45,7 @@ namespace libCZI
         /// \param pixelType            If non-null, the pixel type of the expected bitmap.
         /// \param width                If non-null, the width of the expected bitmap.
         /// \param height               If non-null, the height of the expected bitmap.
-        /// \param additional_arguments If non-null, additional arguments for the decoder. This is a null-terminated string, where the syntax is defined class specifically.
+        /// \param additional_arguments If non-null, additional arguments for the decoder. This is a null-terminated string, where the syntax is class-specific.
         ///
         /// \return A bitmap object with the decoded data.
         virtual std::shared_ptr<libCZI::IBitmapData> Decode(const void* ptrData, size_t size, const libCZI::PixelType* pixelType, const std::uint32_t* width, const std::uint32_t* height, const char* additional_arguments = nullptr) = 0;
