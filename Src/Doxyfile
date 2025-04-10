@@ -970,6 +970,7 @@ INPUT                  = ./libCZI/libCZI.h \
                          ./libCZI/Doc/CZICmd_usage.markdown \
                          ./libCZI/Doc/coordinate_systems.markdown \
                          ./libCZI/Doc/write_czi.markdown \
+                         ./libCZI/Doc/resolution_protocol.markdown \
                          ./libCZI/Doc/Todos.markdown \
                          ./libCZI/Doc/version-history.markdown
 
