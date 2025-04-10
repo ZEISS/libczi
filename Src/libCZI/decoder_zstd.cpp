@@ -94,6 +94,26 @@ namespace
         return zstd_frame_content_size;
     }
 
+    size_t DecompressAndThrowIfError(const void* ptr_compressed_data, size_t size_compressed_data, void* ptr_destination, size_t size_destination, size_t expected_decompressed_size)
+    {
+        const size_t decompressed_size = ZSTD_decompress(ptr_destination, size_destination, ptr_compressed_data, size_compressed_data);
+        if (ZSTD_isError(decompressed_size))
+        {
+            ostringstream ss;
+            ss << "Zstd-decompression failed with error: " << ZSTD_getErrorName(decompressed_size);
+            throw runtime_error(ss.str());
+        }
+
+        if (decompressed_size != expected_decompressed_size)
+        {
+            ostringstream ss;
+            ss << "Zstd-decompression produced unexpected size. Expected: " << expected_decompressed_size << ", actual: " << decompressed_size;
+            throw runtime_error(ss.str());
+        }
+
+        return decompressed_size;
+    }
+
     /// Decodes zstd-compressed data to give a bitmap of the specified characteristics. If the size of the
     /// zstd-compressed data does not exactly match the size of the bitmap, an exception is thrown.
     ///
@@ -121,20 +141,9 @@ namespace
 
         auto bitmap = CStdBitmapData::Create(pixel_type, width, height, stride);
         auto bitmap_lock_info = libCZI::ScopedBitmapLockerSP(bitmap);
-        const size_t decompressed_size = ZSTD_decompress(bitmap_lock_info.ptrDataRoi, expected_size, ptr_data, size);
-        if (ZSTD_isError(decompressed_size))
-        {
-            stringstream ss;
-            ss << "Zstd-decompression failed with error: " << ZSTD_getErrorName(decompressed_size);
-            throw runtime_error(ss.str());
-        }
 
-        if (decompressed_size != expected_size)
-        {
-            stringstream ss;
-            ss << "Zstd-decompression produced unexpected size. Expected: " << expected_size << ", actual: " << decompressed_size;
-            throw runtime_error(ss.str());
-        }
+        // Decompress the data into the bitmap       
+        DecompressAndThrowIfError(ptr_data, size, bitmap_lock_info.ptrDataRoi, expected_size, zstd_frame_content_size);
 
         return bitmap;
     }
@@ -146,7 +155,7 @@ namespace
     ///
     /// \param  ptr_data    Pointer to the zstd-compressed data.
     /// \param  size        The size of the zstd-compressed data.
-    /// \param  pixel_type  The pixel type of the destination bitmap.
+    /// \param  pixel_type  The pixel type of the destination bitmap (precondition: since hi-lo-byte-packing only works with 16-bit integer type, this must be either Gray16 or Bgr48).
     /// \param  width       The width of the destination bitmap.
     /// \param  height      The height of the destination bitmap.
     ///
@@ -171,23 +180,13 @@ namespace
             throw runtime_error("Failed to allocate temporary buffer for Zstd-decompression.");
         }
 
-        const size_t decompressed_size = ZSTD_decompress(temporary_buffer.get(), expected_size, ptr_data, size);
-        if (ZSTD_isError(decompressed_size))
-        {
-            stringstream ss;
-            ss << "Zstd-decompression failed with error: " << ZSTD_getErrorName(decompressed_size);
-            throw runtime_error(ss.str());
-        }
-
-        if (zstd_frame_content_size != expected_size)
-        {
-            stringstream ss;
-            ss << "Zstd-decompression produced unexpected size. Expected: " << expected_size << ", actual: " << decompressed_size;
-            throw runtime_error(ss.str());
-        }
+        const size_t decompressed_size = DecompressAndThrowIfError(ptr_data, size, temporary_buffer.get(), expected_size, zstd_frame_content_size);
 
         auto bitmap = CStdBitmapData::Create(pixel_type, width, height);
-        auto bitmap_lock_info = libCZI::ScopedBitmapLockerSP(bitmap);
+        const auto bitmap_lock_info = libCZI::ScopedBitmapLockerSP(bitmap);
+
+        // Note: "width * bytes_per_pel / 2" gives the "number of 16-bit pels" in a row, and we divide by 2 because that's
+        //        the number of bytes per pel for a 16-bit pel. This gives the correct size also for Bgr48.
         LoHiBytePackUnpack::LoHiBytePackStrided(temporary_buffer.get(), decompressed_size, width * bytes_per_pel / 2, height, bitmap_lock_info.stride, bitmap_lock_info.ptrDataRoi);
         return bitmap;
     }
@@ -232,20 +231,8 @@ namespace
         {
             // sizes mismatch, and the decoded size is less than expected - so we need to decode and then fill up with zeroes
             auto bitmap_lock_info = libCZI::ScopedBitmapLockerSP(bitmap);
-            size_t decompressed_size = ZSTD_decompress(bitmap_lock_info.ptrDataRoi, zstd_frame_content_size, ptr_data, size);
-            if (ZSTD_isError(decompressed_size))
-            {
-                stringstream ss;
-                ss << "Zstd-decompression failed with error: " << ZSTD_getErrorName(decompressed_size);
-                throw runtime_error(ss.str());
-            }
 
-            if (zstd_frame_content_size != decompressed_size)
-            {
-                stringstream ss;
-                ss << "Zstd-decompression produced unexpected size. Expected: " << zstd_frame_content_size << ", actual: " << decompressed_size;
-                throw runtime_error(ss.str());
-            }
+            const size_t decompressed_size = DecompressAndThrowIfError(ptr_data, size, bitmap_lock_info.ptrDataRoi, expected_size, zstd_frame_content_size);
 
             // fill up the rest with zeroes
             memset(static_cast<uint8_t*>(bitmap_lock_info.ptrDataRoi) + decompressed_size, 0, expected_size - decompressed_size);
@@ -261,23 +248,10 @@ namespace
                 throw runtime_error("Failed to allocate temporary buffer for Zstd-decompression.");
             }
 
-            size_t decompressed_size = ZSTD_decompress(temporary_buffer.get(), zstd_frame_content_size, ptr_data, size);
-            if (ZSTD_isError(decompressed_size))
-            {
-                stringstream ss;
-                ss << "Zstd-decompression failed with error: " << ZSTD_getErrorName(decompressed_size);
-                throw runtime_error(ss.str());
-            }
+            DecompressAndThrowIfError(ptr_data, size, temporary_buffer.get(), zstd_frame_content_size, zstd_frame_content_size);
 
-            if (zstd_frame_content_size != decompressed_size)
-            {
-                stringstream ss;
-                ss << "Zstd-decompression produced unexpected size. Expected: " << zstd_frame_content_size << ", actual: " << decompressed_size;
-                throw runtime_error(ss.str());
-            }
-
-            auto bmLckInfo = libCZI::ScopedBitmapLockerSP(bitmap);
-            memcpy(bmLckInfo.ptrDataRoi, temporary_buffer.get(), expected_size);
+            auto bitmap_lock_info = libCZI::ScopedBitmapLockerSP(bitmap);
+            memcpy(bitmap_lock_info.ptrDataRoi, temporary_buffer.get(), expected_size);
 
             return bitmap;
         }
@@ -313,20 +287,7 @@ namespace
                 throw runtime_error("Failed to allocate temporary buffer for Zstd-decompression.");
             }
 
-            size_t decompressed_size = ZSTD_decompress(temporary_buffer.get(), zstd_frame_content_size, ptr_data, size);
-            if (ZSTD_isError(decompressed_size))
-            {
-                stringstream ss;
-                ss << "Zstd-decompression failed with error: " << ZSTD_getErrorName(decompressed_size);
-                throw runtime_error(ss.str());
-            }
-
-            if (zstd_frame_content_size != decompressed_size)
-            {
-                stringstream ss;
-                ss << "Zstd-decompression produced unexpected size. Expected: " << zstd_frame_content_size << ", actual: " << decompressed_size;
-                throw runtime_error(ss.str());
-            }
+            DecompressAndThrowIfError(ptr_data, size, temporary_buffer.get(), zstd_frame_content_size, zstd_frame_content_size);
 
             auto bitmap = CStdBitmapData::Create(pixel_type, width, height);
             auto bitmap_lock_info = libCZI::ScopedBitmapLockerSP(bitmap);
@@ -341,20 +302,7 @@ namespace
                 throw runtime_error("Failed to allocate temporary buffer for Zstd-decompression.");
             }
 
-            size_t decompressed_size = ZSTD_decompress(temporary_buffer.get(), zstd_frame_content_size, ptr_data, size);
-            if (ZSTD_isError(decompressed_size))
-            {
-                stringstream ss;
-                ss << "Zstd-decompression failed with error: " << ZSTD_getErrorName(decompressed_size);
-                throw runtime_error(ss.str());
-            }
-
-            if (zstd_frame_content_size != decompressed_size)
-            {
-                stringstream ss;
-                ss << "Zstd-decompression produced unexpected size. Expected: " << zstd_frame_content_size << ", actual: " << decompressed_size;
-                throw runtime_error(ss.str());
-            }
+            const size_t decompressed_size = DecompressAndThrowIfError(ptr_data, size, temporary_buffer.get(), zstd_frame_content_size, zstd_frame_content_size);
 
             auto bitmap = CStdBitmapData::Create(pixel_type, width, height, stride);
             auto bitmap_lock_info = libCZI::ScopedBitmapLockerSP(bitmap);
@@ -372,22 +320,9 @@ namespace
                 throw runtime_error("Failed to allocate temporary buffer for Zstd-decompression.");
             }
 
-            size_t decompressed_size = ZSTD_decompress(temporary_buffer.get(), zstd_frame_content_size, ptr_data, size);
-            if (ZSTD_isError(decompressed_size))
-            {
-                stringstream ss;
-                ss << "Zstd-decompression failed with error: " << ZSTD_getErrorName(decompressed_size);
-                throw runtime_error(ss.str());
-            }
+            const size_t decompressed_size = DecompressAndThrowIfError(ptr_data, size, temporary_buffer.get(), zstd_frame_content_size, zstd_frame_content_size);
 
-            if (zstd_frame_content_size != decompressed_size)
-            {
-                stringstream ss;
-                ss << "Zstd-decompression produced unexpected size. Expected: " << zstd_frame_content_size << ", actual: " << decompressed_size;
-                throw runtime_error(ss.str());
-            }
-
-            // Ok, now we need an additional temporary buffer for the packing (we simply cannot unpack into the
+            // Ok, now we need an additional temporary buffer for the packing (we simply cannot pack into the
             //  destination bitmap, at least not without a new LoHiBytePack-method which would allow this)
             unique_ptr<void, decltype(&free)> temporary_buffer_for_packed(malloc(zstd_frame_content_size), free);
             if (temporary_buffer_for_packed == nullptr)
