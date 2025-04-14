@@ -696,7 +696,7 @@ namespace libCZI
         /// This structure gathers the settings for controlling the 'Open' operation of the CZIReader-class.
         struct LIBCZI_API OpenOptions
         {
-            /// This enum is used to specify the policy which information is considered authoritative (in the description
+            /// This enum is used to specify the policy which defines which information is considered authoritative (in the description
             /// of a sub-block) - either the information in the sub-block directory or in the sub-block header. Also, it
             /// controls how to handle a discrepancy here - either throw an exception if a discrepancy is encountered or ignore
             /// a discrepancy (and go with the respective information for decoding a bitmap as is).
