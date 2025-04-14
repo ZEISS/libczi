@@ -14,7 +14,7 @@ A CZI containing mismatches (as discussed below) is without a doubt to be consid
 a malformed file, then a consistent behavior is desirable. Also, it is impractical to check internal consistency in all aspects before
 reading data from a CZI-file - it is designed in way that it allows to access only the parts of the file which are of interest (as opposed
 to be read in its entirety to memory). If such discrepancies are encountered, it is strongly recommended to report them in some form,
-potentially even to the user. So - those cases are indications of a malformed and corrupted file, and should be treated as such.
+potentially even to the user. Those cases are indications of a malformed and corrupted file, and should be treated as such.
 
 Note that by defining which piece of information is to be considered as authoritative, no statement is made whether it is _correct_. The whole
 purpose here is to have _consistent_ behavior when facing malformed data. Following those procedure does not magically make the underlying problem
