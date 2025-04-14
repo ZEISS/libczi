@@ -333,7 +333,7 @@ std::shared_ptr<ISubBlock> CCZIReader::ReadSubBlock(const CCziSubBlockDirectory:
     libCZI::SubBlockInfo info;
     if ((this->sub_block_directory_info_policy_ & OpenOptions::SubBlockDirectoryInfoPolicy::PrecedenceMask) == OpenOptions::SubBlockDirectoryInfoPolicy::SubBlockDirectoryPrecedence)
     {
-        // the sub-block-directory information takes precedence, which is default and specified to be the authoritative information
+        // the sub-block-directory information takes precedence, which is the default behavior and specified to be the authoritative information.
         info.pixelType = CziUtils::PixelTypeFromInt(entry.PixelType);
         info.compressionModeRaw = entry.Compression;
         info.coordinate = entry.coordinate;
