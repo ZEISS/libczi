@@ -27,7 +27,7 @@ Physically, the information is represented by the data-structure [SubBlockDirect
 The information in this structure which is relevant for the payload content is:
 * Pixel Type
 * Compression
-* physical width and height of the bitmap
+* Physical width and height of the bitmap
 
 It is now conceivable that the information in the DirectoryEntry is not consistent with the actual payload content. The following cases need to be considered:
 
