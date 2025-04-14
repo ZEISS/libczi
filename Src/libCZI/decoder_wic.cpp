@@ -292,10 +292,6 @@ static bool DeterminePixelType(const WICPixelFormatGUID& wicPxlFmt, GUID* destPi
         throw std::logic_error(ss.str());
     }
 
-    /*if (sizeBitmap.h != height || sizeBitmap.w != width) {
-        throw  std::logic_error("width and height don't match...");
-    }*/
-
     if (GetSite()->IsEnabled(LOGLEVEL_CHATTYINFORMATION))
     {
         stringstream ss; ss << " Requested Decoded PixelFormat:" << GetInformativeString(wicDestPxlFmt) << " Width:" << sizeBitmap.w << " Height:" << sizeBitmap.h;
