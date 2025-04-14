@@ -22,7 +22,7 @@ go away (which usually is either a problem when authoring the CZI or some sort o
 
 ## discrepancies between sub-block's DirectoryEntry and the actual payload content
 
-In a sub-block, we have a description of the payload content in the DirectoryEntry, and we have the actual payload content.
+In a sub-block, we have a description of the payload content in the DirectoryEntry as well as the actual payload content.
 Physically, the information is represented by the data-structure [SubBlockDirectoryEntryDV](https://github.com/ZEISS/libczi/blob/11015ae9aa97abbf9d78293a27115393077f9146/Src/libCZI/CziStructs.h#L175).
 The information in this structure which is relevant for the payload content is:
 * Pixel Type
