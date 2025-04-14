@@ -33,7 +33,7 @@ namespace libCZI
         /// This method is intended to be called concurrently, implementors should make no assumption
         /// about concurrency.
         /// The parameters `pixelType`, `width` and `height` are used for validation purposes only. The decoder
-        /// is expected to check if the data passed in is of the expected type and size. If not, it should throw an exception.
+        /// is expected to check whether the data passed in is of the expected type and size. If not, it should throw an exception.
         /// If instead nullptr is passed for any of `pixelType`, `width` or `height`, then this means that this parameter
         /// is not to be validated. The decoder is expected to decode the data and return a bitmap object.
         ///
