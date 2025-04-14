@@ -17,7 +17,7 @@ to be read in its entirety to memory). If such discrepancies are encountered, it
 potentially even to the user. Those cases are indications of a malformed and corrupted file, and should be treated as such.
 
 Note that by defining which piece of information is to be considered as authoritative, no statement is made whether it is _correct_. The whole
-purpose here is to have _consistent_ behavior when facing malformed data. Following those procedure does not magically make the underlying problem
+purpose here is to have _consistent_ behavior when facing malformed data. Following these procedures does not magically make the underlying problem
 go away (which usually is either a problem when authoring the CZI or some sort of storage malfunction or error in transmission).
 
 ## discrepancies between sub-block's DirectoryEntry and the actual payload content
