@@ -14,7 +14,7 @@ private:
     size_t usedSize;
 public:
     CMemOutputStream(size_t initialSize);
-    virtual ~CMemOutputStream() override;
+    ~CMemOutputStream() override;
 
     const char* GetDataC() const
     {
@@ -38,7 +38,7 @@ public:
         return spBuffer;
     }
 public:	// interface IOutputStream
-    virtual void Write(std::uint64_t offset, const void* pv, std::uint64_t size, std::uint64_t* ptrBytesWritten) override;
+    void Write(std::uint64_t offset, const void* pv, std::uint64_t size, std::uint64_t* ptrBytesWritten) override;
 private:
     void EnsureSize(std::uint64_t newSize);
 };

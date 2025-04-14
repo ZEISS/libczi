@@ -81,17 +81,17 @@ public:
     /// Decodes the specified data, giving an uncompressed bitmap.
     /// The course of action is as follows:
     /// * The decoder will be initialized with the specified compressed data.  
-    /// * The characteristics of the compressed data will be determined - i.e the pixel type, width, height, etc. are determined.  
+    /// * The characteristics of the compressed data will be determined - i.e. the pixel type, width, height, etc. are determined.  
     /// * The 'get_destination_func' is called, passing in the pixel type, width, and height (as determined in the step before).    
     /// * The 'get_destination_func' function  now is to check whether it can receive the bitmap (as reported). If it cannot, it   
     ///   must throw an exception (which will be propagated to the caller). Otherwise, it must return a tuple, containing
     ///   a pointer to a buffer that can hold the uncompressed bitmap and the stride. This buffer must remain valid until the
-    ///   the function returns - either normally or by throwing an exception.
+    ///   function returns - either normally or by throwing an exception.
     /// Notes:
     /// * The decoder will call the 'get_destination_func' function only once, and the buffer must be valid  
     ///   until the method returns.
     /// * The 'get_destination_func' function may choose to throw an exception (if the memory cannot be allocated,  
-    ///   or the reported characteristics are determined to be invalid, etc). 
+    ///   or the reported characteristics are determined to be invalid, etc.). 
     ///
     /// \param  ptrData                 Information describing the pointer.
     /// \param  size                    The size.

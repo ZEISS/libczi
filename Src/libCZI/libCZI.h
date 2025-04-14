@@ -119,10 +119,31 @@ namespace libCZI
     /// \return The newly created CZI-reader-writer.
     LIBCZI_API std::shared_ptr<ICziReaderWriter> CreateCZIReaderWriter();
 
+    /// This structure defines how to handle mismatches and discrepancies between sub-block information and the
+    /// actual pixel data. Please see the documentation about "Resolution Protocol for Ambiguous or Contradictory Information"
+    /// for details. For libCZI until version 0.63.2 the behavior was to throw an exception in case of a discrepancy
+    /// detected.
+    struct CreateBitmapOptions
+    {
+        /// In case of uncompressed pixel data, apply the resolution protocol for uncompressed data.
+        /// If false, an exception is thrown  (in case of a discrepancy).
+        bool handle_uncompressed_data_size_mismatch{ true };
+
+        /// In case of JpgXR compressed pixel data, apply the resolution protocol for JpgXR-compressed data.
+        /// If false, an exception is thrown  (in case of a discrepancy).
+        bool handle_jpgxr_bitmap_mismatch{ true };
+
+        /// In case of zstd compressed pixel data, apply the resolution protocol for zstd-compressed data.
+        /// If false, an exception is thrown  (in case of a discrepancy).
+        bool handle_zstd_data_size_mismatch{ true };
+    };
+
     /// Creates bitmap from sub block.
-    /// \param [in] subBlk The sub-block.
-    /// \return The newly allocated bitmap containing the image from the sub-block.
-    LIBCZI_API std::shared_ptr<IBitmapData>  CreateBitmapFromSubBlock(ISubBlock* subBlk);
+    /// \param      subBlk  The sub-block.
+    /// \param      options (Optional) Options for controlling the operation. This controls how discrepancies
+    ///                     between the actual pixel data and the information in the sub-block are handled.
+    /// \returns    The newly allocated bitmap containing the image from the sub-block.
+    LIBCZI_API std::shared_ptr<IBitmapData>  CreateBitmapFromSubBlock(ISubBlock* subBlk, const CreateBitmapOptions* options = nullptr);
 
     /// Creates metadata-object from a metadata segment.
     /// \param [in] metadataSegment The metadata segment object.
@@ -333,7 +354,7 @@ namespace libCZI
         /// keep a reference (and return the same bitmap if called twice).
         /// In current version this method is equivalent to calling CreateBitmapFromSubBlock.
         /// \return The bitmap (contained in this sub-block).
-        virtual std::shared_ptr<IBitmapData> CreateBitmap() = 0;
+        virtual std::shared_ptr<IBitmapData> CreateBitmap(const CreateBitmapOptions* options = nullptr) = 0;
 
         virtual ~ISubBlock() = default;
 
@@ -675,6 +696,24 @@ namespace libCZI
         /// This structure gathers the settings for controlling the 'Open' operation of the CZIReader-class.
         struct LIBCZI_API OpenOptions
         {
+            /// This enum is used to specify the policy which defines which information is considered authoritative (in the description
+            /// of a sub-block) - either the information in the sub-block directory or in the sub-block header. Also, it
+            /// controls how to handle a discrepancy here - either throw an exception if a discrepancy is encountered or ignore
+            /// a discrepancy (and go with the respective information for decoding a bitmap as is).
+            /// Note that the values defined here are used to define a bit-field. The first bit (bit 0) is used to
+            /// distinguish between sub-block-directory precedence and sub-block-header precedence. The value 'PrecedenceMask'
+            /// is used to mask this bit. Bit 7 is used to indicate whether a discrepancy is to be ignored or whether an error
+            /// is to be reported.
+            /// Historically, libCZI (up to version 0.63.2) used to give precedence fo the sub-block header information,
+            /// and it did not report a discrepancy.
+            enum class SubBlockDirectoryInfoPolicy : std::uint8_t
+            {
+                SubBlockDirectoryPrecedence = 0, ///< The sub-block-directory information is used for the sub-blocks.
+                SubBlockHeaderPrecedence = 1,    ///< The sub-block information is used for the sub-blocks.
+                PrecedenceMask = 1,              ///< Bit-mask allowing to extract the relevant bits for "precedence".
+                IgnoreDiscrepancy = 0x80,        ///< Flag allowing to choose whether a discrepancy is to be ignored (true) or whether an exception is to be thrown (false) when accessing the sub-block.
+            };
+
             /// This option controls whether the lax parameter validation when parsing the dimension-entry of a subblock is to be used.
             /// Previous versions of libCZI did not check whether certain values in the file have the expected value. If those values
             /// are different than expected, this meant that libCZI would not be able to deal with the document properly.  
@@ -697,12 +736,18 @@ namespace libCZI
             /// "CZIFrameOfReference::RawSubBlockCoordinateSystem" will be used.
             libCZI::CZIFrameOfReference default_frame_of_reference{ libCZI::CZIFrameOfReference::Invalid };
 
-            /// Sets the the default.
+            /// This bitfield is used to specify the policy which information is considered authoritative in the construction of a sub-block -
+            /// either the information in the sub-block directory or in the sub-block header. Also, it controls how to handle a discrepancy 
+            /// in this respect - either throw an exception if a discrepancy is encountered or ignore it.
+            SubBlockDirectoryInfoPolicy subBlockDirectoryInfoPolicy{ SubBlockDirectoryInfoPolicy::SubBlockDirectoryPrecedence };
+
+            /// Sets the default.
             void SetDefault()
             {
                 this->lax_subblock_coordinate_checks = true;
                 this->ignore_sizem_for_pyramid_subblocks = false;
                 this->default_frame_of_reference = libCZI::CZIFrameOfReference::Invalid;
+                this->subBlockDirectoryInfoPolicy = SubBlockDirectoryInfoPolicy::SubBlockDirectoryPrecedence;
             }
         };
 
@@ -732,7 +777,7 @@ namespace libCZI
         /// Creates an accessor for the sub-blocks.
         /// See also the various typed methods: `CreateSingleChannelTileAccessor`, `CreateSingleChannelPyramidLayerTileAccessor` and `CreateSingleChannelScalingTileAccessor`.
         /// \remark
-        /// If the class is not operational (i. e. Open was not called or Open was not successful), then an exception of type std::logic_error is thrown.
+        /// If the class is not operational (i.e. Open was not called or Open was not successful), then an exception of type std::logic_error is thrown.
         ///
         /// \param accessorType The type of the accessor.
         ///

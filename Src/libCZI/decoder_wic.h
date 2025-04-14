@@ -27,7 +27,7 @@ public:
     virtual ~CWicJpgxrDecoder();
 
 public:
-    std::shared_ptr<libCZI::IBitmapData> Decode(const void* ptrData, size_t size, libCZI::PixelType pixelType, std::uint32_t height, std::uint32_t width) override;
+    std::shared_ptr<libCZI::IBitmapData> Decode(const void* ptrData, size_t size, const libCZI::PixelType* pixelType, const std::uint32_t* height, const std::uint32_t* width, const char* additional_arguments) override;
 };
 
 #endif

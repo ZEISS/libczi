@@ -15,7 +15,7 @@ namespace libCZI
     /// created by `ISite::GetDecoder`.
     enum class ImageDecoderType
     {
-        JPXR_JxrLib,    ///< Identifies an decoder capable of decoding a JPG-XR compressed image.
+        JPXR_JxrLib,    ///< Identifies a decoder capable of decoding a JPG-XR compressed image.
 
         ZStd0,          ///< Identifies a decoder capable of decoding a zstd compressed image (type "zstd0").
 
@@ -28,41 +28,61 @@ namespace libCZI
     class IDecoder
     {
     public:
-
         /// Passing in a block of raw data, decode the image and return a bitmap object.
         /// \remark
         /// This method is intended to be called concurrently, implementors should make no assumption
         /// about concurrency.
+        /// The parameters `pixelType`, `width` and `height` are used for validation purposes only. The decoder
+        /// is expected to check whether the data passed in is of the expected type and size. If not, it should throw an exception.
+        /// If instead nullptr is passed for any of `pixelType`, `width` or `height`, then this means that this parameter
+        /// is not to be validated. The decoder is expected to decode the data and return a bitmap object.
         ///
         /// \remark
         /// In case of an error (of whatever kind) the method is expected to throw an exception.
         /// 
-        /// \param ptrData          Pointer to a a block of memory (which contains the encoded image).
+        /// \param ptrData              Pointer to a block of memory (which contains the encoded image).
         /// \param size                 The size of the memory block pointed by `ptrData`.
-        /// \param pixelType    The pixel type of the expected bitmap.
-        /// \param width                The width of the expected bitmap, used for validation purposes only.
-        /// \param height               The height of the expected bitmap, used for validation purposes only.
+        /// \param pixelType            If non-null, the pixel type of the expected bitmap.
+        /// \param width                If non-null, the width of the expected bitmap.
+        /// \param height               If non-null, the height of the expected bitmap.
+        /// \param additional_arguments If non-null, additional arguments for the decoder. This is a null-terminated string, where the syntax is class-specific.
         ///
         /// \return A bitmap object with the decoded data.
-        virtual std::shared_ptr<libCZI::IBitmapData> Decode(const void* ptrData, size_t size, libCZI::PixelType pixelType, std::uint32_t width, std::uint32_t height) = 0;
+        virtual std::shared_ptr<libCZI::IBitmapData> Decode(const void* ptrData, size_t size, const libCZI::PixelType* pixelType, const std::uint32_t* width, const std::uint32_t* height, const char* additional_arguments = nullptr) = 0;
 
         virtual ~IDecoder() = default;
+
+        /// Decodes the specified data and returns a bitmap object. This is a convenience method, where the parameters
+        /// `pixelType`, `width` and `height` are passed in as references and as required parameters (as opposed to optional).
+        ///
+        /// \param  ptrData             Pointer to a block of memory (which contains the encoded image).
+        /// \param  size                The size of the memory block pointed by `ptrData`.
+        /// \param  pixelType           The pixel type which is expected.
+        /// \param  width               The width which is expected.
+        /// \param  height              The height which is expected.
+        /// \param additional_arguments If non-null, additional arguments for the decoder. This is a null-terminated string, where the syntax is defined class specifically.
+        ///
+        /// \return A bitmap object with the decoded data.
+        std::shared_ptr<libCZI::IBitmapData> Decode(const void* ptrData, size_t size, libCZI::PixelType pixelType, std::uint32_t width, std::uint32_t height, const char* additional_arguments = nullptr)
+        {
+            return this->Decode(ptrData, size, &pixelType, &width, &height, additional_arguments);
+        }
     };
 
-    const int LOGLEVEL_CATASTROPHICERROR = 0;   ///< Identifies a catastrophic error (i. e. the program cannot continue).
+    const int LOGLEVEL_CATASTROPHICERROR = 0;   ///< Identifies a catastrophic error (i.e. the program cannot continue).
     const int LOGLEVEL_ERROR = 1;               ///< Identifies a non-recoverable error.
     const int LOGLEVEL_SEVEREWARNING = 2;       ///< Identifies that a severe problem has occured. Proper operation of the module is not ensured.
     const int LOGLEVEL_WARNING = 3;             ///< Identifies that a problem has been identified. It is likely that proper operation can be kept up.
     const int LOGLEVEL_INFORMATION = 4;         ///< Identifies an informational output. It has no impact on the proper operation.
     const int LOGLEVEL_CHATTYINFORMATION = 5;   ///< Identifies an informational output which has no impact on proper operation. Use this for output which may occur with high frequency.
 
-    /// Interface for the Site-object. It is intented for customizing the library (by injecting a
+    /// Interface for the Site-object. It is intended for customizing the library (by injecting a
     /// custom implementation of this interface).
     class ISite
     {
     public:
         /// Query if  the specified logging level is enabled. In the case that constructing the message
-        /// to be logged takes a significant amount of resources (i. e. time or memory), this method should
+        /// to be logged takes a significant amount of resources (i.e. time or memory), this method should
         /// be called before in order to determine whether the output is required at all. This also means
         /// that this method may be called very frequently, so implementors should take care that it executes
         /// reasonably fast.

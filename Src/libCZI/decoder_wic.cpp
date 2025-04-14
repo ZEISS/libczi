@@ -220,7 +220,7 @@ static bool DeterminePixelType(const WICPixelFormatGUID& wicPxlFmt, GUID* destPi
     return false;
 }
 
-/*virtual*/std::shared_ptr<libCZI::IBitmapData> CWicJpgxrDecoder::Decode(const void* ptrData, size_t size, libCZI::PixelType pixelType, uint32_t width, uint32_t height)
+/*virtual*/std::shared_ptr<libCZI::IBitmapData> CWicJpgxrDecoder::Decode(const void* ptrData, size_t size, const libCZI::PixelType* pixelType, const uint32_t* width, const uint32_t* height, const char* additional_arguments)
 {
     if (GetSite()->IsEnabled(LOGLEVEL_CHATTYINFORMATION))
     {
@@ -229,7 +229,7 @@ static bool DeterminePixelType(const WICPixelFormatGUID& wicPxlFmt, GUID* destPi
     }
 
     IWICStream* wicStream;
-    HRESULT hr = this->pFactory->CreateStream(&wicStream/*cpWicStream*/);
+    HRESULT hr = this->pFactory->CreateStream(&wicStream);
     ThrowIfFailed("pFactory->CreateStream", hr);
     unique_ptr<IWICStream, COMDeleter> up_wicStream(wicStream);
 
@@ -270,7 +270,7 @@ static bool DeterminePixelType(const WICPixelFormatGUID& wicPxlFmt, GUID* destPi
         throw  std::logic_error("need to look into these formats...");
     }
 
-    if (px_type != pixelType)
+    if (pixelType != nullptr && px_type != *pixelType)
     {
         throw  std::logic_error("pixel type validation failed...");
     }
@@ -278,9 +278,23 @@ static bool DeterminePixelType(const WICPixelFormatGUID& wicPxlFmt, GUID* destPi
     hr = up_wicBitmapFrameDecode->GetSize(&sizeBitmap.w, &sizeBitmap.h);
     ThrowIfFailed("wicBitmapFrameDecode->GetSize", hr);
 
-    if (sizeBitmap.h != height || sizeBitmap.w != width) {
-        throw  std::logic_error("width and height don't match...");
+    if (width != nullptr && sizeBitmap.w != *width)
+    {
+        ostringstream ss;
+        ss << "width mismatch: expected " << *width << ", but got " << sizeBitmap.w;
+        throw std::logic_error(ss.str());
     }
+
+    if (height != nullptr && sizeBitmap.h != *height)
+    {
+        ostringstream ss;
+        ss << "height mismatch: expected " << *height << ", but got " << sizeBitmap.h;
+        throw std::logic_error(ss.str());
+    }
+
+    /*if (sizeBitmap.h != height || sizeBitmap.w != width) {
+        throw  std::logic_error("width and height don't match...");
+    }*/
 
     if (GetSite()->IsEnabled(LOGLEVEL_CHATTYINFORMATION))
     {

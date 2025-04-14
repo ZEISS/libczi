@@ -419,7 +419,9 @@ static void _testWriteReadCompressedImageZStd1(uint32_t width, uint32_t height, 
     while (false);
 
     if (compressed != nullptr)
+    {
         delete[] compressed;
+    }
 }
 
 /**

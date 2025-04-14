@@ -75,7 +75,7 @@ CCziSubBlock::CCziSubBlock(const libCZI::SubBlockInfo& info, const CCZIParse::Su
     }
 }
 
-/*virtual*/std::shared_ptr<IBitmapData> CCziSubBlock::CreateBitmap()
+/*virtual*/std::shared_ptr<IBitmapData> CCziSubBlock::CreateBitmap(const CreateBitmapOptions* options)
 {
-    return CreateBitmapFromSubBlock(this);
+    return CreateBitmapFromSubBlock(this, options);
 }

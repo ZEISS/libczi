@@ -23,5 +23,5 @@ public:
     const libCZI::SubBlockInfo& GetSubBlockInfo() const override;
     void DangerousGetRawData(libCZI::ISubBlock::MemBlkType type, const void*& ptr, size_t& size) const override;
     std::shared_ptr<const void> GetRawData(MemBlkType type, size_t* ptrSize) override;
-    std::shared_ptr<libCZI::IBitmapData> CreateBitmap() override;
+    std::shared_ptr<libCZI::IBitmapData> CreateBitmap(const libCZI::CreateBitmapOptions* options) override;
 };
