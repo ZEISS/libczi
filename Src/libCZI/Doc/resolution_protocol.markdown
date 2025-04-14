@@ -8,7 +8,7 @@ resolution protocol                 {#resolution_protocol_}
 In cases where a CZI file contains ambiguous or contradictory information, the behavior
 described in this document shall be considered canonical. Implementations MUST resolve
 any conflicts according to these guidelines to ensure consistency and interoperability.  
-Note that those guidelines only give recommendations how the data is to interpreted, this does not mean that
+Note that those guidelines only give recommendations for how the data is to be interpreted, this does not mean that
 one should rely on this. 
 A CZI containing mismatches (as discussed below) is without a doubt to be considered *malformed* and *corrupt*. However - if facing such
 a malformed file, then a consistent behavior is desirable. Also, it is impractical to check internal consistency in all aspects before
