@@ -42,7 +42,7 @@ The information in the DirectoyEntry is to be considered authoritative, i.e. the
 
 If the payload size is larger than what is calculated from width, height and pixel type, the additional data is to be discarded.   
 
-If the payload size is smaller than what is calculated from width, height and pixel type, then the missing data is to be considered containing zeroes.
+If the payload size is smaller than what is calculated from width, height and pixel type, then the missing data is to be filled with zeros.
 
 
 ### case 2: width/height/pixel type size mismatch for JPGXR-data
