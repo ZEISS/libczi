@@ -177,10 +177,19 @@ namespace libCZI
     /// stream-object (for writing a file from disk) is provided here. For a more specialized and
     /// tuned version, libCZI-users should consider implementing the interface "IOutputStream" in
     /// their own code.
-    /// \param szFilename        Filename of the file.
+    /// \param szwFilename       Filename of the file (as a wide character string).
     /// \param overwriteExisting True if an existing file should be overwritten, false otherwise.
     /// \return The new output-stream object.
-    LIBCZI_API std::shared_ptr<IOutputStream> CreateOutputStreamForFile(const wchar_t* szFilename, bool overwriteExisting);
+    LIBCZI_API std::shared_ptr<IOutputStream> CreateOutputStreamForFile(const wchar_t* szwFilename, bool overwriteExisting);
+
+    /// Creates an output-stream-object for the specified filename. A stock-implementation of a
+    /// stream-object (for writing a file from disk) is provided here. For a more specialized and
+    /// tuned version, libCZI-users should consider implementing the interface "IOutputStream" in
+    /// their own code.
+    /// \param szFilename        Filename of the file (in UTF8 encoding).
+    /// \param overwriteExisting True if an existing file should be overwritten, false otherwise.
+    /// \return The new output-stream object.
+    LIBCZI_API std::shared_ptr<IOutputStream> CreateOutputStreamForFileUtf8(const char* szFilename, bool overwriteExisting);
 
     /// Creates an input-output-stream for the specified filename.
     /// A stock-implementation of a stream-object (for modifying a file from disk) is provided here. For a more specialized and tuned version, libCZI-users should consider
@@ -520,7 +529,7 @@ namespace libCZI
         /// The layer number starts with 0 with the highest resolution layer.
         /// The lowest level (layer 0) is denoted by pyramidLayerNo == 0 AND minificationFactor==0.
         /// Another special case is pyramidLayerNo == 0xff AND minificationFactor==0xff which means that the
-        /// pyramid-layer could not be determined (=the minification factor could not unambiguously correlated to
+        /// pyramid-layer could not be determined (=the minification factor could not unambiguously be correlated to
         /// a pyramid-layer).
         struct PyramidLayerInfo
         {
@@ -651,6 +660,18 @@ namespace libCZI
     class LIBCZI_API IAttachmentRepository
     {
     public:
+        /// Gets the number of attachments available in the repository.
+        ///
+        /// \returns    The attachment count.
+        virtual int GetAttachmentCount() const = 0;
+
+        /// Attempts to get the attachment information of the attachment with the specified index. If the specified
+        /// index is not valid, then false is returned.
+        /// \param          index   Index of the attachment to query information for.
+        /// \param [out]    info    If non-null and operation is successful, then the information is put here.
+        /// \returns    True if it succeeds; false otherwise.
+        virtual bool TryGetAttachmentInfo(int index, AttachmentInfo* info) const = 0;
+
         /// Enumerate all attachments.
         ///
         /// \param funcEnum The functor which will be called for every attachment. If the return value of the

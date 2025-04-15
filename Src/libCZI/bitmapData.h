@@ -55,13 +55,19 @@ public:
         const int lckCnt = std::atomic_fetch_sub(&this->lockCnt, 1);
         if (lckCnt < 1)
         {
+            // we undo the decrement of lockCnt (from above) here
+            std::atomic_fetch_add(&this->lockCnt, 1);
             throw std::logic_error("Lock/Unlock-semantic was violated.");
         }
     }
 
+    int GetLockCount() const override
+    {
+        return std::atomic_load(&this->lockCnt);
+    }
+
     ~CBitmapData() override
     {
-#if defined(_DEBUG)
         const int lckCnt = std::atomic_load(&this->lockCnt);
         if (lckCnt != 0)
         {
@@ -72,9 +78,11 @@ public:
                 GetSite()->Log(libCZI::LOGLEVEL_CATASTROPHICERROR, ss);
             }
 
-            assert(lckCnt == 0);
+            GetSite()->TerminateProgram(
+                libCZI::ISite::TerminationReason::BitmapDestroyedWithLockCountNotZero,
+                "FATAL ERROR : Bitmap is being destroyed with a lockCnt <> 0.");
         }
-#endif
+
         this->allocator.Free(this->pData);
     }
 

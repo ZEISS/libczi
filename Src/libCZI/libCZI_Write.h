@@ -145,6 +145,11 @@ namespace libCZI
         bool TryGetReservedSizeForSubBlockDirectory(size_t* size) const override;
         bool TryGetReservedSizeForMetadataSegment(size_t* size) const override;
 
+        /// Sets the file Guid.
+        ///
+        /// \param  guid    The CZI-document'S Guid. If null Guid is given, then a new Guid will be created.
+        void SetFileGuid(const GUID& guid) { this->fileGuid = guid; }
+
         /// Sets reserved size for the "attachments directory".
         ///
         /// \param reserveSpace True to reserve space.
@@ -300,7 +305,7 @@ namespace libCZI
             ptrBitmap(nullptr), strideBitmap(0), ptrSbBlkMetadata(nullptr), sbBlkMetadataSize(0), ptrSbBlkAttachment(nullptr), sbBlkAttachmentSize(0)
         {}
 
-        const void* ptrBitmap;              ///< Pointer to the the bitmap to be put into the subblock. The size of the memory-block must be (strideBitmap * physicalWidth).
+        const void* ptrBitmap;              ///< Pointer to the bitmap to be put into the subblock. The size of the memory-block must be (strideBitmap * physicalWidth).
         std::uint32_t strideBitmap;         ///< The stride of the bitmap.
 
         const void* ptrSbBlkMetadata;       ///< Pointer to the subblock-metadata.
@@ -322,7 +327,7 @@ namespace libCZI
         AddSubBlockInfoLinewiseBitmap() :ptrSbBlkMetadata(nullptr), sbBlkMetadataSize(0), ptrSbBlkAttachment(nullptr), sbBlkAttachmentSize(0)
         {}
 
-        /// This functor will be called for every line, ie. the parameter line will count from 0 to physicalHeight-1. The pointer
+        /// This functor will be called for every line, i.e. the parameter line will count from 0 to physicalHeight-1. The pointer
         /// returned by this function must be valid until the next call into the functor (or returning from the 'SyncAddSubBlock' method).
         std::function<const void* (int line)> getBitmapLine;
 
@@ -372,9 +377,15 @@ namespace libCZI
             const auto len = strlen(sz);
             memcpy(this->name, sz, (std::min)(sizeof(this->name), len));
         }
+
+        /// Clears this structure to its blank/initial state.
+        void Clear()
+        {
+            memset(this, 0, sizeof(*this));
+        }
     };
 
-    /// This struct defines the data to be added as metadata-segment. Unused entries (e. g. no attachment) must have a size of 0.
+    /// This struct defines the data to be added as metadata-segment. Unused entries (e.g. no attachment) must have a size of 0.
     struct LIBCZI_API WriteMetadataInfo
     {
         const char* szMetadata;     ///< The xml-string (in UTF-8 encoding)
@@ -441,7 +452,7 @@ namespace libCZI
         virtual std::shared_ptr<libCZI::ICziMetadataBuilder> GetPreparedMetadata(const PrepareMetadataInfo& info) = 0;
 
         /// Finalizes the CZI (i.e. writes out the final directory-segments) and closes the file.
-        /// Note that this method must be called explicitely in order to get a valid CZI - calling the destructor alone will
+        /// Note that this method must be called explicitly in order to get a valid CZI - calling the destructor alone will
         /// close the file immediately without finalization.
         virtual void Close() = 0;
 

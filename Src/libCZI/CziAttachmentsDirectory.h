@@ -46,9 +46,10 @@ public:
         this->attachmentEntries.reserve(initialCnt);
     }
 
+    size_t GetEntryCnt() const;
     void AddAttachmentEntry(const AttachmentEntry& entry);
     void EnumAttachments(const std::function<bool(int index, const CCziAttachmentsDirectory::AttachmentEntry&)>& func);
-    bool TryGetAttachment(int index, AttachmentEntry& entry);
+    bool TryGetAttachment(int index, AttachmentEntry& entry) const;
 };
 
 class CWriterCziAttachmentsDirectory : public CCziAttachmentsDirectoryBase
@@ -78,7 +79,7 @@ public:
 
     void AddAttachment(const AttachmentEntry& entry, int* key = nullptr);
 
-    bool TryGetAttachment(int key, AttachmentEntry* attchmntEntry);
+    bool TryGetAttachment(int key, AttachmentEntry* attchmntEntry) const;
 
     bool TryModifyAttachment(int key, const AttachmentEntry& attchmntEntry);
 

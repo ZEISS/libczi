@@ -5,6 +5,7 @@
 #pragma once
 
 #include "IBitmapGen.h"
+#include <atomic>
 
 class CNullBitmapWrapper : public libCZI::IBitmapData
 {
@@ -41,6 +42,7 @@ private:
     std::uint32_t width;
     std::uint32_t height;
     std::uint32_t stride;
+    std::atomic<int> lockCnt = ATOMIC_VAR_INIT(0);
 public:
     CNullBitmapWrapper(libCZI::PixelType pixeltype, std::uint32_t width, std::uint32_t height);
     virtual ~CNullBitmapWrapper();
@@ -48,6 +50,7 @@ public:
     virtual libCZI::IntSize GetSize() const;
     virtual libCZI::BitmapLockInfo  Lock();
     virtual void Unlock();
+    virtual int GetLockCount() const;
 
     void Clear();
     void Clear(const ColorSpecification& color);

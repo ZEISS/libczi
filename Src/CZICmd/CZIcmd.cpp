@@ -48,6 +48,14 @@ public:
         return this->pSite->GetDecoder(type, arguments);
     }
 
+    void TerminateProgram(TerminationReason reason, const char* message) override
+    {
+        std::stringstream ss;
+        ss << "libCZI terminated the program -> reason: " << static_cast<int>(reason) << ", message: \"" << message << "\"";
+        this->options.GetLog()->WriteLineStdErr(ss.str());
+        std::abort();
+    }
+
     std::shared_ptr<libCZI::IBitmapData> CreateBitmap(libCZI::PixelType pixeltype, std::uint32_t width, std::uint32_t height, std::uint32_t stride, std::uint32_t extraRows, std::uint32_t extraColumns) override
     {
         return this->pSite->CreateBitmap(pixeltype, width, height, stride, extraRows, extraColumns);

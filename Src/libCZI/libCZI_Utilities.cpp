@@ -687,6 +687,11 @@ std::vector<tOutput> InternalCreateLookUpTableFromGamma(int tableElementCnt, tFl
     return CziUtils::CompressionModeToInt(mode);
 }
 
+/*static*/std::string Utils::ConvertToUtf8(const std::wstring& wide_string)
+{
+    return Utilities::convertWchar_tToUtf8(wide_string.c_str());
+}
+
 Utils::CompressionOption Utils::ParseCompressionOptions(const std::string& options)
 {
     const std::regex compressionOptionsRegex(R"(^\s*([a-zA-Z0-9]+)\s*:\s*((?:\s*[a-zA-Z0-9]*\s*=\s*[a-zA-Z0-9.+-]*\s*[;])*(?:\s*[a-zA-Z0-9]*\s*=\s*[a-zA-Z0-9.+-]*)?)\s*$)");
@@ -726,3 +731,4 @@ Utils::CompressionOption Utils::ParseCompressionOptions(const std::string& optio
 
     throw logic_error("The specified string could not be processed.");
 }
+

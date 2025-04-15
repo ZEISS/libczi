@@ -218,10 +218,17 @@ namespace libCZI
         virtual BitmapLockInfo  Lock() = 0;
 
         /// Inform the bitmap object that the data (previously retrieved by a call to Lock)
-        /// is not longer used.
+        /// is no longer used.
+        /// If Unlock is called with the lock-count being zero, an exception of type std::logic_error
+        /// will be thrown (and the lock-count will be unchanged).
         /// 
         /// The BitmapLockInfo returned must only be considered to be valid until Unlock is called.
         virtual void            Unlock() = 0;
+
+        /// Get the lock count. Note that this value is only momentarily valid.
+        ///
+        /// \returns    The lock count.
+        virtual int             GetLockCount() const = 0;
 
         virtual ~IBitmapData() {}
 
