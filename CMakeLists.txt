@@ -112,7 +112,7 @@ option(LIBCZI_BUILD_CZICMD "Build application 'CZICmd'." OFF)
 option(LIBCZI_BUILD_DYNLIB "Build dynamic library for 'libCZI'." ON)
 
 # Whether to build the libCZIApi-project (C-API-layer for libCZI).
-option(LIBCZI_BUILD_LIBCZIAPI "Build the libCZIApi-project (C-bindings for libCZI)." ON)
+option(LIBCZI_BUILD_LIBCZIAPI "Build the libCZIApi-project (C-bindings for libCZI)." OFF)
 
 # With this option one can choose between "downloading a private copy of Eigen3 during build" or use
 #  an existing Eigen3 (on the system). If CMake is unable to find an Eigen3-package (and this option is
