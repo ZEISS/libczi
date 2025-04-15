@@ -1,46 +1,51 @@
-# Simple workflow for deploying static content to GitHub Pages
-name: Pages
+name: Generate Documentation
 
 on:
-  # Runs on pushes targeting the default branch
-  push:
-    branches: ["main"]
+  workflow_dispatch:
+  pull_request:
+    branches:
+      - main
 
-# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
 permissions:
-  contents: read
-  pages: write
-  id-token: write
-
-# Allow one concurrent deployment
-concurrency:
-  group: "pages"
-  cancel-in-progress: true
+  contents: read 
 
 jobs:
-  # Single deploy job since we're just deploying
-  deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+  generate:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      - name: Install Doxygen
-        run: sudo apt-get install doxygen -y
-        shell: bash
-      - name: Generate Doxygen Documentation
-        working-directory: ${{github.workspace}}/Src
-        run: doxygen Doxyfile
-        shell: bash
-      - name: Setup Pages
-        uses: actions/configure-pages@v5
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          # Upload entire repository
-          path: "${{github.workspace}}/Src/Build/html/"
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+    - uses: actions/checkout@v4
+    - name: Pre Setup
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y doxygen zip
+
+    - name: Install Sphinx and Friends
+      run: |
+        # breathe integrates doxygen's xml output in sphinx
+        # exhale makes breathe integrations available in sphinx' .rst files
+        # recommonmark makes markdown files first-class citizens in sphinx
+        # sphinx-markdown-tables is needed to support markdown tables
+        # sphinx-book-theme is a simple theme
+        pip install breathe exhale sphinx-book-theme recommonmark sphinx-markdown-tables
+        # The following enables multiple doxygen projects with exhale
+        pip install -e "git+https://github.com/mithro/sphinx-contrib-mithro#egg=sphinx-contrib-exhale-multiproject&subdirectory=sphinx-contrib-exhale-multiproject"
+
+    - name: Generate Doxygen
+      run: |
+        pushd Src/ && doxygen
+        pushd libCZIAPI/ && doxygen
+
+    - name: Generate Sphinx
+      run: |
+        pushd docs
+        sphinx-build -M html source build
+
+    - name: Zip Result
+      run: zip -r docs.zip docs/build/
+
+    - name: Publish Artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: documentation
+        path: docs.zip
