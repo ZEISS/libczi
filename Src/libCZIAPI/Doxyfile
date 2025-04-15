@@ -46,7 +46,7 @@ DOXYFILE_ENCODING      = UTF-8
 # title of most generated pages and in a few other places.
 # The default value is: My Project.
 
-PROJECT_NAME           = libCZI
+PROJECT_NAME           = libCZIAPI
 
 # The PROJECT_NUMBER tag can be used to enter a project or revision number. This
 # could be handy for archiving the generated documentation or if some version
@@ -947,19 +947,19 @@ WARN_LOGFILE           =
 # spaces. See also FILE_PATTERNS and EXTENSION_MAPPING
 # Note: If this tag is empty the current directory is searched.
 
-INPUT                  = ./libCZI/libCZI.h \
-                         ./libCZI/libCZI_Compositor.h \
-                         ./libCZI/libCZI_DimCoordinate.h \
-                         ./libCZI/libCZI_exceptions.h \
-                         ./libCZI/libCZI_Metadata.h \
-                         ./libCZI/libCZI_Metadata2.h \
-                         ./libCZI/libCZI_Pixels.h \
-                         ./libCZI/libCZI_Site.h \
-                         ./libCZI/libCZI_Utilities.h \
-                         ./libCZI/libCZI_Write.h \
-                         ./libCZI/libCZI_ReadWrite.h \
-                         ./libCZI/libCZI_compress.h \
-                         ./libCZI/libCZI_StreamsLib.h
+INPUT                  = ./inc/bitmap_structs.h \
+                         ./inc/errorcodes.h \
+                         ./inc/external_input_stream_struct.h \
+                         ./inc/importexport.h \
+                         ./inc/inputstream_class_info_struct.h \
+                         ./inc/libCZIApi.h \
+                         ./inc/MetadataAsXml_struct.h \
+                         ./inc/misc_types.h \
+                         ./inc/ObjectHandles.h \
+                         ./inc/reader_open_info_struct.h \
+                         ./inc/subblock_statistics_struct.h \
+                         ./inc/versioninfo_structs.h
+
 
 # This tag can be used to specify the character encoding of the source files
 # that doxygen parses. Internally doxygen uses the UTF-8 encoding. Doxygen uses
@@ -1106,7 +1106,7 @@ EXAMPLE_RECURSIVE      = NO
 # that contain images that are to be included in the documentation (see the
 # \image command).
 
-IMAGE_PATH             = ./libCZI/Doc/Images
+# IMAGE_PATH             = ./libCZI/Doc/Images
 
 # The INPUT_FILTER tag can be used to specify a program that doxygen should
 # invoke to filter for each input file. Doxygen will invoke the filter program
@@ -2271,7 +2271,7 @@ XML_OUTPUT             = xml
 # The default value is: YES.
 # This tag requires that the tag GENERATE_XML is set to YES.
 
-XML_PROGRAMLISTING     = NO
+XML_PROGRAMLISTING     = YES
 
 # If the XML_NS_MEMB_FILE_SCOPE tag is set to YES, doxygen will include
 # namespace members in file scope as well, matching the HTML output.

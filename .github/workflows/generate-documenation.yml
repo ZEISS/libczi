@@ -1,0 +1,51 @@
+name: Generate Documentation
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read 
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Pre Setup
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y doxygen zip
+
+    - name: Install Sphinx and Friends
+      run: |
+        # breathe integrates doxygen's xml output in sphinx
+        # exhale makes breathe integrations available in sphinx' .rst files
+        # recommonmark makes markdown files first-class citizens in sphinx
+        # sphinx-markdown-tables is needed to support markdown tables
+        # sphinx-book-theme is a simple theme
+        pip install breathe exhale sphinx-book-theme recommonmark sphinx-markdown-tables
+        # The following enables multiple doxygen projects with exhale
+        pip install -e "git+https://github.com/mithro/sphinx-contrib-mithro#egg=sphinx-contrib-exhale-multiproject&subdirectory=sphinx-contrib-exhale-multiproject"
+
+    - name: Generate Doxygen
+      run: |
+        pushd Src/ && doxygen
+        pushd libCZIAPI/ && doxygen
+
+    - name: Generate Sphinx
+      run: |
+        pushd docs
+        sphinx-build -M html source build
+
+    - name: Zip Result
+      run: zip -r docs.zip docs/build/
+
+    - name: Publish Artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: documentation
+        path: docs.zip
