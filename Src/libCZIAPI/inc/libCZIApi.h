@@ -559,6 +559,14 @@ EXTERNALLIBCZIAPI_API(LibCZIApiErrorCode) libCZI_WriterAddAttachment(CziWriterOb
 // TODO(JBL): EXTERNALLIBCZIAPI_API(LibCZIApiErrorCode) libCZI_WriterGetPreparedMetadata(CziWriterObjectHandle writer_object, CziMetadataBuilderHandle* metadata_builder, const PrepareMetadataInfoInterop* prepare_metadata_info_interop);
 
 EXTERNALLIBCZIAPI_API(LibCZIApiErrorCode) libCZI_WriterWriteMetadata(CziWriterObjectHandle writer_object, const WriteMetadataInfoInterop* write_metadata_info_interop);
+
+/// Finalizes the CZI (i.e. writes out the final directory-segments) and closes the file.
+/// Note that this method must be called explicitly in order to get a valid CZI - calling 'libCZI_ReleaseWriter' without
+/// a prior call to this method will close the file immediately without finalization.
+///
+/// \param  writer_object   The writer object.
+///
+/// \returns    An error-code indicating success or failure of the operation.
 EXTERNALLIBCZIAPI_API(LibCZIApiErrorCode) libCZI_WriterClose(CziWriterObjectHandle writer_object);
 
 /// Release the specified writer object.
