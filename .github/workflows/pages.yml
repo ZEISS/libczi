@@ -17,7 +17,7 @@ jobs:
     - uses: actions/checkout@v4
     - name: Pre Setup
       run: |
-        sudo apt-get update
+        #sudo apt-get update
         sudo apt-get install -y doxygen zip
 
     - name: Install Sphinx and Friends
@@ -42,7 +42,10 @@ jobs:
         sphinx-build -M html source build
 
     - name: Zip Result
-      run: zip -r docs.zip docs/build/
+      run: |
+        pwd
+        tree docs/build
+        zip -r docs.zip docs/build/
 
     - name: Publish Artifacts
       uses: actions/upload-artifact@v4
