@@ -6,8 +6,11 @@ on:
     branches:
       - main
 
+# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
 permissions:
-  contents: read 
+  contents: read
+  pages: write
+  id-token: write
 
 jobs:
   generate:
@@ -43,8 +46,8 @@ jobs:
 
     - name: Zip Result
       run: |
-        pwd
-        tree docs/build
+        #pwd
+        #tree docs/build
         zip -r docs.zip docs/build/
 
     - name: Publish Artifacts
