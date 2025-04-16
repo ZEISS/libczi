@@ -34,4 +34,6 @@ Version history
  0.62.5             | [119](https://github.com/ZEISS/libczi/pull/119)      | fix a discrepancy between code and documentation
  0.62.6             | [120](https://github.com/ZEISS/libczi/pull/120)      | fix workload identity in the azure blob inputstream
  0.62.7             | [122](https://github.com/ZEISS/libczi/pull/122)      | documentation update
- 0.63.0             | [123](https://github.com/ZEISS/libczi/pull/123)      | introduce "frames-of-reference"
+ 0.63.0             | [123](https://github.com/ZEISS/libczi/pull/123)      | introduce "frames-of-reference" 0.63.1             | [128](https://github.com/ZEISS/libczi/pull/128)      | fix for CZICmd (command "ExtractAttachment"), improve UTF8-handling (on Windows)
+ 0.63.2             | [129](https://github.com/ZEISS/libczi/pull/129)      | update zstd to [version 1.5.7](https://github.com/facebook/zstd/releases/tag/v1.5.7)
+ 0.64.0             | [130](https://github.com/ZEISS/libczi/pull/130)      | define & implement "Resolution Protocol for Ambiguous or Contradictory Information"
