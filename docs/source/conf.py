@@ -41,7 +41,7 @@ html_static_path = ['_static']
 
 
 breathe_projects = {
-    "Src" : "../../Src/Build/xml",
+    "Src" : "../../Src/libCZI/Build/xml",
     "Api" : "../../Src/libCZIAPI/Build/xml"
 }
 

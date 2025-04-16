@@ -36,25 +36,25 @@ jobs:
 
     - name: Generate Doxygen
       run: |
-        pushd Src/ && doxygen
-        pushd libCZIAPI/ && doxygen
+        pushd Src/libCZI/ && doxygen && popd 
+        pushd Src/libCZIAPI/ && doxygen && popd
 
     - name: Generate Sphinx
       run: |
         pushd docs
         sphinx-build -M html source build
 
-    - name: Zip Result
-      run: |
-        #pwd
-        #tree docs/build
-        zip -r docs.zip docs/build/
+    # - name: Zip Result
+    #   run: |
+    #     #pwd
+    #     #tree docs/build
+    #     zip -r docs.zip docs/build/
 
-    - name: Publish Artifacts
-      uses: actions/upload-artifact@v4
-      with:
-        name: documentation
-        path: docs.zip
+    # - name: Publish Artifacts
+    #   uses: actions/upload-artifact@v4
+    #   with:
+    #     name: documentation
+    #     path: docs.zip
 
     - name: Setup Pages
       uses: actions/configure-pages@v5
