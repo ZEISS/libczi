@@ -22,6 +22,7 @@ Documentation of LibCZI and adjacent projects.
    pages/czicmd_usage
    pages/coordinate_systems
    pages/write_czi
+   pages/resolution_protocol
    pages/todos
    pages/version_history
 
