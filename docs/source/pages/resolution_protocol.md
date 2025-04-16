@@ -1,4 +1,4 @@
-resolution protocol                 {#resolution_protocol_}
+resolution protocol
 ===================
 
 # Resolution Protocol for Ambiguous or Contradictory Information
