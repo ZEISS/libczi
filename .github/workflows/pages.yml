@@ -1,4 +1,5 @@
-name: Generate Documentation
+# workflow for deploying static content to GitHub Pages
+name: Pages
 
 on:
   workflow_dispatch:
