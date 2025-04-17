@@ -617,10 +617,22 @@ namespace libCZI
         /// \return The pyramid statistics.
         virtual PyramidStatistics GetPyramidStatistics() = 0;
 
+        /// Transform the specified point from one coordinate system to another.
+        ///
+        /// \param  source_point                    Source point and specification of the coordinate system it is defined in.
+        /// \param  destination_frame_of_reference  Identifies the coordinate system to which the point should be transformed.
+        ///
+        /// \returns    The transformed point.
         virtual libCZI::IntPointAndFrameOfReference TransformPoint(const libCZI::IntPointAndFrameOfReference& source_point, libCZI::CZIFrameOfReference destination_frame_of_reference) = 0;
 
         virtual ~ISubBlockRepository() = default;
 
+        /// Transform the specified rectangle from one coordinate system to another.
+        ///
+        /// \param  source_point                    Source rectangle and specification of the coordinate system it is defined in.
+        /// \param  destination_frame_of_reference  Identifies the coordinate system to which the point should be transformed.
+        ///
+        /// \returns    The transformed rectangle.
         libCZI::IntRectAndFrameOfReference TransformRectangle(const libCZI::IntRectAndFrameOfReference& source_rectangle, libCZI::CZIFrameOfReference destination_frame_of_reference)
         {
             libCZI::IntPointAndFrameOfReference source_point_and_frame_of_reference;
