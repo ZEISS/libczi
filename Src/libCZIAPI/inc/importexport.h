@@ -25,6 +25,7 @@
     #define EXTERNALLIBCZIAPI_API(_returntype_) _returntype_
 #elif LIBCZIAPI_EXPORTS_SHARED
     #ifdef __GNUC__
+        #define LIBCZIAPI_API __attribute__ ((visibility ("default")))
         #if defined(__i386__)
         #define EXTERNALLIBCZIAPI_API(_returntype_)  extern "C"  _returntype_ __attribute__ ((visibility ("default"))) __attribute__((stdcall))
         #else
@@ -34,34 +35,6 @@
         #define EXTERNALLIBCZIAPI_API(_returntype_)  extern "C"  _returntype_  __declspec(dllexport)  __stdcall
     #endif
 #else
-    #define EXTERNALLIBCZIAPI_API(_returntype_) _returntype_
+    #define LIBCZIAPI_API __declspec(dllexport)
+    #define EXTERNALLIBCZIAPI_API(_returntype_)  extern "C"  _returntype_ LIBCZIAPI_API  __stdcall 
 #endif
-
-/*
-#ifdef LIBCZIAPI_EXPORTS_FOR_DOXYGEN
-    #define EXTERNALLIBCZIAPI_API(_returntype_) _returntype_
-#elif LIBCZIAPI_EXPORTS
-    #ifdef __GNUC__
-        #define LIBCZIAPI_API __attribute__ ((visibility ("default")))
-        #if defined(__i386__)
-            #define EXTERNALLIBCZIAPI_API(_returntype_)  extern "C"  _returntype_ __attribute__ ((visibility ("default"))) __attribute__((stdcall))
-        #else
-            #define EXTERNALLIBCZIAPI_API(_returntype_)  extern "C"  _returntype_ __attribute__ ((visibility ("default"))) 
-        #endif
-    #else
-        #if LIBCZIAPI_EXPORTS_SHARED
-            #define LIBCZIAPI_API __declspec(dllexport)
-            #define EXTERNALLIBCZIAPI_API(_returntype_)  extern "C"  _returntype_ LIBCZIAPI_API  __stdcall
-        #else
-            //#define LIBCZIAPI_API
-            #define EXTERNALLIBCZIAPI_API(_returntype_) _returntype_
-        #endif
-    #endif
-#else
-    #ifdef __GNUC__
-        #define EXTERNALLIBCZIAPI_API(_returntype_) _returntype_
-    #else
-        #define EXTERNALLIBCZIAPI_API(_returntype_) _returntype_
-    #endif
-#endif
-*/
