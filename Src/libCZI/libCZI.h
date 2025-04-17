@@ -483,7 +483,7 @@ namespace libCZI
 
         /// The minimal axis-aligned-bounding box determined only from the logical coordinates of the sub-blocks on pyramid-layer0 in the 
         /// document. The top-left corner of this bounding-box gives the coordinate of the origin of the 'CZI-Pixel-Coordinate-System' in
-        /// the coordinate system used by libCZI (which is refered to as 'raw-subblock-coordinate-system'). See @ref coordinatesystems for
+        /// the coordinate system used by libCZI (which is referred to as 'raw-subblock-coordinate-system'). See @ref coordinatesystems for
         /// additional information.
         IntRect boundingBoxLayer0Only;
 
@@ -629,7 +629,7 @@ namespace libCZI
 
         /// Transform the specified rectangle from one coordinate system to another.
         ///
-        /// \param  source_point                    Source rectangle and specification of the coordinate system it is defined in.
+        /// \param  source_rectangle                Source rectangle and specification of the coordinate system it is defined in.
         /// \param  destination_frame_of_reference  Identifies the coordinate system to which the point should be transformed.
         ///
         /// \returns    The transformed rectangle.

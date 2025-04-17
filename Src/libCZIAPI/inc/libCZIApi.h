@@ -430,7 +430,7 @@ EXTERNALLIBCZIAPI_API(LibCZIApiErrorCode) libCZI_ReleaseMetadataSegment(Metadata
 /// "description" : "<description>", type string
 /// "comment" : "<comment>", type string
 /// "keywords" : "<keyword1>,<keyword2>,...", type string
-/// "rating" : <rating>, type integer
+/// "rating" : "<rating>", type integer
 /// "creation_date" : "<creation date>", type string, conforming to ISO 8601
 ///
 /// \param          czi_document_info           The CZI-document-info object.
