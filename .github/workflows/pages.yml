@@ -26,8 +26,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Pre Setup
+      - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Setup with apt
         run: |
           #sudo apt-get update
           sudo apt-get install -y doxygen zip
