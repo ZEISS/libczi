@@ -947,18 +947,28 @@ WARN_LOGFILE           =
 # spaces. See also FILE_PATTERNS and EXTENSION_MAPPING
 # Note: If this tag is empty the current directory is searched.
 
-INPUT                  = ./inc/bitmap_structs.h \
-                         ./inc/errorcodes.h \
-                         ./inc/external_input_stream_struct.h \
-                         ./inc/importexport.h \
-                         ./inc/inputstream_class_info_struct.h \
-                         ./inc/libCZIApi.h \
-                         ./inc/MetadataAsXml_struct.h \
-                         ./inc/misc_types.h \
-                         ./inc/ObjectHandles.h \
-                         ./inc/reader_open_info_struct.h \
-                         ./inc/subblock_statistics_struct.h \
-                         ./inc/versioninfo_structs.h
+INPUT                  = ./inc/accessor_options_interop.h                  \
+                         ./inc/add_attachment_info_interop.h               \
+                         ./inc/add_subblock_info_interop.h                 \
+                         ./inc/attachment_info_interop.h                   \
+                         ./inc/bitmap_structs.h                            \
+                         ./inc/composition_channel_info_interop.h          \
+                         ./inc/errorcodes.h                                \
+                         ./inc/external_input_stream_struct.h              \
+                         ./inc/external_output_stream_struct.h             \
+                         ./inc/external_stream_error_information_struct.h  \
+                         ./inc/fileheader_info_interop.h                   \
+                         ./inc/inputstream_class_info_struct.h             \
+                         ./inc/libCZIApi.h                                 \
+                         ./inc/MetadataAsXml_struct.h                      \
+                         ./inc/misc_types.h                                \
+                         ./inc/ObjectHandles.h                             \
+                         ./inc/reader_open_info_struct.h                   \
+                         ./inc/scaling_info_interop.h                      \
+                         ./inc/subblock_info_interop.h                     \
+                         ./inc/subblock_statistics_struct.h                \
+                         ./inc/versioninfo_structs.h                       \
+                         ./inc/write_metadata_info_interop.h               
 
 
 # This tag can be used to specify the character encoding of the source files

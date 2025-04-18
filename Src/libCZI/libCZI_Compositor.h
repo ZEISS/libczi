@@ -175,7 +175,7 @@ namespace libCZI
         struct Options
         {
             /// The background color. If the destination bitmap is a grayscale-type, then the mean from R, G and B is calculated and multiplied
-            /// with the maximum pixel value (of the specific pixeltype). If it is a RGB-color type, then R, G and B are separately multiplied with
+            /// with the maximum pixel value (of the specific pixeltype). If it is an RGB-color type, then R, G and B are separately multiplied with
             /// the maximum pixel value.
             /// If any of R, G or B is NaN, then the background is not cleared.
             RgbFloatColor   backGroundColor;
