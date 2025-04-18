@@ -33,14 +33,14 @@ else()
 endif()
 
 set(LIBCZIAPISRCFILES 
-    inc/libCZIApi.h
-    inc/importexport.h
-    inc/errorcodes.h
-    inc/versioninfo_structs.h
-    inc/inputstream_class_info_struct.h
-    inc/subblock_info_interop.h
-    inc/attachment_info_interop.h
-    src/libCZIApi.cpp 
+    "inc/libCZIApi.h"
+    "inc/importexport.h"
+    "inc/errorcodes.h"
+    "inc/versioninfo_structs.h"
+    "inc/inputstream_class_info_struct.h"
+    "inc/subblock_info_interop.h"
+    "inc/attachment_info_interop.h"
+    "src/libCZIApi.cpp"
     "src/sharedptrwrapper.h" 
     "inc/external_input_stream_struct.h"
     "inc/external_output_stream_struct.h"
@@ -58,8 +58,6 @@ set(LIBCZIAPISRCFILES
     "inc/accessor_options_interop.h"
     "inc/composition_channel_info_interop.h"
     "inc/scaling_info_interop.h"
-    "src/utils.cpp" 
-    "src/utils.h"
     "src/parameterhelpers.h"
     "src/parameterhelpers.cpp"
 )
