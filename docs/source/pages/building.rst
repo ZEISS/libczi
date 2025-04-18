@@ -127,5 +127,5 @@ the following command brings in the necessary dependencies:
 Building the documentation
 --------------------------
 
-Executing <tt>doxygen</tt> will produce the HTML documentation in the folder ../Src/Build folder.
+Executing :code:`doxygen` will produce the HTML documentation in the folder ../Src/Build folder.
 

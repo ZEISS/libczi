@@ -145,8 +145,7 @@ Note that we are using the ``SubBlockStatistics`` in order to specify a
 ROI with coordinates relative to the upper left corner of the bounding
 box. The result is depicted here:
 
-|single channel tile accessor| @image latex
-SingleChannelTileAccessor_3.PNG “single channel tile accessor”
+|single channel tile accessor| SingleChannelTileAccessor_3.PNG "single channel tile accessor"
 
 Here is an example which leverages the SingleChannelScalingTileAccessor:
 
@@ -182,8 +181,7 @@ will have
 
 This operaton is depicted here:
 
-|single channel scaling tile accessor| @image latex
-SingleChannelTileAccessor_4.PNG “single channel scaling tile accessor”
+|single channel scaling tile accessor| SingleChannelTileAccessor_4.PNG "single channel scaling tile accessor"
 
 creating a multi-channel composite
 ----------------------------------
@@ -261,9 +259,7 @@ expected by the ``ComposeMultiChannel_Bgr24`` function).
 
 The complete operation is depicted here:
 
-|multi-channel-composite from a (scaled) tile-composite| @image latex
-ScalingSingleChannelTileAccessor1.png “multi-channel-composite from a
-(scaled) tile-composite”
+|multi-channel-composite from a (scaled) tile-composite| ScalingSingleChannelTileAccessor1.png "multi-channel-composite from a (scaled) tile-composite"
 
 stream objects
 --------------
