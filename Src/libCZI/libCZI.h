@@ -483,7 +483,7 @@ namespace libCZI
 
         /// The minimal axis-aligned-bounding box determined only from the logical coordinates of the sub-blocks on pyramid-layer0 in the 
         /// document. The top-left corner of this bounding-box gives the coordinate of the origin of the 'CZI-Pixel-Coordinate-System' in
-        /// the coordinate system used by libCZI (which is referred to as 'raw-subblock-coordinate-system'). See @ref coordinatesystems for
+        /// the coordinate system used by libCZI (which is referred to as 'raw-subblock-coordinate-system'). See [Coordinate Systems](pages/coordinate_systems.html) for
         /// additional information.
         IntRect boundingBoxLayer0Only;
 
