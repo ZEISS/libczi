@@ -3,7 +3,15 @@ name: Pages
 
 on:
   workflow_dispatch:
+    inputs:
+      deploy:
+        description: "Deploy to GitHub Pages?"
+        required: false
+        default: "false"
   pull_request:
+    branches:
+      - main
+  push:
     branches:
       - main
 
@@ -58,13 +66,17 @@ jobs:
     #     path: docs.zip
 
     - name: Setup Pages
+      # run this step only if the main branch is pushed to or if the workflow is manually triggered and configured to deploy
+      if: github.ref == 'refs/heads/main' || github.event.inputs.deploy == 'true'
       uses: actions/configure-pages@v5
     - name: Upload artifact
+      if: github.ref == 'refs/heads/main' || github.event.inputs.deploy == 'true'
       uses: actions/upload-pages-artifact@v3
       with:
         # The path to the directory containing the files to be uploaded
         path: "${{github.workspace}}/docs/build/html/"
 
     - name: Deploy to GitHub Pages
+      if: github.ref == 'refs/heads/main' || github.event.inputs.deploy == 'true'  
       id: deployment
       uses: actions/deploy-pages@v4
