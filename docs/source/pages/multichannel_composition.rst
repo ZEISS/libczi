@@ -29,8 +29,8 @@ The steps in the operation are:
 The operation "Apply gradiation" works in the following way: the normalized pixel value is mapped to an integer (in the range 0..255) by looking
 up a value:
 
-![linear gradation curve](gradationcurve_1.PNG "gradation_curve_linear")
-@image latex gradationcurve_1.PNG "linear gradation curve"
+.. image:: ../_static/images/gradationcurve_1.PNG
+   :alt: linear gradation curve
 
 Above a linear gradation curve is shown. There are three ways commonly used to define the gradation curve:
 * linear (a straight line from the point [black point,0] to [white point,255] - as shown above)
@@ -43,7 +43,7 @@ uniformly distributed points between black point and white point. Values between
 For example, the parameters white_point=0.2, black_point=1.0 and lookupTable={0, 66, 100, 166, 255} will result in this gradation curve:
 
 .. image:: ../_static/images/gradationcurve_2.PNG
-   :alt: gradation_curve_sample
+   :alt: gradation curve sample
 
 
 For generating a look-up-table (which then can be used for Compositors::ComposeMultiChannel) two utility functions are provided:
