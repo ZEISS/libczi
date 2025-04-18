@@ -72,7 +72,7 @@ set_target_properties(libCZIAPI PROPERTIES CXX_STANDARD 17)
 set_target_properties(libCZIAPIStatic PROPERTIES CXX_STANDARD 17)
 
 target_compile_definitions(libCZIAPI PRIVATE _LIBCZISTATICLIB LIBCZIAPI_EXPORTS_SHARED)
-target_compile_definitions(libCZIAPIStatic PRIVATE _LIBCZISTATICLIB)
+target_compile_definitions(libCZIAPIStatic PRIVATE _LIBCZISTATICLIB _LIBCZIAPISTATICLIB)
 
 target_link_libraries(libCZIAPI PRIVATE libCZIStatic)
 target_link_libraries(libCZIAPIStatic PRIVATE libCZIStatic)

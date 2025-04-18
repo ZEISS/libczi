@@ -6,7 +6,7 @@
 
 // This file contains the definitions of the macros used to export/import the libCZIAPI.
 // * when running doxygen, the macro "LIBCZIAPI_EXPORTS_FOR_DOXYGEN" and we use defines which are then shown in the documentation.
-// * when compiling the imgdoc2 API, the macro "LIBCZIAPI_EXPORTS" is defined and we use the __declspec(dllexport) attribute.
+// * when compiling the libCZIAPI, the macro "LIBCZIAPI_EXPORTS" is defined and we use the __declspec(dllexport) attribute.
 // * other cases are currently not worked out 
 
 #ifdef LIBCZIAPI_EXPORTS_FOR_DOXYGEN
@@ -15,7 +15,7 @@
     #if defined(__i386__)
         #define LIBCZIAPI_STDCALL __attribute__((stdcall))
     #else
-        #define LIBCZIAPI_STDCALL 
+        #define LIBCZIAPI_STDCALL __attribute__((stdcall))
     #endif
 #else
     #define LIBCZIAPI_STDCALL __stdcall
@@ -34,6 +34,9 @@
     #else
         #define EXTERNALLIBCZIAPI_API(_returntype_)  extern "C"  _returntype_  __declspec(dllexport)  __stdcall
     #endif
+#elif _LIBCZIAPISTATICLIB
+    #define EXTERNALLIBCZIAPI_API(_returntype_) _returntype_
+    #define LIBCZIAPI_API
 #else
     #define LIBCZIAPI_API __declspec(dllexport)
     #define EXTERNALLIBCZIAPI_API(_returntype_)  extern "C"  _returntype_ LIBCZIAPI_API  __stdcall 
