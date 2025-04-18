@@ -19,30 +19,6 @@ using namespace std;
 
 namespace
 {
-    //void* AllocateMemory(size_t size)
-    //{
-    //    return malloc(size);
-    //}
-
-    //void FreeMemory(void* ptr)
-    //{
-    //    free(ptr);
-    //}
-
-    //char* AllocString(const string& text)
-    //{
-    //    const size_t size = text.size();
-    //    if (size == 0)
-    //    {
-    //        return nullptr;
-    //    }
-
-    //    char* result = static_cast<char*>(AllocateMemory(size + 1));
-    //    memcpy(result, text.c_str(), size);
-    //    result[size] = '\0';
-    //    return result;
-    //}
-
     IntRectInterop ConvertIntRect(const IntRect& rect)
     {
         IntRectInterop result;
@@ -217,7 +193,6 @@ LibCZIApiErrorCode libCZI_ReaderGetFileHeaderInfo(CziReaderObjectHandle reader_o
 
 LibCZIApiErrorCode libCZI_ReaderGetStatisticsSimple(CziReaderObjectHandle reader_object, SubBlockStatisticsInterop* statistics)
 {
-    //Message_Box();
     if (reader_object == kInvalidObjectHandle || statistics == nullptr)
     {
         return LibCZIApi_ErrorCode_InvalidArgument;
@@ -229,20 +204,26 @@ LibCZIApiErrorCode libCZI_ReaderGetStatisticsSimple(CziReaderObjectHandle reader
         return LibCZIApi_ErrorCode_InvalidHandle;
     }
 
-    const auto statistics_data = shared_czi_reader_wrapping_object->shared_ptr_->GetStatistics();
-    statistics->sub_block_count = statistics_data.subBlockCount;
-    statistics->min_m_index = statistics_data.minMindex;
-    statistics->max_m_index = statistics_data.maxMindex;
-    statistics->bounding_box = ConvertIntRect(statistics_data.boundingBox);
-    statistics->bounding_box_layer0 = ConvertIntRect(statistics_data.boundingBoxLayer0Only);
-    statistics->dim_bounds = ConvertDimBounds(&statistics_data.dimBounds);
+    try
+    {
+        const auto statistics_data = shared_czi_reader_wrapping_object->shared_ptr_->GetStatistics();
+        statistics->sub_block_count = statistics_data.subBlockCount;
+        statistics->min_m_index = statistics_data.minMindex;
+        statistics->max_m_index = statistics_data.maxMindex;
+        statistics->bounding_box = ConvertIntRect(statistics_data.boundingBox);
+        statistics->bounding_box_layer0 = ConvertIntRect(statistics_data.boundingBoxLayer0Only);
+        statistics->dim_bounds = ConvertDimBounds(&statistics_data.dimBounds);
 
-    return LibCZIApi_ErrorCode_OK;
+        return LibCZIApi_ErrorCode_OK;
+    }
+    catch (const std::exception&)
+    {
+        return LibCZIApi_ErrorCode_UnspecifiedError;
+    }
 }
 
 LibCZIApiErrorCode libCZI_ReaderGetStatisticsEx(CziReaderObjectHandle reader_object, SubBlockStatisticsInteropEx* statistics, std::int32_t* number_of_per_channel_bounding_boxes)
 {
-    //Message_Box();
     if (reader_object == kInvalidObjectHandle || statistics == nullptr)
     {
         return LibCZIApi_ErrorCode_InvalidArgument;
@@ -254,40 +235,47 @@ LibCZIApiErrorCode libCZI_ReaderGetStatisticsEx(CziReaderObjectHandle reader_obj
         return LibCZIApi_ErrorCode_InvalidHandle;
     }
 
-    const std::int32_t number_of_scenes_available = number_of_per_channel_bounding_boxes != nullptr ? *number_of_per_channel_bounding_boxes : 0;
-
-    const auto statistics_data = shared_czi_reader_wrapping_object->shared_ptr_->GetStatistics();
-    statistics->sub_block_count = statistics_data.subBlockCount;
-    statistics->min_m_index = statistics_data.minMindex;
-    statistics->max_m_index = statistics_data.maxMindex;
-    statistics->bounding_box = ConvertIntRect(statistics_data.boundingBox);
-    statistics->bounding_box_layer0 = ConvertIntRect(statistics_data.boundingBoxLayer0Only);
-    statistics->dim_bounds = ConvertDimBounds(&statistics_data.dimBounds);
-
-    int32_t i = 0;
-    for (const auto& item : statistics_data.sceneBoundingBoxes)
+    try
     {
-        if (i < number_of_scenes_available)
+        const std::int32_t number_of_scenes_available = number_of_per_channel_bounding_boxes != nullptr ? *number_of_per_channel_bounding_boxes : 0;
+
+        const auto statistics_data = shared_czi_reader_wrapping_object->shared_ptr_->GetStatistics();
+        statistics->sub_block_count = statistics_data.subBlockCount;
+        statistics->min_m_index = statistics_data.minMindex;
+        statistics->max_m_index = statistics_data.maxMindex;
+        statistics->bounding_box = ConvertIntRect(statistics_data.boundingBox);
+        statistics->bounding_box_layer0 = ConvertIntRect(statistics_data.boundingBoxLayer0Only);
+        statistics->dim_bounds = ConvertDimBounds(&statistics_data.dimBounds);
+
+        int32_t i = 0;
+        for (const auto& item : statistics_data.sceneBoundingBoxes)
         {
-            statistics->per_scenes_bounding_boxes[i].sceneIndex = item.first;
-            statistics->per_scenes_bounding_boxes[i].bounding_box = ConvertIntRect(item.second.boundingBox);
-            statistics->per_scenes_bounding_boxes[i].bounding_box_layer0_only = ConvertIntRect(item.second.boundingBoxLayer0);
-            ++i;
+            if (i < number_of_scenes_available)
+            {
+                statistics->per_scenes_bounding_boxes[i].sceneIndex = item.first;
+                statistics->per_scenes_bounding_boxes[i].bounding_box = ConvertIntRect(item.second.boundingBox);
+                statistics->per_scenes_bounding_boxes[i].bounding_box_layer0_only = ConvertIntRect(item.second.boundingBoxLayer0);
+                ++i;
+            }
+            else
+            {
+                break;
+            }
         }
-        else
+
+        statistics->number_of_per_scenes_bounding_boxes = i;
+
+        if (number_of_per_channel_bounding_boxes != nullptr)
         {
-            break;
+            *number_of_per_channel_bounding_boxes = static_cast<int32_t>(statistics_data.sceneBoundingBoxes.size());
         }
+
+        return LibCZIApi_ErrorCode_OK;
     }
-
-    statistics->number_of_per_scenes_bounding_boxes = i;
-
-    if (number_of_per_channel_bounding_boxes != nullptr)
+    catch (const std::exception&)
     {
-        *number_of_per_channel_bounding_boxes = static_cast<int32_t>(statistics_data.sceneBoundingBoxes.size());
+        return LibCZIApi_ErrorCode_UnspecifiedError;
     }
-
-    return LibCZIApi_ErrorCode_OK;
 }
 
 LibCZIApiErrorCode libCZI_ReaderGetPyramidStatistics(CziReaderObjectHandle reader_object, char** pyramid_statistics_as_json)
@@ -394,8 +382,15 @@ LibCZIApiErrorCode libCZI_ReaderGetAttachmentCount(CziReaderObjectHandle reader_
         return LibCZIApi_ErrorCode_InvalidHandle;
     }
 
-    *count = shared_czi_reader_wrapping_object->shared_ptr_->GetAttachmentCount();
-    return LibCZIApi_ErrorCode_OK;
+    try
+    {
+        *count = shared_czi_reader_wrapping_object->shared_ptr_->GetAttachmentCount();
+        return LibCZIApi_ErrorCode_OK;
+    }
+    catch (const std::exception&)
+    {
+        return LibCZIApi_ErrorCode_UnspecifiedError;
+    }
 }
 
 LibCZIApiErrorCode libCZI_ReaderGetAttachmentInfoFromDirectory(CziReaderObjectHandle reader_object, std::int32_t index, AttachmentInfoInterop* attachment_info_interop)
@@ -714,7 +709,6 @@ namespace
 
 LibCZIApiErrorCode libCZI_CreateInputStreamFromExternal(const ExternalInputStreamStructInterop* external_input_stream_struct, InputStreamObjectHandle* stream_object)
 {
-    //Message_Box();
     if (external_input_stream_struct == nullptr || stream_object == nullptr)
     {
         return LibCZIApi_ErrorCode_InvalidArgument;
@@ -767,16 +761,22 @@ LibCZIApiErrorCode libCZI_SubBlockCreateBitmap(SubBlockObjectHandle sub_block_ob
 
     *bitmap_object = kInvalidObjectHandle;
 
-    // TODO(JBL): error handling (CreateBitmap can throw an exception)
-    auto bitmap = shared_sub_block_wrapping_object->shared_ptr_->CreateBitmap();
-    if (!bitmap)
+    try
     {
-        return LibCZIApi_ErrorCode_OutOfMemory;
-    }
+        auto bitmap = shared_sub_block_wrapping_object->shared_ptr_->CreateBitmap();
+        if (!bitmap)
+        {
+            return LibCZIApi_ErrorCode_OutOfMemory;
+        }
 
-    auto shared_bitmap_wrapping_object = new SharedPtrWrapper<IBitmapData>{ bitmap };
-    *bitmap_object = reinterpret_cast<BitmapObjectHandle>(shared_bitmap_wrapping_object);
-    return LibCZIApi_ErrorCode_OK;
+        auto shared_bitmap_wrapping_object = new SharedPtrWrapper<IBitmapData>{ bitmap };
+        *bitmap_object = reinterpret_cast<BitmapObjectHandle>(shared_bitmap_wrapping_object);
+        return LibCZIApi_ErrorCode_OK;
+    }
+    catch (const std::exception&)
+    {
+        return LibCZIApi_ErrorCode_UnspecifiedError;
+    }
 }
 
 LibCZIApiErrorCode libCZI_SubBlockGetInfo(SubBlockObjectHandle sub_block_object, SubBlockInfoInterop* sub_block_info)
@@ -1957,7 +1957,7 @@ LibCZIApiErrorCode libCZI_CompositorFillOutCompositionChannelInfoInterop(Display
     try
     {
         ParameterHelpers::FillOutCompositionChannelInfoFromDisplaySettings(
-            shared_display_settings_wrapping_object->shared_ptr_.get(), 
+            shared_display_settings_wrapping_object->shared_ptr_.get(),
             channel_index,
             sixteen_or_eight_bits_lut,
             *composition_channel_info_interop);
