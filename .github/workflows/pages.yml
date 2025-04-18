@@ -27,31 +27,31 @@ jobs:
 
     steps:
       - name: Pre Setup
-      - uses: actions/checkout@v4
-      run: |
-        #sudo apt-get update
-        sudo apt-get install -y doxygen zip
+        uses: actions/checkout@v4
+        run: |
+          #sudo apt-get update
+          sudo apt-get install -y doxygen zip
 
-    - name: Install Sphinx and Friends
-      run: |
-        # breathe integrates doxygen's xml output in sphinx
-        # exhale makes breathe integrations available in sphinx' .rst files
-        # recommonmark makes markdown files first-class citizens in sphinx
-        # sphinx-markdown-tables is needed to support markdown tables
-        # sphinx-book-theme is a simple theme
-        pip install breathe exhale sphinx-book-theme recommonmark sphinx-markdown-tables
-        # The following enables multiple doxygen projects with exhale
-        pip install -e "git+https://github.com/mithro/sphinx-contrib-mithro#egg=sphinx-contrib-exhale-multiproject&subdirectory=sphinx-contrib-exhale-multiproject"
+      - name: Install Sphinx and Friends
+        run: |
+          # breathe integrates doxygen's xml output in sphinx
+          # exhale makes breathe integrations available in sphinx' .rst files
+          # recommonmark makes markdown files first-class citizens in sphinx
+          # sphinx-markdown-tables is needed to support markdown tables
+          # sphinx-book-theme is a simple theme
+          pip install breathe exhale sphinx-book-theme recommonmark sphinx-markdown-tables
+          # The following enables multiple doxygen projects with exhale
+          pip install -e "git+https://github.com/mithro/sphinx-contrib-mithro#egg=sphinx-contrib-exhale-multiproject&subdirectory=sphinx-contrib-exhale-multiproject"
 
-    - name: Generate Doxygen
-      run: |
-        pushd Src/libCZI/ && doxygen && popd
-        pushd Src/libCZIAPI/ && doxygen && popd
+      - name: Generate Doxygen
+        run: |
+          pushd Src/libCZI/ && doxygen && popd
+          pushd Src/libCZIAPI/ && doxygen && popd
 
-    - name: Generate Sphinx
-      run: |
-        pushd docs
-        sphinx-build -M html source build
+      - name: Generate Sphinx
+        run: |
+          pushd docs
+          sphinx-build -M html source build
 
     # - name: Zip Result
     #   run: |
@@ -65,18 +65,17 @@ jobs:
     #     name: documentation
     #     path: docs.zip
 
-    - name: Setup Pages
-      # run this step only if the main branch is pushed to or if the workflow is manually triggered and configured to deploy
-      if: github.ref == 'refs/heads/main' || github.event.inputs.deploy == 'true'
-      uses: actions/configure-pages@v5
-    - name: Upload artifact
-      if: github.ref == 'refs/heads/main' || github.event.inputs.deploy == 'true'
-      uses: actions/upload-pages-artifact@v3
-      with:
-        # The path to the directory containing the files to be uploaded
-        path: "${{github.workspace}}/docs/build/html/"
-
-    - name: Deploy to GitHub Pages
-      if: github.ref == 'refs/heads/main' || github.event.inputs.deploy == 'true'
-      id: deployment
-      uses: actions/deploy-pages@v4
+      - name: Setup Pages
+        # run this step only if the main branch is pushed to or if the workflow is manually triggered and configured to deploy
+        if: github.ref == 'refs/heads/main' || github.event.inputs.deploy == 'true'
+        uses: actions/configure-pages@v5
+      - name: Upload artifact
+        if: github.ref == 'refs/heads/main' || github.event.inputs.deploy == 'true'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          # The path to the directory containing the files to be uploaded
+          path: "${{github.workspace}}/docs/build/html/"
+      - name: Deploy to GitHub Pages
+        if: github.ref == 'refs/heads/main' || github.event.inputs.deploy == 'true'
+        id: deployment
+        uses: actions/deploy-pages@v4
