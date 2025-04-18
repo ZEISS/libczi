@@ -9,19 +9,21 @@ The operation (as implemented by the function Compositors::ComposeMultiChannel) 
 * definition of a black- and white-point
 * a gradiation curve
   
-The steps in the operation are::
+The steps in the operation are:
 
-Let result R-G-B pixel value = 0,0,0
-For each channel
-    If tinting is enabled for this channel:
-        * get normalized pixel value
-        * apply gradation
-        * multiply with R-G-B tinting color
-        * add R-G-B value to result pixel 
-    If tinting is disabled for this channel:
-        * get normalized R-G-B value
-        * apply gradation to R, G and B
-        * add R-G-B value to result pixel 
+::
+
+  Let result R-G-B pixel value = 0,0,0
+  For each channel
+      If tinting is enabled for this channel:
+          * get normalized pixel value
+          * apply gradation
+          * multiply with R-G-B tinting color
+          * add R-G-B value to result pixel 
+      If tinting is disabled for this channel:
+          * get normalized R-G-B value
+          * apply gradation to R, G and B
+          * add R-G-B value to result pixel 
 
 
 The operation "Apply gradiation" works in the following way: the normalized pixel value is mapped to an integer (in the range 0..255) by looking
