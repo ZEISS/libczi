@@ -81,6 +81,13 @@ namespace libCZI
     class ISite
     {
     public:
+        /// Values that represent reasons for terminating the program.
+        enum class TerminationReason : std::uint8_t
+        {
+            Unknown = 0,    ///< An enum constant representing the unknown option
+            BitmapDestroyedWithLockCountNotZero = 1,    ///< A bitmap was destroyed while it was still locked.
+        };
+
         /// Query if  the specified logging level is enabled. In the case that constructing the message
         /// to be logged takes a significant amount of resources (i.e. time or memory), this method should
         /// be called before in order to determine whether the output is required at all. This also means
@@ -121,6 +128,12 @@ namespace libCZI
         ///
         /// \return The newly allocated bitmap.
         virtual std::shared_ptr<libCZI::IBitmapData> CreateBitmap(libCZI::PixelType pixeltype, std::uint32_t width, std::uint32_t height, std::uint32_t stride = 0, std::uint32_t extraRows = 0, std::uint32_t extraColumns = 0) = 0;
+
+        /// This method is called in order to terminate the program in case of an unrecoverable error.
+        ///
+        /// \param  reason  An enumeration specifying the reason for abnormal termination.
+        /// \param  message An informative text detailing the reason for abnormal termination.
+        virtual void TerminateProgram(TerminationReason reason, const char* message) = 0;
 
         /// Output the specified string at the specified logging level.
         /// \param level The level.

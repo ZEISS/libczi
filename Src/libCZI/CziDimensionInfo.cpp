@@ -90,7 +90,7 @@ void CCziDimensionZInfo::SetZDriveSpeed(const double& d)
     this->zdriveSpeedValid = true;
 }
 
-bool CCziDimensionZInfo::TryGetReferencePosition(double* d) /*override*/
+bool CCziDimensionZInfo::TryGetReferencePosition(double* d) const /*override*/
 {
     if (this->referencePosValid == true)
     {
@@ -105,7 +105,7 @@ bool CCziDimensionZInfo::TryGetReferencePosition(double* d) /*override*/
     return false;
 }
 
-bool CCziDimensionZInfo::TryGetIntervalDefinition(double* offset, double* increment) /*override*/
+bool CCziDimensionZInfo::TryGetIntervalDefinition(double* offset, double* increment) const /*override*/
 {
     if (this->type == DefType::Interval)
     {
@@ -125,7 +125,7 @@ bool CCziDimensionZInfo::TryGetIntervalDefinition(double* offset, double* increm
     return false;
 }
 
-bool CCziDimensionZInfo::TryGetPositionList(std::vector<double>* positions) /*override*/
+bool CCziDimensionZInfo::TryGetPositionList(std::vector<double>* positions) const /*override*/
 {
     if (this->type == DefType::List)
     {
@@ -140,7 +140,7 @@ bool CCziDimensionZInfo::TryGetPositionList(std::vector<double>* positions) /*ov
     return false;
 }
 
-bool CCziDimensionZInfo::TryGetXyzHandedness(XyzHandedness* xyzHandedness) /*override*/
+bool CCziDimensionZInfo::TryGetXyzHandedness(XyzHandedness* xyzHandedness) const /*override*/
 {
     if (this->xyzHandednessValid)
     {
@@ -155,7 +155,7 @@ bool CCziDimensionZInfo::TryGetXyzHandedness(XyzHandedness* xyzHandedness) /*ove
     return false;
 }
 
-bool CCziDimensionZInfo::TryGetZAxisDirection(ZaxisDirection* zAxisDirection) /*override*/
+bool CCziDimensionZInfo::TryGetZAxisDirection(ZaxisDirection* zAxisDirection) const /*override*/
 {
     if (this->zaxisDirectionValid)
     {
@@ -170,7 +170,7 @@ bool CCziDimensionZInfo::TryGetZAxisDirection(ZaxisDirection* zAxisDirection) /*
     return false;
 }
 
-bool CCziDimensionZInfo::TryGetZDriveMode(ZDriveMode* zdrivemode) /*override*/
+bool CCziDimensionZInfo::TryGetZDriveMode(ZDriveMode* zdrivemode) const /*override*/
 {
     if (this->zdriveModeValid)
     {
@@ -185,7 +185,7 @@ bool CCziDimensionZInfo::TryGetZDriveMode(ZDriveMode* zdrivemode) /*override*/
     return false;
 }
 
-bool CCziDimensionZInfo::TryZDriveSpeed(double* zdrivespeed) /*override*/
+bool CCziDimensionZInfo::TryZDriveSpeed(double* zdrivespeed) const /*override*/
 {
     if (this->zdriveSpeedValid)
     {
@@ -227,7 +227,7 @@ void CCziDimensionTInfo::SetListDefinition(std::vector<double>&& list)
     this->type = DefType::List;
 }
 
-bool CCziDimensionTInfo::TryGetStartTime(libCZI::XmlDateTime* dateTime) /*override*/
+bool CCziDimensionTInfo::TryGetStartTime(libCZI::XmlDateTime* dateTime) const/*override*/
 {
     if (this->startTimeValid)
     {
@@ -242,7 +242,7 @@ bool CCziDimensionTInfo::TryGetStartTime(libCZI::XmlDateTime* dateTime) /*overri
     return false;
 }
 
-bool CCziDimensionTInfo::TryGetIntervalDefinition(double* offset, double* increment) /*override*/
+bool CCziDimensionTInfo::TryGetIntervalDefinition(double* offset, double* increment) const/*override*/
 {
     if (this->type == DefType::Interval)
     {
@@ -262,7 +262,7 @@ bool CCziDimensionTInfo::TryGetIntervalDefinition(double* offset, double* increm
     return false;
 }
 
-bool CCziDimensionTInfo::TryGetOffsetsList(std::vector<double>* offsets) /*override*/
+bool CCziDimensionTInfo::TryGetOffsetsList(std::vector<double>* offsets) const/*override*/
 {
 
     if (this->type == DefType::List)

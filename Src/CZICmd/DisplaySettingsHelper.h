@@ -106,7 +106,7 @@ public:
         }
     }
 
-    void EnumChannels(std::function<bool(int)> func) const override
+    void EnumChannels(const std::function<bool(int)>& func) const override
     {
         for (std::map<int, std::shared_ptr<libCZI::IChannelDisplaySetting>>::const_iterator it = this->chDsplSettings.cbegin();
             it != this->chDsplSettings.cend(); ++it)

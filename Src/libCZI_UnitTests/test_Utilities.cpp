@@ -139,7 +139,7 @@ public:
     {
         this->lckCnt--;
     }
-    int GetLockCnt() const
+    virtual int				GetLockCount() const
     {
         return this->lckCnt;
     }
@@ -151,17 +151,17 @@ TEST(Utilities, ScopedBitmapLocker1)
 
     {
         ScopedBitmapLockerSP locker1{ bitmap };
-        EXPECT_EQ(bitmap->GetLockCnt(), 1) << "expecting a lock-count of '1'";
+        EXPECT_EQ(bitmap->GetLockCount(), 1) << "expecting a lock-count of '1'";
 
         {
             ScopedBitmapLockerSP locker2{ bitmap };
-            EXPECT_EQ(bitmap->GetLockCnt(), 2) << "expecting a lock-count of '2'";
+            EXPECT_EQ(bitmap->GetLockCount(), 2) << "expecting a lock-count of '2'";
         }
 
-        EXPECT_EQ(bitmap->GetLockCnt(), 1) << "expecting a lock-count of '1'";
+        EXPECT_EQ(bitmap->GetLockCount(), 1) << "expecting a lock-count of '1'";
     }
 
-    EXPECT_EQ(bitmap->GetLockCnt(), 0) << "expecting a lock-count of zero";
+    EXPECT_EQ(bitmap->GetLockCount(), 0) << "expecting a lock-count of zero";
 }
 
 TEST(Utilities, ScopedBitmapLocker2)
@@ -173,10 +173,10 @@ TEST(Utilities, ScopedBitmapLocker2)
         std::vector<ScopedBitmapLockerSP> vec;
         vec.push_back(ScopedBitmapLockerSP{ bitmap });
         vec.push_back(ScopedBitmapLockerSP{ bitmap });
-        EXPECT_EQ(bitmap->GetLockCnt(), 2) << "expecting a lock-count of '2'";
+        EXPECT_EQ(bitmap->GetLockCount(), 2) << "expecting a lock-count of '2'";
     }
 
-    EXPECT_EQ(bitmap->GetLockCnt(), 0) << "expecting a lock-count of zero";
+    EXPECT_EQ(bitmap->GetLockCount(), 0) << "expecting a lock-count of zero";
 }
 
 TEST(Utilities, ScopedBitmapLocker3)
@@ -188,10 +188,10 @@ TEST(Utilities, ScopedBitmapLocker3)
         std::vector<ScopedBitmapLockerSP> vec;
         vec.emplace_back(ScopedBitmapLockerSP{ bitmap });
         vec.emplace_back(ScopedBitmapLockerSP{ bitmap });
-        EXPECT_EQ(bitmap->GetLockCnt(), 2) << "expecting a lock-count of '2'";
+        EXPECT_EQ(bitmap->GetLockCount(), 2) << "expecting a lock-count of '2'";
     }
 
-    EXPECT_EQ(bitmap->GetLockCnt(), 0) << "expecting a lock-count of zero";
+    EXPECT_EQ(bitmap->GetLockCount(), 0) << "expecting a lock-count of zero";
 }
 
 // test-fixture, cf. https://stackoverflow.com/questions/47354280/what-is-the-best-way-of-testing-private-methods-with-googletest

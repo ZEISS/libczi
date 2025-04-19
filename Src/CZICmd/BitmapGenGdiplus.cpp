@@ -6,6 +6,7 @@
 #include "BitmapGenNull.h"
 #include "utils.h"
 #include "inc_libCZI.h"
+#include <atomic>
 
 #if CZICMD_USE_GDIPLUS == 1
 
@@ -20,6 +21,7 @@ class CGdiplusBitmapWrapper : public libCZI::IBitmapData
 private:
     shared_ptr<Bitmap> bitmap;
     BitmapData bd;
+    std::atomic<int> lockCnt = ATOMIC_VAR_INIT(0);
 public:
     CGdiplusBitmapWrapper(shared_ptr<Bitmap> bitmap) :bitmap(bitmap) {}
     virtual ~CGdiplusBitmapWrapper() = default;
@@ -52,12 +54,21 @@ public:
         bitmapLockInfo.ptrDataRoi = this->bd.Scan0;
         bitmapLockInfo.stride = this->bd.Stride;
         bitmapLockInfo.size = static_cast<size_t>(this->bd.Stride) * this->bd.Height;
+
+        std::atomic_fetch_add(&this->lockCnt, 1);
+
         return bitmapLockInfo;
     }
 
     virtual void Unlock()
     {
         this->bitmap->UnlockBits(&this->bd);
+        std::atomic_fetch_sub(&this->lockCnt, 1);
+    }
+
+    virtual int GetLockCount() const
+    {
+        return std::atomic_load(&this->lockCnt);
     }
 };
 

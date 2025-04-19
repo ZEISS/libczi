@@ -50,6 +50,8 @@ public:
     libCZI::IntPointAndFrameOfReference TransformPoint(const libCZI::IntPointAndFrameOfReference& source_point, libCZI::CZIFrameOfReference destination_frame_of_reference) override;
 
     // interface IAttachmentRepository
+    int GetAttachmentCount() const override;
+    bool TryGetAttachmentInfo(int index, libCZI::AttachmentInfo* info) const override;
     void EnumerateAttachments(const std::function<bool(int index, const libCZI::AttachmentInfo& info)>& funcEnum) override;
     void EnumerateSubset(const char* contentFileType, const char* name, const std::function<bool(int index, const libCZI::AttachmentInfo& info)>& funcEnum) override;
     std::shared_ptr<libCZI::IAttachment> ReadAttachment(int index) override;

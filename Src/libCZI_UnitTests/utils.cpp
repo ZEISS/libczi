@@ -73,6 +73,11 @@ public:
     virtual void Unlock()
     {
     }
+
+    virtual int GetLockCount() const
+    {
+        return 0;
+    }
 };
 
 static constexpr uint16_t ZEISS_LOGO_WIDTH{ 200 };

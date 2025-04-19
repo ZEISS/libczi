@@ -381,5 +381,12 @@ namespace libCZI
         //! Examples: "zstd0:ExplicitLevel=3", "zstd1:ExplicitLevel=2;PreProcess=HiLoByteUnpack"
         //! If parsing fails an excpetion of type "Logic_error" is thrown.
         static CompressionOption ParseCompressionOptions(const std::string& options);
+
+        /// Converts the specified wide string into UTF8-encoding.
+        ///
+        /// \param  wide_string    The wide string to be converted.
+        ///
+        /// \returns    The given data converted to an UTF8-encoding.
+        static std::string ConvertToUtf8(const std::wstring& wide_string);
     };
 }

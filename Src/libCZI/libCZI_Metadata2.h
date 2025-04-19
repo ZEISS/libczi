@@ -80,7 +80,7 @@ namespace libCZI
     /// Values that represent a contrast method, a technique used to achieve contrast, for the images in a channel.
     enum class DimensionChannelContrastMethod : std::uint8_t
     {
-        Brightfield,                ///< Bright filed micrsocopy was used.
+        Brightfield,                ///< Bright filed microscopy was used.
         Phase,                      ///< Unknown denotation.
         DIC,                        ///< Differential Interference Contrast was used.
         HoffmanModulation,          ///< Hoffman Modulation Contrast (HMC) was used.
@@ -141,7 +141,7 @@ namespace libCZI
         /// Attempts to get the 'id'. If the method succeeds, the id is put into the specified string.
         /// \param [out] id If non-null, the id is put here (if successful).
         /// \returns True if it succeeds; false otherwise.
-        virtual bool TryGetAttributeId(std::wstring* id) = 0;
+        virtual bool TryGetAttributeId(std::wstring* id) const = 0;
         virtual ~IAttributeId() = default;
     };
 
@@ -152,7 +152,7 @@ namespace libCZI
         /// Attempts to get the 'name'. If the method succeeds, the name is put into the specified string.
         /// \param [out] name If non-null, the name is put here (if successful).
         /// \returns True if it succeeds; false otherwise.
-        virtual bool TryGetAttributeName(std::wstring* name) = 0;
+        virtual bool TryGetAttributeName(std::wstring* name) const = 0;
         virtual ~IAttributeName() = default;
     };
 
@@ -174,177 +174,177 @@ namespace libCZI
         /// Try to get the channel type.
         /// \param [in,out] type If non-null and successful, the channel type is placed here.
         /// \returns True if it succeeds, false if it fails.
-        virtual bool TryGetChannelType(DimensionChannelChannelType* type) = 0;
+        virtual bool TryGetChannelType(DimensionChannelChannelType* type) const = 0;
 
         /// Try to get the channel unit.
         /// \param [in,out] unit If non-null and successful, the channel unit is placed here.
         /// \returns True if it succeeds, false if it fails.
-        virtual bool TryGetChannelUnit(std::wstring* unit) = 0;
+        virtual bool TryGetChannelUnit(std::wstring* unit) const = 0;
 
         /// Try to get the pixel type
         /// \param [in,out] pixelType If non-null and successful, the pixel type is placed here.
         /// \returns True if it succeeds, false if it fails.
-        virtual bool TryGetPixelType(PixelType* pixelType) = 0;
+        virtual bool TryGetPixelType(PixelType* pixelType) const = 0;
 
         /// Try to get the component bit count.
         /// \param [in,out] bitCount If non-null and successful, the component bit count is placed here.
         /// \returns True if it succeeds, false if it fails.
-        virtual bool TryGetComponentBitCount(int* bitCount) = 0;
+        virtual bool TryGetComponentBitCount(int* bitCount) const = 0;
 
         /// Try to get the acquisition mode.
         /// \param [in,out] acquisitionMode If non-null and successful, the acquisition mode is placed here.
         /// \returns True if it succeeds, false if it fails.
-        virtual bool TryGetAcquisitionMode(DimensionChannelAcquisitionMode* acquisitionMode) = 0;
+        virtual bool TryGetAcquisitionMode(DimensionChannelAcquisitionMode* acquisitionMode) const = 0;
 
         /// Try to get the illumination type
         /// \param [in,out] illuminationType If non-null and successful, the illumination type is placed here.
         /// \returns True if it succeeds, false if it fails.
-        virtual bool TryGetIlluminationType(DimensionChannelIlluminationType* illuminationType) = 0;
+        virtual bool TryGetIlluminationType(DimensionChannelIlluminationType* illuminationType) const = 0;
 
         /// Try to get the contrast method
         /// \param [in,out] contrastMethod If non-null and successful, the contrast method is placed here.
         /// \returns True if it succeeds, false if it fails.
-        virtual bool TryGetContrastMethod(DimensionChannelContrastMethod* contrastMethod) = 0;
+        virtual bool TryGetContrastMethod(DimensionChannelContrastMethod* contrastMethod) const = 0;
 
         /// Try to get the illumination wavelength information.
         /// \param [in,out] illuminationwavelength If non-null and successful, the illumination wavelength information is placed here.
         /// \returns True if it succeeds, false if it fails.
-        virtual bool TryGetIlluminationWavelength(SpectrumCharacteristics* illuminationwavelength) = 0;
+        virtual bool TryGetIlluminationWavelength(SpectrumCharacteristics* illuminationwavelength) const = 0;
 
         /// Try to get the detection wavelength information.
         /// \param [in,out] detectionwavelength If non-null and successful, the detection wavelength information is placed here.
         /// \returns True if it succeeds, false if it fails.
-        virtual bool TryGetDetectionWavelength(SpectrumCharacteristics* detectionwavelength) = 0;
+        virtual bool TryGetDetectionWavelength(SpectrumCharacteristics* detectionwavelength) const = 0;
 
         /// Try to get excitation wavelength.
         /// \param [in,out] excitationwavelength If non-null and successful, the excitation wavelength is placed here.
         /// \returns True if it succeeds, false if it fails.
-        virtual bool TryGetExcitationWavelength(double* excitationwavelength) = 0;
+        virtual bool TryGetExcitationWavelength(double* excitationwavelength) const = 0;
 
         /// Try to get emission wavelength.
         /// \param [in,out] emissionwavelength If non-null and successful, the emission wavelength is placed here.
         /// \returns True if it succeeds, false if it fails.
-        virtual bool TryGetEmissionWavelength(double* emissionwavelength) = 0;
+        virtual bool TryGetEmissionWavelength(double* emissionwavelength) const = 0;
 
         /// Try to get the effective numerical aperture.
         /// \param [in,out] na If non-null and successful, the effective numerical aperture is placed here.
         /// \returns True if it succeeds, false if it fails.
-        virtual bool TryGetEffectiveNA(double* na) = 0;
+        virtual bool TryGetEffectiveNA(double* na) const = 0;
 
         /// Try to get the dye identifier.
         /// \param [in,out] dyeid If non-null and successful, the dye identifier is placed here.
         /// \returns True if it succeeds, false if it fails.
-        virtual bool TryGetDyeId(std::wstring* dyeid) = 0;
+        virtual bool TryGetDyeId(std::wstring* dyeid) const = 0;
 
         /// Try to get the dye database identifier.
         /// \param [in,out] dyedatabaseid If non-null and successful, the dye database identifier is placed here.
         /// \returns True if it succeeds, false if it fails.
-        virtual bool TryGetDyeDatabaseId(std::wstring* dyedatabaseid) = 0;
+        virtual bool TryGetDyeDatabaseId(std::wstring* dyedatabaseid) const = 0;
 
         /// Try to get the pinhole size.
         /// \param [in,out] pinholesize If non-null and successful, the pinhole size is placed here.
         /// \returns True if it succeeds, false if it fails.
-        virtual bool TryGetPinholeSize(double* pinholesize) = 0;
+        virtual bool TryGetPinholeSize(double* pinholesize) const = 0;
 
         /// Try to get the pinhole size in units of airy disk size.
         /// \param [in,out] pinholesizeairy If non-null, the pinhole size in units of airy disk size if placed here.
         /// \returns True if it succeeds, false if it fails.
-        virtual bool TryGetPinholeSizeAiry(double* pinholesizeairy) = 0;
+        virtual bool TryGetPinholeSizeAiry(double* pinholesizeairy) const = 0;
 
         /// Try to get the pinhole geometry.
         /// \param [in,out] pinholegeometry If non-null and successful, the pinhole geometry is placed here.
         /// \returns True if it succeeds, false if it fails.
-        virtual bool TryGetPinholeGeometry(DimensionChannelPinholeGeometry* pinholegeometry) = 0;
+        virtual bool TryGetPinholeGeometry(DimensionChannelPinholeGeometry* pinholegeometry) const = 0;
 
         /// Try to get the name of the fluorophor used to produce this channel [plain text string].
         /// \param [in,out] fluor If non-null and successful, the name of the fluorophor is placed here.
         /// \returns True if it succeeds, false if it fails.
-        virtual bool TryGetFluor(std::wstring* fluor) = 0;
+        virtual bool TryGetFluor(std::wstring* fluor) const = 0;
 
         /// Try to get optical density of ND filters used.
         /// \param [in,out] ndfilter If non-null and successful, the optical density of ND filters used is placed here.
         /// \returns True if it succeeds, false if it fails.
-        virtual bool TryGetNDFilter(double* ndfilter) = 0;
+        virtual bool TryGetNDFilter(double* ndfilter) const = 0;
 
         /// Try to get the pocket cell setting.
         /// \param [in,out] pocketcellsetting If non-null and successful, the pocket cell setting is placed here.
         /// \returns True if it succeeds, false if it fails.
-        virtual bool TryGetPocketCellSetting(int* pocketcellsetting) = 0;
+        virtual bool TryGetPocketCellSetting(int* pocketcellsetting) const = 0;
 
         /// Try to get the color.
         /// \param [in,out] color If non-null and successful, the color is placed here.
         /// \returns True if it succeeds, false if it fails.
-        virtual bool TryGetColor(libCZI::Rgb8Color* color) = 0;
+        virtual bool TryGetColor(libCZI::Rgb8Color* color) const = 0;
 
         /// Try to get the exposure time
         /// \param [in,out] exposuretime If non-null and successful, the exposure time is placed here.
         /// \returns True if it succeeds, false if it fails.
-        virtual bool TryGetExposureTime(RangeOrSingleValue<std::uint64_t>* exposuretime) = 0;
+        virtual bool TryGetExposureTime(RangeOrSingleValue<std::uint64_t>* exposuretime) const = 0;
 
         /// Try to get the depth of focus.
         /// \param [in,out] depthoffocus If non-null and successful, the depth of focus is placed here.
         /// \returns True if it succeeds, false if it fails.
-        virtual bool TryGetDepthOfFocus(double* depthoffocus) = 0;
+        virtual bool TryGetDepthOfFocus(double* depthoffocus) const = 0;
 
         /// Try to get the section thickness.
         /// \param [in,out] sectionthickness If non-null and successful, the section thickness is placed here.
         /// \returns True if it succeeds, false if it fails.
-        virtual bool TryGetSectionThickness(double* sectionthickness) = 0;
+        virtual bool TryGetSectionThickness(double* sectionthickness) const = 0;
 
         /// Gets the detector settings.
         /// \returns The detector settings.
-        virtual std::shared_ptr<IDimensionChannelDetectorSettings> GetDetectorSettings() = 0;
+        virtual std::shared_ptr<IDimensionChannelDetectorSettings> GetDetectorSettings() const = 0;
 
         /// Gets the light sources settings.
         /// \returns The light sources settings.
-        virtual std::shared_ptr<IDimensionChannelLightSourcesSettings> GetLightSourcesSettings() = 0;
+        virtual std::shared_ptr<IDimensionChannelLightSourcesSettings> GetLightSourcesSettings() const = 0;
 
         /// Gets the light path.
         /// \returns The light path.
-        virtual std::shared_ptr<IDimensionChannelLightPath> GetLightPath() = 0;
+        virtual std::shared_ptr<IDimensionChannelLightPath> GetLightPath() const = 0;
 
         /// Gets the laser scan information.
         /// \returns The laser scan information.
-        virtual std::shared_ptr<IDimensionChannelLaserScanInfo> GetLaserScanInfo() = 0;
+        virtual std::shared_ptr<IDimensionChannelLaserScanInfo> GetLaserScanInfo() const = 0;
 
         /// Gets the SPIM illumination settings
         /// \returns The SPIM illumination settings.
-        virtual std::shared_ptr<IDimensionChannelSPIMIlluminationSettings> GetSPIMIlluminationSettings() = 0;
+        virtual std::shared_ptr<IDimensionChannelSPIMIlluminationSettings> GetSPIMIlluminationSettings() const = 0;
 
         /// Gets the SPIM detection settings
         /// \returns The SPIM detection settings.
-        virtual std::shared_ptr<IDimensionChannelSPIMDetectionSettings> GetSPIMDetectionSettings() = 0;
+        virtual std::shared_ptr<IDimensionChannelSPIMDetectionSettings> GetSPIMDetectionSettings() const = 0;
 
         /// Gets the SIM settings.
         /// \returns The SIM settings.
-        virtual std::shared_ptr<IDimensionChannelSIMSettings> GetSIMSettings() = 0;
+        virtual std::shared_ptr<IDimensionChannelSIMSettings> GetSIMSettings() const = 0;
 
         /// Gets the polarizing settings.
         /// \returns The polarizing settings.
-        virtual std::shared_ptr<IDimensionChannelPolarizingSettings> GetPolarizingSettings() = 0;
+        virtual std::shared_ptr<IDimensionChannelPolarizingSettings> GetPolarizingSettings() const = 0;
 
         /// Gets the airy scan settings.
         /// \returns The airy scan settings.
-        virtual std::shared_ptr<IDimensionChannelAiryscanSettings> GetAiryscanSettings() = 0;
+        virtual std::shared_ptr<IDimensionChannelAiryscanSettings> GetAiryscanSettings() const = 0;
 
         /// Try to get the reflector.
         /// \param [in,out] reflector If non-null and successful, the reflector is placed here.
         /// \returns True if it succeeds, false if it fails.
-        virtual bool TryGetReflector(std::wstring* reflector) = 0;
+        virtual bool TryGetReflector(std::wstring* reflector) const = 0;
 
         /// Try to get the condenser contrast.
         /// \param [in,out] condensorContrast If non-null and successful, the condensor contrast is placed here.
         /// \returns True if it succeeds, false if it fails.
-        virtual bool TryGetCondenserContrast(std::wstring* condensorContrast) = 0;
+        virtual bool TryGetCondenserContrast(std::wstring* condensorContrast) const = 0;
 
         /// Try to get numerical aperture of the condenser.
         /// \param [in,out] naCondensor If non-null, the numerical aperture of the condenser.
         /// \returns True if it succeeds, false if it fails.
-        virtual bool TryGetNACondenser(double* naCondensor) = 0;
+        virtual bool TryGetNACondenser(double* naCondensor) const = 0;
 
         /// Gets the ratio (between two active channels).
         /// \returns The ratio.
-        virtual std::shared_ptr<IDimensionChannelRatio> GetRatio() = 0;
+        virtual std::shared_ptr<IDimensionChannelRatio> GetRatio() const = 0;
 
         ~IDimensionChannelInfo() override = default;
     };

@@ -73,7 +73,7 @@ jobs:
           # See https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type
           # Note that we need to point CMake to the vcpkg-toolchain-file, and also specify the target triplet, c.f. https://learn.microsoft.com/en-us/vcpkg/concepts/triplets
           # since we aim for a static build.
-          cmake -B "${{github.workspace}}/build" -A x64 -DCMAKE_BUILD_TYPE=${{matrix.build}} -DLIBCZI_BUILD_CZICMD=ON -DLIBCZI_BUILD_CURL_BASED_STREAM=ON -DLIBCZI_BUILD_AZURESDK_BASED_STREAM=ON -DLIBCZI_BUILD_PREFER_EXTERNALPACKAGE_LIBCURL=ON -DCMAKE_TOOLCHAIN_FILE="$env:VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake" -DVCPKG_TARGET_TRIPLET=x64-windows-static
+          cmake -B "${{github.workspace}}/build" -A x64 -DCMAKE_BUILD_TYPE=${{matrix.build}} -DLIBCZI_BUILD_CZICMD=ON -DLIBCZI_BUILD_CURL_BASED_STREAM=ON -DLIBCZI_BUILD_AZURESDK_BASED_STREAM=ON -DLIBCZI_BUILD_PREFER_EXTERNALPACKAGE_LIBCURL=ON -DLIBCZI_BUILD_LIBCZIAPI=ON -DCMAKE_TOOLCHAIN_FILE="$env:VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake" -DVCPKG_TARGET_TRIPLET=x64-windows-static
 
       - name: Configure CMake (Windows ARM64)
         if: ${{ (matrix.OS == 'windows-latest') }}
@@ -83,13 +83,13 @@ jobs:
           # Note that since we are doing a cross compilation, we cannot execute code in order to determine platform
           # characteristics like endianess and whether unaligned access is allowed. Therefore, we need to set the following
           # variables manually: CRASH_ON_UNALIGNED_ACCESS=OFF and IS_BIG_ENDIAN=FALSE.
-          cmake -B "${{github.workspace}}/arm64build" -A ARM64 -DCMAKE_BUILD_TYPE=${{matrix.build}} -DLIBCZI_BUILD_CZICMD=ON -DLIBCZI_BUILD_CURL_BASED_STREAM=ON -DLIBCZI_BUILD_AZURESDK_BASED_STREAM=ON -DLIBCZI_BUILD_PREFER_EXTERNALPACKAGE_LIBCURL=ON -DCMAKE_TOOLCHAIN_FILE="$env:VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake" -DVCPKG_TARGET_TRIPLET=arm64-windows-static -DCRASH_ON_UNALIGNED_ACCESS=OFF -DIS_BIG_ENDIAN=FALSE
+          cmake -B "${{github.workspace}}/arm64build" -A ARM64 -DCMAKE_BUILD_TYPE=${{matrix.build}} -DLIBCZI_BUILD_CZICMD=ON -DLIBCZI_BUILD_CURL_BASED_STREAM=ON -DLIBCZI_BUILD_AZURESDK_BASED_STREAM=ON -DLIBCZI_BUILD_PREFER_EXTERNALPACKAGE_LIBCURL=ON -DLIBCZI_BUILD_LIBCZIAPI=ON -DCMAKE_TOOLCHAIN_FILE="$env:VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake" -DVCPKG_TARGET_TRIPLET=arm64-windows-static -DCRASH_ON_UNALIGNED_ACCESS=OFF -DIS_BIG_ENDIAN=FALSE
 
       - name: Configure CMake (Linux)
         if: ${{ (matrix.OS == 'ubuntu-latest') }}
         shell: bash
         run: |
-          cmake -B "${{github.workspace}}/build" -DCMAKE_BUILD_TYPE=${{matrix.build}} -DLIBCZI_BUILD_CZICMD=ON -DLIBCZI_BUILD_CURL_BASED_STREAM=ON -DLIBCZI_BUILD_PREFER_EXTERNALPACKAGE_LIBCURL=OFF -DLIBCZI_BUILD_AZURESDK_BASED_STREAM=ON -DCMAKE_TOOLCHAIN_FILE="${VCPKG_INSTALLATION_ROOT}/scripts/buildsystems/vcpkg.cmake"
+          cmake -B "${{github.workspace}}/build" -DCMAKE_BUILD_TYPE=${{matrix.build}} -DLIBCZI_BUILD_CZICMD=ON -DLIBCZI_BUILD_CURL_BASED_STREAM=ON -DLIBCZI_BUILD_PREFER_EXTERNALPACKAGE_LIBCURL=OFF -DLIBCZI_BUILD_AZURESDK_BASED_STREAM=ON -DLIBCZI_BUILD_LIBCZIAPI=ON -DCMAKE_TOOLCHAIN_FILE="${VCPKG_INSTALLATION_ROOT}/scripts/buildsystems/vcpkg.cmake"
 
       - name: Build (Linux)
         if: ${{ (matrix.OS == 'ubuntu-latest') }}

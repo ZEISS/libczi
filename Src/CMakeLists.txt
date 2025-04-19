@@ -74,10 +74,72 @@ endif()
 
 add_subdirectory(libCZI)
 
+# CZICmd and libCZIAPI are dependent on RapidJSON, so we need to find or download it.
+if (LIBCZI_BUILD_CZICMD OR LIBCZI_BUILD_LIBCZIAPI)
+  if (LIBCZI_BUILD_PREFER_EXTERNALPACKAGE_RAPIDJSON)
+      find_package(RapidJSON QUIET)
+      if (NOT RapidJSON_FOUND)
+          message(FATAL_ERROR [=[
+          RapidJSON library was not found, which is required for building. Consider installing
+          like 'sudo apt-get install rapidjson-dev'. Alternatively, consider setting the option
+          LIBCZI_BUILD_PREFER_EXTERNALPACKAGE_RAPIDJSON to OFF in order to download and build RapidJSON
+          automatically as part of the build process.
+          ]=])
+      endif()
+  else()
+      # Since "RapidJSON" is a header-only library, we just have to download it and point to the include directory.
+      # Note: when using v1.1.0 of RapidJSON (the latest release) there we problems (with GCC14.2 with msys2), so
+      #        we use a later version from the master branch.
+      include(FetchContent)
+      FetchContent_Declare(
+              RapidJSON
+              GIT_REPOSITORY https://github.com/Tencent/rapidjson.git
+              GIT_TAG        24b5e7a8b27f42fa16b96fc70aade9106cf7102f # master as of 2025-04-01
+              PREFIX "${CMAKE_BINARY_DIR}/vendor/rapidjson"
+      )
+
+      set(RAPIDJSON_BUILD_DOC OFF CACHE BOOL "" FORCE)
+      set(RAPIDJSON_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+      set(RAPIDJSON_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+      FetchContent_MakeAvailable(RapidJSON)
+
+      set(RAPIDJSON_INCLUDE_DIRS ${rapidjson_SOURCE_DIR}/include)
+  endif()
+endif()
+
 if (LIBCZI_BUILD_CZICMD)
  add_subdirectory(CZICmd)
 endif(LIBCZI_BUILD_CZICMD)
 
+if (LIBCZI_BUILD_LIBCZIAPI)
+  add_subdirectory(libCZIAPI)
+endif(LIBCZI_BUILD_LIBCZIAPI)
+
 if (LIBCZI_BUILD_UNITTESTS)
+  include(FetchContent)
+
+  set(INSTALL_GTEST OFF CACHE BOOL "" FORCE)
+  # For Windows: Prevent overriding the parent project's compiler/linker settings
+  set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+  set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
+
+  if(${CMAKE_VERSION}  VERSION_GREATER_EQUAL "3.24.0")
+	  FetchContent_Declare(
+		  googletest
+		  URL https://github.com/google/googletest/archive/refs/tags/v1.14.0.zip
+		  DOWNLOAD_EXTRACT_TIMESTAMP TRUE)
+  else ()
+	  FetchContent_Declare(
+		  googletest
+		  URL https://github.com/google/googletest/archive/refs/tags/v1.14.0.zip)
+  endif()
+
+  FetchContent_MakeAvailable(googletest)
+
  add_subdirectory(libCZI_UnitTests)
+
+  if (LIBCZI_BUILD_LIBCZIAPI)
+    add_subdirectory(libCZIAPI_UnitTests)
+  endif()
 endif(LIBCZI_BUILD_UNITTESTS)
+

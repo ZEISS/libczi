@@ -103,17 +103,23 @@ std::shared_ptr<libCZI::IStream> libCZI::CreateStreamFromMemory(libCZI::IAttachm
     return make_shared<CStreamImplInMemory>(attachment);
 }
 
-std::shared_ptr<IOutputStream> libCZI::CreateOutputStreamForFile(const wchar_t* szFilename, bool overwriteExisting)
+std::shared_ptr<IOutputStream> libCZI::CreateOutputStreamForFile(const wchar_t* szwFilename, bool overwriteExisting)
 {
 #if LIBCZI_WINDOWSAPI_AVAILABLE
-    return make_shared<CSimpleOutputStreamImplWindows>(szFilename, overwriteExisting);
+    return make_shared<CSimpleOutputStreamImplWindows>(szwFilename, overwriteExisting);
 #else
 #if LIBCZI_USE_PREADPWRITEBASED_STREAMIMPL
-    return make_shared<COutputStreamImplPwrite>(szFilename, overwriteExisting);
+    return make_shared<COutputStreamImplPwrite>(szwFilename, overwriteExisting);
 #else
-    return make_shared<CSimpleOutputStreamStreams>(szFilename, overwriteExisting);
+    return make_shared<CSimpleOutputStreamStreams>(szwFilename, overwriteExisting);
 #endif
 #endif
+}
+
+std::shared_ptr<IOutputStream> libCZI::CreateOutputStreamForFileUtf8(const char* szFilename, bool overwriteExisting)
+{
+    wstring filename_wide = Utilities::convertUtf8ToWchar_t(szFilename);
+    return libCZI::CreateOutputStreamForFile(filename_wide.c_str(), overwriteExisting);
 }
 
 std::shared_ptr<IInputOutputStream> libCZI::CreateInputOutputStreamForFile(const wchar_t* szFilename)

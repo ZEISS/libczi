@@ -17,7 +17,7 @@ namespace libCZI
     {
         invalid = 0,    ///< Invalid dimension index.
 
-        MinDim = 1,     ///< This enum must be have the value of the lowest (valid) dimension index.
+        MinDim = 1,     ///< This enum must have the value of the lowest (valid) dimension index.
 
         Z = 1,          ///< The Z-dimension.
         C = 2,          ///< The C-dimension ("channel").
@@ -29,7 +29,7 @@ namespace libCZI
         V = 8,          ///< The V-dimension ("view").
         B = 9,          ///< The B-dimension ("block") - its use is deprecated.
 
-        MaxDim = 9      ///< This enum must be have the value of the highest (valid) dimension index.
+        MaxDim = 9      ///< This enum must have the value of the highest (valid) dimension index.
     };
 
     /// Interface used to represent a coordinate (in the space of the dimensions identified by `DimensionIndex`).

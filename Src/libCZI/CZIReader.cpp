@@ -252,6 +252,33 @@ CCZIReader::CCZIReader() :
     this->stream.reset();
 }
 
+/*virtual*/int CCZIReader::GetAttachmentCount() const
+{
+    this->ThrowIfNotOperational();
+    return static_cast<int>(this->attachmentDir.GetEntryCnt());
+}
+
+/*virtual*/bool CCZIReader::TryGetAttachmentInfo(int index, libCZI::AttachmentInfo* info) const
+{
+    this->ThrowIfNotOperational();
+    CCziAttachmentsDirectory::AttachmentEntry entry;
+    if (this->attachmentDir.TryGetAttachment(index, entry) == false)
+    {
+        return false;
+    }
+
+    if (info != nullptr)
+    {
+        info->contentGuid = entry.ContentGuid;
+        static_assert(sizeof(info->contentFileType) == sizeof(entry.ContentFileType) + 1, "The sizes of the two fields differ from expectation.");
+        memcpy(info->contentFileType, entry.ContentFileType, sizeof(entry.ContentFileType));
+        info->contentFileType[sizeof(entry.ContentFileType)] = '\0';
+        info->name = entry.Name;
+    }
+
+    return true;
+}
+
 /*virtual*/void CCZIReader::EnumerateAttachments(const std::function<bool(int index, const libCZI::AttachmentInfo& info)>& funcEnum)
 {
     this->ThrowIfNotOperational();
@@ -403,7 +430,7 @@ std::shared_ptr<libCZI::IMetadataSegment> CCZIReader::ReadMetadataSegment(std::u
     return std::make_shared<CCziMetadataSegment>(metaDataSegmentData, free);
 }
 
-void CCZIReader::ThrowIfNotOperational()
+void CCZIReader::ThrowIfNotOperational() const
 {
     if (this->isOperational == false)
     {

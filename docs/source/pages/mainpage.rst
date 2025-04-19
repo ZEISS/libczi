@@ -1,0 +1,62 @@
+libCZI Documentation
+====================
+
+
+libCZI is a library intended for providing read and write access to the information contained in CZI-documents.
+
+It features
+- reading subblocks and get the content as a bitmap
+- reading subblocks which are compressed with JPEG-XR and ZStd
+- works with tiled images and pyramid images
+- composing multi-channel images with tinting and applying a gradation curve
+- access metadata
+- writing subblocks and metadata
+
+In a nutshell, it offers (almost...) the same functionality as the 2D-viewer in ZEN - in terms of composing the image (including display-settings) and managing the data found in a CZI-file.
+
+.. image:: ../_static/images/ZEN_screenshot_1.PNG
+   :alt: ZEN - 2D-viewer
+
+The code is written in C++11 and (so far) has been successfully compiled with
+- Visual Studio 2015 (Microsoft C++ v. 19.00.23506)
+- GCC 5.2.1 (on Ubuntu Linux 4.2.0)
+- Clang 3.4.1 (on FreeBSD 10.2)
+
+It is intended to be easily portable to other platforms.
+
+It aims to be thread-safe (by most `definitions <https://en.wikipedia.org/wiki/Thread_safety>`_). The library itself does not leverage multithreading, but it is designed for being used in a multithreaded environment.
+
+Versioning of libCZI
+---------------------
+
+For libCZI the `semantic versioning scheme 2.0 <https://semver.org/>`_ is to be applied. The version number is defined in the top-level CMakeList.txt file `here <https://github.com/ZEISS/libczi/blob/main/CMakeLists.txt#L4>`_. This is the only place where the version number is defined. When making changes, this version number needs to be updated accordingly. For determining whether a change is a breaking one, the source code level is decisive; i.e. not binary compatibility (of the resulting static or dynamic library) is to be considered, but the case of re-compiling with the changed sources. A borderline case are maybe changes in the CMake-files - here the best judgement is to be applied whether a change in the compilation result will occur.
+
+Note that the number defined in the `project <https://cmake.org/cmake/help/latest/command/project.html#command:project>`_ statement allows for four numbers: ``<major>.<minor>.<patch>.<tweak>``. The number for ``<tweak>`` has no semantic meaning.
+
+CZI in a nutshell
+--------------------
+
+Conceptionally a CZI-document can be described as a set of blobs (or blocks - in this context just a binary data structure defined only by its length), which are linked by a directory structure.
+
+.. image:: ../_static/images/CZI_1.PNG
+   :alt: CZI - conceptual overview
+
+At the start of the file, there is a distinguished data-structure ("the header") which (amongst other things) contains the offsets of three other special blocks:
+
+- the metadata block (contains all "per document" metadata in XML-format)
+- sub-block directory (contains a list of all sub-blocks contained in the document and their respective position in the file)
+- the attachment directory (contains a list of all attachment-blocks contained in the document and their respective position in the file)
+
+With the term *sub-block* we are referring to an entity which contains a 2-dimensional image (or "a bitmap"), some associated metadata in XML-format (which we refer to as *sub-block metadata*) and (potentially) some other binary attachment (referred to as *sub-block attachment*). Do not confuse the terms "sub-block metadata" ↔ "metadata" and "sub-block attachment" ↔ "attachment" in this regard. Sub-blocks are identified by something like a coordinate - a list of dimensions and for each dimension a value.
+
+Attachments can contain any sort of binary data (their content is not further defined on the file-format level). They are identified by a string. A naming convention is used to discover their content.
+
+The identifier (or coordinate) of a sub-block can be grouped in two categories: a number of abstract dimensions (abstract in the sense that the number is not directly related to a spatial point) and an X-Y-coordinate in a 2D-plane. Examples for the former are "C-dimension" (used for different channels) or "T-dimensions" (used for images acquired at different points in time) → `link_enum_dimensionindex`. The X-Y-coordinate refer to a common (to all sub-blocks) coordinate system in which the sub-blocks are thought to be arranged. In fact - sub-blocks are not only described by their X-Y-coordinate, but by a complete rectangle (adding width and height to the X-Y-coordinate) - called the *logical rect*. And, in addition there is a parameter *physical width* and *physical height* → `link_subblockinfo`.
+
+.. image:: ../_static/images/CZI_2.PNG
+   :alt: CZI - position of sub-block on plane
+
+So the logical_rect defines the position (and size) of the sub-block on a plane. The physical_size gives the width and height of the bitmap contained in the sub-block. They may or may not coincide with each other. If they do not coincide, then conceptually the bitmap is to be considered to have a different resolution - so that we do not have a one-to-one correspondence between a pixel and an increment by 1 on the X- or Y-coordinate. This concept is leveraged in order to have a resolution pyramid available in a CZI-document.
+
+.. _link_enum_dimensionindex: `cf. DimensionIndex`
+.. _link_subblockinfo: `cf. SubBlockInfo`

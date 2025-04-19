@@ -61,13 +61,13 @@ public:
     void SetZDriveMode(libCZI::IDimensionZInfo::ZDriveMode zdrivemode);
     void SetZDriveSpeed(const double& d);
 public:
-    bool TryGetReferencePosition(double* d) override;
-    bool TryGetIntervalDefinition(double* start, double* increment) override;
-    bool TryGetPositionList(std::vector<double>* positions) override;
-    bool TryGetXyzHandedness(XyzHandedness* xyzHandedness) override;
-    bool TryGetZAxisDirection(ZaxisDirection* zAxisDirection) override;
-    bool TryGetZDriveMode(ZDriveMode* zdrivemode) override;
-    bool TryZDriveSpeed(double* zdrivespeed) override;
+    bool TryGetReferencePosition(double* d) const override;
+    bool TryGetIntervalDefinition(double* offset, double* increment) const override;
+    bool TryGetPositionList(std::vector<double>* positions) const override;
+    bool TryGetXyzHandedness(XyzHandedness* xyzHandedness) const override;
+    bool TryGetZAxisDirection(ZaxisDirection* zAxisDirection) const override;
+    bool TryGetZDriveMode(ZDriveMode* zdrivemode) const override;
+    bool TryZDriveSpeed(double* zdrivespeed) const override;
 };
 
 class CCziDimensionTInfo : public libCZI::IDimensionTInfo
@@ -93,7 +93,7 @@ public:
     void SetIntervalDefinition(const double& start, const double& increment);
     void SetListDefinition(std::vector<double>&& list);
 public:
-    bool TryGetStartTime(libCZI::XmlDateTime* dateTime) override;
-    bool TryGetIntervalDefinition(double* offset, double* increment) override;
-    bool TryGetOffsetsList(std::vector<double>* offsets) override;
+    bool TryGetStartTime(libCZI::XmlDateTime* dateTime) const override;
+    bool TryGetIntervalDefinition(double* offset, double* increment) const override;
+    bool TryGetOffsetsList(std::vector<double>* offsets) const override;
 };

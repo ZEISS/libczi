@@ -5,6 +5,7 @@
 #include "BitmapGenNull.h"
 #include "utils.h"
 #include "inc_libCZI.h"
+#include <atomic>
 
 CNullBitmapWrapper::CNullBitmapWrapper(libCZI::PixelType pixeltype, std::uint32_t width, std::uint32_t height) :pixeltype(pixeltype), width(width), height(height)
 {
@@ -104,11 +105,20 @@ void CNullBitmapWrapper::Clear(const ColorSpecification& color)
     bitmapLockInfo.ptrDataRoi = this->ptrData;
     bitmapLockInfo.stride = this->stride;
     bitmapLockInfo.size = static_cast<uint64_t>(this->stride) * this->height;
+
+    std::atomic_fetch_add(&this->lockCnt, 1);
+
     return bitmapLockInfo;
 }
 
 /*virtual*/void CNullBitmapWrapper::Unlock()
 {
+    std::atomic_fetch_sub(&this->lockCnt, 1);
+}
+
+/*virtual*/int CNullBitmapWrapper::GetLockCount() const
+{
+    return std::atomic_load(&this->lockCnt);
 }
 
 void CNullBitmapWrapper::CopyMonochromeBitmap(int posX, int posY, const void* ptrData, int stride, int width, int height, const ColorSpecification& color)

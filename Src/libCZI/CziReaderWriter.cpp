@@ -765,6 +765,33 @@ void CCziReaderWriter::WriteToOutputStream(std::uint64_t offset, const void* pv,
     throw logic_error("Unsupported frame-of-reference transformation.");
 }
 
+/*virtual*/int CCziReaderWriter::GetAttachmentCount() const
+{
+    this->ThrowIfNotOperational();
+    return static_cast<int>(this->attachmentDirectory.GetEntryCnt());
+}
+
+/*virtual*/bool CCziReaderWriter::TryGetAttachmentInfo(int index, libCZI::AttachmentInfo* info) const
+{
+    this->ThrowIfNotOperational();
+    CCziAttachmentsDirectoryBase::AttachmentEntry entry;
+    if (this->attachmentDirectory.TryGetAttachment(index, &entry) == false)
+    {
+        return false;
+    }
+
+    if (info != nullptr)
+    {
+        info->contentGuid = entry.ContentGuid;
+        static_assert(sizeof(info->contentFileType) == sizeof(entry.ContentFileType) + 1, "The sizes of the two fields differ from expectation.");
+        memcpy(info->contentFileType, entry.ContentFileType, sizeof(info->contentFileType));
+        info->contentFileType[sizeof(entry.ContentFileType)] = '\0';
+        info->name = entry.Name;
+    }
+
+    return true;
+}
+
 /*virtual*/void CCziReaderWriter::EnumerateAttachments(const std::function<bool(int index, const libCZI::AttachmentInfo& info)>& funcEnum)
 {
     this->ThrowIfNotOperational();
