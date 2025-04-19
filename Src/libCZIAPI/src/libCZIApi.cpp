@@ -9,7 +9,6 @@
 #include <libCZI.h>
 
 #include "parameterhelpers.h"
-#include "utils.h"
 
 #include <limits>
 #include <algorithm>
