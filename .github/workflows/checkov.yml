@@ -1,0 +1,3 @@
+# Allow workflow_dispatch inputs for manual control
+skip_checks:
+  - CKV_GHA_7
