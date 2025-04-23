@@ -14,6 +14,7 @@ Documentation of LibCZI and adjacent projects.
 
    pages/mainpage
    pages/building
+   pages/building_documentation
    pages/image_document_concept
    pages/using_libCZI
    pages/accessors
@@ -25,6 +26,7 @@ Documentation of LibCZI and adjacent projects.
    pages/resolution_protocol
    pages/todos
    pages/version_history
+   pages/api/mainpage
 
 
 Doxygen Documentation
