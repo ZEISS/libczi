@@ -22,11 +22,12 @@
 FROM python:3.9-slim-buster
 
 # Install git and other dependencies
-RUN apt-get update && apt-get install -y git && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y --no-install-recommends git && rm -rf /var/lib/apt/lists/*
 
 # Install Sphinx some extensions
-RUN pip install sphinx breathe exhale sphinx-book-theme recommonmark sphinx-markdown-tables
+RUN pip install --no-cache-dir sphinx==8.2.3 breathe==4.36.0 exhale==0.3.7 sphinx-book-theme==1.1.4 recommonmark==0.7.0 sphinx-markdown-tables==0.0.15 \
+&& pip install --no-cache-dir -e "git+https://github.com/mithro/sphinx-contrib-mithro#egg=sphinx-contrib-exhale-multiproject&subdirectory=sphinx-contrib-exhale-multiproject"
 
-# The following enables multiple doxygen projects with exhale
-RUN pip install -e "git+https://github.com/mithro/sphinx-contrib-mithro#egg=sphinx-contrib-exhale-multiproject&subdirectory=sphinx-contrib-exhale-multiproject"
-
+# Add a non-root user after installing dependencies and switch to it
+RUN useradd -ms /bin/bash sphinxuser
+USER sphinxuser
