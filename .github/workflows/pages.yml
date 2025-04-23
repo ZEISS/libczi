@@ -2,6 +2,7 @@
 name: Pages
 
 on:
+  # checkov:skip=CKV_GHA_7: We allow workflow_dispatch inputs for manual deploy control
   workflow_dispatch:
     inputs:
       deploy:
