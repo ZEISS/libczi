@@ -307,3 +307,5 @@ __pycache__/
 /CMakeSettings.json
 /Src/Build/html
 megalinter-reports/
+/Src/libCZI/Build/
+/Src/libCZIAPI/Build/

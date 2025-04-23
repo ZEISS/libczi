@@ -3,7 +3,15 @@ name: Pages
 
 on:
   workflow_dispatch:
+    inputs:
+      deploy:
+        description: "Deploy to GitHub Pages?"
+        required: false
+        default: "false"
   pull_request:
+    branches:
+      - main
+  push:
     branches:
       - main
 
@@ -18,32 +26,34 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
-    - name: Pre Setup
-      run: |
-        #sudo apt-get update
-        sudo apt-get install -y doxygen zip
+      - name: Checkout
+        uses: actions/checkout@v4
 
-    - name: Install Sphinx and Friends
-      run: |
-        # breathe integrates doxygen's xml output in sphinx
-        # exhale makes breathe integrations available in sphinx' .rst files
-        # recommonmark makes markdown files first-class citizens in sphinx
-        # sphinx-markdown-tables is needed to support markdown tables
-        # sphinx-book-theme is a simple theme
-        pip install breathe exhale sphinx-book-theme recommonmark sphinx-markdown-tables
-        # The following enables multiple doxygen projects with exhale
-        pip install -e "git+https://github.com/mithro/sphinx-contrib-mithro#egg=sphinx-contrib-exhale-multiproject&subdirectory=sphinx-contrib-exhale-multiproject"
+      - name: Setup with apt
+        run: |
+          #sudo apt-get update
+          sudo apt-get install -y doxygen zip
 
-    - name: Generate Doxygen
-      run: |
-        pushd Src/libCZI/ && doxygen && popd 
-        pushd Src/libCZIAPI/ && doxygen && popd
+      - name: Install Sphinx and Friends
+        run: |
+          # breathe integrates doxygen's xml output in sphinx
+          # exhale makes breathe integrations available in sphinx' .rst files
+          # recommonmark makes markdown files first-class citizens in sphinx
+          # sphinx-markdown-tables is needed to support markdown tables
+          # sphinx-book-theme is a simple theme
+          pip install breathe exhale sphinx-book-theme recommonmark sphinx-markdown-tables
+          # The following enables multiple doxygen projects with exhale
+          pip install -e "git+https://github.com/mithro/sphinx-contrib-mithro#egg=sphinx-contrib-exhale-multiproject&subdirectory=sphinx-contrib-exhale-multiproject"
 
-    - name: Generate Sphinx
-      run: |
-        pushd docs
-        sphinx-build -M html source build
+      - name: Generate Doxygen
+        run: |
+          pushd Src/libCZI/ && doxygen && popd
+          pushd Src/libCZIAPI/ && doxygen && popd
+
+      - name: Generate Sphinx
+        run: |
+          pushd docs
+          sphinx-build -M html source build
 
     # - name: Zip Result
     #   run: |
@@ -57,14 +67,17 @@ jobs:
     #     name: documentation
     #     path: docs.zip
 
-    - name: Setup Pages
-      uses: actions/configure-pages@v5
-    - name: Upload artifact
-      uses: actions/upload-pages-artifact@v3
-      with:
-        # The path to the directory containing the files to be uploaded
-        path: "${{github.workspace}}/docs/build/html/"
-
-    - name: Deploy to GitHub Pages
-      id: deployment
-      uses: actions/deploy-pages@v4
+      - name: Setup Pages
+        # run this step only if the main branch is pushed to or if the workflow is manually triggered and configured to deploy
+        if: github.ref == 'refs/heads/main' || github.event.inputs.deploy == 'true'
+        uses: actions/configure-pages@v5
+      - name: Upload artifact
+        if: github.ref == 'refs/heads/main' || github.event.inputs.deploy == 'true'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          # The path to the directory containing the files to be uploaded
+          path: "${{github.workspace}}/docs/build/html/"
+      - name: Deploy to GitHub Pages
+        if: github.ref == 'refs/heads/main' || github.event.inputs.deploy == 'true'
+        id: deployment
+        uses: actions/deploy-pages@v4

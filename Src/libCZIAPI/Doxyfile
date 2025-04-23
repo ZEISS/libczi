@@ -947,18 +947,28 @@ WARN_LOGFILE           =
 # spaces. See also FILE_PATTERNS and EXTENSION_MAPPING
 # Note: If this tag is empty the current directory is searched.
 
-INPUT                  = ./inc/bitmap_structs.h \
-                         ./inc/errorcodes.h \
-                         ./inc/external_input_stream_struct.h \
-                         ./inc/importexport.h \
-                         ./inc/inputstream_class_info_struct.h \
-                         ./inc/libCZIApi.h \
-                         ./inc/MetadataAsXml_struct.h \
-                         ./inc/misc_types.h \
-                         ./inc/ObjectHandles.h \
-                         ./inc/reader_open_info_struct.h \
-                         ./inc/subblock_statistics_struct.h \
-                         ./inc/versioninfo_structs.h
+INPUT                  = ./inc/accessor_options_interop.h                  \
+                         ./inc/add_attachment_info_interop.h               \
+                         ./inc/add_subblock_info_interop.h                 \
+                         ./inc/attachment_info_interop.h                   \
+                         ./inc/bitmap_structs.h                            \
+                         ./inc/composition_channel_info_interop.h          \
+                         ./inc/errorcodes.h                                \
+                         ./inc/external_input_stream_struct.h              \
+                         ./inc/external_output_stream_struct.h             \
+                         ./inc/external_stream_error_information_struct.h  \
+                         ./inc/fileheader_info_interop.h                   \
+                         ./inc/inputstream_class_info_struct.h             \
+                         ./inc/libCZIApi.h                                 \
+                         ./inc/MetadataAsXml_struct.h                      \
+                         ./inc/misc_types.h                                \
+                         ./inc/ObjectHandles.h                             \
+                         ./inc/reader_open_info_struct.h                   \
+                         ./inc/scaling_info_interop.h                      \
+                         ./inc/subblock_info_interop.h                     \
+                         ./inc/subblock_statistics_struct.h                \
+                         ./inc/versioninfo_structs.h                       \
+                         ./inc/write_metadata_info_interop.h               
 
 
 # This tag can be used to specify the character encoding of the source files
@@ -2365,7 +2375,7 @@ ENABLE_PREPROCESSING   = YES
 # The default value is: NO.
 # This tag requires that the tag ENABLE_PREPROCESSING is set to YES.
 
-MACRO_EXPANSION        = NO
+MACRO_EXPANSION        = YES
 
 # If the EXPAND_ONLY_PREDEF and MACRO_EXPANSION tags are both set to YES then
 # the macro expansion is limited to the macros specified with the PREDEFINED and
@@ -2373,7 +2383,7 @@ MACRO_EXPANSION        = NO
 # The default value is: NO.
 # This tag requires that the tag ENABLE_PREPROCESSING is set to YES.
 
-EXPAND_ONLY_PREDEF     = NO
+EXPAND_ONLY_PREDEF     = YES
 
 # If the SEARCH_INCLUDES tag is set to YES, the include files in the
 # INCLUDE_PATH will be searched if a #include is found.
@@ -2406,7 +2416,7 @@ INCLUDE_FILE_PATTERNS  =
 # recursively expanded use the := operator instead of the = operator.
 # This tag requires that the tag ENABLE_PREPROCESSING is set to YES.
 
-PREDEFINED             =
+PREDEFINED             = LIBCZIAPI_EXPORTS_FOR_DOXYGEN
 
 # If the MACRO_EXPANSION and EXPAND_ONLY_PREDEF tags are set to YES then this
 # tag can be used to specify a list of macro names that should be expanded. The
@@ -2415,7 +2425,7 @@ PREDEFINED             =
 # definition found in the source code.
 # This tag requires that the tag ENABLE_PREPROCESSING is set to YES.
 
-EXPAND_AS_DEFINED      =
+EXPAND_AS_DEFINED      = EXTERNALLIBCZIAPI_API LIBCZIAPI_STDCALL
 
 # If the SKIP_FUNCTION_MACROS tag is set to YES then doxygen's preprocessor will
 # remove all references to function-like macros that are alone on a line, have

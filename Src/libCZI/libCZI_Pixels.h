@@ -77,8 +77,8 @@ namespace libCZI
     /// A point (with integer coordinates).
     struct IntPoint
     {
-        int x;
-        int y;
+        int x;  ///< The x coordinate.
+        int y;  ///< The y coordinate.
     };
 
     /// Values that represent different frame of reference.

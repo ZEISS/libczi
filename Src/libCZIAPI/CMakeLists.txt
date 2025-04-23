@@ -33,14 +33,14 @@ else()
 endif()
 
 set(LIBCZIAPISRCFILES 
-    inc/libCZIApi.h
-    inc/importexport.h
-    inc/errorcodes.h
-    inc/versioninfo_structs.h
-    inc/inputstream_class_info_struct.h
-    inc/subblock_info_interop.h
-    inc/attachment_info_interop.h
-    src/libCZIApi.cpp 
+    "inc/libCZIApi.h"
+    "inc/importexport.h"
+    "inc/errorcodes.h"
+    "inc/versioninfo_structs.h"
+    "inc/inputstream_class_info_struct.h"
+    "inc/subblock_info_interop.h"
+    "inc/attachment_info_interop.h"
+    "src/libCZIApi.cpp"
     "src/sharedptrwrapper.h" 
     "inc/external_input_stream_struct.h"
     "inc/external_output_stream_struct.h"
@@ -58,8 +58,6 @@ set(LIBCZIAPISRCFILES
     "inc/accessor_options_interop.h"
     "inc/composition_channel_info_interop.h"
     "inc/scaling_info_interop.h"
-    "src/utils.cpp" 
-    "src/utils.h"
     "src/parameterhelpers.h"
     "src/parameterhelpers.cpp"
 )
@@ -72,7 +70,7 @@ set_target_properties(libCZIAPI PROPERTIES CXX_STANDARD 17)
 set_target_properties(libCZIAPIStatic PROPERTIES CXX_STANDARD 17)
 
 target_compile_definitions(libCZIAPI PRIVATE _LIBCZISTATICLIB LIBCZIAPI_EXPORTS_SHARED)
-target_compile_definitions(libCZIAPIStatic PRIVATE _LIBCZISTATICLIB)
+target_compile_definitions(libCZIAPIStatic PRIVATE _LIBCZISTATICLIB _LIBCZIAPISTATICLIB)
 
 target_link_libraries(libCZIAPI PRIVATE libCZIStatic)
 target_link_libraries(libCZIAPIStatic PRIVATE libCZIStatic)
@@ -85,22 +83,29 @@ target_include_directories(libCZIAPIStatic PRIVATE ../libCZI ${RAPIDJSON_INCLUDE
 #            how we deal with this towards production/publication.
 
 # Function to handle post-build copying
-function(copy_to_runtime TARGET_NAME ARCH DIR_SUFFIX)
-    set(RUNTIME_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../../Bindings/dotnet/LibCZI_Net/runtimes/${DIR_SUFFIX}/native")
+function(copy_to_runtime TARGET_NAME  TARGET_DIR)
+    #set(RUNTIME_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../../Bindings/dotnet/LibCZI_Net/runtimes/${DIR_SUFFIX}/native")
+    set(RUNTIME_DIR "${TARGET_DIR}")
     message(STATUS "Copying DLL to output folder: ${RUNTIME_DIR}")
     add_custom_command(
         TARGET ${TARGET_NAME} POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E make_directory "${RUNTIME_DIR}"
         COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:libCZIAPI> "${RUNTIME_DIR}/$<TARGET_FILE_NAME:${TARGET_NAME}>"
-        COMMENT "Copying DLL for ${ARCH} to ${RUNTIME_DIR}"
+        COMMENT "Copying DLL to ${RUNTIME_DIR}"
     )
 endfunction()
+
+if (LIBCZI_DESTINATION_FOLDER_LIBCZIAPI)
+  message(STATUS "'libCZIAPI' will be copied to ${LIBCZI_DESTINATION_FOLDER_LIBCZIAPI}")
+  copy_to_runtime(libCZIAPI "${LIBCZI_DESTINATION_FOLDER_LIBCZIAPI}")
+endif()
 
 # Debugging messages
 #message(STATUS "CMAKE_SYSTEM_NAME: ${CMAKE_SYSTEM_NAME}")
 #message(STATUS "CMAKE_GENERATOR_PLATFORM: ${CMAKE_GENERATOR_PLATFORM}")
 ##message(STATUS "SYSTEM_PROCESSOR_UPPER: ${CMAKE_SYSTEM_PROCESSOR}")
 
+#[[
 if (CMAKE_SYSTEM_NAME STREQUAL "Windows")
     # Normalize system processor name
     string(TOUPPER "${CMAKE_SYSTEM_PROCESSOR}" SYSTEM_PROCESSOR_UPPER)
@@ -151,6 +156,7 @@ else()
     message(WARNING "Unsupported system: ${CMAKE_SYSTEM_NAME}")
 endif()
 
+#]]
 
 #get_target_property(LIBRARIES_NEEDED libCZIAPIStatic INTERFACE_LINK_LIBRARIES)
 

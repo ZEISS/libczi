@@ -191,7 +191,7 @@ namespace libCZI
         bool mIndexValid;                           ///< Whether the field 'mIndex' is valid;
         int mIndex;                                 ///< The M-index of the subblock.
         int x;                                      ///< The x-coordinate of the subblock.
-        int y;                                      ///< The x-coordinate of the subblock.
+        int y;                                      ///< The y-coordinate of the subblock.
         int logicalWidth;                           ///< The logical with of the subblock (in pixels).
         int logicalHeight;                          ///< The logical height of the subblock (in pixels).
         int physicalWidth;                          ///< The physical with of the subblock (in pixels).
@@ -289,7 +289,7 @@ namespace libCZI
         std::uint32_t sbBlkMetadataSize;    ///< The size of the subblock-metadata in bytes. If this is 0, then ptrSbBlkMetadata is not used (and no sub-block-metadata written).
 
         const void* ptrSbBlkAttachment;     ///< Pointer to the subblock-attachment.
-        std::uint32_t sbBlkAttachmentSize;  ///< The size of the subblock-attachment in bytes. If this is 0, then ptrSbBlkMetadata is not used (and no sub-block-metadata written).
+        std::uint32_t sbBlkAttachmentSize;  ///< The size of the subblock-attachment in bytes. If this is 0, then ptrSbBlkAttachment is not used (and no sub-block-attachment written).
 
         /// Clears this object to its blank/initial state.
         void Clear() override;
@@ -312,7 +312,7 @@ namespace libCZI
         std::uint32_t sbBlkMetadataSize;    ///< The size of the subblock-metadata in bytes. If this is 0, then ptrSbBlkMetadata is not used (and no sub-block-metadata written).
 
         const void* ptrSbBlkAttachment;     ///< Pointer to the subblock-attachment.
-        std::uint32_t sbBlkAttachmentSize;  ///< The size of the subblock-attachment in bytes. If this is 0, then ptrSbBlkMetadata is not used (and no sub-block-metadata written).
+        std::uint32_t sbBlkAttachmentSize;  ///< The size of the subblock-attachment in bytes. If this is 0, then ptrSbBlkAttachment is not used (and no sub-block-attachment written).
 
         /// Clears this object to its blank/initial state.
         void Clear() override;

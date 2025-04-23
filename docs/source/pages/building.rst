@@ -1,7 +1,7 @@
 Building libCZI
 ===============
 
-libCZI aims to be portable and should build readily using any decent C++ compiler. This repository is leveraging the [CMake](https://cmake.org/) system for building.
+libCZI aims to be portable and should build readily using any decent C++ compiler. This repository is leveraging the `CMake <https://cmake.org/>`_ system for building.
 
 Here are some instructions for building on Windows and on Linux.
 
@@ -10,9 +10,11 @@ Here are some instructions for building on Windows and on Linux.
 Building on Windows with Visual Studio
 --------------------------------------
 
-Visual Studio has [built-in support](https://docs.microsoft.com/en-us/cpp/build/cmake-projects-in-visual-studio?view=msvc-160) for CMake projects. Executing File->Open Folder... and pointing to the folder where the libCZI-repo is located should give something like this:
-![libCZI solution](Images/VisualStudio_cmake1.png "libCZI solution")
-@image latex VisualStudio_cmake1.png "libCZI solution"
+Visual Studio has `built-in support <https://docs.microsoft.com/en-us/cpp/build/cmake-projects-in-visual-studio?view=msvc-160>`_ for CMake projects. Executing File->Open Folder... and pointing to the folder where the libCZI-repo is located should give something like this:
+
+.. image:: ../_static/images/VisualStudio_cmake1.png
+   :alt: libCZI solution
+
 The project should compile and build without further ado.
 
 For building on the command-line, it is recommended to do an out-of-source build. Executing those commands will execute all steps - go to the folder where the libCZI-repo is located:
@@ -114,7 +116,7 @@ For building with a downloaded libcurl, the following packages is needed:
 
     sudo apt-get install libssl-dev
 
-Alternatively, the cross-platform package-manager [vcpkg](https://vcpkg.io/en/) can be used to manage the dependencies. For building on Windows,
+Alternatively, the cross-platform package-manager `vcpkg <https://vcpkg.io/en/>`_ can be used to manage the dependencies. For building on Windows,
 the following command brings in the necessary dependencies:
 
 .. code:: bash
@@ -125,5 +127,5 @@ the following command brings in the necessary dependencies:
 Building the documentation
 --------------------------
 
-Executing <tt>doxygen</tt> will produce the HTML documentation in the folder ../Src/Build folder.
+Executing :code:`doxygen` will produce the HTML documentation in the folder ../Src/Build folder.
 

@@ -271,7 +271,7 @@ std::shared_ptr<libCZI::IDimensionChannelLightSourcesSettings> CDimensionChannel
 
 std::shared_ptr<libCZI::IDimensionChannelLightPath> CDimensionChannelInfo::GetLightPath() const /*override*/
 {
-    return this->lighPath;
+    return this->lightPath;
 }
 
 std::shared_ptr<IDimensionChannelLaserScanInfo> CDimensionChannelInfo::GetLaserScanInfo() const /*override*/
@@ -654,7 +654,7 @@ void CDimensionChannelInfo::ParseInformation(pugi::xml_node node)
     n = node.child(L"LightPath");
     if (!!n)
     {
-        this->lighPath = make_shared<CDimensionChannelLightPath>(n);
+        this->lightPath = make_shared<CDimensionChannelLightPath>(n);
     }
 
     n = node.child(L"LaserScanInfo");

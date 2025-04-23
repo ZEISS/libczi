@@ -21,6 +21,9 @@ author = 'Zeiss Microscopy GmbH'
 
 extensions = ['breathe', 'exhale', 'recommonmark', 'sphinx_markdown_tables']
 
+# Suppress harmless duplicate C++ declaration warnings from Exhale/Breathe
+suppress_warnings = ["duplicate_declaration.cpp"]
+
 source_parsers = {
     '.md': 'recommonmark.parser.CommonMarkParser',
 }

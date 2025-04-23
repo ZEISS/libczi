@@ -430,7 +430,7 @@ EXTERNALLIBCZIAPI_API(LibCZIApiErrorCode) libCZI_ReleaseMetadataSegment(Metadata
 /// "description" : "<description>", type string
 /// "comment" : "<comment>", type string
 /// "keywords" : "<keyword1>,<keyword2>,...", type string
-/// "rating" : <rating>, type integer
+/// "rating" : "<rating>", type integer
 /// "creation_date" : "<creation date>", type string, conforming to ISO 8601
 ///
 /// \param          czi_document_info           The CZI-document-info object.
@@ -439,6 +439,12 @@ EXTERNALLIBCZIAPI_API(LibCZIApiErrorCode) libCZI_ReleaseMetadataSegment(Metadata
 /// \returns    An error-code indicating success or failure of the operation.
 EXTERNALLIBCZIAPI_API(LibCZIApiErrorCode) libCZI_CziDocumentInfoGetGeneralDocumentInfo(CziDocumentInfoHandle czi_document_info, void** general_document_info_json);
 
+/// Get scaling information from the specified czi-document information object. The information gives the size of an image pixels.
+///
+/// \param          czi_document_info           Handle to the CZI-document-info object from which the scaling information will be retrieved.
+/// \param [out]    scaling_info_interop        If successful, the scaling information is put here.
+///
+/// \returns        An error-code indicating success or failure of the operation.
 EXTERNALLIBCZIAPI_API(LibCZIApiErrorCode) libCZI_CziDocumentInfoGetScalingInfo(CziDocumentInfoHandle czi_document_info, ScalingInfoInterop* scaling_info_interop);
 
 /// Retrieve the set of dimensions for which "dimension info" data is available. The argument 'available_dimensions_count' indicates the number of
@@ -462,6 +468,13 @@ EXTERNALLIBCZIAPI_API(LibCZIApiErrorCode) libCZI_CziDocumentInfoGetAvailableDime
 /// \returns    An error-code indicating success or failure of the operation.
 EXTERNALLIBCZIAPI_API(LibCZIApiErrorCode) libCZI_CziDocumentInfoGetDisplaySettings(CziDocumentInfoHandle czi_document_info, DisplaySettingsHandle* display_settings_handle);
 
+/// Get the dimension information from the document's XML-metadata. The information is returned as a JSON-formatted string.
+///
+/// \param          czi_document_info       Handle to the CZI-document-info object from which the dimension information will be retrieved.
+/// \param          dimension_index         Index of the dimension.
+/// \param [out]    dimension_info_json     If successful, the information is put here as JSON format. Note that the data must be freed using 'libCZI_Free' by the caller.
+///
+/// \returns        An error-code indicating success or failure of the operation.
 EXTERNALLIBCZIAPI_API(LibCZIApiErrorCode) libCZI_CziDocumentInfoGetDimensionInfo(CziDocumentInfoHandle czi_document_info, std::uint32_t dimension_index, void** dimension_info_json);
 
 /// Release the specified CZI-document-info object.
@@ -477,8 +490,26 @@ EXTERNALLIBCZIAPI_API(LibCZIApiErrorCode) libCZI_ReleaseCziDocumentInfo(CziDocum
 // ****************************************************************************************************
 // Outputstream functions begin here
 
+/// Create an output stream object for a file identified by its filename, which is given as a wide string. Note that wchar_t on
+/// Windows is 16-bit wide, and on Unix-like systems it is 32-bit wide.
+/// 
+/// \param          filename                Filename of the file which is to be opened (zero terminated wide string). Note that on Windows, this 
+///                                         is a string with 16-bit code units, and on Unix-like systems it is typically a string with 32-bit code units.
+/// \param          overwrite               Indicates whether the file should be overwritten.
+/// \param [out]    output_stream_object    The output stream object that will hold the created stream.
+/// 
+/// \return         An error-code that indicates whether the operation is successful or not. Non-positive values indicates successful, positive values
+///                 indicates unsuccessful operation.
 EXTERNALLIBCZIAPI_API(LibCZIApiErrorCode) libCZI_CreateOutputStreamForFileWide(const wchar_t* filename, bool overwrite, OutputStreamObjectHandle* output_stream_object);
 
+/// Create an input stream object for a file identified by its filename, which is given as an UTF8 - encoded string.
+/// 
+/// \param          filename                Filename of the file which is to be opened (in UTF8 encoding).
+/// \param          overwrite               Indicates whether the file should be overwritten.
+/// \param [out]    output_stream_object    The output stream object that will hold the created stream.
+/// 
+/// \return         An error-code that indicates whether the operation is successful or not. Non-positive values indicates successful, positive values
+///                 indicates unsuccessful operation.
 EXTERNALLIBCZIAPI_API(LibCZIApiErrorCode) libCZI_CreateOutputStreamForFileUTF8(const char* filename, bool overwrite, OutputStreamObjectHandle* output_stream_object);
 
 /// Release the specified output stream object. After this function is called, the handle is no
@@ -558,20 +589,26 @@ EXTERNALLIBCZIAPI_API(LibCZIApiErrorCode) libCZI_WriterAddAttachment(CziWriterOb
 
 // TODO(JBL): EXTERNALLIBCZIAPI_API(LibCZIApiErrorCode) libCZI_WriterGetPreparedMetadata(CziWriterObjectHandle writer_object, CziMetadataBuilderHandle* metadata_builder, const PrepareMetadataInfoInterop* prepare_metadata_info_interop);
 
+/// Add the specified metadata to the writer object. The metadata is provided in the 'write_metadata_info_interop' structure.
+///
+/// \param  writer_object               Handle to the writer object to which the metadata will be added.
+/// \param  write_metadata_info_interop Information describing the metadata to be added.
+///
+/// \returns    An error-code indicating success or failure of the operation.
 EXTERNALLIBCZIAPI_API(LibCZIApiErrorCode) libCZI_WriterWriteMetadata(CziWriterObjectHandle writer_object, const WriteMetadataInfoInterop* write_metadata_info_interop);
 
 /// Finalizes the CZI (i.e. writes out the final directory-segments) and closes the file.
 /// Note that this method must be called explicitly in order to get a valid CZI - calling 'libCZI_ReleaseWriter' without
 /// a prior call to this method will close the file immediately without finalization.
 ///
-/// \param  writer_object   The writer object.
+/// \param  writer_object   Handle to the writer object that is to be closed.
 ///
 /// \returns    An error-code indicating success or failure of the operation.
 EXTERNALLIBCZIAPI_API(LibCZIApiErrorCode) libCZI_WriterClose(CziWriterObjectHandle writer_object);
 
 /// Release the specified writer object.
 ///
-/// \param  writer_object The writer object.
+/// \param  writer_object Handle to the writer object that is to be released.
 ///
 /// \returns    An error-code indicating success or failure of the operation.
 EXTERNALLIBCZIAPI_API(LibCZIApiErrorCode) libCZI_ReleaseWriter(CziWriterObjectHandle writer_object);
@@ -582,8 +619,34 @@ EXTERNALLIBCZIAPI_API(LibCZIApiErrorCode) libCZI_ReleaseWriter(CziWriterObjectHa
 // ****************************************************************************************************
 // SingleChannelScalingTileAccessor functions begin here
 
+/// Create a single channel scaling tile accessor. 
+/// 
+/// \param reader_object            A handle representing the reader-object.
+/// \param accessor_object [out]    If the operation is successful, a handle to the newly created single-channel-scaling-tile-accessor is put here.
+/// 
+/// \returns    An error-code indicating success or failure of the operation.
 EXTERNALLIBCZIAPI_API(LibCZIApiErrorCode) libCZI_CreateSingleChannelTileAccessor(CziReaderObjectHandle reader_object, SingleChannelScalingTileAccessorObjectHandle* accessor_object);
+
+/// Gets the size information of the specified tile accessor based on the region of interest and zoom factor.
+/// 
+/// \param  accessor_object     Handle to the tile accessor object for which the size is to be calculated. This object is responsible for managing the access to the tiles within the specified plane.
+/// \param  roi                 The region of interest that defines the region of interest within the plane for which the size is to be calculated.
+/// \param  zoom                A floating-point value representing the zoom factor.
+/// \param  size [out]          The size of the tile accessor. It contains width and height information.            
+/// 
+/// \returns    An error-code indicating success or failure of the operation.
 EXTERNALLIBCZIAPI_API(LibCZIApiErrorCode) libCZI_SingleChannelTileAccessorCalcSize(SingleChannelScalingTileAccessorObjectHandle accessor_object, const IntRectInterop* roi, float zoom, IntSizeInterop* size);
+
+/// Gets the tile bitmap of the specified plane and the specified roi with the specified zoom factor. 
+/// 
+/// \param  accessor_object         Handle to the tile accessor object. This object is responsible for managing the access to the tiles within the specified plane.
+/// \param  coordinate              Pointer to a `CoordinateInterop` structure that specifies the coordinates within the plane from which the tile bitmap is to be retrieved.
+/// \param  roi                     The region of interest that defines within the plane for which the tile bitmap is requested.
+/// \param  zoom                    A floating-point value representing the zoom factor.
+/// \param  options                 A pointer to an AccessorOptionsInterop structure that may contain additional options for accessing the tile bitmap.
+/// \param  bitmap_object [out]     If the operation is successful, the created bitmap object will be put here.
+///
+/// \returns    An error-code indicating success or failure of the operation.
 EXTERNALLIBCZIAPI_API(LibCZIApiErrorCode) libCZI_SingleChannelTileAccessorGet(SingleChannelScalingTileAccessorObjectHandle accessor_object, const CoordinateInterop* coordinate, const IntRectInterop* roi, float zoom, const AccessorOptionsInterop* options, BitmapObjectHandle* bitmap_object);
 
 /// Release the specified accessor object.
