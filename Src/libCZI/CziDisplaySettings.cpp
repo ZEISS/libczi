@@ -426,7 +426,7 @@ CDisplaySettingsOnPod::CDisplaySettingsOnPod(const std::function<bool(int no, in
     }
 }
 
-void CDisplaySettingsOnPod::CDisplaySettingsOnPod::EnumChannels(const std::function<bool(int)>& func) const /*override*/
+void CDisplaySettingsOnPod::EnumChannels(const std::function<bool(int)>& func) const /*override*/
 {
     for (std::map<int, shared_ptr< IChannelDisplaySetting>>::const_iterator it = this->channelDs.cbegin(); it != this->channelDs.cend(); ++it)
     {

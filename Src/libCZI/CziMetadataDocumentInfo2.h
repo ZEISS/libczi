@@ -171,7 +171,7 @@ private:
     Nullable<double> sectionThickness;
     std::shared_ptr<libCZI::IDimensionChannelDetectorSettings> detectorSettings;
     std::shared_ptr<libCZI::IDimensionChannelLightSourcesSettings> lightSourcesSettings;
-    std::shared_ptr<libCZI::IDimensionChannelLightPath> lighPath;
+    std::shared_ptr<libCZI::IDimensionChannelLightPath> lightPath;
     std::shared_ptr<libCZI::IDimensionChannelLaserScanInfo> laserScanInfo;
     std::shared_ptr<libCZI::IDimensionChannelSPIMIlluminationSettings> spimIlluminationSettings;
     std::shared_ptr<libCZI::IDimensionChannelSPIMDetectionSettings> spimDetectionSettings;
