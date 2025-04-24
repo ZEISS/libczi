@@ -194,7 +194,7 @@ namespace libCZI
         int y;                                      ///< The y-coordinate of the subblock.
         int logicalWidth;                           ///< The logical width of the subblock (in pixels).
         int logicalHeight;                          ///< The logical height of the subblock (in pixels).
-        int physicalWidth;                          ///< The physical with of the subblock (in pixels).
+        int physicalWidth;                          ///< The physical width of the subblock (in pixels).
         int physicalHeight;                         ///< The physical height of the subblock (in pixels).
         libCZI::PixelType PixelType;                ///< The pixel type of the subblock.
         libCZI::SubBlockPyramidType pyramid_type;   ///< The pyramid type of the subblock. The significance of this field
