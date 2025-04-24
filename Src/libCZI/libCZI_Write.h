@@ -192,7 +192,7 @@ namespace libCZI
         int mIndex;                                 ///< The M-index of the subblock.
         int x;                                      ///< The x-coordinate of the subblock.
         int y;                                      ///< The y-coordinate of the subblock.
-        int logicalWidth;                           ///< The logical with of the subblock (in pixels).
+        int logicalWidth;                           ///< The logical width of the subblock (in pixels).
         int logicalHeight;                          ///< The logical height of the subblock (in pixels).
         int physicalWidth;                          ///< The physical with of the subblock (in pixels).
         int physicalHeight;                         ///< The physical height of the subblock (in pixels).
