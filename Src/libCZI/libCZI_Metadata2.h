@@ -80,7 +80,7 @@ namespace libCZI
     /// Values that represent a contrast method, a technique used to achieve contrast, for the images in a channel.
     enum class DimensionChannelContrastMethod : std::uint8_t
     {
-        Brightfield,                ///< Bright filed microscopy was used.
+        Brightfield,                ///< Bright field microscopy was used.
         Phase,                      ///< Unknown denotation.
         DIC,                        ///< Differential Interference Contrast was used.
         HoffmanModulation,          ///< Hoffman Modulation Contrast (HMC) was used.
