@@ -376,38 +376,38 @@ namespace libCZI
         /// Gets the reference position in units of µm. If this is not valid, then the Z-positions only have a relative meaning.
         /// \param [in,out] d If non-null, the double will receive the requested value if successful.
         /// \returns True if it succeeds, false if it fails.
-        virtual bool TryGetReferencePosition(double* d) = 0;
+        virtual bool TryGetReferencePosition(double* d) const = 0;
 
         /// Attempts to get interval definition for the z-positions. 
         /// \param [in,out] offset    If non-null and the method was successful, the offset is stored here.
         /// \param [in,out] increment If non-null and the method was successful, the increment is stored here.
         /// \returns True if it succeeds, false if it fails.
-        virtual bool TryGetIntervalDefinition(double* offset, double* increment) = 0;
+        virtual bool TryGetIntervalDefinition(double* offset, double* increment) const = 0;
 
         /// Attempts to get list definition for the z-positions. 
         /// \param [in,out] positions    If non-null and the method was successful, the list of positions is stored here.
         /// \returns True if it succeeds, false if it fails.
-        virtual bool TryGetPositionList(std::vector<double>* positions) = 0;
+        virtual bool TryGetPositionList(std::vector<double>* positions) const = 0;
 
         /// Attempts to get XYZ-handedness property.
         /// \param [in,out] xyzHandedness If non-null and the method was successful, the XYZ-handedness is stored here.
         /// \returns True if it succeeds, false if it fails.
-        virtual bool TryGetXyzHandedness(XyzHandedness* xyzHandedness) = 0;
+        virtual bool TryGetXyzHandedness(XyzHandedness* xyzHandedness) const = 0;
 
         /// Attempts to get Z-axis direction property.
         /// \param [in,out] zAxisDirection If non-null and the method was successful, the Z-axis direction is stored here.
         /// \returns True if it succeeds, false if it fails.
-        virtual bool TryGetZAxisDirection(ZaxisDirection* zAxisDirection) = 0;
+        virtual bool TryGetZAxisDirection(ZaxisDirection* zAxisDirection) const = 0;
 
         /// Attempts to get Z-drive mode property.
         /// \param [in,out] zdrivemode If non-null and the method was successful, the Z-drive mode is stored here.
         /// \returns True if it succeeds, false if it fails.
-        virtual bool TryGetZDriveMode(ZDriveMode* zdrivemode) = 0;
+        virtual bool TryGetZDriveMode(ZDriveMode* zdrivemode) const = 0;
 
         /// Attempts to get the z-drive speed (in units of µm/s).
         /// \param [in,out] zdrivespeed If non-null and the method was successful, the z-drive speed is stored here.
         /// \returns True if it succeeds, false if it fails.
-        virtual bool TryZDriveSpeed(double* zdrivespeed) = 0;
+        virtual bool TryZDriveSpeed(double* zdrivespeed) const = 0;
 
         virtual ~IDimensionZInfo() = default;
     };
@@ -420,18 +420,18 @@ namespace libCZI
         /// (to which to relative time spans refer to).
         /// \param [in,out] dateTime If non-null, the reference date time.
         /// \returns True if it succeeds, false if it fails.
-        virtual bool TryGetStartTime(XmlDateTime* dateTime) = 0;
+        virtual bool TryGetStartTime(XmlDateTime* dateTime) const = 0;
 
         /// Attempts to get interval definition which allows to associate a time span with a t-index.
         /// \param [in,out] offset    If non-null, the offset will be put here (unit: second).
         /// \param [in,out] increment If non-null, the increment will be put here (unit: second).
         /// \returns True if it succeeds, false if it fails.
-        virtual bool TryGetIntervalDefinition(double* offset, double* increment) = 0;
+        virtual bool TryGetIntervalDefinition(double* offset, double* increment) const = 0;
 
         /// Attempts to get the offset list.
         /// \param [in,out] offsets If non-null, the offsets will be put here  (unit: second).
         /// \returns True if it succeeds, false if it fails.
-        virtual bool TryGetOffsetsList(std::vector<double>* offsets) = 0;
+        virtual bool TryGetOffsetsList(std::vector<double>* offsets) const = 0;
 
         virtual ~IDimensionTInfo() = default;
     };
@@ -527,7 +527,7 @@ namespace libCZI
         ///
         /// \param func The functor to be called (passing in the channel index). If the functor returns false, the 
         ///             enumeration is stopped.
-        virtual void EnumChannels(std::function<bool(int chIndex)> func) const = 0;
+        virtual void EnumChannels(const std::function<bool(int chIndex)>& func) const = 0;
 
         /// Gets channel display settings for the specified channel. If the channel index is not valid, then
         /// an empty shared_ptr is returned.
@@ -708,7 +708,7 @@ namespace libCZI
 
         /// Enumerate the dimensions (defined in the metadata under Metadata/Information/Image, checking for the nodes
         /// StartZ, SizeZ, StartC, SizeC, StartT, StartT, ...). If "Size" or "Start" for a specific dimensions is present,
-        /// then this dimension will be listed here. The default for "Start" is 0, and 1 for for "Size".
+        /// then this dimension will be listed here. The default for "Start" is 0, and 1 for "Size".
         /// \remark
         /// The information here is not considered authoritative.
         /// \param enumDimensions The functor which will be called for each dimension. If the functor returns false, the enumeration is canceled.
@@ -873,7 +873,7 @@ namespace libCZI
     {
     public:
         /// Query if the CZI's metadata (the XML) is well-formed and parsed correctly.
-        /// If this is not the case, then other methods (of this interface) will thrown a
+        /// If this is not the case, then other methods (of this interface) will throw a
         /// LibCZIXmlParseException exception.
         /// 
         /// \returns True if the XML is well-formed, false if not.
@@ -1295,14 +1295,14 @@ namespace libCZI
             std::wstring nameAttribute;         ///< The value of the attribute "Name" (if "writeNameAttribute" is true).
         };
 
-        /// Writes the nodes ""Metadata/Information/Image/SizeX" and ""Metadata/Information/Image/SizeY".
+        /// Writes the nodes "Metadata/Information/Image/SizeX" and ""Metadata/Information/Image/SizeY".
         ///
         /// \param [in,out] builder The metadata-builder object.
         /// \param          width   The width (=SizeX).
         /// \param          height  The height (=SizeY).
         static void WriteImageSizeInformation(libCZI::ICziMetadataBuilder* builder, int width, int height);
 
-        /// Writes the node ""Metadata/Information/Image/SizeM".
+        /// Writes the node "Metadata/Information/Image/SizeM".
         ///
         /// \param [in,out] builder The metadata-builder object.
         /// \param          mSize   The M-size.
@@ -1343,7 +1343,7 @@ namespace libCZI
         ///                                returned, the enumeration is ended.
         static void WriteDimInfoT_List(libCZI::ICziMetadataBuilder* builder, const libCZI::XmlDateTime* startTime, const std::function<double(int)>& funcGetOffsets);
 
-        /// Helper function in order to write the Dimension-Z information - as a an equal-distance sequence.
+        /// Helper function in order to write the Dimension-Z information - as an equal-distance sequence.
         ///
         /// \param [in] builder         The metadata-builder object.
         /// \param          startPos    The start position.
@@ -1351,7 +1351,7 @@ namespace libCZI
         /// \param          increment   The increment.
         static void WriteDimInfoZ_Interval(libCZI::ICziMetadataBuilder* builder, double startPos, double startOffSet, double increment);
 
-        /// Helper function in order to write the Dimension-Z information - as a an explicit list.
+        /// Helper function in order to write the Dimension-Z information - as an explicit list.
         ///
         /// \param [in] builder        The metadata-builder object.
         /// \param      startPos       The start position.
@@ -1383,7 +1383,7 @@ namespace libCZI
         /// 
         /// \param [in] builder     The metadata-builder object.
         /// \param      key         Key of the custom key-value pair.
-        /// \param      value       Value of the custom key-value pair.                       
+        /// \param      value       Value of the custom key-value pair.
         static void SetOrAddCustomKeyValuePair(libCZI::ICziMetadataBuilder* builder, const std::string& key, const libCZI::CustomValueVariant& value);
 
         /// Helper function which writes the specified display-settings into the specified metadata-builder. The display-settings

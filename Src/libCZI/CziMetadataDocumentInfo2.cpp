@@ -139,187 +139,187 @@ CDimensionChannelInfo::CDimensionChannelInfo(pugi::xml_node node)
     this->ParseInformation(node);
 }
 
-bool CDimensionChannelInfo::TryGetChannelType(libCZI::DimensionChannelChannelType* type) /*override*/
+bool CDimensionChannelInfo::TryGetChannelType(libCZI::DimensionChannelChannelType* type) const /*override*/
 {
     return this->channeltype.TryGet(type);
 }
 
-bool CDimensionChannelInfo::TryGetChannelUnit(std::wstring* unit) /*override*/
+bool CDimensionChannelInfo::TryGetChannelUnit(std::wstring* unit) const /*override*/
 {
     return this->channelunit.TryGet(unit);
 }
 
-bool CDimensionChannelInfo::TryGetPixelType(libCZI::PixelType* pixelType) /*override*/
+bool CDimensionChannelInfo::TryGetPixelType(libCZI::PixelType* pixelType) const/*override*/
 {
     return this->pixeltype.TryGet(pixelType);
 }
 
-bool CDimensionChannelInfo::TryGetComponentBitCount(int* bitCount) /*override*/
+bool CDimensionChannelInfo::TryGetComponentBitCount(int* bitCount) const /*override*/
 {
     return this->bitcount.TryGet(bitCount);
 }
 
-bool CDimensionChannelInfo::TryGetAcquisitionMode(libCZI::DimensionChannelAcquisitionMode* acquisitionMode) /*override*/
+bool CDimensionChannelInfo::TryGetAcquisitionMode(libCZI::DimensionChannelAcquisitionMode* acquisitionMode) const /*override*/
 {
     return this->acquisitionMode.TryGet(acquisitionMode);
 }
 
-bool CDimensionChannelInfo::TryGetIlluminationType(libCZI::DimensionChannelIlluminationType* illuminationType) /*override*/
+bool CDimensionChannelInfo::TryGetIlluminationType(libCZI::DimensionChannelIlluminationType* illuminationType) const /*override*/
 {
     return this->illuminationType.TryGet(illuminationType);
 }
 
-bool CDimensionChannelInfo::TryGetContrastMethod(libCZI::DimensionChannelContrastMethod* contrastMethod) /*override*/
+bool CDimensionChannelInfo::TryGetContrastMethod(libCZI::DimensionChannelContrastMethod* contrastMethod) const /*override*/
 {
     return this->contrastMethod.TryGet(contrastMethod);
 }
 
-bool CDimensionChannelInfo::TryGetIlluminationWavelength(libCZI::SpectrumCharacteristics* illuminationwavelength) /*override*/
+bool CDimensionChannelInfo::TryGetIlluminationWavelength(libCZI::SpectrumCharacteristics* illuminationwavelength) const /*override*/
 {
     return this->illuminationWavelength.TryGet(illuminationwavelength);
 }
 
-bool CDimensionChannelInfo::TryGetDetectionWavelength(libCZI::SpectrumCharacteristics* detectionwavelength) /*override*/
+bool CDimensionChannelInfo::TryGetDetectionWavelength(libCZI::SpectrumCharacteristics* detectionwavelength) const /*override*/
 {
     return this->detectionWavelength.TryGet(detectionwavelength);
 }
 
-bool CDimensionChannelInfo::TryGetExcitationWavelength(double* excitationwavelength)  /*override*/
+bool CDimensionChannelInfo::TryGetExcitationWavelength(double* excitationwavelength) const  /*override*/
 {
     return this->excitationWavelength.TryGet(excitationwavelength);
 }
 
-bool CDimensionChannelInfo::TryGetEmissionWavelength(double* emissionwavelength)  /*override*/
+bool CDimensionChannelInfo::TryGetEmissionWavelength(double* emissionwavelength) const /*override*/
 {
     return this->emissionWavelength.TryGet(emissionwavelength);
 }
 
-bool CDimensionChannelInfo::TryGetEffectiveNA(double* na)  /*override*/
+bool CDimensionChannelInfo::TryGetEffectiveNA(double* na) const  /*override*/
 {
     return this->effectiveNA.TryGet(na);
 }
 
-bool CDimensionChannelInfo::TryGetDyeId(std::wstring* dyeid) /*override*/
+bool CDimensionChannelInfo::TryGetDyeId(std::wstring* dyeid) const /*override*/
 {
     return this->dyeId.TryGet(dyeid);
 }
 
-bool CDimensionChannelInfo::TryGetDyeDatabaseId(std::wstring* dyedatabaseid) /*override*/
+bool CDimensionChannelInfo::TryGetDyeDatabaseId(std::wstring* dyedatabaseid) const /*override*/
 {
     return this->dyeDatabaseId.TryGet(dyedatabaseid);
 }
 
-bool CDimensionChannelInfo::TryGetPinholeSize(double* pinholesize) /*override*/
+bool CDimensionChannelInfo::TryGetPinholeSize(double* pinholesize) const /*override*/
 {
     return this->pinholeSize.TryGet(pinholesize);
 }
 
-bool CDimensionChannelInfo::TryGetPinholeSizeAiry(double* pinholesizeairy) /*override*/
+bool CDimensionChannelInfo::TryGetPinholeSizeAiry(double* pinholesizeairy) const /*override*/
 {
     return this->pinholeSizeAiry.TryGet(pinholesizeairy);
 }
 
-bool CDimensionChannelInfo::TryGetPinholeGeometry(libCZI::DimensionChannelPinholeGeometry* pinholegeometry) /*override*/
+bool CDimensionChannelInfo::TryGetPinholeGeometry(libCZI::DimensionChannelPinholeGeometry* pinholegeometry) const /*override*/
 {
     return this->pinholeGeometry.TryGet(pinholegeometry);
 }
 
-bool CDimensionChannelInfo::TryGetFluor(std::wstring* fluor) /*override*/
+bool CDimensionChannelInfo::TryGetFluor(std::wstring* fluor) const /*override*/
 {
     return this->fluor.TryGet(fluor);
 }
 
-bool CDimensionChannelInfo::TryGetNDFilter(double* ndfilter) /*override*/
+bool CDimensionChannelInfo::TryGetNDFilter(double* ndfilter) const /*override*/
 {
     return this->ndFilter.TryGet(ndfilter);
 }
 
-bool CDimensionChannelInfo::TryGetPocketCellSetting(int* pocketcellsetting) /*override*/
+bool CDimensionChannelInfo::TryGetPocketCellSetting(int* pocketcellsetting) const /*override*/
 {
     return this->pocketCellSetting.TryGet(pocketcellsetting);
 }
 
-bool CDimensionChannelInfo::TryGetColor(libCZI::Rgb8Color* color) /*override*/
+bool CDimensionChannelInfo::TryGetColor(libCZI::Rgb8Color* color) const /*override*/
 {
     return this->color.TryGet(color);
 }
 
-bool CDimensionChannelInfo::TryGetExposureTime(libCZI::RangeOrSingleValue<std::uint64_t>* exposuretime) /*override*/
+bool CDimensionChannelInfo::TryGetExposureTime(libCZI::RangeOrSingleValue<std::uint64_t>* exposuretime) const /*override*/
 {
     return this->exposureTime.TryGet(exposuretime);
 }
 
-bool CDimensionChannelInfo::TryGetDepthOfFocus(double* depthoffocus) /*override*/
+bool CDimensionChannelInfo::TryGetDepthOfFocus(double* depthoffocus) const /*override*/
 {
     return this->depthOfFocus.TryGet(depthoffocus);
 }
 
-bool CDimensionChannelInfo::TryGetSectionThickness(double* sectionthickness) /*override*/
+bool CDimensionChannelInfo::TryGetSectionThickness(double* sectionthickness) const /*override*/
 {
     return this->sectionThickness.TryGet(sectionthickness);
 }
 
-std::shared_ptr<libCZI::IDimensionChannelDetectorSettings> CDimensionChannelInfo::GetDetectorSettings() /*override*/
+std::shared_ptr<libCZI::IDimensionChannelDetectorSettings> CDimensionChannelInfo::GetDetectorSettings() const /*override*/
 {
     return this->detectorSettings;
 }
 
-std::shared_ptr<libCZI::IDimensionChannelLightSourcesSettings> CDimensionChannelInfo::GetLightSourcesSettings() /*override*/
+std::shared_ptr<libCZI::IDimensionChannelLightSourcesSettings> CDimensionChannelInfo::GetLightSourcesSettings() const /*override*/
 {
     return this->lightSourcesSettings;
 }
 
-std::shared_ptr<libCZI::IDimensionChannelLightPath> CDimensionChannelInfo::GetLightPath() /*override*/
+std::shared_ptr<libCZI::IDimensionChannelLightPath> CDimensionChannelInfo::GetLightPath() const /*override*/
 {
-    return this->lighPath;
+    return this->lightPath;
 }
 
-std::shared_ptr<IDimensionChannelLaserScanInfo> CDimensionChannelInfo::GetLaserScanInfo() /*override*/
+std::shared_ptr<IDimensionChannelLaserScanInfo> CDimensionChannelInfo::GetLaserScanInfo() const /*override*/
 {
     return this->laserScanInfo;
 }
 
-std::shared_ptr<IDimensionChannelSPIMIlluminationSettings> CDimensionChannelInfo::GetSPIMIlluminationSettings() /*override*/
+std::shared_ptr<IDimensionChannelSPIMIlluminationSettings> CDimensionChannelInfo::GetSPIMIlluminationSettings() const /*override*/
 {
     return this->spimIlluminationSettings;
 }
 
-std::shared_ptr<libCZI::IDimensionChannelSPIMDetectionSettings> CDimensionChannelInfo::GetSPIMDetectionSettings() /*override*/
+std::shared_ptr<libCZI::IDimensionChannelSPIMDetectionSettings> CDimensionChannelInfo::GetSPIMDetectionSettings() const /*override*/
 {
     return this->spimDetectionSettings;
 }
 
-std::shared_ptr<libCZI::IDimensionChannelSIMSettings> CDimensionChannelInfo::GetSIMSettings() /*override*/
+std::shared_ptr<libCZI::IDimensionChannelSIMSettings> CDimensionChannelInfo::GetSIMSettings() const /*override*/
 {
     return this->simSettings;
 }
 
-std::shared_ptr<libCZI::IDimensionChannelPolarizingSettings> CDimensionChannelInfo::GetPolarizingSettings() /*override*/
+std::shared_ptr<libCZI::IDimensionChannelPolarizingSettings> CDimensionChannelInfo::GetPolarizingSettings() const /*override*/
 {
     return this->polarizingSettings;
 }
 
-std::shared_ptr<libCZI::IDimensionChannelAiryscanSettings> CDimensionChannelInfo::GetAiryscanSettings() /*override*/
+std::shared_ptr<libCZI::IDimensionChannelAiryscanSettings> CDimensionChannelInfo::GetAiryscanSettings() const /*override*/
 {
     return this->airyscanSettings;
 }
 
-bool CDimensionChannelInfo::TryGetReflector(std::wstring* reflector) /*override*/
+bool CDimensionChannelInfo::TryGetReflector(std::wstring* reflector) const /*override*/
 {
     return this->reflector.TryGet(reflector);
 }
 
-bool CDimensionChannelInfo::TryGetCondenserContrast(std::wstring* condensorContrast) /*override*/
+bool CDimensionChannelInfo::TryGetCondenserContrast(std::wstring* condensorContrast) const /*override*/
 {
     return this->condensorContrast.TryGet(condensorContrast);
 }
 
-bool CDimensionChannelInfo::TryGetNACondenser(double* naCondensor) /*override*/
+bool CDimensionChannelInfo::TryGetNACondenser(double* naCondensor) const /*override*/
 {
     return this->naCondensor.TryGet(naCondensor);
 }
 
-std::shared_ptr<libCZI::IDimensionChannelRatio> CDimensionChannelInfo::GetRatio() /*override*/
+std::shared_ptr<libCZI::IDimensionChannelRatio> CDimensionChannelInfo::GetRatio() const /*override*/
 {
     return this->ratio;
 }
@@ -432,6 +432,14 @@ void CDimensionChannelInfo::SetCondenserContrast(const std::wstring& condensorCo
 void CDimensionChannelInfo::SetNACondenser(double naCondensor)
 {
     this->naCondensor.Set(naCondensor);
+}
+void CDimensionChannelInfo::SetAttributeId(const std::wstring* id)
+{
+    this->attributeId.SetId(id);
+}
+void CDimensionChannelInfo::SetAttributeName(const std::wstring* name)
+{
+    this->attributeName.SetName(name);
 }
 // ----------------------------------------------------------------------------
 
@@ -646,7 +654,7 @@ void CDimensionChannelInfo::ParseInformation(pugi::xml_node node)
     n = node.child(L"LightPath");
     if (!!n)
     {
-        this->lighPath = make_shared<CDimensionChannelLightPath>(n);
+        this->lightPath = make_shared<CDimensionChannelLightPath>(n);
     }
 
     n = node.child(L"LaserScanInfo");

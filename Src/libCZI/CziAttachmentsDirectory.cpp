@@ -28,6 +28,11 @@
     return true;
 }
 
+size_t CCziAttachmentsDirectory::GetEntryCnt() const
+{
+    return this->attachmentEntries.size();
+}
+
 void CCziAttachmentsDirectory::AddAttachmentEntry(const AttachmentEntry& entry)
 {
     this->attachmentEntries.emplace_back(entry);
@@ -48,7 +53,7 @@ void CCziAttachmentsDirectory::EnumAttachments(const std::function<bool(int inde
     }
 }
 
-bool CCziAttachmentsDirectory::TryGetAttachment(int index, AttachmentEntry& entry)
+bool CCziAttachmentsDirectory::TryGetAttachment(int index, AttachmentEntry& entry) const
 {
     if (index < (int)this->attachmentEntries.size())
     {
@@ -127,7 +132,7 @@ size_t CReaderWriterCziAttachmentsDirectory::GetEntryCnt() const
     return this->attchmnts.size();
 }
 
-bool CReaderWriterCziAttachmentsDirectory::TryGetAttachment(int key, AttachmentEntry* attchmntEntry)
+bool CReaderWriterCziAttachmentsDirectory::TryGetAttachment(int key, AttachmentEntry* attchmntEntry) const
 {
     const auto it = this->attchmnts.find(key);
     if (it == this->attchmnts.cend())

@@ -175,13 +175,13 @@ namespace libCZI
         struct Options
         {
             /// The background color. If the destination bitmap is a grayscale-type, then the mean from R, G and B is calculated and multiplied
-            /// with the maximum pixel value (of the specific pixeltype). If it is a RGB-color type, then R, G and B are separately multiplied with
+            /// with the maximum pixel value (of the specific pixeltype). If it is an RGB-color type, then R, G and B are separately multiplied with
             /// the maximum pixel value.
             /// If any of R, G or B is NaN, then the background is not cleared.
             RgbFloatColor   backGroundColor;
 
             /// If true, then the tiles are sorted by their M-index (tile with highest M-index will be 'on top').
-            /// Otherwise the Z-order is arbitrary.
+            /// Otherwise, the Z-order is arbitrary.
             bool sortByM;
 
             /// If true, then the tile-visibility-check-optimization is used. When doing the multi-tile composition,
@@ -190,7 +190,7 @@ namespace libCZI
             /// without this optimization - i.e. there should be no reason to turn it off besides potential bugs.
             bool useVisibilityCheckOptimization;
 
-            /// If true, then a one-pixel wide boundary will be drawn around 
+            /// If true, then a one-pixel wide boundary will be drawn around
             /// each tile (in black color).
             bool drawTileBorder;
 
@@ -255,8 +255,8 @@ namespace libCZI
         /// The pixeltype is determined by examining the first subblock found in the
         /// specified plane (which is an arbitrary subblock). A newly allocated
         /// bitmap is returned.
-        /// \param xPos            The x-position (given in _raw-subblock-coordinate-system_, c.f. @ref coordinatesystems).
-        /// \param yPos            The y-position (given in _raw-subblock-coordinate-system_, c.f. @ref coordinatesystems).
+        /// \param xPos            The x-position (given in _raw-subblock-coordinate-system_, c.f. [Coordinate Systems](../pages/coordinate_systems.html)).
+        /// \param yPos            The y-position (given in _raw-subblock-coordinate-system_, c.f. [Coordinate Systems](../pages/coordinate_systems.html)).
         /// \param width           The width.
         /// \param height          The height.
         /// \param planeCoordinate The plane coordinate.
@@ -269,8 +269,8 @@ namespace libCZI
 
         /// Gets the tile composite of the specified plane and the specified ROI.
         /// \param pixeltype       The pixeltype.
-        /// \param xPos            The x-position (given in _raw-subblock-coordinate-system_, c.f. @ref coordinatesystems).
-        /// \param yPos            The y-position (given in _raw-subblock-coordinate-system_, c.f. @ref coordinatesystems).
+        /// \param xPos            The x-position (given in _raw-subblock-coordinate-system_, c.f. [Coordinate Systems](../pages/coordinate_systems.html)).
+        /// \param yPos            The y-position (given in _raw-subblock-coordinate-system_, c.f. [Coordinate Systems](../pages/coordinate_systems.html)).
         /// \param width           The width.
         /// \param height          The height.
         /// \param planeCoordinate The plane coordinate.
@@ -285,7 +285,7 @@ namespace libCZI
         /// determined by examining the first subblock found in the specified plane (which is an
         /// arbitrary subblock). A newly allocated bitmap is returned.
         ///
-        /// \param  roi             The ROI (given in _raw-subblock-coordinate-system_, c.f. @ref coordinatesystems).
+        /// \param  roi             The ROI (given in _raw-subblock-coordinate-system_, c.f. [Coordinate Systems](../pages/coordinate_systems.html)).
         /// \param  planeCoordinate The plane coordinate.
         /// \param  pOptions        Options for controlling the operation.
         ///
@@ -298,7 +298,7 @@ namespace libCZI
         /// Gets the tile composite of the specified plane and the specified ROI. 
         ///
         /// \param pixeltype       The pixeltype.
-        /// \param roi             The ROI (given in _raw-subblock-coordinate-system_, c.f. @ref coordinatesystems).
+        /// \param roi             The ROI (given in _raw-subblock-coordinate-system_, c.f. [Coordinate Systems](../pages/coordinate_systems.html)).
         /// \param planeCoordinate The plane coordinate.
         /// \param pOptions        Options for controlling the operation.
         ///
@@ -312,8 +312,8 @@ namespace libCZI
         /// (and the pixeltype).
         ///
         /// \param [in] pDest      The destination bitmap.
-        /// \param xPos            The x-position of the ROI (width and height are given by pDest) - given in _raw-subblock-coordinate-system_, c.f. @ref coordinatesystems.
-        /// \param yPos            The y-position of the ROI (width and height are given by pDest) - given in _raw-subblock-coordinate-system_, c.f. @ref coordinatesystems.
+        /// \param xPos            The x-position of the ROI (width and height are given by pDest) - given in _raw-subblock-coordinate-system_, c.f. [Coordinate Systems](../pages/coordinate_systems.html).
+        /// \param yPos            The y-position of the ROI (width and height are given by pDest) - given in _raw-subblock-coordinate-system_, c.f. [Coordinate Systems](../pages/coordinate_systems.html).
         /// \param planeCoordinate The plane coordinate.
         /// \param pOptions        Options for controlling the operation.
         void Get(libCZI::IBitmapData* pDest, int xPos, int yPos, const IDimCoordinate* planeCoordinate, const Options* pOptions)
@@ -414,7 +414,7 @@ namespace libCZI
         /// The pixeltype is determined by examining the first subblock found in the
         /// specified plane (which is an arbitrary subblock). A newly allocated
         /// bitmap is returned.
-        /// \param roi             The ROI (given in _raw-subblock-coordinate-system_, c.f. @ref coordinatesystems).
+        /// \param roi             The ROI (given in _raw-subblock-coordinate-system_, c.f. [Coordinate Systems](../pages/coordinate_systems.html)).
         /// \param planeCoordinate The plane coordinate.
         /// \param pyramidInfo     Information describing the pyramid-layer.
         /// \param pOptions        Options for controlling the operation.
@@ -426,7 +426,7 @@ namespace libCZI
 
         /// Gets the tile composite of the specified plane and the specified ROI and the specified pyramid-layer.
         /// \param pixeltype       The pixeltype (of the destination bitmap).
-        /// \param roi             The ROI (given in _raw-subblock-coordinate-system_, c.f. @ref coordinatesystems).
+        /// \param roi             The ROI (given in _raw-subblock-coordinate-system_, c.f. [Coordinate Systems](../pages/coordinate_systems.html)).
         /// \param planeCoordinate The plane coordinate.
         /// \param pyramidInfo     Information describing the pyramid-layer.
         /// \param pOptions        Options for controlling the operation.
@@ -438,8 +438,8 @@ namespace libCZI
 
         /// Copy the composite to the specified bitmap.
         /// \param [out] pDest     The destination bitmap (also defining the width and height)
-        /// \param xPos            The x-position (given in _raw-subblock-coordinate-system_, c.f. @ref coordinatesystems).
-        /// \param yPos            The y-position (given in _raw-subblock-coordinate-system_, c.f. @ref coordinatesystems).
+        /// \param xPos            The x-position (given in _raw-subblock-coordinate-system_, c.f. [Coordinate Systems](../pages/coordinate_systems.html)).
+        /// \param yPos            The y-position (given in _raw-subblock-coordinate-system_, c.f. [Coordinate Systems](../pages/coordinate_systems.html)).
         /// \param planeCoordinate The plane coordinate.
         /// \param pyramidInfo     Information describing the pyramid-layer.
         /// \param pOptions        Options for controlling the operation.
@@ -506,14 +506,14 @@ namespace libCZI
         };
 
         /// Calculates the size a bitmap will have (when created by this accessor) for the specified ROI and the specified Zoom.
-        /// Since the exact size if subject to rounding errors, one should always use this method if the exact size must be known beforehand.
+        /// Since the exact size is subject to rounding errors, one should always use this method if the exact size must be known beforehand.
         /// The Get-method which operates on a pre-allocated bitmap will only work if the size (of the bitmap passed in) exactly matches.
         /// \param roi  The ROI (since only the size is relevant here currently, the coordinate system it is given in does not matter).
         /// \param zoom The zoom factor.
         /// \return The size of the composite created by this accessor (for these parameters).
         virtual libCZI::IntSize CalcSize(const libCZI::IntRect& roi, float zoom) const = 0;
 
-        /// Gets the scaled tile composite of the specified plane and the specified ROI with the specified zoom factor.\n
+        /// Gets the scaled tile composite of the specified plane and the specified ROI with the specified zoom factor.
         /// The pixeltype is determined by examining the first subblock found in the
         /// specified plane (which is an arbitrary subblock). A newly allocated
         /// bitmap is returned.
@@ -547,7 +547,7 @@ namespace libCZI
         /// The pixeltype is determined by examining the first subblock found in the
         /// specified plane (which is an arbitrary subblock). A newly allocated
         /// bitmap is returned.
-        /// \param roi             The ROI (given in _raw-subblock-coordinate-system_, c.f. @ref coordinatesystems).
+        /// \param roi             The ROI (given in _raw-subblock-coordinate-system_, c.f. [Coordinate Systems](../pages/coordinate_systems.html)).
         /// \param planeCoordinate The plane coordinate.
         /// \param zoom            The zoom.
         /// \param pOptions        Options for controlling the operation (may be nullptr).
@@ -559,7 +559,7 @@ namespace libCZI
 
         /// Gets the scaled tile composite of the specified plane and the specified ROI with the specified zoom factor.
         /// \param pixeltype       The pixeltype (of the destination bitmap).
-        /// \param roi             The ROI (given in _raw-subblock-coordinate-system_, c.f. @ref coordinatesystems).
+        /// \param roi             The ROI (given in _raw-subblock-coordinate-system_, c.f. [Coordinate Systems](../pages/coordinate_systems.html)).
         /// \param planeCoordinate The plane coordinate.
         /// \param zoom            The zoom factor.
         /// \param pOptions        Options for controlling the operation (may be nullptr).
@@ -573,7 +573,7 @@ namespace libCZI
         /// The size of the bitmap must exactly match the size reported by the method "CalcSize" (for the same ROI and zoom),
         /// otherwise an invalid_argument-exception is thrown.
         /// \param [in,out] pDest   The destination bitmap.
-        /// \param roi              The ROI (given in _raw-subblock-coordinate-system_, c.f. @ref coordinatesystems).
+        /// \param roi              The ROI (given in _raw-subblock-coordinate-system_, c.f. [Coordinate Systems](../pages/coordinate_systems.html)).
         /// \param planeCoordinate  The plane coordinate.
         /// \param zoom             The zoom factor.
         /// \param pOptions         Options controlling the operation. May be nullptr.
@@ -661,7 +661,7 @@ namespace libCZI
             /// of the look-up table must be 256. In case of a Gray16/Bgr48-channel, the size must be
             /// 65536.
             /// \remark
-            /// If a look-up table is provided, then \c blackPoint and \c whitePoint are not used any more.
+            /// If a look-up table is provided, then \c blackPoint and \c whitePoint are not used anymore .
             int         lookUpTableElementCount;
 
             /// The pointer to the look-up table. If lookUpTableElementCount is <> 0, then this pointer

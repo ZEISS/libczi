@@ -407,14 +407,15 @@ CDisplaySettingsOnPod::CDisplaySettingsOnPod(const DisplaySettingsPOD& pod)
     }
 }
 
-CDisplaySettingsOnPod::CDisplaySettingsOnPod(std::function<bool(int no, int&, libCZI::ChannelDisplaySettingsPOD& dispSetting)> getChannelDisplaySettings)
+CDisplaySettingsOnPod::CDisplaySettingsOnPod(const std::function<bool(int no, int&, libCZI::ChannelDisplaySettingsPOD& dispSetting)>& getChannelDisplaySettings)
 {
     if (getChannelDisplaySettings)
     {
         int no = 0;
         for (;; ++no)
         {
-            int chIdx; ChannelDisplaySettingsPOD chDsplSettings;
+            int chIdx;
+            ChannelDisplaySettingsPOD chDsplSettings;
             if (!getChannelDisplaySettings(no, chIdx, chDsplSettings))
             {
                 break;
@@ -425,7 +426,7 @@ CDisplaySettingsOnPod::CDisplaySettingsOnPod(std::function<bool(int no, int&, li
     }
 }
 
-void CDisplaySettingsOnPod::CDisplaySettingsOnPod::EnumChannels(std::function<bool(int)> func) const /*override*/
+void CDisplaySettingsOnPod::EnumChannels(const std::function<bool(int)>& func) const /*override*/
 {
     for (std::map<int, shared_ptr< IChannelDisplaySetting>>::const_iterator it = this->channelDs.cbegin(); it != this->channelDs.cend(); ++it)
     {

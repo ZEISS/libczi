@@ -2,26 +2,6 @@
 #
 # SPDX-License-Identifier: LGPL-3.0-or-later
 
-include(FetchContent)
-
-set(INSTALL_GTEST OFF CACHE BOOL "" FORCE)
-# For Windows: Prevent overriding the parent project's compiler/linker settings
-set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
-set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
-
-if(${CMAKE_VERSION}  VERSION_GREATER_EQUAL "3.24.0")
-	FetchContent_Declare(
-		googletest
-		URL https://github.com/google/googletest/archive/refs/tags/v1.14.0.zip
-		DOWNLOAD_EXTRACT_TIMESTAMP TRUE)
-else ()
-	FetchContent_Declare(
-		googletest
-		URL https://github.com/google/googletest/archive/refs/tags/v1.14.0.zip)
-endif()
-
-FetchContent_MakeAvailable(googletest)
-
 ADD_EXECUTABLE(libCZI_UnitTests 
 										inc_libCZI.h
 										include_gtest.h

@@ -1,10 +1,20 @@
-# Simple workflow for deploying static content to GitHub Pages
+# workflow for deploying static content to GitHub Pages
 name: Pages
 
 on:
-  # Runs on pushes targeting the default branch
+  # checkov:skip=CKV_GHA_7: We allow workflow_dispatch inputs for manual deploy control
+  workflow_dispatch:
+    inputs:
+      deploy:
+        description: "Deploy to GitHub Pages?"
+        required: false
+        default: "false"
+  pull_request:
+    branches:
+      - main
   push:
-    branches: ["main"]
+    branches:
+      - main
 
 # Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
 permissions:
@@ -12,35 +22,63 @@ permissions:
   pages: write
   id-token: write
 
-# Allow one concurrent deployment
-concurrency:
-  group: "pages"
-  cancel-in-progress: true
-
 jobs:
-  # Single deploy job since we're just deploying
-  deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+  generate:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
-      - name: Install Doxygen
-        run: sudo apt-get install doxygen -y
-        shell: bash
-      - name: Generate Doxygen Documentation
-        working-directory: ${{github.workspace}}/Src
-        run: doxygen Doxyfile
-        shell: bash
+        uses: actions/checkout@v4
+
+      - name: Setup with apt
+        run: |
+          #sudo apt-get update
+          sudo apt-get install -y doxygen zip
+
+      - name: Install Sphinx and Friends
+        run: |
+          # breathe integrates doxygen's xml output in sphinx
+          # exhale makes breathe integrations available in sphinx' .rst files
+          # recommonmark makes markdown files first-class citizens in sphinx
+          # sphinx-markdown-tables is needed to support markdown tables
+          # sphinx-book-theme is a simple theme
+          pip install breathe exhale sphinx-book-theme recommonmark sphinx-markdown-tables
+          # The following enables multiple doxygen projects with exhale
+          pip install -e "git+https://github.com/mithro/sphinx-contrib-mithro#egg=sphinx-contrib-exhale-multiproject&subdirectory=sphinx-contrib-exhale-multiproject"
+
+      - name: Generate Doxygen
+        run: |
+          pushd Src/libCZI/ && doxygen && popd
+          pushd Src/libCZIAPI/ && doxygen && popd
+
+      - name: Generate Sphinx
+        run: |
+          pushd docs
+          sphinx-build -M html source build
+
+    # - name: Zip Result
+    #   run: |
+    #     #pwd
+    #     #tree docs/build
+    #     zip -r docs.zip docs/build/
+
+    # - name: Publish Artifacts
+    #   uses: actions/upload-artifact@v4
+    #   with:
+    #     name: documentation
+    #     path: docs.zip
+
       - name: Setup Pages
+        # run this step only if the main branch is pushed to or if the workflow is manually triggered and configured to deploy
+        if: github.ref == 'refs/heads/main' || github.event.inputs.deploy == 'true'
         uses: actions/configure-pages@v5
       - name: Upload artifact
+        if: github.ref == 'refs/heads/main' || github.event.inputs.deploy == 'true'
         uses: actions/upload-pages-artifact@v3
         with:
-          # Upload entire repository
-          path: "${{github.workspace}}/Src/Build/html/"
+          # The path to the directory containing the files to be uploaded
+          path: "${{github.workspace}}/docs/build/html/"
       - name: Deploy to GitHub Pages
+        if: github.ref == 'refs/heads/main' || github.event.inputs.deploy == 'true'
         id: deployment
         uses: actions/deploy-pages@v4

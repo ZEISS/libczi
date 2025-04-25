@@ -12,11 +12,23 @@
 class CAttributeId : public libCZI::IAttributeId
 {
 public:
+    CAttributeId() = default;
     explicit CAttributeId(pugi::xml_node node) { this->ParseInformation(node); }
 private:
     void ParseInformation(pugi::xml_node node);
 public:
-    bool TryGetAttributeId(std::wstring* id) override { return this->attributeId.TryGet(id); }
+    bool TryGetAttributeId(std::wstring* id) const override { return this->attributeId.TryGet(id); }
+    void SetId(const std::wstring* id)
+    {
+        if (id == nullptr)
+        {
+            this->attributeId.isValid = false;
+        }
+        else
+        {
+            this->attributeId.Set(*id);
+        }
+    }
 private:
     Nullable<std::wstring> attributeId;
 };
@@ -24,11 +36,23 @@ private:
 class CAttributeName : public libCZI::IAttributeName
 {
 public:
+    CAttributeName() = default;
     explicit CAttributeName(pugi::xml_node node) { this->ParseInformation(node); }
 private:
     void ParseInformation(pugi::xml_node node);
 public:
-    bool TryGetAttributeName(std::wstring* id)override { return this->attributeName.TryGet(id); }
+    bool TryGetAttributeName(std::wstring* id) const override { return this->attributeName.TryGet(id); }
+    void SetName(const std::wstring* id)
+    {
+        if (id == nullptr)
+        {
+            this->attributeName.isValid = false;
+        }
+        else
+        {
+            this->attributeName.Set(*id);
+        }
+    }
 private:
     Nullable<std::wstring> attributeName;
 };
@@ -36,48 +60,49 @@ private:
 class CDimensionChannelInfo : public libCZI::IDimensionChannelInfo
 {
 public:
+    CDimensionChannelInfo() = default;
     explicit CDimensionChannelInfo(pugi::xml_node node);
 public:
-    bool TryGetChannelType(libCZI::DimensionChannelChannelType* type) override;
-    bool TryGetChannelUnit(std::wstring* unit) override;
-    bool TryGetPixelType(libCZI::PixelType* pixelType)override;
-    bool TryGetComponentBitCount(int* bitCount)override;
-    bool TryGetAcquisitionMode(libCZI::DimensionChannelAcquisitionMode* acquisitionMode)override;
-    bool TryGetIlluminationType(libCZI::DimensionChannelIlluminationType* illuminationType)override;
-    bool TryGetContrastMethod(libCZI::DimensionChannelContrastMethod* contrastMethod)override;
-    bool TryGetIlluminationWavelength(libCZI::SpectrumCharacteristics* illuminationwavelength)override;
-    bool TryGetDetectionWavelength(libCZI::SpectrumCharacteristics* detectionwavelength)override;
-    bool TryGetExcitationWavelength(double* excitationwavelength) override;
-    bool TryGetEmissionWavelength(double* emissionwavelength) override;
-    bool TryGetEffectiveNA(double* na) override;
-    bool TryGetDyeId(std::wstring* dyeid) override;
-    bool TryGetDyeDatabaseId(std::wstring* dyedatabaseid) override;
-    bool TryGetPinholeSize(double* pinholesize) override;
-    bool TryGetPinholeSizeAiry(double* pinholesizeairy) override;
-    bool TryGetPinholeGeometry(libCZI::DimensionChannelPinholeGeometry* pinholegeometry) override;
-    bool TryGetFluor(std::wstring* fluor) override;
-    bool TryGetNDFilter(double* ndfilter) override;
-    bool TryGetPocketCellSetting(int* pocketcellsetting) override;
-    bool TryGetColor(libCZI::Rgb8Color* color) override;
-    bool TryGetExposureTime(libCZI::RangeOrSingleValue<std::uint64_t>* exposuretime) override;
-    bool TryGetDepthOfFocus(double* depthoffocus) override;
-    bool TryGetSectionThickness(double* sectionthickness) override;
-    std::shared_ptr<libCZI::IDimensionChannelDetectorSettings> GetDetectorSettings() override;
-    std::shared_ptr<libCZI::IDimensionChannelLightSourcesSettings> GetLightSourcesSettings() override;
-    std::shared_ptr<libCZI::IDimensionChannelLightPath> GetLightPath() override;
-    std::shared_ptr<libCZI::IDimensionChannelLaserScanInfo> GetLaserScanInfo() override;
-    std::shared_ptr<libCZI::IDimensionChannelSPIMIlluminationSettings> GetSPIMIlluminationSettings() override;
-    std::shared_ptr<libCZI::IDimensionChannelSPIMDetectionSettings> GetSPIMDetectionSettings() override;
-    std::shared_ptr<libCZI::IDimensionChannelSIMSettings> GetSIMSettings() override;
-    std::shared_ptr<libCZI::IDimensionChannelPolarizingSettings> GetPolarizingSettings() override;
-    std::shared_ptr<libCZI::IDimensionChannelAiryscanSettings> GetAiryscanSettings() override;
-    bool TryGetReflector(std::wstring* reflector) override;
-    bool TryGetCondenserContrast(std::wstring* condensorContrast) override;
-    bool TryGetNACondenser(double* naCondensor) override;
-    std::shared_ptr<libCZI::IDimensionChannelRatio> GetRatio() override;
+    bool TryGetChannelType(libCZI::DimensionChannelChannelType* type) const override;
+    bool TryGetChannelUnit(std::wstring* unit) const override;
+    bool TryGetPixelType(libCZI::PixelType* pixelType) const override;
+    bool TryGetComponentBitCount(int* bitCount) const override;
+    bool TryGetAcquisitionMode(libCZI::DimensionChannelAcquisitionMode* acquisitionMode) const override;
+    bool TryGetIlluminationType(libCZI::DimensionChannelIlluminationType* illuminationType) const override;
+    bool TryGetContrastMethod(libCZI::DimensionChannelContrastMethod* contrastMethod) const override;
+    bool TryGetIlluminationWavelength(libCZI::SpectrumCharacteristics* illuminationwavelength) const override;
+    bool TryGetDetectionWavelength(libCZI::SpectrumCharacteristics* detectionwavelength) const override;
+    bool TryGetExcitationWavelength(double* excitationwavelength) const override;
+    bool TryGetEmissionWavelength(double* emissionwavelength) const override;
+    bool TryGetEffectiveNA(double* na) const override;
+    bool TryGetDyeId(std::wstring* dyeid) const override;
+    bool TryGetDyeDatabaseId(std::wstring* dyedatabaseid) const override;
+    bool TryGetPinholeSize(double* pinholesize) const override;
+    bool TryGetPinholeSizeAiry(double* pinholesizeairy) const override;
+    bool TryGetPinholeGeometry(libCZI::DimensionChannelPinholeGeometry* pinholegeometry) const override;
+    bool TryGetFluor(std::wstring* fluor) const override;
+    bool TryGetNDFilter(double* ndfilter) const override;
+    bool TryGetPocketCellSetting(int* pocketcellsetting) const override;
+    bool TryGetColor(libCZI::Rgb8Color* color) const override;
+    bool TryGetExposureTime(libCZI::RangeOrSingleValue<std::uint64_t>* exposuretime) const override;
+    bool TryGetDepthOfFocus(double* depthoffocus) const override;
+    bool TryGetSectionThickness(double* sectionthickness) const override;
+    std::shared_ptr<libCZI::IDimensionChannelDetectorSettings> GetDetectorSettings() const override;
+    std::shared_ptr<libCZI::IDimensionChannelLightSourcesSettings> GetLightSourcesSettings() const override;
+    std::shared_ptr<libCZI::IDimensionChannelLightPath> GetLightPath() const override;
+    std::shared_ptr<libCZI::IDimensionChannelLaserScanInfo> GetLaserScanInfo() const override;
+    std::shared_ptr<libCZI::IDimensionChannelSPIMIlluminationSettings> GetSPIMIlluminationSettings() const override;
+    std::shared_ptr<libCZI::IDimensionChannelSPIMDetectionSettings> GetSPIMDetectionSettings() const override;
+    std::shared_ptr<libCZI::IDimensionChannelSIMSettings> GetSIMSettings() const override;
+    std::shared_ptr<libCZI::IDimensionChannelPolarizingSettings> GetPolarizingSettings() const override;
+    std::shared_ptr<libCZI::IDimensionChannelAiryscanSettings> GetAiryscanSettings() const override;
+    bool TryGetReflector(std::wstring* reflector) const override;
+    bool TryGetCondenserContrast(std::wstring* condensorContrast) const override;
+    bool TryGetNACondenser(double* naCondensor) const override;
+    std::shared_ptr<libCZI::IDimensionChannelRatio> GetRatio() const override;
 
-    bool TryGetAttributeId(std::wstring* id) override { return this->attributeId.TryGetAttributeId(id); }
-    bool TryGetAttributeName(std::wstring* id) override { return this->attributeName.TryGetAttributeName(id); }
+    bool TryGetAttributeId(std::wstring* id) const override { return this->attributeId.TryGetAttributeId(id); }
+    bool TryGetAttributeName(std::wstring* id) const override { return this->attributeName.TryGetAttributeName(id); }
 public:
     void SetChannelType(libCZI::DimensionChannelChannelType type);
     void SetChannelUnit(const std::wstring& unit);
@@ -107,6 +132,9 @@ public:
     void SetReflector(const std::wstring& reflector);
     void SetCondenserContrast(const std::wstring& condensorContrast);
     void SetNACondenser(double naCondensor);
+
+    void SetAttributeId(const std::wstring* id);
+    void SetAttributeName(const std::wstring* name);
 private:
     void ParseInformation(pugi::xml_node node);
 
@@ -143,7 +171,7 @@ private:
     Nullable<double> sectionThickness;
     std::shared_ptr<libCZI::IDimensionChannelDetectorSettings> detectorSettings;
     std::shared_ptr<libCZI::IDimensionChannelLightSourcesSettings> lightSourcesSettings;
-    std::shared_ptr<libCZI::IDimensionChannelLightPath> lighPath;
+    std::shared_ptr<libCZI::IDimensionChannelLightPath> lightPath;
     std::shared_ptr<libCZI::IDimensionChannelLaserScanInfo> laserScanInfo;
     std::shared_ptr<libCZI::IDimensionChannelSPIMIlluminationSettings> spimIlluminationSettings;
     std::shared_ptr<libCZI::IDimensionChannelSPIMDetectionSettings> spimDetectionSettings;
@@ -161,12 +189,14 @@ class CDimensionsChannelsInfo : public libCZI::IDimensionsChannelsInfo
 private:
     std::vector<std::shared_ptr<CDimensionChannelInfo>> channels;
 public:
+    CDimensionsChannelsInfo() = default;
     explicit CDimensionsChannelsInfo(pugi::xml_node node);
     static std::shared_ptr<CDimensionsChannelsInfo> TryParse(const CCziMetadata* md);
 public:
     int GetChannelCount() const override;
     std::shared_ptr<libCZI::IDimensionChannelInfo> GetChannel(int i) const override;
 
+    void AddChannel(const std::shared_ptr<CDimensionChannelInfo>& channel) { this->channels.push_back(channel); }
 private:
     void ParseInformation(pugi::xml_node node);
 };

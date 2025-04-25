@@ -35,12 +35,12 @@ class CDisplaySettingsOnPod : public libCZI::IDisplaySettings
 private:
     std::map<int, std::shared_ptr<libCZI::IChannelDisplaySetting>> channelDs;
 public:
-    explicit CDisplaySettingsOnPod(std::function<bool(int no, int&, libCZI::ChannelDisplaySettingsPOD& dispSetting)> getChannelDisplaySettings);
+    explicit CDisplaySettingsOnPod(const std::function<bool(int no, int&, libCZI::ChannelDisplaySettingsPOD& dispSetting)>& getChannelDisplaySettings);
     explicit CDisplaySettingsOnPod(const libCZI::DisplaySettingsPOD& pod);
 
     static std::shared_ptr<libCZI::IDisplaySettings> CreateFromXml(pugi::xml_node node);
 public: // interface IDisplaySettings
-    void EnumChannels(std::function<bool(int)> func) const override;
+    void EnumChannels(const std::function<bool(int)>& func) const override;
     std::shared_ptr<libCZI::IChannelDisplaySetting> GetChannelDisplaySettings(int chIndex) const override;
 };
 

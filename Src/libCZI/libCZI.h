@@ -177,10 +177,19 @@ namespace libCZI
     /// stream-object (for writing a file from disk) is provided here. For a more specialized and
     /// tuned version, libCZI-users should consider implementing the interface "IOutputStream" in
     /// their own code.
-    /// \param szFilename        Filename of the file.
+    /// \param szwFilename       Filename of the file (as a wide character string).
     /// \param overwriteExisting True if an existing file should be overwritten, false otherwise.
     /// \return The new output-stream object.
-    LIBCZI_API std::shared_ptr<IOutputStream> CreateOutputStreamForFile(const wchar_t* szFilename, bool overwriteExisting);
+    LIBCZI_API std::shared_ptr<IOutputStream> CreateOutputStreamForFile(const wchar_t* szwFilename, bool overwriteExisting);
+
+    /// Creates an output-stream-object for the specified filename. A stock-implementation of a
+    /// stream-object (for writing a file from disk) is provided here. For a more specialized and
+    /// tuned version, libCZI-users should consider implementing the interface "IOutputStream" in
+    /// their own code.
+    /// \param szFilename        Filename of the file (in UTF8 encoding).
+    /// \param overwriteExisting True if an existing file should be overwritten, false otherwise.
+    /// \return The new output-stream object.
+    LIBCZI_API std::shared_ptr<IOutputStream> CreateOutputStreamForFileUtf8(const char* szFilename, bool overwriteExisting);
 
     /// Creates an input-output-stream for the specified filename.
     /// A stock-implementation of a stream-object (for modifying a file from disk) is provided here. For a more specialized and tuned version, libCZI-users should consider
@@ -474,7 +483,7 @@ namespace libCZI
 
         /// The minimal axis-aligned-bounding box determined only from the logical coordinates of the sub-blocks on pyramid-layer0 in the 
         /// document. The top-left corner of this bounding-box gives the coordinate of the origin of the 'CZI-Pixel-Coordinate-System' in
-        /// the coordinate system used by libCZI (which is refered to as 'raw-subblock-coordinate-system'). See @ref coordinatesystems for
+        /// the coordinate system used by libCZI (which is referred to as 'raw-subblock-coordinate-system'). See [Coordinate Systems](../pages/coordinate_systems.html) for
         /// additional information.
         IntRect boundingBoxLayer0Only;
 
@@ -520,7 +529,7 @@ namespace libCZI
         /// The layer number starts with 0 with the highest resolution layer.
         /// The lowest level (layer 0) is denoted by pyramidLayerNo == 0 AND minificationFactor==0.
         /// Another special case is pyramidLayerNo == 0xff AND minificationFactor==0xff which means that the
-        /// pyramid-layer could not be determined (=the minification factor could not unambiguously correlated to
+        /// pyramid-layer could not be determined (=the minification factor could not unambiguously be correlated to
         /// a pyramid-layer).
         struct PyramidLayerInfo
         {
@@ -608,10 +617,22 @@ namespace libCZI
         /// \return The pyramid statistics.
         virtual PyramidStatistics GetPyramidStatistics() = 0;
 
+        /// Transform the specified point from one coordinate system to another.
+        ///
+        /// \param  source_point                    Source point and specification of the coordinate system it is defined in.
+        /// \param  destination_frame_of_reference  Identifies the coordinate system to which the point should be transformed.
+        ///
+        /// \returns    The transformed point.
         virtual libCZI::IntPointAndFrameOfReference TransformPoint(const libCZI::IntPointAndFrameOfReference& source_point, libCZI::CZIFrameOfReference destination_frame_of_reference) = 0;
 
         virtual ~ISubBlockRepository() = default;
 
+        /// Transform the specified rectangle from one coordinate system to another.
+        ///
+        /// \param  source_rectangle                Source rectangle and specification of the coordinate system it is defined in.
+        /// \param  destination_frame_of_reference  Identifies the coordinate system to which the point should be transformed.
+        ///
+        /// \returns    The transformed rectangle.
         libCZI::IntRectAndFrameOfReference TransformRectangle(const libCZI::IntRectAndFrameOfReference& source_rectangle, libCZI::CZIFrameOfReference destination_frame_of_reference)
         {
             libCZI::IntPointAndFrameOfReference source_point_and_frame_of_reference;
@@ -651,6 +672,18 @@ namespace libCZI
     class LIBCZI_API IAttachmentRepository
     {
     public:
+        /// Gets the number of attachments available in the repository.
+        ///
+        /// \returns    The attachment count.
+        virtual int GetAttachmentCount() const = 0;
+
+        /// Attempts to get the attachment information of the attachment with the specified index. If the specified
+        /// index is not valid, then false is returned.
+        /// \param          index   Index of the attachment to query information for.
+        /// \param [out]    info    If non-null and operation is successful, then the information is put here.
+        /// \returns    True if it succeeds; false otherwise.
+        virtual bool TryGetAttachmentInfo(int index, AttachmentInfo* info) const = 0;
+
         /// Enumerate all attachments.
         ///
         /// \param funcEnum The functor which will be called for every attachment. If the return value of the
@@ -716,7 +749,7 @@ namespace libCZI
 
             /// This option controls whether the lax parameter validation when parsing the dimension-entry of a subblock is to be used.
             /// Previous versions of libCZI did not check whether certain values in the file have the expected value. If those values
-            /// are different than expected, this meant that libCZI would not be able to deal with the document properly.  
+            /// are different than expected, this meant that libCZI would not be able to deal with the document properly.
             /// If lax checking of this is disabled, then Open will fail with a corresponding exception.
             /// The default is to enable lax checking (for compatibility with previous libCZI-versions), but users are encouraged to
             /// disable this for new code.
@@ -732,12 +765,12 @@ namespace libCZI
 
             /// The default frame-of-reference which is to be used by the reader-object. This determines which frame-of-reference
             /// is used when the enum value "CZIFrameOfReference::Default" is used with an operation of the reader-object.
-            /// If the value specified here is "CZIFrameOfReference::Invalid" or "CZIFrameOfReference::Default", then 
+            /// If the value specified here is "CZIFrameOfReference::Invalid" or "CZIFrameOfReference::Default", then
             /// "CZIFrameOfReference::RawSubBlockCoordinateSystem" will be used.
             libCZI::CZIFrameOfReference default_frame_of_reference{ libCZI::CZIFrameOfReference::Invalid };
 
             /// This bitfield is used to specify the policy which information is considered authoritative in the construction of a sub-block -
-            /// either the information in the sub-block directory or in the sub-block header. Also, it controls how to handle a discrepancy 
+            /// either the information in the sub-block directory or in the sub-block header. Also, it controls how to handle a discrepancy
             /// in this respect - either throw an exception if a discrepancy is encountered or ignore it.
             SubBlockDirectoryInfoPolicy subBlockDirectoryInfoPolicy{ SubBlockDirectoryInfoPolicy::SubBlockDirectoryPrecedence };
 
@@ -769,7 +802,7 @@ namespace libCZI
 
         /// Reads the metadata segment from the stream.
         /// \remark
-        /// If the class is not operational (i. e. Open was not called or Open was not successful), then an exception of type std::logic_error is thrown.
+        /// If the class is not operational (i.e. Open was not called or Open was not successful), then an exception of type std::logic_error is thrown.
         ///
         /// \return The metadata segment.
         virtual std::shared_ptr<IMetadataSegment> ReadMetadataSegment() = 0;
@@ -787,7 +820,7 @@ namespace libCZI
         /// Closes CZI-reader. The underlying stream-object will be released, and further calls to
         /// other methods will fail. The stream is also closed when the object is destroyed, so it
         /// is usually not necessary to explicitly call `Close`. Note that the stream is not closed
-        /// immediately (or - there is no guarantee that on return from this call all references to the 
+        /// immediately (or - there is no guarantee that on return from this call all references to the
         /// stream object are released). Concurrently executing operations continue to use the stream
         /// and keep it referenced until they are finished.
         virtual void Close() = 0;

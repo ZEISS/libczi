@@ -7,6 +7,7 @@
 #include "decoder.h"
 #include "decoder_zstd.h"
 #include <mutex>
+#include <cstdlib>
 #include "bitmapData.h"
 #include "decoder_wic.h"
 
@@ -35,6 +36,11 @@ public:
     std::shared_ptr<IDecoder> GetDecoder(ImageDecoderType type, const char* arguments) override
     {
         throw std::runtime_error("must not be called...");
+    }
+
+    void TerminateProgram(TerminationReason reason, const char* message) override
+    {
+        abort();
     }
 };
 

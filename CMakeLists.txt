@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.15)
 cmake_policy(SET CMP0091 NEW) # enable new "MSVC runtime library selection" (https://cmake.org/cmake/help/latest/variable/CMAKE_MSVC_RUNTIME_LIBRARY.html)
 
 project(libCZI 
-      VERSION 0.64.0
+      VERSION 0.65.0
       HOMEPAGE_URL "https://github.com/ZEISS/libczi"
       DESCRIPTION "libCZI is an Open Source Cross-Platform C++ library to read and write CZI")
 
@@ -110,6 +110,9 @@ option(LIBCZI_BUILD_CZICMD "Build application 'CZICmd'." OFF)
 
 # Whether to build dynamic libCZI-library.
 option(LIBCZI_BUILD_DYNLIB "Build dynamic library for 'libCZI'." ON)
+
+# Whether to build the libCZIApi-project (C-API-layer for libCZI).
+option(LIBCZI_BUILD_LIBCZIAPI "Build the libCZIApi-project (C-bindings for libCZI)." OFF)
 
 # With this option one can choose between "downloading a private copy of Eigen3 during build" or use
 #  an existing Eigen3 (on the system). If CMake is unable to find an Eigen3-package (and this option is
