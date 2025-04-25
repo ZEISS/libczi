@@ -309,3 +309,4 @@ __pycache__/
 megalinter-reports/
 /Src/libCZI/Build/
 /Src/libCZIAPI/Build/
+/docs/build/
