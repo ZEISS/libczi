@@ -33,6 +33,14 @@
 /// \param  data    Pointer to the memory to be freed.
 EXTERNALLIBCZIAPI_API(void) libCZI_Free(void* data);
 
+/// Allocate memory of the specified size.
+///
+/// \param          size    The size of the memory block to be allocated in bytes.
+/// \param [out]    data    If successful, a pointer to the allocated memory is put here. The memory must be freed using 'libCZI_Free'.
+///
+/// \returns    An error-code indicating success or failure of the operation.
+EXTERNALLIBCZIAPI_API(LibCZIApiErrorCode) libCZI_AllocateMemory(std::uint64_t size, void** data);
+
 /// Get version information about the libCZIApi-library.
 ///
 /// \param [out] version_info    If successful, the version information is put here.

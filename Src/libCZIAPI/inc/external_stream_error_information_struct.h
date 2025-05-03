@@ -17,7 +17,7 @@ const std::int32_t kStreamErrorCode_UnspecifiedError = 1;   ///< Error code for 
 struct ExternalStreamErrorInfoInterop
 {
     std::int32_t error_code;                        ///< The error code - possible values are the constants kStreamErrorCode_XXX.
-    MemoryAllocationObjectHandle error_message;     ///< The error message (zero-terminated UTF8-encoded string). This string must be allocated with 'libCZI_AllocateString'.
+    MemoryAllocationObjectHandle error_message;     ///< The error message (zero-terminated UTF8-encoded string). This string must be allocated with 'libCZI_AllocateMemory'.
 };
 
 #pragma pack(pop)

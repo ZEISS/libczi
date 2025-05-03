@@ -85,6 +85,28 @@ void libCZI_Free(void* data)
     ParameterHelpers::FreeMemory(data);
 }
 
+LibCZIApiErrorCode libCZI_AllocateMemory(std::uint64_t size, void** data)
+{
+    if (data == nullptr)
+    {
+        return LibCZIApi_ErrorCode_InvalidArgument;
+    }
+
+    *data = nullptr;
+    if (size == 0)
+    {
+        return LibCZIApi_ErrorCode_InvalidArgument;
+    }
+
+    if (size > std::numeric_limits<size_t>::max())
+    {
+        return LibCZIApi_ErrorCode_InvalidArgument;
+    }
+
+    *data = ParameterHelpers::AllocateMemory(size);
+    return LibCZIApi_ErrorCode_OK;
+}
+
 LibCZIApiErrorCode libCZI_GetLibCZIVersionInfo(LibCZIVersionInfoInterop* version_info)
 {
     if (version_info == nullptr)
