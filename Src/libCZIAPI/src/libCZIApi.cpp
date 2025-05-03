@@ -104,6 +104,11 @@ LibCZIApiErrorCode libCZI_AllocateMemory(std::uint64_t size, void** data)
     }
 
     *data = ParameterHelpers::AllocateMemory(size);
+    if (*data == nullptr)
+    {
+        return LibCZIApi_ErrorCode_OutOfMemory;
+    }
+
     return LibCZIApi_ErrorCode_OK;
 }
 
@@ -659,9 +664,9 @@ namespace
             {
                 if (error_info.error_message != kInvalidObjectHandle)
                 {
-                    // TODO(JBL): error handling needs to be looked into (and, probably, the memory must be released here)
                     ostringstream error_message;
                     error_message << "Error reading from external input stream. Error code: " << error_info.error_code << ". Error message: \"" << reinterpret_cast<const char*>(error_info.error_message) << "\"";
+                    libCZI_Free(error_info.error_message);
                     throw runtime_error(error_message.str());
                 }
                 else
