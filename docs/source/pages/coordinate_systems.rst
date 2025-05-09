@@ -14,6 +14,7 @@ As far as libCZI is concerned, there are two coordinate systems that are of inte
    unmodified with respect to the actual file content.
 
    Conceptually, the *raw-subblock-coordinate-system* has the following characteristics:
+
    * The X and Y-axis are such that the subblock's logicalRect are axis-aligned.
    * Orientation of the Y-axis is such that the Y-coordinate increases from top to bottom; X-coordinates increase from left to right.
    * The origin of the coordinate system is arbitrary, there is no special geometric meaning to the origin.
@@ -26,6 +27,7 @@ As far as libCZI is concerned, there are two coordinate systems that are of inte
    The *CZI-Pixel-Coordinate-System* is the recommended way for relating to an X-Y-position in the CZI-document.
 
    The characteristics of the *CZI-Pixel-Coordinate-System* are:
+
    * The X and Y-axis are such that the subblock's logicalRect are axis-aligned.
    * Orientation of the Y-axis is such that the Y-coordinate increases from top to bottom; X-coordinates increase from left to right.
    * The origin is such that the coordinate (of the logicalRect) of the top-most and left-most pyramid-layer0 subblock is (0,0).
@@ -39,6 +41,7 @@ Usage in libCZI
 libCZI at this point is using the *raw-subblock-coordinate-system* for all its operations. There are only a few
 operations where the choice of coordinate system is relevant: the accessor-functions which give tile-compositions.
 This includes:
+
 * `ISingleChannelTileAccessor <https://zeiss.github.io/libczi/classlib_c_z_i_1_1_i_single_channel_tile_accessor.html>`_
 * `ISingleChannelPyramidLayerTileAccessor <https://zeiss.github.io/libczi/classlib_c_z_i_1_1_i_single_channel_pyramid_layer_tile_accessor.html>`_
 * `ISingleChannelScalingTileAccessor <https://zeiss.github.io/libczi/classlib_c_z_i_1_1_i_single_channel_scaling_tile_accessor.html>`_
