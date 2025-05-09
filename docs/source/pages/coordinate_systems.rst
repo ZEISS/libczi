@@ -6,7 +6,7 @@ Coordinate Systems
 
 As far as libCZI is concerned, there are two coordinate systems that are of interest:
 
-1. The *raw-subblock-coordinate-system* is the coordinate system in which the X-Y-positions of the subblocks
+#. The *raw-subblock-coordinate-system* is the coordinate system in which the X-Y-positions of the subblocks
    are physically stored in the file, and it is also the coordinate system which is used in libCZI.
    The API `ISubBlock::GetSubBlockInfo <https://zeiss.github.io/libczi/classlib_c_z_i_1_1_i_sub_block.html#a557108549db08e25b1df1ef8fae37a07>`_
    is returning the X-Y-position of the subblock in this coordinate system
@@ -21,7 +21,7 @@ As far as libCZI is concerned, there are two coordinate systems that are of inte
    .. image:: ../_static/images/raw_subblock_coordinate_system_400x.png
       :alt: Raw SubBlock Coordinate System
 
-2. The *CZI-Pixel-Coordinate-System* is a coordinate system where the top-left subblock (of pyramid-layer 0) has the
+#. The *CZI-Pixel-Coordinate-System* is a coordinate system where the top-left subblock (of pyramid-layer 0) has the
    coordinate (0,0). It is related to the *raw-subblock-coordinate-system* by a translation.
    The *CZI-Pixel-Coordinate-System* is the recommended way for relating to an X-Y-position in the CZI-document.
 
