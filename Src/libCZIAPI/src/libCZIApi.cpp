@@ -717,6 +717,7 @@ namespace
                 {
                     ostringstream error_message;
                     error_message << "Error reading from external input stream. Error code: " << error_info.error_code << ". Error message: \"" << reinterpret_cast<const char*>(error_info.error_message) << "\"";
+                    libCZI_Free(reinterpret_cast<void*>(error_info.error_message));
                     throw runtime_error(error_message.str());
                 }
                 else

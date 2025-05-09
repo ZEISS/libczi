@@ -18,7 +18,7 @@ class ParameterHelpers
 {
 public:
 
-    /// Allocate memory and return a void pointer to the allocated space, or NULL if there's insufficient memory available.
+    /// Allocate memory and return a void pointer to the allocated memory, or NULL if there is insufficient memory available.
     ///
     /// \param  size    Bytes to allocate.
     ///
