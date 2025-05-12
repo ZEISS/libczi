@@ -17,7 +17,14 @@
 class ParameterHelpers
 {
 public:
+
+    /// Allocate memory and return a void pointer to the allocated memory, or NULL if there is insufficient memory available.
+    ///
+    /// \param  size    Bytes to allocate.
+    ///
+    /// \returns    Null if it fails, else a pointer to allocated memory.
     static void* AllocateMemory(size_t size);
+
     static void FreeMemory(void* ptr);
     static char* AllocString(const std::string& text);
 

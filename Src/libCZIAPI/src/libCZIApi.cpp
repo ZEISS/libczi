@@ -85,6 +85,35 @@ void libCZI_Free(void* data)
     ParameterHelpers::FreeMemory(data);
 }
 
+LibCZIApiErrorCode libCZI_AllocateMemory(std::uint64_t size, void** data)
+{
+    if (data == nullptr)
+    {
+        return LibCZIApi_ErrorCode_InvalidArgument;
+    }
+
+    *data = nullptr;
+    if (size == 0)
+    {
+        return LibCZIApi_ErrorCode_InvalidArgument;
+    }
+
+    // We defined the API using a uint64_t, and this type is larger than size_t on 32-bit systems. So, this
+    // check here is a no-op on 64-bit systems, but it is necessary on 32-bit systems.
+    if (size > std::numeric_limits<size_t>::max())
+    {
+        return LibCZIApi_ErrorCode_InvalidArgument;
+    }
+
+    *data = ParameterHelpers::AllocateMemory(static_cast<size_t>(size));
+    if (*data == nullptr)
+    {
+        return LibCZIApi_ErrorCode_OutOfMemory;
+    }
+
+    return LibCZIApi_ErrorCode_OK;
+}
+
 LibCZIApiErrorCode libCZI_GetLibCZIVersionInfo(LibCZIVersionInfoInterop* version_info)
 {
     if (version_info == nullptr)
@@ -637,9 +666,9 @@ namespace
             {
                 if (error_info.error_message != kInvalidObjectHandle)
                 {
-                    // TODO(JBL): error handling needs to be looked into (and, probably, the memory must be released here)
                     ostringstream error_message;
                     error_message << "Error reading from external input stream. Error code: " << error_info.error_code << ". Error message: \"" << reinterpret_cast<const char*>(error_info.error_message) << "\"";
+                    libCZI_Free(reinterpret_cast<void*>(error_info.error_message));
                     throw runtime_error(error_message.str());
                 }
                 else
@@ -690,6 +719,7 @@ namespace
                 {
                     ostringstream error_message;
                     error_message << "Error reading from external input stream. Error code: " << error_info.error_code << ". Error message: \"" << reinterpret_cast<const char*>(error_info.error_message) << "\"";
+                    libCZI_Free(reinterpret_cast<void*>(error_info.error_message));
                     throw runtime_error(error_message.str());
                 }
                 else
