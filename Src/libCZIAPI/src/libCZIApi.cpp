@@ -98,12 +98,14 @@ LibCZIApiErrorCode libCZI_AllocateMemory(std::uint64_t size, void** data)
         return LibCZIApi_ErrorCode_InvalidArgument;
     }
 
+    // We defined the API using a uint64_t, and this type is larger than size_t on 32-bit systems. So, this
+    // check here is a no-op on 64-bit systems, but it is necessary on 32-bit systems.
     if (size > std::numeric_limits<size_t>::max())
     {
         return LibCZIApi_ErrorCode_InvalidArgument;
     }
 
-    *data = ParameterHelpers::AllocateMemory(size);
+    *data = ParameterHelpers::AllocateMemory(static_cast<size_t>(size));
     if (*data == nullptr)
     {
         return LibCZIApi_ErrorCode_OutOfMemory;
