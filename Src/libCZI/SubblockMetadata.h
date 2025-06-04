@@ -16,10 +16,10 @@ private:
 public:
     SubblockMetadata(const char* xml, size_t xmlSize);
     SubblockMetadata() = delete;
-    SubblockMetadata(const SubblockMetadata&) = default;
-    SubblockMetadata(SubblockMetadata&&) = default;
-    SubblockMetadata& operator=(const SubblockMetadata&) = default;
-    SubblockMetadata& operator=(SubblockMetadata&&) = default;
+    SubblockMetadata(const SubblockMetadata&) = delete;
+    SubblockMetadata(SubblockMetadata&&) = delete;
+    SubblockMetadata& operator=(const SubblockMetadata&) = delete;
+    SubblockMetadata& operator=(SubblockMetadata&&) = delete;
     virtual ~SubblockMetadata() = default;
 
 public: // interface IXmlNodeRead
