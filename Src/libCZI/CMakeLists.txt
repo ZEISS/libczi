@@ -90,6 +90,7 @@ set(LIBCZISRCFILES
             libCZI_Utilities.h
             libCZI_Write.h
             libCZI_StreamsLib.h
+            libCZI_SubBlockMetadata.h
             MD5Sum.h
             MultiChannelCompositor.h
             SingleChannelAccessorBase.h
@@ -120,6 +121,8 @@ set(LIBCZISRCFILES
             StreamsLib/azureblobinputstream.cpp
             subblock_cache.h
             subblock_cache.cpp
+            SubblockMetadata.h
+            SubblockMetadata.cpp
 )
 
 # prepare the configuration-file "libCZI_Config.h"

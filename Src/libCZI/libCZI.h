@@ -13,6 +13,7 @@
 
 #include "ImportExport.h"
 
+
 #include "libCZI_exceptions.h"
 #include "libCZI_DimCoordinate.h"
 #include "libCZI_Pixels.h"
@@ -65,6 +66,7 @@ namespace libCZI
     class ISubBlockRepository;
     class IAttachment;
     class ISubBlockCache;
+    class ISubBlockMetadata;
 
     /// This structure contains information about the compiler settings and the version of the source
     /// which was used to create the library.
@@ -211,6 +213,8 @@ namespace libCZI
     /// \param  xml The UTF8-encoded XML string.
     /// \return The newly created metadata-builder-object.
     LIBCZI_API std::shared_ptr<ICziMetadataBuilder> CreateMetadataBuilderFromXml(const std::string& xml);
+
+    LIBCZI_API std::shared_ptr<ISubBlockMetadata> CreateSubBlockMetadataFromSubBlock(const libCZI::ISubBlock* sub_block);
 
     /// Interface used for accessing the data-stream.  
     /// Implementations of this interface are expected to be thread-safe - it should be possible to
@@ -851,3 +855,4 @@ namespace libCZI
 #include "libCZI_Helpers.h"
 #include "libCZI_Write.h"
 #include "libCZI_ReadWrite.h"
+#include "libCZI_SubBlockMetadata.h"
