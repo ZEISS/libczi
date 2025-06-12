@@ -73,6 +73,25 @@ namespace
         destination.majorVersion = source.majorVersion;
         destination.minorVersion = source.minorVersion;
     }
+
+    void CopyFromSubBlockInfoToSubBlockInfoInterop(const libCZI::SubBlockInfo& source, SubBlockInfoInterop& destination)
+    {
+        destination.compression_mode_raw = source.compressionModeRaw;
+
+        destination.pixel_type = static_cast<std::int32_t>(source.pixelType);
+
+        destination.coordinate.dimensions_valid = source.coordinate.GetValidDimensionsCount();
+
+        destination.logical_rect.x = source.logicalRect.x;
+        destination.logical_rect.y = source.logicalRect.y;
+        destination.logical_rect.h = source.logicalRect.h;
+        destination.logical_rect.w = source.logicalRect.w;
+
+        destination.physical_size.w = source.physicalSize.w;
+        destination.physical_size.h = source.physicalSize.h;
+
+        destination.m_index = source.mIndex;
+    }
 }
 
 void libCZI_Free(void* data)
@@ -918,6 +937,37 @@ LibCZIApiErrorCode libCZI_ReleaseSubBlock(SubBlockObjectHandle sub_block_object)
     delete shared_sub_block_wrapping_object;
 
     return LibCZIApi_ErrorCode_OK;
+}
+
+LibCZIApiErrorCode libCZI_TryGetSubBlockInfoForIndex(CziReaderObjectHandle reader_object, std::int32_t index, SubBlockInfoInterop* sub_block_info_interop)
+{
+    if (reader_object == kInvalidObjectHandle || sub_block_info_interop == nullptr)
+    {
+        return LibCZIApi_ErrorCode_InvalidArgument;
+    }
+
+    auto shared_czi_reader_wrapping_object = reinterpret_cast<SharedPtrWrapper<ICZIReader>*>(reader_object);
+    if (!shared_czi_reader_wrapping_object->IsValid())
+    {
+        return LibCZIApi_ErrorCode_InvalidHandle;
+    }
+
+    try
+    {
+        SubBlockInfo sub_block_info;
+        const bool b = shared_czi_reader_wrapping_object->shared_ptr_->TryGetSubBlockInfo(index, &sub_block_info);
+        if (!b)
+        {
+            return LibCZIApi_ErrorCode_IndexOutOfRange;
+        }
+
+        CopyFromSubBlockInfoToSubBlockInfoInterop(sub_block_info, *sub_block_info_interop);
+        return LibCZIApi_ErrorCode_OK;
+    }
+    catch (const std::exception&)
+    {
+        return LibCZIApi_ErrorCode_UnspecifiedError;
+    }
 }
 
 //****************************************************************************************************
