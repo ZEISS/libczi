@@ -76,21 +76,6 @@ namespace
 
     void CopyFromSubBlockInfoToSubBlockInfoInterop(const libCZI::SubBlockInfo& source, SubBlockInfoInterop& destination)
     {
-       /* destination.compression_mode_raw = source.compressionModeRaw;
-
-        destination.pixel_type = static_cast<std::int32_t>(source.pixelType);
-
-        destination.coordinate.dimensions_valid = source.coordinate.GetValidDimensionsCount();
-
-        destination.logical_rect.x = source.logicalRect.x;
-        destination.logical_rect.y = source.logicalRect.y;
-        destination.logical_rect.h = source.logicalRect.h;
-        destination.logical_rect.w = source.logicalRect.w;
-
-        destination.physical_size.w = source.physicalSize.w;
-        destination.physical_size.h = source.physicalSize.h;
-
-        destination.m_index = source.mIndex;*/
         destination.compression_mode_raw = source.compressionModeRaw;
         destination.pixel_type = static_cast<int32_t>(source.pixelType);
         destination.coordinate = ParameterHelpers::ConvertIDimCoordinateToCoordinateInterop(&source.coordinate);
@@ -861,23 +846,6 @@ LibCZIApiErrorCode libCZI_SubBlockGetInfo(SubBlockObjectHandle sub_block_object,
     {
         const auto& sub_block_info_data = shared_sub_block_wrapping_object->shared_ptr_->GetSubBlockInfo();
         CopyFromSubBlockInfoToSubBlockInfoInterop(sub_block_info_data, *sub_block_info);
-        /*sub_block_info->compression_mode_raw = sub_block_info_data.compressionModeRaw;
-        sub_block_info->pixel_type = static_cast<int32_t>(sub_block_info_data.pixelType);
-        sub_block_info->coordinate = ParameterHelpers::ConvertIDimCoordinateToCoordinateInterop(&sub_block_info_data.coordinate);
-        sub_block_info->logical_rect.x = sub_block_info_data.logicalRect.x;
-        sub_block_info->logical_rect.y = sub_block_info_data.logicalRect.y;
-        sub_block_info->logical_rect.w = sub_block_info_data.logicalRect.w;
-        sub_block_info->logical_rect.h = sub_block_info_data.logicalRect.h;
-        sub_block_info->physical_size.w = sub_block_info_data.physicalSize.w;
-        sub_block_info->physical_size.h = sub_block_info_data.physicalSize.h;
-        if (sub_block_info_data.IsMindexValid())
-        {
-            sub_block_info->m_index = sub_block_info_data.mIndex;
-        }
-        else
-        {
-            sub_block_info->m_index = numeric_limits<int32_t>::min();
-        }*/
 
         return LibCZIApi_ErrorCode_OK;
     }
