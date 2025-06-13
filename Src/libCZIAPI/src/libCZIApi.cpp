@@ -76,7 +76,7 @@ namespace
 
     void CopyFromSubBlockInfoToSubBlockInfoInterop(const libCZI::SubBlockInfo& source, SubBlockInfoInterop& destination)
     {
-        destination.compression_mode_raw = source.compressionModeRaw;
+       /* destination.compression_mode_raw = source.compressionModeRaw;
 
         destination.pixel_type = static_cast<std::int32_t>(source.pixelType);
 
@@ -90,7 +90,24 @@ namespace
         destination.physical_size.w = source.physicalSize.w;
         destination.physical_size.h = source.physicalSize.h;
 
-        destination.m_index = source.mIndex;
+        destination.m_index = source.mIndex;*/
+        destination.compression_mode_raw = source.compressionModeRaw;
+        destination.pixel_type = static_cast<int32_t>(source.pixelType);
+        destination.coordinate = ParameterHelpers::ConvertIDimCoordinateToCoordinateInterop(&source.coordinate);
+        destination.logical_rect.x = source.logicalRect.x;
+        destination.logical_rect.y = source.logicalRect.y;
+        destination.logical_rect.w = source.logicalRect.w;
+        destination.logical_rect.h = source.logicalRect.h;
+        destination.physical_size.w = source.physicalSize.w;
+        destination.physical_size.h = source.physicalSize.h;
+        if (source.IsMindexValid())
+        {
+            destination.m_index = source.mIndex;
+        }
+        else
+        {
+            destination.m_index = numeric_limits<int32_t>::min();
+        }
     }
 }
 
@@ -843,7 +860,8 @@ LibCZIApiErrorCode libCZI_SubBlockGetInfo(SubBlockObjectHandle sub_block_object,
     try
     {
         const auto& sub_block_info_data = shared_sub_block_wrapping_object->shared_ptr_->GetSubBlockInfo();
-        sub_block_info->compression_mode_raw = sub_block_info_data.compressionModeRaw;
+        CopyFromSubBlockInfoToSubBlockInfoInterop(sub_block_info_data, *sub_block_info);
+        /*sub_block_info->compression_mode_raw = sub_block_info_data.compressionModeRaw;
         sub_block_info->pixel_type = static_cast<int32_t>(sub_block_info_data.pixelType);
         sub_block_info->coordinate = ParameterHelpers::ConvertIDimCoordinateToCoordinateInterop(&sub_block_info_data.coordinate);
         sub_block_info->logical_rect.x = sub_block_info_data.logicalRect.x;
@@ -859,7 +877,7 @@ LibCZIApiErrorCode libCZI_SubBlockGetInfo(SubBlockObjectHandle sub_block_object,
         else
         {
             sub_block_info->m_index = numeric_limits<int32_t>::min();
-        }
+        }*/
 
         return LibCZIApi_ErrorCode_OK;
     }

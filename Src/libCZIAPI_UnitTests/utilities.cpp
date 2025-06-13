@@ -167,3 +167,20 @@ tuple<shared_ptr<void>, size_t> Utilities::CreateMosaicCzi(const MosaicInfo& mos
 
     return dim_bounds;
 }
+
+/*static*/libCZI::CDimCoordinate Utilities::ConvertCoordinateInterop(const CoordinateInterop& coordinate_interop)
+{
+    libCZI::CDimCoordinate coordinate;
+    int coordinate_index = 0;
+    for (int i = static_cast<int>(libCZI::DimensionIndex::MinDim); i <= static_cast<int>(libCZI::DimensionIndex::MaxDim); ++i)
+    {
+        const int index = i - static_cast<int>(libCZI::DimensionIndex::MinDim);
+        if (coordinate_interop.dimensions_valid & (1 << index))
+        {
+            coordinate.Set(static_cast<libCZI::DimensionIndex>(i), coordinate_interop.value[coordinate_index]);
+            ++coordinate_index;
+        }
+    }
+
+    return coordinate;
+}

@@ -310,7 +310,7 @@ EXTERNALLIBCZIAPI_API(LibCZIApiErrorCode) libCZI_SubBlockGetRawData(SubBlockObje
 /// \returns An error-code indicating success or failure of the operation.
 EXTERNALLIBCZIAPI_API(LibCZIApiErrorCode) libCZI_ReleaseSubBlock(SubBlockObjectHandle sub_block_object);
 
-/// Get information about the sub-block at the specified index. The information is put into the 'sub_block_info_interop' structure.
+/// Get information about the sub-block with the specified index. The information is put into the 'sub_block_info_interop' structure.
 /// If the index is not valid, then the function returns 'LibCZIApi_ErrorCode_IndexOutOfRange'.
 ///
 /// \param          reader_object           The reader object.

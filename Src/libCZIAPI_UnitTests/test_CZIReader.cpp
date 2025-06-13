@@ -281,8 +281,6 @@ TEST(CZIAPI_Reader, ConstructExternalInputStreamAndTryGetSubBlockInfoForIndex)
     ASSERT_EQ(LibCZIApi_ErrorCode_OK, error_code);
     ASSERT_EQ(info.compression_mode_raw, 0);
 
-    ASSERT_EQ(info.coordinate.dimensions_valid, 2);
-
     ASSERT_EQ(info.logical_rect.x, 0);
     ASSERT_EQ(info.logical_rect.y, 0);
     ASSERT_EQ(info.logical_rect.w, 1);
@@ -294,6 +292,10 @@ TEST(CZIAPI_Reader, ConstructExternalInputStreamAndTryGetSubBlockInfoForIndex)
     ASSERT_EQ(info.physical_size.h, 1);
 
     ASSERT_EQ(info.pixel_type, 0);
+
+    const libCZI::CDimCoordinate dim_coordinate = Utilities::ConvertCoordinateInterop(info.coordinate);
+    const auto dim_coordinate_as_string = libCZI::Utils::DimCoordinateToString(&dim_coordinate);
+    ASSERT_STREQ("C0T0", dim_coordinate_as_string.c_str());
 
     error_code = libCZI_ReleaseReader(reader_object);
     ASSERT_EQ(LibCZIApi_ErrorCode_OK, error_code);
