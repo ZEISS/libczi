@@ -3,16 +3,27 @@
 #include "libCZI_SubBlockMetadata.h"
 
 #include "pugixml.hpp"
+#include "XmlNodeWrapper.h"
+#include "libCZI_Exceptions.h"
+
 #include <memory>
 #include <string>
 #include <functional>
 
-
-
-class SubblockMetadata : public libCZI::ISubBlockMetadata
+class SubblockMetadata : public libCZI::ISubBlockMetadata, public std::enable_shared_from_this<SubblockMetadata>
 {
 private:
+    struct XmlNodeWrapperThrowExcp
+    {
+        [[noreturn]] static void ThrowInvalidPath()
+        {
+            throw libCZI::LibCZIMetadataException("invalid path", libCZI::LibCZIMetadataException::ErrorType::InvalidPath);
+        }
+    };
+
+    pugi::xml_parse_result   parseResult;
     pugi::xml_document doc;
+    std::unique_ptr<XmlNodeWrapperReadonly<SubblockMetadata, XmlNodeWrapperThrowExcp> > wrapper;
 public:
     SubblockMetadata(const char* xml, size_t xmlSize);
     SubblockMetadata() = delete;
@@ -29,4 +40,9 @@ public: // interface IXmlNodeRead
     std::shared_ptr<libCZI::IXmlNodeRead> GetChildNodeReadonly(const char* path) override;
     std::wstring Name() const override;
     void EnumChildren(const std::function<bool(std::shared_ptr<libCZI::IXmlNodeRead>)>& enumChildren) override;
+
+    bool IsXmlValid() const /*override*/;
+
+private:
+    void ThrowIfXmlInvalid() const;
 };
