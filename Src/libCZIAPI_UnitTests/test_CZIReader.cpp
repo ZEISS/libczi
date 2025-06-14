@@ -238,3 +238,67 @@ TEST(CZIAPI_Reader, ConstructMultiSceneCziAndOpenCziAndCheckContent)
     ASSERT_EQ(1, input_stream_release_call_count) << "The 'external input-stream-object' is not released as expected.";
 };
 
+TEST(CZIAPI_Reader, ConstructExternalInputStreamAndTryGetSubBlockInfoForIndex)
+{
+    CziReaderObjectHandle reader_object;
+    InputStreamObjectHandle stream_object;
+
+    LibCZIApiErrorCode error_code = libCZI_CreateReader(&reader_object);
+    ASSERT_EQ(LibCZIApi_ErrorCode_OK, error_code);
+
+    auto memory_input_stream_handler_object = new MemoryInputStream(CTestData::czi_with_subblock_of_size_t2, sizeof(CTestData::czi_with_subblock_of_size_t2));
+
+    int input_stream_release_call_count = 0;
+    ExternalInputStreamStructInterop external_input_stream_struct;
+    external_input_stream_struct.opaque_handle1 = reinterpret_cast<uintptr_t>(memory_input_stream_handler_object);
+    external_input_stream_struct.opaque_handle2 = reinterpret_cast<uintptr_t>(&input_stream_release_call_count);
+    external_input_stream_struct.read_function = [](uintptr_t opaque_handle1, uintptr_t opaque_handle2, uint64_t offset, void* pv, uint64_t size, uint64_t* ptrBytesRead, ExternalStreamErrorInfoInterop* error_info) -> int32_t
+        {
+            auto memory_input_stream_handler = reinterpret_cast<MemoryInputStream*>(opaque_handle1);
+            return memory_input_stream_handler->Read(offset, pv, size, ptrBytesRead, error_info);
+        };
+    external_input_stream_struct.close_function = [](uintptr_t opaque_handle1, uintptr_t opaque_handle2)->void
+        {
+            auto memory_input_stream_handler = reinterpret_cast<MemoryInputStream*>(opaque_handle1);
+            delete memory_input_stream_handler;
+            auto input_stream_release_call_count = reinterpret_cast<int*>(opaque_handle2);
+            ++(*input_stream_release_call_count);
+        };
+
+    error_code = libCZI_CreateInputStreamFromExternal(&external_input_stream_struct, &stream_object);
+    ASSERT_EQ(LibCZIApi_ErrorCode_OK, error_code);
+
+    ReaderOpenInfoInterop reader_open_info;
+    reader_open_info.streamObject = stream_object;
+    error_code = libCZI_ReaderOpen(reader_object, &reader_open_info);
+    ASSERT_EQ(LibCZIApi_ErrorCode_OK, error_code);
+
+    error_code = libCZI_ReleaseInputStream(stream_object);
+    ASSERT_EQ(LibCZIApi_ErrorCode_OK, error_code);
+
+    SubBlockInfoInterop info;
+    error_code = libCZI_TryGetSubBlockInfoForIndex(reader_object, 0, &info);
+    ASSERT_EQ(LibCZIApi_ErrorCode_OK, error_code);
+    ASSERT_EQ(info.compression_mode_raw, 0);
+
+    ASSERT_EQ(info.logical_rect.x, 0);
+    ASSERT_EQ(info.logical_rect.y, 0);
+    ASSERT_EQ(info.logical_rect.w, 1);
+    ASSERT_EQ(info.logical_rect.h, 1);
+
+    ASSERT_EQ(info.m_index, 0);
+
+    ASSERT_EQ(info.physical_size.w, 1);
+    ASSERT_EQ(info.physical_size.h, 1);
+
+    ASSERT_EQ(info.pixel_type, 0);
+
+    const libCZI::CDimCoordinate dim_coordinate = Utilities::ConvertCoordinateInterop(info.coordinate);
+    const auto dim_coordinate_as_string = libCZI::Utils::DimCoordinateToString(&dim_coordinate);
+    ASSERT_STREQ("C0T0", dim_coordinate_as_string.c_str());
+
+    error_code = libCZI_ReleaseReader(reader_object);
+    ASSERT_EQ(LibCZIApi_ErrorCode_OK, error_code);
+
+    ASSERT_EQ(1, input_stream_release_call_count) << "The 'external input-stream-object' is not released as expected.";
+}
