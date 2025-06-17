@@ -310,6 +310,16 @@ EXTERNALLIBCZIAPI_API(LibCZIApiErrorCode) libCZI_SubBlockGetRawData(SubBlockObje
 /// \returns An error-code indicating success or failure of the operation.
 EXTERNALLIBCZIAPI_API(LibCZIApiErrorCode) libCZI_ReleaseSubBlock(SubBlockObjectHandle sub_block_object);
 
+/// Get information about the sub-block with the specified index. The information is put into the 'sub_block_info_interop' structure.
+/// If the index is not valid, then the function returns 'LibCZIApi_ErrorCode_IndexOutOfRange'.
+///
+/// \param          reader_object           The reader object.
+/// \param          index                   The index of the attachment to query information for.
+/// \param [out]    sub_block_info_interop  If successful, the retrieved information is put here.
+///
+/// \returns An error-code indicating success or failure of the operation.
+EXTERNALLIBCZIAPI_API(LibCZIApiErrorCode) libCZI_TryGetSubBlockInfoForIndex(CziReaderObjectHandle reader_object, std::int32_t index, SubBlockInfoInterop* sub_block_info_interop);
+
 // sub-block functions end here
 // ****************************************************************************************************
 
@@ -465,7 +475,7 @@ EXTERNALLIBCZIAPI_API(LibCZIApiErrorCode) libCZI_CziDocumentInfoGetScalingInfo(C
 /// \param [in,out] available_dimensions        If successful, the available dimensions are put here. The list is terminated with a value of 'kInvalidDimensionIndex'.
 ///
 /// \returns    An error-code indicating success or failure of the operation.
-EXTERNALLIBCZIAPI_API(LibCZIApiErrorCode) libCZI_CziDocumentInfoGetAvailableDimension(CziDocumentInfoHandle czi_document_info, std::uint32_t available_dimensions_count, std::uint32_t*  available_dimensions);
+EXTERNALLIBCZIAPI_API(LibCZIApiErrorCode) libCZI_CziDocumentInfoGetAvailableDimension(CziDocumentInfoHandle czi_document_info, std::uint32_t available_dimensions_count, std::uint32_t* available_dimensions);
 
 /// Get the display-settings from the document's XML-metadata. The display-settings are returned in the form of an object,
 /// for which a handle is returned.
@@ -682,7 +692,7 @@ EXTERNALLIBCZIAPI_API(LibCZIApiErrorCode) libCZI_ReleaseCreateSingleChannelTileA
 ///
 /// \returns    An error-code indicating success or failure of the operation.
 EXTERNALLIBCZIAPI_API(LibCZIApiErrorCode) libCZI_CompositorFillOutCompositionChannelInfoInterop(
-                                                                    DisplaySettingsHandle display_settings_handle, 
+                                                                    DisplaySettingsHandle display_settings_handle,
                                                                     int channel_index,
                                                                     bool sixteen_or_eight_bits_lut,
                                                                     CompositionChannelInfoInterop* composition_channel_info_interop);
