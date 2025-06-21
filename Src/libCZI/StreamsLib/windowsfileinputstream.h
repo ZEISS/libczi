@@ -8,7 +8,7 @@
 #if LIBCZI_WINDOWSAPI_AVAILABLE
 #include <string>
 #include "../libCZI.h"
-#include <Windows.h>
+#include <windows.h>
 
 /// Implementation of the IStream-interface for files based on the Win32-API.
 /// It leverages the Win32-API ReadFile passing in an offset, thus allowing for concurrent
