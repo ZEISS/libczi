@@ -353,7 +353,10 @@ IF(UNIX)
   set_property(TARGET libCZIStatic PROPERTY POSITION_INDEPENDENT_CODE ON)
 ENDIF(UNIX)
 if(LIBCZI_HAVE_WIN32_API)
-    target_link_libraries(libCZIStatic PUBLIC ole32 Windowscodecs)
+    target_link_libraries(libCZIStatic PUBLIC ole32)
+endif()
+if(LIBCZI_HAVE_WINCODECS_API)
+    target_link_libraries(libCZIStatic PUBLIC Windowscodecs)
 endif()
 
 #
