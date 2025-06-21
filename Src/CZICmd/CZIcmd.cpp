@@ -9,7 +9,7 @@
 #include "inc_libCZI.h"
 #include <clocale>
 #if CZICMD_WINDOWSAPI_AVAILABLE
-#include <Windows.h>
+#include <windows.h>
 #endif
 
 class CLibCZISite : public libCZI::ISite
