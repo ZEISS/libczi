@@ -33,7 +33,8 @@ public:
     SubblockMetadata& operator=(SubblockMetadata&&) = delete;
     virtual ~SubblockMetadata() = default;
 
-public: // interface IXmlNodeRead
+public:
+    // interface IXmlNodeRead
     bool TryGetAttribute(const wchar_t* attributeName, std::wstring* attribValue) const override;
     void EnumAttributes(const std::function<bool(const std::wstring& attribName, const std::wstring& attribValue)>& enumFunc) const override;
     bool TryGetValue(std::wstring* value) const override;
@@ -41,8 +42,14 @@ public: // interface IXmlNodeRead
     std::wstring Name() const override;
     void EnumChildren(const std::function<bool(std::shared_ptr<libCZI::IXmlNodeRead>)>& enumChildren) override;
 
+    // interface ISubBlockMetadataMetadataView
+    bool TryGetAttachmentDataFormat(std::wstring* data_format) override;
+    bool TryGetTagAsDouble(std::wstring tag_name, double* value) override;
+    bool TryGetTagAsString(std::wstring tag_name, std::wstring* value) override;
+    bool TryGetStagePositionFromTags(std::tuple<double, double>* stage_position) override;
+
     bool IsXmlValid() const override;
-    std::string GetXml() override;
+    std::string GetXml() const override;
 
 private:
     void ThrowIfXmlInvalid() const;

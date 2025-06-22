@@ -66,7 +66,7 @@ bool SubblockMetadata::IsXmlValid() const
 }
 
 
-std::string SubblockMetadata::GetXml()
+std::string SubblockMetadata::GetXml() const
 {
     static pugi::char_t Indent[] = PUGIXML_TEXT(" ");
 
@@ -77,4 +77,95 @@ std::string SubblockMetadata::GetXml()
     this->doc.save(writer, Indent, format_default, encoding_utf8);
     stream.flush();
     return stream.str();
+}
+
+bool SubblockMetadata::TryGetAttachmentDataFormat(std::wstring* data_format) 
+{
+    this->ThrowIfXmlInvalid();
+    const auto node = this->GetChildNodeReadonly("METADATA/AttachmentSchema/DataFormat");
+    if (node == nullptr)
+    {
+        return false;
+    }
+
+    return node->TryGetValue(data_format);
+}
+
+bool SubblockMetadata::TryGetTagAsDouble(std::wstring tag_name, double* value) 
+{
+    this->ThrowIfXmlInvalid();
+    const auto node = this->GetChildNodeReadonly("METADATA/Tags");
+    if (node == nullptr)
+    {
+        return false;
+    }
+
+    const auto requested_node = node->GetChildNodeReadonly(Utils::ConvertToUtf8(tag_name).c_str());
+    if (requested_node == nullptr)
+    {
+        return false;
+    }
+
+
+    return requested_node->TryGetValueAsDouble(value);
+}
+
+bool SubblockMetadata::TryGetTagAsString(std::wstring tag_name, std::wstring* value) 
+{
+    this->ThrowIfXmlInvalid();
+    const auto node = this->GetChildNodeReadonly("METADATA/Tags");
+    if (node == nullptr)
+    {
+        return false;
+    }
+
+    const auto requested_node = node->GetChildNodeReadonly(Utils::ConvertToUtf8(tag_name).c_str());
+    if (requested_node == nullptr)
+    {
+        return false;
+    }
+
+
+    return requested_node->TryGetValue(value);
+}
+
+bool SubblockMetadata::TryGetStagePositionFromTags(std::tuple<double, double>* stage_position) 
+{
+    this->ThrowIfXmlInvalid();
+    const auto node = this->GetChildNodeReadonly("METADATA/Tags");
+    if (node == nullptr)
+    {
+        return false;
+    }
+
+    const auto stage_x_position_node = node->GetChildNodeReadonly("StageXPosition");
+    if (stage_x_position_node == nullptr)
+    {
+        return false;
+    }
+
+    const auto stage_y_position_node = node->GetChildNodeReadonly("StageYPosition");
+    if (stage_y_position_node == nullptr)
+    {
+        return false;
+    }
+
+    double stage_x_position;
+    if (!stage_x_position_node->TryGetValueAsDouble(&stage_x_position))
+    {
+        return false;
+    }
+
+    double stage_y_position;
+    if (!stage_y_position_node->TryGetValueAsDouble(&stage_y_position))
+    {
+        return false;
+    }
+
+    if (stage_position != nullptr)
+    {
+        *stage_position = make_tuple(stage_x_position, stage_y_position);
+    }
+
+    return true;
 }
