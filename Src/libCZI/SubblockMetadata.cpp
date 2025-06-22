@@ -65,7 +65,6 @@ bool SubblockMetadata::IsXmlValid() const
     return this->parseResult;
 }
 
-
 std::string SubblockMetadata::GetXml() const
 {
     static pugi::char_t Indent[] = PUGIXML_TEXT(" ");
@@ -124,7 +123,6 @@ bool SubblockMetadata::TryGetTagAsString(std::wstring tag_name, std::wstring* va
     {
         return false;
     }
-
 
     return requested_node->TryGetValue(value);
 }

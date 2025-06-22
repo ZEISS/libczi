@@ -24,19 +24,16 @@ namespace libCZI
         // Delete move constructor and move assignment operator
         ISubBlockMetadataMetadataView(ISubBlockMetadataMetadataView&&) = delete;
         ISubBlockMetadataMetadataView& operator=(ISubBlockMetadataMetadataView&&) = delete;
-
     };
 
     class ISubBlockMetadata : public IXmlNodeRead, ISubBlockMetadataMetadataView
     {
     public:
         ISubBlockMetadata() = default;
-        virtual ~ISubBlockMetadata() override = default;
+        ~ISubBlockMetadata() override = default;
 
         virtual bool IsXmlValid() const = 0;
         virtual std::string GetXml() const = 0;
-
-
 
         // Delete copy constructor and copy assignment operator
         ISubBlockMetadata(const ISubBlockMetadata&) = delete;
