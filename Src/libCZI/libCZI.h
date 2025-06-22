@@ -356,7 +356,7 @@ namespace libCZI
         /// \param type             The type.
         /// \param [out] ptrSize    If non-null, size of the data buffer is stored here.
         /// \return The raw data.
-        virtual std::shared_ptr<const void> GetRawData(MemBlkType type, size_t* ptrSize) = 0;
+        virtual std::shared_ptr<const void> GetRawData(MemBlkType type, size_t* ptrSize) const = 0;
 
         /// Creates a bitmap (from the data of this sub-block).
         /// \remark

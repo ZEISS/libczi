@@ -41,7 +41,8 @@ public: // interface IXmlNodeRead
     std::wstring Name() const override;
     void EnumChildren(const std::function<bool(std::shared_ptr<libCZI::IXmlNodeRead>)>& enumChildren) override;
 
-    bool IsXmlValid() const /*override*/;
+    bool IsXmlValid() const override;
+    std::string GetXml() override;
 
 private:
     void ThrowIfXmlInvalid() const;

@@ -10,6 +10,9 @@ namespace libCZI
         ISubBlockMetadata() = default;
         virtual ~ISubBlockMetadata() = default;
 
+        virtual bool IsXmlValid() const = 0;
+        virtual std::string GetXml() = 0;
+
         // Delete copy constructor and copy assignment operator
         ISubBlockMetadata(const ISubBlockMetadata&) = delete;
         ISubBlockMetadata& operator=(const ISubBlockMetadata&) = delete;

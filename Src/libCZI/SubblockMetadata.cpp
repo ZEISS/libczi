@@ -1,16 +1,16 @@
 #include "SubblockMetadata.h"
 #include <sstream>
 
-using namespace std;
+using namespace pugi;
 using namespace libCZI;
+using namespace std;
 
 SubblockMetadata::SubblockMetadata(const char* xml, size_t xml_size)
 {
     this->parseResult = this->doc.load_buffer(xml, xml_size, pugi::parse_default, pugi::encoding_utf8);
     if (this->parseResult)
     {
-        this->wrapper = std::unique_ptr<XmlNodeWrapperReadonly<SubblockMetadata, XmlNodeWrapperThrowExcp>>(
-            new XmlNodeWrapperReadonly<SubblockMetadata, XmlNodeWrapperThrowExcp>(this->doc.internal_object()));
+        this->wrapper = std::make_unique<XmlNodeWrapperReadonly<SubblockMetadata, XmlNodeWrapperThrowExcp>>(this->doc.internal_object());
     }
 }
 
@@ -60,7 +60,21 @@ void SubblockMetadata::ThrowIfXmlInvalid() const
     }
 }
 
-/*virtual*/bool SubblockMetadata::IsXmlValid() const
+bool SubblockMetadata::IsXmlValid() const
 {
     return this->parseResult;
+}
+
+
+std::string SubblockMetadata::GetXml()
+{
+    static pugi::char_t Indent[] = PUGIXML_TEXT(" ");
+
+    this->ThrowIfXmlInvalid();
+
+    std::ostringstream stream;
+    xml_writer_stream writer(stream);
+    this->doc.save(writer, Indent, format_default, encoding_utf8);
+    stream.flush();
+    return stream.str();
 }

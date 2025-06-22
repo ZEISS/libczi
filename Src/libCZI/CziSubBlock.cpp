@@ -45,7 +45,7 @@ CCziSubBlock::CCziSubBlock(const libCZI::SubBlockInfo& info, const CCZIParse::Su
     }
 }
 
-/*virtual*/std::shared_ptr<const void> CCziSubBlock::GetRawData(MemBlkType type, size_t* ptrSize)
+/*virtual*/std::shared_ptr<const void> CCziSubBlock::GetRawData(MemBlkType type, size_t* ptrSize) const
 {
     switch (type)
     {

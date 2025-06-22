@@ -12,6 +12,7 @@
 #include "CziWriter.h"
 #include "CziReaderWriter.h"
 #include "CziMetadataBuilder.h"
+#include "SubBlockMetadata.h"
 #include "inc_libCZI_Config.h"
 
 using namespace libCZI;
@@ -143,4 +144,17 @@ std::shared_ptr<ICziMetadataBuilder> libCZI::CreateMetadataBuilder()
 std::shared_ptr<ICziMetadataBuilder> libCZI::CreateMetadataBuilderFromXml(const std::string& xml)
 {
     return make_shared<CCZiMetadataBuilder>(L"ImageDocument", xml);
+}
+
+std::shared_ptr<ISubBlockMetadata> libCZI::CreateSubBlockMetadataFromSubBlock(const libCZI::ISubBlock* sub_block)
+{
+    if (sub_block == nullptr)
+    {
+        throw std::invalid_argument("sub_block must not be null");
+    }
+
+    size_t size_metadata;
+    auto raw_data = sub_block->GetRawData(libCZI::ISubBlock::MemBlkType::Metadata, &size_metadata);
+    auto sub_block_metadata = make_shared<SubblockMetadata>((const char*)raw_data.get(), size_metadata);
+    return sub_block_metadata;
 }
