@@ -5,6 +5,7 @@
 include(FetchContent)
 include(CheckIncludeFiles)
 include(CheckSymbolExists)
+include(CMakePackageConfigHelpers)
 
 set(LIBCZISRCFILES 
             BitmapOperations.cpp
@@ -246,10 +247,6 @@ if (LIBCZI_BUILD_PREFER_EXTERNALPACKAGE_ZSTD)
   else()
     message(FATAL_ERROR "No suitable zstd target found")
   endif()
-get_property(_allTargets
-             DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
-             PROPERTY   BUILDSYSTEM_TARGETS)
-message(STATUS "Known targets: ${_allTargets}")
 else()
   FetchContent_Declare(
     zstd
@@ -365,6 +362,51 @@ if(LIBCZI_HAVE_WIN32_API)
 endif()
 
 #
+set(INSTALL_CMAKEDIR "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}")
+
+# Shared lib install
+if(LIBCZI_BUILD_DYNLIB)
+  install(TARGETS libCZI
+          EXPORT libCZITargets
+          ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+          LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+          RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+          PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME})
+endif()
+
+# Static lib install
+install(TARGETS libCZIStatic
+        EXPORT libCZITargets
+        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+        PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME})
+
+# Export target definitions
+install(EXPORT libCZITargets
+        NAMESPACE libczi::
+        DESTINATION ${INSTALL_CMAKEDIR})
+
+# Generate and install libcziConfig.cmake and version file
+write_basic_package_version_file(
+    "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake"
+    VERSION ${PROJECT_VERSION}
+    COMPATIBILITY SameMajorVersion
+)
+
+configure_package_config_file(
+    "${CMAKE_CURRENT_SOURCE_DIR}/cmake/${PROJECT_NAME}Config.cmake.in"
+    "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake"
+    INSTALL_DESTINATION ${INSTALL_CMAKEDIR}
+)
+
+install(FILES
+    "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake"
+    "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake"
+    DESTINATION ${INSTALL_CMAKEDIR}
+)
+
+#[[
 # Notes: - the variables CMAKE_INSTALL_<...> have been defined in the module "GNUInstallDirs"
 #install(FILES ${libCZIPublicHeaders} DESTINATION  ${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME})
 if (LIBCZI_BUILD_DYNLIB)
@@ -393,7 +435,7 @@ install(EXPORT libCZIStatic
     NAMESPACE libczi::
     DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/libczi)
 
-include(CMakePackageConfigHelpers)
+
 
 configure_package_config_file(
   ${PROJECT_SOURCE_DIR}/support/cmake/libcziConfig.cmake.in
@@ -404,3 +446,4 @@ configure_package_config_file(
 install(FILES
   ${CMAKE_CURRENT_BINARY_DIR}/libcziConfig.cmake
   DESTINATION ${CMAKE_INSTALL_LIBDIR})
+#]]
