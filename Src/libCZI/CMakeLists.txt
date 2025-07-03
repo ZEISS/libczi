@@ -364,9 +364,24 @@ endif()
 #
 set(INSTALL_CMAKEDIR "${CMAKE_INSTALL_DATADIR}/${PROJECT_NAME}") # -> share/libczi
 
+#---- decide whether to install headers this pass ----------------
+set(_install_headers TRUE)
+
+if(LIBCZI_DO_INSTALL_HEADER_FILES_IN_DEBUG_BUILD)
+    # Option is ON =>install only if current config is *not* Debug
+    # -- Multi-config generators (Visual Studio, Ninja Multi-Config) --
+    if(DEFINED CMAKE_INSTALL_CONFIG_NAME AND CMAKE_INSTALL_CONFIG_NAME STREQUAL "Debug")
+        set(_install_headers FALSE)
+    endif()
+    # -- Single-config generators (Ninja, Makefiles) -------------------
+    if(NOT DEFINED CMAKE_INSTALL_CONFIG_NAME AND CMAKE_BUILD_TYPE STREQUAL "Debug")
+        set(_install_headers FALSE)
+    endif()
+endif()
+
 # Shared lib install
 if(LIBCZI_BUILD_DYNLIB)
-  if(NOT CMAKE_INSTALL_CONFIG_NAME STREQUAL "Debug" OR LIBCZI_DO_INSTALL_HEADER_FILES_IN_DEBUG_BUILD)
+  if(_install_headers)
     install(TARGETS libCZI
             EXPORT libCZITargets
             ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
@@ -377,7 +392,7 @@ if(LIBCZI_BUILD_DYNLIB)
 endif()
 
 # Static lib install
-if(NOT CMAKE_INSTALL_CONFIG_NAME STREQUAL "Debug" OR LIBCZI_DO_INSTALL_HEADER_FILES_IN_DEBUG_BUILD)
+if(_install_headers)
     install(TARGETS libCZIStatic
             EXPORT libCZITargets
             ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}

@@ -14,7 +14,7 @@ include(GNUInstallDirs)
 # choose the appropriate MSVC-runtime
 option(LIBCZI_DO_NOT_SET_MSVC_RUNTIME_LIBRARY "In case of building with VisualStudio, do NOT configure to link the static C-runtime" OFF)
 
-option(LIBCZI_DO_INSTALL_HEADER_FILES_IN_DEBUG_BUILD "Install headers during Debug install" OFF)
+option(LIBCZI_DO_INSTALL_HEADER_FILES_IN_DEBUG_BUILD "If ON, header files are *not* installed when CMAKE_INSTALL_CONFIG_NAME == Debug" OFF) # Default: always install headers
 
 # By default, the binaries built here will link to the static MSVC-runtime.
 # However, if the option LIBCZI_DO_NOT_SET_MSVC_RUNTIME_LIBRARY is given, we will not instruct CMake to choose
