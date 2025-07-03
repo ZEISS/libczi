@@ -239,6 +239,8 @@ endif()
 
 if (LIBCZI_BUILD_PREFER_EXTERNALPACKAGE_ZSTD)
   find_package(zstd CONFIG REQUIRED)
+  get_target_property(dummy zstd::zstd INTERFACE_INCLUDE_DIRECTORIES)
+  message(STATUS "Found zstd::zstd with includes: ${dummy}")
 else()
   FetchContent_Declare(
     zstd
