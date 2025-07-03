@@ -239,8 +239,10 @@ endif()
 
 if (LIBCZI_BUILD_PREFER_EXTERNALPACKAGE_ZSTD)
   find_package(zstd CONFIG REQUIRED)
-  get_target_property(dummy zstd::zstd INTERFACE_INCLUDE_DIRECTORIES)
-  message(STATUS "Found zstd::zstd with includes: ${dummy}")
+get_property(_allTargets
+             DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
+             PROPERTY   BUILDSYSTEM_TARGETS)
+message(STATUS "Known targets: ${_allTargets}")
 else()
   FetchContent_Declare(
     zstd
