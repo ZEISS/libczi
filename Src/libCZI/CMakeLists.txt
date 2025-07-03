@@ -379,6 +379,13 @@ if(LIBCZI_DO_INSTALL_HEADER_FILES_IN_DEBUG_BUILD)
     endif()
 endif()
 
+set(_public_header_args "")
+if(_install_headers)
+    list(APPEND _public_header_args
+         PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME}
+         INCLUDES      DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME})
+endif()
+
 # Shared lib install
 if(LIBCZI_BUILD_DYNLIB)
   if(_install_headers)
@@ -387,7 +394,7 @@ if(LIBCZI_BUILD_DYNLIB)
             ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
             LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
             RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-            PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME})
+            ${_public_header_args})
   endif()
 endif()
 
@@ -398,7 +405,7 @@ if(_install_headers)
             ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
             LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
             RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-            PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME})
+            ${_public_header_args})
 endif()
 
 # Export target definitions
