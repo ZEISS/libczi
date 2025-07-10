@@ -358,7 +358,7 @@ endif()
 #install(FILES ${libCZIPublicHeaders} DESTINATION  ${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME})
 if (LIBCZI_BUILD_DYNLIB)
   install(TARGETS libCZI
-		 EXPORT "libCZI"
+  #		 EXPORT "libCZI"
      ARCHIVE  DESTINATION ${CMAKE_INSTALL_LIBDIR}
      LIBRARY  DESTINATION ${CMAKE_INSTALL_LIBDIR}
      RUNTIME  DESTINATION ${CMAKE_INSTALL_BINDIR}
@@ -366,30 +366,8 @@ if (LIBCZI_BUILD_DYNLIB)
 endif(LIBCZI_BUILD_DYNLIB)
 
 install(TARGETS libCZIStatic
-		 EXPORT "libCZIStatic"
+#		 EXPORT "libCZIStatic"
      ARCHIVE  DESTINATION ${CMAKE_INSTALL_LIBDIR}
      LIBRARY  DESTINATION ${CMAKE_INSTALL_LIBDIR}
      RUNTIME  DESTINATION ${CMAKE_INSTALL_BINDIR}
      PUBLIC_HEADER DESTINATION  ${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME})
-
-install(EXPORT libCZI
-    FILE libczi-shared-targets.cmake
-    NAMESPACE libczi::
-    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/libczi)
-
-install(EXPORT libCZIStatic
-    FILE libczi-static-targets.cmake
-    NAMESPACE libczi::
-    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/libczi)
-
-include(CMakePackageConfigHelpers)
-
-configure_package_config_file(
-  ${PROJECT_SOURCE_DIR}/support/cmake/libcziConfig.cmake.in
-  ${CMAKE_CURRENT_BINARY_DIR}/libcziConfig.cmake
-  INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}
-)
-
-install(FILES
-  ${CMAKE_CURRENT_BINARY_DIR}/libcziConfig.cmake
-  DESTINATION ${CMAKE_INSTALL_LIBDIR})
