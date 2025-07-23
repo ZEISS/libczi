@@ -92,7 +92,10 @@ The CMake-file defines the following options for customizing the build:
 |                                  | (and be available in the stream  |
 |                                  | factory). Default is **OFF**.    |
 +----------------------------------+----------------------------------+
-
+| LIBCZI\_BUILD\_                  | Prefer a RapidJSON-package       |
+| PREFER\_EXTERNALPACKAGE\_        | present on the system.  Default  |
+| RAPIDJSON                        | is **ON**                        |
++----------------------------------+----------------------------------+
 
 If building CZICmd is desired, then running CMake with this command line will enable building CZICmd:
 
