@@ -47,27 +47,27 @@ The CMake-file defines the following options for customizing the build:
 +----------------------------------+----------------------------------+
 | option                           | description                      |
 +==================================+==================================+
-| LIBCZI\_BUILDUNITTESTS           | Whether to build the unit-tests  |
+| LIBCZI\_BUILD\_UNITTESTS         | Whether to build the unit-tests  |
 |                                  | for libCZI. Default is **ON**.   |
 +----------------------------------+----------------------------------+
-| LIBCZI\_BUILDCZICMD              | Whether to build the test- and   |
+| LIBCZI\_BUILD\_CZICMD            | Whether to build the test- and   |
 |                                  | sample-application CZICmd.       |
 |                                  | Default is **OFF**.              |
 +----------------------------------+----------------------------------+
-| LIBCZI\_BUILDDYNLIB              | Whether to build the dynamic     |
+| LIBCZI\_BUILD\_DYNLIB            | Whether to build the dynamic     |
 |                                  | link libaray for libczi. Default |
 |                                  | is **ON**.                       |
 +----------------------------------+----------------------------------+
-| LIBCZI\_BUILD                    | Whether to use an existing       |
-| PREFEREXTERNALPACKAGEEIGEN3      | Eigen3-library on the system     |
+| LIBCZI\_BUILD\_                  | Whether to use an existing       |
+| PREFER\_EXTERNALPACKAGE\_EIGEN3  | Eigen3-library on the system     |
 |                                  | (included via                    |
 |                                  | find_package). If this           |
 |                                  | is OFF, then a copy of Eigen3 is |
 |                                  | downloaded as part of the build. |
 |                                  | Default is **OFF**.              |
 +----------------------------------+----------------------------------+
-| LIBCZI\_                         | Whether to use an existing       |
-| BUILDPREFEREXTERNALPACKAGEZSTD   | zstd-library on the system       |
+| LIBCZI\_BUILD\_                  | Whether to use an existing       |
+| PREFER\_EXTERNALPACKAGE\_ZSTD    | zstd-library on the system       |
 |                                  | (included via                    |
 |                                  | find_package). If this           |
 |                                  | is OFF, then a copy of zstd is   |
@@ -75,23 +75,24 @@ The CMake-file defines the following options for customizing the build:
 |                                  | Default is **OFF**.              |
 +----------------------------------+----------------------------------+
 | LIBCZI\                          | Whether a curl-based stream      |
-| BUILDCURLBASEDSTREAM             | object should be built (and be   |
+| BUILD\_CURL\_BASED\_STREAM       | object should be built (and be   |
 |                                  | available in the stream          |
 |                                  | factory). Default is **OFF**.    |
 +----------------------------------+----------------------------------+
 | LIBCZI\_BUILD                    | Whether to use an existing       |
-| PREFEREXTERNALPACKAGELIBCURL     | libcurl-library on the system    |
-|                                  | (included via                    |
+| PREFER\_EXTERNAL\_PACKAGE\_      | libcurl-library on the system    |
+| LIBCURL                          | (included via                    |
 |                                  | find_package). If this           |
 |                                  | is OFF, then a copy of libcurl   |
 |                                  | is downloaded as part of the     |
 |                                  | build. Default is **OFF**.       |
 +----------------------------------+----------------------------------+
 | LIBCZI\_                         | Whether the Azure-SDK-based      |
-| BUILDAZURESDKBASEDSTREAM         | stream object should be built    |
+| BUILD\_AZURESDK\_BASED\_STREAM   | stream object should be built    |
 |                                  | (and be available in the stream  |
 |                                  | factory). Default is **OFF**.    |
 +----------------------------------+----------------------------------+
+
 
 If building CZICmd is desired, then running CMake with this command line will enable building CZICmd:
 
