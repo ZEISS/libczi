@@ -96,6 +96,11 @@ The CMake-file defines the following options for customizing the build:
 | PREFER\_EXTERNALPACKAGE\_        | present on the system.  Default  |
 | RAPIDJSON                        | is **ON**                        |
 +----------------------------------+----------------------------------+
+| LIBCZI\_BUILD\_LIBCZIAPI         | Build the **C** API bridge       |
+|                                  | which can be used as foreign     |
+|                                  | function interface between other |
+|                                  | languages.  Default is **OFF**   |
++----------------------------------+----------------------------------+
 
 If building CZICmd is desired, then running CMake with this command line will enable building CZICmd:
 
