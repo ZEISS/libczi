@@ -361,6 +361,22 @@ if(LIBCZI_HAVE_WIN32_API)
     target_link_libraries(libCZIStatic PUBLIC ole32 Windowscodecs)
 endif()
 
+# Shared library include directories
+if (LIBCZI_BUILD_DYNLIB)
+    target_include_directories(libCZI
+        PUBLIC
+            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+            $<INSTALL_INTERFACE:include/libCZI>
+    )
+endif()
+
+# Static library include directories
+target_include_directories(libCZIStatic
+    PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+        $<INSTALL_INTERFACE:include/libCZI>
+)
+
 if(LIBCZI_ENABLE_INSTALL)
 
     set(INSTALL_CMAKEDIR "${CMAKE_INSTALL_DATADIR}/${PROJECT_NAME}") # -> share/libczi
