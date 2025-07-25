@@ -361,51 +361,53 @@ if(LIBCZI_HAVE_WIN32_API)
     target_link_libraries(libCZIStatic PUBLIC ole32 Windowscodecs)
 endif()
 
-#
-set(INSTALL_CMAKEDIR "${CMAKE_INSTALL_DATADIR}/${PROJECT_NAME}") # -> share/libczi
+if(LIBCZI_ENABLE_INSTALL)
 
-# Shared lib install
-if(LIBCZI_BUILD_DYNLIB)
-    install(TARGETS libCZI
-            EXPORT libCZITargets
-            ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-            LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-            RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-            PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME}
-            CONFIGURATIONS Release RelWithDebInfo MinSizeRel)
+    set(INSTALL_CMAKEDIR "${CMAKE_INSTALL_DATADIR}/${PROJECT_NAME}") # -> share/libczi
+
+    # Shared lib install
+    if(LIBCZI_BUILD_DYNLIB)
+        install(TARGETS libCZI
+                EXPORT libCZITargets
+                ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+                LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+                RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+                PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME}
+                CONFIGURATIONS Release RelWithDebInfo MinSizeRel)
+
+    else()
+        # Static lib install
+        install(TARGETS libCZIStatic
+                EXPORT libCZITargets
+                ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+                LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+                RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+                PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME}
+                CONFIGURATIONS Release RelWithDebInfo MinSizeRel)
+    endif()
+
+    # Export target definitions
+    install(EXPORT libCZITargets
+            NAMESPACE libczi::
+            DESTINATION ${INSTALL_CMAKEDIR})
+
+    # Generate and install libcziConfig.cmake and version file
+    write_basic_package_version_file(
+        "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake"
+        VERSION ${PROJECT_VERSION}
+        COMPATIBILITY SameMajorVersion
+    )
+
+    configure_package_config_file(
+        "${CMAKE_CURRENT_SOURCE_DIR}/cmake/${PROJECT_NAME}Config.cmake.in"
+        "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake"
+        INSTALL_DESTINATION ${INSTALL_CMAKEDIR}
+    )
+
+    install(FILES
+        "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake"
+        "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake"
+        DESTINATION ${INSTALL_CMAKEDIR}
+    )
 
 endif()
-
-# Static lib install
-install(TARGETS libCZIStatic
-        EXPORT libCZITargets
-        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-        PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME}
-        CONFIGURATIONS Release RelWithDebInfo MinSizeRel)
-
-
-# Export target definitions
-install(EXPORT libCZITargets
-        NAMESPACE libczi::
-        DESTINATION ${INSTALL_CMAKEDIR})
-
-# Generate and install libcziConfig.cmake and version file
-write_basic_package_version_file(
-    "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake"
-    VERSION ${PROJECT_VERSION}
-    COMPATIBILITY SameMajorVersion
-)
-
-configure_package_config_file(
-    "${CMAKE_CURRENT_SOURCE_DIR}/cmake/${PROJECT_NAME}Config.cmake.in"
-    "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake"
-    INSTALL_DESTINATION ${INSTALL_CMAKEDIR}
-)
-
-install(FILES
-    "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake"
-    "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake"
-    DESTINATION ${INSTALL_CMAKEDIR}
-)

@@ -111,6 +111,9 @@ option(LIBCZI_BUILD_CZICMD "Build application 'CZICmd'." OFF)
 # Whether to build dynamic libCZI-library.
 option(LIBCZI_BUILD_DYNLIB "Build dynamic library for 'libCZI'." ON)
 
+# Whether the libCZI-library should be installed to the system.
+option(LIBCZI_ENABLE_INSTALL "Enable installation of libCZI" OFF)
+
 # Whether to build the libCZIApi-project (C-API-layer for libCZI).
 option(LIBCZI_BUILD_LIBCZIAPI "Build the libCZIApi-project (C-bindings for libCZI)." OFF)
 
@@ -127,6 +130,12 @@ option(LIBCZI_BUILD_PREFER_EXTERNALPACKAGE_ZSTD "Prefer a ZSTD-package present o
 # When this option is ON, we try to use an existing RapidJSON-library. Otherwise, we download a private
 #  copy of RapidJSON during the CMake-run. This option is only relevant if building CZICmd.
 option(LIBCZI_BUILD_PREFER_EXTERNALPACKAGE_RAPIDJSON "Prefer an RapidJSON-package present on the system" ON)
+
+
+# Let the standard option BUILD_SHARED_LIBS override the internal option
+if(DEFINED BUILD_SHARED_LIBS)
+  set(LIBCZI_BUILD_DYNLIB ${BUILD_SHARED_LIBS} CACHE BOOL "Build dynamic library for 'libCZI'." FORCE)
+endif()
 
 if (LIBCZI_BUILD_UNITTESTS)
  include (CTest)
