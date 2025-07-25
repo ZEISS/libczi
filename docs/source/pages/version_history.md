@@ -41,4 +41,4 @@ Version history
  0.65.0             | [134](https://github.com/ZEISS/libczi/pull/134)      | introduce "libCZIAPI", use Sphinx for documentation
  0.65.1             | [136](https://github.com/ZEISS/libczi/pull/136)      | improve error handling in libCZIAPI (for "external streams")
  0.66.0             | [138](https://github.com/ZEISS/libczi/pull/138)      | add TryGetSubBlockInfoForIndex in libCZIAPI
- 0.66.1             | [142](https://github.com/ZEISS/libczi/pull/142)	   | update on cmake build system for vcpkg support
+ 0.66.1 | [142](https://github.com/ZEISS/libczi/pull/142)	   | update on cmake build system for vcpkg support
