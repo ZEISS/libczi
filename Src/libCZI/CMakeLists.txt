@@ -157,34 +157,48 @@ endif()
 
 string(CONCAT libCZI_CompilerIdentification ${CMAKE_CXX_COMPILER_ID} " " ${CMAKE_CXX_COMPILER_VERSION} )
 
-# get the URL of the upstream repository
-execute_process(
-  COMMAND git remote get-url origin
-  WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-  OUTPUT_VARIABLE libCZI_REPOSITORYREMOTEURL
-  OUTPUT_STRIP_TRAILING_WHITESPACE
-)
-if (NOT DEFINED libCZI_REPOSITORYREMOTEURL OR "${libCZI_REPOSITORYREMOTEURL}" STREQUAL "")
+# get the URL and the hash of the source code we are building
+# the strategy is:
+# 1. allow for the information to be externally provided (via the variable LIBCZI_REPOSITORY_REMOTE, LIBCZI_REPOSITORY_BRANCH, LIBCZI_REPOSITORY_HASH)
+# 2. if not provided, try to get the information by trying to run git commands
+# 3. if that fails, set the information to "unknown"
+# Use values from cache if set by portfile or other means
+set(libCZI_REPOSITORYREMOTEURL "${LIBCZI_REPOSITORY_REMOTE}" CACHE STRING "")
+set(libCZI_REPOSITORYBRANCH "${LIBCZI_REPOSITORY_BRANCH}" CACHE STRING "")
+set(libCZI_REPOSITORYHASH "${LIBCZI_REPOSITORY_HASH}" CACHE STRING "")
+# Fallback to git commands if not already set
+if (NOT libCZI_REPOSITORYREMOTEURL)
+  execute_process(
+    COMMAND git remote get-url origin
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+    OUTPUT_VARIABLE libCZI_REPOSITORYREMOTEURL
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+  )
+endif()
+if (NOT libCZI_REPOSITORYBRANCH)
+  execute_process(
+    COMMAND git name-rev --name-only HEAD
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+    OUTPUT_VARIABLE libCZI_REPOSITORYBRANCH
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+  )
+endif()
+if (NOT libCZI_REPOSITORYHASH)
+  execute_process(
+    COMMAND git log -1 --format=%H
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+    OUTPUT_VARIABLE libCZI_REPOSITORYHASH
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+  )
+endif()
+# Final fallback
+if (NOT libCZI_REPOSITORYREMOTEURL)
   set(libCZI_REPOSITORYREMOTEURL "unknown")
 endif()
-
-execute_process(
-  COMMAND git name-rev --name-only HEAD
-  WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-  OUTPUT_VARIABLE libCZI_REPOSITORYBRANCH
-  OUTPUT_STRIP_TRAILING_WHITESPACE
-)
-if (NOT DEFINED libCZI_REPOSITORYBRANCH OR "${libCZI_REPOSITORYBRANCH}" STREQUAL "")
+if (NOT libCZI_REPOSITORYBRANCH)
   set(libCZI_REPOSITORYBRANCH "unknown")
 endif()
-
-execute_process(
-  COMMAND  git log -1 --format=%H
-  WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-  OUTPUT_VARIABLE libCZI_REPOSITORYHASH
-  OUTPUT_STRIP_TRAILING_WHITESPACE
-)
-if (NOT DEFINED libCZI_REPOSITORYHASH OR "${libCZI_REPOSITORYHASH}" STREQUAL "")
+if (NOT libCZI_REPOSITORYHASH)
   set(libCZI_REPOSITORYHASH "unknown")
 endif()
 
