@@ -4,10 +4,38 @@
 
 @PACKAGE_INIT@
 
+# This module is automatically installed by CMake and vcpkg when the libCZI package is installed.
+# It is included via `find_package(libCZI CONFIG REQUIRED)` in downstream projects.
+#
+# Purpose:
+#   - Provide a consistent and user-friendly interface to downstream users
+#   - Ensure dependencies are found
+#   - Map internal target names (e.g., libCZIStatic or libCZIShared) to a canonical alias: libczi::libCZI
+
 include(CMakeFindDependencyMacro)
 
-# Pull in all dependencies that libCZI expects
+# Find all required dependencies that libCZI expects clients to link against.
+# These must also be declared in vcpkg.json dependencies to work properly across all platforms.
 find_dependency(zstd CONFIG REQUIRED)
 find_dependency(Eigen3 CONFIG REQUIRED)
 
+# Import the actual targets provided by the build (static or shared)
 include("${CMAKE_CURRENT_LIST_DIR}/libCZITargets.cmake")
+
+# -----------------------------------------------------------------------------
+# Canonical alias target: libczi::libCZI
+#
+# Goal:
+#   Downstream users can always link to libczi::libCZI, regardless of static/shared.
+#   Internally, we map that to either libczi::libCZIStatic or libczi::libCZI.
+#
+# Convention:
+#   - Static build target:   libczi::libCZIStatic
+#   - Shared build target:   libczi::libCZI
+#
+# This alias allows transparent switching depending on build mode.
+# -----------------------------------------------------------------------------
+
+if(TARGET libczi::libCZIStatic AND NOT TARGET libczi::libCZI)
+    add_library(libczi::libCZI ALIAS libczi::libCZIStatic)
+endif()
