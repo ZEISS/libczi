@@ -1,0 +1,7 @@
+# SPDX-FileCopyrightText: 2025 Carl Zeiss Microscopy GmbH
+#
+# SPDX-License-Identifier: MIT
+
+@PACKAGE_INIT@
+
+include("${CMAKE_CURRENT_LIST_DIR}/libCZITargets.cmake")

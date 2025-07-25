@@ -5,6 +5,7 @@
 include(FetchContent)
 include(CheckIncludeFiles)
 include(CheckSymbolExists)
+include(CMakePackageConfigHelpers)
 
 set(LIBCZISRCFILES 
             BitmapOperations.cpp
@@ -239,6 +240,13 @@ endif()
 
 if (LIBCZI_BUILD_PREFER_EXTERNALPACKAGE_ZSTD)
   find_package(zstd CONFIG REQUIRED)
+  if (TARGET zstd::libzstd_static)               # static triplet
+    set(LIBCZI_ZSTD_LINK_TARGET "zstd::libzstd_static")
+  elseif (TARGET zstd::libzstd_shared)           # shared triplet
+    set(LIBCZI_ZSTD_LINK_TARGET "zstd::libzstd_shared")
+  else()
+    message(FATAL_ERROR "No suitable zstd target found")
+  endif()
 else()
   FetchContent_Declare(
     zstd
@@ -289,7 +297,7 @@ if (LIBCZI_BUILD_DYNLIB)
   set_target_properties(libCZI PROPERTIES DEBUG_POSTFIX "d")
   set_target_properties(libCZI PROPERTIES PUBLIC_HEADER "${libCZIPublicHeaders}")
   if (LIBCZI_BUILD_PREFER_EXTERNALPACKAGE_ZSTD)
-   target_link_libraries(libCZI PRIVATE zstd::libzstd_static)
+   target_link_libraries(libCZI PRIVATE ${LIBCZI_ZSTD_LINK_TARGET})
   else()
    target_link_libraries(libCZI PRIVATE libzstd_static)
    target_include_directories(libCZI PRIVATE ${zstd_SOURCE_DIR}/lib)
@@ -327,7 +335,7 @@ target_include_directories(libCZIStatic PRIVATE  ${EIGEN3_INCLUDE_DIR})
 set_target_properties(libCZIStatic PROPERTIES DEBUG_POSTFIX "d")
 set_target_properties(libCZIStatic PROPERTIES PUBLIC_HEADER "${libCZIPublicHeaders}")
 if (LIBCZI_BUILD_PREFER_EXTERNALPACKAGE_ZSTD)
-   target_link_libraries(libCZIStatic PRIVATE zstd::libzstd_static)
+   target_link_libraries(libCZIStatic PRIVATE ${LIBCZI_ZSTD_LINK_TARGET})
 else()
    target_link_libraries(libCZIStatic PRIVATE libzstd_static)
    target_include_directories(libCZIStatic PRIVATE ${zstd_SOURCE_DIR}/lib)
@@ -354,20 +362,50 @@ if(LIBCZI_HAVE_WIN32_API)
 endif()
 
 #
-# Notes: - the variables CMAKE_INSTALL_<...> have been defined in the module "GNUInstallDirs"
-#install(FILES ${libCZIPublicHeaders} DESTINATION  ${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME})
-if (LIBCZI_BUILD_DYNLIB)
-  install(TARGETS libCZI
-  #		 EXPORT "libCZI"
-     ARCHIVE  DESTINATION ${CMAKE_INSTALL_LIBDIR}
-     LIBRARY  DESTINATION ${CMAKE_INSTALL_LIBDIR}
-     RUNTIME  DESTINATION ${CMAKE_INSTALL_BINDIR}
-     PUBLIC_HEADER DESTINATION  ${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME})
-endif(LIBCZI_BUILD_DYNLIB)
+set(INSTALL_CMAKEDIR "${CMAKE_INSTALL_DATADIR}/${PROJECT_NAME}") # -> share/libczi
 
+# Shared lib install
+if(LIBCZI_BUILD_DYNLIB)
+    install(TARGETS libCZI
+            EXPORT libCZITargets
+            ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+            LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+            RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+            PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME}
+            CONFIGURATIONS Release RelWithDebInfo MinSizeRel)
+
+endif()
+
+# Static lib install
 install(TARGETS libCZIStatic
-#		 EXPORT "libCZIStatic"
-     ARCHIVE  DESTINATION ${CMAKE_INSTALL_LIBDIR}
-     LIBRARY  DESTINATION ${CMAKE_INSTALL_LIBDIR}
-     RUNTIME  DESTINATION ${CMAKE_INSTALL_BINDIR}
-     PUBLIC_HEADER DESTINATION  ${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME})
+        EXPORT libCZITargets
+        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+        PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME}
+        CONFIGURATIONS Release RelWithDebInfo MinSizeRel)
+
+
+# Export target definitions
+install(EXPORT libCZITargets
+        NAMESPACE libczi::
+        DESTINATION ${INSTALL_CMAKEDIR})
+
+# Generate and install libcziConfig.cmake and version file
+write_basic_package_version_file(
+    "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake"
+    VERSION ${PROJECT_VERSION}
+    COMPATIBILITY SameMajorVersion
+)
+
+configure_package_config_file(
+    "${CMAKE_CURRENT_SOURCE_DIR}/cmake/${PROJECT_NAME}Config.cmake.in"
+    "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake"
+    INSTALL_DESTINATION ${INSTALL_CMAKEDIR}
+)
+
+install(FILES
+    "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake"
+    "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake"
+    DESTINATION ${INSTALL_CMAKEDIR}
+)
