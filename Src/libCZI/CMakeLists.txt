@@ -372,6 +372,7 @@ ENDIF(UNIX)
 if(LIBCZI_HAVE_WIN32_API)
     target_link_libraries(libCZIStatic PUBLIC ole32 Windowscodecs)
 endif()
+target_compile_definitions(libCZIStatic PUBLIC _LIBCZISTATICLIB)    # make sure that users of the static library get the correct definition
 
 # Shared library include directories
 if (LIBCZI_BUILD_DYNLIB)
