@@ -295,7 +295,6 @@ if (LIBCZI_BUILD_DYNLIB)
   target_include_directories(libCZI PRIVATE  "${CMAKE_CURRENT_BINARY_DIR}")
   target_include_directories(libCZI PRIVATE  ${EIGEN3_INCLUDE_DIR})
   set_target_properties(libCZI PROPERTIES DEBUG_POSTFIX "d")
-  set_target_properties(libCZI PROPERTIES PUBLIC_HEADER "${libCZIPublicHeaders}")
   if (LIBCZI_BUILD_PREFER_EXTERNALPACKAGE_ZSTD)
    target_link_libraries(libCZI PRIVATE ${LIBCZI_ZSTD_LINK_TARGET})
   else()
@@ -333,7 +332,6 @@ set_target_properties(libCZIStatic PROPERTIES VERSION ${PROJECT_VERSION})
 target_include_directories(libCZIStatic PRIVATE  "${CMAKE_CURRENT_BINARY_DIR}")
 target_include_directories(libCZIStatic PRIVATE  ${EIGEN3_INCLUDE_DIR})
 set_target_properties(libCZIStatic PROPERTIES DEBUG_POSTFIX "d")
-set_target_properties(libCZIStatic PROPERTIES PUBLIC_HEADER "${libCZIPublicHeaders}")
 if (LIBCZI_BUILD_PREFER_EXTERNALPACKAGE_ZSTD)
    target_link_libraries(libCZIStatic PRIVATE ${LIBCZI_ZSTD_LINK_TARGET})
 else()
@@ -364,17 +362,17 @@ endif()
 # Shared library include directories
 if (LIBCZI_BUILD_DYNLIB)
     target_include_directories(libCZI
-        PUBLIC
-            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
-            $<INSTALL_INTERFACE:include/libCZI>
-    )
+      PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+        $<INSTALL_INTERFACE:include>
+  )
 endif()
 
 # Static library include directories
 target_include_directories(libCZIStatic
-    PUBLIC
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
-        $<INSTALL_INTERFACE:include/libCZI>
+  PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+    $<INSTALL_INTERFACE:include>
 )
 
 if(LIBCZI_ENABLE_INSTALL)
@@ -401,6 +399,11 @@ if(LIBCZI_ENABLE_INSTALL)
                 PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME}
                 CONFIGURATIONS Release RelWithDebInfo MinSizeRel)
     endif()
+
+    # Manual install of public headers to include/libCZI (simulate structure without moving files)
+    install(FILES ${libCZIPublicHeaders}
+        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/libCZI
+        )
 
     # Export target definitions
     install(EXPORT libCZITargets
