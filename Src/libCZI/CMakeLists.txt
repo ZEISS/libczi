@@ -332,6 +332,10 @@ if (LIBCZI_BUILD_DYNLIB)
   if(LIBCZI_HAVE_WIN32_API)
     target_link_libraries(libCZI PRIVATE ole32 Windowscodecs)
   endif()
+  target_include_directories(libCZI
+      PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+        $<INSTALL_INTERFACE:include>)
 endif(LIBCZI_BUILD_DYNLIB)
 
 #
@@ -374,21 +378,11 @@ if(LIBCZI_HAVE_WIN32_API)
 endif()
 target_compile_definitions(libCZIStatic PUBLIC _LIBCZISTATICLIB)    # make sure that users of the static library get the correct definition
 
-# Shared library include directories
-if (LIBCZI_BUILD_DYNLIB)
-    target_include_directories(libCZI
-      PUBLIC
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
-        $<INSTALL_INTERFACE:include>
-  )
-endif()
-
 # Static library include directories
 target_include_directories(libCZIStatic
   PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
-    $<INSTALL_INTERFACE:include>
-)
+    $<INSTALL_INTERFACE:include>)
 
 if(LIBCZI_ENABLE_INSTALL)
 
