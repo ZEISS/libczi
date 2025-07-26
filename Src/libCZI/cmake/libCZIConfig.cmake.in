@@ -30,3 +30,12 @@ include("${CMAKE_CURRENT_LIST_DIR}/libCZITargets.cmake")
 # -----------------------------------------------------------------------------
 
 # Map the actual built target to the canonical alias libczi::libCZI
+
+
+
+# Define canonical alias target
+if(TARGET libCZIStatic AND NOT TARGET libczi::libCZI)
+    add_library(libczi::libCZI ALIAS libCZIStatic)
+elseif(TARGET libCZI AND NOT TARGET libczi::libCZI)
+    add_library(libczi::libCZI ALIAS libCZI)
+endif()
