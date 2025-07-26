@@ -132,11 +132,6 @@ option(LIBCZI_BUILD_PREFER_EXTERNALPACKAGE_ZSTD "Prefer a ZSTD-package present o
 option(LIBCZI_BUILD_PREFER_EXTERNALPACKAGE_RAPIDJSON "Prefer an RapidJSON-package present on the system" ON)
 
 
-# Let the standard option BUILD_SHARED_LIBS override the internal option
-#if(DEFINED BUILD_SHARED_LIBS)
-#  set(LIBCZI_BUILD_DYNLIB ${BUILD_SHARED_LIBS} CACHE BOOL "Build dynamic library for 'libCZI'." FORCE)
-#endif()
-
 if (LIBCZI_BUILD_UNITTESTS)
  include (CTest)
  enable_testing()

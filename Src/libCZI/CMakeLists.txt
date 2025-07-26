@@ -414,13 +414,9 @@ if(LIBCZI_ENABLE_INSTALL)
 
     # Manual install of public headers to include/libCZI (simulate structure without moving files)
     install(FILES ${libCZIPublicHeaders}
-        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/libCZI
-        )
+        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/libCZI)
 
     # Export target definitions
-    #install(EXPORT libCZITargets
-    #        NAMESPACE libczi::
-    #        DESTINATION ${INSTALL_CMAKEDIR})
     if(TARGET libCZI)
         set(_libczi_target libCZI)
     elseif(TARGET libCZIStatic)
