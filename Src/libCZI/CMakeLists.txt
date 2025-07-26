@@ -434,7 +434,7 @@ if(LIBCZI_ENABLE_INSTALL)
     )
 
     configure_package_config_file(
-        "${CMAKE_CURRENT_SOURCE_DIR}/cmake/${PROJECT_NAME_LOWERCASE}Config.cmake.in"
+        "${CMAKE_CURRENT_SOURCE_DIR}/cmake/${PROJECT_NAME}Config.cmake.in"
         "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME_LOWERCASE}Config.cmake"
         INSTALL_DESTINATION ${INSTALL_CMAKEDIR}
     )

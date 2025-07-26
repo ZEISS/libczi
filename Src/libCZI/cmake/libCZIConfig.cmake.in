@@ -30,11 +30,11 @@ include("${CMAKE_CURRENT_LIST_DIR}/libCZITargets.cmake")
 # -----------------------------------------------------------------------------
 
 # Shared build (preferred when available)
-if (TARGET libczi::libCZI AND NOT TARGET libczi::libCZIStatic AND NOT TARGET libczi::libCZI)
-    add_library(libczi::libCZI ALIAS libczi::libCZI)
-endif()
+#if (TARGET libczi::libCZI AND NOT TARGET libczi::libCZIStatic AND NOT TARGET libczi::libCZI)
+#    add_library(libczi::libCZI ALIAS libczi::libCZI)
+#endif()
 
 # Static build
-if (TARGET libczi::libCZIStatic AND NOT TARGET libczi::libCZI)
-    add_library(libczi::libCZI ALIAS libczi::libCZIStatic)
-endif()
+#if (TARGET libczi::libCZIStatic AND NOT TARGET libczi::libCZI)
+#    add_library(libczi::libCZI ALIAS libczi::libCZIStatic)
+#endif()
