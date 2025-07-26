@@ -392,7 +392,8 @@ target_include_directories(libCZIStatic
 
 if(LIBCZI_ENABLE_INSTALL)
 
-    set(INSTALL_CMAKEDIR "${CMAKE_INSTALL_DATADIR}/${PROJECT_NAME}") # -> share/libczi
+    string(TOLOWER "${PROJECT_NAME}" PROJECT_NAME_LOWERCASE)
+    set(INSTALL_CMAKEDIR "${CMAKE_INSTALL_DATADIR}/${PROJECT_NAME_LOWERCASE}") # -> share/libczi
 
     # Shared lib install
     if(LIBCZI_BUILD_DYNLIB)
@@ -401,7 +402,7 @@ if(LIBCZI_ENABLE_INSTALL)
                 ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
                 LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
                 RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-                PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME}
+                PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME_LOWERCASE}
                 CONFIGURATIONS Release RelWithDebInfo MinSizeRel)
 
     else()
@@ -411,7 +412,7 @@ if(LIBCZI_ENABLE_INSTALL)
                 ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
                 LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
                 RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-                PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME}
+                PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME_LOWERCASE}
                 CONFIGURATIONS Release RelWithDebInfo MinSizeRel)
     endif()
 
@@ -427,20 +428,20 @@ if(LIBCZI_ENABLE_INSTALL)
 
     # Generate and install libcziConfig.cmake and version file
     write_basic_package_version_file(
-        "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake"
+        "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME_LOWERCASE}ConfigVersion.cmake"
         VERSION ${PROJECT_VERSION}
         COMPATIBILITY SameMajorVersion
     )
 
     configure_package_config_file(
-        "${CMAKE_CURRENT_SOURCE_DIR}/cmake/${PROJECT_NAME}Config.cmake.in"
-        "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake"
+        "${CMAKE_CURRENT_SOURCE_DIR}/cmake/${PROJECT_NAME_LOWERCASE}Config.cmake.in"
+        "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME_LOWERCASE}Config.cmake"
         INSTALL_DESTINATION ${INSTALL_CMAKEDIR}
     )
 
     install(FILES
-        "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake"
-        "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake"
+        "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME_LOWERCASE}Config.cmake"
+        "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME_LOWERCASE}ConfigVersion.cmake"
         DESTINATION ${INSTALL_CMAKEDIR}
     )
 
