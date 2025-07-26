@@ -416,9 +416,22 @@ if(LIBCZI_ENABLE_INSTALL)
         )
 
     # Export target definitions
-    install(EXPORT libCZITargets
-            NAMESPACE libczi::
-            DESTINATION ${INSTALL_CMAKEDIR})
+    #install(EXPORT libCZITargets
+    #        NAMESPACE libczi::
+    #        DESTINATION ${INSTALL_CMAKEDIR})
+    if(TARGET libCZI)
+        set(_libczi_target libCZI)
+    elseif(TARGET libCZIStatic)
+        set(_libczi_target libCZIStatic)
+    endif()
+    if(DEFINED _libczi_target)
+        install(EXPORT libCZITargets
+                NAMESPACE libczi::
+                DESTINATION ${INSTALL_CMAKEDIR}
+                FILE libCZITargets.cmake
+                EXPORT_LINK_INTERFACE_LIBRARIES)
+    endif()
+
 
     # Generate and install libcziConfig.cmake and version file
     write_basic_package_version_file(
