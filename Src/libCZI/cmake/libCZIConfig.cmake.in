@@ -30,10 +30,3 @@ include("${CMAKE_CURRENT_LIST_DIR}/libCZITargets.cmake")
 # -----------------------------------------------------------------------------
 
 # Map the actual built target to the canonical alias libczi::libCZI
-if(TARGET libczi::libCZIStatic AND NOT TARGET libczi::libCZI)
-    add_library(libczi::libCZI ALIAS libczi::libCZIStatic)
-elseif(TARGET libczi::libCZI AND NOT TARGET libczi::libCZIStatic)
-    # Dynamic version is already named correctly, nothing to do
-else()
-    message(WARNING "Could not determine which variant of libCZI was built.")
-endif()
