@@ -22,3 +22,8 @@ find_dependency(Eigen3 CONFIG REQUIRED)
 # Import the actual targets provided by the build (static or shared)
 include("${CMAKE_CURRENT_LIST_DIR}/libCZITargets.cmake")
 
+# Create a canonical alias used by downstream projects
+if(TARGET libczi::libCZIStatic AND NOT TARGET libCZI)
+    add_library(libCZI INTERFACE IMPORTED)
+    target_link_libraries(libCZI INTERFACE libczi::libCZIStatic)
+endif()
