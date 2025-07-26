@@ -300,7 +300,7 @@ set(libCZIPublicHeaders "ImportExport.h" "libCZI.h" "libCZI_Compositor.h" "libCZ
 #define the shared libCZI - library
 #
 if (LIBCZI_BUILD_DYNLIB)
-  message(ERROR "DYNLIB SHOULD NOT BE BUILT")
+  message(FATAL_ERROR "DYNLIB SHOULD NOT BE BUILT")
 
   add_library(libCZI SHARED ${LIBCZISRCFILES} $<TARGET_OBJECTS:JxrDecodeStatic>)
  
