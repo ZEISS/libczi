@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.15)
 cmake_policy(SET CMP0091 NEW) # enable new "MSVC runtime library selection" (https://cmake.org/cmake/help/latest/variable/CMAKE_MSVC_RUNTIME_LIBRARY.html)
 
 project(libCZI 
-      VERSION 0.66.1
+      VERSION 0.66.2
       HOMEPAGE_URL "https://github.com/ZEISS/libczi"
       DESCRIPTION "libCZI is an Open Source Cross-Platform C++ library to read and write CZI")
 
@@ -111,6 +111,9 @@ option(LIBCZI_BUILD_CZICMD "Build application 'CZICmd'." OFF)
 # Whether to build dynamic libCZI-library.
 option(LIBCZI_BUILD_DYNLIB "Build dynamic library for 'libCZI'." ON)
 
+# Whether the libCZI-library should be installed to the system.
+option(LIBCZI_ENABLE_INSTALL "Enable installation of libCZI" OFF)
+
 # Whether to build the libCZIApi-project (C-API-layer for libCZI).
 option(LIBCZI_BUILD_LIBCZIAPI "Build the libCZIApi-project (C-bindings for libCZI)." OFF)
 
@@ -127,6 +130,7 @@ option(LIBCZI_BUILD_PREFER_EXTERNALPACKAGE_ZSTD "Prefer a ZSTD-package present o
 # When this option is ON, we try to use an existing RapidJSON-library. Otherwise, we download a private
 #  copy of RapidJSON during the CMake-run. This option is only relevant if building CZICmd.
 option(LIBCZI_BUILD_PREFER_EXTERNALPACKAGE_RAPIDJSON "Prefer an RapidJSON-package present on the system" ON)
+
 
 if (LIBCZI_BUILD_UNITTESTS)
  include (CTest)
