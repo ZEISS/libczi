@@ -80,11 +80,17 @@ message("check for open -> ${HAVE_FCNTL_H_OPEN_TEXT} ; check for pread -> ${HAVE
 # The meaning of this switch is: whether Win32-API can be used (and this affects not only compilation but e.g. also linking to the Win32-API, as
 # it is not automatically linked to when using MinGW or Cygwin).
 # TODO(JBL): check whether cross-compiling to Windows works
-if (WIN32 OR CYGWIN OR MSYS OR MINGW OR CMAKE_SYSTEM_NAME STREQUAL "Windows")
-  set(LIBCZI_HAVE_WIN32_API ON)
-else()
-  set(LIBCZI_HAVE_WIN32_API OFF)
-endif()
+##if (WIN32 OR CYGWIN OR MSYS OR MINGW OR CMAKE_SYSTEM_NAME STREQUAL "Windows")
+##  set(LIBCZI_HAVE_WIN32_API ON)
+##else()
+##  set(LIBCZI_HAVE_WIN32_API OFF)
+##endif()
+
+include(detect_win32_api_mode)
+detect_win32_api_mode(
+    LIBCZI_HAVE_WIN32_API
+    LIBCZI_HAVE_WIN32UWP_API
+)
 
 # This option controls whether to build the curl-based http-/https-stream object. If this option is
 # "ON", the build will fail if the curl-library is not available (either as an external package or
