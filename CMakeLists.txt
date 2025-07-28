@@ -86,6 +86,16 @@ else()
   set(LIBCZI_HAVE_WIN32_API OFF)
 endif()
 
+# Determine whether we are cross-compiling to Windows. When cross-compiling, there is insufficient support
+# for the Windows Imaging Component (WIC), so we disable it.
+if (LIBCZI_HAVE_WIN32_API)
+  if (CYGWIN OR MSYS OR MINGW)
+    set(LIBCZI_HAVE_WINCODECS_API OFF)
+  else()
+    set(LIBCZI_HAVE_WINCODECS_API ON)
+  endif()
+endif()
+
 # This option controls whether to build the curl-based http-/https-stream object. If this option is
 # "ON", the build will fail if the curl-library is not available (either as an external package or
 # as a private copy downloaded during the CMake-run).

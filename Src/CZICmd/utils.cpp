@@ -9,7 +9,7 @@
 #include <regex>
 
 #if CZICMD_WINDOWSAPI_AVAILABLE
-#include <Windows.h>
+#include <windows.h>
 #endif
 
 #if defined(HAS_CODECVT)

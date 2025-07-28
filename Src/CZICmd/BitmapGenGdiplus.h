@@ -8,7 +8,7 @@
 #include "IBitmapGen.h"
 
 #if CZICMD_USE_GDIPLUS == 1
-#include <Windows.h>
+#include <windows.h>
 
 class CBitmapGenGdiplus :public IBitmapGen
 {
