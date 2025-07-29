@@ -80,7 +80,7 @@ static const struct
                 return std::make_shared<UwpFileInputStream>(file_name.c_str());
             }
         },
-#endif  // LIBCZI_WINDOWSAPI_AVAILABLE
+#endif  // LIBCZI_WINDOWS_UWPAPI_AVAILABLE
 #if LIBCZI_USE_PREADPWRITEBASED_STREAMIMPL
         {
             { "pread_file_inputstream", "stream implementation based on pread-API", nullptr, nullptr },
