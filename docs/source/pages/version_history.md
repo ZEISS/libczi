@@ -43,3 +43,4 @@ Version history
  0.66.0             | [138](https://github.com/ZEISS/libczi/pull/138)      | add TryGetSubBlockInfoForIndex in libCZIAPI
  0.66.1             | [142](https://github.com/ZEISS/libczi/pull/142)      | update on CMake build system for vcpkg support
  0.66.2             | [143](https://github.com/ZEISS/libczi/pull/143)      | additional updates on CMake build system towards vcpkg support
+ 0.66.3             | [144](https://github.com/ZEISS/libczi/pull/144)      | add (initial and experimental) support for building for UWP (Universal Windows Platform)
