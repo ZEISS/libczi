@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2025 Carl Zeiss Microscopy GmbH
+#
+# SPDX-License-Identifier: MIT
+
 ##
 # detect_win32_api_mode(<out_var_win32> <out_var_uwp>)
 #
