@@ -89,17 +89,17 @@ These notices must be retained in any copies of any part of this documentation
 and/or software.
 
 -------------------------------------------------------------------------------
-|  pugixml 1.10 (used under MIT License) http://pugixml.org/
+|  pugixml 1.13 (used under MIT License) http://pugixml.org/
 -------------------------------------------------------------------------------
 
 --- --- --- --- --- --- --- Copyright notice(s) --- --- --- --- --- --- --- ---
-Copyright (C) 2006-2019, by Arseny Kapoulkine (arseny.kapoulkine@gmail.com)
+Copyright (C) 2006-2022, by Arseny Kapoulkine (arseny.kapoulkine@gmail.com)
 Copyright (C) 2003, by Kristen Wegner (kristen@tima.net)
 
 --- --- --- --- --- --- --- License text(s) --- --- --- --- --- --- --- --- ---
 This library is distributed under the MIT License:
 
-Copyright (c) 2006-2019 Arseny Kapoulkine
+Copyright (c) 2006-2022 Arseny Kapoulkine
 
 Permission is hereby granted, free of charge, to any person
 obtaining a copy of this software and associated documentation
