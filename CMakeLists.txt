@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.15)
 cmake_policy(SET CMP0091 NEW) # enable new "MSVC runtime library selection" (https://cmake.org/cmake/help/latest/variable/CMAKE_MSVC_RUNTIME_LIBRARY.html)
 
 project(libCZI 
-      VERSION 0.66.2
+      VERSION 0.66.3
       HOMEPAGE_URL "https://github.com/ZEISS/libczi"
       DESCRIPTION "libCZI is an Open Source Cross-Platform C++ library to read and write CZI")
 
@@ -75,16 +75,12 @@ check_cxx_symbol_exists(pwrite unistd.h HAVE_UNISTD_H_PWRITE)
 BoolToFoundNotFound(HAVE_UNISTD_H_PWRITE HAVE_UNISTD_H_PWRITE_TEXT)
 message("check for open -> ${HAVE_FCNTL_H_OPEN_TEXT} ; check for pread -> ${HAVE_UNISTD_H_PREAD_TEXT} ; check for pwrite -> ${HAVE_UNISTD_H_PWRITE_TEXT}")
 
-# Determine whether the Win32-API can be used (in other words: whether we are on a Windows-platform or targetting the Windows-platform).
-# Note that just checking for WIN32 is not sufficient here, as this is not defined with environments such as msys2. In those cases, UNIX is defined.
-# The meaning of this switch is: whether Win32-API can be used (and this affects not only compilation but e.g. also linking to the Win32-API, as
-# it is not automatically linked to when using MinGW or Cygwin).
-# TODO(JBL): check whether cross-compiling to Windows works
-if (WIN32 OR CYGWIN OR MSYS OR MINGW OR CMAKE_SYSTEM_NAME STREQUAL "Windows")
-  set(LIBCZI_HAVE_WIN32_API ON)
-else()
-  set(LIBCZI_HAVE_WIN32_API OFF)
-endif()
+# Determine whether we are building for the classic Win32-API or for UWP (Universal Windows Platform).
+include(detect_win32_api_mode)
+detect_win32_api_mode(
+    LIBCZI_HAVE_WIN32_API
+    LIBCZI_HAVE_WIN32UWP_API
+)
 
 # This option controls whether to build the curl-based http-/https-stream object. If this option is
 # "ON", the build will fail if the curl-library is not available (either as an external package or

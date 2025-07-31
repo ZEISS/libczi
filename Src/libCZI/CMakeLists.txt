@@ -113,6 +113,8 @@ set(LIBCZISRCFILES
             StreamsLib/curlhttpinputstream.h
             StreamsLib/windowsfileinputstream.cpp
             StreamsLib/windowsfileinputstream.h
+            StreamsLib/uwpfileinputstream.cpp
+            StreamsLib/uwpfileinputstream.h
             StreamsLib/simplefileinputstream.cpp
             StreamsLib/simplefileinputstream.h
             StreamsLib/preadfileinputstream.cpp
@@ -283,6 +285,12 @@ if (LIBCZI_HAVE_WIN32_API)
   set(libCZI_WINDOWSAPIAVAILABLE 1)
 else()
   set(libCZI_WINDOWSAPIAVAILABLE 0)
+endif()
+
+if (LIBCZI_HAVE_WIN32UWP_API)
+  set(libCZI_WINDOWSAPI_UWP_AVAILABLE 1)
+else()
+  set(libCZI_WINDOWSAPI_UWP_AVAILABLE 0)
 endif()
 
 configure_file (
