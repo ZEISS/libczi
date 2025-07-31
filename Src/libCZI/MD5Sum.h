@@ -3,6 +3,46 @@
 // SPDX-License-Identifier: RSA-MD
 
 #pragma once
+
+#include <cstdint>
+
+class CMd5Sum
+{
+private:
+    constexpr static size_t MD5_HASH_SIZE = 16;
+
+    struct md5_context
+    {
+        // state
+        unsigned int a;
+        unsigned int b;
+        unsigned int c;
+        unsigned int d;
+        // number of bits, modulo 2^64 (lsb first)
+        unsigned int count[2];
+        // input buffer
+        unsigned char input[64];
+        // current block
+        unsigned int block[16];
+    };
+
+    struct md5_digest
+    {
+        unsigned char bytes[MD5_HASH_SIZE];
+    };
+
+    md5_context ctx_;
+    md5_digest digest_;
+public:
+    CMd5Sum();
+    void update(const void* buffer, size_t buffer_size);
+    void complete();
+    void getHash(char* pHash);
+private:
+    static std::uint8_t* md5_transform(md5_context* ctx, const void* data, std::uintmax_t size);
+};
+
+#if false
 #include <cstdint>
 
 /* Copyright (C) 1991-2, RSA Data Security, Inc. Created 1991. All rights reserved.
@@ -169,3 +209,4 @@ inline void CMd5Sum::MD5_memset(CMd5Sum::POINTER output, int value, size_t len)
 }
 
 
+#endif
