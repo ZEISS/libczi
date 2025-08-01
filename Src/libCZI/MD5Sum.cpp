@@ -1,6 +1,6 @@
-// SPDX-FileCopyrightText: 1991-2 RSA Data Security, Inc.
+// SPDX-FileCopyrightText: 2025 Carl Zeiss Microscopy GmbH
 //
-// SPDX-License-Identifier: RSA-MD
+// SPDX-License-Identifier: LGPL-3.0-or-later
 
 #include "MD5Sum.h"
 #include <cstdint>
