@@ -8,7 +8,7 @@
 #include <cstdint>
 
 /// A simplistic implementation of the MD5 hash algorithm.
-/// The implementation is derived from the public domain MD5 implementation https://github.com/galenguyer/md5.
+/// The implementation is derived from the public domain (licensed under the "Unlicense license") MD5 implementation https://github.com/galenguyer/md5.
 /// The mode of operation is:
 /// * Initialize the MD5 context with `CMd5Sum()`  
 /// * Add data to the MD5 context with `update(const void* buffer, size_t buffer_size)` (as many times as needed)  
