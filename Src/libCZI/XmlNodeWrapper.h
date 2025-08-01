@@ -163,9 +163,9 @@ private:
             const wchar_t* nodeName;
             const std::map<std::wstring, std::wstring>& attribs;
 
-            bool operator()(pugi::xml_node node) const
+            bool operator()(libCZI::pugi::xml_node node) const
             {
-                if (node.type() != pugi::xml_node_type::node_element)
+                if (node.type() != libCZI::pugi::xml_node_type::node_element)
                 {
                     return false;
                 }
@@ -177,7 +177,7 @@ private:
 
                 for (auto it = this->attribs.cbegin(); it != this->attribs.cend(); ++it)
                 {
-                    auto attribute = node.find_attribute([&](const pugi::xml_attribute& a)
+                    auto attribute = node.find_attribute([&](const libCZI::pugi::xml_attribute& a)
                         {
                             return wcscmp(a.name(), it->first.c_str()) == 0;
                         });
