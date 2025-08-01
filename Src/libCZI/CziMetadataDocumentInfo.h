@@ -32,6 +32,6 @@ private:
     void ParseDimensionInfo();
 
 private:
-    pugi::xml_node GetNode(const wchar_t* path) const;
-    static pugi::xml_node GetNodeRelativeFromNode(pugi::xml_node node, const wchar_t* path);
+    libCZI::pugi::xml_node GetNode(const wchar_t* path) const;
+    static libCZI::pugi::xml_node GetNodeRelativeFromNode(libCZI::pugi::xml_node node, const wchar_t* path);
 };

@@ -5,7 +5,7 @@
 #include "CziMetadata.h"
 #include "CziMetadataDocumentInfo.h"
 
-using namespace pugi;
+using namespace libCZI::pugi;
 using namespace libCZI;
 using namespace std;
 
