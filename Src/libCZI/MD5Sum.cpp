@@ -546,22 +546,20 @@ CMd5Sum::CMd5Sum()
 
 void CMd5Sum::update(const void* buffer, size_t buffer_size)
 {
-    //void md5_update(struct md5_context* ctx, const void* buffer, uint32_t buffer_size) {
-    uint32_t saved_low = this->ctx_.count[0];
-    uint32_t used;
-    uint32_t free;
+    const uint32_t saved_low = this->ctx_.count[0];
 
     if ((this->ctx_.count[0] = ((saved_low + buffer_size) & 0x1fffffff)) < saved_low)
     {
         this->ctx_.count[1]++;
     }
 
-    this->ctx_.count[1] += (uint32_t)(buffer_size >> 29);
+    this->ctx_.count[1] += static_cast<uint32_t>(buffer_size >> 29);
 
-    used = saved_low & 0x3f;
+    const uint32_t used = saved_low & 0x3f;
 
-    if (used) {
-        free = 64 - used;
+    if (used) 
+    {
+        const uint32_t free = 64 - used;
 
         if (buffer_size < free) 
         {
@@ -570,14 +568,14 @@ void CMd5Sum::update(const void* buffer, size_t buffer_size)
         }
 
         memcpy(&this->ctx_.input[used], buffer, free);
-        buffer = (uint8_t*)buffer + free;
+        buffer = static_cast<const uint8_t*>(buffer) + free;
         buffer_size -= free;
         md5_transform(&this->ctx_, this->ctx_.input, 64);
     }
 
     if (buffer_size >= 64) 
     {
-        buffer = md5_transform(&this->ctx_, buffer, buffer_size & ~(unsigned long)0x3f);
+        buffer = md5_transform(&this->ctx_, buffer, buffer_size & ~static_cast<unsigned long>(0x3f));
         buffer_size = buffer_size % 64;
     }
 
@@ -590,7 +588,8 @@ void CMd5Sum::complete()
     this->ctx_.input[used++] = 0x80;
     uint32_t free = 64 - used;
 
-    if (free < 8) {
+    if (free < 8) 
+    {
         memset(&this->ctx_.input[used], 0, free);
         md5_transform(&this->ctx_, this->ctx_.input, 64);
         used = 0;
@@ -600,14 +599,14 @@ void CMd5Sum::complete()
     memset(&this->ctx_.input[used], 0, free - 8);
 
     this->ctx_.count[0] <<= 3;
-    this->ctx_.input[56] = (uint8_t)(this->ctx_.count[0]);
-    this->ctx_.input[57] = (uint8_t)(this->ctx_.count[0] >> 8);
-    this->ctx_.input[58] = (uint8_t)(this->ctx_.count[0] >> 16);
-    this->ctx_.input[59] = (uint8_t)(this->ctx_.count[0] >> 24);
-    this->ctx_.input[60] = (uint8_t)(this->ctx_.count[1]);
-    this->ctx_.input[61] = (uint8_t)(this->ctx_.count[1] >> 8);
-    this->ctx_.input[62] = (uint8_t)(this->ctx_.count[1] >> 16);
-    this->ctx_.input[63] = (uint8_t)(this->ctx_.count[1] >> 24);
+    this->ctx_.input[56] = static_cast<uint8_t>(this->ctx_.count[0]);
+    this->ctx_.input[57] = static_cast<uint8_t>(this->ctx_.count[0] >> 8);
+    this->ctx_.input[58] = static_cast<uint8_t>(this->ctx_.count[0] >> 16);
+    this->ctx_.input[59] = static_cast<uint8_t>(this->ctx_.count[0] >> 24);
+    this->ctx_.input[60] = static_cast<uint8_t>(this->ctx_.count[1]);
+    this->ctx_.input[61] = static_cast<uint8_t>(this->ctx_.count[1] >> 8);
+    this->ctx_.input[62] = static_cast<uint8_t>(this->ctx_.count[1] >> 16);
+    this->ctx_.input[63] = static_cast<uint8_t>(this->ctx_.count[1] >> 24);
 
     md5_transform(&this->ctx_, this->ctx_.input, 64);
 
@@ -634,9 +633,9 @@ void CMd5Sum::getHash(char* pHash)
     memcpy(pHash, this->digest_.bytes, sizeof(this->digest_.bytes));
 }
 
-/*static*/std::uint8_t* CMd5Sum::md5_transform(md5_context* ctx, const void* data, std::uintmax_t size)
+/*static*/const std::uint8_t* CMd5Sum::md5_transform(md5_context* ctx, const void* data, std::uintmax_t size)
 {
-    uint8_t* ptr = (uint8_t*)data;
+    const uint8_t* ptr = (const uint8_t*)data;
     uint32_t a, b, c, d, aa, bb, cc, dd;
 
 #define F(x, y, z) (z ^ (x & (y ^ z)))
@@ -661,7 +660,8 @@ a += b \
     c = ctx->c;
     d = ctx->d;
 
-    do {
+    do 
+    {
         aa = a;
         bb = b;
         cc = c;

@@ -39,7 +39,7 @@ public:
     void complete();
     void getHash(char* pHash);
 private:
-    static std::uint8_t* md5_transform(md5_context* ctx, const void* data, std::uintmax_t size);
+    static const std::uint8_t* md5_transform(md5_context* ctx, const void* data, std::uintmax_t size);
 };
 
 #if false
