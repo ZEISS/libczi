@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <cstddef>
 #include <cstdint>
 
 /// A simplistic implementation of the MD5 hash algorithm.
