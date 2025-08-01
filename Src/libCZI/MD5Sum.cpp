@@ -123,8 +123,8 @@ a = ROTATE_LEFT(a, s), \
 a += b \
 )
 #define GET(n) (ctx->block[(n)])
-#define SET(n) (ctx->block[(n)] =        \
-          ((uint32_t)ptr[(n)*4 + 0] << 0 )   \
+#define SET(n) (ctx->block[(n)] =            \
+        ((uint32_t)ptr[(n)*4 + 0] << 0 )     \
         | ((uint32_t)ptr[(n)*4 + 1] << 8 )   \
         | ((uint32_t)ptr[(n)*4 + 2] << 16)   \
         | ((uint32_t)ptr[(n)*4 + 3] << 24) )
