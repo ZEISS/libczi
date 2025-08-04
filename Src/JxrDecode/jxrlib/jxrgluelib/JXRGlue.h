@@ -31,6 +31,7 @@
 extern "C" {
 #endif
 
+#include "../common/include/jxrlib_symbol_mangle.h"
 #include "JXRMeta.h"
 #include "../common/include/guiddef.h" 
 
@@ -53,12 +54,12 @@ extern "C" {
     //================================================================
     typedef U32 PKIID;
 
-    EXTERN_C const PKIID IID_PKImageScanEncode;
-    EXTERN_C const PKIID IID_PKImageFrameEncode;
+    EXTERN_C const PKIID JXRLIB_API(IID_PKImageScanEncode);
+    EXTERN_C const PKIID JXRLIB_API(IID_PKImageFrameEncode);
 
-    EXTERN_C const PKIID IID_PKImageWmpEncode;
+    EXTERN_C const PKIID JXRLIB_API(IID_PKImageWmpEncode);
 
-    EXTERN_C const PKIID IID_PKImageWmpDecode;
+    EXTERN_C const PKIID JXRLIB_API(IID_PKImageWmpDecode);
 
     struct IFDEntry
     {
@@ -67,8 +68,8 @@ extern "C" {
         U32 uCount;
         U32 uValue;
     };
-    EXTERN_C const U32 IFDEntryTypeSizes[13];
-    EXTERN_C const U32 SizeofIFDEntry;
+    EXTERN_C const U32 JXRLIB_API(IFDEntryTypeSizes)[13];
+    EXTERN_C const U32 JXRLIB_API(SizeofIFDEntry);
 
     //================================================================
     typedef float Float;
@@ -86,7 +87,7 @@ extern "C" {
     /* Undefined formats */
 #define GUID_PKPixelFormatUndefined GUID_PKPixelFormatDontCare
 
-    DEFINE_GUID(GUID_PKPixelFormatDontCare, 0x6fddc324, 0x4e03, 0x4bfe, 0xb1, 0x85, 0x3d, 0x77, 0x76, 0x8d, 0xc9, 0x00);
+    DEFINE_GUID(JXRLIB_API(GUID_PKPixelFormatDontCare), 0x6fddc324, 0x4e03, 0x4bfe, 0xb1, 0x85, 0x3d, 0x77, 0x76, 0x8d, 0xc9, 0x00);
 
     /* Indexed formats */
     //DEFINE_GUID(GUID_PKPixelFormat1bppIndexed, 0x6fddc324, 0x4e03, 0x4bfe, 0xb1, 0x85, 0x3d, 0x77, 0x76, 0x8d, 0xc9, 0x01);
@@ -94,22 +95,22 @@ extern "C" {
     //DEFINE_GUID(GUID_PKPixelFormat4bppIndexed, 0x6fddc324, 0x4e03, 0x4bfe, 0xb1, 0x85, 0x3d, 0x77, 0x76, 0x8d, 0xc9, 0x03);
     //DEFINE_GUID(GUID_PKPixelFormat8bppIndexed, 0x6fddc324, 0x4e03, 0x4bfe, 0xb1, 0x85, 0x3d, 0x77, 0x76, 0x8d, 0xc9, 0x04);
 
-    DEFINE_GUID(GUID_PKPixelFormatBlackWhite, 0x6fddc324, 0x4e03, 0x4bfe, 0xb1, 0x85, 0x3d, 0x77, 0x76, 0x8d, 0xc9, 0x05);
+    DEFINE_GUID(JXRLIB_API(GUID_PKPixelFormatBlackWhite), 0x6fddc324, 0x4e03, 0x4bfe, 0xb1, 0x85, 0x3d, 0x77, 0x76, 0x8d, 0xc9, 0x05);
     //DEFINE_GUID(GUID_PKPixelFormat2bppGray,   0x6fddc324, 0x4e03, 0x4bfe, 0xb1, 0x85, 0x3d, 0x77, 0x76, 0x8d, 0xc9, 0x06);
     //DEFINE_GUID(GUID_PKPixelFormat4bppGray,   0x6fddc324, 0x4e03, 0x4bfe, 0xb1, 0x85, 0x3d, 0x77, 0x76, 0x8d, 0xc9, 0x07);
-    DEFINE_GUID(GUID_PKPixelFormat8bppGray, 0x6fddc324, 0x4e03, 0x4bfe, 0xb1, 0x85, 0x3d, 0x77, 0x76, 0x8d, 0xc9, 0x08);
+    DEFINE_GUID(JXRLIB_API(GUID_PKPixelFormat8bppGray), 0x6fddc324, 0x4e03, 0x4bfe, 0xb1, 0x85, 0x3d, 0x77, 0x76, 0x8d, 0xc9, 0x08);
 
     /* sRGB formats (gamma is approx. 2.2) */
     /* For a full definition, see the sRGB spec */
 
     /* 16bpp formats */
-    DEFINE_GUID(GUID_PKPixelFormat16bppRGB555, 0x6fddc324, 0x4e03, 0x4bfe, 0xb1, 0x85, 0x3d, 0x77, 0x76, 0x8d, 0xc9, 0x09);
-    DEFINE_GUID(GUID_PKPixelFormat16bppRGB565, 0x6fddc324, 0x4e03, 0x4bfe, 0xb1, 0x85, 0x3d, 0x77, 0x76, 0x8d, 0xc9, 0x0a);
-    DEFINE_GUID(GUID_PKPixelFormat16bppGray, 0x6fddc324, 0x4e03, 0x4bfe, 0xb1, 0x85, 0x3d, 0x77, 0x76, 0x8d, 0xc9, 0x0b);
+    DEFINE_GUID(JXRLIB_API(GUID_PKPixelFormat16bppRGB555), 0x6fddc324, 0x4e03, 0x4bfe, 0xb1, 0x85, 0x3d, 0x77, 0x76, 0x8d, 0xc9, 0x09);
+    DEFINE_GUID(JXRLIB_API(GUID_PKPixelFormat16bppRGB565), 0x6fddc324, 0x4e03, 0x4bfe, 0xb1, 0x85, 0x3d, 0x77, 0x76, 0x8d, 0xc9, 0x0a);
+    DEFINE_GUID(JXRLIB_API(GUID_PKPixelFormat16bppGray), 0x6fddc324, 0x4e03, 0x4bfe, 0xb1, 0x85, 0x3d, 0x77, 0x76, 0x8d, 0xc9, 0x0b);
 
     /* 24bpp formats */
-    DEFINE_GUID(GUID_PKPixelFormat24bppBGR, 0x6fddc324, 0x4e03, 0x4bfe, 0xb1, 0x85, 0x3d, 0x77, 0x76, 0x8d, 0xc9, 0x0c);
-    DEFINE_GUID(GUID_PKPixelFormat24bppRGB, 0x6fddc324, 0x4e03, 0x4bfe, 0xb1, 0x85, 0x3d, 0x77, 0x76, 0x8d, 0xc9, 0x0d);
+    DEFINE_GUID(JXRLIB_API(GUID_PKPixelFormat24bppBGR), 0x6fddc324, 0x4e03, 0x4bfe, 0xb1, 0x85, 0x3d, 0x77, 0x76, 0x8d, 0xc9, 0x0c);
+    DEFINE_GUID(JXRLIB_API(GUID_PKPixelFormat24bppRGB), 0x6fddc324, 0x4e03, 0x4bfe, 0xb1, 0x85, 0x3d, 0x77, 0x76, 0x8d, 0xc9, 0x0d);
 
     /* 32bpp format */
     DEFINE_GUID(GUID_PKPixelFormat32bppBGR, 0x6fddc324, 0x4e03, 0x4bfe, 0xb1, 0x85, 0x3d, 0x77, 0x76, 0x8d, 0xc9, 0x0e);
@@ -274,16 +275,16 @@ extern "C" {
     } PKPixelInfo;
 
     //================================================================
-    ERR PKAlloc(void** ppv, size_t cb);
-    ERR PKFree(void** ppv);
+    ERR JXRLIB_API(PKAlloc)(void** ppv, size_t cb);
+    ERR JXRLIB_API(PKFree)(void** ppv);
 
     //----------------------------------------------------------------
     //ERR GetPixelInfo(PKPixelFormatGUID enPixelFormat, const PKPixelInfo** ppPI);
-    ERR PixelFormatLookup(PKPixelInfo* pPI, U8 uLookupType);
-    const PKPixelFormatGUID* GetPixelFormatFromHash(const U8 uPFHash);
+    ERR JXRLIB_API(PixelFormatLookup)(PKPixelInfo* pPI, U8 uLookupType);
+    const PKPixelFormatGUID* JXRLIB_API(GetPixelFormatFromHash)(const U8 uPFHash);
 
-    ERR GetImageEncodeIID(const char* szExt, const PKIID** ppIID);
-    ERR GetImageDecodeIID(const char* szExt, const PKIID** ppIID);
+    ERR JXRLIB_API(GetImageEncodeIID)(const char* szExt, const PKIID** ppIID);
+    ERR JXRLIB_API(GetImageDecodeIID)(const char* szExt, const PKIID** ppIID);
 
 
     //================================================================
@@ -317,10 +318,10 @@ extern "C" {
     } PKFactory;
 
     //----------------------------------------------------------------
-    ERR PKCreateFactory_CreateStream(PKStream** ppStream);
-    ERR PKCreateFactory_Release(PKFactory** ppFactory);
+    ERR JXRLIB_API(PKCreateFactory_CreateStream)(PKStream** ppStream);
+    ERR JXRLIB_API(PKCreateFactory_Release)(PKFactory** ppFactory);
 
-    EXTERN_C ERR PKCreateFactory(PKFactory**, U32);
+    EXTERN_C ERR JXRLIB_API(PKCreateFactory)(PKFactory**, U32);
 
 
     //================================================================
@@ -336,10 +337,10 @@ extern "C" {
     } PKCodecFactory;
 
     //----------------------------------------------------------------
-    ERR PKCodecFactory_CreateCodec(const PKIID* iid, void** ppv);
-    ERR PKCreateCodecFactory_Release(PKCodecFactory** ppCFactory);
+    ERR JXRLIB_API(PKCodecFactory_CreateCodec)(const PKIID* iid, void** ppv);
+    ERR JXRLIB_API(PKCreateCodecFactory_Release)(PKCodecFactory** ppCFactory);
 
-    EXTERN_C ERR PKCreateCodecFactory(PKCodecFactory**, U32);
+    EXTERN_C ERR JXRLIB_API(PKCreateCodecFactory)(PKCodecFactory**, U32);
 
     //================================================================
 
@@ -439,28 +440,29 @@ extern "C" {
     } PKImageEncode;
 
     //----------------------------------------------------------------
-    ERR PKImageEncode_Create_WMP(PKImageEncode** ppIE);
+    ERR JXRLIB_API(PKImageEncode_Create_WMP)(PKImageEncode** ppIE);
 
-    ERR PKImageEncode_Initialize(PKImageEncode* pIE, struct tagWMPStream* pStream, void* pvParam, size_t cbParam);
-    ERR PKImageEncode_Terminate(PKImageEncode* pIE);
-    ERR PKImageEncode_SetPixelFormat(PKImageEncode* pIE, PKPixelFormatGUID enPixelFormat);
-    ERR PKImageEncode_SetSize(PKImageEncode* pIE, I32 iWidth, I32 iHeight);
-    ERR PKImageEncode_SetResolution(PKImageEncode* pIE, Float rX, Float rY);
-    ERR PKImageEncode_SetColorContext(PKImageEncode* pIE, const U8* pbColorContext, U32 cbColorContext);
-    ERR PKImageEncode_SetDescriptiveMetadata(PKImageEncode* pIE, const DESCRIPTIVEMETADATA* pDescMetadata);
-    ERR PKImageEncode_WritePixels(PKImageEncode* pIE, U32 cLine, U8* pbPixel, U32 cbStride);
-    ERR PKImageEncode_CreateNewFrame(PKImageEncode* pIE, void* pvParam, size_t cbParam);
-    ERR PKImageEncode_Release(PKImageEncode** ppIE);
+    ERR JXRLIB_API(PKImageEncode_Initialize)(PKImageEncode* pIE, struct tagWMPStream* pStream, void* pvParam, size_t cbParam);
+    ERR JXRLIB_API(PKImageEncode_Terminate)(PKImageEncode* pIE);
+    ERR JXRLIB_API(PKImageEncode_SetPixelFormat)(PKImageEncode* pIE, PKPixelFormatGUID enPixelFormat);
+    ERR JXRLIB_API(PKImageEncode_SetSize)(PKImageEncode* pIE, I32 iWidth, I32 iHeight);
+    ERR JXRLIB_API(PKImageEncode_SetResolution)(PKImageEncode* pIE, Float rX, Float rY);
+    ERR JXRLIB_API(PKImageEncode_SetColorContext)(PKImageEncode* pIE, const U8* pbColorContext, U32 cbColorContext);
+    ERR JXRLIB_API(PKImageEncode_SetDescriptiveMetadata)(PKImageEncode* pIE, const DESCRIPTIVEMETADATA* pDescMetadata);
+    ERR JXRLIB_API(PKImageEncode_WritePixels)(PKImageEncode* pIE, U32 cLine, U8* pbPixel, U32 cbStride);
+    ERR JXRLIB_API(PKImageEncode_CreateNewFrame)(PKImageEncode* pIE, void* pvParam, size_t cbParam);
+    ERR JXRLIB_API(PKImageEncode_Release)(PKImageEncode** ppIE);
 
-    ERR PKImageEncode_SetXMPMetadata_WMP(PKImageEncode* pIE, const U8* pbXMPMetadata, U32 cbXMPMetadata);
-    ERR PKImageEncode_SetEXIFMetadata_WMP(PKImageEncode* pIE, const U8* pbEXIFMetadata, U32 cbEXIFMetadata);
-    ERR PKImageEncode_SetGPSInfoMetadata_WMP(PKImageEncode* pIE, const U8* pbGPSInfoMetadata, U32 cbGPSInfoMetadata);
-    ERR PKImageEncode_SetIPTCNAAMetadata_WMP(PKImageEncode* pIE, const U8* pbIPTCNAAMetadata, U32 cbIPTCNAAMetadata);
-    ERR PKImageEncode_SetPhotoshopMetadata_WMP(PKImageEncode* pIE, const U8* pbPhotoshopMetadata, U32 cbPhotoshopMetadata);
+    ERR JXRLIB_API(PKImageEncode_SetXMPMetadata_WMP)(PKImageEncode* pIE, const U8* pbXMPMetadata, U32 cbXMPMetadata);
+    ERR JXRLIB_API(PKImageEncode_SetEXIFMetadata_WMP)(PKImageEncode* pIE, const U8* pbEXIFMetadata, U32 cbEXIFMetadata);
+    ERR JXRLIB_API(PKImageEncode_SetGPSInfoMetadata_WMP)(PKImageEncode* pIE, const U8* pbGPSInfoMetadata, U32 cbGPSInfoMetadata);
+    ERR JXRLIB_API(PKImageEncode_SetGPSInfoMetadata_WMP)(PKImageEncode* pIE, const U8* pbGPSInfoMetadata, U32 cbGPSInfoMetadata);
+    ERR JXRLIB_API(PKImageEncode_SetIPTCNAAMetadata_WMP)(PKImageEncode* pIE, const U8* pbIPTCNAAMetadata, U32 cbIPTCNAAMetadata);
+    ERR JXRLIB_API(PKImageEncode_SetPhotoshopMetadata_WMP)(PKImageEncode* pIE, const U8* pbPhotoshopMetadata, U32 cbPhotoshopMetadata);
 
-    void FreeDescMetadata(DPKPROPVARIANT* pvar);
+    void JXRLIB_API(FreeDescMetadata)(DPKPROPVARIANT* pvar);
 
-    ERR PKImageEncode_Create(PKImageEncode** ppIE);
+    ERR JXRLIB_API(PKImageEncode_Create)(PKImageEncode** ppIE);
 
     //================================================================
     typedef struct tagPKImageDecode
@@ -530,28 +532,28 @@ extern "C" {
     } PKImageDecode;
 
     //----------------------------------------------------------------
-    ERR PKImageDecode_Create_WMP(PKImageDecode** ppID);
+    ERR JXRLIB_API(PKImageDecode_Create_WMP)(PKImageDecode** ppID);
 
-    ERR PKImageDecode_Initialize(PKImageDecode* pID, struct tagWMPStream* pStream);
-    ERR PKImageDecode_GetPixelFormat(PKImageDecode* pID, PKPixelFormatGUID* pPF);
-    ERR PKImageDecode_GetSize(PKImageDecode* pID, I32* piWidth, I32* piHeight);
-    ERR PKImageDecode_GetResolution(PKImageDecode* pID, Float* pfrX, Float* pfrY);
-    ERR PKImageDecode_GetColorContext(PKImageDecode* pID, U8* pbColorContext, U32* pcbColorContext);
-    ERR PKImageDecode_GetDescriptiveMetadata(PKImageDecode* pID, DESCRIPTIVEMETADATA* pDescMetadata);
-    ERR PKImageDecode_Copy(PKImageDecode* pID, const PKRect* pRect, U8* pb, U32 cbStride);
-    ERR PKImageDecode_GetFrameCount(PKImageDecode* pID, U32* puCount);
-    ERR PKImageDecode_SelectFrame(PKImageDecode* pID, U32 uFrame);
-    ERR PKImageDecode_Release(PKImageDecode** ppID);
+    ERR JXRLIB_API(PKImageDecode_Initialize)(PKImageDecode* pID, struct tagWMPStream* pStream);
+    ERR JXRLIB_API(PKImageDecode_GetPixelFormat)(PKImageDecode* pID, PKPixelFormatGUID* pPF);
+    ERR JXRLIB_API(PKImageDecode_GetSize)(PKImageDecode* pID, I32* piWidth, I32* piHeight);
+    ERR JXRLIB_API(PKImageDecode_GetResolution)(PKImageDecode* pID, Float* pfrX, Float* pfrY);
+    ERR JXRLIB_API(PKImageDecode_GetColorContext)(PKImageDecode* pID, U8* pbColorContext, U32* pcbColorContext);
+    ERR JXRLIB_API(PKImageDecode_GetDescriptiveMetadata)(PKImageDecode* pID, DESCRIPTIVEMETADATA* pDescMetadata);
+    ERR JXRLIB_API(PKImageDecode_Copy)(PKImageDecode* pID, const PKRect* pRect, U8* pb, U32 cbStride);
+    ERR JXRLIB_API(PKImageDecode_GetFrameCount)(PKImageDecode* pID, U32* puCount);
+    ERR JXRLIB_API(PKImageDecode_SelectFrame)(PKImageDecode* pID, U32 uFrame);
+    ERR JXRLIB_API(PKImageDecode_Release)(PKImageDecode** ppID);
 
-    ERR PKImageDecode_GetXMPMetadata_WMP(PKImageDecode* pID, U8* pbXMPMetadata, U32* pcbXMPMetadata);
-    ERR PKImageDecode_GetEXIFMetadata_WMP(PKImageDecode* pID, U8* pbEXIFMetadata, U32* pcbEXIFMetadata);
-    ERR PKImageDecode_GetGPSInfoMetadata_WMP(PKImageDecode* pID, U8* pbGPSInfoMetadata, U32* pcbGPSInfoMetadata);
-    ERR PKImageDecode_GetIPTCNAAMetadata_WMP(PKImageDecode* pID, U8* pbIPTCNAAMetadata, U32* pcbIPTCNAAMetadata);
-    ERR PKImageDecode_GetPhotoshopMetadata_WMP(PKImageDecode* pID, U8* pbPhotoshopMetadata, U32* pcbPhotoshopMetadata);
+    ERR JXRLIB_API(PKImageDecode_GetXMPMetadata_WMP)(PKImageDecode* pID, U8* pbXMPMetadata, U32* pcbXMPMetadata);
+    ERR JXRLIB_API(PKImageDecode_GetEXIFMetadata_WMP)(PKImageDecode* pID, U8* pbEXIFMetadata, U32* pcbEXIFMetadata);
+    ERR JXRLIB_API(PKImageDecode_GetGPSInfoMetadata_WMP)(PKImageDecode* pID, U8* pbGPSInfoMetadata, U32* pcbGPSInfoMetadata);
+    ERR JXRLIB_API(PKImageDecode_GetIPTCNAAMetadata_WMP)(PKImageDecode* pID, U8* pbIPTCNAAMetadata, U32* pcbIPTCNAAMetadata);
+    ERR JXRLIB_API(PKImageDecode_GetPhotoshopMetadata_WMP)(PKImageDecode* pID, U8* pbPhotoshopMetadata, U32* pcbPhotoshopMetadata);
 
-    ERR PKImageDecode_Create(PKImageDecode** ppID);
-    ERR PKCodecFactory_CreateDecoderFromFile(const char* szFilename, PKImageDecode** ppDecoder);
-    ERR PKCodecFactory_CreateDecoderFromStream(struct tagWMPStream* pStream, PKImageDecode** ppDecoder);
+    ERR JXRLIB_API(PKImageDecode_Create)(PKImageDecode** ppID);
+    ERR JXRLIB_API(PKCodecFactory_CreateDecoderFromFile)(const char* szFilename, PKImageDecode** ppDecoder);
+    ERR JXRLIB_API(PKCodecFactory_CreateDecoderFromStream)(struct tagWMPStream* pStream, PKImageDecode** ppDecoder);
 
     //================================================================
     typedef struct tagPKFormatConverter
@@ -574,31 +576,31 @@ extern "C" {
     } PKFormatConverter;
 
     //----------------------------------------------------------------
-    ERR PKImageEncode_Transcode(PKImageEncode* pIE, PKFormatConverter* pFC, PKRect* pRect);
-    ERR PKImageEncode_WriteSource(PKImageEncode* pIE, PKFormatConverter* pFC, PKRect* pRect);
-    ERR PKFormatConverter_Initialize(PKFormatConverter* pFC, PKImageDecode* pID, char* pExt, PKPixelFormatGUID enPF);
-    ERR PKFormatConverter_InitializeConvert(PKFormatConverter* pFC, const PKPixelFormatGUID enPFFrom,
+    ERR JXRLIB_API(PKImageEncode_Transcode)(PKImageEncode* pIE, PKFormatConverter* pFC, PKRect* pRect);
+    ERR JXRLIB_API(PKImageEncode_WriteSource)(PKImageEncode* pIE, PKFormatConverter* pFC, PKRect* pRect);
+    ERR JXRLIB_API(PKFormatConverter_Initialize)(PKFormatConverter* pFC, PKImageDecode* pID, char* pExt, PKPixelFormatGUID enPF);
+    ERR JXRLIB_API(PKFormatConverter_InitializeConvert)(PKFormatConverter* pFC, const PKPixelFormatGUID enPFFrom,
                                             char* pExt, PKPixelFormatGUID enPFTo);
-    ERR PKFormatConverter_GetPixelFormat(PKFormatConverter* pFC, PKPixelFormatGUID* pPF);
-    ERR PKFormatConverter_GetSourcePixelFormat(PKFormatConverter* pFC, PKPixelFormatGUID* pPF);
-    ERR PKFormatConverter_GetSize(PKFormatConverter* pFC, I32* piWidth, I32* piHeight);
-    ERR PKFormatConverter_GetResolution(PKFormatConverter* pFC, Float* pfrX, Float* pfrY);
-    ERR PKFormatConverter_Copy(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStride);
-    ERR PKFormatConverter_Convert(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStride);
-    ERR PKFormatConverter_Release(PKFormatConverter** ppFC);
+    ERR JXRLIB_API(PKFormatConverter_GetPixelFormat)(PKFormatConverter* pFC, PKPixelFormatGUID* pPF);
+    ERR JXRLIB_API(PKFormatConverter_GetSourcePixelFormat)(PKFormatConverter* pFC, PKPixelFormatGUID* pPF);
+    ERR JXRLIB_API(PKFormatConverter_GetSize)(PKFormatConverter* pFC, I32* piWidth, I32* piHeight);
+    ERR JXRLIB_API(PKFormatConverter_GetResolution)(PKFormatConverter* pFC, Float* pfrX, Float* pfrY);
+    ERR JXRLIB_API(PKFormatConverter_Copy)(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStride);
+    ERR JXRLIB_API(PKFormatConverter_Convert)(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStride);
+    ERR JXRLIB_API(PKFormatConverter_Release)(PKFormatConverter** ppFC);
 
     // Think of this as static member of PKFormatConverter "class"
-    ERR PKFormatConverter_EnumConversions(const PKPixelFormatGUID* pguidSourcePF,
+    ERR JXRLIB_API(PKFormatConverter_EnumConversions)(const PKPixelFormatGUID* pguidSourcePF,
                                             const U32 iIndex,
                                             const PKPixelFormatGUID** ppguidTargetPF);
 
-    ERR PKCodecFactory_CreateFormatConverter(PKFormatConverter** ppFConverter);
+    ERR JXRLIB_API(PKCodecFactory_CreateFormatConverter)(PKFormatConverter** ppFConverter);
 
     //----------------------------------------------------------------
-    ERR PKAlloc(void** ppv, size_t cb);
-    ERR PKFree(void** ppv);
-    ERR PKAllocAligned(void** ppv, size_t cb, size_t iAlign);
-    ERR PKFreeAligned(void** ppv);
+    ERR JXRLIB_API(PKAlloc)(void** ppv, size_t cb);
+    ERR JXRLIB_API(PKFree)(void** ppv);
+    ERR JXRLIB_API(PKAllocAligned)(void** ppv, size_t cb, size_t iAlign);
+    ERR JXRLIB_API(PKFreeAligned)(void** ppv);
 
 #ifdef __cplusplus
 } // extern "C"

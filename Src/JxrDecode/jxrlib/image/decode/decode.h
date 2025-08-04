@@ -29,6 +29,8 @@
 #ifndef WMI_DECODE_H
 #define WMI_DECODE_H
 
+#include "../../common/include/jxrlib_symbol_mangle.h"
+
 typedef struct CWMDecoderParameters {
     /** ROI decode **/
     Bool bDecodeFullFrame;
@@ -51,34 +53,34 @@ typedef struct CWMDecoderParameters {
     size_t* pOffsetY;
 } CWMDecoderParameters;
 
-Void predCBPDec(CWMImageStrCodec*, CCodingContext*);
-Void predDCACDec(CWMImageStrCodec*);
-Void predACDec(CWMImageStrCodec*);
+Void JXRLIB_API(predCBPDec)(CWMImageStrCodec*, CCodingContext*);
+Void JXRLIB_API(predDCACDec)(CWMImageStrCodec*);
+Void JXRLIB_API(predACDec)(CWMImageStrCodec*);
 
-Int dequantizeMacroblock(CWMImageStrCodec*);
-Int invTransformMacroblock(CWMImageStrCodec* pSC);
-Int invTransformMacroblock_alteredOperators_hard(CWMImageStrCodec* pSC);
+Int JXRLIB_API(dequantizeMacroblock)(CWMImageStrCodec*);
+Int JXRLIB_API(invTransformMacroblock)(CWMImageStrCodec* pSC);
+Int JXRLIB_API(invTransformMacroblock_alteredOperators_hard)(CWMImageStrCodec* pSC);
 
-Int DecodeMacroblockDC(CWMImageStrCodec* pSC, CCodingContext* pContext, Int iMBX, Int iMBY);
-Int DecodeMacroblockLowpass(CWMImageStrCodec* pSC, CCodingContext* pContext, Int iMBX, Int iMBY);
-Int DecodeMacroblockHighpass(CWMImageStrCodec* pSC, CCodingContext* pContext, Int iMBX, Int iMBY);
+Int JXRLIB_API(DecodeMacroblockDC)(CWMImageStrCodec* pSC, CCodingContext* pContext, Int iMBX, Int iMBY);
+Int JXRLIB_API(DecodeMacroblockLowpass)(CWMImageStrCodec* pSC, CCodingContext* pContext, Int iMBX, Int iMBY);
+Int JXRLIB_API(DecodeMacroblockHighpass)(CWMImageStrCodec* pSC, CCodingContext* pContext, Int iMBX, Int iMBY);
 
-Int AdaptLowpassDec(struct CCodingContext*);
-Int AdaptHighpassDec(struct CCodingContext*);
+Int JXRLIB_API(AdaptLowpassDec)(struct CCodingContext*);
+Int JXRLIB_API(AdaptHighpassDec)(struct CCodingContext*);
 
-Void ResetCodingContextDec(CCodingContext* pContext);
-Void FreeCodingContextDec(struct CWMImageStrCodec* pSC);
+Void JXRLIB_API(ResetCodingContextDec)(CCodingContext* pContext);
+Void JXRLIB_API(FreeCodingContextDec)(struct CWMImageStrCodec* pSC);
 
 /*************************************************************************/
 // Inverse transform functions
 // 2-point post filter for boundaries (only used in 420 UV DC subband)
-Void strPost2(PixelI*, PixelI*);
+Void JXRLIB_API(strPost2)(PixelI*, PixelI*);
 
 // 2x2 post filter (only used in 420 UV DC subband)
-Void strPost2x2(PixelI*, PixelI*, PixelI*, PixelI*);
+Void JXRLIB_API(strPost2x2)(PixelI*, PixelI*, PixelI*, PixelI*);
 
 /** 4-point post filter for boundaries **/
-Void strPost4(PixelI*, PixelI*, PixelI*, PixelI*);
+Void JXRLIB_API(strPost4)(PixelI*, PixelI*, PixelI*, PixelI*);
 
 /** data allocation in working buffer (first stage) **/
 
@@ -95,20 +97,20 @@ Void strPost4(PixelI*, PixelI*, PixelI*, PixelI*);
 /** 192 194 196 198 **/
 
 /** 4x4 inverse DCT for first stage **/
-Void strIDCT4x4FirstStage(PixelI*);
-Void strIDCT4x4Stage1(PixelI*);
-Void strIDCT4x4FirstStage420UV(PixelI*);
+Void JXRLIB_API(strIDCT4x4FirstStage)(PixelI*);
+Void JXRLIB_API(strIDCT4x4Stage1)(PixelI*);
+Void JXRLIB_API(strIDCT4x4FirstStage420UV)(PixelI*);
 
 /** 4x4 post filter for first stage **/
-Void strPost4x4FirstStage(PixelI*);
-Void strPost4x4Stage1Split(PixelI*, PixelI*, Int, Int, Bool);
-Void strPost4x4Stage1(PixelI*, Int, Int, Bool);
-Void strPost4x4Stage1Split_alternate(PixelI*, PixelI*, Int);
-Void strPost4x4Stage1_alternate(PixelI*, Int);
+Void JXRLIB_API(strPost4x4FirstStage)(PixelI*);
+Void JXRLIB_API(strPost4x4Stage1Split)(PixelI*, PixelI*, Int, Int, Bool);
+Void JXRLIB_API(strPost4x4Stage1)(PixelI*, Int, Int, Bool);
+Void JXRLIB_API(strPost4x4Stage1Split_alternate)(PixelI*, PixelI*, Int);
+Void JXRLIB_API(strPost4x4Stage1_alternate)(PixelI*, Int);
 //Void strPost4x4Stage1Split_420(PixelI*, PixelI*);
 //Void strPost4x4Stage1_420(PixelI*);
 
-Void strPost4x4FirstStage420UV(PixelI*);
+Void JXRLIB_API(strPost4x4FirstStage420UV)(PixelI*);
 
 /** data allocation in working buffer (second stage)**/
 
@@ -124,20 +126,20 @@ Void strPost4x4FirstStage420UV(PixelI*);
 
 /** 4x4 invesr DCT for second stage **/
 //Void strIDCT4x4SecondStage(PixelI *);
-Void strIDCT4x4Stage2(PixelI*);
-Void strNormalizeDec(PixelI*, Bool);
-Void strDCT2x2dnDec(PixelI*, PixelI*, PixelI*, PixelI*);
+Void JXRLIB_API(strIDCT4x4Stage2)(PixelI*);
+Void JXRLIB_API(strNormalizeDec)(PixelI*, Bool);
+Void JXRLIB_API(strDCT2x2dnDec)(PixelI*, PixelI*, PixelI*, PixelI*);
 
 /** 4x4 post filter for second stage **/
-Void strPost4x4SecondStage(PixelI*);
-Void strPost4x4Stage2Split(PixelI*, PixelI*);
-Void strPost4x4Stage2Split_alternate(PixelI*, PixelI*);
+Void JXRLIB_API(strPost4x4SecondStage)(PixelI*);
+Void JXRLIB_API(strPost4x4Stage2Split)(PixelI*, PixelI*);
+Void JXRLIB_API(strPost4x4Stage2Split_alternate)(PixelI*, PixelI*);
 
 /** Huffman decode related defines **/
 #define HUFFMAN_DECODE_ROOT_BITS_LOG    3
 #define HUFFMAN_DECODE_ROOT_BITS    (5)   
 
-Int getHuff(const short* pDecodeTable, BitIOInfo* pIO);
+Int JXRLIB_API(getHuff)(const short* pDecodeTable, BitIOInfo* pIO);
 
 #endif // WMI_DECODE_H
 

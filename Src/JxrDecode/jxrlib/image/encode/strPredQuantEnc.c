@@ -26,10 +26,11 @@
 //
 //*@@@---@@@@******************************************************************
 
+#include "../../common/include/jxrlib_symbol_mangle.h"
 #include "../sys/strcodec.h"
 #include "encode.h"
 
-I32 QUANT_Mulless(PixelI v, PixelI o, I32 r)
+I32 JXRLIB_API(QUANT_Mulless)(PixelI v, PixelI o, I32 r)
 {
     const I32 m = v >> 31;
 
@@ -37,20 +38,20 @@ I32 QUANT_Mulless(PixelI v, PixelI o, I32 r)
     return ((((v ^ m) - m + o) >> r) ^ m) - m;
 }
 
-I32 MUL32HR(U32 a, U32 b, U32 r)
+I32 JXRLIB_API(MUL32HR)(U32 a, U32 b, U32 r)
 {
     return (I32)((U32)((U64)a * b >> 32) >> r);
 }
 
-I32 QUANT(PixelI v, PixelI o, I32 man, I32 exp)
+I32 JXRLIB_API(QUANT)(PixelI v, PixelI o, I32 man, I32 exp)
 {
     const I32 m = v >> 31;
 
     assert(sizeof(PixelI) == sizeof(U32));
-    return (MUL32HR((v ^ m) - m + o, man, exp) ^ m) - m;
+    return (JXRLIB_API(MUL32HR)((v ^ m) - m + o, man, exp) ^ m) - m;
 }
 
-Int quantizeMacroblock(CWMImageStrCodec* pSC)
+Int JXRLIB_API(quantizeMacroblock)(CWMImageStrCodec* pSC)
 {
     CWMITile* pTile = pSC->pTile + pSC->cTileColumn;
     CWMIMBInfo* pMBInfo = &pSC->MBInfo;
@@ -61,7 +62,7 @@ Int quantizeMacroblock(CWMImageStrCodec* pSC)
         for (iChannel = 0; iChannel < (int)pSC->m_param.cNumChannels; iChannel++) {
             const Bool bUV = (iChannel > 0 && (cf == YUV_444 || cf == YUV_422 || cf == YUV_420));
             const int iNumBlock = (bUV ? (cf == YUV_422 ? 8 : (cf == YUV_420 ? 4 : 16)) : 16);
-            const int* pOffset = (iNumBlock == 4 ? blkOffsetUV : (iNumBlock == 8 ? blkOffsetUV_422 : blkOffset));
+            const int* pOffset = (iNumBlock == 4 ? JXRLIB_API(blkOffsetUV) : (iNumBlock == 8 ? JXRLIB_API(blkOffsetUV_422) : JXRLIB_API(blkOffset)));
             CWMIQuantizer* pQPDC = pTile->pQuantizerDC[iChannel];
             CWMIQuantizer* pQPLP = pTile->pQuantizerLP[iChannel] + pMBInfo->iQIndexLP;
             CWMIQuantizer* pQPHP = pTile->pQuantizerHP[iChannel] + pMBInfo->iQIndexHP;
@@ -70,14 +71,14 @@ Int quantizeMacroblock(CWMImageStrCodec* pSC)
                 PixelI* pData = pSC->pPlane[iChannel] + pOffset[j];
 
                 if (j == 0) // DC
-                    pData[0] = (pQPDC->iMan == 0 ? QUANT_Mulless(pData[0], pQPDC->iOffset, pQPDC->iExp) : QUANT(pData[0], pQPDC->iOffset, pQPDC->iMan, pQPDC->iExp));
+                    pData[0] = (pQPDC->iMan == 0 ? JXRLIB_API(QUANT_Mulless)(pData[0], pQPDC->iOffset, pQPDC->iExp) : JXRLIB_API(QUANT)(pData[0], pQPDC->iOffset, pQPDC->iMan, pQPDC->iExp));
                 else if (pSC->WMISCP.sbSubband != SB_DC_ONLY) // LP
-                    pData[0] = (pQPLP->iMan == 0 ? QUANT_Mulless(pData[0], pQPLP->iOffset, pQPLP->iExp) : QUANT(pData[0], pQPLP->iOffset, pQPLP->iMan, pQPLP->iExp));
+                    pData[0] = (pQPLP->iMan == 0 ? JXRLIB_API(QUANT_Mulless)(pData[0], pQPLP->iOffset, pQPLP->iExp) : JXRLIB_API(QUANT)(pData[0], pQPLP->iOffset, pQPLP->iMan, pQPLP->iExp));
 
                 // quantize HP
                 if (pSC->WMISCP.sbSubband != SB_DC_ONLY && pSC->WMISCP.sbSubband != SB_NO_HIGHPASS)
                     for (i = 1; i < 16; i++)
-                        pData[i] = (pQPHP->iMan == 0 ? QUANT_Mulless(pData[i], pQPHP->iOffset, pQPHP->iExp) : QUANT(pData[i], pQPHP->iOffset, pQPHP->iMan, pQPHP->iExp));
+                        pData[i] = (pQPHP->iMan == 0 ? JXRLIB_API(QUANT_Mulless)(pData[i], pQPHP->iOffset, pQPHP->iExp) : JXRLIB_API(QUANT)(pData[i], pQPHP->iOffset, pQPHP->iMan, pQPHP->iExp));
             }
         }
 
@@ -87,17 +88,17 @@ Int quantizeMacroblock(CWMImageStrCodec* pSC)
 
         if (iChannel > 0 && cf == YUV_422) {
             for (i = 0; i < 8; i++) {
-                pDC[i] = pData[blkOffsetUV_422[i]];
+                pDC[i] = pData[JXRLIB_API(blkOffsetUV_422)[i]];
             }
         }
         else if (iChannel > 0 && cf == YUV_420) {
             for (i = 0; i < 4; i++) {
-                pDC[i] = pData[blkOffsetUV[i]];
+                pDC[i] = pData[JXRLIB_API(blkOffsetUV)[i]];
             }
         }
         else {
             for (i = 0; i < 16; i++) {
-                pDC[i] = pData[dctIndex[2][i]];
+                pDC[i] = pData[JXRLIB_API(dctIndex)[2][i]];
             }
         }
     }
@@ -106,23 +107,23 @@ Int quantizeMacroblock(CWMImageStrCodec* pSC)
 }
 
 /* frequency domain prediction */
-Void predMacroblockEnc(CWMImageStrCodec* pSC)
+Void JXRLIB_API(predMacroblockEnc)(CWMImageStrCodec* pSC)
 {
     const COLORFORMAT cf = pSC->m_param.cfColorFormat;
     const Int iChannels = (cf == YUV_420 || cf == YUV_422) ? 1 : (Int)pSC->m_param.cNumChannels;
     size_t mbX = pSC->cColumn - 1;// mbY = pSC->cRow - 1;
     CWMIMBInfo* pMBInfo = &(pSC->MBInfo);
-    Int iDCACPredMode = getDCACPredMode(pSC, mbX);
+    Int iDCACPredMode = JXRLIB_API(getDCACPredMode)(pSC, mbX);
     Int iDCPredMode = (iDCACPredMode & 0x3);
     Int iADPredMode = (iDCACPredMode & 0xC);
-    Int iACPredMode = getACPredMode(pMBInfo, cf);
+    Int iACPredMode = JXRLIB_API(getACPredMode)(pMBInfo, cf);
     PixelI* pOrg, * pRef;
     Int i, j, k;
 
     pMBInfo->iOrientation = 2 - iACPredMode;
 
     /* keep necessary info for future prediction */
-    updatePredInfo(pSC, pMBInfo, mbX, cf);
+    JXRLIB_API(updatePredInfo)(pSC, pMBInfo, mbX, cf);
 
     for (i = 0; i < iChannels; i++) {
         pOrg = pMBInfo->iBlockDC[i]; // current DC block
@@ -471,7 +472,7 @@ static Int predCBPC422Enc(CWMImageStrCodec* pSC, Int iCBP, size_t mbX, size_t mb
     return iRetval;
 }
 
-Void predCBPEnc(CWMImageStrCodec* pSC, CCodingContext* pContext)
+Void JXRLIB_API(predCBPEnc)(CWMImageStrCodec* pSC, CCodingContext* pContext)
 {
     size_t mbX = pSC->cColumn - 1, mbY = pSC->cRow - 1;
     CWMIMBInfo* pMBInfo = &(pSC->MBInfo);
@@ -481,7 +482,7 @@ Void predCBPEnc(CWMImageStrCodec* pSC, CCodingContext* pContext)
         const COLORFORMAT cf = pSC->m_param.cfColorFormat;
         const Bool bUV = (iChannel > 0);
         const int iNumBlock = (bUV ? (cf == YUV_422 ? 8 : (cf == YUV_420 ? 4 : 16)) : 16);
-        const int* pOffset = (iNumBlock == 4 ? blkOffsetUV : (iNumBlock == 8 ? blkOffsetUV_422 : blkOffset));
+        const int* pOffset = (iNumBlock == 4 ? JXRLIB_API(blkOffsetUV) : (iNumBlock == 8 ? JXRLIB_API(blkOffsetUV_422) : JXRLIB_API(blkOffset)));
         const Int threshold = (1 << pContext->m_aModelAC.m_iFlcBits[bUV ? 1 : 0]) - 1, threshold2 = threshold * 2 + 1;
         Int iCBP = 0;
 

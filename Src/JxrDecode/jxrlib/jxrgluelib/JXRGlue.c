@@ -25,6 +25,7 @@
 // POSSIBILITY OF SUCH DAMAGE.
 //
 //*@@@---@@@@******************************************************************
+#include "../common/include/jxrlib_symbol_mangle.h"
 #include <stdlib.h>
 #include <ctype.h>
 
@@ -32,25 +33,25 @@
 #include "JXRGlue.h"
 
 //================================================================
-const PKIID IID_PKImageScanEncode = 1;
-const PKIID IID_PKImageFrameEncode = 2;
+const PKIID JXRLIB_API(IID_PKImageScanEncode) = 1;
+const PKIID JXRLIB_API(IID_PKImageFrameEncode) = 2;
 
-const PKIID IID_PKImageUnsupported = 100;
-const PKIID IID_PKImageWmpEncode = 101;
+const PKIID JXRLIB_API(IID_PKImageUnsupported) = 100;
+const PKIID JXRLIB_API(IID_PKImageWmpEncode) = 101;
 
-const PKIID IID_PKImageWmpDecode = 201;
+const PKIID JXRLIB_API(IID_PKImageWmpDecode) = 201;
 
 //================================================================
 // Misc supporting functions
 //================================================================
-ERR PKAlloc(void** ppv, size_t cb)
+ERR JXRLIB_API(PKAlloc)(void** ppv, size_t cb)
 {
     *ppv = calloc(1, cb);
     return *ppv ? WMP_errSuccess : WMP_errOutOfMemory;
 }
 
 
-ERR PKFree(void** ppv)
+ERR JXRLIB_API(PKFree)(void** ppv)
 {
     if (ppv)
     {
@@ -61,7 +62,7 @@ ERR PKFree(void** ppv)
     return WMP_errSuccess;
 }
 
-ERR PKAllocAligned(void** ppv, size_t cb, size_t iAlign)
+ERR JXRLIB_API(PKAllocAligned)(void** ppv, size_t cb, size_t iAlign)
 {
     U8* pOrigPtr;
     U8* pReturnedPtr;
@@ -89,7 +90,7 @@ ERR PKAllocAligned(void** ppv, size_t cb, size_t iAlign)
     return WMP_errSuccess;
 }
 
-ERR PKFreeAligned(void** ppv)
+ERR JXRLIB_API(PKFreeAligned)(void** ppv)
 {
     if (ppv && *ppv)
     {
@@ -103,7 +104,7 @@ ERR PKFreeAligned(void** ppv)
 
 
 
-int PKStrnicmp(const char* s1, const char* s2, size_t c)
+int JXRLIB_API(PKStrnicmp)(const char* s1, const char* s2, size_t c)
 {
     for (; tolower(*s1) == tolower(*s2) && *s1 && *s2 && c; ++s1, ++s2, --c);
     return c ? *s1 - *s2 : 0;
@@ -111,16 +112,16 @@ int PKStrnicmp(const char* s1, const char* s2, size_t c)
 
 static const PKPixelInfo pixelInfo[] =
 {
-    {&GUID_PKPixelFormatDontCare, 1, Y_ONLY, BD_8, 8, PK_pixfmtNul, 0, 0, 0, 0},
+    {&JXRLIB_API(GUID_PKPixelFormatDontCare), 1, Y_ONLY, BD_8, 8, PK_pixfmtNul, 0, 0, 0, 0},
 
     // Gray
     //{&GUID_PKPixelFormat2bppGray, 1, Y_ONLY, BD_8, 2, PK_pixfmtNul},
     //{&GUID_PKPixelFormat4bppGray, 1, Y_ONLY, BD_8, 4, PK_pixfmtNul},
 
-    {&GUID_PKPixelFormatBlackWhite, 1, Y_ONLY, BD_1, 1, PK_pixfmtNul,               1, 1, 1, 1},//BlackIsZero is default for GUID_PKPixelFormatBlackWhite
-    {&GUID_PKPixelFormatBlackWhite, 1, Y_ONLY, BD_1, 1, PK_pixfmtNul,               0, 1, 1, 1},//WhiteIsZero
-    {&GUID_PKPixelFormat8bppGray, 1, Y_ONLY, BD_8, 8, PK_pixfmtNul,                 1, 1, 8, 1},
-    {&GUID_PKPixelFormat16bppGray, 1, Y_ONLY, BD_16, 16, PK_pixfmtNul,              1, 1, 16, 1},
+    {&JXRLIB_API(GUID_PKPixelFormatBlackWhite), 1, Y_ONLY, BD_1, 1, PK_pixfmtNul,               1, 1, 1, 1},//BlackIsZero is default for GUID_PKPixelFormatBlackWhite
+    {&JXRLIB_API(GUID_PKPixelFormatBlackWhite), 1, Y_ONLY, BD_1, 1, PK_pixfmtNul,               0, 1, 1, 1},//WhiteIsZero
+    {&JXRLIB_API(GUID_PKPixelFormat8bppGray), 1, Y_ONLY, BD_8, 8, PK_pixfmtNul,                 1, 1, 8, 1},
+    {&JXRLIB_API(GUID_PKPixelFormat16bppGray), 1, Y_ONLY, BD_16, 16, PK_pixfmtNul,              1, 1, 16, 1},
     {&GUID_PKPixelFormat16bppGrayFixedPoint, 1, Y_ONLY, BD_16S, 16, PK_pixfmtNul,   1, 1, 16, 2},
     {&GUID_PKPixelFormat16bppGrayHalf, 1, Y_ONLY, BD_16F, 16, PK_pixfmtNul,         1, 1, 16, 3},
     //{&GUID_PKPixelFormat32bppGray, 1, Y_ONLY, BD_32, 32, PK_pixfmtNul,              1, 1, 32, 1},
@@ -128,8 +129,8 @@ static const PKPixelInfo pixelInfo[] =
     {&GUID_PKPixelFormat32bppGrayFloat, 1, Y_ONLY, BD_32F, 32, PK_pixfmtNul,        1, 1, 32, 3},
 
     // RGB
-    {&GUID_PKPixelFormat24bppRGB, 3, CF_RGB, BD_8, 24, PK_pixfmtNul,                2, 3, 8, 1},
-    {&GUID_PKPixelFormat24bppBGR, 3, CF_RGB, BD_8, 24, PK_pixfmtBGR,                2, 3, 8, 1},
+    {&JXRLIB_API(GUID_PKPixelFormat24bppRGB), 3, CF_RGB, BD_8, 24, PK_pixfmtNul,                2, 3, 8, 1},
+    {&JXRLIB_API(GUID_PKPixelFormat24bppBGR), 3, CF_RGB, BD_8, 24, PK_pixfmtBGR,                2, 3, 8, 1},
     {&GUID_PKPixelFormat32bppRGB, 3, CF_RGB, BD_8, 32, PK_pixfmtNul,                2, 3, 8, 1},
     {&GUID_PKPixelFormat32bppBGR, 3, CF_RGB, BD_8, 32, PK_pixfmtBGR,                2, 3, 8, 1},
     {&GUID_PKPixelFormat48bppRGB, 3, CF_RGB, BD_16, 48, PK_pixfmtNul,               2, 3, 16, 1},
@@ -163,8 +164,8 @@ static const PKPixelInfo pixelInfo[] =
     {&GUID_PKPixelFormat128bppPRGBAFloat, 4, CF_RGB, BD_32F, 128, PK_pixfmtHasAlpha | PK_pixfmtPreMul,         2, 4, 32, 3},
 
     // Packed formats
-    {&GUID_PKPixelFormat16bppRGB555, 3, CF_RGB,  BD_5, 16, PK_pixfmtNul,      2, 3, 5, 1},
-    {&GUID_PKPixelFormat16bppRGB565, 3, CF_RGB, BD_565, 16, PK_pixfmtNul,     2, 3, 6, 1},
+    {&JXRLIB_API(GUID_PKPixelFormat16bppRGB555), 3, CF_RGB,  BD_5, 16, PK_pixfmtNul,      2, 3, 5, 1},
+    {&JXRLIB_API(GUID_PKPixelFormat16bppRGB565), 3, CF_RGB, BD_565, 16, PK_pixfmtNul,     2, 3, 6, 1},
     {&GUID_PKPixelFormat32bppRGB101010, 3, CF_RGB, BD_10, 32, PK_pixfmtNul,   2, 3, 10, 1},
 
     // CMYK
@@ -214,7 +215,7 @@ static const PKPixelInfo pixelInfo[] =
 
 //----------------------------------------------------------------
 //ERR GetPixelInfo(PKPixelFormatGUID enPixelFormat, const PKPixelInfo** ppPI)
-ERR PixelFormatLookup(PKPixelInfo* pPI, U8 uLookupType)
+ERR JXRLIB_API(PixelFormatLookup)(PKPixelInfo* pPI, U8 uLookupType)
 {
     ERR err = WMP_errSuccess;
     size_t i;
@@ -253,7 +254,7 @@ Cleanup:
 }
 
 
-const PKPixelFormatGUID* GetPixelFormatFromHash(const U8 uPFHash)
+const PKPixelFormatGUID* JXRLIB_API(GetPixelFormatFromHash)(const U8 uPFHash)
 {
     int i;
 
@@ -280,16 +281,16 @@ static ERR GetIIDInfo(const char* szExt, const PKIIDInfo** ppInfo)
     ERR err = WMP_errSuccess;
 
     static PKIIDInfo iidInfo[] = {
-        {".jxr", &IID_PKImageWmpEncode, &IID_PKImageWmpDecode},
-        {".wdp", &IID_PKImageUnsupported, &IID_PKImageWmpDecode},
-        {".hdp", &IID_PKImageUnsupported, &IID_PKImageWmpDecode},
+        {".jxr", &JXRLIB_API(IID_PKImageWmpEncode), &JXRLIB_API(IID_PKImageWmpDecode)},
+        {".wdp", &JXRLIB_API(IID_PKImageUnsupported), &JXRLIB_API(IID_PKImageWmpDecode)},
+        {".hdp", &JXRLIB_API(IID_PKImageUnsupported), &JXRLIB_API(IID_PKImageWmpDecode)},
     };
     size_t i = 0;
 
     *ppInfo = NULL;
     for (i = 0; i < sizeof2(iidInfo); ++i)
     {
-        if (0 == PKStrnicmp(szExt, iidInfo[i].szExt, strlen(iidInfo[i].szExt)))
+        if (0 == JXRLIB_API(PKStrnicmp)(szExt, iidInfo[i].szExt, strlen(iidInfo[i].szExt)))
         {
             *ppInfo = &iidInfo[i];
             goto Cleanup;
@@ -302,7 +303,7 @@ Cleanup:
     return err;
 }
 
-ERR GetImageEncodeIID(const char* szExt, const PKIID** ppIID)
+ERR JXRLIB_API(GetImageEncodeIID)(const char* szExt, const PKIID** ppIID)
 {
     ERR err = WMP_errSuccess;
 
@@ -315,7 +316,7 @@ Cleanup:
     return err;
 }
 
-ERR GetImageDecodeIID(const char* szExt, const PKIID** ppIID)
+ERR JXRLIB_API(GetImageDecodeIID)(const char* szExt, const PKIID** ppIID)
 {
     ERR err = WMP_errSuccess;
 
@@ -331,43 +332,43 @@ Cleanup:
 //================================================================
 // PKFactory
 //================================================================
-ERR PKCreateFactory_CreateStream(PKStream** ppStream)
+ERR JXRLIB_API(PKCreateFactory_CreateStream)(PKStream** ppStream)
 {
     ERR err = WMP_errSuccess;
 
-    Call(PKAlloc((void**)ppStream, sizeof(**ppStream)));
+    Call(JXRLIB_API(PKAlloc)((void**)ppStream, sizeof(**ppStream)));
 
 Cleanup:
     return err;
 }
 
-ERR PKCreateFactory_Release(PKFactory** ppFactory)
+ERR JXRLIB_API(PKCreateFactory_Release)(PKFactory** ppFactory)
 {
     ERR err = WMP_errSuccess;
 
-    Call(PKFree((void**)ppFactory));
+    Call(JXRLIB_API(PKFree)((void**)ppFactory));
 
 Cleanup:
     return err;
 }
 
 //----------------------------------------------------------------
-ERR PKCreateFactory(PKFactory** ppFactory, U32 uVersion)
+ERR JXRLIB_API(PKCreateFactory)(PKFactory** ppFactory, U32 uVersion)
 {
     ERR err = WMP_errSuccess;
     PKFactory* pFactory = NULL;
 
     UNREFERENCED_PARAMETER(uVersion);
 
-    Call(PKAlloc((void**)ppFactory, sizeof(**ppFactory)));
+    Call(JXRLIB_API(PKAlloc)((void**)ppFactory, sizeof(**ppFactory)));
     pFactory = *ppFactory;
 
-    pFactory->CreateStream = PKCreateFactory_CreateStream;
+    pFactory->CreateStream = JXRLIB_API(PKCreateFactory_CreateStream);
 
-    pFactory->CreateStreamFromFilename = CreateWS_File;
-    pFactory->CreateStreamFromMemory = CreateWS_Memory;
+    pFactory->CreateStreamFromFilename = JXRLIB_API(CreateWS_File);
+    pFactory->CreateStreamFromMemory = JXRLIB_API(CreateWS_Memory);
 
-    pFactory->Release = PKCreateFactory_Release;
+    pFactory->Release = JXRLIB_API(PKCreateFactory_Release);
 
 Cleanup:
     return err;
@@ -377,17 +378,17 @@ Cleanup:
 //================================================================
 // PKCodecFactory
 //================================================================
-ERR PKCodecFactory_CreateCodec(const PKIID* iid, void** ppv)
+ERR JXRLIB_API(PKCodecFactory_CreateCodec)(const PKIID* iid, void** ppv)
 {
     ERR err = WMP_errSuccess;
 
-    if (IID_PKImageWmpEncode == *iid)
+    if (JXRLIB_API(IID_PKImageWmpEncode) == *iid)
     {
-        Call(PKImageEncode_Create_WMP((PKImageEncode**)ppv));
+        Call(JXRLIB_API(PKImageEncode_Create_WMP)((PKImageEncode**)ppv));
     }
-    else if (IID_PKImageWmpDecode == *iid)
+    else if (JXRLIB_API(IID_PKImageWmpDecode) == *iid)
     {
-        Call(PKImageDecode_Create_WMP((PKImageDecode**)ppv));
+        Call(JXRLIB_API(PKImageDecode_Create_WMP)((PKImageDecode**)ppv));
     }
     else
     {
@@ -398,7 +399,7 @@ Cleanup:
     return err;
 }
 
-ERR PKCodecFactory_CreateDecoderFromFile(const char* szFilename, PKImageDecode** ppDecoder)
+ERR JXRLIB_API(PKCodecFactory_CreateDecoderFromFile)(const char* szFilename, PKImageDecode** ppDecoder)
 {
     ERR err = WMP_errSuccess;
 
@@ -413,13 +414,13 @@ ERR PKCodecFactory_CreateDecoderFromFile(const char* szFilename, PKImageDecode**
     FailIf(NULL == pExt, WMP_errUnsupportedFormat);
 
     // get decode PKIID
-    Call(GetImageDecodeIID(pExt, &pIID));
+    Call(JXRLIB_API(GetImageDecodeIID)(pExt, &pIID));
 
     // create stream
-    Call(CreateWS_File(&pStream, szFilename, "rb"));
+    Call(JXRLIB_API(CreateWS_File)(&pStream, szFilename, "rb"));
 
     // Create decoder
-    Call(PKCodecFactory_CreateCodec(pIID, (void**)ppDecoder));
+    Call(JXRLIB_API(PKCodecFactory_CreateCodec)(pIID, (void**)ppDecoder));
     pDecoder = *ppDecoder;
 
     // attach stream to decoder
@@ -430,7 +431,7 @@ Cleanup:
     return err;
 }
 
-ERR PKCodecFactory_CreateDecoderFromMemory(char* inBuffer, size_t size, PKImageDecode** ppDecoder)
+ERR JXRLIB_API(PKCodecFactory_CreateDecoderFromMemory)(char* inBuffer, size_t size, PKImageDecode** ppDecoder)
 {
     ERR err = WMP_errSuccess;
 
@@ -441,13 +442,13 @@ ERR PKCodecFactory_CreateDecoderFromMemory(char* inBuffer, size_t size, PKImageD
     PKImageDecode* pDecoder = NULL;
 
     // get decode PKIID
-    Call(GetImageDecodeIID(pExt, &pIID));
+    Call(JXRLIB_API(GetImageDecodeIID)(pExt, &pIID));
 
     // create stream
-    Call(CreateWS_Memory(&pStream, inBuffer, size));
+    Call(JXRLIB_API(CreateWS_Memory)(&pStream, inBuffer, size));
 
     // Create decoder
-    Call(PKCodecFactory_CreateCodec(pIID, (void**)ppDecoder));
+    Call(JXRLIB_API(PKCodecFactory_CreateCodec)(pIID, (void**)ppDecoder));
     pDecoder = *ppDecoder;
 
     // attach stream to decoder
@@ -458,12 +459,12 @@ Cleanup:
     return err;
 }
 
-ERR PKCodecFactory_CreateDecoderFromStream(struct tagWMPStream* pStream, PKImageDecode** ppDecoder)
+ERR JXRLIB_API(PKCodecFactory_CreateDecoderFromStream)(struct tagWMPStream* pStream, PKImageDecode** ppDecoder)
 {
     ERR err = WMP_errSuccess;
 
     // Create decoder
-    Call(PKCodecFactory_CreateCodec(&IID_PKImageWmpDecode, (void**)ppDecoder));
+    Call(JXRLIB_API(PKCodecFactory_CreateCodec)(&JXRLIB_API(IID_PKImageWmpDecode), (void**)ppDecoder));
 
     // attach stream to decoder
     Call((*ppDecoder)->Initialize(*ppDecoder, pStream));
@@ -473,54 +474,54 @@ Cleanup:
     return err;
 }
 
-ERR PKCodecFactory_CreateFormatConverter(PKFormatConverter** ppFConverter)
+ERR JXRLIB_API(PKCodecFactory_CreateFormatConverter)(PKFormatConverter** ppFConverter)
 {
     ERR err = WMP_errSuccess;
     PKFormatConverter* pFC = NULL;
 
-    Call(PKAlloc((void**)ppFConverter, sizeof(**ppFConverter)));
+    Call(JXRLIB_API(PKAlloc)((void**)ppFConverter, sizeof(**ppFConverter)));
     pFC = *ppFConverter;
 
-    pFC->Initialize = PKFormatConverter_Initialize;
-    pFC->InitializeConvert = PKFormatConverter_InitializeConvert;
-    pFC->GetPixelFormat = PKFormatConverter_GetPixelFormat;
-    pFC->GetSourcePixelFormat = PKFormatConverter_GetSourcePixelFormat;
-    pFC->GetSize = PKFormatConverter_GetSize;
-    pFC->GetResolution = PKFormatConverter_GetResolution;
-    pFC->Copy = PKFormatConverter_Copy;
-    pFC->Convert = PKFormatConverter_Convert;
-    pFC->Release = PKFormatConverter_Release;
+    pFC->Initialize = JXRLIB_API(PKFormatConverter_Initialize);
+    pFC->InitializeConvert = JXRLIB_API(PKFormatConverter_InitializeConvert);
+    pFC->GetPixelFormat = JXRLIB_API(PKFormatConverter_GetPixelFormat);
+    pFC->GetSourcePixelFormat = JXRLIB_API(PKFormatConverter_GetSourcePixelFormat);
+    pFC->GetSize = JXRLIB_API(PKFormatConverter_GetSize);
+    pFC->GetResolution = JXRLIB_API(PKFormatConverter_GetResolution);
+    pFC->Copy = JXRLIB_API(PKFormatConverter_Copy);
+    pFC->Convert = JXRLIB_API(PKFormatConverter_Convert);
+    pFC->Release = JXRLIB_API(PKFormatConverter_Release);
 
 Cleanup:
     return err;
 }
 
-ERR PKCreateCodecFactory_Release(PKCodecFactory** ppCFactory)
+ERR JXRLIB_API(PKCreateCodecFactory_Release)(PKCodecFactory** ppCFactory)
 {
     ERR err = WMP_errSuccess;
 
-    Call(PKFree((void**)ppCFactory));
+    Call(JXRLIB_API(PKFree)((void**)ppCFactory));
 
 Cleanup:
     return err;
 }
 
-ERR PKCreateCodecFactory(PKCodecFactory** ppCFactory, U32 uVersion)
+ERR JXRLIB_API(PKCreateCodecFactory)(PKCodecFactory** ppCFactory, U32 uVersion)
 {
     ERR err = WMP_errSuccess;
     PKCodecFactory* pCFactory = NULL;
 
     UNREFERENCED_PARAMETER(uVersion);
 
-    Call(PKAlloc((void**)ppCFactory, sizeof(**ppCFactory)));
+    Call(JXRLIB_API(PKAlloc)((void**)ppCFactory, sizeof(**ppCFactory)));
     pCFactory = *ppCFactory;
 
-    pCFactory->CreateCodec = PKCodecFactory_CreateCodec;
-    pCFactory->CreateDecoderFromFile = PKCodecFactory_CreateDecoderFromFile;
-    pCFactory->CreateDecoderFromMemory = PKCodecFactory_CreateDecoderFromMemory;
-    pCFactory->CreateDecoderFromStream = PKCodecFactory_CreateDecoderFromStream;
-    pCFactory->CreateFormatConverter = PKCodecFactory_CreateFormatConverter;
-    pCFactory->Release = PKCreateCodecFactory_Release;
+    pCFactory->CreateCodec = JXRLIB_API(PKCodecFactory_CreateCodec);
+    pCFactory->CreateDecoderFromFile = JXRLIB_API(PKCodecFactory_CreateDecoderFromFile);
+    pCFactory->CreateDecoderFromMemory = JXRLIB_API(PKCodecFactory_CreateDecoderFromMemory);
+    pCFactory->CreateDecoderFromStream = JXRLIB_API(PKCodecFactory_CreateDecoderFromStream);
+    pCFactory->CreateFormatConverter = JXRLIB_API(PKCodecFactory_CreateFormatConverter);
+    pCFactory->Release = JXRLIB_API(PKCreateCodecFactory_Release);
 
 Cleanup:
     return err;
@@ -530,7 +531,7 @@ Cleanup:
 //================================================================
 // PKImageEncode
 //================================================================
-ERR PKImageEncode_Initialize(
+ERR JXRLIB_API(PKImageEncode_Initialize)(
     PKImageEncode* pIE,
     struct tagWMPStream* pStream,
     void* pvParam,
@@ -543,7 +544,7 @@ ERR PKImageEncode_Initialize(
     UNREFERENCED_PARAMETER(cbParam);
 
     pIE->pStream = pStream;
-    pIE->guidPixFormat = GUID_PKPixelFormatDontCare;
+    pIE->guidPixFormat = JXRLIB_API(GUID_PKPixelFormatDontCare);
     pIE->fResX = 96;
     pIE->fResY = 96;
     pIE->cFrame = 1;
@@ -554,14 +555,14 @@ Cleanup:
     return err;
 }
 
-ERR PKImageEncode_Terminate(
+ERR JXRLIB_API(PKImageEncode_Terminate)(
     PKImageEncode* pIE)
 {
     UNREFERENCED_PARAMETER(pIE);
     return WMP_errSuccess;
 }
 
-ERR PKImageEncode_SetPixelFormat(
+ERR JXRLIB_API(PKImageEncode_SetPixelFormat)(
     PKImageEncode* pIE,
     PKPixelFormatGUID enPixelFormat)
 {
@@ -570,7 +571,7 @@ ERR PKImageEncode_SetPixelFormat(
     return WMP_errSuccess;
 }
 
-ERR PKImageEncode_SetSize(
+ERR JXRLIB_API(PKImageEncode_SetSize)(
     PKImageEncode* pIE,
     I32 iWidth,
     I32 iHeight)
@@ -586,7 +587,7 @@ ERR PKImageEncode_SetSize(
     return WMP_errInvalidParameter;
 }
 
-ERR PKImageEncode_SetResolution(
+ERR JXRLIB_API(PKImageEncode_SetResolution)(
     PKImageEncode* pIE,
     Float fResX,
     Float fResY)
@@ -597,7 +598,7 @@ ERR PKImageEncode_SetResolution(
     return WMP_errSuccess;
 }
 
-ERR PKImageEncode_SetColorContext(PKImageEncode* pIE,
+ERR JXRLIB_API(PKImageEncode_SetColorContext)(PKImageEncode* pIE,
     const U8* pbColorContext,
     U32 cbColorContext)
 {
@@ -608,14 +609,14 @@ ERR PKImageEncode_SetColorContext(PKImageEncode* pIE,
 }
 
 
-ERR PKImageEncode_SetDescriptiveMetadata(PKImageEncode* pIE, const DESCRIPTIVEMETADATA* pDescMetadata)
+ERR JXRLIB_API(PKImageEncode_SetDescriptiveMetadata)(PKImageEncode* pIE, const DESCRIPTIVEMETADATA* pDescMetadata)
 {
     UNREFERENCED_PARAMETER(pIE);
     UNREFERENCED_PARAMETER(pDescMetadata);
     return WMP_errNotYetImplemented;
 }
 
-ERR PKImageEncode_WritePixels(
+ERR JXRLIB_API(PKImageEncode_WritePixels)(
     PKImageEncode* pIE,
     U32 cLine,
     U8* pbPixels,
@@ -628,15 +629,15 @@ ERR PKImageEncode_WritePixels(
     return WMP_errAbstractMethod;
 }
 
-ERR PKImageEncode_WriteSource(
+ERR JXRLIB_API(PKImageEncode_WriteSource)(
     PKImageEncode* pIE,
     PKFormatConverter* pFC,
     PKRect* pRect)
 {
     ERR err = WMP_errSuccess;
 
-    PKPixelFormatGUID enPFFrom = GUID_PKPixelFormatDontCare;
-    PKPixelFormatGUID enPFTo = GUID_PKPixelFormatDontCare;
+    PKPixelFormatGUID enPFFrom = JXRLIB_API(GUID_PKPixelFormatDontCare);
+    PKPixelFormatGUID enPFTo = JXRLIB_API(GUID_PKPixelFormatDontCare);
 
     PKPixelInfo pPIFrom;
     PKPixelInfo pPITo;
@@ -657,11 +658,11 @@ ERR PKImageEncode_WriteSource(
     // calc common stride
 //    Call(GetPixelInfo(enPFFrom, &pPIFrom));
     pPIFrom.pGUIDPixFmt = &enPFFrom;
-    PixelFormatLookup(&pPIFrom, LOOKUP_FORWARD);
+    JXRLIB_API(PixelFormatLookup)(&pPIFrom, LOOKUP_FORWARD);
 
     //    Call(GetPixelInfo(enPFTo, &pPITo));
     pPITo.pGUIDPixFmt = &enPFTo;
-    PixelFormatLookup(&pPITo, LOOKUP_FORWARD);
+    JXRLIB_API(PixelFormatLookup)(&pPITo, LOOKUP_FORWARD);
 
     //    cbStrideFrom = (pPIFrom->cbPixel * pRect->Width + pPIFrom->cbPixelDenom - 1) / pPIFrom->cbPixelDenom;
     cbStrideFrom = (BD_1 == pPIFrom.bdBitDepth ? ((pPIFrom.cbitUnit * pRect->Width + 7) >> 3) : (((pPIFrom.cbitUnit + 7) >> 3) * pRect->Width));
@@ -678,25 +679,25 @@ ERR PKImageEncode_WriteSource(
     cbStride = cbStrideFrom > cbStrideTo ? cbStrideFrom : cbStrideTo;//  max(cbStrideFrom, cbStrideTo);
 
     // actual dec/enc with local buffer
-    Call(PKAllocAligned((void**)&pb, (size_t)cbStride * pRect->Height, 128));
+    Call(JXRLIB_API(PKAllocAligned)((void**)&pb, (size_t)cbStride * pRect->Height, 128));
 
     Call(pFC->Copy(pFC, pRect, pb, cbStride));
 
     Call(pIE->WritePixels(pIE, pRect->Height, pb, cbStride));
 
 Cleanup:
-    PKFreeAligned((void**)&pb);
+    JXRLIB_API(PKFreeAligned)((void**)&pb);
     return err;
 }
 
-ERR PKImageEncode_WritePixelsBandedBegin(PKImageEncode* pEncoder, struct tagWMPStream* pPATempFile)
+ERR JXRLIB_API(PKImageEncode_WritePixelsBandedBegin)(PKImageEncode* pEncoder, struct tagWMPStream* pPATempFile)
 {
     UNREFERENCED_PARAMETER(pEncoder);
     UNREFERENCED_PARAMETER(pPATempFile);
     return WMP_errAbstractMethod;
 }
 
-ERR PKImageEncode_WritePixelsBanded(PKImageEncode* pEncoder, U32 cLines, U8* pbPixels, U32 cbStride, Bool fLastCall)
+ERR JXRLIB_API(PKImageEncode_WritePixelsBanded)(PKImageEncode* pEncoder, U32 cLines, U8* pbPixels, U32 cbStride, Bool fLastCall)
 {
     UNREFERENCED_PARAMETER(pEncoder);
     UNREFERENCED_PARAMETER(cLines);
@@ -706,22 +707,22 @@ ERR PKImageEncode_WritePixelsBanded(PKImageEncode* pEncoder, U32 cLines, U8* pbP
     return WMP_errAbstractMethod;
 }
 
-ERR PKImageEncode_WritePixelsBandedEnd(PKImageEncode* pEncoder)
+ERR JXRLIB_API(PKImageEncode_WritePixelsBandedEnd)(PKImageEncode* pEncoder)
 {
     UNREFERENCED_PARAMETER(pEncoder);
     return WMP_errAbstractMethod;
 }
 
 
-ERR PKImageEncode_Transcode(
+ERR JXRLIB_API(PKImageEncode_Transcode)(
     PKImageEncode* pIE,
     PKFormatConverter* pFC,
     PKRect* pRect)
 {
     ERR err = WMP_errSuccess;
 
-    PKPixelFormatGUID enPFFrom = GUID_PKPixelFormatDontCare;
-    PKPixelFormatGUID enPFTo = GUID_PKPixelFormatDontCare;
+    PKPixelFormatGUID enPFFrom = JXRLIB_API(GUID_PKPixelFormatDontCare);
+    PKPixelFormatGUID enPFTo = JXRLIB_API(GUID_PKPixelFormatDontCare);
 
     PKPixelInfo pPIFrom;
     PKPixelInfo pPITo;
@@ -742,11 +743,11 @@ ERR PKImageEncode_Transcode(
     // calc common stride
 //    Call(GetPixelInfo(enPFFrom, &pPIFrom));
     pPIFrom.pGUIDPixFmt = &enPFFrom;
-    PixelFormatLookup(&pPIFrom, LOOKUP_FORWARD);
+    JXRLIB_API(PixelFormatLookup)(&pPIFrom, LOOKUP_FORWARD);
 
     //    Call(GetPixelInfo(enPFTo, &pPITo));
     pPITo.pGUIDPixFmt = &enPFTo;
-    PixelFormatLookup(&pPITo, LOOKUP_FORWARD);
+    JXRLIB_API(PixelFormatLookup)(&pPITo, LOOKUP_FORWARD);
 
     //    cbStrideFrom = (pPIFrom->cbPixel * pRect->Width + pPIFrom->cbPixelDenom - 1) / pPIFrom->cbPixelDenom;
     cbStrideFrom = (BD_1 == pPIFrom.bdBitDepth ? ((pPIFrom.cbitUnit * pRect->Width + 7) >> 3) : (((pPIFrom.cbitUnit + 7) >> 3) * pRect->Width));
@@ -779,17 +780,17 @@ ERR PKImageEncode_Transcode(
     else
     {
         // actual dec/enc with local buffer
-        Call(PKAllocAligned((void**)&pb, (size_t)cbStride * pRect->Height, 128));
+        Call(JXRLIB_API(PKAllocAligned)((void**)&pb, (size_t)cbStride * pRect->Height, 128));
         Call(pFC->Copy(pFC, pRect, pb, cbStride));
         Call(pIE->WritePixels(pIE, pRect->Height, pb, cbStride));
     }
 
 Cleanup:
-    PKFreeAligned((void**)&pb);
+    JXRLIB_API(PKFreeAligned)((void**)&pb);
     return err;
 }
 
-ERR PKImageEncode_CreateNewFrame(
+ERR JXRLIB_API(PKImageEncode_CreateNewFrame)(
     PKImageEncode* pIE,
     void* pvParam,
     size_t cbParam)
@@ -801,39 +802,39 @@ ERR PKImageEncode_CreateNewFrame(
     return WMP_errSuccess;
 }
 
-ERR PKImageEncode_Release(
+ERR JXRLIB_API(PKImageEncode_Release)(
     PKImageEncode** ppIE)
 {
     PKImageEncode* pIE = *ppIE;
     pIE->pStream->Close(&pIE->pStream);
 
-    return PKFree((void**)ppIE);
+    return JXRLIB_API(PKFree)((void**)ppIE);
 }
 
-ERR PKImageEncode_Create(PKImageEncode** ppIE)
+ERR JXRLIB_API(PKImageEncode_Create)(PKImageEncode** ppIE)
 {
     ERR err = WMP_errSuccess;
     PKImageEncode* pIE = NULL;
 
-    Call(PKAlloc((void**)ppIE, sizeof(**ppIE)));
+    Call(JXRLIB_API(PKAlloc)((void**)ppIE, sizeof(**ppIE)));
 
     pIE = *ppIE;
-    pIE->Initialize = PKImageEncode_Initialize;
-    pIE->Terminate = PKImageEncode_Terminate;
-    pIE->SetPixelFormat = PKImageEncode_SetPixelFormat;
-    pIE->SetSize = PKImageEncode_SetSize;
-    pIE->SetResolution = PKImageEncode_SetResolution;
-    pIE->SetColorContext = PKImageEncode_SetColorContext;
-    pIE->SetDescriptiveMetadata = PKImageEncode_SetDescriptiveMetadata;
-    pIE->WritePixels = PKImageEncode_WritePixels;
+    pIE->Initialize = JXRLIB_API(PKImageEncode_Initialize);
+    pIE->Terminate = JXRLIB_API(PKImageEncode_Terminate);
+    pIE->SetPixelFormat = JXRLIB_API(PKImageEncode_SetPixelFormat);
+    pIE->SetSize = JXRLIB_API(PKImageEncode_SetSize);
+    pIE->SetResolution = JXRLIB_API(PKImageEncode_SetResolution);
+    pIE->SetColorContext = JXRLIB_API(PKImageEncode_SetColorContext);
+    pIE->SetDescriptiveMetadata = JXRLIB_API(PKImageEncode_SetDescriptiveMetadata);
+    pIE->WritePixels = JXRLIB_API(PKImageEncode_WritePixels);
     //    pIE->WriteSource = PKImageEncode_WriteSource;
 
-    pIE->WritePixelsBandedBegin = PKImageEncode_WritePixelsBandedBegin;
-    pIE->WritePixelsBanded = PKImageEncode_WritePixelsBanded;
-    pIE->WritePixelsBandedEnd = PKImageEncode_WritePixelsBandedEnd;
+    pIE->WritePixelsBandedBegin = JXRLIB_API(PKImageEncode_WritePixelsBandedBegin);
+    pIE->WritePixelsBanded = JXRLIB_API(PKImageEncode_WritePixelsBanded);
+    pIE->WritePixelsBandedEnd = JXRLIB_API(PKImageEncode_WritePixelsBandedEnd);
 
-    pIE->CreateNewFrame = PKImageEncode_CreateNewFrame;
-    pIE->Release = PKImageEncode_Release;
+    pIE->CreateNewFrame = JXRLIB_API(PKImageEncode_CreateNewFrame);
+    pIE->Release = JXRLIB_API(PKImageEncode_Release);
     pIE->bWMP = FALSE;
 
 Cleanup:
@@ -844,14 +845,14 @@ Cleanup:
 //================================================================
 // PKImageDecode
 //================================================================
-ERR PKImageDecode_Initialize(
+ERR JXRLIB_API(PKImageDecode_Initialize)(
     PKImageDecode* pID,
     struct tagWMPStream* pStream)
 {
     ERR err = WMP_errSuccess;
 
     pID->pStream = pStream;
-    pID->guidPixFormat = GUID_PKPixelFormatDontCare;
+    pID->guidPixFormat = JXRLIB_API(GUID_PKPixelFormatDontCare);
     pID->fResX = 96;
     pID->fResY = 96;
     pID->cFrame = 1;
@@ -864,7 +865,7 @@ Cleanup:
     return WMP_errSuccess;
 }
 
-ERR PKImageDecode_GetPixelFormat(
+ERR JXRLIB_API(PKImageDecode_GetPixelFormat)(
     PKImageDecode* pID,
     PKPixelFormatGUID* pPF)
 {
@@ -873,7 +874,7 @@ ERR PKImageDecode_GetPixelFormat(
     return WMP_errSuccess;
 }
 
-ERR PKImageDecode_GetSize(
+ERR JXRLIB_API(PKImageDecode_GetSize)(
     PKImageDecode* pID,
     I32* piWidth,
     I32* piHeight)
@@ -884,7 +885,7 @@ ERR PKImageDecode_GetSize(
     return WMP_errSuccess;
 }
 
-ERR PKImageDecode_GetResolution(
+ERR JXRLIB_API(PKImageDecode_GetResolution)(
     PKImageDecode* pID,
     Float* pfResX,
     Float* pfResY)
@@ -895,7 +896,7 @@ ERR PKImageDecode_GetResolution(
     return WMP_errSuccess;
 }
 
-ERR PKImageDecode_GetColorContext(PKImageDecode* pID, U8* pbColorContext, U32* pcbColorContext)
+ERR JXRLIB_API(PKImageDecode_GetColorContext)(PKImageDecode* pID, U8* pbColorContext, U32* pcbColorContext)
 {
     UNREFERENCED_PARAMETER(pID);
     UNREFERENCED_PARAMETER(pbColorContext);
@@ -903,14 +904,14 @@ ERR PKImageDecode_GetColorContext(PKImageDecode* pID, U8* pbColorContext, U32* p
     return WMP_errNotYetImplemented;
 }
 
-ERR PKImageDecode_GetDescriptiveMetadata(PKImageDecode* pIE, DESCRIPTIVEMETADATA* pDescMetadata)
+ERR JXRLIB_API(PKImageDecode_GetDescriptiveMetadata)(PKImageDecode* pIE, DESCRIPTIVEMETADATA* pDescMetadata)
 {
     UNREFERENCED_PARAMETER(pIE);
     UNREFERENCED_PARAMETER(pDescMetadata);
     return WMP_errNotYetImplemented;
 }
 
-ERR PKImageDecode_Copy(
+ERR JXRLIB_API(PKImageDecode_Copy)(
     PKImageDecode* pID,
     const PKRect* pRect,
     U8* pb,
@@ -923,7 +924,7 @@ ERR PKImageDecode_Copy(
     return WMP_errAbstractMethod;
 }
 
-ERR PKImageDecode_GetFrameCount(
+ERR JXRLIB_API(PKImageDecode_GetFrameCount)(
     PKImageDecode* pID,
     U32* puCount)
 {
@@ -932,7 +933,7 @@ ERR PKImageDecode_GetFrameCount(
     return WMP_errSuccess;
 }
 
-ERR PKImageDecode_SelectFrame(
+ERR JXRLIB_API(PKImageDecode_SelectFrame)(
     PKImageDecode* pID,
     U32 uFrame)
 {
@@ -942,35 +943,35 @@ ERR PKImageDecode_SelectFrame(
     return WMP_errSuccess;
 }
 
-ERR PKImageDecode_Release(
+ERR JXRLIB_API(PKImageDecode_Release)(
     PKImageDecode** ppID)
 {
     PKImageDecode* pID = *ppID;
 
     pID->fStreamOwner&& pID->pStream->Close(&pID->pStream);
 
-    return PKFree((void**)ppID);
+    return JXRLIB_API(PKFree)((void**)ppID);
 }
 
-ERR PKImageDecode_Create(
+ERR JXRLIB_API(PKImageDecode_Create)(
     PKImageDecode** ppID)
 {
     ERR err = WMP_errSuccess;
     PKImageDecode* pID = NULL;
 
-    Call(PKAlloc((void**)ppID, sizeof(**ppID)));
+    Call(JXRLIB_API(PKAlloc)((void**)ppID, sizeof(**ppID)));
 
     pID = *ppID;
-    pID->Initialize = PKImageDecode_Initialize;
-    pID->GetPixelFormat = PKImageDecode_GetPixelFormat;
-    pID->GetSize = PKImageDecode_GetSize;
-    pID->GetResolution = PKImageDecode_GetResolution;
-    pID->GetColorContext = PKImageDecode_GetColorContext;
-    pID->GetDescriptiveMetadata = PKImageDecode_GetDescriptiveMetadata;
-    pID->Copy = PKImageDecode_Copy;
-    pID->GetFrameCount = PKImageDecode_GetFrameCount;
-    pID->SelectFrame = PKImageDecode_SelectFrame;
-    pID->Release = PKImageDecode_Release;
+    pID->Initialize = JXRLIB_API(PKImageDecode_Initialize);
+    pID->GetPixelFormat = JXRLIB_API(PKImageDecode_GetPixelFormat);
+    pID->GetSize = JXRLIB_API(PKImageDecode_GetSize);
+    pID->GetResolution = JXRLIB_API(PKImageDecode_GetResolution);
+    pID->GetColorContext = JXRLIB_API(PKImageDecode_GetColorContext);
+    pID->GetDescriptiveMetadata = JXRLIB_API(PKImageDecode_GetDescriptiveMetadata);
+    pID->Copy = JXRLIB_API(PKImageDecode_Copy);
+    pID->GetFrameCount = JXRLIB_API(PKImageDecode_GetFrameCount);
+    pID->SelectFrame = JXRLIB_API(PKImageDecode_SelectFrame);
+    pID->Release = JXRLIB_API(PKImageDecode_Release);
 
 Cleanup:
     return err;
