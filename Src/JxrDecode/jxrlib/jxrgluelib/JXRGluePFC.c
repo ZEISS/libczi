@@ -25,6 +25,7 @@
 // POSSIBILITY OF SUCH DAMAGE.
 //
 //*@@@---@@@@******************************************************************
+#include "../common/include/jxrlib_symbol_mangle.h"
 #include <stdlib.h>
 
 #include "JXRGlue.h"
@@ -137,7 +138,7 @@ static U8 Convert_AlphaFloat_To_U8(float f)
 }
 
 
-ERR RGB24_BGR24(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStride)
+ERR JXRLIB_API(RGB24_BGR24)(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStride)
 {
     I32 i = 0, j = 0;
 
@@ -159,12 +160,12 @@ ERR RGB24_BGR24(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStrid
     return WMP_errSuccess;
 }
 
-ERR BGR24_RGB24(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStride)
+ERR JXRLIB_API(BGR24_RGB24)(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStride)
 {
-    return RGB24_BGR24(pFC, pRect, pb, cbStride);
+    return JXRLIB_API(RGB24_BGR24)(pFC, pRect, pb, cbStride);
 }
 
-ERR RGB24_BGR32(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStride)
+ERR JXRLIB_API(RGB24_BGR32)(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStride)
 {
     I32 i = 0, j = 0;
 
@@ -187,7 +188,7 @@ ERR RGB24_BGR32(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStrid
     return WMP_errSuccess;
 }
 
-ERR BGR32_RGB24(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStride)
+ERR JXRLIB_API(BGR32_RGB24)(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStride)
 {
     I32 i = 0, j = 0;
 
@@ -210,7 +211,7 @@ ERR BGR32_RGB24(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStrid
     return WMP_errSuccess;
 }
 
-ERR RGB24_Gray8(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStride)
+ERR JXRLIB_API(RGB24_Gray8)(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStride)
 {
     I32 i = 0, j = 0, k = 0;
 
@@ -233,18 +234,18 @@ ERR RGB24_Gray8(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStrid
     return WMP_errSuccess;
 }
 
-ERR BGR24_Gray8(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStride)
+ERR JXRLIB_API(BGR24_Gray8)(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStride)
 {
     ERR err = WMP_errSuccess;
 
-    Call(BGR24_RGB24(pFC, pRect, pb, cbStride));
-    Call(RGB24_Gray8(pFC, pRect, pb, cbStride));
+    Call(JXRLIB_API(BGR24_RGB24)(pFC, pRect, pb, cbStride));
+    Call(JXRLIB_API(RGB24_Gray8)(pFC, pRect, pb, cbStride));
 
 Cleanup:
     return err;
 }
 
-ERR Gray8_RGB24(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStride)
+ERR JXRLIB_API(Gray8_RGB24)(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStride)
 {
     I32 i = 0, j = 0, k = 0;
 
@@ -267,9 +268,9 @@ ERR Gray8_RGB24(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStrid
     return WMP_errSuccess;
 }
 
-ERR Gray8_BGR24(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStride)
+ERR JXRLIB_API(Gray8_BGR24)(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStride)
 {
-    return Gray8_RGB24(pFC, pRect, pb, cbStride);
+    return JXRLIB_API(Gray8_RGB24)(pFC, pRect, pb, cbStride);
 }
 
 #if 0
@@ -339,7 +340,7 @@ Cleanup:
 }
 #endif
 
-ERR RGBA128Fixed_RGBA128Float(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStride)
+ERR JXRLIB_API(RGBA128Fixed_RGBA128Float)(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStride)
 {
     const I32 iHeight = pRect->Height;
     const I32 iWidthX4 = 4 * pRect->Width; // 4 == R, G, B, A
@@ -362,7 +363,7 @@ ERR RGBA128Fixed_RGBA128Float(PKFormatConverter* pFC, const PKRect* pRect, U8* p
 }
 
 
-ERR RGBA128Float_RGBA128Fixed(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStride)
+ERR JXRLIB_API(RGBA128Float_RGBA128Fixed)(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStride)
 {
     const I32 iHeight = pRect->Height;
     const I32 iWidthX4 = 4 * pRect->Width; // 4 == R, G, B, A
@@ -386,7 +387,7 @@ ERR RGBA128Float_RGBA128Fixed(PKFormatConverter* pFC, const PKRect* pRect, U8* p
 
 
 
-ERR RGB96Fixed_RGB96Float(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStride)
+ERR JXRLIB_API(RGB96Fixed_RGB96Float)(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStride)
 {
     const I32 iHeight = pRect->Height;
     const I32 iWidthX3 = 3 * pRect->Width; // 3 == R, G, B
@@ -409,7 +410,7 @@ ERR RGB96Fixed_RGB96Float(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U
 }
 
 
-ERR RGB128Fixed_RGB96Float(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStride)
+ERR JXRLIB_API(RGB128Fixed_RGB96Float)(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStride)
 {
     const I32 iHeight = pRect->Height;
     const I32 iWidth = pRect->Width;
@@ -437,7 +438,7 @@ ERR RGB128Fixed_RGB96Float(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, 
 
 
 
-ERR RGB96Float_RGB96Fixed(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStride)
+ERR JXRLIB_API(RGB96Float_RGB96Fixed)(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStride)
 {
     const I32 iHeight = pRect->Height;
     const I32 iWidthX3 = 3 * pRect->Width; // 3 == R, G, B
@@ -460,7 +461,7 @@ ERR RGB96Float_RGB96Fixed(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U
 }
 
 
-ERR RGB96Float_RGB128Fixed(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStride)
+ERR JXRLIB_API(RGB96Float_RGB128Fixed)(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStride)
 {
     const I32 iHeight = pRect->Height;
     const I32 iWidth = pRect->Width;
@@ -489,7 +490,7 @@ ERR RGB96Float_RGB128Fixed(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, 
 }
 
 
-ERR RGB96Float_RGB128Float(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStride)
+ERR JXRLIB_API(RGB96Float_RGB128Float)(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStride)
 {
     const I32 iHeight = pRect->Height;
     const I32 iWidth = pRect->Width;
@@ -517,7 +518,7 @@ ERR RGB96Float_RGB128Float(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, 
 }
 
 
-ERR RGB128Float_RGB96Float(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStride)
+ERR JXRLIB_API(RGB128Float_RGB96Float)(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStride)
 {
     const I32 iHeight = pRect->Height;
     const I32 iWidth = pRect->Width;
@@ -543,7 +544,7 @@ ERR RGB128Float_RGB96Float(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, 
 }
 
 
-ERR RGB48Half_RGB64Half(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStride)
+ERR JXRLIB_API(RGB48Half_RGB64Half)(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStride)
 {
     const I32 iHeight = pRect->Height;
     const I32 iWidth = pRect->Width;
@@ -571,7 +572,7 @@ ERR RGB48Half_RGB64Half(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32
 }
 
 
-ERR RGB64Half_RGB48Half(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStride)
+ERR JXRLIB_API(RGB64Half_RGB48Half)(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStride)
 {
     const I32 iHeight = pRect->Height;
     const I32 iWidth = pRect->Width;
@@ -597,7 +598,7 @@ ERR RGB64Half_RGB48Half(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32
 }
 
 
-ERR BGR24_BGR32(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStride)
+ERR JXRLIB_API(BGR24_BGR32)(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStride)
 {
     const I32 iHeight = pRect->Height;
     const I32 iWidth = pRect->Width;
@@ -625,7 +626,7 @@ ERR BGR24_BGR32(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStrid
 }
 
 
-ERR BGR32_BGR24(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStride)
+ERR JXRLIB_API(BGR32_BGR24)(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStride)
 {
     const I32 iHeight = pRect->Height;
     const I32 iWidth = pRect->Width;
@@ -651,7 +652,7 @@ ERR BGR32_BGR24(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStrid
 }
 
 
-ERR Gray32Fixed_Gray32Float(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStride)
+ERR JXRLIB_API(Gray32Fixed_Gray32Float)(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStride)
 {
     const I32 iHeight = pRect->Height;
     const I32 iWidth = pRect->Width;
@@ -674,7 +675,7 @@ ERR Gray32Fixed_Gray32Float(PKFormatConverter* pFC, const PKRect* pRect, U8* pb,
 }
 
 
-ERR Gray32Float_Gray32Fixed(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStride)
+ERR JXRLIB_API(Gray32Float_Gray32Fixed)(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStride)
 {
     const I32 iHeight = pRect->Height;
     const I32 iWidth = pRect->Width;
@@ -698,7 +699,7 @@ ERR Gray32Float_Gray32Fixed(PKFormatConverter* pFC, const PKRect* pRect, U8* pb,
 
 
 
-ERR Gray16Fixed_Gray32Float(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStride)
+ERR JXRLIB_API(Gray16Fixed_Gray32Float)(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStride)
 {
     const I32 iHeight = pRect->Height;
     const I32 iWidth = pRect->Width;
@@ -722,7 +723,7 @@ ERR Gray16Fixed_Gray32Float(PKFormatConverter* pFC, const PKRect* pRect, U8* pb,
 }
 
 
-ERR Gray32Float_Gray16Fixed(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStride)
+ERR JXRLIB_API(Gray32Float_Gray16Fixed)(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStride)
 {
     const I32 iHeight = pRect->Height;
     const I32 iWidth = pRect->Width;
@@ -746,7 +747,7 @@ ERR Gray32Float_Gray16Fixed(PKFormatConverter* pFC, const PKRect* pRect, U8* pb,
 }
 
 
-ERR RGB48Fixed_RGB96Float(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStride)
+ERR JXRLIB_API(RGB48Fixed_RGB96Float)(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStride)
 {
     const I32 iHeight = pRect->Height;
     const I32 iWidthX3 = 3 * pRect->Width;
@@ -770,7 +771,7 @@ ERR RGB48Fixed_RGB96Float(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U
 }
 
 
-ERR RGB96Float_RGB48Fixed(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStride)
+ERR JXRLIB_API(RGB96Float_RGB48Fixed)(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStride)
 {
     const I32 iHeight = pRect->Height;
     const I32 iWidthX3 = 3 * pRect->Width;
@@ -794,7 +795,7 @@ ERR RGB96Float_RGB48Fixed(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U
 }
 
 
-ERR RGB64Fixed_RGB96Float(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStride)
+ERR JXRLIB_API(RGB64Fixed_RGB96Float)(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStride)
 {
     const I32 iHeight = pRect->Height;
     const I32 iWidth = pRect->Width;
@@ -822,7 +823,7 @@ ERR RGB64Fixed_RGB96Float(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U
 }
 
 
-ERR RGB96Float_RGB64Fixed(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStride)
+ERR JXRLIB_API(RGB96Float_RGB64Fixed)(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStride)
 {
     const I32 iHeight = pRect->Height;
     const I32 iWidth = pRect->Width;
@@ -851,7 +852,7 @@ ERR RGB96Float_RGB64Fixed(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U
 }
 
 
-ERR RGBA64Fixed_RGBA128Float(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStride)
+ERR JXRLIB_API(RGBA64Fixed_RGBA128Float)(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStride)
 {
     const I32 iHeight = pRect->Height;
     const I32 iWidthX4 = 4 * pRect->Width;
@@ -876,7 +877,7 @@ ERR RGBA64Fixed_RGBA128Float(PKFormatConverter* pFC, const PKRect* pRect, U8* pb
 
 
 
-ERR RGBA128Float_RGBA64Fixed(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStride)
+ERR JXRLIB_API(RGBA128Float_RGBA64Fixed)(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStride)
 {
     const I32 iHeight = pRect->Height;
     const I32 iWidthX4 = 4 * pRect->Width;
@@ -901,7 +902,7 @@ ERR RGBA128Float_RGBA64Fixed(PKFormatConverter* pFC, const PKRect* pRect, U8* pb
 
 
 
-ERR RGBE_RGB96Float(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStride)
+ERR JXRLIB_API(RGBE_RGB96Float)(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStride)
 {
     const I32 iHeight = pRect->Height;
     const I32 iWidth = pRect->Width;
@@ -954,7 +955,7 @@ ERR RGBE_RGB96Float(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbS
 }
 
 
-ERR RGB96Float_RGBE(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStride)
+ERR JXRLIB_API(RGB96Float_RGBE)(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStride)
 {
     const I32 iHeight = pRect->Height;
     const I32 iWidth = pRect->Width;
@@ -1020,7 +1021,7 @@ ERR RGB96Float_RGBE(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbS
 }
 
 
-ERR RGBA64Half_RGBA128Float(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStride)
+ERR JXRLIB_API(RGBA64Half_RGBA128Float)(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStride)
 {
     const I32 iHeight = pRect->Height;
     const I32 iWidthX4 = 4 * pRect->Width;
@@ -1043,7 +1044,7 @@ ERR RGBA64Half_RGBA128Float(PKFormatConverter* pFC, const PKRect* pRect, U8* pb,
 }
 
 
-ERR RGBA128Float_RGBA64Half(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStride)
+ERR JXRLIB_API(RGBA128Float_RGBA64Half)(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStride)
 {
     const I32 iHeight = pRect->Height;
     const I32 iWidthX4 = 4 * pRect->Width;
@@ -1066,7 +1067,7 @@ ERR RGBA128Float_RGBA64Half(PKFormatConverter* pFC, const PKRect* pRect, U8* pb,
 }
 
 
-ERR RGB64Half_RGB96Float(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStride)
+ERR JXRLIB_API(RGB64Half_RGB96Float)(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStride)
 {
     const I32 iHeight = pRect->Height;
     const I32 iWidth = pRect->Width;
@@ -1093,7 +1094,7 @@ ERR RGB64Half_RGB96Float(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U3
 }
 
 
-ERR RGB96Float_RGB64Half(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStride)
+ERR JXRLIB_API(RGB96Float_RGB64Half)(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStride)
 {
     const I32 iHeight = pRect->Height;
     const I32 iWidth = pRect->Width;
@@ -1121,7 +1122,7 @@ ERR RGB96Float_RGB64Half(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U3
 }
 
 
-ERR RGB48Half_RGB96Float(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStride)
+ERR JXRLIB_API(RGB48Half_RGB96Float)(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStride)
 {
     const I32 iHeight = pRect->Height;
     const I32 iWidthX3 = 3 * pRect->Width;
@@ -1144,7 +1145,7 @@ ERR RGB48Half_RGB96Float(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U3
 }
 
 
-ERR RGB96Float_RGB48Half(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStride)
+ERR JXRLIB_API(RGB96Float_RGB48Half)(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStride)
 {
     const I32 iHeight = pRect->Height;
     const I32 iWidthX3 = 3 * pRect->Width;
@@ -1167,7 +1168,7 @@ ERR RGB96Float_RGB48Half(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U3
 }
 
 
-ERR Gray16Half_Gray32Float(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStride)
+ERR JXRLIB_API(Gray16Half_Gray32Float)(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStride)
 {
     const I32 iHeight = pRect->Height;
     const I32 iWidth = pRect->Width;
@@ -1190,7 +1191,7 @@ ERR Gray16Half_Gray32Float(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, 
 }
 
 
-ERR Gray32Float_Gray16Half(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStride)
+ERR JXRLIB_API(Gray32Float_Gray16Half)(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStride)
 {
     const I32 iHeight = pRect->Height;
     const I32 iWidth = pRect->Width;
@@ -1212,7 +1213,7 @@ ERR Gray32Float_Gray16Half(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, 
     return WMP_errSuccess;
 }
 
-ERR RGB555_RGB24(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStride)
+ERR JXRLIB_API(RGB555_RGB24)(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStride)
 {
     const I32 iHeight = pRect->Height;
     const I32 iWidth = pRect->Width;
@@ -1244,7 +1245,7 @@ ERR RGB555_RGB24(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStri
 }
 
 
-ERR RGB101010_RGB48(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStride)
+ERR JXRLIB_API(RGB101010_RGB48)(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStride)
 {
     const I32 iHeight = pRect->Height;
     const I32 iWidth = pRect->Width;
@@ -1276,7 +1277,7 @@ ERR RGB101010_RGB48(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbS
 }
 
 
-ERR RGB24_RGB555(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStride)
+ERR JXRLIB_API(RGB24_RGB555)(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStride)
 {
     const I32 iHeight = pRect->Height;
     const I32 iWidth = pRect->Width;
@@ -1309,7 +1310,7 @@ ERR RGB24_RGB555(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStri
 
 
 
-ERR RGB48_RGB101010(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStride)
+ERR JXRLIB_API(RGB48_RGB101010)(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStride)
 {
     const I32 iHeight = pRect->Height;
     const I32 iWidth = pRect->Width;
@@ -1342,7 +1343,7 @@ ERR RGB48_RGB101010(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbS
 
 
 
-ERR RGB565_RGB24(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStride)
+ERR JXRLIB_API(RGB565_RGB24)(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStride)
 {
     const I32 iHeight = pRect->Height;
     const I32 iWidth = pRect->Width;
@@ -1375,7 +1376,7 @@ ERR RGB565_RGB24(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStri
 
 
 
-ERR RGB24_RGB565(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStride)
+ERR JXRLIB_API(RGB24_RGB565)(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStride)
 {
     const I32 iHeight = pRect->Height;
     const I32 iWidth = pRect->Width;
@@ -1407,7 +1408,7 @@ ERR RGB24_RGB565(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStri
 }
 
 
-ERR RGBA32_BGRA32(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStride)
+ERR JXRLIB_API(RGBA32_BGRA32)(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStride)
 {
     const I32 iHeight = pRect->Height;
     const I32 iWidthX4 = 4 * pRect->Width; // 4 == R, G, B, A
@@ -1433,13 +1434,13 @@ ERR RGBA32_BGRA32(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStr
 }
 
 
-ERR BGRA32_RGBA32(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStride)
+ERR JXRLIB_API(BGRA32_RGBA32)(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStride)
 {
-    return RGBA32_BGRA32(pFC, pRect, pb, cbStride);
+    return JXRLIB_API(RGBA32_BGRA32)(pFC, pRect, pb, cbStride);
 }
 
 
-ERR BlackWhite_Gray8(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStride)
+ERR JXRLIB_API(BlackWhite_Gray8)(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStride)
 {
     const I32 iHeight = pRect->Height;
     const I32 iWidth = pRect->Width;
@@ -1479,7 +1480,7 @@ ERR BlackWhite_Gray8(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cb
 }
 
 
-ERR Gray16_Gray8(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStride)
+ERR JXRLIB_API(Gray16_Gray8)(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStride)
 {
     I32 i = 0, j = 0;
 
@@ -1500,7 +1501,7 @@ ERR Gray16_Gray8(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStri
     return WMP_errSuccess;
 }
 
-ERR RGB48_RGB24(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStride)
+ERR JXRLIB_API(RGB48_RGB24)(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStride)
 {
     const I32 iHeight = pRect->Height;
     const I32 iWidth = pRect->Width;
@@ -1530,7 +1531,7 @@ ERR RGB48_RGB24(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStrid
     return WMP_errSuccess;
 }
 
-ERR RGBA64_RGBA32(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStride)
+ERR JXRLIB_API(RGBA64_RGBA32)(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStride)
 {
     const I32 iHeight = pRect->Height;
     const I32 iWidth = pRect->Width;
@@ -1562,7 +1563,7 @@ ERR RGBA64_RGBA32(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStr
     return WMP_errSuccess;
 }
 
-ERR Gray32Float_Gray8(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStride)
+ERR JXRLIB_API(Gray32Float_Gray8)(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStride)
 {
     const I32 iHeight = pRect->Height;
     const I32 iWidth = pRect->Width;
@@ -1588,7 +1589,7 @@ ERR Gray32Float_Gray8(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 c
     return WMP_errSuccess;
 }
 
-ERR RGB96Float_RGB24(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStride)
+ERR JXRLIB_API(RGB96Float_RGB24)(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStride)
 {
     const I32 iHeight = pRect->Height;
     const I32 iWidth = pRect->Width;
@@ -1618,7 +1619,7 @@ ERR RGB96Float_RGB24(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cb
     return WMP_errSuccess;
 }
 
-ERR RGB128Float_RGB24(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStride)
+ERR JXRLIB_API(RGB128Float_RGB24)(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStride)
 {
     const I32 iHeight = pRect->Height;
     const I32 iWidth = pRect->Width;
@@ -1648,7 +1649,7 @@ ERR RGB128Float_RGB24(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 c
     return WMP_errSuccess;
 }
 
-ERR RGBA128Float_RGBA32(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStride)
+ERR JXRLIB_API(RGBA128Float_RGBA32)(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStride)
 {
     const I32 iHeight = pRect->Height;
     const I32 iWidth = pRect->Width;
@@ -1680,7 +1681,7 @@ ERR RGBA128Float_RGBA32(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32
     return WMP_errSuccess;
 }
 
-ERR Gray16Fixed_Gray8(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStride)
+ERR JXRLIB_API(Gray16Fixed_Gray8)(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStride)
 {
     const I32 iHeight = pRect->Height;
     const I32 iWidth = pRect->Width;
@@ -1705,7 +1706,7 @@ ERR Gray16Fixed_Gray8(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 c
     return WMP_errSuccess;
 }
 
-ERR Gray32Fixed_Gray8(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStride)
+ERR JXRLIB_API(Gray32Fixed_Gray8)(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStride)
 {
     const I32 iHeight = pRect->Height;
     const I32 iWidth = pRect->Width;
@@ -1730,7 +1731,7 @@ ERR Gray32Fixed_Gray8(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 c
     return WMP_errSuccess;
 }
 
-ERR RGB48Fixed_RGB24(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStride)
+ERR JXRLIB_API(RGB48Fixed_RGB24)(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStride)
 {
     const I32 iHeight = pRect->Height;
     const I32 iWidth = pRect->Width;
@@ -1756,7 +1757,7 @@ ERR RGB48Fixed_RGB24(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cb
     return WMP_errSuccess;
 }
 
-ERR RGB64Fixed_RGB24(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStride)
+ERR JXRLIB_API(RGB64Fixed_RGB24)(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStride)
 {
     const I32 iHeight = pRect->Height;
     const I32 iWidth = pRect->Width;
@@ -1782,7 +1783,7 @@ ERR RGB64Fixed_RGB24(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cb
     return WMP_errSuccess;
 }
 
-ERR RGB96Fixed_RGB24(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStride)
+ERR JXRLIB_API(RGB96Fixed_RGB24)(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStride)
 {
     const I32 iHeight = pRect->Height;
     const I32 iWidth = pRect->Width;
@@ -1808,7 +1809,7 @@ ERR RGB96Fixed_RGB24(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cb
     return WMP_errSuccess;
 }
 
-ERR RGB128Fixed_RGB24(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStride)
+ERR JXRLIB_API(RGB128Fixed_RGB24)(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStride)
 {
     const I32 iHeight = pRect->Height;
     const I32 iWidth = pRect->Width;
@@ -1834,7 +1835,7 @@ ERR RGB128Fixed_RGB24(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 c
     return WMP_errSuccess;
 }
 
-ERR RGBA64Fixed_RGBA32(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStride)
+ERR JXRLIB_API(RGBA64Fixed_RGBA32)(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStride)
 {
     const I32 iHeight = pRect->Height;
     const I32 iWidth = pRect->Width;
@@ -1861,7 +1862,7 @@ ERR RGBA64Fixed_RGBA32(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 
     return WMP_errSuccess;
 }
 
-ERR RGBA128Fixed_RGBA32(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStride)
+ERR JXRLIB_API(RGBA128Fixed_RGBA32)(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStride)
 {
     const I32 iHeight = pRect->Height;
     const I32 iWidth = pRect->Width;
@@ -1888,7 +1889,7 @@ ERR RGBA128Fixed_RGBA32(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32
     return WMP_errSuccess;
 }
 
-ERR Gray16Half_Gray8(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStride)
+ERR JXRLIB_API(Gray16Half_Gray8)(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStride)
 {
     const I32 iHeight = pRect->Height;
     const I32 iWidth = pRect->Width;
@@ -1914,7 +1915,7 @@ ERR Gray16Half_Gray8(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cb
     return WMP_errSuccess;
 }
 
-ERR RGB48Half_RGB24(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStride)
+ERR JXRLIB_API(RGB48Half_RGB24)(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStride)
 {
     const I32 iHeight = pRect->Height;
     const I32 iWidth = pRect->Width;
@@ -1943,7 +1944,7 @@ ERR RGB48Half_RGB24(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbS
     return WMP_errSuccess;
 }
 
-ERR RGB64Half_RGB24(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStride)
+ERR JXRLIB_API(RGB64Half_RGB24)(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStride)
 {
     const I32 iHeight = pRect->Height;
     const I32 iWidth = pRect->Width;
@@ -1972,7 +1973,7 @@ ERR RGB64Half_RGB24(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbS
     return WMP_errSuccess;
 }
 
-ERR RGBA64Half_RGBA32(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStride)
+ERR JXRLIB_API(RGBA64Half_RGBA32)(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStride)
 {
     const I32 iHeight = pRect->Height;
     const I32 iWidth = pRect->Width;
@@ -2003,7 +2004,7 @@ ERR RGBA64Half_RGBA32(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 c
     return WMP_errSuccess;
 }
 
-ERR RGB101010_RGB24(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStride)
+ERR JXRLIB_API(RGB101010_RGB24)(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStride)
 {
     const I32 iHeight = pRect->Height;
     const I32 iWidth = pRect->Width;
@@ -2034,7 +2035,7 @@ ERR RGB101010_RGB24(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbS
     return WMP_errSuccess;
 }
 
-ERR RGBE_RGB24(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStride)
+ERR JXRLIB_API(RGBE_RGB24)(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStride)
 {
     I32 i = 0, j = 0;
 
@@ -2091,89 +2092,89 @@ typedef struct tagPKPixelConverterInfo
 } PKPixelConverterInfo;
 
 static PKPixelConverterInfo s_pcInfo[] = {
-    {&GUID_PKPixelFormat24bppRGB, &GUID_PKPixelFormat24bppBGR, RGB24_BGR24}, // Fwd
-    {&GUID_PKPixelFormat24bppBGR, &GUID_PKPixelFormat24bppRGB, BGR24_RGB24}, // Rev
-    {&GUID_PKPixelFormat24bppRGB, &GUID_PKPixelFormat32bppBGR, RGB24_BGR32}, // Fwd
-    {&GUID_PKPixelFormat32bppBGR, &GUID_PKPixelFormat24bppRGB, BGR32_RGB24}, // Rev
+    {&JXRLIB_API(GUID_PKPixelFormat24bppRGB), &JXRLIB_API(GUID_PKPixelFormat24bppBGR), JXRLIB_API(RGB24_BGR24)}, // Fwd
+    {&JXRLIB_API(GUID_PKPixelFormat24bppBGR), &JXRLIB_API(GUID_PKPixelFormat24bppRGB), JXRLIB_API(BGR24_RGB24)}, // Rev
+    {&JXRLIB_API(GUID_PKPixelFormat24bppRGB), &JXRLIB_API(GUID_PKPixelFormat32bppBGR), JXRLIB_API(RGB24_BGR32)}, // Fwd
+    {&JXRLIB_API(GUID_PKPixelFormat32bppBGR), &JXRLIB_API(GUID_PKPixelFormat24bppRGB), JXRLIB_API(BGR32_RGB24)}, // Rev
 
     // The following are not to be exposed when building the Adobe Photoshop plugin
 #ifndef ADOBE_PS_PLUGIN
-    {&GUID_PKPixelFormat24bppRGB, &GUID_PKPixelFormat8bppGray, RGB24_Gray8}, // Fwd
-    {&GUID_PKPixelFormat8bppGray, &GUID_PKPixelFormat24bppRGB, Gray8_RGB24}, // Rev
-    {&GUID_PKPixelFormat24bppBGR, &GUID_PKPixelFormat8bppGray, BGR24_Gray8}, // Fwd
-    {&GUID_PKPixelFormat8bppGray, &GUID_PKPixelFormat24bppBGR, Gray8_BGR24}, // Rev
+    {&JXRLIB_API(GUID_PKPixelFormat24bppRGB), &JXRLIB_API(GUID_PKPixelFormat8bppGray), JXRLIB_API(RGB24_Gray8)}, // Fwd
+    {&JXRLIB_API(GUID_PKPixelFormat8bppGray), &JXRLIB_API(GUID_PKPixelFormat24bppRGB), JXRLIB_API(Gray8_RGB24)}, // Rev
+    {&JXRLIB_API(GUID_PKPixelFormat24bppBGR), &JXRLIB_API(GUID_PKPixelFormat8bppGray), JXRLIB_API(BGR24_Gray8)}, // Fwd
+    {&JXRLIB_API(GUID_PKPixelFormat8bppGray), &JXRLIB_API(GUID_PKPixelFormat24bppBGR), JXRLIB_API(Gray8_BGR24)}, // Rev
 #endif // ADOBE_PS_PLUGIN
 
-    {&GUID_PKPixelFormat128bppRGBAFixedPoint, &GUID_PKPixelFormat128bppRGBAFloat, RGBA128Fixed_RGBA128Float}, // Fwd
-    {&GUID_PKPixelFormat128bppRGBAFloat, &GUID_PKPixelFormat128bppRGBAFixedPoint, RGBA128Float_RGBA128Fixed}, // Rev
-    {&GUID_PKPixelFormat96bppRGBFixedPoint, &GUID_PKPixelFormat96bppRGBFloat, RGB96Fixed_RGB96Float}, // Fwd
-    {&GUID_PKPixelFormat96bppRGBFloat, &GUID_PKPixelFormat96bppRGBFixedPoint, RGB96Float_RGB96Fixed}, // Rev
-    {&GUID_PKPixelFormat96bppRGBFloat, &GUID_PKPixelFormat128bppRGBFloat, RGB96Float_RGB128Float}, // Fwd
-    {&GUID_PKPixelFormat128bppRGBFloat, &GUID_PKPixelFormat96bppRGBFloat, RGB128Float_RGB96Float}, // Rev
-    {&GUID_PKPixelFormat96bppRGBFixedPoint, &GUID_PKPixelFormat128bppRGBFixedPoint, RGB96Float_RGB128Float}, // Fwd
-    {&GUID_PKPixelFormat128bppRGBFixedPoint, &GUID_PKPixelFormat96bppRGBFixedPoint, RGB128Float_RGB96Float}, // Rev
-    {&GUID_PKPixelFormat64bppRGBHalf, &GUID_PKPixelFormat48bppRGBHalf, RGB64Half_RGB48Half}, // Fwd
-    {&GUID_PKPixelFormat48bppRGBHalf, &GUID_PKPixelFormat64bppRGBHalf, RGB48Half_RGB64Half}, // Rev
-    {&GUID_PKPixelFormat64bppRGBFixedPoint, &GUID_PKPixelFormat48bppRGBFixedPoint, RGB64Half_RGB48Half}, // Fwd
-    {&GUID_PKPixelFormat48bppRGBFixedPoint, &GUID_PKPixelFormat64bppRGBFixedPoint, RGB48Half_RGB64Half}, // Rev
-    {&GUID_PKPixelFormat32bppBGR, &GUID_PKPixelFormat24bppBGR, BGR32_BGR24}, // Fwd
-    {&GUID_PKPixelFormat24bppBGR, &GUID_PKPixelFormat32bppBGR, BGR24_BGR32}, // Rev
-    {&GUID_PKPixelFormat96bppRGBFloat, &GUID_PKPixelFormat128bppRGBFixedPoint, RGB96Float_RGB128Fixed}, // Fwd
-    {&GUID_PKPixelFormat128bppRGBFixedPoint, &GUID_PKPixelFormat96bppRGBFloat, RGB128Fixed_RGB96Float}, // Rev
-    {&GUID_PKPixelFormat32bppGrayFixedPoint, &GUID_PKPixelFormat32bppGrayFloat, Gray32Fixed_Gray32Float}, // Fwd
-    {&GUID_PKPixelFormat32bppGrayFloat, &GUID_PKPixelFormat32bppGrayFixedPoint, Gray32Float_Gray32Fixed}, // Rev
-    {&GUID_PKPixelFormat16bppGrayFixedPoint, &GUID_PKPixelFormat32bppGrayFloat, Gray16Fixed_Gray32Float}, // Fwd
-    {&GUID_PKPixelFormat32bppGrayFloat, &GUID_PKPixelFormat16bppGrayFixedPoint, Gray32Float_Gray16Fixed}, // Rev
-    {&GUID_PKPixelFormat48bppRGBFixedPoint, &GUID_PKPixelFormat96bppRGBFloat, RGB48Fixed_RGB96Float}, // Fwd
-    {&GUID_PKPixelFormat96bppRGBFloat, &GUID_PKPixelFormat48bppRGBFixedPoint, RGB96Float_RGB48Fixed}, // Rev
-    {&GUID_PKPixelFormat64bppRGBFixedPoint, &GUID_PKPixelFormat96bppRGBFloat, RGB64Fixed_RGB96Float}, // Fwd
-    {&GUID_PKPixelFormat96bppRGBFloat, &GUID_PKPixelFormat64bppRGBFixedPoint, RGB96Float_RGB64Fixed}, // Rev
-    {&GUID_PKPixelFormat64bppRGBAFixedPoint, &GUID_PKPixelFormat128bppRGBAFloat, RGBA64Fixed_RGBA128Float}, // Fwd
-    {&GUID_PKPixelFormat128bppRGBAFloat, &GUID_PKPixelFormat64bppRGBAFixedPoint, RGBA128Float_RGBA64Fixed}, // Rev
-    {&GUID_PKPixelFormat32bppRGBE, &GUID_PKPixelFormat96bppRGBFloat, RGBE_RGB96Float}, // Fwd
-    {&GUID_PKPixelFormat96bppRGBFloat, &GUID_PKPixelFormat32bppRGBE, RGB96Float_RGBE}, // Rev
-    {&GUID_PKPixelFormat64bppRGBAHalf, &GUID_PKPixelFormat128bppRGBAFloat, RGBA64Half_RGBA128Float}, // Fwd
-    {&GUID_PKPixelFormat128bppRGBAFloat, &GUID_PKPixelFormat64bppRGBAHalf, RGBA128Float_RGBA64Half}, // Rev
-    {&GUID_PKPixelFormat64bppRGBHalf, &GUID_PKPixelFormat96bppRGBFloat, RGB64Half_RGB96Float}, // Fwd
-    {&GUID_PKPixelFormat96bppRGBFloat, &GUID_PKPixelFormat64bppRGBHalf, RGB96Float_RGB64Half}, // Rev
-    {&GUID_PKPixelFormat48bppRGBHalf, &GUID_PKPixelFormat96bppRGBFloat, RGB48Half_RGB96Float}, // Fwd
-    {&GUID_PKPixelFormat96bppRGBFloat, &GUID_PKPixelFormat48bppRGBHalf, RGB96Float_RGB48Half}, // Rev
-    {&GUID_PKPixelFormat16bppGrayHalf, &GUID_PKPixelFormat32bppGrayFloat, Gray16Half_Gray32Float}, // Fwd
-    {&GUID_PKPixelFormat32bppGrayFloat, &GUID_PKPixelFormat16bppGrayHalf, Gray32Float_Gray16Half}, // Rev
-    {&GUID_PKPixelFormat16bppRGB555, &GUID_PKPixelFormat24bppRGB, RGB555_RGB24}, // Fwd
-    {&GUID_PKPixelFormat24bppRGB, &GUID_PKPixelFormat16bppRGB555, RGB24_RGB555}, // Rev
-    {&GUID_PKPixelFormat16bppRGB565, &GUID_PKPixelFormat24bppRGB, RGB565_RGB24}, // Fwd
-    {&GUID_PKPixelFormat24bppRGB, &GUID_PKPixelFormat16bppRGB565, RGB24_RGB565}, // Rev
-    {&GUID_PKPixelFormat32bppRGB101010, &GUID_PKPixelFormat48bppRGB, RGB101010_RGB48}, // Fwd
-    {&GUID_PKPixelFormat48bppRGB, &GUID_PKPixelFormat32bppRGB101010, RGB48_RGB101010}, // Rev
-    {&GUID_PKPixelFormat32bppRGBA, &GUID_PKPixelFormat32bppBGRA, RGBA32_BGRA32}, // Fwd
-    {&GUID_PKPixelFormat32bppBGRA, &GUID_PKPixelFormat32bppRGBA, BGRA32_RGBA32}, // Rev
-    {&GUID_PKPixelFormat32bppPRGBA, &GUID_PKPixelFormat32bppPBGRA, RGBA32_BGRA32}, // Fwd
-    {&GUID_PKPixelFormat32bppPBGRA, &GUID_PKPixelFormat32bppPRGBA, BGRA32_RGBA32}, // Rev
+    {&JXRLIB_API(GUID_PKPixelFormat128bppRGBAFixedPoint), &JXRLIB_API(GUID_PKPixelFormat128bppRGBAFloat), JXRLIB_API(RGBA128Fixed_RGBA128Float)}, // Fwd
+    {&JXRLIB_API(GUID_PKPixelFormat128bppRGBAFloat), &JXRLIB_API(GUID_PKPixelFormat128bppRGBAFixedPoint), JXRLIB_API(RGBA128Float_RGBA128Fixed)}, // Rev
+    {&JXRLIB_API(GUID_PKPixelFormat96bppRGBFixedPoint), &JXRLIB_API(GUID_PKPixelFormat96bppRGBFloat), JXRLIB_API(RGB96Fixed_RGB96Float)}, // Fwd
+    {&JXRLIB_API(GUID_PKPixelFormat96bppRGBFloat), &JXRLIB_API(GUID_PKPixelFormat96bppRGBFixedPoint), JXRLIB_API(RGB96Float_RGB96Fixed)}, // Rev
+    {&JXRLIB_API(GUID_PKPixelFormat96bppRGBFloat), &JXRLIB_API(GUID_PKPixelFormat128bppRGBFloat), JXRLIB_API(RGB96Float_RGB128Float)}, // Fwd
+    {&JXRLIB_API(GUID_PKPixelFormat128bppRGBFloat), &JXRLIB_API(GUID_PKPixelFormat96bppRGBFloat), JXRLIB_API(RGB128Float_RGB96Float)}, // Rev
+    {&JXRLIB_API(GUID_PKPixelFormat96bppRGBFixedPoint), &JXRLIB_API(GUID_PKPixelFormat128bppRGBFixedPoint), JXRLIB_API(RGB96Float_RGB128Float)}, // Fwd
+    {&JXRLIB_API(GUID_PKPixelFormat128bppRGBFixedPoint), &JXRLIB_API(GUID_PKPixelFormat96bppRGBFixedPoint), JXRLIB_API(RGB128Float_RGB96Float)}, // Rev
+    {&JXRLIB_API(GUID_PKPixelFormat64bppRGBHalf), &JXRLIB_API(GUID_PKPixelFormat48bppRGBHalf), JXRLIB_API(RGB64Half_RGB48Half)}, // Fwd
+    {&JXRLIB_API(GUID_PKPixelFormat48bppRGBHalf), &JXRLIB_API(GUID_PKPixelFormat64bppRGBHalf), JXRLIB_API(RGB48Half_RGB64Half)}, // Rev
+    {&JXRLIB_API(GUID_PKPixelFormat64bppRGBFixedPoint), &JXRLIB_API(GUID_PKPixelFormat48bppRGBFixedPoint), JXRLIB_API(RGB64Half_RGB48Half)}, // Fwd
+    {&JXRLIB_API(GUID_PKPixelFormat48bppRGBFixedPoint), &JXRLIB_API(GUID_PKPixelFormat64bppRGBFixedPoint), JXRLIB_API(RGB48Half_RGB64Half)}, // Rev
+    {&JXRLIB_API(GUID_PKPixelFormat32bppBGR), &JXRLIB_API(GUID_PKPixelFormat24bppBGR), JXRLIB_API(BGR32_BGR24)}, // Fwd
+    {&JXRLIB_API(GUID_PKPixelFormat24bppBGR), &JXRLIB_API(GUID_PKPixelFormat32bppBGR), JXRLIB_API(BGR24_BGR32)}, // Rev
+    {&JXRLIB_API(GUID_PKPixelFormat96bppRGBFloat), &JXRLIB_API(GUID_PKPixelFormat128bppRGBFixedPoint), JXRLIB_API(RGB96Float_RGB128Fixed)}, // Fwd
+    {&JXRLIB_API(GUID_PKPixelFormat128bppRGBFixedPoint), &JXRLIB_API(GUID_PKPixelFormat96bppRGBFloat), JXRLIB_API(RGB128Fixed_RGB96Float)}, // Rev
+    {&JXRLIB_API(GUID_PKPixelFormat32bppGrayFixedPoint), &JXRLIB_API(GUID_PKPixelFormat32bppGrayFloat), JXRLIB_API(Gray32Fixed_Gray32Float)}, // Fwd
+    {&JXRLIB_API(GUID_PKPixelFormat32bppGrayFloat), &JXRLIB_API(GUID_PKPixelFormat32bppGrayFixedPoint), JXRLIB_API(Gray32Float_Gray32Fixed)}, // Rev
+    {&JXRLIB_API(GUID_PKPixelFormat16bppGrayFixedPoint), &JXRLIB_API(GUID_PKPixelFormat32bppGrayFloat), JXRLIB_API(Gray16Fixed_Gray32Float)}, // Fwd
+    {&JXRLIB_API(GUID_PKPixelFormat32bppGrayFloat), &JXRLIB_API(GUID_PKPixelFormat16bppGrayFixedPoint), JXRLIB_API(Gray32Float_Gray16Fixed)}, // Rev
+    {&JXRLIB_API(GUID_PKPixelFormat48bppRGBFixedPoint), &JXRLIB_API(GUID_PKPixelFormat96bppRGBFloat), JXRLIB_API(RGB48Fixed_RGB96Float)}, // Fwd
+    {&JXRLIB_API(GUID_PKPixelFormat96bppRGBFloat), &JXRLIB_API(GUID_PKPixelFormat48bppRGBFixedPoint), JXRLIB_API(RGB96Float_RGB48Fixed)}, // Rev
+    {&JXRLIB_API(GUID_PKPixelFormat64bppRGBFixedPoint), &JXRLIB_API(GUID_PKPixelFormat96bppRGBFloat), JXRLIB_API(RGB64Fixed_RGB96Float)}, // Fwd
+    {&JXRLIB_API(GUID_PKPixelFormat96bppRGBFloat), &JXRLIB_API(GUID_PKPixelFormat64bppRGBFixedPoint), JXRLIB_API(RGB96Float_RGB64Fixed)}, // Rev
+    {&JXRLIB_API(GUID_PKPixelFormat64bppRGBAFixedPoint), &JXRLIB_API(GUID_PKPixelFormat128bppRGBAFloat), JXRLIB_API(RGBA64Fixed_RGBA128Float)}, // Fwd
+    {&JXRLIB_API(GUID_PKPixelFormat128bppRGBAFloat), &JXRLIB_API(GUID_PKPixelFormat64bppRGBAFixedPoint), JXRLIB_API(RGBA128Float_RGBA64Fixed)}, // Rev
+    {&JXRLIB_API(GUID_PKPixelFormat32bppRGBE), &JXRLIB_API(GUID_PKPixelFormat96bppRGBFloat), JXRLIB_API(RGBE_RGB96Float)}, // Fwd
+    {&JXRLIB_API(GUID_PKPixelFormat96bppRGBFloat), &JXRLIB_API(GUID_PKPixelFormat32bppRGBE), JXRLIB_API(RGB96Float_RGBE)}, // Rev
+    {&JXRLIB_API(GUID_PKPixelFormat64bppRGBAHalf), &JXRLIB_API(GUID_PKPixelFormat128bppRGBAFloat), JXRLIB_API(RGBA64Half_RGBA128Float)}, // Fwd
+    {&JXRLIB_API(GUID_PKPixelFormat128bppRGBAFloat), &JXRLIB_API(GUID_PKPixelFormat64bppRGBAHalf), JXRLIB_API(RGBA128Float_RGBA64Half)}, // Rev
+    {&JXRLIB_API(GUID_PKPixelFormat64bppRGBHalf), &JXRLIB_API(GUID_PKPixelFormat96bppRGBFloat), JXRLIB_API(RGB64Half_RGB96Float)}, // Fwd
+    {&JXRLIB_API(GUID_PKPixelFormat96bppRGBFloat), &JXRLIB_API(GUID_PKPixelFormat64bppRGBHalf), JXRLIB_API(RGB96Float_RGB64Half)}, // Rev
+    {&JXRLIB_API(GUID_PKPixelFormat48bppRGBHalf), &JXRLIB_API(GUID_PKPixelFormat96bppRGBFloat), JXRLIB_API(RGB48Half_RGB96Float)}, // Fwd
+    {&JXRLIB_API(GUID_PKPixelFormat96bppRGBFloat), &JXRLIB_API(GUID_PKPixelFormat48bppRGBHalf), JXRLIB_API(RGB96Float_RGB48Half)}, // Rev
+    {&JXRLIB_API(GUID_PKPixelFormat16bppGrayHalf), &JXRLIB_API(GUID_PKPixelFormat32bppGrayFloat), JXRLIB_API(Gray16Half_Gray32Float)}, // Fwd
+    {&JXRLIB_API(GUID_PKPixelFormat32bppGrayFloat), &JXRLIB_API(GUID_PKPixelFormat16bppGrayHalf), JXRLIB_API(Gray32Float_Gray16Half)}, // Rev
+    {&JXRLIB_API(GUID_PKPixelFormat16bppRGB555), &JXRLIB_API(GUID_PKPixelFormat24bppRGB), JXRLIB_API(RGB555_RGB24)}, // Fwd
+    {&JXRLIB_API(GUID_PKPixelFormat24bppRGB), &JXRLIB_API(GUID_PKPixelFormat16bppRGB555), JXRLIB_API(RGB24_RGB555)}, // Rev
+    {&JXRLIB_API(GUID_PKPixelFormat16bppRGB565), &JXRLIB_API(GUID_PKPixelFormat24bppRGB), JXRLIB_API(RGB565_RGB24)}, // Fwd
+    {&JXRLIB_API(GUID_PKPixelFormat24bppRGB), &JXRLIB_API(GUID_PKPixelFormat16bppRGB565), JXRLIB_API(RGB24_RGB565)}, // Rev
+    {&JXRLIB_API(GUID_PKPixelFormat32bppRGB101010), &JXRLIB_API(GUID_PKPixelFormat48bppRGB), JXRLIB_API(RGB101010_RGB48)}, // Fwd
+    {&JXRLIB_API(GUID_PKPixelFormat48bppRGB), &JXRLIB_API(GUID_PKPixelFormat32bppRGB101010), JXRLIB_API(RGB48_RGB101010)}, // Rev
+    {&JXRLIB_API(GUID_PKPixelFormat32bppRGBA), &JXRLIB_API(GUID_PKPixelFormat32bppBGRA), JXRLIB_API(RGBA32_BGRA32)}, // Fwd
+    {&JXRLIB_API(GUID_PKPixelFormat32bppBGRA), &JXRLIB_API(GUID_PKPixelFormat32bppRGBA), JXRLIB_API(BGRA32_RGBA32)}, // Rev
+    {&JXRLIB_API(GUID_PKPixelFormat32bppPRGBA), &JXRLIB_API(GUID_PKPixelFormat32bppPBGRA), JXRLIB_API(RGBA32_BGRA32)}, // Fwd
+    {&JXRLIB_API(GUID_PKPixelFormat32bppPBGRA), &JXRLIB_API(GUID_PKPixelFormat32bppPRGBA), JXRLIB_API(BGRA32_RGBA32)}, // Rev
 
     // conversions to 8bppGray / 24bppRGB / 32bppRGBA
-    {&GUID_PKPixelFormatBlackWhite, &GUID_PKPixelFormat8bppGray, BlackWhite_Gray8},
-    {&GUID_PKPixelFormat16bppGray, &GUID_PKPixelFormat8bppGray, Gray16_Gray8},
-    {&GUID_PKPixelFormat48bppRGB, &GUID_PKPixelFormat24bppRGB, RGB48_RGB24},
-    {&GUID_PKPixelFormat64bppRGBA, &GUID_PKPixelFormat32bppRGBA, RGBA64_RGBA32},
-    {&GUID_PKPixelFormat32bppGrayFloat, &GUID_PKPixelFormat8bppGray, Gray32Float_Gray8},
-    {&GUID_PKPixelFormat96bppRGBFloat, &GUID_PKPixelFormat24bppRGB, RGB96Float_RGB24},
-    {&GUID_PKPixelFormat128bppRGBFloat, &GUID_PKPixelFormat24bppRGB, RGB128Float_RGB24},
-    {&GUID_PKPixelFormat128bppRGBAFloat, &GUID_PKPixelFormat32bppRGBA, RGBA128Float_RGBA32},
-    {&GUID_PKPixelFormat16bppGrayFixedPoint, &GUID_PKPixelFormat8bppGray, Gray16Fixed_Gray8},
-    {&GUID_PKPixelFormat32bppGrayFixedPoint, &GUID_PKPixelFormat8bppGray, Gray32Fixed_Gray8},
-    {&GUID_PKPixelFormat48bppRGBFixedPoint, &GUID_PKPixelFormat24bppRGB, RGB48Fixed_RGB24},
-    {&GUID_PKPixelFormat64bppRGBFixedPoint, &GUID_PKPixelFormat24bppRGB, RGB64Fixed_RGB24},
-    {&GUID_PKPixelFormat96bppRGBFixedPoint, &GUID_PKPixelFormat24bppRGB, RGB96Fixed_RGB24},
-    {&GUID_PKPixelFormat128bppRGBFixedPoint, &GUID_PKPixelFormat24bppRGB, RGB128Fixed_RGB24},
-    {&GUID_PKPixelFormat64bppRGBAFixedPoint, &GUID_PKPixelFormat32bppRGBA, RGBA64Fixed_RGBA32},
-    {&GUID_PKPixelFormat128bppRGBAFixedPoint, &GUID_PKPixelFormat32bppRGBA, RGBA128Fixed_RGBA32},
-    {&GUID_PKPixelFormat16bppGrayHalf, &GUID_PKPixelFormat8bppGray, Gray16Half_Gray8},
-    {&GUID_PKPixelFormat48bppRGBHalf, &GUID_PKPixelFormat24bppRGB, RGB48Half_RGB24},
-    {&GUID_PKPixelFormat64bppRGBHalf, &GUID_PKPixelFormat24bppRGB, RGB64Half_RGB24},
-    {&GUID_PKPixelFormat64bppRGBAHalf, &GUID_PKPixelFormat32bppRGBA, RGBA64Half_RGBA32},
-    {&GUID_PKPixelFormat32bppRGB101010, &GUID_PKPixelFormat24bppRGB, RGB101010_RGB24},
-    {&GUID_PKPixelFormat32bppRGBE, &GUID_PKPixelFormat24bppRGB, RGBE_RGB24}
+    {&JXRLIB_API(GUID_PKPixelFormatBlackWhite), &JXRLIB_API(GUID_PKPixelFormat8bppGray), JXRLIB_API(BlackWhite_Gray8)},
+    {&JXRLIB_API(GUID_PKPixelFormat16bppGray), &JXRLIB_API(GUID_PKPixelFormat8bppGray), JXRLIB_API(Gray16_Gray8)},
+    {&JXRLIB_API(GUID_PKPixelFormat48bppRGB), &JXRLIB_API(GUID_PKPixelFormat24bppRGB), JXRLIB_API(RGB48_RGB24)},
+    {&JXRLIB_API(GUID_PKPixelFormat64bppRGBA), &JXRLIB_API(GUID_PKPixelFormat32bppRGBA), JXRLIB_API(RGBA64_RGBA32)},
+    {&JXRLIB_API(GUID_PKPixelFormat32bppGrayFloat), &JXRLIB_API(GUID_PKPixelFormat8bppGray), JXRLIB_API(Gray32Float_Gray8)},
+    {&JXRLIB_API(GUID_PKPixelFormat96bppRGBFloat), &JXRLIB_API(GUID_PKPixelFormat24bppRGB), JXRLIB_API(RGB96Float_RGB24)},
+    {&JXRLIB_API(GUID_PKPixelFormat128bppRGBFloat), &JXRLIB_API(GUID_PKPixelFormat24bppRGB), JXRLIB_API(RGB128Float_RGB24)},
+    {&JXRLIB_API(GUID_PKPixelFormat128bppRGBAFloat), &JXRLIB_API(GUID_PKPixelFormat32bppRGBA), JXRLIB_API(RGBA128Float_RGBA32)},
+    {&JXRLIB_API(GUID_PKPixelFormat16bppGrayFixedPoint), &JXRLIB_API(GUID_PKPixelFormat8bppGray), JXRLIB_API(Gray16Fixed_Gray8)},
+    {&JXRLIB_API(GUID_PKPixelFormat32bppGrayFixedPoint), &JXRLIB_API(GUID_PKPixelFormat8bppGray), JXRLIB_API(Gray32Fixed_Gray8)},
+    {&JXRLIB_API(GUID_PKPixelFormat48bppRGBFixedPoint), &JXRLIB_API(GUID_PKPixelFormat24bppRGB), JXRLIB_API(RGB48Fixed_RGB24)},
+    {&JXRLIB_API(GUID_PKPixelFormat64bppRGBFixedPoint), &JXRLIB_API(GUID_PKPixelFormat24bppRGB), JXRLIB_API(RGB64Fixed_RGB24)},
+    {&JXRLIB_API(GUID_PKPixelFormat96bppRGBFixedPoint), &JXRLIB_API(GUID_PKPixelFormat24bppRGB), JXRLIB_API(RGB96Fixed_RGB24)},
+    {&JXRLIB_API(GUID_PKPixelFormat128bppRGBFixedPoint), &JXRLIB_API(GUID_PKPixelFormat24bppRGB), JXRLIB_API(RGB128Fixed_RGB24)},
+    {&JXRLIB_API(GUID_PKPixelFormat64bppRGBAFixedPoint), &JXRLIB_API(GUID_PKPixelFormat32bppRGBA), JXRLIB_API(RGBA64Fixed_RGBA32)},
+    {&JXRLIB_API(GUID_PKPixelFormat128bppRGBAFixedPoint), &JXRLIB_API(GUID_PKPixelFormat32bppRGBA), JXRLIB_API(RGBA128Fixed_RGBA32)},
+    {&JXRLIB_API(GUID_PKPixelFormat16bppGrayHalf), &JXRLIB_API(GUID_PKPixelFormat8bppGray), JXRLIB_API(Gray16Half_Gray8)},
+    {&JXRLIB_API(GUID_PKPixelFormat48bppRGBHalf), &JXRLIB_API(GUID_PKPixelFormat24bppRGB), JXRLIB_API(RGB48Half_RGB24)},
+    {&JXRLIB_API(GUID_PKPixelFormat64bppRGBHalf), &JXRLIB_API(GUID_PKPixelFormat24bppRGB), JXRLIB_API(RGB64Half_RGB24)},
+    {&JXRLIB_API(GUID_PKPixelFormat64bppRGBAHalf), &JXRLIB_API(GUID_PKPixelFormat32bppRGBA), JXRLIB_API(RGBA64Half_RGBA32)},
+    {&JXRLIB_API(GUID_PKPixelFormat32bppRGB101010), &JXRLIB_API(GUID_PKPixelFormat24bppRGB), JXRLIB_API(RGB101010_RGB24)},
+    {&JXRLIB_API(GUID_PKPixelFormat32bppRGBE), &JXRLIB_API(GUID_PKPixelFormat24bppRGB), JXRLIB_API(RGBE_RGB24)}
 };
 
 /* auxiliary data structure and hack to support valid encoding from/to configurations that
@@ -2189,21 +2190,21 @@ typedef struct tagPKPixelConverter2Info
 
 static PKPixelConverter2Info s_pcInfo2[] = {
     // This allows us to view an RGBA input file as RGB, for when we create a planar alpha file
-    {&GUID_PKPixelFormat128bppRGBFloat, &GUID_PKPixelFormat128bppRGBAFloat},
+    {&JXRLIB_API(GUID_PKPixelFormat128bppRGBFloat), &JXRLIB_API(GUID_PKPixelFormat128bppRGBAFloat)},
     // 16- and 32-bpp RGB input files are given the "DontCare" GUID, so the next three 
     // from/to combinations are ok, and allowed on encoding: 
-    {&GUID_PKPixelFormatDontCare, &GUID_PKPixelFormat16bppRGB555},
-    {&GUID_PKPixelFormatDontCare, &GUID_PKPixelFormat16bppRGB565},
-    {&GUID_PKPixelFormatDontCare, &GUID_PKPixelFormat32bppBGRA}
+    {&JXRLIB_API(GUID_PKPixelFormatDontCare), &JXRLIB_API(GUID_PKPixelFormat16bppRGB555)},
+    {&JXRLIB_API(GUID_PKPixelFormatDontCare), &JXRLIB_API(GUID_PKPixelFormat16bppRGB565)},
+    {&JXRLIB_API(GUID_PKPixelFormatDontCare), &JXRLIB_API(GUID_PKPixelFormat32bppBGRA)}
 };
 
-ERR PKFormatConverter_Initialize(PKFormatConverter* pFC, PKImageDecode* pID, char* pExt, PKPixelFormatGUID enPF)
+ERR JXRLIB_API(PKFormatConverter_Initialize)(PKFormatConverter* pFC, PKImageDecode* pID, char* pExt, PKPixelFormatGUID enPF)
 {
     ERR err;
     PKPixelFormatGUID   enPFFrom;
 
     Call(pID->GetPixelFormat(pID, &enPFFrom));
-    Call(PKFormatConverter_InitializeConvert(pFC, enPFFrom, pExt, enPF));
+    Call(JXRLIB_API(PKFormatConverter_InitializeConvert)(pFC, enPFFrom, pExt, enPF));
 
     pFC->pDecoder = pID;
 
@@ -2212,9 +2213,9 @@ Cleanup:
 }
 
 
-extern int PKStrnicmp(const char* s1, const char* s2, size_t c);
+extern int JXRLIB_API(PKStrnicmp)(const char* s1, const char* s2, size_t c);
 
-ERR PKFormatConverter_InitializeConvert(PKFormatConverter* pFC, const PKPixelFormatGUID enPFFrom,
+ERR JXRLIB_API(PKFormatConverter_InitializeConvert)(PKFormatConverter* pFC, const PKPixelFormatGUID enPFFrom,
     char* pExt, PKPixelFormatGUID enPFTo)
 {
     ERR err = WMP_errSuccess;
@@ -2222,15 +2223,15 @@ ERR PKFormatConverter_InitializeConvert(PKFormatConverter* pFC, const PKPixelFor
     //================================
     pFC->enPixelFormat = enPFTo;
 
-    if (pExt != NULL && IsEqualGUID(&enPFTo, &GUID_PKPixelFormat24bppRGB) &&
-        0 == PKStrnicmp(pExt, ".bmp", strlen(pExt)))
-        enPFTo = GUID_PKPixelFormat24bppBGR;
-    if (pExt != NULL && (0 == PKStrnicmp(pExt, ".tif", strlen(pExt)) || 0 == PKStrnicmp(pExt, ".tiff", strlen(pExt))))
+    if (pExt != NULL && IsEqualGUID(&enPFTo, &JXRLIB_API(GUID_PKPixelFormat24bppRGB)) &&
+        0 == JXRLIB_API(PKStrnicmp)(pExt, ".bmp", strlen(pExt)))
+        enPFTo = JXRLIB_API(GUID_PKPixelFormat24bppBGR);
+    if (pExt != NULL && (0 == JXRLIB_API(PKStrnicmp)(pExt, ".tif", strlen(pExt)) || 0 == JXRLIB_API(PKStrnicmp)(pExt, ".tiff", strlen(pExt))))
     {
-        if (IsEqualGUID(&enPFTo, &GUID_PKPixelFormat32bppBGRA))
-            enPFTo = GUID_PKPixelFormat32bppRGBA;
-        if (IsEqualGUID(&enPFTo, &GUID_PKPixelFormat32bppPBGRA))
-            enPFTo = GUID_PKPixelFormat32bppPRGBA;
+        if (IsEqualGUID(&enPFTo, &JXRLIB_API(GUID_PKPixelFormat32bppBGRA)))
+            enPFTo = JXRLIB_API(GUID_PKPixelFormat32bppRGBA);
+        if (IsEqualGUID(&enPFTo, &JXRLIB_API(GUID_PKPixelFormat32bppPBGRA)))
+            enPFTo = JXRLIB_API(GUID_PKPixelFormat32bppPRGBA);
     }
 
     //================================
@@ -2266,7 +2267,7 @@ Cleanup:
     return err;
 }
 
-ERR PKFormatConverter_EnumConversions(const PKPixelFormatGUID* pguidSourcePF,
+ERR JXRLIB_API(PKFormatConverter_EnumConversions)(const PKPixelFormatGUID* pguidSourcePF,
     const U32 iIndex,
     const PKPixelFormatGUID** ppguidTargetPF)
 {
@@ -2274,7 +2275,7 @@ ERR PKFormatConverter_EnumConversions(const PKPixelFormatGUID* pguidSourcePF,
     U32 i;
     ERR errResult = WMP_errIndexNotFound;
 
-    *ppguidTargetPF = &GUID_PKPixelFormatDontCare; // Init return value
+    *ppguidTargetPF = &JXRLIB_API(GUID_PKPixelFormatDontCare); // Init return value
     for (i = 0; i < sizeof2(s_pcInfo); i++)
     {
         if (IsEqualGUID(s_pcInfo[i].pGUIDPixFmtFrom, pguidSourcePF))
@@ -2293,29 +2294,29 @@ ERR PKFormatConverter_EnumConversions(const PKPixelFormatGUID* pguidSourcePF,
     return errResult;
 }
 
-ERR PKFormatConverter_GetPixelFormat(PKFormatConverter* pFC, PKPixelFormatGUID* pPF)
+ERR JXRLIB_API(PKFormatConverter_GetPixelFormat)(PKFormatConverter* pFC, PKPixelFormatGUID* pPF)
 {
     *pPF = pFC->enPixelFormat;
 
     return WMP_errSuccess;
 }
 
-ERR PKFormatConverter_GetSourcePixelFormat(PKFormatConverter* pFC, PKPixelFormatGUID* pPF)
+ERR JXRLIB_API(PKFormatConverter_GetSourcePixelFormat)(PKFormatConverter* pFC, PKPixelFormatGUID* pPF)
 {
     return pFC->pDecoder->GetPixelFormat(pFC->pDecoder, pPF);
 }
 
-ERR PKFormatConverter_GetSize(PKFormatConverter* pFC, I32* piWidth, I32* piHeight)
+ERR JXRLIB_API(PKFormatConverter_GetSize)(PKFormatConverter* pFC, I32* piWidth, I32* piHeight)
 {
     return pFC->pDecoder->GetSize(pFC->pDecoder, piWidth, piHeight);
 }
 
-ERR PKFormatConverter_GetResolution(PKFormatConverter* pFC, Float* pfrX, Float* pfrY)
+ERR JXRLIB_API(PKFormatConverter_GetResolution)(PKFormatConverter* pFC, Float* pfrX, Float* pfrY)
 {
     return pFC->pDecoder->GetResolution(pFC->pDecoder, pfrX, pfrY);
 }
 
-ERR PKFormatConverter_Copy(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStride)
+ERR JXRLIB_API(PKFormatConverter_Copy)(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStride)
 {
     ERR err = WMP_errSuccess;
 
@@ -2326,7 +2327,7 @@ Cleanup:
     return err;
 }
 
-ERR PKFormatConverter_Convert(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStride)
+ERR JXRLIB_API(PKFormatConverter_Convert)(PKFormatConverter* pFC, const PKRect* pRect, U8* pb, U32 cbStride)
 {
     UNREFERENCED_PARAMETER(pFC);
     UNREFERENCED_PARAMETER(pRect);
@@ -2336,11 +2337,11 @@ ERR PKFormatConverter_Convert(PKFormatConverter* pFC, const PKRect* pRect, U8* p
     return WMP_errSuccess;
 }
 
-ERR PKFormatConverter_Release(PKFormatConverter** ppFC)
+ERR JXRLIB_API(PKFormatConverter_Release)(PKFormatConverter** ppFC)
 {
     ERR err = WMP_errSuccess;
 
-    Call(PKFree((void**)ppFC));
+    Call(JXRLIB_API(PKFree)((void**)ppFC));
 
 Cleanup:
     return err;

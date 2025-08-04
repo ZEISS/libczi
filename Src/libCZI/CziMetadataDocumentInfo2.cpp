@@ -9,7 +9,8 @@
 using namespace std;
 using namespace libCZI;
 
-
+namespace
+{
 template<typename t>
 void SetIfPresentAndValid(pugi::xml_node node, const wchar_t* nodeName, t* p, void(t::* pfn)(const wstring&))
 {
@@ -94,7 +95,7 @@ void SetIfAttributePresentAndValid(pugi::xml_node node, const wchar_t* nodeName,
     }
 }
 
-static pugi::xml_node GetNodeRelativeFromNode(pugi::xml_node node, const wchar_t* path)
+pugi::xml_node GetNodeRelativeFromNode(pugi::xml_node node, const wchar_t* path)
 {
     Utilities::Split(wstring(path), L'/',
         [&](const std::wstring str)->bool
@@ -106,9 +107,10 @@ static pugi::xml_node GetNodeRelativeFromNode(pugi::xml_node node, const wchar_t
     return node;
 }
 
-static pugi::xml_node GetNode(const CCziMetadata* md, const wchar_t* path)
+pugi::xml_node GetNode(const CCziMetadata* md, const wchar_t* path)
 {
     return GetNodeRelativeFromNode(md->GetXmlDoc().child(L"ImageDocument"), path);
+}
 }
 
 // ************************************************************************************

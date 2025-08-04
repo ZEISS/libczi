@@ -25,6 +25,7 @@
 // POSSIBILITY OF SUCH DAMAGE.
 //
 //*@@@---@@@@******************************************************************
+#include "../../common/include/jxrlib_symbol_mangle.h"
 #include "../sys/strcodec.h"
 #include "encode.h"
 #include "../sys/strTransform.h"
@@ -41,7 +42,7 @@ extern char L1WW[];
 #define _FORCEINLINE
 #endif // X86OPT_INLINE
 
-Int inputMBRow(CWMImageStrCodec*);
+Int JXRLIB_API(inputMBRow)(CWMImageStrCodec*);
 
 #if defined(WMP_OPT_SSE2) || defined(WMP_OPT_CC_ENC) || defined(WMP_OPT_TRFM_ENC)
 void StrEncOpt(CWMImageStrCodec* pSC);
@@ -49,40 +50,40 @@ void StrEncOpt(CWMImageStrCodec* pSC);
 
 #define MINIMUM_PACKET_LENGTH 4  // as long as packet header - skipped if data is not accessed (happens only for flexbits)
 
-Void writeQuantizer(CWMIQuantizer* pQuantizer[MAX_CHANNELS], BitIOInfo* pIO, U8 cChMode, size_t cChannel, size_t iPos)
+Void JXRLIB_API(writeQuantizer)(CWMIQuantizer* pQuantizer[MAX_CHANNELS], BitIOInfo* pIO, U8 cChMode, size_t cChannel, size_t iPos)
 {
     if (cChMode > 2)
         cChMode = 2;
 
     if (cChannel > 1)
-        putBit16(pIO, cChMode, 2); // Channel mode
+        JXRLIB_API(putBit16)(pIO, cChMode, 2); // Channel mode
     else
         cChMode = 0;
 
-    putBit16(pIO, pQuantizer[0][iPos].iIndex, 8); // Y
+    JXRLIB_API(putBit16)(pIO, pQuantizer[0][iPos].iIndex, 8); // Y
 
     if (cChMode == 1)  // MIXED
-        putBit16(pIO, pQuantizer[1][iPos].iIndex, 8); // UV
+        JXRLIB_API(putBit16)(pIO, pQuantizer[1][iPos].iIndex, 8); // UV
     else if (cChMode > 0) { // INDEPENDENT
         size_t i;
 
         for (i = 1; i < cChannel; i++)
-            putBit16(pIO, pQuantizer[i][iPos].iIndex, 8); // UV
+            JXRLIB_API(putBit16)(pIO, pQuantizer[i][iPos].iIndex, 8); // UV
     }
 }
 
 // packet header: 00000000 00000000 00000001 ?????xxx
 // xxx:           000(spatial) 001(DC) 010(AD) 011(AC) 100(FL) 101-111(reserved)
 // ?????:         (iTileY * cNumOfSliceV + iTileX)
-Void writePacketHeader(BitIOInfo* pIO, U8 ptPacketType, U8 pID)
+Void JXRLIB_API(writePacketHeader)(BitIOInfo* pIO, U8 ptPacketType, U8 pID)
 {
-    putBit16(pIO, 0, 8);
-    putBit16(pIO, 0, 8);
-    putBit16(pIO, 1, 8);
-    putBit16(pIO, (pID << 3) + (ptPacketType & 7), 8);
+    JXRLIB_API(putBit16)(pIO, 0, 8);
+    JXRLIB_API(putBit16)(pIO, 0, 8);
+    JXRLIB_API(putBit16)(pIO, 1, 8);
+    JXRLIB_API(putBit16)(pIO, (pID << 3) + (ptPacketType & 7), 8);
 }
 
-Int writeTileHeaderDC(CWMImageStrCodec* pSC, BitIOInfo* pIO)
+Int JXRLIB_API(writeTileHeaderDC)(CWMImageStrCodec* pSC, BitIOInfo* pIO)
 {
     size_t iTile, j = (pSC->m_pNextSC == NULL ? 1U : 2U);
 
@@ -95,18 +96,18 @@ Int writeTileHeaderDC(CWMImageStrCodec* pSC, BitIOInfo* pIO)
 
             if (pSC->cTileRow + pSC->cTileColumn == 0) // allocate DC QP info
                 for (iTile = 0; iTile <= pSC->WMISCP.cNumOfSliceMinus1V; iTile++)
-                    if (allocateQuantizer(pSC->pTile[iTile].pQuantizerDC, pSC->m_param.cNumChannels, 1) != ICERR_OK)
+                    if (JXRLIB_API(allocateQuantizer)(pSC->pTile[iTile].pQuantizerDC, pSC->m_param.cNumChannels, 1) != ICERR_OK)
                         return ICERR_ERROR;
 
             for (i = 0; i < pSC->m_param.cNumChannels; i++)
                 pTile->pQuantizerDC[i]->iIndex = (U8)((rand() & 0x2f) + 1); // QP indexes, just for concept proofing!
 
-            formatQuantizer(pTile->pQuantizerDC, pTile->cChModeDC, pSC->m_param.cNumChannels, 0, TRUE, pSC->m_param.bScaledArith);
+            JXRLIB_API(formatQuantizer)(pTile->pQuantizerDC, pTile->cChModeDC, pSC->m_param.cNumChannels, 0, TRUE, pSC->m_param.bScaledArith);
 
             for (i = 0; i < pSC->m_param.cNumChannels; i++)
                 pTile->pQuantizerDC[i]->iOffset = (pTile->pQuantizerDC[i]->iQP >> 1);
 
-            writeQuantizer(pTile->pQuantizerDC, pIO, pTile->cChModeDC, pSC->m_param.cNumChannels, 0);
+            JXRLIB_API(writeQuantizer)(pTile->pQuantizerDC, pIO, pTile->cChModeDC, pSC->m_param.cNumChannels, 0);
         }
 
         pSC = pSC->m_pNextSC;
@@ -115,7 +116,7 @@ Int writeTileHeaderDC(CWMImageStrCodec* pSC, BitIOInfo* pIO)
     return ICERR_OK;
 }
 
-Int writeTileHeaderLP(CWMImageStrCodec* pSC, BitIOInfo* pIO)
+Int JXRLIB_API(writeTileHeaderLP)(CWMImageStrCodec* pSC, BitIOInfo* pIO)
 {
     size_t k = (pSC->m_pNextSC == NULL ? 1U : 2U);
 
@@ -125,31 +126,31 @@ Int writeTileHeaderLP(CWMImageStrCodec* pSC, BitIOInfo* pIO)
             U8 i, j;
 
             pTile->bUseDC = ((rand() & 1) == 0 ? TRUE : FALSE); // use DC quantizer?
-            putBit16(pIO, pTile->bUseDC == TRUE ? 1 : 0, 1);
+            JXRLIB_API(putBit16)(pIO, pTile->bUseDC == TRUE ? 1 : 0, 1);
             pTile->cBitsLP = 0;
 
             pTile->cNumQPLP = (pTile->bUseDC == TRUE ? 1 : (U8)((rand() & 0xf) + 1)); // # of LP QPs
 
             if (pSC->cTileRow > 0)
-                freeQuantizer(pTile->pQuantizerLP);
+                JXRLIB_API(freeQuantizer)(pTile->pQuantizerLP);
 
-            if (allocateQuantizer(pTile->pQuantizerLP, pSC->m_param.cNumChannels, pTile->cNumQPLP) != ICERR_OK)
+            if (JXRLIB_API(allocateQuantizer)(pTile->pQuantizerLP, pSC->m_param.cNumChannels, pTile->cNumQPLP) != ICERR_OK)
                 return ICERR_ERROR;
 
             if (pTile->bUseDC == TRUE)
-                useDCQuantizer(pSC, pSC->cTileColumn);
+                JXRLIB_API(useDCQuantizer)(pSC, pSC->cTileColumn);
             else {
-                putBit16(pIO, pTile->cNumQPLP - 1, 4);
+                JXRLIB_API(putBit16)(pIO, pTile->cNumQPLP - 1, 4);
 
-                pTile->cBitsLP = dquantBits(pTile->cNumQPLP);
+                pTile->cBitsLP = JXRLIB_API(dquantBits)(pTile->cNumQPLP);
 
                 for (i = 0; i < pTile->cNumQPLP; i++) {
                     pTile->cChModeLP[i] = (U8)(rand() & 3); // channel mode, just for concept proofing!
 
                     for (j = 0; j < (U8)pSC->m_param.cNumChannels; j++)
                         pTile->pQuantizerLP[j][i].iIndex = (U8)((rand() & 0xfe) + 1); // QP indexes, just for concept proofing!
-                    formatQuantizer(pTile->pQuantizerLP, pTile->cChModeLP[i], pSC->m_param.cNumChannels, i, TRUE, pSC->m_param.bScaledArith);
-                    writeQuantizer(pTile->pQuantizerLP, pIO, pTile->cChModeLP[i], pSC->m_param.cNumChannels, i);
+                    JXRLIB_API(formatQuantizer)(pTile->pQuantizerLP, pTile->cChModeLP[i], pSC->m_param.cNumChannels, i, TRUE, pSC->m_param.bScaledArith);
+                    JXRLIB_API(writeQuantizer)(pTile->pQuantizerLP, pIO, pTile->cChModeLP[i], pSC->m_param.cNumChannels, i);
                 }
             }
         }
@@ -159,7 +160,7 @@ Int writeTileHeaderLP(CWMImageStrCodec* pSC, BitIOInfo* pIO)
     return ICERR_OK;
 }
 
-Int writeTileHeaderHP(CWMImageStrCodec* pSC, BitIOInfo* pIO)
+Int JXRLIB_API(writeTileHeaderHP)(CWMImageStrCodec* pSC, BitIOInfo* pIO)
 {
     size_t k = (pSC->m_pNextSC == NULL ? 1U : 2U);
 
@@ -169,30 +170,30 @@ Int writeTileHeaderHP(CWMImageStrCodec* pSC, BitIOInfo* pIO)
             U8 i, j;
 
             pTile->bUseLP = ((rand() & 1) == 0 ? TRUE : FALSE); // use LP quantizer?
-            putBit16(pIO, pTile->bUseLP == TRUE ? 1 : 0, 1);
+            JXRLIB_API(putBit16)(pIO, pTile->bUseLP == TRUE ? 1 : 0, 1);
             pTile->cBitsHP = 0;
 
             pTile->cNumQPHP = (pTile->bUseLP == TRUE ? pTile->cNumQPLP : (U8)((rand() & 0xf) + 1)); // # of LP QPs
 
             if (pSC->cTileRow > 0)
-                freeQuantizer(pTile->pQuantizerHP);
+                JXRLIB_API(freeQuantizer)(pTile->pQuantizerHP);
 
-            if (allocateQuantizer(pTile->pQuantizerHP, pSC->m_param.cNumChannels, pTile->cNumQPHP) != ICERR_OK)
+            if (JXRLIB_API(allocateQuantizer)(pTile->pQuantizerHP, pSC->m_param.cNumChannels, pTile->cNumQPHP) != ICERR_OK)
                 return ICERR_ERROR;
 
             if (pTile->bUseLP == TRUE)
-                useLPQuantizer(pSC, pTile->cNumQPHP, pSC->cTileColumn);
+                JXRLIB_API(useLPQuantizer)(pSC, pTile->cNumQPHP, pSC->cTileColumn);
             else {
-                putBit16(pIO, pTile->cNumQPHP - 1, 4);
-                pTile->cBitsHP = dquantBits(pTile->cNumQPHP);
+                JXRLIB_API(putBit16)(pIO, pTile->cNumQPHP - 1, 4);
+                pTile->cBitsHP = JXRLIB_API(dquantBits)(pTile->cNumQPHP);
 
                 for (i = 0; i < pTile->cNumQPHP; i++) {
                     pTile->cChModeHP[i] = (U8)(rand() & 3); // channel mode, just for concept proofing!
 
                     for (j = 0; j < (U8)pSC->m_param.cNumChannels; j++)
                         pTile->pQuantizerHP[j][i].iIndex = (U8)((rand() & 0xfe) + 1); // QP indexes, just for concept proofing!
-                    formatQuantizer(pTile->pQuantizerHP, pTile->cChModeHP[i], pSC->m_param.cNumChannels, i, FALSE, pSC->m_param.bScaledArith);
-                    writeQuantizer(pTile->pQuantizerHP, pIO, pTile->cChModeHP[i], pSC->m_param.cNumChannels, i);
+                    JXRLIB_API(formatQuantizer)(pTile->pQuantizerHP, pTile->cChModeHP[i], pSC->m_param.cNumChannels, i, FALSE, pSC->m_param.bScaledArith);
+                    JXRLIB_API(writeQuantizer)(pTile->pQuantizerHP, pIO, pTile->cChModeHP[i], pSC->m_param.cNumChannels, i);
                 }
             }
         }
@@ -202,7 +203,7 @@ Int writeTileHeaderHP(CWMImageStrCodec* pSC, BitIOInfo* pIO)
     return ICERR_OK;
 }
 
-Int encodeMB(CWMImageStrCodec* pSC, Int iMBX, Int iMBY)
+Int JXRLIB_API(encodeMB)(CWMImageStrCodec* pSC, Int iMBX, Int iMBY)
 {
     CCodingContext* pContext = &pSC->m_pCodingContext[pSC->cTileColumn];
 
@@ -210,41 +211,41 @@ Int encodeMB(CWMImageStrCodec* pSC, Int iMBX, Int iMBY)
         U8 pID = (U8)((pSC->cTileRow * (pSC->WMISCP.cNumOfSliceMinus1V + 1) + pSC->cTileColumn) & 0x1F);
 
         if (pSC->WMISCP.bfBitstreamFormat == SPATIAL) {
-            writePacketHeader(pContext->m_pIODC, 0, pID);
+            JXRLIB_API(writePacketHeader)(pContext->m_pIODC, 0, pID);
             if (pSC->m_param.bTrimFlexbitsFlag)
-                putBit16(pContext->m_pIODC, pContext->m_iTrimFlexBits, 4);
-            writeTileHeaderDC(pSC, pContext->m_pIODC);
-            writeTileHeaderLP(pSC, pContext->m_pIODC);
-            writeTileHeaderHP(pSC, pContext->m_pIODC);
+                JXRLIB_API(putBit16)(pContext->m_pIODC, pContext->m_iTrimFlexBits, 4);
+            JXRLIB_API(writeTileHeaderDC)(pSC, pContext->m_pIODC);
+            JXRLIB_API(writeTileHeaderLP)(pSC, pContext->m_pIODC);
+            JXRLIB_API(writeTileHeaderHP)(pSC, pContext->m_pIODC);
         }
         else {
-            writePacketHeader(pContext->m_pIODC, 1, pID);
-            writeTileHeaderDC(pSC, pContext->m_pIODC);
+            JXRLIB_API(writePacketHeader)(pContext->m_pIODC, 1, pID);
+            JXRLIB_API(writeTileHeaderDC)(pSC, pContext->m_pIODC);
             if (pSC->cSB > 1) {
-                writePacketHeader(pContext->m_pIOLP, 2, pID);
-                writeTileHeaderLP(pSC, pContext->m_pIOLP);
+                JXRLIB_API(writePacketHeader)(pContext->m_pIOLP, 2, pID);
+                JXRLIB_API(writeTileHeaderLP)(pSC, pContext->m_pIOLP);
             }
             if (pSC->cSB > 2) {
-                writePacketHeader(pContext->m_pIOAC, 3, pID);
-                writeTileHeaderHP(pSC, pContext->m_pIOAC);
+                JXRLIB_API(writePacketHeader)(pContext->m_pIOAC, 3, pID);
+                JXRLIB_API(writeTileHeaderHP)(pSC, pContext->m_pIOAC);
             }
             if (pSC->cSB > 3) {
-                writePacketHeader(pContext->m_pIOFL, 4, pID);
+                JXRLIB_API(writePacketHeader)(pContext->m_pIOFL, 4, pID);
                 if (pSC->m_param.bTrimFlexbitsFlag)
-                    putBit16(pContext->m_pIOFL, pContext->m_iTrimFlexBits, 4);
+                    JXRLIB_API(putBit16)(pContext->m_pIOFL, pContext->m_iTrimFlexBits, 4);
             }
         }
     }
 
-    if (EncodeMacroblockDC(pSC, pContext, iMBX, iMBY) != ICERR_OK)
+    if (JXRLIB_API(EncodeMacroblockDC)(pSC, pContext, iMBX, iMBY) != ICERR_OK)
         return ICERR_ERROR;
 
     if (pSC->WMISCP.sbSubband != SB_DC_ONLY)
-        if (EncodeMacroblockLowpass(pSC, pContext, iMBX, iMBY) != ICERR_OK)
+        if (JXRLIB_API(EncodeMacroblockLowpass)(pSC, pContext, iMBX, iMBY) != ICERR_OK)
             return ICERR_ERROR;
 
     if (pSC->WMISCP.sbSubband != SB_DC_ONLY && pSC->WMISCP.sbSubband != SB_NO_HIGHPASS)
-        if (EncodeMacroblockHighpass(pSC, pContext, iMBX, iMBY) != ICERR_OK)
+        if (JXRLIB_API(EncodeMacroblockHighpass)(pSC, pContext, iMBX, iMBY) != ICERR_OK)
             return ICERR_ERROR;
 
     if (iMBX + 1 == (int)pSC->cmbWidth && (iMBY + 1 == (int)pSC->cmbHeight ||
@@ -255,16 +256,16 @@ Int encodeMB(CWMImageStrCodec* pSC, Int iMBX, Int iMBY)
         // get sizes of each packet and update index table
         if (pSC->m_pNextSC == NULL || pSC->m_bSecondary) {
             for (k = 0; k < pSC->cNumBitIO; k++) {
-                fillToByte(pSC->m_ppBitIO[k]);
+                JXRLIB_API(fillToByte)(pSC->m_ppBitIO[k]);
                 pSC->ppWStream[k]->GetPos(pSC->ppWStream[k], &l);
-                pSC->pIndexTable[pSC->cNumBitIO * pSC->cTileRow + k] = l + getSizeWrite(pSC->m_ppBitIO[k]); // offset
+                pSC->pIndexTable[pSC->cNumBitIO * pSC->cTileRow + k] = l + JXRLIB_API(getSizeWrite)(pSC->m_ppBitIO[k]); // offset
             }
         }
 
         // reset coding contexts
         if (iMBY + 1 != (int)pSC->cmbHeight) {
             for (k = 0; k <= pSC->WMISCP.cNumOfSliceMinus1V; k++)
-                ResetCodingContextEnc(&pSC->m_pCodingContext[k]);
+                JXRLIB_API(ResetCodingContextEnc)(&pSC->m_pCodingContext[k]);
         }
     }
 
@@ -274,21 +275,21 @@ Int encodeMB(CWMImageStrCodec* pSC, Int iMBX, Int iMBY)
 /*************************************************************************
     Top level function for processing a macroblock worth of input
 *************************************************************************/
-Int processMacroblock(CWMImageStrCodec* pSC)
+Int JXRLIB_API(processMacroblock)(CWMImageStrCodec* pSC)
 {
     Bool topORleft = (pSC->cColumn == 0 || pSC->cRow == 0);
     ERR_CODE result = ICERR_OK;
     size_t j, jend = (pSC->m_pNextSC != NULL);
 
     for (j = 0; j <= jend; j++) {
-        transformMacroblock(pSC);
+        JXRLIB_API(transformMacroblock)(pSC);
         if (!topORleft) {
-            getTilePos(pSC, (Int)pSC->cColumn - 1, (Int)pSC->cRow - 1);
+            JXRLIB_API(getTilePos)(pSC, (Int)pSC->cColumn - 1, (Int)pSC->cRow - 1);
             if (jend) {
                 pSC->m_pNextSC->cTileRow = pSC->cTileRow;
                 pSC->m_pNextSC->cTileColumn = pSC->cTileColumn;
             }
-            if ((result = encodeMB(pSC, (Int)pSC->cColumn - 1, (Int)pSC->cRow - 1)) != ICERR_OK)
+            if ((result = JXRLIB_API(encodeMB)(pSC, (Int)pSC->cColumn - 1, (Int)pSC->cRow - 1)) != ICERR_OK)
                 return result;
         }
 
@@ -418,11 +419,11 @@ Int StrIOEncInit(CWMImageStrCodec* pSC)
 {
 //#if false   // TODO TODO TODO
     pSC->m_param.bIndexTable = !(pSC->WMISCP.bfBitstreamFormat == SPATIAL && pSC->WMISCP.cNumOfSliceMinus1H + pSC->WMISCP.cNumOfSliceMinus1V == 0);
-    if (allocateBitIOInfo(pSC) != ICERR_OK) {
+    if (JXRLIB_API(allocateBitIOInfo)(pSC) != ICERR_OK) {
         return ICERR_ERROR;
     }
 
-    attachISWrite(pSC->pIOHeader, pSC->WMISCP.pWStream);
+    JXRLIB_API(attachISWrite)(pSC->pIOHeader, pSC->WMISCP.pWStream);
 
     if (pSC->cNumBitIO > 0) {
         size_t i;
@@ -489,16 +490,16 @@ Int StrIOEncInit(CWMImageStrCodec* pSC)
 
             }
             else */{
-                if (CreateWS_List(pSC->ppWStream + i) != ICERR_OK) return ICERR_ERROR;
+                if (JXRLIB_API(CreateWS_List)(pSC->ppWStream + i) != ICERR_OK) return ICERR_ERROR;
             }
-            attachISWrite(pSC->m_ppBitIO[i], pSC->ppWStream[i]);
+            JXRLIB_API(attachISWrite)(pSC->m_ppBitIO[i], pSC->ppWStream[i]);
         }
     }
 //#endif
     return ICERR_OK;
 }
 
-#define PUTBITS putBit16
+#define PUTBITS JXRLIB_API(putBit16)
 /*************************************************************************
     Write variable length byte aligned integer
 *************************************************************************/
@@ -530,11 +531,11 @@ static Void PutVLWordEsc(BitIOInfo* pIO, Int iEscape, size_t s)
 /*************************************************************************
     Write index table at start (null index table)
 *************************************************************************/
-Int writeIndexTableNull(CWMImageStrCodec* pSC)
+Int JXRLIB_API(writeIndexTableNull)(CWMImageStrCodec* pSC)
 {
     if (pSC->cNumBitIO == 0) {
         BitIOInfo* pIO = pSC->pIOHeader;
-        fillToByte(pIO);
+        JXRLIB_API(fillToByte)(pIO);
 
         /* Profile / Level info */
         PutVLWordEsc(pIO, 0, 4);    // 4 bytes
@@ -549,7 +550,7 @@ Int writeIndexTableNull(CWMImageStrCodec* pSC)
 /*************************************************************************
     Write index table
 *************************************************************************/
-Int writeIndexTable(CWMImageStrCodec* pSC)
+Int JXRLIB_API(writeIndexTable)(CWMImageStrCodec* pSC)
 {
     if (pSC->cNumBitIO > 0) {
         BitIOInfo* pIO = pSC->pIOHeader;
@@ -586,13 +587,13 @@ Int writeIndexTable(CWMImageStrCodec* pSC)
 
         writeIS_L1(pSC, pIO);
         PutVLWordEsc(pIO, 0xff, 0); // escape to end
-        fillToByte(pIO);
+        JXRLIB_API(fillToByte)(pIO);
     }
 
     return ICERR_OK;
 }
 
-Int copyTo(struct tagWMPStream* pSrc, struct tagWMPStream* pDst, size_t iBytes)
+Int JXRLIB_API(copyTo)(struct tagWMPStream* pSrc, struct tagWMPStream* pDst, size_t iBytes)
 {
     char pData[PACKETLENGTH];
 
@@ -612,11 +613,11 @@ Int copyTo(struct tagWMPStream* pSrc, struct tagWMPStream* pDst, size_t iBytes)
     return ICERR_OK;
 }
 
-Int StrIOEncTerm(CWMImageStrCodec* pSC)
+Int JXRLIB_API(StrIOEncTerm)(CWMImageStrCodec* pSC)
 {
     BitIOInfo* pIO = pSC->pIOHeader;
 
-    fillToByte(pIO);
+    JXRLIB_API(fillToByte)(pIO);
 
     if (pSC->WMISCP.bVerbose) {
         U32 i, j;
@@ -659,9 +660,9 @@ Int StrIOEncTerm(CWMImageStrCodec* pSC)
         }
     }
 
-    writeIndexTable(pSC); // write index table to the header
+    JXRLIB_API(writeIndexTable)(pSC); // write index table to the header
 
-    detachISWrite(pSC, pIO);
+    JXRLIB_API(detachISWrite)(pSC, pIO);
 
     if (pSC->cNumBitIO > 0) {
         size_t i, j, k, l;
@@ -669,7 +670,7 @@ Int StrIOEncTerm(CWMImageStrCodec* pSC)
         size_t* pTable = pSC->pIndexTable;
 
         for (i = 0; i < pSC->cNumBitIO; i++) {
-            detachISWrite(pSC, pSC->m_ppBitIO[i]);
+            JXRLIB_API(detachISWrite)(pSC, pSC->m_ppBitIO[i]);
         }
 
         for (i = 0; i < pSC->cNumBitIO; i++) {
@@ -681,18 +682,18 @@ Int StrIOEncTerm(CWMImageStrCodec* pSC)
                 for (j = 0; j <= pSC->WMISCP.cNumOfSliceMinus1V; j++) {
 
                     if (pSC->WMISCP.bfBitstreamFormat == SPATIAL)
-                        copyTo(pSC->ppWStream[j], pDst, pTable[k++]);
+                        JXRLIB_API(copyTo)(pSC->ppWStream[j], pDst, pTable[k++]);
                     else if (!pSC->WMISCP.bProgressiveMode) {
-                        copyTo(pSC->ppWStream[j * pSC->cSB + 0], pDst, pTable[k++]);
+                        JXRLIB_API(copyTo)(pSC->ppWStream[j * pSC->cSB + 0], pDst, pTable[k++]);
                         if (pSC->cSB > 1)
-                            copyTo(pSC->ppWStream[j * pSC->cSB + 1], pDst, pTable[k++]);
+                            JXRLIB_API(copyTo)(pSC->ppWStream[j * pSC->cSB + 1], pDst, pTable[k++]);
                         if (pSC->cSB > 2)
-                            copyTo(pSC->ppWStream[j * pSC->cSB + 2], pDst, pTable[k++]);
+                            JXRLIB_API(copyTo)(pSC->ppWStream[j * pSC->cSB + 2], pDst, pTable[k++]);
                         if (pSC->cSB > 3)
-                            copyTo(pSC->ppWStream[j * pSC->cSB + 3], pDst, pTable[k++]);
+                            JXRLIB_API(copyTo)(pSC->ppWStream[j * pSC->cSB + 3], pDst, pTable[k++]);
                     }
                     else {
-                        copyTo(pSC->ppWStream[j * pSC->cSB + l], pDst, pTable[k]);
+                        JXRLIB_API(copyTo)(pSC->ppWStream[j * pSC->cSB + l], pDst, pTable[k]);
                         k += pSC->cSB;
                     }
                 }
@@ -744,7 +745,7 @@ Int StrIOEncTerm(CWMImageStrCodec* pSC)
 /*************************************************************************
     Write header of image plane
 *************************************************************************/
-Int WriteImagePlaneHeader(CWMImageStrCodec* pSC)
+Int JXRLIB_API(WriteImagePlaneHeader)(CWMImageStrCodec* pSC)
 {
     CWMImageInfo* pII = &pSC->WMII;
     CWMIStrCodecParam* pSCP = &pSC->WMISCP;
@@ -797,13 +798,13 @@ Int WriteImagePlaneHeader(CWMImageStrCodec* pSC)
     // quantization
     PUTBITS(pIO, (pSC->m_param.uQPMode & 1) == 1 ? 0 : 1, 1); // DC frame uniform quantization?
     if ((pSC->m_param.uQPMode & 1) == 0)
-        writeQuantizer(pSC->pTile[0].pQuantizerDC, pIO, (pSC->m_param.uQPMode >> 3) & 3, pSC->m_param.cNumChannels, 0);
+        JXRLIB_API(writeQuantizer)(pSC->pTile[0].pQuantizerDC, pIO, (pSC->m_param.uQPMode >> 3) & 3, pSC->m_param.cNumChannels, 0);
     if (pSC->WMISCP.sbSubband != SB_DC_ONLY) {
         PUTBITS(pIO, (pSC->m_param.uQPMode & 0x200) == 0 ? 1 : 0, 1); // use DC quantization?
         if ((pSC->m_param.uQPMode & 0x200) != 0) {
             PUTBITS(pIO, (pSC->m_param.uQPMode & 2) == 2 ? 0 : 1, 1); // LP frame uniform quantization?
             if ((pSC->m_param.uQPMode & 2) == 0)
-                writeQuantizer(pSC->pTile[0].pQuantizerLP, pIO, (pSC->m_param.uQPMode >> 5) & 3, pSC->m_param.cNumChannels, 0);
+                JXRLIB_API(writeQuantizer)(pSC->pTile[0].pQuantizerLP, pIO, (pSC->m_param.uQPMode >> 5) & 3, pSC->m_param.cNumChannels, 0);
         }
 
         if (pSC->WMISCP.sbSubband != SB_NO_HIGHPASS) {
@@ -811,19 +812,19 @@ Int WriteImagePlaneHeader(CWMImageStrCodec* pSC)
             if ((pSC->m_param.uQPMode & 0x400) != 0) {
                 PUTBITS(pIO, (pSC->m_param.uQPMode & 4) == 4 ? 0 : 1, 1); // HP frame uniform quantization?
                 if ((pSC->m_param.uQPMode & 4) == 0)
-                    writeQuantizer(pSC->pTile[0].pQuantizerHP, pIO, (pSC->m_param.uQPMode >> 7) & 3, pSC->m_param.cNumChannels, 0);
+                    JXRLIB_API(writeQuantizer)(pSC->pTile[0].pQuantizerHP, pIO, (pSC->m_param.uQPMode >> 7) & 3, pSC->m_param.cNumChannels, 0);
             }
         }
     }
 
-    fillToByte(pIO);  // remove this later
+    JXRLIB_API(fillToByte)(pIO);  // remove this later
     return ICERR_OK;
 }
 
 /*************************************************************************
     Write header to buffer
 *************************************************************************/
-Int WriteWMIHeader(CWMImageStrCodec* pSC)
+Int JXRLIB_API(WriteWMIHeader)(CWMImageStrCodec* pSC)
 {
     CWMImageInfo* pII = &pSC->WMII;
     CWMIStrCodecParam* pSCP = &pSC->WMISCP;
@@ -843,7 +844,7 @@ Int WriteWMIHeader(CWMImageStrCodec* pSC)
 
     // 0
         /** signature **/
-    for (i = 0; i < 8; PUTBITS(pSC->pIOHeader, gGDISignature[i++], 8));
+    for (i = 0; i < 8; PUTBITS(pSC->pIOHeader, JXRLIB_API(gGDISignature)[i++], 8));
 
     // 8
         /** codec version and subversion **/
@@ -878,8 +879,8 @@ Int WriteWMIHeader(CWMImageStrCodec* pSC)
 
     // 12 - Variable length fields
     // size
-    putBit32(pIO, (U32)(pII->cWidth - 1), bAbbreviatedHeader ? 16 : 32);
-    putBit32(pIO, (U32)(pII->cHeight - 1), bAbbreviatedHeader ? 16 : 32);
+    JXRLIB_API(putBit32)(pIO, (U32)(pII->cWidth - 1), bAbbreviatedHeader ? 16 : 32);
+    JXRLIB_API(putBit32)(pIO, (U32)(pII->cHeight - 1), bAbbreviatedHeader ? 16 : 32);
 
     // tiling
     if (pSCP->cNumOfSliceMinus1V || pSCP->cNumOfSliceMinus1H) {
@@ -902,16 +903,16 @@ Int WriteWMIHeader(CWMImageStrCodec* pSC)
         PUTBITS(pIO, (U32)pCoreParam->cExtraPixelsBottom, 6);
         PUTBITS(pIO, (U32)pCoreParam->cExtraPixelsRight, 6);
     }
-    fillToByte(pIO);  // redundant
+    JXRLIB_API(fillToByte)(pIO);  // redundant
 
     // write image plane headers
-    WriteImagePlaneHeader(pSC);
+    JXRLIB_API(WriteImagePlaneHeader)(pSC);
 
     return ICERR_OK;
 }
 
 // streaming codec init/term
-Int StrEncInit(CWMImageStrCodec* pSC)
+Int JXRLIB_API(StrEncInit)(CWMImageStrCodec* pSC)
 {
     COLORFORMAT cf = pSC->m_param.cfColorFormat;
     COLORFORMAT cfE = pSC->WMII.cfColorFormat;
@@ -944,7 +945,7 @@ Int StrEncInit(CWMImageStrCodec* pSC)
 
     pSC->cTileColumn = pSC->cTileRow = 0;
 
-    if (allocateTileInfo(pSC) != ICERR_OK)
+    if (JXRLIB_API(allocateTileInfo)(pSC) != ICERR_OK)
         return ICERR_ERROR;
 
     if (pSC->m_param.bTranscode == FALSE) {
@@ -1019,15 +1020,15 @@ Int StrEncInit(CWMImageStrCodec* pSC)
     }
 
     if ((pSC->m_param.uQPMode & 1) == 0) { // DC frame uniform quantization
-        if (allocateQuantizer(pSC->pTile[0].pQuantizerDC, pSC->m_param.cNumChannels, 1) != ICERR_OK)
+        if (JXRLIB_API(allocateQuantizer)(pSC->pTile[0].pQuantizerDC, pSC->m_param.cNumChannels, 1) != ICERR_OK)
             return ICERR_ERROR;
-        setUniformQuantizer(pSC, 0);
+        JXRLIB_API(setUniformQuantizer)(pSC, 0);
         for (i = 0; i < pSC->m_param.cNumChannels; i++)
             if (pSC->m_param.bTranscode)
                 pSC->pTile[0].pQuantizerDC[i]->iIndex = pSC->m_param.uiQPIndexDC[i];
             else
                 pSC->pTile[0].pQuantizerDC[i]->iIndex = pSC->m_param.uiQPIndexDC[i] = (U8)(((i == 0 ? iQPIndexY : (i == 1) ? iQPIndexU : iQPIndexV)) & 0xff);
-        formatQuantizer(pSC->pTile[0].pQuantizerDC, (pSC->m_param.uQPMode >> 3) & 3, pSC->m_param.cNumChannels, 0, TRUE, pSC->m_param.bScaledArith);
+        JXRLIB_API(formatQuantizer)(pSC->pTile[0].pQuantizerDC, (pSC->m_param.uQPMode >> 3) & 3, pSC->m_param.cNumChannels, 0, TRUE, pSC->m_param.bScaledArith);
 
         for (i = 0; i < pSC->m_param.cNumChannels; i++)
             pSC->pTile[0].pQuantizerDC[i]->iOffset = (pSC->pTile[0].pQuantizerDC[i]->iQP >> 1);
@@ -1035,37 +1036,37 @@ Int StrEncInit(CWMImageStrCodec* pSC)
 
     if (pSC->WMISCP.sbSubband != SB_DC_ONLY) {
         if ((pSC->m_param.uQPMode & 2) == 0) { // LP frame uniform quantization
-            if (allocateQuantizer(pSC->pTile[0].pQuantizerLP, pSC->m_param.cNumChannels, 1) != ICERR_OK)
+            if (JXRLIB_API(allocateQuantizer)(pSC->pTile[0].pQuantizerLP, pSC->m_param.cNumChannels, 1) != ICERR_OK)
                 return ICERR_ERROR;
-            setUniformQuantizer(pSC, 1);
+            JXRLIB_API(setUniformQuantizer)(pSC, 1);
             for (i = 0; i < pSC->m_param.cNumChannels; i++)
                 if (pSC->m_param.bTranscode)
                     pSC->pTile[0].pQuantizerLP[i]->iIndex = pSC->m_param.uiQPIndexLP[i];
                 else
                     pSC->pTile[0].pQuantizerLP[i]->iIndex = pSC->m_param.uiQPIndexLP[i] = (U8)(((i == 0 ? iQPIndexYLP : (i == 1) ? iQPIndexULP : iQPIndexVLP)) & 0xff);
-            formatQuantizer(pSC->pTile[0].pQuantizerLP, (pSC->m_param.uQPMode >> 5) & 3, pSC->m_param.cNumChannels, 0, TRUE, pSC->m_param.bScaledArith);
+            JXRLIB_API(formatQuantizer)(pSC->pTile[0].pQuantizerLP, (pSC->m_param.uQPMode >> 5) & 3, pSC->m_param.cNumChannels, 0, TRUE, pSC->m_param.bScaledArith);
         }
 
         if (pSC->WMISCP.sbSubband != SB_NO_HIGHPASS) {
             if ((pSC->m_param.uQPMode & 4) == 0) { // HP frame uniform quantization
-                if (allocateQuantizer(pSC->pTile[0].pQuantizerHP, pSC->m_param.cNumChannels, 1) != ICERR_OK)
+                if (JXRLIB_API(allocateQuantizer)(pSC->pTile[0].pQuantizerHP, pSC->m_param.cNumChannels, 1) != ICERR_OK)
                     return ICERR_ERROR;
-                setUniformQuantizer(pSC, 2);
+                JXRLIB_API(setUniformQuantizer)(pSC, 2);
                 for (i = 0; i < pSC->m_param.cNumChannels; i++)
                     if (pSC->m_param.bTranscode)
                         pSC->pTile[0].pQuantizerHP[i]->iIndex = pSC->m_param.uiQPIndexHP[i];
                     else
                         pSC->pTile[0].pQuantizerHP[i]->iIndex = pSC->m_param.uiQPIndexHP[i] = (U8)(((i == 0 ? iQPIndexYHP : (i == 1) ? iQPIndexUHP : iQPIndexVHP)) & 0xff);
-                formatQuantizer(pSC->pTile[0].pQuantizerHP, (pSC->m_param.uQPMode >> 7) & 3, pSC->m_param.cNumChannels, 0, FALSE, pSC->m_param.bScaledArith);
+                JXRLIB_API(formatQuantizer)(pSC->pTile[0].pQuantizerHP, (pSC->m_param.uQPMode >> 7) & 3, pSC->m_param.cNumChannels, 0, FALSE, pSC->m_param.bScaledArith);
             }
         }
     }
 
-    if (allocatePredInfo(pSC) != ICERR_OK) {
+    if (JXRLIB_API(allocatePredInfo)(pSC) != ICERR_OK) {
         return ICERR_ERROR;
     }
 
-    if (pSC->WMISCP.cNumOfSliceMinus1V >= MAX_TILES || AllocateCodingContextEnc(pSC, pSC->WMISCP.cNumOfSliceMinus1V + 1, pSC->WMISCP.uiTrimFlexBits) != ICERR_OK) {
+    if (pSC->WMISCP.cNumOfSliceMinus1V >= MAX_TILES || JXRLIB_API(AllocateCodingContextEnc)(pSC, pSC->WMISCP.cNumOfSliceMinus1V + 1, pSC->WMISCP.uiTrimFlexBits) != ICERR_OK) {
         return ICERR_ERROR;
     }
 
@@ -1076,12 +1077,12 @@ Int StrEncInit(CWMImageStrCodec* pSC)
         pSC->cSB = pSC->m_pNextSC->cSB;
         pSC->ppWStream = pSC->m_pNextSC->ppWStream;
         pSC->pIndexTable = pSC->m_pNextSC->pIndexTable;
-        setBitIOPointers(pSC);
+        JXRLIB_API(setBitIOPointers)(pSC);
     }
     else {
         StrIOEncInit(pSC);
-        setBitIOPointers(pSC);
-        WriteWMIHeader(pSC);
+        JXRLIB_API(setBitIOPointers)(pSC);
+        JXRLIB_API(WriteWMIHeader)(pSC);
     }
 
     return ICERR_OK;
@@ -1104,14 +1105,14 @@ static Int StrEncTerm(CTXSTRCODEC ctxSC)
                 free(pSC->pResV);
         }
 
-        freePredInfo(pSC);
+        JXRLIB_API(freePredInfo)(pSC);
 
         if (j == 0)
-            StrIOEncTerm(pSC);
+            JXRLIB_API(StrIOEncTerm)(pSC);
 
-        FreeCodingContextEnc(pSC);
+        JXRLIB_API(FreeCodingContextEnc)(pSC);
 
-        freeTileInfo(pSC);
+        JXRLIB_API(freeTileInfo)(pSC);
 
         pSC->WMISCP.nExpBias -= 128; // reset
 
@@ -1121,7 +1122,7 @@ static Int StrEncTerm(CTXSTRCODEC ctxSC)
     return 0;
 }
 
-U32 setUniformTiling(U32* pTile, U32 cNumTile, U32 cNumMB)
+U32 JXRLIB_API(setUniformTiling)(U32* pTile, U32 cNumTile, U32 cNumMB)
 {
     U32 i, j;
 
@@ -1136,7 +1137,7 @@ U32 setUniformTiling(U32* pTile, U32 cNumTile, U32 cNumMB)
     return cNumTile;
 }
 
-U32 validateTiling(U32* pTile, U32 cNumTile, U32 cNumMB)
+U32 JXRLIB_API(validateTiling)(U32* pTile, U32 cNumTile, U32 cNumMB)
 {
     U32 i, cMBs;
 
@@ -1149,7 +1150,7 @@ U32 validateTiling(U32* pTile, U32 cNumTile, U32 cNumMB)
 
     for (i = cMBs = 0; i + 1 < cNumTile; i++) {
         if (pTile[i] == 0 || pTile[i] > 65535) { // invalid tile setting, resetting to uniform tiling
-            cNumTile = setUniformTiling(pTile, cNumTile, cNumMB);
+            cNumTile = JXRLIB_API(setUniformTiling)(pTile, cNumTile, cNumMB);
             break;
         }
 
@@ -1163,7 +1164,7 @@ U32 validateTiling(U32* pTile, U32 cNumTile, U32 cNumMB)
 
     // last tile
     if (cNumMB - cMBs > 65536)
-        cNumTile = setUniformTiling(pTile, cNumTile, cNumMB);
+        cNumTile = JXRLIB_API(setUniformTiling)(pTile, cNumTile, cNumMB);
 
     for (i = 1; i < cNumTile; i++)
         pTile[i] += pTile[i - 1];
@@ -1177,7 +1178,7 @@ U32 validateTiling(U32* pTile, U32 cNumTile, U32 cNumMB)
 /*************************************************************************
   Validate and adjust input params here
 *************************************************************************/
-Int ValidateArgs(CWMImageInfo* pII, CWMIStrCodecParam* pSCP)
+Int JXRLIB_API(ValidateArgs)(CWMImageInfo* pII, CWMIStrCodecParam* pSCP)
 {
     int i;
     Bool bTooNarrowTile = FALSE;
@@ -1238,8 +1239,8 @@ Int ValidateArgs(CWMImageInfo* pII, CWMIStrCodecParam* pSCP)
     }
 
     // adjust tiling
-    pSCP->cNumOfSliceMinus1V = validateTiling(pSCP->uiTileX, pSCP->cNumOfSliceMinus1V + 1, (((U32)pII->cWidth + 15) >> 4)) - 1;
-    pSCP->cNumOfSliceMinus1H = validateTiling(pSCP->uiTileY, pSCP->cNumOfSliceMinus1H + 1, (((U32)pII->cHeight + 15) >> 4)) - 1;
+    pSCP->cNumOfSliceMinus1V = JXRLIB_API(validateTiling)(pSCP->uiTileX, pSCP->cNumOfSliceMinus1V + 1, (((U32)pII->cWidth + 15) >> 4)) - 1;
+    pSCP->cNumOfSliceMinus1H = JXRLIB_API(validateTiling)(pSCP->uiTileY, pSCP->cNumOfSliceMinus1H + 1, (((U32)pII->cHeight + 15) >> 4)) - 1;
 
     if (pSCP->bUseHardTileBoundaries && ((pSCP->cfColorFormat == YUV_420) || (pSCP->cfColorFormat == YUV_422)) && (pSCP->olOverlap == OL_TWO)) {
         for (i = 1; i < (int)(pSCP->cNumOfSliceMinus1H + 1); i++) {
@@ -1322,17 +1323,17 @@ static Void InitializeStrEnc(CWMImageStrCodec* pSC,
     pSC->cmbWidth = (pSC->WMII.cWidth + 15) / 16;
     pSC->cmbHeight = (pSC->WMII.cHeight + 15) / 16;
 
-    pSC->Load = inputMBRow;
-    pSC->Quantize = quantizeMacroblock;
-    pSC->ProcessTopLeft = processMacroblock;
-    pSC->ProcessTop = processMacroblock;
-    pSC->ProcessTopRight = processMacroblock;
-    pSC->ProcessLeft = processMacroblock;
-    pSC->ProcessCenter = processMacroblock;
-    pSC->ProcessRight = processMacroblock;
-    pSC->ProcessBottomLeft = processMacroblock;
-    pSC->ProcessBottom = processMacroblock;
-    pSC->ProcessBottomRight = processMacroblock;
+    pSC->Load = JXRLIB_API(inputMBRow);
+    pSC->Quantize = JXRLIB_API(quantizeMacroblock);
+    pSC->ProcessTopLeft = JXRLIB_API(processMacroblock);
+    pSC->ProcessTop = JXRLIB_API(processMacroblock);
+    pSC->ProcessTopRight = JXRLIB_API(processMacroblock);
+    pSC->ProcessLeft = JXRLIB_API(processMacroblock);
+    pSC->ProcessCenter = JXRLIB_API(processMacroblock);
+    pSC->ProcessRight = JXRLIB_API(processMacroblock);
+    pSC->ProcessBottomLeft = JXRLIB_API(processMacroblock);
+    pSC->ProcessBottom = JXRLIB_API(processMacroblock);
+    pSC->ProcessBottomRight = JXRLIB_API(processMacroblock);
 
     pSC->m_pNextSC = NULL;
     pSC->m_bSecondary = FALSE;
@@ -1341,7 +1342,7 @@ static Void InitializeStrEnc(CWMImageStrCodec* pSC,
 /*************************************************************************
    Streaming API init
 *************************************************************************/
-Int ImageStrEncInit(
+Int JXRLIB_API(ImageStrEncInit)(
     CWMImageInfo* pII,
     CWMIStrCodecParam* pSCP,
     CTXSTRCODEC* pctxSC)
@@ -1358,7 +1359,7 @@ Int ImageStrEncInit(
 
     Int err;
 
-    if (ValidateArgs(pII, pSCP) != ICERR_OK) {
+    if (JXRLIB_API(ValidateArgs)(pII, pSCP) != ICERR_OK) {
         goto ErrorExit;
     }
 
@@ -1367,7 +1368,7 @@ Int ImageStrEncInit(
 
     //================================================
     cbChannel = cbChannels[pSCP->bdBitDepth];
-    cblkChroma = cblkChromas[pSCP->cfColorFormat];
+    cblkChroma = JXRLIB_API(cblkChromas)[pSCP->cfColorFormat];
     cbMacBlockStride = cbChannel * 16 * 16;
     cbMacBlockChroma = cbChannel * 16 * cblkChroma;
     cMacBlock = (pII->cWidth + 15) / 16;
@@ -1427,7 +1428,7 @@ Int ImageStrEncInit(
     pSC->pIOHeader = (BitIOInfo*)pb;
 
     //================================================
-    err = StrEncInit(pSC);
+    err = JXRLIB_API(StrEncInit)(pSC);
     if (ICERR_OK != err)
         goto ErrorExit;
 
@@ -1470,17 +1471,17 @@ Int ImageStrEncInit(
         pNextSC->m_bSecondary = TRUE;
 
         // 5. StrEncInit
-        StrEncInit(pNextSC);
+        JXRLIB_API(StrEncInit)(pNextSC);
 
         // 6. Write header of image plane
-        WriteImagePlaneHeader(pNextSC);
+        JXRLIB_API(WriteImagePlaneHeader)(pNextSC);
     }
 
     pSC->m_pNextSC = pNextSC;
     //================================================
     *pctxSC = (CTXSTRCODEC)pSC;
 
-    writeIndexTableNull(pSC);
+    JXRLIB_API(writeIndexTableNull)(pSC);
 #if defined(WMP_OPT_SSE2) || defined(WMP_OPT_CC_ENC) || defined(WMP_OPT_TRFM_ENC)
     StrEncOpt(pSC);
 #endif // OPT defined
@@ -1495,7 +1496,7 @@ ErrorExit:
 /*************************************************************************
    Streaming API encode
 *************************************************************************/
-Int ImageStrEncEncode(
+Int JXRLIB_API(ImageStrEncEncode)(
     CTXSTRCODEC ctxSC,
     const CWMImageBufferInfo* pBI)
 {
@@ -1513,7 +1514,7 @@ Int ImageStrEncEncode(
 
     pSC->WMIBI = *pBI;
     pSC->cColumn = 0;
-    initMRPtr(pSC);
+    JXRLIB_API(initMRPtr)(pSC);
     if (pNextSC)
         pNextSC->WMIBI = *pBI;
 
@@ -1532,23 +1533,23 @@ Int ImageStrEncEncode(
         return ICERR_ERROR;
     if (ProcessLeft(pSC) != ICERR_OK)
         return ICERR_ERROR;
-    advanceMRPtr(pSC);
+    JXRLIB_API(advanceMRPtr)(pSC);
 
     //================================
     for (pSC->cColumn = 1; pSC->cColumn < pSC->cmbWidth; ++pSC->cColumn) {
         if (ProcessCenter(pSC) != ICERR_OK)
             return ICERR_ERROR;
-        advanceMRPtr(pSC);
+        JXRLIB_API(advanceMRPtr)(pSC);
     }
 
     //================================
     if (ProcessRight(pSC) != ICERR_OK)
         return ICERR_ERROR;
     if (pSC->cRow)
-        advanceOneMBRow(pSC);
+        JXRLIB_API(advanceOneMBRow)(pSC);
 
     ++pSC->cRow;
-    swapMRPtr(pSC);
+    JXRLIB_API(swapMRPtr)(pSC);
 
 //    PERFTIMER_STOP(pSC->m_fMeasurePerf, pSC->m_ptEncDecPerf);
     return ICERR_OK;
@@ -1557,7 +1558,7 @@ Int ImageStrEncEncode(
 /*************************************************************************
    Streaming API term
 *************************************************************************/
-Int ImageStrEncTerm(
+Int JXRLIB_API(ImageStrEncTerm)(
     CTXSTRCODEC ctxSC)
 {
     CWMImageStrCodec* pSC = (CWMImageStrCodec*)ctxSC;
@@ -1571,15 +1572,15 @@ Int ImageStrEncTerm(
     //================================
 //    PERFTIMER_START(pSC->m_fMeasurePerf, pSC->m_ptEncDecPerf);
     pSC->cColumn = 0;
-    initMRPtr(pSC);
+    JXRLIB_API(initMRPtr)(pSC);
 
     pSC->ProcessBottomLeft(pSC);
-    advanceMRPtr(pSC);
+    JXRLIB_API(advanceMRPtr)(pSC);
 
     //================================
     for (pSC->cColumn = 1; pSC->cColumn < pSC->cmbWidth; ++pSC->cColumn) {
         pSC->ProcessBottom(pSC);
-        advanceMRPtr(pSC);
+        JXRLIB_API(advanceMRPtr)(pSC);
     }
 
     //================================
@@ -1600,7 +1601,7 @@ Int ImageStrEncTerm(
 
 // centralized UV downsampling
 #define DF_ODD ((((d1 + d2 + d3) << 2) + (d2 << 1) + d0 + d4 + 8) >> 4)
-Void downsampleUV(CWMImageStrCodec* pSC)
+Void JXRLIB_API(downsampleUV)(CWMImageStrCodec* pSC)
 {
     const COLORFORMAT cfInt = pSC->m_param.cfColorFormat;
     const COLORFORMAT cfExt = pSC->WMII.cfColorFormat;
@@ -1616,17 +1617,17 @@ Void downsampleUV(CWMImageStrCodec* pSC)
             pDst = (cfInt == YUV_422 ? pSC->p1MBbuffer[iChannel] : pSrc);
 
             for (iRow = 0; iRow < 16; iRow++) {
-                d0 = d4 = pSrc[idxCC[iRow][2]], d1 = d3 = pSrc[idxCC[iRow][1]], d2 = pSrc[idxCC[iRow][0]]; // left boundary
+                d0 = d4 = pSrc[JXRLIB_API(idxCC)[iRow][2]], d1 = d3 = pSrc[JXRLIB_API(idxCC)[iRow][1]], d2 = pSrc[JXRLIB_API(idxCC)[iRow][0]]; // left boundary
 
                 for (iColumn = 0; iColumn + 2 < pSC->cmbWidth * 16; iColumn += 2) {
-                    pDst[((iColumn >> 4) << (8 - cShift)) + idxCC[iRow][(iColumn & 15) >> cShift]] = DF_ODD;
+                    pDst[((iColumn >> 4) << (8 - cShift)) + JXRLIB_API(idxCC)[iRow][(iColumn & 15) >> cShift]] = DF_ODD;
                     d0 = d2, d1 = d3, d2 = d4;
-                    d3 = pSrc[(((iColumn + 3) >> 4) << 8) + idxCC[iRow][(iColumn + 3) & 0xf]];
-                    d4 = pSrc[(((iColumn + 4) >> 4) << 8) + idxCC[iRow][(iColumn + 4) & 0xf]];
+                    d3 = pSrc[(((iColumn + 3) >> 4) << 8) + JXRLIB_API(idxCC)[iRow][(iColumn + 3) & 0xf]];
+                    d4 = pSrc[(((iColumn + 4) >> 4) << 8) + JXRLIB_API(idxCC)[iRow][(iColumn + 4) & 0xf]];
                 }
 
                 d4 = d2; // right boundary
-                pDst[((iColumn >> 4) << (8 - cShift)) + idxCC[iRow][(iColumn & 15) >> cShift]] = DF_ODD;
+                pDst[((iColumn >> 4) << (8 - cShift)) + JXRLIB_API(idxCC)[iRow][(iColumn & 15) >> cShift]] = DF_ODD;
             }
         }
 
@@ -1645,36 +1646,36 @@ Void downsampleUV(CWMImageStrCodec* pSC)
                 pxOff = (iColumn & 7) << cShift;
 
                 if (pSC->cRow == 0) // top image boundary
-                    d0 = d4 = pSrc[mbOff + idxCC[2][pxOff]], d1 = d3 = pSrc[mbOff + idxCC[1][pxOff]], d2 = pSrc[mbOff + idxCC[0][pxOff]]; // top MB boundary
+                    d0 = d4 = pSrc[mbOff + JXRLIB_API(idxCC)[2][pxOff]], d1 = d3 = pSrc[mbOff + JXRLIB_API(idxCC)[1][pxOff]], d2 = pSrc[mbOff + JXRLIB_API(idxCC)[0][pxOff]]; // top MB boundary
                 else {
                     // last row of previous MB row
-                    d0 = pBuf[0][iColumn], d1 = pBuf[1][iColumn], d2 = pBuf[2][iColumn], d3 = pBuf[3][iColumn], d4 = pSrc[mbOff + idxCC[0][pxOff]];
-                    pSC->p0MBbuffer[iChannel][((iColumn >> 3) << 6) + idxCC_420[7][iColumn & 7]] = DF_ODD;
+                    d0 = pBuf[0][iColumn], d1 = pBuf[1][iColumn], d2 = pBuf[2][iColumn], d3 = pBuf[3][iColumn], d4 = pSrc[mbOff + JXRLIB_API(idxCC)[0][pxOff]];
+                    pSC->p0MBbuffer[iChannel][((iColumn >> 3) << 6) + JXRLIB_API(idxCC_420)[7][iColumn & 7]] = DF_ODD;
 
                     // for first row of current MB
                     d0 = pBuf[2][iColumn], d1 = pBuf[3][iColumn];
-                    d2 = pSrc[mbOff + idxCC[0][pxOff]], d3 = pSrc[mbOff + idxCC[1][pxOff]], d4 = pSrc[mbOff + idxCC[2][pxOff]];
+                    d2 = pSrc[mbOff + JXRLIB_API(idxCC)[0][pxOff]], d3 = pSrc[mbOff + JXRLIB_API(idxCC)[1][pxOff]], d4 = pSrc[mbOff + JXRLIB_API(idxCC)[2][pxOff]];
                 }
 
                 for (iRow = 0; iRow < 12; iRow += 2) {
-                    pDst[((iColumn >> 3) << 6) + idxCC_420[iRow >> 1][iColumn & 7]] = DF_ODD;
+                    pDst[((iColumn >> 3) << 6) + JXRLIB_API(idxCC_420)[iRow >> 1][iColumn & 7]] = DF_ODD;
                     d0 = d2, d1 = d3, d2 = d4;
-                    d3 = pSrc[mbOff + idxCC[iRow + 3][pxOff]];
-                    d4 = pSrc[mbOff + idxCC[iRow + 4][pxOff]];
+                    d3 = pSrc[mbOff + JXRLIB_API(idxCC)[iRow + 3][pxOff]];
+                    d4 = pSrc[mbOff + JXRLIB_API(idxCC)[iRow + 4][pxOff]];
                 }
 
                 //last row of current MB
-                pDst[((iColumn >> 3) << 6) + idxCC_420[6][iColumn & 7]] = DF_ODD;
+                pDst[((iColumn >> 3) << 6) + JXRLIB_API(idxCC_420)[6][iColumn & 7]] = DF_ODD;
                 d0 = d2, d1 = d3, d2 = d4;
-                d3 = pSrc[mbOff + idxCC[iRow + 3][pxOff]];
+                d3 = pSrc[mbOff + JXRLIB_API(idxCC)[iRow + 3][pxOff]];
 
                 if (pSC->cRow + 1 == pSC->cmbHeight) { // bottom image boundary
                     d4 = d2;
-                    pDst[((iColumn >> 3) << 6) + idxCC_420[7][iColumn & 7]] = DF_ODD;
+                    pDst[((iColumn >> 3) << 6) + JXRLIB_API(idxCC_420)[7][iColumn & 7]] = DF_ODD;
                 }
                 else {
                     for (iRow = 0; iRow < 4; iRow++)
-                        pBuf[iRow][iColumn] = pSrc[mbOff + idxCC[iRow + 12][pxOff]];
+                        pBuf[iRow][iColumn] = pSrc[mbOff + JXRLIB_API(idxCC)[iRow + 12][pxOff]];
                 }
             }
         }
@@ -1682,7 +1683,7 @@ Void downsampleUV(CWMImageStrCodec* pSC)
 }
 
 // centralized horizontal padding
-Void padHorizontally(CWMImageStrCodec* pSC)
+Void JXRLIB_API(padHorizontally)(CWMImageStrCodec* pSC)
 {
     if (pSC->WMII.cWidth != pSC->cmbWidth * 16) { // horizontal padding is necessary!
         const COLORFORMAT cfExt = pSC->WMISCP.bYUVData ?
@@ -1706,9 +1707,9 @@ Void padHorizontally(CWMImageStrCodec* pSC)
 
         // pad full resoluton channels
         for (iRow = 0; iRow < 16; iRow++) {
-            const size_t iPosLast = ((iLast >> 4) << 8) + idxCC[iRow][iLast & 0xf];
+            const size_t iPosLast = ((iLast >> 4) << 8) + JXRLIB_API(idxCC)[iRow][iLast & 0xf];
             for (iColumn = iLast + 1; iColumn < pSC->cmbWidth * 16; iColumn++) {
-                const size_t iPos = ((iColumn >> 4) << 8) + idxCC[iRow][iColumn & 0xf];
+                const size_t iPos = ((iColumn >> 4) << 8) + JXRLIB_API(idxCC)[iRow][iColumn & 0xf];
                 for (iChannel = 0; iChannel < cFullChannel; iChannel++)
                     pCh[iChannel & 15][iPos] = pCh[iChannel & 15][iPosLast];
             }
@@ -1716,18 +1717,18 @@ Void padHorizontally(CWMImageStrCodec* pSC)
 
         if (cfExt == YUV_422) // pad YUV_422 UV
             for (iLast >>= 1, iRow = 0; iRow < 16; iRow++) {
-                const size_t iPosLast = ((iLast >> 3) << 7) + idxCC[iRow][iLast & 7];
+                const size_t iPosLast = ((iLast >> 3) << 7) + JXRLIB_API(idxCC)[iRow][iLast & 7];
                 for (iColumn = iLast + 1; iColumn < pSC->cmbWidth * 8; iColumn++) {
-                    const size_t iPos = ((iColumn >> 3) << 7) + idxCC[iRow][iColumn & 7];
+                    const size_t iPos = ((iColumn >> 3) << 7) + JXRLIB_API(idxCC)[iRow][iColumn & 7];
                     for (iChannel = 1; iChannel < 3; iChannel++)
                         pCh[iChannel][iPos] = pCh[iChannel][iPosLast];
                 }
             }
         else if (cfExt == YUV_420) // pad YUV_420 UV
             for (iLast >>= 1, iRow = 0; iRow < 8; iRow++) {
-                const size_t iPosLast = ((iLast >> 3) << 6) + idxCC_420[iRow][iLast & 7];
+                const size_t iPosLast = ((iLast >> 3) << 6) + JXRLIB_API(idxCC_420)[iRow][iLast & 7];
                 for (iColumn = iLast + 1; iColumn < pSC->cmbWidth * 8; iColumn++) {
-                    const size_t iPos = ((iColumn >> 3) << 6) + idxCC_420[iRow][iColumn & 7];
+                    const size_t iPos = ((iColumn >> 3) << 6) + JXRLIB_API(idxCC_420)[iRow][iColumn & 7];
                     for (iChannel = 1; iChannel < 3; iChannel++)
                         pCh[iChannel][iPos] = pCh[iChannel][iPosLast];
                 }
@@ -1736,7 +1737,7 @@ Void padHorizontally(CWMImageStrCodec* pSC)
 }
 
 // centralized alpha channel color conversion, small perf penalty
-Int inputMBRowAlpha(CWMImageStrCodec* pSC)
+Int JXRLIB_API(inputMBRowAlpha)(CWMImageStrCodec* pSC)
 {
     if (pSC->m_bSecondary == FALSE && pSC->m_pNextSC != NULL) { // alpha channel is present
         const size_t cShift = (pSC->m_pNextSC->m_param.bScaledArith ? (SHIFTZERO + QPFRACBITS) : 0);
@@ -1754,7 +1755,7 @@ Int inputMBRowAlpha(CWMImageStrCodec* pSC)
                 const U8* pSrc = pSrc0;
 
                 for (iColumn = 0; iColumn < cColumn; iColumn++, pSrc += cStride)
-                    pA[((iColumn >> 4) << 8) + idxCC[iRow][iColumn & 0xf]] = ((PixelI)pSrc[iAlphaPos] - (1 << 7)) << cShift;
+                    pA[((iColumn >> 4) << 8) + JXRLIB_API(idxCC)[iRow][iColumn & 0xf]] = ((PixelI)pSrc[iAlphaPos] - (1 << 7)) << cShift;
             }
             else if (bdExt == BD_16) {
                 const size_t cStride = (pSC->WMII.cBitsPerUnit >> 3) / sizeof(U16);
@@ -1762,7 +1763,7 @@ Int inputMBRowAlpha(CWMImageStrCodec* pSC)
                 const U16* pSrc = (U16*)pSrc0;
 
                 for (iColumn = 0; iColumn < cColumn; iColumn++, pSrc += cStride)
-                    pA[((iColumn >> 4) << 8) + idxCC[iRow][iColumn & 0xf]] = ((((PixelI)pSrc[iAlphaPos] - (1 << 15)) >> nLenMantissaOrShift) << cShift);
+                    pA[((iColumn >> 4) << 8) + JXRLIB_API(idxCC)[iRow][iColumn & 0xf]] = ((((PixelI)pSrc[iAlphaPos] - (1 << 15)) >> nLenMantissaOrShift) << cShift);
             }
             else if (bdExt == BD_16S) {
                 const size_t cStride = (pSC->WMII.cBitsPerUnit >> 3) / sizeof(I16);
@@ -1770,14 +1771,14 @@ Int inputMBRowAlpha(CWMImageStrCodec* pSC)
                 const I16* pSrc = (I16*)pSrc0;
 
                 for (iColumn = 0; iColumn < cColumn; iColumn++, pSrc += cStride)
-                    pA[((iColumn >> 4) << 8) + idxCC[iRow][iColumn & 0xf]] = (((PixelI)pSrc[iAlphaPos] >> nLenMantissaOrShift) << cShift);
+                    pA[((iColumn >> 4) << 8) + JXRLIB_API(idxCC)[iRow][iColumn & 0xf]] = (((PixelI)pSrc[iAlphaPos] >> nLenMantissaOrShift) << cShift);
             }
             else if (bdExt == BD_16F) {
                 const size_t cStride = (pSC->WMII.cBitsPerUnit >> 3) / sizeof(U16);
                 const I16* pSrc = (I16*)pSrc0;
 
                 for (iColumn = 0; iColumn < cColumn; iColumn++, pSrc += cStride)
-                    pA[((iColumn >> 4) << 8) + idxCC[iRow][iColumn & 0xf]] = forwardHalf(pSrc[iAlphaPos]) << cShift;
+                    pA[((iColumn >> 4) << 8) + JXRLIB_API(idxCC)[iRow][iColumn & 0xf]] = forwardHalf(pSrc[iAlphaPos]) << cShift;
             }
             else if (bdExt == BD_32S) {
                 const size_t cStride = (pSC->WMII.cBitsPerUnit >> 3) / sizeof(I32);
@@ -1785,7 +1786,7 @@ Int inputMBRowAlpha(CWMImageStrCodec* pSC)
                 const I32* pSrc = (I32*)pSrc0;
 
                 for (iColumn = 0; iColumn < cColumn; iColumn++, pSrc += cStride)
-                    pA[((iColumn >> 4) << 8) + idxCC[iRow][iColumn & 0xf]] = (((PixelI)pSrc[iAlphaPos] >> nLenMantissaOrShift) << cShift);
+                    pA[((iColumn >> 4) << 8) + JXRLIB_API(idxCC)[iRow][iColumn & 0xf]] = (((PixelI)pSrc[iAlphaPos] >> nLenMantissaOrShift) << cShift);
             }
             else if (bdExt == BD_32F) {
                 const size_t cStride = (pSC->WMII.cBitsPerUnit >> 3) / sizeof(float);
@@ -1794,7 +1795,7 @@ Int inputMBRowAlpha(CWMImageStrCodec* pSC)
                 const float* pSrc = (float*)pSrc0;
 
                 for (iColumn = 0; iColumn < cColumn; iColumn++, pSrc += cStride)
-                    pA[((iColumn >> 4) << 8) + idxCC[iRow][iColumn & 0xf]] = float2pixel(pSrc[iAlphaPos], nExpBias, nLen) << cShift;
+                    pA[((iColumn >> 4) << 8) + JXRLIB_API(idxCC)[iRow][iColumn & 0xf]] = float2pixel(pSrc[iAlphaPos], nExpBias, nLen) << cShift;
             }
             else // not supported
                 return ICERR_ERROR;
@@ -1803,7 +1804,7 @@ Int inputMBRowAlpha(CWMImageStrCodec* pSC)
                 pSrc0 += pSC->WMIBI.cbStride;
 
             for (iColumn = cColumn; iColumn < pSC->cmbWidth * 16; iColumn++) // horizontal padding
-                pA[((iColumn >> 4) << 8) + idxCC[iRow][iColumn & 0xf]] = pA[(((cColumn - 1) >> 4) << 8) + idxCC[iRow][(cColumn - 1) & 0xf]];
+                pA[((iColumn >> 4) << 8) + JXRLIB_API(idxCC)[iRow][iColumn & 0xf]] = pA[(((cColumn - 1) >> 4) << 8) + JXRLIB_API(idxCC)[iRow][(cColumn - 1) & 0xf]];
         }
     }
 
@@ -1811,7 +1812,7 @@ Int inputMBRowAlpha(CWMImageStrCodec* pSC)
 }
 
 // input one MB row of image data from input buffer
-Int inputMBRow(CWMImageStrCodec* pSC)
+Int JXRLIB_API(inputMBRow)(CWMImageStrCodec* pSC)
 {
     const size_t cShift = (pSC->m_param.bScaledArith ? (SHIFTZERO + QPFRACBITS) : 0);
     const BITDEPTH_BITS bdExt = pSC->WMII.bdBitDepth;
@@ -1832,7 +1833,7 @@ Int inputMBRow(CWMImageStrCodec* pSC)
     size_t iRow, iColumn, iPos;
 
     // guard input buffer
-    if (checkImageBuffer(pSC, cColumn, cRow) != ICERR_OK)
+    if (JXRLIB_API(checkImageBuffer)(pSC, cColumn, cRow) != ICERR_OK)
         return ICERR_ERROR;
 
     if (pSC->m_bUVResolutionChange)  // will do downsampling somewhere else!
@@ -1860,7 +1861,7 @@ Int inputMBRow(CWMImageStrCodec* pSC)
                         pChannel[1] = pSC->pResU, pChannel[2] = pSC->pResV;
 
                     for (iColumn = 0; iColumn < cColumn; iColumn++, pSrc += cChannel) {
-                        iPos = ((iColumn >> 4) << 8) + idxCC[iRow][iColumn & 0xf];
+                        iPos = ((iColumn >> 4) << 8) + JXRLIB_API(idxCC)[iRow][iColumn & 0xf];
                         for (iChannel = 0; iChannel < cChannel; iChannel++)
                             pChannel[iChannel & 15][iPos] = (PixelI)pSrc[iChannel & 15];
                     }
@@ -1870,28 +1871,28 @@ Int inputMBRow(CWMImageStrCodec* pSC)
                 case YUV_422:
                     for (iColumn = 0; iColumn < cColumn; iColumn += 2, pSrc += 4) {
                         if (cfInt != Y_ONLY) {
-                            iPos = ((iColumn >> 4) << 7) + idxCC[iRow][(iColumn >> 1) & 7];
+                            iPos = ((iColumn >> 4) << 7) + JXRLIB_API(idxCC)[iRow][(iColumn >> 1) & 7];
                             pU[iPos] = (PixelI)pSrc[0];
                             pV[iPos] = (PixelI)pSrc[2];
                         }
 
-                        pY[((iColumn >> 4) << 8) + idxCC[iRow][iColumn & 15]] = (PixelI)pSrc[1];
-                        pY[(((iColumn + 1) >> 4) << 8) + idxCC[iRow][(iColumn + 1) & 15]] = (PixelI)pSrc[3];
+                        pY[((iColumn >> 4) << 8) + JXRLIB_API(idxCC)[iRow][iColumn & 15]] = (PixelI)pSrc[1];
+                        pY[(((iColumn + 1) >> 4) << 8) + JXRLIB_API(idxCC)[iRow][(iColumn + 1) & 15]] = (PixelI)pSrc[3];
                     }
                     break;
 
                 case YUV_420:
                     for (iColumn = 0; iColumn < cColumn; iColumn += 2, pSrc += 6) {
                         if (cfInt != Y_ONLY) {
-                            iPos = ((iColumn >> 4) << 6) + idxCC_420[iRow >> 1][(iColumn >> 1) & 7];
+                            iPos = ((iColumn >> 4) << 6) + JXRLIB_API(idxCC_420)[iRow >> 1][(iColumn >> 1) & 7];
                             pU[iPos] = (PixelI)pSrc[4];
                             pV[iPos] = (PixelI)pSrc[5];
                         }
 
-                        pY[((iColumn >> 4) << 8) + idxCC[iRow][iColumn & 15]] = (PixelI)pSrc[0];
-                        pY[(((iColumn + 1) >> 4) << 8) + idxCC[iRow][(iColumn + 1) & 15]] = (PixelI)pSrc[1];
-                        pY[((iColumn >> 4) << 8) + idxCC[iRow + 1][iColumn & 15]] = (PixelI)pSrc[2];
-                        pY[(((iColumn + 1) >> 4) << 8) + idxCC[iRow + 1][(iColumn + 1) & 15]] = (PixelI)pSrc[3];
+                        pY[((iColumn >> 4) << 8) + JXRLIB_API(idxCC)[iRow][iColumn & 15]] = (PixelI)pSrc[0];
+                        pY[(((iColumn + 1) >> 4) << 8) + JXRLIB_API(idxCC)[iRow][(iColumn + 1) & 15]] = (PixelI)pSrc[1];
+                        pY[((iColumn >> 4) << 8) + JXRLIB_API(idxCC)[iRow + 1][iColumn & 15]] = (PixelI)pSrc[2];
+                        pY[(((iColumn + 1) >> 4) << 8) + JXRLIB_API(idxCC)[iRow + 1][(iColumn + 1) & 15]] = (PixelI)pSrc[3];
                     }
                     break;
 
@@ -1912,7 +1913,7 @@ Int inputMBRow(CWMImageStrCodec* pSC)
 
                         _CC(r, g, b); // color conversion
 
-                        iPos = ((iColumn >> 4) << 8) + idxCC[iRow][iColumn & 0xf];
+                        iPos = ((iColumn >> 4) << 8) + JXRLIB_API(idxCC)[iRow][iColumn & 0xf];
                         pU[iPos] = -r, pV[iPos] = b, pY[iPos] = g - iOffset;
                     }
                     break;
@@ -1932,7 +1933,7 @@ Int inputMBRow(CWMImageStrCodec* pSC)
                         pChannel[1] = pSC->pResU, pChannel[2] = pSC->pResV;
 
                     for (iColumn = 0; iColumn < cColumn; iColumn++, pSrc += cPixelStride) {
-                        iPos = ((iColumn >> 4) << 8) + idxCC[iRow][iColumn & 0xf];
+                        iPos = ((iColumn >> 4) << 8) + JXRLIB_API(idxCC)[iRow][iColumn & 0xf];
                         for (iChannel = 0; iChannel < cChannel; iChannel++)
                             pChannel[iChannel & 15][iPos] = (((PixelI)pSrc[iChannel & 15]) << cShift) - iOffset;
                     }
@@ -1948,7 +1949,7 @@ Int inputMBRow(CWMImageStrCodec* pSC)
 
                         _CC(r, g, b);
 
-                        iPos = ((iColumn >> 4) << 8) + idxCC[iRow][iColumn & 0xf];
+                        iPos = ((iColumn >> 4) << 8) + JXRLIB_API(idxCC)[iRow][iColumn & 0xf];
                         pU[iPos] = -r, pV[iPos] = b, pY[iPos] = g;
                     }
                     break;
@@ -1965,7 +1966,7 @@ Int inputMBRow(CWMImageStrCodec* pSC)
 
                         _CC_CMYK(c, m, y, k);
 
-                        iPos = ((iColumn >> 4) << 8) + idxCC[iRow][iColumn & 0xf];
+                        iPos = ((iColumn >> 4) << 8) + JXRLIB_API(idxCC)[iRow][iColumn & 0xf];
                         pU[iPos] = c, pV[iPos] = -y, pK[iPos] = k, pY[iPos] = iOffset - m;
                     }
                     break;
@@ -1974,28 +1975,28 @@ Int inputMBRow(CWMImageStrCodec* pSC)
                 case YUV_422:
                     for (iColumn = 0; iColumn < cColumn; iColumn += 2, pSrc += cPixelStride) {
                         if (cfInt != Y_ONLY) {
-                            iPos = ((iColumn >> 4) << 7) + idxCC[iRow][(iColumn >> 1) & 7];
+                            iPos = ((iColumn >> 4) << 7) + JXRLIB_API(idxCC)[iRow][(iColumn >> 1) & 7];
                             pU[iPos] = (((PixelI)pSrc[0]) << cShift) - iOffset;
                             pV[iPos] = (((PixelI)pSrc[2]) << cShift) - iOffset;
                         }
 
-                        pY[((iColumn >> 4) << 8) + idxCC[iRow][iColumn & 15]] = (((PixelI)pSrc[1]) << cShift) - iOffset;
-                        pY[(((iColumn + 1) >> 4) << 8) + idxCC[iRow][(iColumn + 1) & 15]] = (((PixelI)pSrc[3]) << cShift) - iOffset;
+                        pY[((iColumn >> 4) << 8) + JXRLIB_API(idxCC)[iRow][iColumn & 15]] = (((PixelI)pSrc[1]) << cShift) - iOffset;
+                        pY[(((iColumn + 1) >> 4) << 8) + JXRLIB_API(idxCC)[iRow][(iColumn + 1) & 15]] = (((PixelI)pSrc[3]) << cShift) - iOffset;
                     }
                     break;
 
                 case YUV_420:
                     for (iColumn = 0; iColumn < cColumn; iColumn += 2, pSrc += cPixelStride) {
                         if (cfInt != Y_ONLY) {
-                            iPos = ((iColumn >> 4) << 6) + idxCC_420[iRow >> 1][(iColumn >> 1) & 7];
+                            iPos = ((iColumn >> 4) << 6) + JXRLIB_API(idxCC_420)[iRow >> 1][(iColumn >> 1) & 7];
                             pU[iPos] = (((PixelI)pSrc[4]) << cShift) - iOffset;
                             pV[iPos] = (((PixelI)pSrc[5]) << cShift) - iOffset;
                         }
 
-                        pY[((iColumn >> 4) << 8) + idxCC[iRow][iColumn & 15]] = (((PixelI)pSrc[0]) << cShift) - iOffset;
-                        pY[(((iColumn + 1) >> 4) << 8) + idxCC[iRow][(iColumn + 1) & 15]] = (((PixelI)pSrc[1]) << cShift) - iOffset;
-                        pY[((iColumn >> 4) << 8) + idxCC[iRow + 1][iColumn & 15]] = (((PixelI)pSrc[2]) << cShift) - iOffset;
-                        pY[(((iColumn + 1) >> 4) << 8) + idxCC[iRow + 1][(iColumn + 1) & 15]] = (((PixelI)pSrc[3]) << cShift) - iOffset;
+                        pY[((iColumn >> 4) << 8) + JXRLIB_API(idxCC)[iRow][iColumn & 15]] = (((PixelI)pSrc[0]) << cShift) - iOffset;
+                        pY[(((iColumn + 1) >> 4) << 8) + JXRLIB_API(idxCC)[iRow][(iColumn + 1) & 15]] = (((PixelI)pSrc[1]) << cShift) - iOffset;
+                        pY[((iColumn >> 4) << 8) + JXRLIB_API(idxCC)[iRow + 1][iColumn & 15]] = (((PixelI)pSrc[2]) << cShift) - iOffset;
+                        pY[(((iColumn + 1) >> 4) << 8) + JXRLIB_API(idxCC)[iRow + 1][(iColumn + 1) & 15]] = (((PixelI)pSrc[3]) << cShift) - iOffset;
                     }
                     break;
 
@@ -2016,7 +2017,7 @@ Int inputMBRow(CWMImageStrCodec* pSC)
 
                         _CC(r, g, b); // color conversion
 
-                        iPos = ((iColumn >> 4) << 8) + idxCC[iRow][iColumn & 0xf];
+                        iPos = ((iColumn >> 4) << 8) + JXRLIB_API(idxCC)[iRow][iColumn & 0xf];
                         pU[iPos] = -r, pV[iPos] = b, pY[iPos] = g - iOffset;
                     }
                     break;
@@ -2029,7 +2030,7 @@ Int inputMBRow(CWMImageStrCodec* pSC)
                     size_t iChannel;
 
                     for (iColumn = 0; iColumn < cColumn; iColumn++, pSrc += cStride) {
-                        iPos = ((iColumn >> 4) << 8) + idxCC[iRow][iColumn & 0xf];
+                        iPos = ((iColumn >> 4) << 8) + JXRLIB_API(idxCC)[iRow][iColumn & 0xf];
                         for (iChannel = 0; iChannel < cChannel; iChannel++)
                             pSC->p1MBbuffer[iChannel][iPos] = (((PixelI)pSrc[iChannel] >> nLen) << cShift) - iOffset;
                     }
@@ -2048,7 +2049,7 @@ Int inputMBRow(CWMImageStrCodec* pSC)
 
                         _CC_CMYK(c, m, y, k);
 
-                        iPos = ((iColumn >> 4) << 8) + idxCC[iRow][iColumn & 0xf];
+                        iPos = ((iColumn >> 4) << 8) + JXRLIB_API(idxCC)[iRow][iColumn & 0xf];
                         pU[iPos] = c, pV[iPos] = -y, pK[iPos] = k, pY[iPos] = iOffset - m;
                     }
                     break;
@@ -2057,28 +2058,28 @@ Int inputMBRow(CWMImageStrCodec* pSC)
                 case YUV_422:
                     for (iColumn = 0; iColumn < cColumn; iColumn += 2, pSrc += cStride) {
                         if (cfInt != Y_ONLY) {
-                            iPos = ((iColumn >> 4) << 7) + idxCC[iRow][(iColumn >> 1) & 7];
+                            iPos = ((iColumn >> 4) << 7) + JXRLIB_API(idxCC)[iRow][(iColumn >> 1) & 7];
                             pU[iPos] = (((PixelI)pSrc[0]) << cShift) - iOffset;
                             pV[iPos] = (((PixelI)pSrc[2]) << cShift) - iOffset;
                         }
 
-                        pY[((iColumn >> 4) << 8) + idxCC[iRow][iColumn & 15]] = (((PixelI)pSrc[1]) << cShift) - iOffset;
-                        pY[(((iColumn + 1) >> 4) << 8) + idxCC[iRow][(iColumn + 1) & 15]] = (((PixelI)pSrc[3]) << cShift) - iOffset;
+                        pY[((iColumn >> 4) << 8) + JXRLIB_API(idxCC)[iRow][iColumn & 15]] = (((PixelI)pSrc[1]) << cShift) - iOffset;
+                        pY[(((iColumn + 1) >> 4) << 8) + JXRLIB_API(idxCC)[iRow][(iColumn + 1) & 15]] = (((PixelI)pSrc[3]) << cShift) - iOffset;
                     }
                     break;
 
                 case YUV_420:
                     for (iColumn = 0; iColumn < cColumn; iColumn += 2, pSrc += cStride) {
                         if (cfInt != Y_ONLY) {
-                            iPos = ((iColumn >> 4) << 6) + idxCC_420[iRow >> 1][(iColumn >> 1) & 7];
+                            iPos = ((iColumn >> 4) << 6) + JXRLIB_API(idxCC_420)[iRow >> 1][(iColumn >> 1) & 7];
                             pU[iPos] = (((PixelI)pSrc[4]) << cShift) - iOffset;
                             pV[iPos] = (((PixelI)pSrc[5]) << cShift) - iOffset;
                         }
 
-                        pY[((iColumn >> 4) << 8) + idxCC[iRow][iColumn & 15]] = (((PixelI)pSrc[0]) << cShift) - iOffset;
-                        pY[(((iColumn + 1) >> 4) << 8) + idxCC[iRow][(iColumn + 1) & 15]] = (((PixelI)pSrc[1]) << cShift) - iOffset;
-                        pY[((iColumn >> 4) << 8) + idxCC[iRow + 1][iColumn & 15]] = (((PixelI)pSrc[2]) << cShift) - iOffset;
-                        pY[(((iColumn + 1) >> 4) << 8) + idxCC[iRow + 1][(iColumn + 1) & 15]] = (((PixelI)pSrc[3]) << cShift) - iOffset;
+                        pY[((iColumn >> 4) << 8) + JXRLIB_API(idxCC)[iRow][iColumn & 15]] = (((PixelI)pSrc[0]) << cShift) - iOffset;
+                        pY[(((iColumn + 1) >> 4) << 8) + JXRLIB_API(idxCC)[iRow][(iColumn + 1) & 15]] = (((PixelI)pSrc[1]) << cShift) - iOffset;
+                        pY[((iColumn >> 4) << 8) + JXRLIB_API(idxCC)[iRow + 1][iColumn & 15]] = (((PixelI)pSrc[2]) << cShift) - iOffset;
+                        pY[(((iColumn + 1) >> 4) << 8) + JXRLIB_API(idxCC)[iRow + 1][(iColumn + 1) & 15]] = (((PixelI)pSrc[3]) << cShift) - iOffset;
                     }
                     break;
 
@@ -2098,7 +2099,7 @@ Int inputMBRow(CWMImageStrCodec* pSC)
 
                         _CC(r, g, b); // color conversion
 
-                        iPos = ((iColumn >> 4) << 8) + idxCC[iRow][iColumn & 0xf];
+                        iPos = ((iColumn >> 4) << 8) + JXRLIB_API(idxCC)[iRow][iColumn & 0xf];
                         pU[iPos] = -r, pV[iPos] = b, pY[iPos] = g;
                     }
                     break;
@@ -2111,7 +2112,7 @@ Int inputMBRow(CWMImageStrCodec* pSC)
                     size_t iChannel;
 
                     for (iColumn = 0; iColumn < cColumn; iColumn++, pSrc += cStride) {
-                        iPos = ((iColumn >> 4) << 8) + idxCC[iRow][iColumn & 0xf];
+                        iPos = ((iColumn >> 4) << 8) + JXRLIB_API(idxCC)[iRow][iColumn & 0xf];
                         for (iChannel = 0; iChannel < cChannel; iChannel++)
                             pSC->p1MBbuffer[iChannel][iPos] = (((PixelI)pSrc[iChannel] >> nLen) << cShift);
                     }
@@ -2130,7 +2131,7 @@ Int inputMBRow(CWMImageStrCodec* pSC)
 
                         _CC_CMYK(c, m, y, k);
 
-                        iPos = ((iColumn >> 4) << 8) + idxCC[iRow][iColumn & 0xf];
+                        iPos = ((iColumn >> 4) << 8) + JXRLIB_API(idxCC)[iRow][iColumn & 0xf];
                         pU[iPos] = c, pV[iPos] = -y, pK[iPos] = k, pY[iPos] = -m;
                     }
                 }
@@ -2154,7 +2155,7 @@ Int inputMBRow(CWMImageStrCodec* pSC)
 
                         _CC(r, g, b); // color conversion
 
-                        iPos = ((iColumn >> 4) << 8) + idxCC[iRow][iColumn & 0xf];
+                        iPos = ((iColumn >> 4) << 8) + JXRLIB_API(idxCC)[iRow][iColumn & 0xf];
                         pU[iPos] = -r, pV[iPos] = b, pY[iPos] = g;
                     }
                     break;
@@ -2167,7 +2168,7 @@ Int inputMBRow(CWMImageStrCodec* pSC)
                     size_t iChannel;
 
                     for (iColumn = 0; iColumn < cColumn; iColumn++, pSrc += cStride) {
-                        iPos = ((iColumn >> 4) << 8) + idxCC[iRow][iColumn & 0xf];
+                        iPos = ((iColumn >> 4) << 8) + JXRLIB_API(idxCC)[iRow][iColumn & 0xf];
                         for (iChannel = 0; iChannel < cChannel; iChannel++)
                             pSC->p1MBbuffer[iChannel][iPos] = forwardHalf(pSrc[iChannel]) << cShift;
                     }
@@ -2191,7 +2192,7 @@ Int inputMBRow(CWMImageStrCodec* pSC)
 
                         _CC(r, g, b); // color conversion
 
-                        iPos = ((iColumn >> 4) << 8) + idxCC[iRow][iColumn & 0xf];
+                        iPos = ((iColumn >> 4) << 8) + JXRLIB_API(idxCC)[iRow][iColumn & 0xf];
                         pU[iPos] = -r, pV[iPos] = b, pY[iPos] = g - iOffset;
                     }
                     break;
@@ -2204,7 +2205,7 @@ Int inputMBRow(CWMImageStrCodec* pSC)
                     size_t iChannel;
 
                     for (iColumn = 0; iColumn < cColumn; iColumn++, pSrc += cStride) {
-                        iPos = ((iColumn >> 4) << 8) + idxCC[iRow][iColumn & 0xf];
+                        iPos = ((iColumn >> 4) << 8) + JXRLIB_API(idxCC)[iRow][iColumn & 0xf];
                         for (iChannel = 0; iChannel < cChannel; iChannel++)
                             pSC->p1MBbuffer[iChannel][iPos] = (pSrc[iChannel] >> nLen) << cShift;
                     }
@@ -2227,7 +2228,7 @@ Int inputMBRow(CWMImageStrCodec* pSC)
 
                         _CC(r, g, b); // color conversion
 
-                        iPos = ((iColumn >> 4) << 8) + idxCC[iRow][iColumn & 0xf];
+                        iPos = ((iColumn >> 4) << 8) + JXRLIB_API(idxCC)[iRow][iColumn & 0xf];
                         pU[iPos] = -r, pV[iPos] = b, pY[iPos] = g;
                     }
                     break;
@@ -2240,7 +2241,7 @@ Int inputMBRow(CWMImageStrCodec* pSC)
                     size_t iChannel;
 
                     for (iColumn = 0; iColumn < cColumn; iColumn++, pSrc += cStride) {
-                        iPos = ((iColumn >> 4) << 8) + idxCC[iRow][iColumn & 0xf];
+                        iPos = ((iColumn >> 4) << 8) + JXRLIB_API(idxCC)[iRow][iColumn & 0xf];
                         for (iChannel = 0; iChannel < cChannel; iChannel++)
                             pSC->p1MBbuffer[iChannel][iPos] = (pSrc[iChannel] >> nLen) << cShift;
                     }
@@ -2265,7 +2266,7 @@ Int inputMBRow(CWMImageStrCodec* pSC)
 
                         _CC(r, g, b); // color conversion
 
-                        iPos = ((iColumn >> 4) << 8) + idxCC[iRow][iColumn & 0xf];
+                        iPos = ((iColumn >> 4) << 8) + JXRLIB_API(idxCC)[iRow][iColumn & 0xf];
                         pU[iPos] = -r, pV[iPos] = b, pY[iPos] = g;
                     }
                     break;
@@ -2278,7 +2279,7 @@ Int inputMBRow(CWMImageStrCodec* pSC)
                     size_t iChannel;
 
                     for (iColumn = 0; iColumn < cColumn; iColumn++, pSrc += cStride) {
-                        iPos = ((iColumn >> 4) << 8) + idxCC[iRow][iColumn & 0xf];
+                        iPos = ((iColumn >> 4) << 8) + JXRLIB_API(idxCC)[iRow][iColumn & 0xf];
                         for (iChannel = 0; iChannel < cChannel; iChannel++)
                             pSC->p1MBbuffer[iChannel][iPos] = float2pixel(pSrc[iChannel], nExpBias, nLen) << cShift;
                     }
@@ -2302,7 +2303,7 @@ Int inputMBRow(CWMImageStrCodec* pSC)
 
                 _CC(r, g, b); // color conversion
 
-                iPos = ((iColumn >> 4) << 8) + idxCC[iRow][iColumn & 0xf];
+                iPos = ((iColumn >> 4) << 8) + JXRLIB_API(idxCC)[iRow][iColumn & 0xf];
                 pU[iPos] = -r, pV[iPos] = b, pY[iPos] = g - iOffset;
             }
         }
@@ -2319,7 +2320,7 @@ Int inputMBRow(CWMImageStrCodec* pSC)
 
                 _CC(r, g, b); // color conversion
 
-                iPos = ((iColumn >> 4) << 8) + idxCC[iRow][iColumn & 0xf];
+                iPos = ((iColumn >> 4) << 8) + JXRLIB_API(idxCC)[iRow][iColumn & 0xf];
                 pU[iPos] = -r, pV[iPos] = b, pY[iPos] = g - iOffset;
             }
         }
@@ -2337,14 +2338,14 @@ Int inputMBRow(CWMImageStrCodec* pSC)
 
                 _CC(r, g, b); // color conversion
 
-                iPos = ((iColumn >> 4) << 8) + idxCC[iRow][iColumn & 0xf];
+                iPos = ((iColumn >> 4) << 8) + JXRLIB_API(idxCC)[iRow][iColumn & 0xf];
                 pU[iPos] = -r, pV[iPos] = b, pY[iPos] = g - iOffset;
             }
         }
         else if (bdExt == BD_1) {
             assert(cfExt == Y_ONLY);
             for (iColumn = 0; iColumn < cColumn; iColumn++) {
-                pY[((iColumn >> 4) << 8) + idxCC[iRow][iColumn & 0xf]] = ((pSC->WMISCP.bBlackWhite + (pSrc0[iColumn >> 3] >> (7 - (iColumn & 7)))) & 1) << cShift;
+                pY[((iColumn >> 4) << 8) + JXRLIB_API(idxCC)[iRow][iColumn & 0xf]] = ((pSC->WMISCP.bBlackWhite + (pSrc0[iColumn >> 3] >> (7 - (iColumn & 7)))) & 1) << cShift;
             }
         }
 
@@ -2352,15 +2353,15 @@ Int inputMBRow(CWMImageStrCodec* pSC)
             pSrc0 += pSC->WMIBI.cbStride;
     }
 
-    padHorizontally(pSC); // centralized horizontal padding
+    JXRLIB_API(padHorizontally)(pSC); // centralized horizontal padding
 
     // centralized down-sampling
     if (pSC->m_bUVResolutionChange)
-        downsampleUV(pSC);
+        JXRLIB_API(downsampleUV)(pSC);
 
     // centralized alpha channel handdling
     if (pSC->WMISCP.uAlphaMode == 3)
-        if (inputMBRowAlpha(pSC) != ICERR_OK)
+        if (JXRLIB_API(inputMBRowAlpha)(pSC) != ICERR_OK)
             return ICERR_ERROR;
 
     return ICERR_OK;

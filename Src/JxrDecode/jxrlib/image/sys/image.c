@@ -26,6 +26,7 @@
 //
 //*@@@---@@@@******************************************************************
 
+#include "../../common/include/jxrlib_symbol_mangle.h"
 #include "strcodec.h"
 
 #include <stdlib.h>
@@ -39,27 +40,27 @@
 //#include <time.h>
 //#endif
 
-Int grgiZigzagInv4x4_lowpass[] = {
+Int JXRLIB_API(grgiZigzagInv4x4_lowpass)[] = {
     0, 1, 4, 5, 2, 8, 6, 9,
     3, 12, 10, 7, 13, 11, 14, 15
 };
 
-Int grgiZigzagInv4x4H[] = {
+Int JXRLIB_API(grgiZigzagInv4x4H)[] = {
     0, 1, 4, 5, 2, 8, 6, 9,
     3, 12, 10, 7, 13, 11, 14, 15
 };
-Int grgiZigzagInv4x4V[] = {
+Int JXRLIB_API(grgiZigzagInv4x4V)[] = {
     0, 4, 8, 5,  1, 12, 9, 6,  2, 13, 3, 15,  7, 10, 14, 11
 };
 
-const Int gSignificantRunBin[] = {
+const Int JXRLIB_API(gSignificantRunBin)[] = {
     -1,-1,-1,-1,
     2,2,2,
     1,1,1,1,
     0,0,0,0
 };
 
-const Int gSignificantRunFixedLength[] = {
+const Int JXRLIB_API(gSignificantRunFixedLength)[] = {
     0,0,1,1,3,
     0,0,1,1,2,
     0,0,0,0,1,
@@ -71,7 +72,7 @@ const Int gSignificantRunFixedLength[] = {
 *************************************************************************/
 #define MODELWEIGHT 70//90
 
-Void UpdateModelMB(COLORFORMAT cf, Int iChannels, Int iLaplacianMean[], CAdaptiveModel* pModel)
+Void JXRLIB_API(UpdateModelMB)(COLORFORMAT cf, Int iChannels, Int iLaplacianMean[], CAdaptiveModel* pModel)
 {
     Int j;
     static const Int aWeight0[3] = { 240/*DC*/, 12/*LP*/, 1 };
@@ -137,7 +138,7 @@ Void UpdateModelMB(COLORFORMAT cf, Int iChannels, Int iLaplacianMean[], CAdaptiv
 }
 
 
-Void ResetCodingContext(CCodingContext* pContext)
+Void JXRLIB_API(ResetCodingContext)(CCodingContext* pContext)
 {
     // reset bit reduction models
     memset(&(pContext->m_aModelAC), 0, sizeof(CAdaptiveModel));
@@ -162,14 +163,14 @@ Void ResetCodingContext(CCodingContext* pContext)
 /*************************************************************************
     Initialize zigzag scan parameters
 *************************************************************************/
-Void InitZigzagScan(CCodingContext* pContext)
+Void JXRLIB_API(InitZigzagScan)(CCodingContext* pContext)
 {
     if (NULL != pContext) {
         Int i;
         for (i = 0; i < 16; i++) {
-            pContext->m_aScanLowpass[i].uScan = grgiZigzagInv4x4_lowpass[i];
-            pContext->m_aScanHoriz[i].uScan = dctIndex[0][grgiZigzagInv4x4H[i]];
-            pContext->m_aScanVert[i].uScan = dctIndex[0][grgiZigzagInv4x4V[i]];
+            pContext->m_aScanLowpass[i].uScan = JXRLIB_API(grgiZigzagInv4x4_lowpass)[i];
+            pContext->m_aScanHoriz[i].uScan = JXRLIB_API(dctIndex)[0][JXRLIB_API(grgiZigzagInv4x4H)[i]];
+            pContext->m_aScanVert[i].uScan = JXRLIB_API(dctIndex)[0][JXRLIB_API(grgiZigzagInv4x4V)[i]];
         }
     }
 }

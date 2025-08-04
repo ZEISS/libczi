@@ -48,23 +48,23 @@ static const char* ERR_to_string(ERR error_code)
 
 static JxrDecode::PixelFormat JxrPixelFormatGuidToEnum(const GUID& guid)
 {
-    if (IsEqualGuid(guid, GUID_PKPixelFormat8bppGray))
+    if (IsEqualGuid(guid, JXRLIB_API(GUID_PKPixelFormat8bppGray)))
     {
         return JxrDecode::PixelFormat::kGray8;
     }
-    else if (IsEqualGuid(guid, GUID_PKPixelFormat16bppGray))
+    else if (IsEqualGuid(guid, JXRLIB_API(GUID_PKPixelFormat16bppGray)))
     {
         return JxrDecode::PixelFormat::kGray16;
     }
-    else if (IsEqualGuid(guid, GUID_PKPixelFormat24bppBGR))
+    else if (IsEqualGuid(guid, JXRLIB_API(GUID_PKPixelFormat24bppBGR)))
     {
         return JxrDecode::PixelFormat::kBgr24;
     }
-    else if (IsEqualGuid(guid, GUID_PKPixelFormat48bppRGB))
+    else if (IsEqualGuid(guid, JXRLIB_API(GUID_PKPixelFormat48bppRGB)))
     {
         return JxrDecode::PixelFormat::kBgr48;
     }
-    else if (IsEqualGuid(guid, GUID_PKPixelFormat32bppGrayFloat))
+    else if (IsEqualGuid(guid, JXRLIB_API(GUID_PKPixelFormat32bppGrayFloat)))
     {
         return JxrDecode::PixelFormat::kGray32Float;
     }
@@ -116,7 +116,7 @@ void JxrDecode::Decode(
     }
 
     WMPStream* pStream = nullptr;
-    ERR err = CreateWS_Memory(&pStream, const_cast<void*>(ptrData), size);
+    ERR err = JXRLIB_API(CreateWS_Memory)(&pStream, const_cast<void*>(ptrData), size);
     if (Failed(err))
     {
         // note: the call "CreateWS_Memory" cannot fail (or the only way it can fail is that the memory allocation fails),
@@ -127,7 +127,7 @@ void JxrDecode::Decode(
     unique_ptr<WMPStream, void(*)(WMPStream*)> upStream(pStream, [](WMPStream* p)->void {p->Close(&p); });
 
     PKImageDecode* pDecoder = nullptr;
-    err = PKCodecFactory_CreateDecoderFromStream(pStream, &pDecoder);
+    err = JXRLIB_API(PKCodecFactory_CreateDecoderFromStream)(pStream, &pDecoder);
     if (Failed(err))
     {
         // unfortunately, "PKCodecFactory_CreateDecoderFromStream" may fail leaving us with a partially constructed
@@ -238,7 +238,7 @@ void JxrDecode::Decode(
     }
 
     PKImageEncode* pImageEncoder;
-    ERR err = PKCodecFactory_CreateCodec(&IID_PKImageWmpEncode, reinterpret_cast<void**>(&pImageEncoder));
+    ERR err = JXRLIB_API(PKCodecFactory_CreateCodec)(&JXRLIB_API(IID_PKImageWmpEncode), reinterpret_cast<void**>(&pImageEncoder));
     if (Failed(err))
     {
         ThrowJxrlibError("'PKCodecFactory_CreateCodec' failed", err);
@@ -270,7 +270,7 @@ void JxrDecode::Decode(
     codec_parameters.uiDefaultQPIndexAlpha = 1;
 
     struct tagWMPStream* pEncodeStream = nullptr;
-    err = CreateWS_HeapBackedWriteableStream(&pEncodeStream, 1024, 0);
+    err = JXRLIB_API(CreateWS_HeapBackedWriteableStream)(&pEncodeStream, 1024, 0);
     if (Failed(err))
     {
         ThrowJxrlibError("'CreateWS_HeapBackedWriteableStream' failed", err);
@@ -292,19 +292,19 @@ void JxrDecode::Decode(
     switch (pixel_format)
     {
     case PixelFormat::kBgr24:
-        err = upImageEncoder->SetPixelFormat(upImageEncoder.get(), GUID_PKPixelFormat24bppBGR);
+        err = upImageEncoder->SetPixelFormat(upImageEncoder.get(), JXRLIB_API(GUID_PKPixelFormat24bppBGR));
         break;
     case PixelFormat::kGray8:
-        err = upImageEncoder->SetPixelFormat(upImageEncoder.get(), GUID_PKPixelFormat8bppGray);
+        err = upImageEncoder->SetPixelFormat(upImageEncoder.get(), JXRLIB_API(GUID_PKPixelFormat8bppGray));
         break;
     case PixelFormat::kBgr48:
-        err = upImageEncoder->SetPixelFormat(upImageEncoder.get(), GUID_PKPixelFormat48bppRGB);
+        err = upImageEncoder->SetPixelFormat(upImageEncoder.get(), JXRLIB_API(GUID_PKPixelFormat48bppRGB));
         break;
     case PixelFormat::kGray16:
-        err = upImageEncoder->SetPixelFormat(upImageEncoder.get(), GUID_PKPixelFormat16bppGray);
+        err = upImageEncoder->SetPixelFormat(upImageEncoder.get(), JXRLIB_API(GUID_PKPixelFormat16bppGray));
         break;
     case PixelFormat::kGray32Float:
-        err = upImageEncoder->SetPixelFormat(upImageEncoder.get(), GUID_PKPixelFormat32bppGrayFloat);
+        err = upImageEncoder->SetPixelFormat(upImageEncoder.get(), JXRLIB_API(GUID_PKPixelFormat32bppGrayFloat));
         break;
     default:
     {
@@ -364,14 +364,14 @@ JxrDecode::CompressedData::~CompressedData()
 {
     if (this->obj_handle_ != nullptr)
     {
-        CloseWS_HeapBackedWriteableStream(reinterpret_cast<struct tagWMPStream**>(&this->obj_handle_));
+        JXRLIB_API(CloseWS_HeapBackedWriteableStream)(reinterpret_cast<struct tagWMPStream**>(&this->obj_handle_));
     }
 }
 
 void* JxrDecode::CompressedData::GetMemory() const
 {
     void* data = nullptr;
-    GetWS_HeapBackedWriteableStreamBuffer(
+    JXRLIB_API(GetWS_HeapBackedWriteableStreamBuffer)(
         static_cast<struct tagWMPStream*>(this->obj_handle_),
         &data,
         nullptr);
@@ -381,7 +381,7 @@ void* JxrDecode::CompressedData::GetMemory() const
 size_t JxrDecode::CompressedData::GetSize() const
 {
     size_t size = 0;
-    GetWS_HeapBackedWriteableStreamBuffer(
+    JXRLIB_API(GetWS_HeapBackedWriteableStreamBuffer)(
         static_cast<struct tagWMPStream*>(this->obj_handle_),
         nullptr,
         &size);

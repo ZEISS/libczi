@@ -45,3 +45,4 @@ Version history
  0.66.2             | [143](https://github.com/ZEISS/libczi/pull/143)      | additional updates on CMake build system towards vcpkg support
  0.66.3             | [144](https://github.com/ZEISS/libczi/pull/144)      | add (initial and experimental) support for building for UWP (Universal Windows Platform)
  0.66.4             | [145](https://github.com/ZEISS/libczi/pull/145)      | have embedded pugixml in its own namespace, replace md5sum implementation, update 3rd-party license texts
+ 0.66.5             | [146](https://github.com/ZEISS/libczi/pull/146)      | have jxrlib-symbols mangled to prevent conflicts with other libraries

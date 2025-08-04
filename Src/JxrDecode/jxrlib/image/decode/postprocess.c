@@ -26,10 +26,11 @@
 //
 //*@@@---@@@@******************************************************************
 
+#include "../../common/include/jxrlib_symbol_mangle.h"
 #include "../sys/windowsmediaphoto.h"
 #include "../sys/strcodec.h"
 
-Void smoothMB(PixelI* p1, PixelI* p0, PixelI* q0, PixelI* q1)
+Void JXRLIB_API(smoothMB)(PixelI* p1, PixelI* p0, PixelI* q0, PixelI* q1)
 {
     //  p1 p0 | q0 q1
     PixelI delta = ((((*q0 - *p0) << 2) + (*p1 - *q1)) >> 3);
@@ -38,7 +39,7 @@ Void smoothMB(PixelI* p1, PixelI* p0, PixelI* q0, PixelI* q1)
     *p0 += delta;
 }
 
-Void smooth(PixelI* p2, PixelI* p1, PixelI* p0, PixelI* q0, PixelI* q1, PixelI* q2)
+Void JXRLIB_API(smooth)(PixelI* p2, PixelI* p1, PixelI* p0, PixelI* q0, PixelI* q1, PixelI* q2)
 {
     //    p2 p1 p0 | q0 q1 q2
     PixelI delta = ((((*q0 - *p0) << 2) + (*p1 - *q1)) >> 3);
@@ -50,7 +51,7 @@ Void smooth(PixelI* p2, PixelI* p1, PixelI* p0, PixelI* q0, PixelI* q1, PixelI* 
     *q1 = (*q1 >> 1) + ((*q0 + *q2) >> 2);
 }
 
-Int initPostProc(struct tagPostProcInfo* strPostProcInfo[MAX_CHANNELS][2], size_t mbWidth, size_t iNumChannels)
+Int JXRLIB_API(initPostProc)(struct tagPostProcInfo* strPostProcInfo[MAX_CHANNELS][2], size_t mbWidth, size_t iNumChannels)
 {
     size_t i, j, k, l;
     Bool b32bit = sizeof(int) == 4;
@@ -84,7 +85,7 @@ Int initPostProc(struct tagPostProcInfo* strPostProcInfo[MAX_CHANNELS][2], size_
     return ICERR_OK;
 }
 
-Void termPostProc(struct tagPostProcInfo* strPostProcInfo[MAX_CHANNELS][2], size_t iNumChannels)
+Void JXRLIB_API(termPostProc)(struct tagPostProcInfo* strPostProcInfo[MAX_CHANNELS][2], size_t iNumChannels)
 {
     size_t i, j;
 
@@ -97,7 +98,7 @@ Void termPostProc(struct tagPostProcInfo* strPostProcInfo[MAX_CHANNELS][2], size
     }
 }
 
-Void slideOneMBRow(struct tagPostProcInfo* strPostProcInfo[MAX_CHANNELS][2], size_t iNumChannels, size_t mbWidth, Bool top, Bool bottom)
+Void JXRLIB_API(slideOneMBRow)(struct tagPostProcInfo* strPostProcInfo[MAX_CHANNELS][2], size_t iNumChannels, size_t mbWidth, Bool top, Bool bottom)
 {
     size_t i, j;
     struct tagPostProcInfo* bar;
@@ -123,7 +124,7 @@ Void slideOneMBRow(struct tagPostProcInfo* strPostProcInfo[MAX_CHANNELS][2], siz
 }
 
 // get DC and texture infomation right before transform
-Void updatePostProcInfo(struct tagPostProcInfo* strPostProcInfo[MAX_CHANNELS][2], PixelI* pMB, size_t mbX, size_t cc)
+Void JXRLIB_API(updatePostProcInfo)(struct tagPostProcInfo* strPostProcInfo[MAX_CHANNELS][2], PixelI* pMB, size_t mbX, size_t cc)
 {
     size_t i, j;
     struct tagPostProcInfo* pMBInfo = strPostProcInfo[cc][1] + mbX;
@@ -161,7 +162,7 @@ Void updatePostProcInfo(struct tagPostProcInfo* strPostProcInfo[MAX_CHANNELS][2]
 #define DMB(a, b) (a->ucMBTexture + b->ucMBTexture == 0) && (abs(a->iMBDC - b->iMBDC) <= threshold)
 
 // demacroblock and get DCs of blocks
-Void postProcMB(struct tagPostProcInfo* strPostProcInfo[MAX_CHANNELS][2], PixelI* p0, PixelI* p1, size_t mbX, size_t cc, Int threshold)
+Void JXRLIB_API(postProcMB)(struct tagPostProcInfo* strPostProcInfo[MAX_CHANNELS][2], PixelI* p0, PixelI* p1, size_t mbX, size_t cc, Int threshold)
 {
     /* 4 MBs involved, current MB is d, we have 4 2-pixel boundary segments */
     /*    |     */
@@ -173,26 +174,26 @@ Void postProcMB(struct tagPostProcInfo* strPostProcInfo[MAX_CHANNELS][2], PixelI
 
     // demacroblock segment --
     if (DMB(pMBa, pMBc)) {
-        smoothMB(p0 - 256 + 10 * 16, p0 - 256 + 11 * 16, p1 - 256 + 8 * 16, p1 - 256 + 9 * 16);
-        smoothMB(p0 - 256 + 14 * 16, p0 - 256 + 15 * 16, p1 - 256 + 12 * 16, p1 - 256 + 13 * 16);
+        JXRLIB_API(smoothMB)(p0 - 256 + 10 * 16, p0 - 256 + 11 * 16, p1 - 256 + 8 * 16, p1 - 256 + 9 * 16);
+        JXRLIB_API(smoothMB)(p0 - 256 + 14 * 16, p0 - 256 + 15 * 16, p1 - 256 + 12 * 16, p1 - 256 + 13 * 16);
     }
 
     // demacroblock segment ++
     if (DMB(pMBb, pMBd)) {
-        smoothMB(p0 + 2 * 16, p0 + 3 * 16, p1 + 0 * 16, p1 + 1 * 16);
-        smoothMB(p0 + 6 * 16, p0 + 7 * 16, p1 + 4 * 16, p1 + 5 * 16);
+        JXRLIB_API(smoothMB)(p0 + 2 * 16, p0 + 3 * 16, p1 + 0 * 16, p1 + 1 * 16);
+        JXRLIB_API(smoothMB)(p0 + 6 * 16, p0 + 7 * 16, p1 + 4 * 16, p1 + 5 * 16);
     }
 
     // demacroblock segment |
     if (DMB(pMBa, pMBb)) {
-        smoothMB(p0 - 256 + 10 * 16, p0 - 256 + 14 * 16, p0 + 2 * 16, p0 + 6 * 16);
-        smoothMB(p0 - 256 + 11 * 16, p0 - 256 + 15 * 16, p0 + 3 * 16, p0 + 7 * 16);
+        JXRLIB_API(smoothMB)(p0 - 256 + 10 * 16, p0 - 256 + 14 * 16, p0 + 2 * 16, p0 + 6 * 16);
+        JXRLIB_API(smoothMB)(p0 - 256 + 11 * 16, p0 - 256 + 15 * 16, p0 + 3 * 16, p0 + 7 * 16);
     }
 
     // demacroblock segment !
     if (DMB(pMBc, pMBd)) {
-        smoothMB(p1 - 256 + 8 * 16, p1 - 256 + 12 * 16, p1 + 0 * 16, p1 + 4 * 16);
-        smoothMB(p1 - 256 + 9 * 16, p1 - 256 + 13 * 16, p1 + 1 * 16, p1 + 5 * 16);
+        JXRLIB_API(smoothMB)(p1 - 256 + 8 * 16, p1 - 256 + 12 * 16, p1 + 0 * 16, p1 + 4 * 16);
+        JXRLIB_API(smoothMB)(p1 - 256 + 9 * 16, p1 - 256 + 13 * 16, p1 + 1 * 16, p1 + 5 * 16);
     }
 
     /* update DCs of blocks */
@@ -228,7 +229,7 @@ Void postProcMB(struct tagPostProcInfo* strPostProcInfo[MAX_CHANNELS][2], PixelI
 /* - - - -  */
 /*  c | d   */
 /*    |     */
-Void postProcBlock(struct tagPostProcInfo* strPostProcInfo[MAX_CHANNELS][2], PixelI* p0, PixelI* p1, size_t mbX, size_t cc, Int threshold)
+Void JXRLIB_API(postProcBlock)(struct tagPostProcInfo* strPostProcInfo[MAX_CHANNELS][2], PixelI* p0, PixelI* p1, size_t mbX, size_t cc, Int threshold)
 {
     size_t i, j, k;
     Int dc[5][5];
@@ -270,7 +271,7 @@ Void postProcBlock(struct tagPostProcInfo* strPostProcInfo[MAX_CHANNELS][2], Pix
                 // smooth horizontal boundary ----
                 pt = (j < 3 ? pc + 16 : p1 - 256 + i * 64);
                 for (k = 0; k < 4; k++) {
-                    smooth(pc + idxCC[1][k], pc + idxCC[2][k], pc + idxCC[3][k], pt + idxCC[0][k], pt + idxCC[1][k], pt + idxCC[2][k]);
+                    JXRLIB_API(smooth)(pc + JXRLIB_API(idxCC)[1][k], pc + JXRLIB_API(idxCC)[2][k], pc + JXRLIB_API(idxCC)[3][k], pt + JXRLIB_API(idxCC)[0][k], pt + JXRLIB_API(idxCC)[1][k], pt + JXRLIB_API(idxCC)[2][k]);
                 }
             }
 
@@ -279,7 +280,7 @@ Void postProcBlock(struct tagPostProcInfo* strPostProcInfo[MAX_CHANNELS][2], Pix
                 // smooth vertical boundary |
                 pt = pc + 64;
                 for (k = 0; k < 4; k++) {
-                    smooth(pc + idxCC[k][1], pc + idxCC[k][2], pc + idxCC[k][3], pt + idxCC[k][0], pt + idxCC[k][1], pt + idxCC[k][2]);
+                    JXRLIB_API(smooth)(pc + JXRLIB_API(idxCC)[k][1], pc + JXRLIB_API(idxCC)[k][2], pc + JXRLIB_API(idxCC)[k][3], pt + JXRLIB_API(idxCC)[k][0], pt + JXRLIB_API(idxCC)[k][1], pt + JXRLIB_API(idxCC)[k][2]);
                 }
             }
         }
