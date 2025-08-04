@@ -75,7 +75,7 @@ static Int InitializeAH(CAdaptiveHuffman** ppAdHuff, Int iSym)
 {
     Int iMemStatus = 0;
 
-    CAdaptiveHuffman* pAdHuff = Allocate(iSym, DECODER);
+    CAdaptiveHuffman* pAdHuff = JXRLIB_API(Allocate)(iSym, DECODER);
     if (pAdHuff == NULL) {
         iMemStatus = -1;    // out of memory
         goto ErrorExit;
@@ -104,7 +104,7 @@ ErrorExit:
 /*************************************************************************
     Context allocation
 *************************************************************************/
-Int AllocateCodingContextDec(CWMImageStrCodec* pSC, Int iNumContexts)
+Int JXRLIB_API(AllocateCodingContextDec)(CWMImageStrCodec* pSC, Int iNumContexts)
 {
     Int i, iCBPSize, k;
     static const Int aAlphabet[] = { 5,4,8,7,7,  12,6,6,12,6,6,7,7,  12,6,6,12,6,6,7,7 };
@@ -144,7 +144,7 @@ Int AllocateCodingContextDec(CWMImageStrCodec* pSC, Int iNumContexts)
             }
         }
 
-        ResetCodingContextDec(pContext);
+        JXRLIB_API(ResetCodingContextDec)(pContext);
     }
 
     return ICERR_OK;
@@ -153,7 +153,7 @@ Int AllocateCodingContextDec(CWMImageStrCodec* pSC, Int iNumContexts)
 /*************************************************************************
     Context reset on encoder
 *************************************************************************/
-Void ResetCodingContextDec(CCodingContext* pContext)
+Void JXRLIB_API(ResetCodingContextDec)(CCodingContext* pContext)
 {
     Int k;
     /** set flags **/
@@ -163,19 +163,19 @@ Void ResetCodingContextDec(CCodingContext* pContext)
         pContext->m_pAHexpt[k]->m_bInitialize = FALSE;
 
     // reset VLC tables
-    AdaptLowpassDec(pContext);
-    AdaptHighpassDec(pContext);
+    JXRLIB_API(AdaptLowpassDec)(pContext);
+    JXRLIB_API(AdaptHighpassDec)(pContext);
 
     // reset zigzag patterns, totals
-    InitZigzagScan(pContext);
+    JXRLIB_API(InitZigzagScan)(pContext);
     // reset bit reduction and cbp models
-    ResetCodingContext(pContext);
+    JXRLIB_API(ResetCodingContext)(pContext);
 }
 
 /*************************************************************************
     Context deletion
 *************************************************************************/
-Void FreeCodingContextDec(CWMImageStrCodec* pSC)
+Void JXRLIB_API(FreeCodingContextDec)(CWMImageStrCodec* pSC)
 {
     Int iContexts = (Int)(pSC->cNumCodingContext), i, k;
 

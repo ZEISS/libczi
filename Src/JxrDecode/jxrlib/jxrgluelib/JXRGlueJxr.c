@@ -26,17 +26,18 @@
 // POSSIBILITY OF SUCH DAMAGE.
 //
 //*@@@---@@@@******************************************************************
+#include "../common/include/jxrlib_symbol_mangle.h"
 #include <limits.h>
 #include <wchar.h>
 #include "JXRGlue.h"
 
 
 static const char szHDPhotoFormat[] = "<dc:format>image/vnd.ms-photo</dc:format>";
-const U32 IFDEntryTypeSizes[] = { 0, 1, 1, 2, 4, 8, 1, 1, 2, 4, 8, 4, 8 };
-const U32 SizeofIFDEntry = sizeof(struct IFDEntry);
+const U32 JXRLIB_API(IFDEntryTypeSizes)[] = { 0, 1, 1, 2, 4, 8, 1, 1, 2, 4, 8, 4, 8 };
+const U32 JXRLIB_API(SizeofIFDEntry) = sizeof(struct IFDEntry);
 
 
-void CalcMetadataSizeLPSTR(const DPKPROPVARIANT var,
+void JXRLIB_API(CalcMetadataSizeLPSTR)(const DPKPROPVARIANT var,
     U16* pcInactiveMetadata,
     U32* pcbOffsetSize,
     U32* pcbCount)
@@ -57,7 +58,7 @@ void CalcMetadataSizeLPSTR(const DPKPROPVARIANT var,
         *pcInactiveMetadata += 1;
 }
 
-void CalcMetadataSizeLPWSTR(const DPKPROPVARIANT var,
+void JXRLIB_API(CalcMetadataSizeLPWSTR)(const DPKPROPVARIANT var,
     U16* pcInactiveMetadata,
     U32* pcbOffsetSize,
     U32* pcbCount)
@@ -78,7 +79,7 @@ void CalcMetadataSizeLPWSTR(const DPKPROPVARIANT var,
         *pcInactiveMetadata += 1;
 }
 
-void CalcMetadataSizeUI2(const DPKPROPVARIANT var,
+void JXRLIB_API(CalcMetadataSizeUI2)(const DPKPROPVARIANT var,
     U16* pcInactiveMetadata,
     U32* pcbMetadataSize)
 {
@@ -92,7 +93,7 @@ void CalcMetadataSizeUI2(const DPKPROPVARIANT var,
         *pcInactiveMetadata += 1;
 }
 
-void CalcMetadataSizeUI4(const DPKPROPVARIANT var,
+void JXRLIB_API(CalcMetadataSizeUI4)(const DPKPROPVARIANT var,
     U16* pcInactiveMetadata,
     U32* pcbContainer)
 {
@@ -106,32 +107,32 @@ void CalcMetadataSizeUI4(const DPKPROPVARIANT var,
         *pcInactiveMetadata += 1;
 }
 
-ERR CalcMetadataOffsetSize(PKImageEncode* pIE,
+ERR JXRLIB_API(CalcMetadataOffsetSize)(PKImageEncode* pIE,
     U16* pcInactiveMetadata,
     U32* pcbMetadataSize)
 {
     ERR err = WMP_errSuccess;
 
-    CalcMetadataSizeLPSTR(pIE->sDescMetadata.pvarImageDescription, pcInactiveMetadata, pcbMetadataSize, NULL);
-    CalcMetadataSizeLPSTR(pIE->sDescMetadata.pvarCameraMake, pcInactiveMetadata, pcbMetadataSize, NULL);
-    CalcMetadataSizeLPSTR(pIE->sDescMetadata.pvarCameraModel, pcInactiveMetadata, pcbMetadataSize, NULL);
-    CalcMetadataSizeLPSTR(pIE->sDescMetadata.pvarSoftware, pcInactiveMetadata, pcbMetadataSize, NULL);
-    CalcMetadataSizeLPSTR(pIE->sDescMetadata.pvarDateTime, pcInactiveMetadata, pcbMetadataSize, NULL);
-    CalcMetadataSizeLPSTR(pIE->sDescMetadata.pvarArtist, pcInactiveMetadata, pcbMetadataSize, NULL);
-    CalcMetadataSizeLPSTR(pIE->sDescMetadata.pvarCopyright, pcInactiveMetadata, pcbMetadataSize, NULL);
-    CalcMetadataSizeUI2(pIE->sDescMetadata.pvarRatingStars, pcInactiveMetadata, pcbMetadataSize);
-    CalcMetadataSizeUI2(pIE->sDescMetadata.pvarRatingValue, pcInactiveMetadata, pcbMetadataSize);
-    CalcMetadataSizeLPWSTR(pIE->sDescMetadata.pvarCaption, pcInactiveMetadata, pcbMetadataSize, NULL);
-    CalcMetadataSizeLPSTR(pIE->sDescMetadata.pvarDocumentName, pcInactiveMetadata, pcbMetadataSize, NULL);
-    CalcMetadataSizeLPSTR(pIE->sDescMetadata.pvarPageName, pcInactiveMetadata, pcbMetadataSize, NULL);
-    CalcMetadataSizeUI4(pIE->sDescMetadata.pvarPageNumber, pcInactiveMetadata, pcbMetadataSize);
-    CalcMetadataSizeLPSTR(pIE->sDescMetadata.pvarHostComputer, pcInactiveMetadata, pcbMetadataSize, NULL);
+    JXRLIB_API(CalcMetadataSizeLPSTR)(pIE->sDescMetadata.pvarImageDescription, pcInactiveMetadata, pcbMetadataSize, NULL);
+    JXRLIB_API(CalcMetadataSizeLPSTR)(pIE->sDescMetadata.pvarCameraMake, pcInactiveMetadata, pcbMetadataSize, NULL);
+    JXRLIB_API(CalcMetadataSizeLPSTR)(pIE->sDescMetadata.pvarCameraModel, pcInactiveMetadata, pcbMetadataSize, NULL);
+    JXRLIB_API(CalcMetadataSizeLPSTR)(pIE->sDescMetadata.pvarSoftware, pcInactiveMetadata, pcbMetadataSize, NULL);
+    JXRLIB_API(CalcMetadataSizeLPSTR)(pIE->sDescMetadata.pvarDateTime, pcInactiveMetadata, pcbMetadataSize, NULL);
+    JXRLIB_API(CalcMetadataSizeLPSTR)(pIE->sDescMetadata.pvarArtist, pcInactiveMetadata, pcbMetadataSize, NULL);
+    JXRLIB_API(CalcMetadataSizeLPSTR)(pIE->sDescMetadata.pvarCopyright, pcInactiveMetadata, pcbMetadataSize, NULL);
+    JXRLIB_API(CalcMetadataSizeUI2)(pIE->sDescMetadata.pvarRatingStars, pcInactiveMetadata, pcbMetadataSize);
+    JXRLIB_API(CalcMetadataSizeUI2)(pIE->sDescMetadata.pvarRatingValue, pcInactiveMetadata, pcbMetadataSize);
+    JXRLIB_API(CalcMetadataSizeLPWSTR)(pIE->sDescMetadata.pvarCaption, pcInactiveMetadata, pcbMetadataSize, NULL);
+    JXRLIB_API(CalcMetadataSizeLPSTR)(pIE->sDescMetadata.pvarDocumentName, pcInactiveMetadata, pcbMetadataSize, NULL);
+    JXRLIB_API(CalcMetadataSizeLPSTR)(pIE->sDescMetadata.pvarPageName, pcInactiveMetadata, pcbMetadataSize, NULL);
+    JXRLIB_API(CalcMetadataSizeUI4)(pIE->sDescMetadata.pvarPageNumber, pcInactiveMetadata, pcbMetadataSize);
+    JXRLIB_API(CalcMetadataSizeLPSTR)(pIE->sDescMetadata.pvarHostComputer, pcInactiveMetadata, pcbMetadataSize, NULL);
 
     return err;
 }
 
 
-ERR CopyDescMetadata(DPKPROPVARIANT* pvarDst,
+ERR JXRLIB_API(CopyDescMetadata)(DPKPROPVARIANT* pvarDst,
     const DPKPROPVARIANT varSrc)
 {
     ERR err = WMP_errSuccess;
@@ -143,14 +144,14 @@ ERR CopyDescMetadata(DPKPROPVARIANT* pvarDst,
         case DPKVT_LPSTR:
             pvarDst->vt = DPKVT_LPSTR;
             uiSize = strlen(varSrc.VT.pszVal) + 1;
-            Call(PKAlloc((void**)&pvarDst->VT.pszVal, uiSize));
+            Call(JXRLIB_API(PKAlloc)((void**)&pvarDst->VT.pszVal, uiSize));
             memcpy(pvarDst->VT.pszVal, varSrc.VT.pszVal, uiSize);
             break;
 
         case DPKVT_LPWSTR:
             pvarDst->vt = DPKVT_LPWSTR;
             uiSize = sizeof(U16) * (wcslen((wchar_t*)varSrc.VT.pwszVal) + 1); // +1 for NULL term
-            Call(PKAlloc((void**)&pvarDst->VT.pszVal, uiSize));
+            Call(JXRLIB_API(PKAlloc)((void**)&pvarDst->VT.pszVal, uiSize));
             memcpy(pvarDst->VT.pwszVal, varSrc.VT.pwszVal, uiSize);
             break;
 
@@ -179,16 +180,16 @@ Cleanup:
 }
 
 
-void FreeDescMetadata(DPKPROPVARIANT* pvar)
+void JXRLIB_API(FreeDescMetadata)(DPKPROPVARIANT* pvar)
 {
     switch (pvar->vt)
     {
         case DPKVT_LPSTR:
-            PKFree((void**)&pvar->VT.pszVal);
+            JXRLIB_API(PKFree)((void**)&pvar->VT.pszVal);
             break;
 
         case DPKVT_LPWSTR:
-            PKFree((void**)&pvar->VT.pwszVal);
+            JXRLIB_API(PKFree)((void**)&pvar->VT.pwszVal);
             break;
 
         default:
@@ -203,7 +204,7 @@ void FreeDescMetadata(DPKPROPVARIANT* pvar)
 }
 
 
-ERR WriteDescMetadata(PKImageEncode* pIE,
+ERR JXRLIB_API(WriteDescMetadata)(PKImageEncode* pIE,
     const DPKPROPVARIANT var,
     WmpDE* pwmpDE,
     U32* puiCurrDescMetadataOffset,
@@ -229,31 +230,31 @@ ERR WriteDescMetadata(PKImageEncode* pIE,
             break;
 
         case DPKVT_LPSTR:
-            CalcMetadataSizeLPSTR(var, &uiTemp, &uiMetadataOffsetSize, &uiCount);
+            JXRLIB_API(CalcMetadataSizeLPSTR)(var, &uiTemp, &uiMetadataOffsetSize, &uiCount);
             pwmpDE->uCount = uiCount;
             pwmpDE->uValueOrOffset = pDEMisc->uDescMetadataOffset + *puiCurrDescMetadataOffset;
-            Call(WriteWmpDE(pWS, poffPos, pwmpDE, (U8*)var.VT.pszVal, &uiDataWrittenToOffset));
+            Call(JXRLIB_API(WriteWmpDE)(pWS, poffPos, pwmpDE, (U8*)var.VT.pszVal, &uiDataWrittenToOffset));
             break;
 
         case DPKVT_LPWSTR:
-            CalcMetadataSizeLPWSTR(var, &uiTemp, &uiMetadataOffsetSize, &uiCount);
+            JXRLIB_API(CalcMetadataSizeLPWSTR)(var, &uiTemp, &uiMetadataOffsetSize, &uiCount);
             pwmpDE->uCount = uiCount;
             pwmpDE->uValueOrOffset = pDEMisc->uDescMetadataOffset + *puiCurrDescMetadataOffset;
-            Call(WriteWmpDE(pWS, poffPos, pwmpDE, (U8*)var.VT.pwszVal, &uiDataWrittenToOffset));
+            Call(JXRLIB_API(WriteWmpDE)(pWS, poffPos, pwmpDE, (U8*)var.VT.pwszVal, &uiDataWrittenToOffset));
             break;
 
         case DPKVT_UI2:
-            CalcMetadataSizeUI2(var, &uiTemp, &uiMetadataOffsetSize);
+            JXRLIB_API(CalcMetadataSizeUI2)(var, &uiTemp, &uiMetadataOffsetSize);
             pwmpDE->uCount = 1;
             pwmpDE->uValueOrOffset = var.VT.uiVal;
-            Call(WriteWmpDE(pWS, poffPos, pwmpDE, NULL, NULL));
+            Call(JXRLIB_API(WriteWmpDE)(pWS, poffPos, pwmpDE, NULL, NULL));
             break;
 
         case DPKVT_UI4:
-            CalcMetadataSizeUI4(var, &uiTemp, &uiMetadataOffsetSize);
+            JXRLIB_API(CalcMetadataSizeUI4)(var, &uiTemp, &uiMetadataOffsetSize);
             pwmpDE->uCount = 1;
             pwmpDE->uValueOrOffset = var.VT.ulVal;
-            Call(WriteWmpDE(pWS, poffPos, pwmpDE, NULL, NULL));
+            Call(JXRLIB_API(WriteWmpDE)(pWS, poffPos, pwmpDE, NULL, NULL));
             break;
 
         default:
@@ -276,7 +277,7 @@ Cleanup:
 //================================================================
 // PKImageEncode_WMP
 //================================================================
-ERR WriteContainerPre(
+ERR JXRLIB_API(WriteContainerPre)(
     PKImageEncode* pIE)
 {
     ERR err = WMP_errSuccess;
@@ -336,7 +337,7 @@ ERR WriteContainerPre(
 
     // const unsigned char Zero[0x20] = { 0 };
     const unsigned char Zero[sizeof(struct IFDEntry) * sizeof(wmpDEs) / sizeof(wmpDEs[0]) + sizeof(U32)] = { 0 };
-    assert(SizeofIFDEntry * sizeof(wmpDEs) / sizeof(wmpDEs[0]) + sizeof(U32) > 0x20);
+    assert(JXRLIB_API(SizeofIFDEntry) * sizeof(wmpDEs) / sizeof(wmpDEs[0]) + sizeof(U32) > 0x20);
 
     //================
     Call(pWS->GetPos(pWS, &offPos));
@@ -345,29 +346,29 @@ ERR WriteContainerPre(
     //================
     // Header (8 bytes)
     Call(pWS->Write(pWS, IIMM, sizeof(IIMM))); offPos += 2;
-    Call(PutUShort(pWS, offPos, 0x01bc)); offPos += 2;
-    Call(PutULong(pWS, offPos, (U32)OFFSET_OF_PFD)); offPos += 4;
+    Call(JXRLIB_API(PutUShort)(pWS, offPos, 0x01bc)); offPos += 2;
+    Call(JXRLIB_API(PutULong)(pWS, offPos, (U32)OFFSET_OF_PFD)); offPos += 4;
 
     //================
     // Write overflow area
     pDEMisc->uOffPixelFormat = (U32)offPos;
     PI.pGUIDPixFmt = &pIE->guidPixFormat;
-    PixelFormatLookup(&PI, LOOKUP_FORWARD);
+    JXRLIB_API(PixelFormatLookup)(&PI, LOOKUP_FORWARD);
 
     //Call(pWS->Write(pWS, PI.pGUIDPixFmt, sizeof(*PI.pGUIDPixFmt))); offPos += 16;
     /** following code is endian-agnostic **/
     {
         unsigned char* pGuid = (unsigned char*)&pIE->guidPixFormat;
-        Call(PutULong(pWS, offPos, ((U32*)pGuid)[0]));
-        Call(PutUShort(pWS, offPos + 4, ((U16*)(pGuid + 4))[0]));
-        Call(PutUShort(pWS, offPos + 6, ((U16*)(pGuid + 6))[0]));
+        Call(JXRLIB_API(PutULong)(pWS, offPos, ((U32*)pGuid)[0]));
+        Call(JXRLIB_API(PutUShort)(pWS, offPos + 4, ((U16*)(pGuid + 4))[0]));
+        Call(JXRLIB_API(PutUShort)(pWS, offPos + 6, ((U16*)(pGuid + 6))[0]));
         Call(pWS->Write(pWS, pGuid + 8, 8));
         offPos += 16;
     }
 
     //================
     // Tally up space required for descriptive metadata 
-    Call(CalcMetadataOffsetSize(pIE, &cInactiveMetadata, &cbMetadataOffsetSize));
+    Call(JXRLIB_API(CalcMetadataOffsetSize)(pIE, &cInactiveMetadata, &cbMetadataOffsetSize));
     cWmpDEs -= cInactiveMetadata;
 
     //================
@@ -399,7 +400,7 @@ ERR WriteContainerPre(
     if (0 == pIE->cbGPSInfoMetadataByteCount)
         cWmpDEs -= 1; // No GPSInfo metadata
 
-    pDEMisc->uImageOffset = (U32)(offPos + sizeof(U16) + SizeofIFDEntry * cWmpDEs + sizeof(U32));
+    pDEMisc->uImageOffset = (U32)(offPos + sizeof(U16) + JXRLIB_API(SizeofIFDEntry) * cWmpDEs + sizeof(U32));
 
     if (cbMetadataOffsetSize > 0)
     {
@@ -446,78 +447,78 @@ ERR WriteContainerPre(
         pDEMisc->uImageOffset += pIE->cbGPSInfoMetadataByteCount;
     }
 
-    Call(PutUShort(pWS, offPos, cWmpDEs)); offPos += 2;
-    Call(pWS->Write(pWS, Zero, SizeofIFDEntry * cWmpDEs + sizeof(U32)));
+    Call(JXRLIB_API(PutUShort)(pWS, offPos, cWmpDEs)); offPos += 2;
+    Call(pWS->Write(pWS, Zero, JXRLIB_API(SizeofIFDEntry) * cWmpDEs + sizeof(U32)));
 
     //================
     wmpDE = wmpDEs[i++];
     assert(WMP_tagDocumentName == wmpDE.uTag);
-    Call(WriteDescMetadata(pIE, pIE->sDescMetadata.pvarDocumentName, &wmpDE,
+    Call(JXRLIB_API(WriteDescMetadata)(pIE, pIE->sDescMetadata.pvarDocumentName, &wmpDE,
         &uiCurrDescMetadataOffset, &offPos));
 
     wmpDE = wmpDEs[i++];
     assert(WMP_tagImageDescription == wmpDE.uTag);
-    Call(WriteDescMetadata(pIE, pIE->sDescMetadata.pvarImageDescription, &wmpDE,
+    Call(JXRLIB_API(WriteDescMetadata)(pIE, pIE->sDescMetadata.pvarImageDescription, &wmpDE,
         &uiCurrDescMetadataOffset, &offPos));
 
     wmpDE = wmpDEs[i++];
     assert(WMP_tagCameraMake == wmpDE.uTag);
-    Call(WriteDescMetadata(pIE, pIE->sDescMetadata.pvarCameraMake, &wmpDE,
+    Call(JXRLIB_API(WriteDescMetadata)(pIE, pIE->sDescMetadata.pvarCameraMake, &wmpDE,
         &uiCurrDescMetadataOffset, &offPos));
 
     wmpDE = wmpDEs[i++];
     assert(WMP_tagCameraModel == wmpDE.uTag);
-    Call(WriteDescMetadata(pIE, pIE->sDescMetadata.pvarCameraModel, &wmpDE,
+    Call(JXRLIB_API(WriteDescMetadata)(pIE, pIE->sDescMetadata.pvarCameraModel, &wmpDE,
         &uiCurrDescMetadataOffset, &offPos));
 
     wmpDE = wmpDEs[i++];
     assert(WMP_tagPageName == wmpDE.uTag);
-    Call(WriteDescMetadata(pIE, pIE->sDescMetadata.pvarPageName, &wmpDE,
+    Call(JXRLIB_API(WriteDescMetadata)(pIE, pIE->sDescMetadata.pvarPageName, &wmpDE,
         &uiCurrDescMetadataOffset, &offPos));
 
     wmpDE = wmpDEs[i++];
     assert(WMP_tagPageNumber == wmpDE.uTag);
-    Call(WriteDescMetadata(pIE, pIE->sDescMetadata.pvarPageNumber, &wmpDE,
+    Call(JXRLIB_API(WriteDescMetadata)(pIE, pIE->sDescMetadata.pvarPageNumber, &wmpDE,
         &uiCurrDescMetadataOffset, &offPos));
 
     wmpDE = wmpDEs[i++];
     assert(WMP_tagSoftware == wmpDE.uTag);
-    Call(WriteDescMetadata(pIE, pIE->sDescMetadata.pvarSoftware, &wmpDE,
+    Call(JXRLIB_API(WriteDescMetadata)(pIE, pIE->sDescMetadata.pvarSoftware, &wmpDE,
         &uiCurrDescMetadataOffset, &offPos));
 
     wmpDE = wmpDEs[i++];
     assert(WMP_tagDateTime == wmpDE.uTag);
-    Call(WriteDescMetadata(pIE, pIE->sDescMetadata.pvarDateTime, &wmpDE,
+    Call(JXRLIB_API(WriteDescMetadata)(pIE, pIE->sDescMetadata.pvarDateTime, &wmpDE,
         &uiCurrDescMetadataOffset, &offPos));
 
     wmpDE = wmpDEs[i++];
     assert(WMP_tagArtist == wmpDE.uTag);
-    Call(WriteDescMetadata(pIE, pIE->sDescMetadata.pvarArtist, &wmpDE,
+    Call(JXRLIB_API(WriteDescMetadata)(pIE, pIE->sDescMetadata.pvarArtist, &wmpDE,
         &uiCurrDescMetadataOffset, &offPos));
 
     wmpDE = wmpDEs[i++];
     assert(WMP_tagHostComputer == wmpDE.uTag);
-    Call(WriteDescMetadata(pIE, pIE->sDescMetadata.pvarHostComputer, &wmpDE,
+    Call(JXRLIB_API(WriteDescMetadata)(pIE, pIE->sDescMetadata.pvarHostComputer, &wmpDE,
         &uiCurrDescMetadataOffset, &offPos));
 
     wmpDE = wmpDEs[i++];
     assert(WMP_tagRatingStars == wmpDE.uTag);
-    Call(WriteDescMetadata(pIE, pIE->sDescMetadata.pvarRatingStars, &wmpDE,
+    Call(JXRLIB_API(WriteDescMetadata)(pIE, pIE->sDescMetadata.pvarRatingStars, &wmpDE,
         &uiCurrDescMetadataOffset, &offPos));
 
     wmpDE = wmpDEs[i++];
     assert(WMP_tagRatingValue == wmpDE.uTag);
-    Call(WriteDescMetadata(pIE, pIE->sDescMetadata.pvarRatingValue, &wmpDE,
+    Call(JXRLIB_API(WriteDescMetadata)(pIE, pIE->sDescMetadata.pvarRatingValue, &wmpDE,
         &uiCurrDescMetadataOffset, &offPos));
 
     wmpDE = wmpDEs[i++];
     assert(WMP_tagCopyright == wmpDE.uTag);
-    Call(WriteDescMetadata(pIE, pIE->sDescMetadata.pvarCopyright, &wmpDE,
+    Call(JXRLIB_API(WriteDescMetadata)(pIE, pIE->sDescMetadata.pvarCopyright, &wmpDE,
         &uiCurrDescMetadataOffset, &offPos));
 
     wmpDE = wmpDEs[i++];
     assert(WMP_tagCaption == wmpDE.uTag);
-    Call(WriteDescMetadata(pIE, pIE->sDescMetadata.pvarCaption, &wmpDE,
+    Call(JXRLIB_API(WriteDescMetadata)(pIE, pIE->sDescMetadata.pvarCaption, &wmpDE,
         &uiCurrDescMetadataOffset, &offPos));
 
     // XMP Metadata
@@ -528,7 +529,7 @@ ERR WriteContainerPre(
         U32 uiTemp;
         wmpDE.uCount = pIE->cbXMPMetadataByteCount;
         wmpDE.uValueOrOffset = pDEMisc->uXMPMetadataOffset;
-        Call(WriteWmpDE(pWS, &offPos, &wmpDE, pIE->pbXMPMetadata, &uiTemp));
+        Call(JXRLIB_API(WriteWmpDE)(pWS, &offPos, &wmpDE, pIE->pbXMPMetadata, &uiTemp));
     }
 
     // IPTCNAA Metadata
@@ -539,7 +540,7 @@ ERR WriteContainerPre(
         U32 uiTemp;
         wmpDE.uCount = pIE->cbIPTCNAAMetadataByteCount;
         wmpDE.uValueOrOffset = pDEMisc->uIPTCNAAMetadataOffset;
-        Call(WriteWmpDE(pWS, &offPos, &wmpDE, pIE->pbIPTCNAAMetadata, &uiTemp));
+        Call(JXRLIB_API(WriteWmpDE)(pWS, &offPos, &wmpDE, pIE->pbIPTCNAAMetadata, &uiTemp));
     }
 
     // Photoshop Metadata
@@ -550,7 +551,7 @@ ERR WriteContainerPre(
         U32 uiTemp;
         wmpDE.uCount = pIE->cbPhotoshopMetadataByteCount;
         wmpDE.uValueOrOffset = pDEMisc->uPhotoshopMetadataOffset;
-        Call(WriteWmpDE(pWS, &offPos, &wmpDE, pIE->pbPhotoshopMetadata, &uiTemp));
+        Call(JXRLIB_API(WriteWmpDE)(pWS, &offPos, &wmpDE, pIE->pbPhotoshopMetadata, &uiTemp));
     }
 
     // EXIF Metadata
@@ -566,11 +567,11 @@ ERR WriteContainerPre(
         }
         pDEMisc->uEXIFMetadataOffset += (pDEMisc->uEXIFMetadataOffset & 1);
         wmpDE.uValueOrOffset = pDEMisc->uEXIFMetadataOffset;
-        Call(WriteWmpDE(pWS, &offPos, &wmpDE, NULL, NULL));
+        Call(JXRLIB_API(WriteWmpDE)(pWS, &offPos, &wmpDE, NULL, NULL));
 
-        Call(PKAlloc((void**)&pbEXIFMetadata, pIE->cbEXIFMetadataByteCount));
+        Call(JXRLIB_API(PKAlloc)((void**)&pbEXIFMetadata, pIE->cbEXIFMetadataByteCount));
         uiTemp = pDEMisc->uEXIFMetadataOffset;
-        Call(BufferCopyIFD(pIE->pbEXIFMetadata, pIE->cbEXIFMetadataByteCount, 0, WMP_INTEL_ENDIAN,
+        Call(JXRLIB_API(BufferCopyIFD)(pIE->pbEXIFMetadata, pIE->cbEXIFMetadataByteCount, 0, WMP_INTEL_ENDIAN,
             pbEXIFMetadata - uiTemp, uiTemp + pIE->cbEXIFMetadataByteCount, &uiTemp));
         Call(pWS->SetPos(pWS, pDEMisc->uEXIFMetadataOffset));
         Call(pWS->Write(pWS, pbEXIFMetadata, pIE->cbEXIFMetadataByteCount));
@@ -584,7 +585,7 @@ ERR WriteContainerPre(
         U32 uiTemp;
         wmpDE.uCount = pIE->cbColorContext;
         wmpDE.uValueOrOffset = pDEMisc->uColorProfileOffset;
-        Call(WriteWmpDE(pWS, &offPos, &wmpDE, pIE->pbColorContext, &uiTemp));
+        Call(JXRLIB_API(WriteWmpDE)(pWS, &offPos, &wmpDE, pIE->pbColorContext, &uiTemp));
     }
 
     // GPSInfo Metadata
@@ -600,11 +601,11 @@ ERR WriteContainerPre(
         }
         pDEMisc->uGPSInfoMetadataOffset += (pDEMisc->uGPSInfoMetadataOffset & 1);
         wmpDE.uValueOrOffset = pDEMisc->uGPSInfoMetadataOffset;
-        Call(WriteWmpDE(pWS, &offPos, &wmpDE, NULL, NULL));
+        Call(JXRLIB_API(WriteWmpDE)(pWS, &offPos, &wmpDE, NULL, NULL));
 
-        Call(PKAlloc((void**)&pbGPSInfoMetadata, pIE->cbGPSInfoMetadataByteCount));
+        Call(JXRLIB_API(PKAlloc)((void**)&pbGPSInfoMetadata, pIE->cbGPSInfoMetadataByteCount));
         uiTemp = pDEMisc->uGPSInfoMetadataOffset;
-        Call(BufferCopyIFD(pIE->pbGPSInfoMetadata, pIE->cbGPSInfoMetadataByteCount, 0, WMP_INTEL_ENDIAN,
+        Call(JXRLIB_API(BufferCopyIFD)(pIE->pbGPSInfoMetadata, pIE->cbGPSInfoMetadataByteCount, 0, WMP_INTEL_ENDIAN,
             pbGPSInfoMetadata - uiTemp, uiTemp + pIE->cbGPSInfoMetadataByteCount, &uiTemp));
         Call(pWS->SetPos(pWS, pDEMisc->uGPSInfoMetadataOffset));
         Call(pWS->Write(pWS, pbGPSInfoMetadata, pIE->cbGPSInfoMetadataByteCount));
@@ -613,44 +614,44 @@ ERR WriteContainerPre(
     wmpDE = wmpDEs[i++];
     assert(WMP_tagPixelFormat == wmpDE.uTag);
     wmpDE.uValueOrOffset = pDEMisc->uOffPixelFormat;
-    Call(WriteWmpDE(pWS, &offPos, &wmpDE, NULL, NULL));
+    Call(JXRLIB_API(WriteWmpDE)(pWS, &offPos, &wmpDE, NULL, NULL));
 
     wmpDE = wmpDEs[i++];
     assert(WMP_tagTransformation == wmpDE.uTag);
     wmpDE.uValueOrOffset = pIE->WMP.oOrientation;
-    Call(WriteWmpDE(pWS, &offPos, &wmpDE, NULL, NULL));
+    Call(JXRLIB_API(WriteWmpDE)(pWS, &offPos, &wmpDE, NULL, NULL));
 
     wmpDE = wmpDEs[i++];
     assert(WMP_tagImageWidth == wmpDE.uTag);
     wmpDE.uValueOrOffset = pIE->uWidth;
-    Call(WriteWmpDE(pWS, &offPos, &wmpDE, NULL, NULL));
+    Call(JXRLIB_API(WriteWmpDE)(pWS, &offPos, &wmpDE, NULL, NULL));
 
     wmpDE = wmpDEs[i++];
     assert(WMP_tagImageHeight == wmpDE.uTag);
     wmpDE.uValueOrOffset = pIE->uHeight;
-    Call(WriteWmpDE(pWS, &offPos, &wmpDE, NULL, NULL));
+    Call(JXRLIB_API(WriteWmpDE)(pWS, &offPos, &wmpDE, NULL, NULL));
 
     wmpDE = wmpDEs[i++];
     assert(WMP_tagWidthResolution == wmpDE.uTag);
     *((float*)&wmpDE.uValueOrOffset) = pIE->fResX;
-    Call(WriteWmpDE(pWS, &offPos, &wmpDE, NULL, NULL));
+    Call(JXRLIB_API(WriteWmpDE)(pWS, &offPos, &wmpDE, NULL, NULL));
 
     wmpDE = wmpDEs[i++];
     assert(WMP_tagHeightResolution == wmpDE.uTag);
     *((float*)&wmpDE.uValueOrOffset) = pIE->fResY;
-    Call(WriteWmpDE(pWS, &offPos, &wmpDE, NULL, NULL));
+    Call(JXRLIB_API(WriteWmpDE)(pWS, &offPos, &wmpDE, NULL, NULL));
 
     wmpDE = wmpDEs[i++];
     assert(WMP_tagImageOffset == wmpDE.uTag);
     wmpDE.uValueOrOffset = pDEMisc->uImageOffset;
-    Call(WriteWmpDE(pWS, &offPos, &wmpDE, NULL, NULL));
+    Call(JXRLIB_API(WriteWmpDE)(pWS, &offPos, &wmpDE, NULL, NULL));
 
     // fix up in WriteContainerPost()
     wmpDE = wmpDEs[i++];
     assert(WMP_tagImageByteCount == wmpDE.uTag);
     pDEMisc->uOffImageByteCount = (U32)offPos;
     wmpDE.uValueOrOffset = 0;
-    Call(WriteWmpDE(pWS, &offPos, &wmpDE, NULL, NULL));
+    Call(JXRLIB_API(WriteWmpDE)(pWS, &offPos, &wmpDE, NULL, NULL));
 
     if (pIE->WMP.bHasAlpha && pIE->WMP.wmiSCP.uAlphaMode == 2)
     {
@@ -659,18 +660,18 @@ ERR WriteContainerPre(
         assert(WMP_tagAlphaOffset == wmpDE.uTag);
         pDEMisc->uOffAlphaOffset = (U32)offPos;
         wmpDE.uValueOrOffset = 0;
-        Call(WriteWmpDE(pWS, &offPos, &wmpDE, NULL, NULL));
+        Call(JXRLIB_API(WriteWmpDE)(pWS, &offPos, &wmpDE, NULL, NULL));
 
         // fix up in WriteContainerPost()
         wmpDE = wmpDEs[i++];
         assert(WMP_tagAlphaByteCount == wmpDE.uTag);
         pDEMisc->uOffAlphaByteCount = (U32)offPos;
         wmpDE.uValueOrOffset = 0;
-        Call(WriteWmpDE(pWS, &offPos, &wmpDE, NULL, NULL));
+        Call(JXRLIB_API(WriteWmpDE)(pWS, &offPos, &wmpDE, NULL, NULL));
     }
 
     //================
-    Call(PutULong(pWS, offPos, 0)); offPos += 4;
+    Call(JXRLIB_API(PutULong)(pWS, offPos, 0)); offPos += 4;
 
     assert(0 == (offPos & 1));
     if (pDEMisc->uColorProfileOffset > 0 || pDEMisc->uDescMetadataOffset > 0 ||
@@ -694,15 +695,15 @@ ERR WriteContainerPre(
 
 Cleanup:
     if (pbEXIFMetadata != NULL)
-        PKFree((void**)&pbEXIFMetadata);
+        JXRLIB_API(PKFree)((void**)&pbEXIFMetadata);
     if (pbGPSInfoMetadata != NULL)
-        PKFree((void**)&pbGPSInfoMetadata);
+        JXRLIB_API(PKFree)((void**)&pbGPSInfoMetadata);
     return err;
 }
 
 
 
-ERR WriteContainerPost(
+ERR JXRLIB_API(WriteContainerPost)(
     PKImageEncode* pIE)
 {
     ERR err = WMP_errSuccess;
@@ -717,18 +718,18 @@ ERR WriteContainerPost(
 
     deImageByteCount.uValueOrOffset = pIE->WMP.nCbImage;
     offPos = pDEMisc->uOffImageByteCount;
-    Call(WriteWmpDE(pWS, &offPos, &deImageByteCount, NULL, NULL));
+    Call(JXRLIB_API(WriteWmpDE)(pWS, &offPos, &deImageByteCount, NULL, NULL));
 
     //Alpha
     if (pIE->WMP.bHasAlpha && pIE->WMP.wmiSCP.uAlphaMode == 2)
     {
         deAlphaOffset.uValueOrOffset = pIE->WMP.nOffAlpha;
         offPos = pDEMisc->uOffAlphaOffset;
-        Call(WriteWmpDE(pWS, &offPos, &deAlphaOffset, NULL, NULL));
+        Call(JXRLIB_API(WriteWmpDE)(pWS, &offPos, &deAlphaOffset, NULL, NULL));
 
         deAlphaByteCount.uValueOrOffset = pIE->WMP.nCbAlpha + pIE->WMP.nOffAlpha;
         offPos = pDEMisc->uOffAlphaByteCount;
-        Call(WriteWmpDE(pWS, &offPos, &deAlphaByteCount, NULL, NULL));
+        Call(JXRLIB_API(WriteWmpDE)(pWS, &offPos, &deAlphaByteCount, NULL, NULL));
     }
 
 Cleanup:
@@ -737,7 +738,7 @@ Cleanup:
 
 
 //================================================
-ERR PKImageEncode_Initialize_WMP(
+ERR JXRLIB_API(PKImageEncode_Initialize_WMP)(
     PKImageEncode* pIE,
     struct tagWMPStream* pStream,
     void* pvParam,
@@ -758,7 +759,7 @@ Cleanup:
     return err;
 }
 
-ERR PKImageEncode_Terminate_WMP(
+ERR JXRLIB_API(PKImageEncode_Terminate_WMP)(
     PKImageEncode* pIE)
 {
     ERR err = WMP_errSuccess;
@@ -767,7 +768,7 @@ ERR PKImageEncode_Terminate_WMP(
 }
 
 
-ERR PKImageEncode_EncodeContent_Init(
+ERR JXRLIB_API(PKImageEncode_EncodeContent_Init)(
     PKImageEncode* pIE,
     PKPixelInfo PI,
     U32 cLine,
@@ -811,13 +812,13 @@ ERR PKImageEncode_EncodeContent_Init(
     pIE->idxCurrentLine = 0;
 
     pIE->WMP.wmiSCP.fMeasurePerf = TRUE;
-    FailIf(ICERR_OK != ImageStrEncInit(&pIE->WMP.wmiI, &pIE->WMP.wmiSCP, &pIE->WMP.ctxSC), WMP_errFail);
+    FailIf(ICERR_OK != JXRLIB_API(ImageStrEncInit)(&pIE->WMP.wmiI, &pIE->WMP.wmiSCP, &pIE->WMP.ctxSC), WMP_errFail);
 
 Cleanup:
     return err;
 }
 
-ERR PKImageEncode_EncodeContent_Encode(
+ERR JXRLIB_API(PKImageEncode_EncodeContent_Encode)(
     PKImageEncode* pIE,
     U32 cLine,
     U8* pbPixels,
@@ -835,7 +836,7 @@ ERR PKImageEncode_EncodeContent_Encode(
         wmiBI.pv = pbPixels + cbStride * i / (f420 ? 2 : 1);
         wmiBI.cLine = 16 < cLine - i ? 16 : cLine - i;// min(16, cLine - i);
         wmiBI.cbStride = cbStride;
-        FailIf(ICERR_OK != ImageStrEncEncode(pIE->WMP.ctxSC, &wmiBI), WMP_errFail);
+        FailIf(ICERR_OK != JXRLIB_API(ImageStrEncEncode)(pIE->WMP.ctxSC, &wmiBI), WMP_errFail);
     }
     pIE->idxCurrentLine += cLine;
 
@@ -843,17 +844,17 @@ Cleanup:
     return err;
 }
 
-ERR PKImageEncode_EncodeContent_Term(PKImageEncode* pIE)
+ERR JXRLIB_API(PKImageEncode_EncodeContent_Term)(PKImageEncode* pIE)
 {
     ERR err = WMP_errSuccess;
 
-    FailIf(ICERR_OK != ImageStrEncTerm(pIE->WMP.ctxSC), WMP_errFail);
+    FailIf(ICERR_OK != JXRLIB_API(ImageStrEncTerm)(pIE->WMP.ctxSC), WMP_errFail);
 
 Cleanup:
     return err;
 }
 
-ERR PKImageEncode_EncodeContent(
+ERR JXRLIB_API(PKImageEncode_EncodeContent)(
     PKImageEncode* pIE,
     PKPixelInfo PI,
     U32 cLine,
@@ -866,9 +867,9 @@ ERR PKImageEncode_EncodeContent(
     Call(pIE->pStream->GetPos(pIE->pStream, &offPos));
     pIE->WMP.nOffImage = (Long)offPos;
 
-    Call(PKImageEncode_EncodeContent_Init(pIE, PI, cLine, pbPixels, cbStride));
-    Call(PKImageEncode_EncodeContent_Encode(pIE, cLine, pbPixels, cbStride));
-    Call(PKImageEncode_EncodeContent_Term(pIE));
+    Call(JXRLIB_API(PKImageEncode_EncodeContent_Init)(pIE, PI, cLine, pbPixels, cbStride));
+    Call(JXRLIB_API(PKImageEncode_EncodeContent_Encode)(pIE, cLine, pbPixels, cbStride));
+    Call(JXRLIB_API(PKImageEncode_EncodeContent_Term)(pIE));
 
     Call(pIE->pStream->GetPos(pIE->pStream, &offPos));
     pIE->WMP.nCbImage = (Long)offPos - pIE->WMP.nOffImage;
@@ -878,7 +879,7 @@ Cleanup:
 }
 
 
-ERR PKImageEncode_EncodeAlpha_Init(
+ERR JXRLIB_API(PKImageEncode_EncodeAlpha_Init)(
     PKImageEncode* pIE,
     PKPixelInfo PI,
     U32 cLine,
@@ -937,13 +938,13 @@ ERR PKImageEncode_EncodeAlpha_Init(
 
     pIE->idxCurrentLine = 0;
     pIE->WMP.wmiSCP_Alpha.fMeasurePerf = TRUE;
-    FailIf(ICERR_OK != ImageStrEncInit(&pIE->WMP.wmiI_Alpha, &pIE->WMP.wmiSCP_Alpha, &pIE->WMP.ctxSC_Alpha), WMP_errFail);
+    FailIf(ICERR_OK != JXRLIB_API(ImageStrEncInit)(&pIE->WMP.wmiI_Alpha, &pIE->WMP.wmiSCP_Alpha, &pIE->WMP.ctxSC_Alpha), WMP_errFail);
 
 Cleanup:
     return err;
 }
 
-ERR PKImageEncode_EncodeAlpha_Encode(
+ERR JXRLIB_API(PKImageEncode_EncodeAlpha_Encode)(
     PKImageEncode* pIE,
     U32 cLine,
     U8* pbPixels,
@@ -959,7 +960,7 @@ ERR PKImageEncode_EncodeAlpha_Encode(
         wmiBI.pv = pbPixels + cbStride * i;
         wmiBI.cLine = 16 < cLine - 1 ? 16 : cLine - 1;// min(16, cLine - i);
         wmiBI.cbStride = cbStride;
-        FailIf(ICERR_OK != ImageStrEncEncode(pIE->WMP.ctxSC_Alpha, &wmiBI), WMP_errFail);
+        FailIf(ICERR_OK != JXRLIB_API(ImageStrEncEncode)(pIE->WMP.ctxSC_Alpha, &wmiBI), WMP_errFail);
     }
     pIE->idxCurrentLine += cLine;
 
@@ -967,17 +968,17 @@ Cleanup:
     return err;
 }
 
-ERR PKImageEncode_EncodeAlpha_Term(PKImageEncode* pIE)
+ERR JXRLIB_API(PKImageEncode_EncodeAlpha_Term)(PKImageEncode* pIE)
 {
     ERR err = WMP_errSuccess;
 
-    FailIf(ICERR_OK != ImageStrEncTerm(pIE->WMP.ctxSC_Alpha), WMP_errFail);
+    FailIf(ICERR_OK != JXRLIB_API(ImageStrEncTerm)(pIE->WMP.ctxSC_Alpha), WMP_errFail);
 
 Cleanup:
     return err;
 }
 
-ERR PKImageEncode_EncodeAlpha(
+ERR JXRLIB_API(PKImageEncode_EncodeAlpha)(
     PKImageEncode* pIE,
     PKPixelInfo PI,
     U32 cLine,
@@ -997,9 +998,9 @@ ERR PKImageEncode_EncodeAlpha(
     }
     pIE->WMP.nOffAlpha = (Long)offPos;
 
-    Call(PKImageEncode_EncodeAlpha_Init(pIE, PI, cLine, pbPixels, cbStride));
-    Call(PKImageEncode_EncodeAlpha_Encode(pIE, cLine, pbPixels, cbStride));
-    Call(PKImageEncode_EncodeAlpha_Term(pIE));
+    Call(JXRLIB_API(PKImageEncode_EncodeAlpha_Init)(pIE, PI, cLine, pbPixels, cbStride));
+    Call(JXRLIB_API(PKImageEncode_EncodeAlpha_Encode)(pIE, cLine, pbPixels, cbStride));
+    Call(JXRLIB_API(PKImageEncode_EncodeAlpha_Term)(pIE));
 
     Call(pIE->pStream->GetPos(pIE->pStream, &offPos));
     pIE->WMP.nCbAlpha = (Long)offPos - pIE->WMP.nOffAlpha;
@@ -1023,10 +1024,10 @@ static ERR SetMetadata(PKImageEncode* pIE, const U8* pbMetadata, U32 cbMetadata,
     }
 
     // Make a copy of the metadata
-    PKFree((void**)pbSet);
+    JXRLIB_API(PKFree)((void**)pbSet);
     *pcbSet = 0;
 
-    Call(PKAlloc((void**)pbSet, cbMetadata));
+    Call(JXRLIB_API(PKAlloc)((void**)pbSet, cbMetadata));
     memcpy(*pbSet, pbMetadata, cbMetadata);
     *pcbSet = cbMetadata;
 
@@ -1036,7 +1037,7 @@ Cleanup:
 
 
 
-ERR PKImageEncode_SetColorContext_WMP(PKImageEncode* pIE,
+ERR JXRLIB_API(PKImageEncode_SetColorContext_WMP)(PKImageEncode* pIE,
     const U8* pbColorContext,
     U32 cbColorContext)
 {
@@ -1045,7 +1046,7 @@ ERR PKImageEncode_SetColorContext_WMP(PKImageEncode* pIE,
 
 
 
-ERR PKImageEncode_SetXMPMetadata_WMP(PKImageEncode* pIE, const U8* pbXMPMetadata, U32 cbXMPMetadata)
+ERR JXRLIB_API(PKImageEncode_SetXMPMetadata_WMP)(PKImageEncode* pIE, const U8* pbXMPMetadata, U32 cbXMPMetadata)
 {   // same as the other Set's, but make sure dc:format is <dc:format>image/vnd.ms-photo</dc:format>
     ERR err = WMP_errSuccess;
     char* pbTemp = 0;
@@ -1058,7 +1059,7 @@ ERR PKImageEncode_SetXMPMetadata_WMP(PKImageEncode* pIE, const U8* pbXMPMetadata
     FailIf(pIE->fHeaderDone, WMP_errOutOfSequence);
 
     // Free any previously set XMP metadata
-    PKFree((void**)&pIE->pbXMPMetadata);
+    JXRLIB_API(PKFree)((void**)&pIE->pbXMPMetadata);
     pIE->cbXMPMetadataByteCount = 0;
 
     // allocate a block big enough for data passed in plus added trailing null plus added HD Photo dc:format
@@ -1066,7 +1067,7 @@ ERR PKImageEncode_SetXMPMetadata_WMP(PKImageEncode* pIE, const U8* pbXMPMetadata
     // there may already be a dc:format we will replace with HD Photo's
     // but anyway this block will be large enough guaranteed
     cbBuffer = cbXMPMetadata + 1 + sizeof("<dc:format>") - 1 + sizeof("</dc:format>") - 1 + sizeof(szHDPhotoFormat) - 1;
-    Call(PKAlloc((void**)&pbTemp, cbBuffer));
+    Call(JXRLIB_API(PKAlloc)((void**)&pbTemp, cbBuffer));
     memcpy(pbTemp, pbXMPMetadata, cbXMPMetadata); // Make a copy of the metadata
     pbTemp[cbXMPMetadata] = '\0';
     cbXMPMetadata = (U32)strlen(pbTemp);
@@ -1103,14 +1104,14 @@ ERR PKImageEncode_SetXMPMetadata_WMP(PKImageEncode* pIE, const U8* pbXMPMetadata
     return (err);
 
 Cleanup:
-    PKFree((void**)&pbTemp);
+    JXRLIB_API(PKFree)((void**)&pbTemp);
     pIE->cbXMPMetadataByteCount = 0;
     return err;
 }
 
 
 
-ERR PKImageEncode_SetEXIFMetadata_WMP(PKImageEncode* pIE, const U8* pbEXIFMetadata, U32 cbEXIFMetadata)
+ERR JXRLIB_API(PKImageEncode_SetEXIFMetadata_WMP)(PKImageEncode* pIE, const U8* pbEXIFMetadata, U32 cbEXIFMetadata)
 {
     return SetMetadata(pIE, pbEXIFMetadata, cbEXIFMetadata,
         &pIE->pbEXIFMetadata, &pIE->cbEXIFMetadataByteCount);
@@ -1118,7 +1119,7 @@ ERR PKImageEncode_SetEXIFMetadata_WMP(PKImageEncode* pIE, const U8* pbEXIFMetada
 
 
 
-ERR PKImageEncode_SetGPSInfoMetadata_WMP(PKImageEncode* pIE, const U8* pbGPSInfoMetadata, U32 cbGPSInfoMetadata)
+ERR JXRLIB_API(PKImageEncode_SetGPSInfoMetadata_WMP)(PKImageEncode* pIE, const U8* pbGPSInfoMetadata, U32 cbGPSInfoMetadata)
 {
     return SetMetadata(pIE, pbGPSInfoMetadata, cbGPSInfoMetadata,
         &pIE->pbGPSInfoMetadata, &pIE->cbGPSInfoMetadataByteCount);
@@ -1126,7 +1127,7 @@ ERR PKImageEncode_SetGPSInfoMetadata_WMP(PKImageEncode* pIE, const U8* pbGPSInfo
 
 
 
-ERR PKImageEncode_SetIPTCNAAMetadata_WMP(PKImageEncode* pIE, const U8* pbIPTCNAAMetadata, U32 cbIPTCNAAMetadata)
+ERR JXRLIB_API(PKImageEncode_SetIPTCNAAMetadata_WMP)(PKImageEncode* pIE, const U8* pbIPTCNAAMetadata, U32 cbIPTCNAAMetadata)
 {
     return SetMetadata(pIE, pbIPTCNAAMetadata, cbIPTCNAAMetadata,
         &pIE->pbIPTCNAAMetadata, &pIE->cbIPTCNAAMetadataByteCount);
@@ -1134,7 +1135,7 @@ ERR PKImageEncode_SetIPTCNAAMetadata_WMP(PKImageEncode* pIE, const U8* pbIPTCNAA
 
 
 
-ERR PKImageEncode_SetPhotoshopMetadata_WMP(PKImageEncode* pIE, const U8* pbPhotoshopMetadata, U32 cbPhotoshopMetadata)
+ERR JXRLIB_API(PKImageEncode_SetPhotoshopMetadata_WMP)(PKImageEncode* pIE, const U8* pbPhotoshopMetadata, U32 cbPhotoshopMetadata)
 {
     return SetMetadata(pIE, pbPhotoshopMetadata, cbPhotoshopMetadata,
         &pIE->pbPhotoshopMetadata, &pIE->cbPhotoshopMetadataByteCount);
@@ -1142,7 +1143,7 @@ ERR PKImageEncode_SetPhotoshopMetadata_WMP(PKImageEncode* pIE, const U8* pbPhoto
 
 
 
-ERR PKImageEncode_SetDescriptiveMetadata_WMP(PKImageEncode* pIE, const DESCRIPTIVEMETADATA* pSrcMeta)
+ERR JXRLIB_API(PKImageEncode_SetDescriptiveMetadata_WMP)(PKImageEncode* pIE, const DESCRIPTIVEMETADATA* pSrcMeta)
 {
     ERR                     err = WMP_errSuccess;
     DESCRIPTIVEMETADATA* pDstMeta = &pIE->sDescMetadata;
@@ -1155,20 +1156,20 @@ ERR PKImageEncode_SetDescriptiveMetadata_WMP(PKImageEncode* pIE, const DESCRIPTI
     }
 
     // Make a copy of the descriptive metadata
-    Call(CopyDescMetadata(&pDstMeta->pvarImageDescription, pSrcMeta->pvarImageDescription));
-    Call(CopyDescMetadata(&pDstMeta->pvarCameraMake, pSrcMeta->pvarCameraMake));
-    Call(CopyDescMetadata(&pDstMeta->pvarCameraModel, pSrcMeta->pvarCameraModel));
-    Call(CopyDescMetadata(&pDstMeta->pvarSoftware, pSrcMeta->pvarSoftware));
-    Call(CopyDescMetadata(&pDstMeta->pvarDateTime, pSrcMeta->pvarDateTime));
-    Call(CopyDescMetadata(&pDstMeta->pvarArtist, pSrcMeta->pvarArtist));
-    Call(CopyDescMetadata(&pDstMeta->pvarCopyright, pSrcMeta->pvarCopyright));
-    Call(CopyDescMetadata(&pDstMeta->pvarRatingStars, pSrcMeta->pvarRatingStars));
-    Call(CopyDescMetadata(&pDstMeta->pvarRatingValue, pSrcMeta->pvarRatingValue));
-    Call(CopyDescMetadata(&pDstMeta->pvarCaption, pSrcMeta->pvarCaption));
-    Call(CopyDescMetadata(&pDstMeta->pvarDocumentName, pSrcMeta->pvarDocumentName));
-    Call(CopyDescMetadata(&pDstMeta->pvarPageName, pSrcMeta->pvarPageName));
-    Call(CopyDescMetadata(&pDstMeta->pvarPageNumber, pSrcMeta->pvarPageNumber));
-    Call(CopyDescMetadata(&pDstMeta->pvarHostComputer, pSrcMeta->pvarHostComputer));
+    Call(JXRLIB_API(CopyDescMetadata)(&pDstMeta->pvarImageDescription, pSrcMeta->pvarImageDescription));
+    Call(JXRLIB_API(CopyDescMetadata)(&pDstMeta->pvarCameraMake, pSrcMeta->pvarCameraMake));
+    Call(JXRLIB_API(CopyDescMetadata)(&pDstMeta->pvarCameraModel, pSrcMeta->pvarCameraModel));
+    Call(JXRLIB_API(CopyDescMetadata)(&pDstMeta->pvarSoftware, pSrcMeta->pvarSoftware));
+    Call(JXRLIB_API(CopyDescMetadata)(&pDstMeta->pvarDateTime, pSrcMeta->pvarDateTime));
+    Call(JXRLIB_API(CopyDescMetadata)(&pDstMeta->pvarArtist, pSrcMeta->pvarArtist));
+    Call(JXRLIB_API(CopyDescMetadata)(&pDstMeta->pvarCopyright, pSrcMeta->pvarCopyright));
+    Call(JXRLIB_API(CopyDescMetadata)(&pDstMeta->pvarRatingStars, pSrcMeta->pvarRatingStars));
+    Call(JXRLIB_API(CopyDescMetadata)(&pDstMeta->pvarRatingValue, pSrcMeta->pvarRatingValue));
+    Call(JXRLIB_API(CopyDescMetadata)(&pDstMeta->pvarCaption, pSrcMeta->pvarCaption));
+    Call(JXRLIB_API(CopyDescMetadata)(&pDstMeta->pvarDocumentName, pSrcMeta->pvarDocumentName));
+    Call(JXRLIB_API(CopyDescMetadata)(&pDstMeta->pvarPageName, pSrcMeta->pvarPageName));
+    Call(JXRLIB_API(CopyDescMetadata)(&pDstMeta->pvarPageNumber, pSrcMeta->pvarPageNumber));
+    Call(JXRLIB_API(CopyDescMetadata)(&pDstMeta->pvarHostComputer, pSrcMeta->pvarHostComputer));
 
 Cleanup:
     return err;
@@ -1176,7 +1177,7 @@ Cleanup:
 
 
 
-ERR PKImageEncode_WritePixels_WMP(
+ERR JXRLIB_API(PKImageEncode_WritePixels_WMP)(
     PKImageEncode* pIE,
     U32 cLine,
     U8* pbPixels,
@@ -1191,13 +1192,13 @@ ERR PKImageEncode_WritePixels_WMP(
     pIE->WMP.eBandedEncState = BANDEDENCSTATE_NONBANDEDENCODE;
 
     PI.pGUIDPixFmt = &pIE->guidPixFormat;
-    PixelFormatLookup(&PI, LOOKUP_FORWARD);
+    JXRLIB_API(PixelFormatLookup)(&PI, LOOKUP_FORWARD);
     pIE->WMP.bHasAlpha = !!(PI.grBit & PK_pixfmtHasAlpha);
 
     if (!pIE->fHeaderDone)
     {
         // write metadata
-        Call(WriteContainerPre(pIE));
+        Call(JXRLIB_API(WriteContainerPre)(pIE));
 
         pIE->fHeaderDone = !FALSE;
     }
@@ -1206,19 +1207,19 @@ ERR PKImageEncode_WritePixels_WMP(
             pIE->WMP.wmiSCP_Alpha = pIE->WMP.wmiSCP;
         }
     */
-    Call(PKImageEncode_EncodeContent(pIE, PI, cLine, pbPixels, cbStride));
+    Call(JXRLIB_API(PKImageEncode_EncodeContent)(pIE, PI, cLine, pbPixels, cbStride));
     if (pIE->WMP.bHasAlpha && pIE->WMP.wmiSCP.uAlphaMode == 2) {//planar alpha
-        Call(PKImageEncode_EncodeAlpha(pIE, PI, cLine, pbPixels, cbStride));
+        Call(JXRLIB_API(PKImageEncode_EncodeAlpha)(pIE, PI, cLine, pbPixels, cbStride));
     }
 
-    Call(WriteContainerPost(pIE));
+    Call(JXRLIB_API(WriteContainerPost)(pIE));
 
 Cleanup:
     return err;
 }
 
 
-ERR PKImageEncode_WritePixelsBandedBegin_WMP(PKImageEncode* pIE, struct tagWMPStream* pPATempFile)
+ERR JXRLIB_API(PKImageEncode_WritePixelsBandedBegin_WMP)(PKImageEncode* pIE, struct tagWMPStream* pPATempFile)
 {
     ERR err = WMP_errSuccess;
 
@@ -1233,7 +1234,7 @@ ERR PKImageEncode_WritePixelsBandedBegin_WMP(PKImageEncode* pIE, struct tagWMPSt
     return err;
 }
 
-ERR PKImageEncode_WritePixelsBanded_WMP(PKImageEncode* pIE, U32 cLine, U8* pbPixels, U32 cbStride, Bool fLastCall)
+ERR JXRLIB_API(PKImageEncode_WritePixelsBanded_WMP)(PKImageEncode* pIE, U32 cLine, U8* pbPixels, U32 cbStride, Bool fLastCall)
 {
     ERR err = WMP_errSuccess;
     PKPixelInfo PI = { 0 };
@@ -1247,7 +1248,7 @@ ERR PKImageEncode_WritePixelsBanded_WMP(PKImageEncode* pIE, U32 cLine, U8* pbPix
     if (!pIE->fHeaderDone || BANDEDENCSTATE_INIT == pIE->WMP.eBandedEncState)
     {
         PI.pGUIDPixFmt = &pIE->guidPixFormat;
-        PixelFormatLookup(&PI, LOOKUP_FORWARD);
+        JXRLIB_API(PixelFormatLookup)(&PI, LOOKUP_FORWARD);
         pIE->WMP.bHasAlpha = !!(PI.grBit & PK_pixfmtHasAlpha);
         fPI = TRUE;
 
@@ -1262,7 +1263,7 @@ ERR PKImageEncode_WritePixelsBanded_WMP(PKImageEncode* pIE, U32 cLine, U8* pbPix
     {
         // write metadata
         assert(fPI);
-        Call(WriteContainerPre(pIE));
+        Call(JXRLIB_API(WriteContainerPre)(pIE));
         pIE->fHeaderDone = !FALSE;
     }
 
@@ -1274,11 +1275,11 @@ ERR PKImageEncode_WritePixelsBanded_WMP(PKImageEncode* pIE, U32 cLine, U8* pbPix
         pIE->WMP.nOffImage = (Long)offPos;
 
         assert(fPI);
-        Call(PKImageEncode_EncodeContent_Init(pIE, PI, cLine, pbPixels, cbStride));
+        Call(JXRLIB_API(PKImageEncode_EncodeContent_Init)(pIE, PI, cLine, pbPixels, cbStride));
         pIE->WMP.eBandedEncState = BANDEDENCSTATE_ENCODING;
     }
 
-    Call(PKImageEncode_EncodeContent_Encode(pIE, cLine, pbPixels, cbStride));
+    Call(JXRLIB_API(PKImageEncode_EncodeContent_Encode)(pIE, cLine, pbPixels, cbStride));
     if (pIE->WMP.bHasAlpha && pIE->WMP.wmiSCP.uAlphaMode == 2)
     {
         //planar alpha
@@ -1293,17 +1294,17 @@ ERR PKImageEncode_WritePixelsBanded_WMP(PKImageEncode* pIE, U32 cLine, U8* pbPix
 
             // For planar alpha, we write the file to a temp file
             pIE->WMP.wmiSCP_Alpha.pWStream = pPATempFile;
-            Call(PKImageEncode_EncodeAlpha_Init(pIE, PI, cLine, pbPixels, cbStride));
+            Call(JXRLIB_API(PKImageEncode_EncodeAlpha_Init)(pIE, PI, cLine, pbPixels, cbStride));
         }
 
-        Call(PKImageEncode_EncodeAlpha_Encode(pIE, cLine, pbPixels, cbStride));
+        Call(JXRLIB_API(PKImageEncode_EncodeAlpha_Encode)(pIE, cLine, pbPixels, cbStride));
     }
 
 Cleanup:
     return err;
 }
 
-ERR PKImageEncode_WritePixelsBandedEnd_WMP(PKImageEncode* pIE)
+ERR JXRLIB_API(PKImageEncode_WritePixelsBandedEnd_WMP)(PKImageEncode* pIE)
 {
     ERR err = WMP_errSuccess;
     struct tagWMPStream* pMainStream = pIE->WMP.wmiSCP.pWStream;
@@ -1312,7 +1313,7 @@ ERR PKImageEncode_WritePixelsBandedEnd_WMP(PKImageEncode* pIE)
     assert(BANDEDENCSTATE_ENCODING == pIE->WMP.eBandedEncState);
 
     // Finish off main content, update its length ptr for WriteContainerPost
-    Call(PKImageEncode_EncodeContent_Term(pIE));
+    Call(JXRLIB_API(PKImageEncode_EncodeContent_Term)(pIE));
     Call(pMainStream->GetPos(pIE->pStream, &offAlpha));
     pIE->WMP.nCbImage = (Long)offAlpha - pIE->WMP.nOffImage;
 
@@ -1325,7 +1326,7 @@ ERR PKImageEncode_WritePixelsBandedEnd_WMP(PKImageEncode* pIE)
         assert(pAlphaStream != pMainStream); // Otherwise we didn't use a temp file
 
         // Close it up - this causes write to temp file
-        Call(PKImageEncode_EncodeAlpha_Term(pIE));
+        Call(JXRLIB_API(PKImageEncode_EncodeAlpha_Term)(pIE));
 
         // Calculate size of alpha bitstream and its new offset
         Call(pAlphaStream->GetPos(pAlphaStream, &cbAlpha));
@@ -1351,14 +1352,14 @@ ERR PKImageEncode_WritePixelsBandedEnd_WMP(PKImageEncode* pIE)
         pIE->WMP.nCbAlpha = (Long)cbAlpha;
     }
 
-    Call(WriteContainerPost(pIE));
+    Call(JXRLIB_API(WriteContainerPost)(pIE));
 
 Cleanup:
     return err;
 }
 
 
-ERR PKImageEncode_Transcode_WMP(
+ERR JXRLIB_API(PKImageEncode_Transcode_WMP)(
     PKImageEncode* pIE,
     PKImageDecode* pID,
     CWMTranscodingParam* pParam)
@@ -1384,14 +1385,14 @@ ERR PKImageEncode_Transcode_WMP(
     Call(pIE->SetResolution(pIE, fResX, fResY));
 
     PI.pGUIDPixFmt = &pIE->guidPixFormat;
-    PixelFormatLookup(&PI, LOOKUP_FORWARD);
+    JXRLIB_API(PixelFormatLookup)(&PI, LOOKUP_FORWARD);
     pIE->WMP.bHasAlpha = !!(PI.grBit & PK_pixfmtHasAlpha) && (2 == pParam->uAlphaMode);
     assert(0 == pIE->WMP.bHasAlpha || (pParam->uAlphaMode == 2)); // Decode alpha mode does not match encode alpha mode!
 
     // Check for any situations where transcoder is being asked to convert alpha - we can't do this
     // NOTE: Decoder's bHasAlpha parameter really means, "has PLANAR alpha"
     PI.pGUIDPixFmt = &pixGUID;
-    PixelFormatLookup(&PI, LOOKUP_FORWARD);
+    JXRLIB_API(PixelFormatLookup)(&PI, LOOKUP_FORWARD);
     FailIf(0 == (PI.grBit & PK_pixfmtHasAlpha) && pParam->uAlphaMode != 0,
         WMP_errAlphaModeCannotBeTranscoded); // Destination is planar/interleaved, src has no alpha
     FailIf(!!(PI.grBit & PK_pixfmtHasAlpha) && 2 == pParam->uAlphaMode &&
@@ -1403,7 +1404,7 @@ ERR PKImageEncode_Transcode_WMP(
     fPlanarAlpha = pIE->WMP.bHasAlpha && (2 == pParam->uAlphaMode);
 
     // write matadata
-    Call(WriteContainerPre(pIE));
+    Call(JXRLIB_API(WriteContainerPre)(pIE));
 
     // Copy transcoding params for alpha (codec changes the struct)
     if (fPlanarAlpha)
@@ -1412,7 +1413,7 @@ ERR PKImageEncode_Transcode_WMP(
     // write compressed bitstream
     Call(pID->GetRawStream(pID, &pWSDec));
 
-    FailIf(ICERR_OK != WMPhotoTranscode(pWSDec, pWSEnc, pParam), WMP_errFail);
+    FailIf(ICERR_OK != JXRLIB_API(WMPhotoTranscode)(pWSDec, pWSEnc, pParam), WMP_errFail);
     Call(pIE->pStream->GetPos(pIE->pStream, &offPos));
     pIE->WMP.nCbImage = (Long)offPos - pIE->WMP.nOffImage;
 
@@ -1424,19 +1425,19 @@ ERR PKImageEncode_Transcode_WMP(
         assert(pID->WMP.wmiDEMisc.uAlphaOffset > 0);
         Call(pWSDec->SetPos(pWSDec, pID->WMP.wmiDEMisc.uAlphaOffset));
 
-        FailIf(ICERR_OK != WMPhotoTranscode(pWSDec, pWSEnc, &tcParamAlpha), WMP_errFail);
+        FailIf(ICERR_OK != JXRLIB_API(WMPhotoTranscode)(pWSDec, pWSEnc, &tcParamAlpha), WMP_errFail);
         Call(pIE->pStream->GetPos(pIE->pStream, &offPos));
         pIE->WMP.nCbAlpha = (Long)offPos - pIE->WMP.nOffAlpha;
     }
 
     // fixup matadata
-    Call(WriteContainerPost(pIE));
+    Call(JXRLIB_API(WriteContainerPost)(pIE));
 
 Cleanup:
     return err;
 }
 
-ERR PKImageEncode_CreateNewFrame_WMP(
+ERR JXRLIB_API(PKImageEncode_CreateNewFrame_WMP)(
     PKImageEncode* pIE,
     void* pvParam,
     size_t cbParam)
@@ -1453,7 +1454,7 @@ Cleanup:
     return err;
 }
 
-ERR PKImageEncode_Release_WMP(
+ERR JXRLIB_API(PKImageEncode_Release_WMP)(
     PKImageEncode** ppIE)
 {
     ERR err = WMP_errSuccess;
@@ -1464,64 +1465,64 @@ ERR PKImageEncode_Release_WMP(
         pIE->pStream->Close(&pIE->pStream);
     }
 
-    PKFree((void**)&pIE->pbColorContext);
+    JXRLIB_API(PKFree)((void**)&pIE->pbColorContext);
     pIE->cbColorContext = 0;
-    PKFree((void**)&pIE->pbXMPMetadata);
+    JXRLIB_API(PKFree)((void**)&pIE->pbXMPMetadata);
     pIE->cbXMPMetadataByteCount = 0;
-    PKFree((void**)&pIE->pbEXIFMetadata);
+    JXRLIB_API(PKFree)((void**)&pIE->pbEXIFMetadata);
     pIE->cbEXIFMetadataByteCount = 0;
-    PKFree((void**)&pIE->pbGPSInfoMetadata);
+    JXRLIB_API(PKFree)((void**)&pIE->pbGPSInfoMetadata);
     pIE->cbGPSInfoMetadataByteCount = 0;
-    PKFree((void**)&pIE->pbIPTCNAAMetadata);
+    JXRLIB_API(PKFree)((void**)&pIE->pbIPTCNAAMetadata);
     pIE->cbIPTCNAAMetadataByteCount = 0;
-    PKFree((void**)&pIE->pbPhotoshopMetadata);
+    JXRLIB_API(PKFree)((void**)&pIE->pbPhotoshopMetadata);
     pIE->cbPhotoshopMetadataByteCount = 0;
 
     // Free descriptive metadata
-    FreeDescMetadata(&pIE->sDescMetadata.pvarImageDescription);
-    FreeDescMetadata(&pIE->sDescMetadata.pvarCameraMake);
-    FreeDescMetadata(&pIE->sDescMetadata.pvarCameraModel);
-    FreeDescMetadata(&pIE->sDescMetadata.pvarSoftware);
-    FreeDescMetadata(&pIE->sDescMetadata.pvarDateTime);
-    FreeDescMetadata(&pIE->sDescMetadata.pvarArtist);
-    FreeDescMetadata(&pIE->sDescMetadata.pvarCopyright);
-    FreeDescMetadata(&pIE->sDescMetadata.pvarRatingStars);
-    FreeDescMetadata(&pIE->sDescMetadata.pvarRatingValue);
-    FreeDescMetadata(&pIE->sDescMetadata.pvarCaption);
-    FreeDescMetadata(&pIE->sDescMetadata.pvarDocumentName);
-    FreeDescMetadata(&pIE->sDescMetadata.pvarPageName);
-    FreeDescMetadata(&pIE->sDescMetadata.pvarPageNumber);
-    FreeDescMetadata(&pIE->sDescMetadata.pvarHostComputer);
+    JXRLIB_API(FreeDescMetadata)(&pIE->sDescMetadata.pvarImageDescription);
+    JXRLIB_API(FreeDescMetadata)(&pIE->sDescMetadata.pvarCameraMake);
+    JXRLIB_API(FreeDescMetadata)(&pIE->sDescMetadata.pvarCameraModel);
+    JXRLIB_API(FreeDescMetadata)(&pIE->sDescMetadata.pvarSoftware);
+    JXRLIB_API(FreeDescMetadata)(&pIE->sDescMetadata.pvarDateTime);
+    JXRLIB_API(FreeDescMetadata)(&pIE->sDescMetadata.pvarArtist);
+    JXRLIB_API(FreeDescMetadata)(&pIE->sDescMetadata.pvarCopyright);
+    JXRLIB_API(FreeDescMetadata)(&pIE->sDescMetadata.pvarRatingStars);
+    JXRLIB_API(FreeDescMetadata)(&pIE->sDescMetadata.pvarRatingValue);
+    JXRLIB_API(FreeDescMetadata)(&pIE->sDescMetadata.pvarCaption);
+    JXRLIB_API(FreeDescMetadata)(&pIE->sDescMetadata.pvarDocumentName);
+    JXRLIB_API(FreeDescMetadata)(&pIE->sDescMetadata.pvarPageName);
+    JXRLIB_API(FreeDescMetadata)(&pIE->sDescMetadata.pvarPageNumber);
+    JXRLIB_API(FreeDescMetadata)(&pIE->sDescMetadata.pvarHostComputer);
 
-    Call(PKFree((void**)ppIE));
+    Call(JXRLIB_API(PKFree)((void**)ppIE));
 
 Cleanup:
     return err;
 }
 
 //----------------------------------------------------------------
-ERR PKImageEncode_Create_WMP(PKImageEncode** ppIE)
+ERR JXRLIB_API(PKImageEncode_Create_WMP)(PKImageEncode** ppIE)
 {
     ERR err = WMP_errSuccess;
 
     PKImageEncode* pIE = NULL;
 
-    Call(PKImageEncode_Create(ppIE));
+    Call(JXRLIB_API(PKImageEncode_Create)(ppIE));
 
     pIE = *ppIE;
-    pIE->Initialize = PKImageEncode_Initialize_WMP;
-    pIE->Terminate = PKImageEncode_Terminate_WMP;
-    pIE->SetColorContext = PKImageEncode_SetColorContext_WMP;
-    pIE->SetDescriptiveMetadata = PKImageEncode_SetDescriptiveMetadata_WMP;
-    pIE->WritePixels = PKImageEncode_WritePixels_WMP;
+    pIE->Initialize = JXRLIB_API(PKImageEncode_Initialize_WMP);
+    pIE->Terminate = JXRLIB_API(PKImageEncode_Terminate_WMP);
+    pIE->SetColorContext = JXRLIB_API(PKImageEncode_SetColorContext_WMP);
+    pIE->SetDescriptiveMetadata = JXRLIB_API(PKImageEncode_SetDescriptiveMetadata_WMP);
+    pIE->WritePixels = JXRLIB_API(PKImageEncode_WritePixels_WMP);
 
-    pIE->WritePixelsBandedBegin = PKImageEncode_WritePixelsBandedBegin_WMP;
-    pIE->WritePixelsBanded = PKImageEncode_WritePixelsBanded_WMP;
-    pIE->WritePixelsBandedEnd = PKImageEncode_WritePixelsBandedEnd_WMP;
+    pIE->WritePixelsBandedBegin = JXRLIB_API(PKImageEncode_WritePixelsBandedBegin_WMP);
+    pIE->WritePixelsBanded = JXRLIB_API(PKImageEncode_WritePixelsBanded_WMP);
+    pIE->WritePixelsBandedEnd = JXRLIB_API(PKImageEncode_WritePixelsBandedEnd_WMP);
 
-    pIE->Transcode = PKImageEncode_Transcode_WMP;
-    pIE->CreateNewFrame = PKImageEncode_CreateNewFrame_WMP;
-    pIE->Release = PKImageEncode_Release_WMP;
+    pIE->Transcode = JXRLIB_API(PKImageEncode_Transcode_WMP);
+    pIE->CreateNewFrame = JXRLIB_API(PKImageEncode_CreateNewFrame_WMP);
+    pIE->Release = JXRLIB_API(PKImageEncode_Release_WMP);
     pIE->bWMP = TRUE;
 
 Cleanup:
@@ -1532,7 +1533,7 @@ Cleanup:
 //================================================================
 // PKImageDecode_WMP
 //================================================================
-ERR ParsePFDEntry(
+ERR JXRLIB_API(ParsePFDEntry)(
     PKImageDecode* pID,
     U16 uTag,
     U16 uType,
@@ -1557,13 +1558,13 @@ ERR ParsePFDEntry(
         {
             unsigned char* pGuid = (unsigned char*)&pID->guidPixFormat;
             /** following code is endian-agnostic **/
-            Call(GetULong(pWS, uValue, (U32*)pGuid));
-            Call(GetUShort(pWS, uValue + 4, (unsigned short*)(pGuid + 4)));
-            Call(GetUShort(pWS, uValue + 6, (unsigned short*)(pGuid + 6)));
+            Call(JXRLIB_API(GetULong)(pWS, uValue, (U32*)pGuid));
+            Call(JXRLIB_API(GetUShort)(pWS, uValue + 4, (unsigned short*)(pGuid + 4)));
+            Call(JXRLIB_API(GetUShort)(pWS, uValue + 6, (unsigned short*)(pGuid + 6)));
             Call(pWS->Read(pWS, pGuid + 8, 8));
 
             PI.pGUIDPixFmt = &pID->guidPixFormat;
-            PixelFormatLookup(&PI, LOOKUP_FORWARD);
+            JXRLIB_API(PixelFormatLookup)(&PI, LOOKUP_FORWARD);
 
             pID->WMP.bHasAlpha = !!(PI.grBit & PK_pixfmtHasAlpha);
             pID->WMP.wmiI.cBitsPerUnit = PI.cbitUnit;
@@ -1631,12 +1632,12 @@ ERR ParsePFDEntry(
 
         case WMP_tagEXIFMetadata:
             pID->WMP.wmiDEMisc.uEXIFMetadataOffset = uValue;
-            CallIgnoreError(errTmp, StreamCalcIFDSize(pWS, uValue, &pID->WMP.wmiDEMisc.uEXIFMetadataByteCount));
+            CallIgnoreError(errTmp, JXRLIB_API(StreamCalcIFDSize)(pWS, uValue, &pID->WMP.wmiDEMisc.uEXIFMetadataByteCount));
             break;
 
         case WMP_tagGPSInfoMetadata:
             pID->WMP.wmiDEMisc.uGPSInfoMetadataOffset = uValue;
-            CallIgnoreError(errTmp, StreamCalcIFDSize(pWS, uValue, &pID->WMP.wmiDEMisc.uGPSInfoMetadataByteCount));
+            CallIgnoreError(errTmp, JXRLIB_API(StreamCalcIFDSize)(pWS, uValue, &pID->WMP.wmiDEMisc.uGPSInfoMetadataByteCount));
             break;
 
         case WMP_tagIPTCNAAMetadata:
@@ -1657,61 +1658,61 @@ ERR ParsePFDEntry(
 
             // Descriptive Metadata
         case WMP_tagImageDescription:
-            CallIgnoreError(errTmp, ReadPropvar(pWS, uType, uCount, uValue,
+            CallIgnoreError(errTmp, JXRLIB_API(ReadPropvar)(pWS, uType, uCount, uValue,
                 &pID->WMP.sDescMetadata.pvarImageDescription));
             assert(DPKVT_LPSTR == pID->WMP.sDescMetadata.pvarImageDescription.vt);
             break;
 
         case WMP_tagCameraMake:
-            CallIgnoreError(errTmp, ReadPropvar(pWS, uType, uCount, uValue,
+            CallIgnoreError(errTmp, JXRLIB_API(ReadPropvar)(pWS, uType, uCount, uValue,
                 &pID->WMP.sDescMetadata.pvarCameraMake));
             assert(DPKVT_LPSTR == pID->WMP.sDescMetadata.pvarCameraMake.vt);
             break;
 
         case WMP_tagCameraModel:
-            CallIgnoreError(errTmp, ReadPropvar(pWS, uType, uCount, uValue,
+            CallIgnoreError(errTmp, JXRLIB_API(ReadPropvar)(pWS, uType, uCount, uValue,
                 &pID->WMP.sDescMetadata.pvarCameraModel));
             assert(DPKVT_LPSTR == pID->WMP.sDescMetadata.pvarCameraModel.vt);
             break;
 
         case WMP_tagSoftware:
-            CallIgnoreError(errTmp, ReadPropvar(pWS, uType, uCount, uValue,
+            CallIgnoreError(errTmp, JXRLIB_API(ReadPropvar)(pWS, uType, uCount, uValue,
                 &pID->WMP.sDescMetadata.pvarSoftware));
             assert(DPKVT_LPSTR == pID->WMP.sDescMetadata.pvarSoftware.vt);
             break;
 
         case WMP_tagDateTime:
-            CallIgnoreError(errTmp, ReadPropvar(pWS, uType, uCount, uValue,
+            CallIgnoreError(errTmp, JXRLIB_API(ReadPropvar)(pWS, uType, uCount, uValue,
                 &pID->WMP.sDescMetadata.pvarDateTime));
             assert(DPKVT_LPSTR == pID->WMP.sDescMetadata.pvarDateTime.vt);
             break;
 
         case WMP_tagArtist:
-            CallIgnoreError(errTmp, ReadPropvar(pWS, uType, uCount, uValue,
+            CallIgnoreError(errTmp, JXRLIB_API(ReadPropvar)(pWS, uType, uCount, uValue,
                 &pID->WMP.sDescMetadata.pvarArtist));
             assert(DPKVT_LPSTR == pID->WMP.sDescMetadata.pvarArtist.vt);
             break;
 
         case WMP_tagCopyright:
-            CallIgnoreError(errTmp, ReadPropvar(pWS, uType, uCount, uValue,
+            CallIgnoreError(errTmp, JXRLIB_API(ReadPropvar)(pWS, uType, uCount, uValue,
                 &pID->WMP.sDescMetadata.pvarCopyright));
             assert(DPKVT_LPSTR == pID->WMP.sDescMetadata.pvarCopyright.vt);
             break;
 
         case WMP_tagRatingStars:
-            CallIgnoreError(errTmp, ReadPropvar(pWS, uType, uCount, uValue,
+            CallIgnoreError(errTmp, JXRLIB_API(ReadPropvar)(pWS, uType, uCount, uValue,
                 &pID->WMP.sDescMetadata.pvarRatingStars));
             assert(DPKVT_UI2 == pID->WMP.sDescMetadata.pvarRatingStars.vt);
             break;
 
         case WMP_tagRatingValue:
-            CallIgnoreError(errTmp, ReadPropvar(pWS, uType, uCount, uValue,
+            CallIgnoreError(errTmp, JXRLIB_API(ReadPropvar)(pWS, uType, uCount, uValue,
                 &pID->WMP.sDescMetadata.pvarRatingValue));
             assert(DPKVT_UI2 == pID->WMP.sDescMetadata.pvarRatingValue.vt);
             break;
 
         case WMP_tagCaption:
-            CallIgnoreError(errTmp, ReadPropvar(pWS, uType, uCount, uValue,
+            CallIgnoreError(errTmp, JXRLIB_API(ReadPropvar)(pWS, uType, uCount, uValue,
                 &pID->WMP.sDescMetadata.pvarCaption));
             assert((DPKVT_BYREF | DPKVT_UI1) == pID->WMP.sDescMetadata.pvarCaption.vt);
 
@@ -1725,25 +1726,25 @@ ERR ParsePFDEntry(
             break;
 
         case WMP_tagDocumentName:
-            CallIgnoreError(errTmp, ReadPropvar(pWS, uType, uCount, uValue,
+            CallIgnoreError(errTmp, JXRLIB_API(ReadPropvar)(pWS, uType, uCount, uValue,
                 &pID->WMP.sDescMetadata.pvarDocumentName));
             assert(DPKVT_LPSTR == pID->WMP.sDescMetadata.pvarDocumentName.vt);
             break;
 
         case WMP_tagPageName:
-            CallIgnoreError(errTmp, ReadPropvar(pWS, uType, uCount, uValue,
+            CallIgnoreError(errTmp, JXRLIB_API(ReadPropvar)(pWS, uType, uCount, uValue,
                 &pID->WMP.sDescMetadata.pvarPageName));
             assert(DPKVT_LPSTR == pID->WMP.sDescMetadata.pvarPageName.vt);
             break;
 
         case WMP_tagPageNumber:
-            CallIgnoreError(errTmp, ReadPropvar(pWS, uType, uCount, uValue,
+            CallIgnoreError(errTmp, JXRLIB_API(ReadPropvar)(pWS, uType, uCount, uValue,
                 &pID->WMP.sDescMetadata.pvarPageNumber));
             assert(DPKVT_UI4 == pID->WMP.sDescMetadata.pvarPageNumber.vt);
             break;
 
         case WMP_tagHostComputer:
-            CallIgnoreError(errTmp, ReadPropvar(pWS, uType, uCount, uValue,
+            CallIgnoreError(errTmp, JXRLIB_API(ReadPropvar)(pWS, uType, uCount, uValue,
                 &pID->WMP.sDescMetadata.pvarHostComputer));
             assert(DPKVT_LPSTR == pID->WMP.sDescMetadata.pvarHostComputer.vt);
             break;
@@ -1758,7 +1759,7 @@ Cleanup:
     return err;
 }
 
-ERR ParsePFD(
+ERR JXRLIB_API(ParsePFD)(
     PKImageDecode* pID,
     size_t offPos,
     U16 cEntry)
@@ -1774,12 +1775,12 @@ ERR ParsePFD(
         U32 uCount = 0;
         U32 uValue = 0;
 
-        Call(GetUShort(pWS, offPos, &uTag)); offPos += 2;
-        Call(GetUShort(pWS, offPos, &uType)); offPos += 2;
-        Call(GetULong(pWS, offPos, &uCount)); offPos += 4;
-        Call(GetULong(pWS, offPos, &uValue)); offPos += 4;
+        Call(JXRLIB_API(GetUShort)(pWS, offPos, &uTag)); offPos += 2;
+        Call(JXRLIB_API(GetUShort)(pWS, offPos, &uType)); offPos += 2;
+        Call(JXRLIB_API(GetULong)(pWS, offPos, &uCount)); offPos += 4;
+        Call(JXRLIB_API(GetULong)(pWS, offPos, &uValue)); offPos += 4;
 
-        Call(ParsePFDEntry(pID, uTag, uType, uCount, uValue));
+        Call(JXRLIB_API(ParsePFDEntry)(pID, uTag, uType, uCount, uValue));
     }
 
     pID->WMP.bHasAlpha = ((pID->WMP.bHasAlpha) && (pID->WMP.wmiDEMisc.uAlphaOffset != 0) && (pID->WMP.wmiDEMisc.uAlphaByteCount != 0));//has planar alpha
@@ -1788,7 +1789,7 @@ Cleanup:
     return err;
 }
 
-ERR ReadContainer(
+ERR JXRLIB_API(ReadContainer)(
     PKImageDecode* pID)
 {
     ERR err = WMP_errSuccess;
@@ -1811,21 +1812,21 @@ ERR ReadContainer(
     Call(pWS->Read(pWS, szSig, sizeof(szSig))); offPos += 2;
     FailIf(szSig != strstr(szSig, "II"), WMP_errUnsupportedFormat);
 
-    Call(GetUShort(pWS, offPos, &uWmpID)); offPos += 2;
+    Call(JXRLIB_API(GetUShort)(pWS, offPos, &uWmpID)); offPos += 2;
     FailIf(WMP_valWMPhotoID != (0x00FF & uWmpID), WMP_errUnsupportedFormat);
 
     // We accept version 00 and version 01 bitstreams - all others rejected
     bVersion = (0xFF00 & uWmpID) >> 8;
     FailIf(bVersion != 0 && bVersion != 1, WMP_errUnsupportedFormat);
 
-    Call(GetULong(pWS, offPos, &offPFD)); offPos += 4;
+    Call(JXRLIB_API(GetULong)(pWS, offPos, &offPFD)); offPos += 4;
 
     //================================
     // PFD
     offPos = (size_t)offPFD;
-    Call(GetUShort(pWS, offPos, &cPFDEntry)); offPos += 2;
+    Call(JXRLIB_API(GetUShort)(pWS, offPos, &cPFDEntry)); offPos += 2;
     FailIf(0 == cPFDEntry || USHRT_MAX == cPFDEntry, WMP_errUnsupportedFormat);
-    Call(ParsePFD(pID, offPos, cPFDEntry));
+    Call(JXRLIB_API(ParsePFD)(pID, offPos, cPFDEntry));
 
     //================================
     Call(pWS->SetPos(pWS, pID->WMP.wmiDEMisc.uImageOffset));
@@ -1836,7 +1837,7 @@ Cleanup:
 
 
 //================================================
-ERR PKImageDecode_Initialize_WMP(
+ERR JXRLIB_API(PKImageDecode_Initialize_WMP)(
     PKImageDecode* pID,
     struct tagWMPStream* pWS)
 {
@@ -1845,10 +1846,10 @@ ERR PKImageDecode_Initialize_WMP(
     CWMImageInfo* pII = NULL;
 
     //================================
-    Call(PKImageDecode_Initialize(pID, pWS));
+    Call(JXRLIB_API(PKImageDecode_Initialize)(pID, pWS));
 
     //================================
-    Call(ReadContainer(pID));
+    Call(JXRLIB_API(ReadContainer)(pID));
 
     //================================
     pID->WMP.wmiSCP.pWStream = pWS;
@@ -1857,7 +1858,7 @@ ERR PKImageDecode_Initialize_WMP(
     pID->WMP.cLinesCropped = 0;
     pID->WMP.fFirstNonZeroDecode = FALSE;
 
-    FailIf(ICERR_OK != ImageStrDecGetInfo(&pID->WMP.wmiI, &pID->WMP.wmiSCP), WMP_errFail);
+    FailIf(ICERR_OK != JXRLIB_API(ImageStrDecGetInfo)(&pID->WMP.wmiI, &pID->WMP.wmiSCP), WMP_errFail);
     assert(Y_ONLY <= pID->WMP.wmiSCP.cfColorFormat && pID->WMP.wmiSCP.cfColorFormat < CFT_MAX);
     assert(BD_SHORT == pID->WMP.wmiSCP.bdBitDepth || BD_LONG == pID->WMP.wmiSCP.bdBitDepth);
 
@@ -1883,7 +1884,7 @@ Cleanup:
 }
 
 
-ERR PKImageDecode_GetSize_WMP(
+ERR JXRLIB_API(PKImageDecode_GetSize_WMP)(
     PKImageDecode* pID,
     I32* piWidth,
     I32* piHeight)
@@ -1902,7 +1903,7 @@ ERR PKImageDecode_GetSize_WMP(
 }
 
 
-ERR PKImageDecode_GetRawStream_WMP(
+ERR JXRLIB_API(PKImageDecode_GetRawStream_WMP)(
     PKImageDecode* pID,
     struct tagWMPStream** ppWS)
 {
@@ -1917,7 +1918,7 @@ Cleanup:
     return err;
 }
 
-ERR PKImageDecode_Copy_WMP(
+ERR JXRLIB_API(PKImageDecode_Copy_WMP)(
     PKImageDecode* pID,
     const PKRect* pRect,
     U8* pb,
@@ -1986,7 +1987,7 @@ ERR PKImageDecode_Copy_WMP(
         if (0 == pID->WMP.DecoderCurrMBRow)
         {
             Call(pID->WMP.wmiSCP.pWStream->GetPos(pID->WMP.wmiSCP.pWStream, &(pID->WMP.cMarker)));
-            FailIf(ICERR_OK != ImageStrDecInit(&pID->WMP.wmiI, &pID->WMP.wmiSCP, &pID->WMP.ctxSC), WMP_errFail);
+            FailIf(ICERR_OK != JXRLIB_API(ImageStrDecInit)(&pID->WMP.wmiI, &pID->WMP.wmiSCP, &pID->WMP.ctxSC), WMP_errFail);
         }
         // Re-entrant mode incurs 1 MBR delay, so to get 0th MBR, we have to ask for 1st MBR
         cMBRow = ((U32)pID->WMP.cLinesCropped + pRect->Y + pRect->Height +
@@ -2000,9 +2001,9 @@ ERR PKImageDecode_Copy_WMP(
             pID->WMP.cLinesDecoded = 0;
             pID->WMP.cLinesCropped = 0;
             pID->WMP.fFirstNonZeroDecode = FALSE;
-            FailIf(ICERR_OK != ImageStrDecTerm(pID->WMP.ctxSC), WMP_errFail);
+            FailIf(ICERR_OK != JXRLIB_API(ImageStrDecTerm)(pID->WMP.ctxSC), WMP_errFail);
             Call(pID->WMP.wmiSCP.pWStream->SetPos(pID->WMP.wmiSCP.pWStream, pID->WMP.cMarker));
-            FailIf(ICERR_OK != ImageStrDecInit(&pID->WMP.wmiI, &pID->WMP.wmiSCP, &pID->WMP.ctxSC), WMP_errFail);
+            FailIf(ICERR_OK != JXRLIB_API(ImageStrDecInit)(&pID->WMP.wmiI, &pID->WMP.wmiSCP, &pID->WMP.ctxSC), WMP_errFail);
         }
 
         // In "Low Memory mode", we don't have full frame buffer. We therefore cannot rotate the image.
@@ -2028,7 +2029,7 @@ ERR PKImageDecode_Copy_WMP(
             size_t cLinesDecoded;
             wmiBI.uiFirstMBRow = i;
             wmiBI.uiLastMBRow = i;
-            FailIf(ICERR_OK != ImageStrDecDecode(pID->WMP.ctxSC, &wmiBI, &cLinesDecoded), WMP_errFail);
+            FailIf(ICERR_OK != JXRLIB_API(ImageStrDecDecode)(pID->WMP.ctxSC, &wmiBI, &cLinesDecoded), WMP_errFail);
             pID->WMP.cLinesDecoded = cLinesDecoded;
             if (FALSE == pID->WMP.fFirstNonZeroDecode && cLinesDecoded > 0)
             {
@@ -2051,7 +2052,7 @@ ERR PKImageDecode_Copy_WMP(
 
         // If we're past the top of the image, then we're done, so terminate.
         if (linesperMBRow * (size_t)(cMBRow - 1) >= pID->WMP.cLinesCropped + pID->WMP.wmiI.cROIHeight) {
-            FailIf(ICERR_OK != ImageStrDecTerm(pID->WMP.ctxSC), WMP_errFail);
+            FailIf(ICERR_OK != JXRLIB_API(ImageStrDecTerm)(pID->WMP.ctxSC), WMP_errFail);
         }
         pID->WMP.DecoderCurrMBRow = cMBRow; // Set to next possible MBRow that is decodable
 
@@ -2107,7 +2108,7 @@ ERR PKImageDecode_Copy_WMP(
 #ifdef REENTRANT_MODE
         if (0 == pID->WMP.DecoderCurrAlphaMBRow) // add this to WMP struct!
         {
-            FailIf(ICERR_OK != ImageStrDecInit(&pID->WMP.wmiI_Alpha, &pID->WMP.wmiSCP_Alpha, &pID->WMP.ctxSC_Alpha), WMP_errFail);
+            FailIf(ICERR_OK != JXRLIB_API(ImageStrDecInit)(&pID->WMP.wmiI_Alpha, &pID->WMP.wmiSCP_Alpha, &pID->WMP.ctxSC_Alpha), WMP_errFail);
         }
 
         // Re-entrant mode incurs 1 MBR delay, so to get 0th MBR, we have to ask for 1st MBR
@@ -2119,8 +2120,8 @@ ERR PKImageDecode_Copy_WMP(
         if (cMBRowStart < pID->WMP.DecoderCurrAlphaMBRow)
         {
             pID->WMP.DecoderCurrAlphaMBRow = 0;
-            FailIf(ICERR_OK != ImageStrDecTerm(pID->WMP.ctxSC_Alpha), WMP_errFail);
-            FailIf(ICERR_OK != ImageStrDecInit(&pID->WMP.wmiI_Alpha, &pID->WMP.wmiSCP_Alpha, &pID->WMP.ctxSC_Alpha), WMP_errFail);
+            FailIf(ICERR_OK != JXRLIB_API(ImageStrDecTerm)(pID->WMP.ctxSC_Alpha), WMP_errFail);
+            FailIf(ICERR_OK != JXRLIB_API(ImageStrDecInit)(&pID->WMP.wmiI_Alpha, &pID->WMP.wmiSCP_Alpha, &pID->WMP.ctxSC_Alpha), WMP_errFail);
         }
 
         for (i = (U32)pID->WMP.DecoderCurrAlphaMBRow; i < cMBRow; i++)
@@ -2128,12 +2129,12 @@ ERR PKImageDecode_Copy_WMP(
             size_t cLinesDecoded;
             wmiBI.uiFirstMBRow = i;
             wmiBI.uiLastMBRow = i;
-            FailIf(ICERR_OK != ImageStrDecDecode(pID->WMP.ctxSC_Alpha, &wmiBI, &cLinesDecoded), WMP_errFail);
+            FailIf(ICERR_OK != JXRLIB_API(ImageStrDecDecode)(pID->WMP.ctxSC_Alpha, &wmiBI, &cLinesDecoded), WMP_errFail);
         }
 
         // If we're past the top of the image, then we're done, so terminate
         if (linesperMBRow * (size_t)(cMBRow - 1) >= pID->WMP.cLinesCropped + pID->WMP.wmiI.cROIHeight) {
-            FailIf(ICERR_OK != ImageStrDecTerm(pID->WMP.ctxSC_Alpha), WMP_errFail);
+            FailIf(ICERR_OK != JXRLIB_API(ImageStrDecTerm)(pID->WMP.ctxSC_Alpha), WMP_errFail);
         }
         pID->WMP.DecoderCurrAlphaMBRow = cMBRow; // Set to next possible MBRow that is decodable
         wmiBI.pv = pb;
@@ -2151,7 +2152,7 @@ Cleanup:
 }
 
 
-ERR PKImageDecode_GetMetadata_WMP(PKImageDecode* pID, U32 uOffset, U32 uByteCount, U8* pbGot, U32* pcbGot)
+ERR JXRLIB_API(PKImageDecode_GetMetadata_WMP)(PKImageDecode* pID, U32 uOffset, U32 uByteCount, U8* pbGot, U32* pcbGot)
 {
     ERR err = WMP_errSuccess;
 
@@ -2178,49 +2179,49 @@ Cleanup:
 
 
 
-ERR PKImageDecode_GetColorContext_WMP(PKImageDecode* pID, U8* pbColorContext, U32* pcbColorContext)
+ERR JXRLIB_API(PKImageDecode_GetColorContext_WMP)(PKImageDecode* pID, U8* pbColorContext, U32* pcbColorContext)
 {
-    return PKImageDecode_GetMetadata_WMP(pID, pID->WMP.wmiDEMisc.uColorProfileOffset,
+    return JXRLIB_API(PKImageDecode_GetMetadata_WMP)(pID, pID->WMP.wmiDEMisc.uColorProfileOffset,
         pID->WMP.wmiDEMisc.uColorProfileByteCount, pbColorContext, pcbColorContext);
 }
 
 
-ERR PKImageDecode_GetXMPMetadata_WMP(PKImageDecode* pID, U8* pbXMPMetadata, U32* pcbXMPMetadata)
+ERR JXRLIB_API(PKImageDecode_GetXMPMetadata_WMP)(PKImageDecode* pID, U8* pbXMPMetadata, U32* pcbXMPMetadata)
 {
-    return PKImageDecode_GetMetadata_WMP(pID, pID->WMP.wmiDEMisc.uXMPMetadataOffset,
+    return JXRLIB_API(PKImageDecode_GetMetadata_WMP)(pID, pID->WMP.wmiDEMisc.uXMPMetadataOffset,
         pID->WMP.wmiDEMisc.uXMPMetadataByteCount, pbXMPMetadata, pcbXMPMetadata);
 }
 
 
-ERR PKImageDecode_GetEXIFMetadata_WMP(PKImageDecode* pID, U8* pbEXIFMetadata, U32* pcbEXIFMetadata)
+ERR JXRLIB_API(PKImageDecode_GetEXIFMetadata_WMP)(PKImageDecode* pID, U8* pbEXIFMetadata, U32* pcbEXIFMetadata)
 {
-    return PKImageDecode_GetMetadata_WMP(pID, pID->WMP.wmiDEMisc.uEXIFMetadataOffset,
+    return JXRLIB_API(PKImageDecode_GetMetadata_WMP)(pID, pID->WMP.wmiDEMisc.uEXIFMetadataOffset,
         pID->WMP.wmiDEMisc.uEXIFMetadataByteCount, pbEXIFMetadata, pcbEXIFMetadata);
 }
 
 
-ERR PKImageDecode_GetGPSInfoMetadata_WMP(PKImageDecode* pID, U8* pbGPSInfoMetadata, U32* pcbGPSInfoMetadata)
+ERR JXRLIB_API(PKImageDecode_GetGPSInfoMetadata_WMP)(PKImageDecode* pID, U8* pbGPSInfoMetadata, U32* pcbGPSInfoMetadata)
 {
-    return PKImageDecode_GetMetadata_WMP(pID, pID->WMP.wmiDEMisc.uGPSInfoMetadataOffset,
+    return JXRLIB_API(PKImageDecode_GetMetadata_WMP)(pID, pID->WMP.wmiDEMisc.uGPSInfoMetadataOffset,
         pID->WMP.wmiDEMisc.uGPSInfoMetadataByteCount, pbGPSInfoMetadata, pcbGPSInfoMetadata);
 }
 
 
-ERR PKImageDecode_GetIPTCNAAMetadata_WMP(PKImageDecode* pID, U8* pbIPTCNAAMetadata, U32* pcbIPTCNAAMetadata)
+ERR JXRLIB_API(PKImageDecode_GetIPTCNAAMetadata_WMP)(PKImageDecode* pID, U8* pbIPTCNAAMetadata, U32* pcbIPTCNAAMetadata)
 {
-    return PKImageDecode_GetMetadata_WMP(pID, pID->WMP.wmiDEMisc.uIPTCNAAMetadataOffset,
+    return JXRLIB_API(PKImageDecode_GetMetadata_WMP)(pID, pID->WMP.wmiDEMisc.uIPTCNAAMetadataOffset,
         pID->WMP.wmiDEMisc.uIPTCNAAMetadataByteCount, pbIPTCNAAMetadata, pcbIPTCNAAMetadata);
 }
 
 
-ERR PKImageDecode_GetPhotoshopMetadata_WMP(PKImageDecode* pID, U8* pbPhotoshopMetadata, U32* pcbPhotoshopMetadata)
+ERR JXRLIB_API(PKImageDecode_GetPhotoshopMetadata_WMP)(PKImageDecode* pID, U8* pbPhotoshopMetadata, U32* pcbPhotoshopMetadata)
 {
-    return PKImageDecode_GetMetadata_WMP(pID, pID->WMP.wmiDEMisc.uPhotoshopMetadataOffset,
+    return JXRLIB_API(PKImageDecode_GetMetadata_WMP)(pID, pID->WMP.wmiDEMisc.uPhotoshopMetadataOffset,
         pID->WMP.wmiDEMisc.uPhotoshopMetadataByteCount, pbPhotoshopMetadata, pcbPhotoshopMetadata);
 }
 
 
-ERR PKImageDecode_GetDescriptiveMetadata_WMP(PKImageDecode* pID, DESCRIPTIVEMETADATA* pDescMetadata)
+ERR JXRLIB_API(PKImageDecode_GetDescriptiveMetadata_WMP)(PKImageDecode* pID, DESCRIPTIVEMETADATA* pDescMetadata)
 {
     ERR err = WMP_errSuccess;
     *pDescMetadata = pID->WMP.sDescMetadata;
@@ -2228,7 +2229,7 @@ ERR PKImageDecode_GetDescriptiveMetadata_WMP(PKImageDecode* pID, DESCRIPTIVEMETA
 }
 
 
-ERR PKImageDecode_Release_WMP(PKImageDecode** ppID)
+ERR JXRLIB_API(PKImageDecode_Release_WMP)(PKImageDecode** ppID)
 {
     ERR             err = WMP_errSuccess;
     PKImageDecode* pID;
@@ -2239,23 +2240,23 @@ ERR PKImageDecode_Release_WMP(PKImageDecode** ppID)
     pID = *ppID;
 
     // Free descriptive metadata
-    FreeDescMetadata(&pID->WMP.sDescMetadata.pvarImageDescription);
-    FreeDescMetadata(&pID->WMP.sDescMetadata.pvarCameraMake);
-    FreeDescMetadata(&pID->WMP.sDescMetadata.pvarCameraModel);
-    FreeDescMetadata(&pID->WMP.sDescMetadata.pvarSoftware);
-    FreeDescMetadata(&pID->WMP.sDescMetadata.pvarDateTime);
-    FreeDescMetadata(&pID->WMP.sDescMetadata.pvarArtist);
-    FreeDescMetadata(&pID->WMP.sDescMetadata.pvarCopyright);
-    FreeDescMetadata(&pID->WMP.sDescMetadata.pvarRatingStars);
-    FreeDescMetadata(&pID->WMP.sDescMetadata.pvarRatingValue);
-    FreeDescMetadata(&pID->WMP.sDescMetadata.pvarCaption);
-    FreeDescMetadata(&pID->WMP.sDescMetadata.pvarDocumentName);
-    FreeDescMetadata(&pID->WMP.sDescMetadata.pvarPageName);
-    FreeDescMetadata(&pID->WMP.sDescMetadata.pvarPageNumber);
-    FreeDescMetadata(&pID->WMP.sDescMetadata.pvarHostComputer);
+    JXRLIB_API(FreeDescMetadata)(&pID->WMP.sDescMetadata.pvarImageDescription);
+    JXRLIB_API(FreeDescMetadata)(&pID->WMP.sDescMetadata.pvarCameraMake);
+    JXRLIB_API(FreeDescMetadata)(&pID->WMP.sDescMetadata.pvarCameraModel);
+    JXRLIB_API(FreeDescMetadata)(&pID->WMP.sDescMetadata.pvarSoftware);
+    JXRLIB_API(FreeDescMetadata)(&pID->WMP.sDescMetadata.pvarDateTime);
+    JXRLIB_API(FreeDescMetadata)(&pID->WMP.sDescMetadata.pvarArtist);
+    JXRLIB_API(FreeDescMetadata)(&pID->WMP.sDescMetadata.pvarCopyright);
+    JXRLIB_API(FreeDescMetadata)(&pID->WMP.sDescMetadata.pvarRatingStars);
+    JXRLIB_API(FreeDescMetadata)(&pID->WMP.sDescMetadata.pvarRatingValue);
+    JXRLIB_API(FreeDescMetadata)(&pID->WMP.sDescMetadata.pvarCaption);
+    JXRLIB_API(FreeDescMetadata)(&pID->WMP.sDescMetadata.pvarDocumentName);
+    JXRLIB_API(FreeDescMetadata)(&pID->WMP.sDescMetadata.pvarPageName);
+    JXRLIB_API(FreeDescMetadata)(&pID->WMP.sDescMetadata.pvarPageNumber);
+    JXRLIB_API(FreeDescMetadata)(&pID->WMP.sDescMetadata.pvarHostComputer);
 
     // Release base class
-    Call(PKImageDecode_Release(ppID));
+    Call(JXRLIB_API(PKImageDecode_Release)(ppID));
 
 Cleanup:
     return err;
@@ -2263,21 +2264,21 @@ Cleanup:
 
 
 
-ERR PKImageDecode_Create_WMP(PKImageDecode** ppID)
+ERR JXRLIB_API(PKImageDecode_Create_WMP)(PKImageDecode** ppID)
 {
     ERR err = WMP_errSuccess;
     PKImageDecode* pID = NULL;
 
-    Call(PKImageDecode_Create(ppID));
+    Call(JXRLIB_API(PKImageDecode_Create)(ppID));
 
     pID = *ppID;
-    pID->Initialize = PKImageDecode_Initialize_WMP;
-    pID->GetSize = PKImageDecode_GetSize_WMP;
-    pID->GetRawStream = PKImageDecode_GetRawStream_WMP;
-    pID->Copy = PKImageDecode_Copy_WMP;
-    pID->GetColorContext = PKImageDecode_GetColorContext_WMP;
-    pID->GetDescriptiveMetadata = PKImageDecode_GetDescriptiveMetadata_WMP;
-    pID->Release = PKImageDecode_Release_WMP;
+    pID->Initialize = JXRLIB_API(PKImageDecode_Initialize_WMP);
+    pID->GetSize = JXRLIB_API(PKImageDecode_GetSize_WMP);
+    pID->GetRawStream = JXRLIB_API(PKImageDecode_GetRawStream_WMP);
+    pID->Copy = JXRLIB_API(PKImageDecode_Copy_WMP);
+    pID->GetColorContext = JXRLIB_API(PKImageDecode_GetColorContext_WMP);
+    pID->GetDescriptiveMetadata = JXRLIB_API(PKImageDecode_GetDescriptiveMetadata_WMP);
+    pID->Release = JXRLIB_API(PKImageDecode_Release_WMP);
 
 Cleanup:
     return err;

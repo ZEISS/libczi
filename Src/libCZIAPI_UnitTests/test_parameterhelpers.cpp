@@ -989,7 +989,7 @@ TEST(CZIAPI_ParameterHelpers, Check_FormatDimensionTInfoAsJson_Scenario2)
 
 TEST(CZIAPI_ParameterHelpers, Check_FormatDimensionCInfoAsJson_Scenario1)
 {
-    pugi::xml_document doc;
+    libCZI::pugi::xml_document doc;
     auto dimension_channel_info_1 = make_shared<CDimensionChannelInfo>();
     wstring attribute_id(L"ID");
     wstring attribute_name(L"NAME");

@@ -13,7 +13,7 @@ License: LGPL-3.0-or-later
 
 Files: Src/JxrDecode/jxrlib/*
 Copyright: Microsoft Corp.
-License: BSD-3-Clause
+License: BSD-2-Clause
 
 Files: .github/* .devcontainer/*
 Copyright: 2017-2022 Carl Zeiss Microscopy GmbH

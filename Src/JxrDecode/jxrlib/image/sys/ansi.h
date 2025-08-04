@@ -27,17 +27,17 @@
 //*@@@---@@@@******************************************************************
 #pragma once
 
-//#include <stdint.h>
+#include "../../common/include/jxrlib_symbol_mangle.h"
 
 //================================
 // bitio functions
 //================================
 #define PACKETLENGTH (1U<<12)   // 4kB
 
-#define readIS_L1(pSC, pIO) readIS(pSC, pIO)
+#define readIS_L1(pSC, pIO) JXRLIB_API(readIS)(pSC, pIO)
 #define readIS_L2(pSC, pIO) (void)(pSC, pIO)
 
-#define writeIS_L1(pSC, pIO) writeIS(pSC, pIO)
+#define writeIS_L1(pSC, pIO) JXRLIB_API(writeIS)(pSC, pIO)
 #define writeIS_L2(pSC, pIO) (void)(pSC, pIO)
 
 
