@@ -1912,7 +1912,7 @@ Int JXRLIB_API(decodeThumbnailAlpha)(CWMImageStrCodec* pSC, const size_t nBits, 
     return ICERR_OK;
 }
 
-Int decodeThumbnail(CWMImageStrCodec* pSC)
+Int JXRLIB_API(decodeThumbnail)(CWMImageStrCodec* pSC)
 {
     const size_t tScale = pSC->m_Dparam->cThumbnailScale;
     const size_t cHeight = min((pSC->m_Dparam->bDecodeFullFrame ? pSC->WMII.cHeight : pSC->m_Dparam->cROIBottomY + 1) - (pSC->cRow - 1) * 16, 16);
@@ -3568,7 +3568,7 @@ Int JXRLIB_API(ImageStrDecDecode)(
             }
 
             if (pSC->m_Dparam->cThumbnailScale >= 2) // decode thumbnail
-                decodeThumbnail(pSC);
+                JXRLIB_API(decodeThumbnail)(pSC);
         }
 
         JXRLIB_API(advanceOneMBRow)(pSC);
