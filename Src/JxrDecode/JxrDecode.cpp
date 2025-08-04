@@ -60,11 +60,11 @@ static JxrDecode::PixelFormat JxrPixelFormatGuidToEnum(const GUID& guid)
     {
         return JxrDecode::PixelFormat::kBgr24;
     }
-    else if (IsEqualGuid(guid, GUID_PKPixelFormat48bppRGB))
+    else if (IsEqualGuid(guid, JXRLIB_API(GUID_PKPixelFormat48bppRGB)))
     {
         return JxrDecode::PixelFormat::kBgr48;
     }
-    else if (IsEqualGuid(guid, GUID_PKPixelFormat32bppGrayFloat))
+    else if (IsEqualGuid(guid, JXRLIB_API(GUID_PKPixelFormat32bppGrayFloat)))
     {
         return JxrDecode::PixelFormat::kGray32Float;
     }
@@ -298,13 +298,13 @@ void JxrDecode::Decode(
         err = upImageEncoder->SetPixelFormat(upImageEncoder.get(), JXRLIB_API(GUID_PKPixelFormat8bppGray));
         break;
     case PixelFormat::kBgr48:
-        err = upImageEncoder->SetPixelFormat(upImageEncoder.get(), GUID_PKPixelFormat48bppRGB);
+        err = upImageEncoder->SetPixelFormat(upImageEncoder.get(), JXRLIB_API(GUID_PKPixelFormat48bppRGB));
         break;
     case PixelFormat::kGray16:
         err = upImageEncoder->SetPixelFormat(upImageEncoder.get(), JXRLIB_API(GUID_PKPixelFormat16bppGray));
         break;
     case PixelFormat::kGray32Float:
-        err = upImageEncoder->SetPixelFormat(upImageEncoder.get(), GUID_PKPixelFormat32bppGrayFloat);
+        err = upImageEncoder->SetPixelFormat(upImageEncoder.get(), JXRLIB_API(GUID_PKPixelFormat32bppGrayFloat));
         break;
     default:
     {

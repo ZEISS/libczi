@@ -2094,8 +2094,8 @@ typedef struct tagPKPixelConverterInfo
 static PKPixelConverterInfo s_pcInfo[] = {
     {&JXRLIB_API(GUID_PKPixelFormat24bppRGB), &JXRLIB_API(GUID_PKPixelFormat24bppBGR), JXRLIB_API(RGB24_BGR24)}, // Fwd
     {&JXRLIB_API(GUID_PKPixelFormat24bppBGR), &JXRLIB_API(GUID_PKPixelFormat24bppRGB), JXRLIB_API(BGR24_RGB24)}, // Rev
-    {&JXRLIB_API(GUID_PKPixelFormat24bppRGB), &GUID_PKPixelFormat32bppBGR, JXRLIB_API(RGB24_BGR32)}, // Fwd
-    {&GUID_PKPixelFormat32bppBGR, &JXRLIB_API(GUID_PKPixelFormat24bppRGB), JXRLIB_API(BGR32_RGB24)}, // Rev
+    {&JXRLIB_API(GUID_PKPixelFormat24bppRGB), &JXRLIB_API(GUID_PKPixelFormat32bppBGR), JXRLIB_API(RGB24_BGR32)}, // Fwd
+    {&JXRLIB_API(GUID_PKPixelFormat32bppBGR), &JXRLIB_API(GUID_PKPixelFormat24bppRGB), JXRLIB_API(BGR32_RGB24)}, // Rev
 
     // The following are not to be exposed when building the Adobe Photoshop plugin
 #ifndef ADOBE_PS_PLUGIN
@@ -2105,76 +2105,76 @@ static PKPixelConverterInfo s_pcInfo[] = {
     {&JXRLIB_API(GUID_PKPixelFormat8bppGray), &JXRLIB_API(GUID_PKPixelFormat24bppBGR), JXRLIB_API(Gray8_BGR24)}, // Rev
 #endif // ADOBE_PS_PLUGIN
 
-    {&GUID_PKPixelFormat128bppRGBAFixedPoint, &GUID_PKPixelFormat128bppRGBAFloat, JXRLIB_API(RGBA128Fixed_RGBA128Float)}, // Fwd
-    {&GUID_PKPixelFormat128bppRGBAFloat, &GUID_PKPixelFormat128bppRGBAFixedPoint, JXRLIB_API(RGBA128Float_RGBA128Fixed)}, // Rev
-    {&GUID_PKPixelFormat96bppRGBFixedPoint, &GUID_PKPixelFormat96bppRGBFloat, JXRLIB_API(RGB96Fixed_RGB96Float)}, // Fwd
-    {&GUID_PKPixelFormat96bppRGBFloat, &GUID_PKPixelFormat96bppRGBFixedPoint, JXRLIB_API(RGB96Float_RGB96Fixed)}, // Rev
-    {&GUID_PKPixelFormat96bppRGBFloat, &GUID_PKPixelFormat128bppRGBFloat, JXRLIB_API(RGB96Float_RGB128Float)}, // Fwd
-    {&GUID_PKPixelFormat128bppRGBFloat, &GUID_PKPixelFormat96bppRGBFloat, JXRLIB_API(RGB128Float_RGB96Float)}, // Rev
-    {&GUID_PKPixelFormat96bppRGBFixedPoint, &GUID_PKPixelFormat128bppRGBFixedPoint, JXRLIB_API(RGB96Float_RGB128Float)}, // Fwd
-    {&GUID_PKPixelFormat128bppRGBFixedPoint, &GUID_PKPixelFormat96bppRGBFixedPoint, JXRLIB_API(RGB128Float_RGB96Float)}, // Rev
-    {&GUID_PKPixelFormat64bppRGBHalf, &GUID_PKPixelFormat48bppRGBHalf, JXRLIB_API(RGB64Half_RGB48Half)}, // Fwd
-    {&GUID_PKPixelFormat48bppRGBHalf, &GUID_PKPixelFormat64bppRGBHalf, JXRLIB_API(RGB48Half_RGB64Half)}, // Rev
-    {&GUID_PKPixelFormat64bppRGBFixedPoint, &GUID_PKPixelFormat48bppRGBFixedPoint, JXRLIB_API(RGB64Half_RGB48Half)}, // Fwd
-    {&GUID_PKPixelFormat48bppRGBFixedPoint, &GUID_PKPixelFormat64bppRGBFixedPoint, JXRLIB_API(RGB48Half_RGB64Half)}, // Rev
-    {&GUID_PKPixelFormat32bppBGR, &JXRLIB_API(GUID_PKPixelFormat24bppBGR), JXRLIB_API(BGR32_BGR24)}, // Fwd
-    {&JXRLIB_API(GUID_PKPixelFormat24bppBGR), &GUID_PKPixelFormat32bppBGR, JXRLIB_API(BGR24_BGR32)}, // Rev
-    {&GUID_PKPixelFormat96bppRGBFloat, &GUID_PKPixelFormat128bppRGBFixedPoint, JXRLIB_API(RGB96Float_RGB128Fixed)}, // Fwd
-    {&GUID_PKPixelFormat128bppRGBFixedPoint, &GUID_PKPixelFormat96bppRGBFloat, JXRLIB_API(RGB128Fixed_RGB96Float)}, // Rev
-    {&GUID_PKPixelFormat32bppGrayFixedPoint, &GUID_PKPixelFormat32bppGrayFloat, JXRLIB_API(Gray32Fixed_Gray32Float)}, // Fwd
-    {&GUID_PKPixelFormat32bppGrayFloat, &GUID_PKPixelFormat32bppGrayFixedPoint, JXRLIB_API(Gray32Float_Gray32Fixed)}, // Rev
-    {&GUID_PKPixelFormat16bppGrayFixedPoint, &GUID_PKPixelFormat32bppGrayFloat, JXRLIB_API(Gray16Fixed_Gray32Float)}, // Fwd
-    {&GUID_PKPixelFormat32bppGrayFloat, &GUID_PKPixelFormat16bppGrayFixedPoint, JXRLIB_API(Gray32Float_Gray16Fixed)}, // Rev
-    {&GUID_PKPixelFormat48bppRGBFixedPoint, &GUID_PKPixelFormat96bppRGBFloat, JXRLIB_API(RGB48Fixed_RGB96Float)}, // Fwd
-    {&GUID_PKPixelFormat96bppRGBFloat, &GUID_PKPixelFormat48bppRGBFixedPoint, JXRLIB_API(RGB96Float_RGB48Fixed)}, // Rev
-    {&GUID_PKPixelFormat64bppRGBFixedPoint, &GUID_PKPixelFormat96bppRGBFloat, JXRLIB_API(RGB64Fixed_RGB96Float)}, // Fwd
-    {&GUID_PKPixelFormat96bppRGBFloat, &GUID_PKPixelFormat64bppRGBFixedPoint, JXRLIB_API(RGB96Float_RGB64Fixed)}, // Rev
-    {&GUID_PKPixelFormat64bppRGBAFixedPoint, &GUID_PKPixelFormat128bppRGBAFloat, JXRLIB_API(RGBA64Fixed_RGBA128Float)}, // Fwd
-    {&GUID_PKPixelFormat128bppRGBAFloat, &GUID_PKPixelFormat64bppRGBAFixedPoint, JXRLIB_API(RGBA128Float_RGBA64Fixed)}, // Rev
-    {&GUID_PKPixelFormat32bppRGBE, &GUID_PKPixelFormat96bppRGBFloat, JXRLIB_API(RGBE_RGB96Float)}, // Fwd
-    {&GUID_PKPixelFormat96bppRGBFloat, &GUID_PKPixelFormat32bppRGBE, JXRLIB_API(RGB96Float_RGBE)}, // Rev
-    {&GUID_PKPixelFormat64bppRGBAHalf, &GUID_PKPixelFormat128bppRGBAFloat, JXRLIB_API(RGBA64Half_RGBA128Float)}, // Fwd
-    {&GUID_PKPixelFormat128bppRGBAFloat, &GUID_PKPixelFormat64bppRGBAHalf, JXRLIB_API(RGBA128Float_RGBA64Half)}, // Rev
-    {&GUID_PKPixelFormat64bppRGBHalf, &GUID_PKPixelFormat96bppRGBFloat, JXRLIB_API(RGB64Half_RGB96Float)}, // Fwd
-    {&GUID_PKPixelFormat96bppRGBFloat, &GUID_PKPixelFormat64bppRGBHalf, JXRLIB_API(RGB96Float_RGB64Half)}, // Rev
-    {&GUID_PKPixelFormat48bppRGBHalf, &GUID_PKPixelFormat96bppRGBFloat, JXRLIB_API(RGB48Half_RGB96Float)}, // Fwd
-    {&GUID_PKPixelFormat96bppRGBFloat, &GUID_PKPixelFormat48bppRGBHalf, JXRLIB_API(RGB96Float_RGB48Half)}, // Rev
-    {&GUID_PKPixelFormat16bppGrayHalf, &GUID_PKPixelFormat32bppGrayFloat, JXRLIB_API(Gray16Half_Gray32Float)}, // Fwd
-    {&GUID_PKPixelFormat32bppGrayFloat, &GUID_PKPixelFormat16bppGrayHalf, JXRLIB_API(Gray32Float_Gray16Half)}, // Rev
+    {&JXRLIB_API(GUID_PKPixelFormat128bppRGBAFixedPoint), &JXRLIB_API(GUID_PKPixelFormat128bppRGBAFloat), JXRLIB_API(RGBA128Fixed_RGBA128Float)}, // Fwd
+    {&JXRLIB_API(GUID_PKPixelFormat128bppRGBAFloat), &JXRLIB_API(GUID_PKPixelFormat128bppRGBAFixedPoint), JXRLIB_API(RGBA128Float_RGBA128Fixed)}, // Rev
+    {&JXRLIB_API(GUID_PKPixelFormat96bppRGBFixedPoint), &JXRLIB_API(GUID_PKPixelFormat96bppRGBFloat), JXRLIB_API(RGB96Fixed_RGB96Float)}, // Fwd
+    {&JXRLIB_API(GUID_PKPixelFormat96bppRGBFloat), &JXRLIB_API(GUID_PKPixelFormat96bppRGBFixedPoint), JXRLIB_API(RGB96Float_RGB96Fixed)}, // Rev
+    {&JXRLIB_API(GUID_PKPixelFormat96bppRGBFloat), &JXRLIB_API(GUID_PKPixelFormat128bppRGBFloat), JXRLIB_API(RGB96Float_RGB128Float)}, // Fwd
+    {&JXRLIB_API(GUID_PKPixelFormat128bppRGBFloat), &JXRLIB_API(GUID_PKPixelFormat96bppRGBFloat), JXRLIB_API(RGB128Float_RGB96Float)}, // Rev
+    {&JXRLIB_API(GUID_PKPixelFormat96bppRGBFixedPoint), &JXRLIB_API(GUID_PKPixelFormat128bppRGBFixedPoint), JXRLIB_API(RGB96Float_RGB128Float)}, // Fwd
+    {&JXRLIB_API(GUID_PKPixelFormat128bppRGBFixedPoint), &JXRLIB_API(GUID_PKPixelFormat96bppRGBFixedPoint), JXRLIB_API(RGB128Float_RGB96Float)}, // Rev
+    {&JXRLIB_API(GUID_PKPixelFormat64bppRGBHalf), &JXRLIB_API(GUID_PKPixelFormat48bppRGBHalf), JXRLIB_API(RGB64Half_RGB48Half)}, // Fwd
+    {&JXRLIB_API(GUID_PKPixelFormat48bppRGBHalf), &JXRLIB_API(GUID_PKPixelFormat64bppRGBHalf), JXRLIB_API(RGB48Half_RGB64Half)}, // Rev
+    {&JXRLIB_API(GUID_PKPixelFormat64bppRGBFixedPoint), &JXRLIB_API(GUID_PKPixelFormat48bppRGBFixedPoint), JXRLIB_API(RGB64Half_RGB48Half)}, // Fwd
+    {&JXRLIB_API(GUID_PKPixelFormat48bppRGBFixedPoint), &JXRLIB_API(GUID_PKPixelFormat64bppRGBFixedPoint), JXRLIB_API(RGB48Half_RGB64Half)}, // Rev
+    {&JXRLIB_API(GUID_PKPixelFormat32bppBGR), &JXRLIB_API(GUID_PKPixelFormat24bppBGR), JXRLIB_API(BGR32_BGR24)}, // Fwd
+    {&JXRLIB_API(GUID_PKPixelFormat24bppBGR), &JXRLIB_API(GUID_PKPixelFormat32bppBGR), JXRLIB_API(BGR24_BGR32)}, // Rev
+    {&JXRLIB_API(GUID_PKPixelFormat96bppRGBFloat), &JXRLIB_API(GUID_PKPixelFormat128bppRGBFixedPoint), JXRLIB_API(RGB96Float_RGB128Fixed)}, // Fwd
+    {&JXRLIB_API(GUID_PKPixelFormat128bppRGBFixedPoint), &JXRLIB_API(GUID_PKPixelFormat96bppRGBFloat), JXRLIB_API(RGB128Fixed_RGB96Float)}, // Rev
+    {&JXRLIB_API(GUID_PKPixelFormat32bppGrayFixedPoint), &JXRLIB_API(GUID_PKPixelFormat32bppGrayFloat), JXRLIB_API(Gray32Fixed_Gray32Float)}, // Fwd
+    {&JXRLIB_API(GUID_PKPixelFormat32bppGrayFloat), &JXRLIB_API(GUID_PKPixelFormat32bppGrayFixedPoint), JXRLIB_API(Gray32Float_Gray32Fixed)}, // Rev
+    {&JXRLIB_API(GUID_PKPixelFormat16bppGrayFixedPoint), &JXRLIB_API(GUID_PKPixelFormat32bppGrayFloat), JXRLIB_API(Gray16Fixed_Gray32Float)}, // Fwd
+    {&JXRLIB_API(GUID_PKPixelFormat32bppGrayFloat), &JXRLIB_API(GUID_PKPixelFormat16bppGrayFixedPoint), JXRLIB_API(Gray32Float_Gray16Fixed)}, // Rev
+    {&JXRLIB_API(GUID_PKPixelFormat48bppRGBFixedPoint), &JXRLIB_API(GUID_PKPixelFormat96bppRGBFloat), JXRLIB_API(RGB48Fixed_RGB96Float)}, // Fwd
+    {&JXRLIB_API(GUID_PKPixelFormat96bppRGBFloat), &JXRLIB_API(GUID_PKPixelFormat48bppRGBFixedPoint), JXRLIB_API(RGB96Float_RGB48Fixed)}, // Rev
+    {&JXRLIB_API(GUID_PKPixelFormat64bppRGBFixedPoint), &JXRLIB_API(GUID_PKPixelFormat96bppRGBFloat), JXRLIB_API(RGB64Fixed_RGB96Float)}, // Fwd
+    {&JXRLIB_API(GUID_PKPixelFormat96bppRGBFloat), &JXRLIB_API(GUID_PKPixelFormat64bppRGBFixedPoint), JXRLIB_API(RGB96Float_RGB64Fixed)}, // Rev
+    {&JXRLIB_API(GUID_PKPixelFormat64bppRGBAFixedPoint), &JXRLIB_API(GUID_PKPixelFormat128bppRGBAFloat), JXRLIB_API(RGBA64Fixed_RGBA128Float)}, // Fwd
+    {&JXRLIB_API(GUID_PKPixelFormat128bppRGBAFloat), &JXRLIB_API(GUID_PKPixelFormat64bppRGBAFixedPoint), JXRLIB_API(RGBA128Float_RGBA64Fixed)}, // Rev
+    {&JXRLIB_API(GUID_PKPixelFormat32bppRGBE), &JXRLIB_API(GUID_PKPixelFormat96bppRGBFloat), JXRLIB_API(RGBE_RGB96Float)}, // Fwd
+    {&JXRLIB_API(GUID_PKPixelFormat96bppRGBFloat), &JXRLIB_API(GUID_PKPixelFormat32bppRGBE), JXRLIB_API(RGB96Float_RGBE)}, // Rev
+    {&JXRLIB_API(GUID_PKPixelFormat64bppRGBAHalf), &JXRLIB_API(GUID_PKPixelFormat128bppRGBAFloat), JXRLIB_API(RGBA64Half_RGBA128Float)}, // Fwd
+    {&JXRLIB_API(GUID_PKPixelFormat128bppRGBAFloat), &JXRLIB_API(GUID_PKPixelFormat64bppRGBAHalf), JXRLIB_API(RGBA128Float_RGBA64Half)}, // Rev
+    {&JXRLIB_API(GUID_PKPixelFormat64bppRGBHalf), &JXRLIB_API(GUID_PKPixelFormat96bppRGBFloat), JXRLIB_API(RGB64Half_RGB96Float)}, // Fwd
+    {&JXRLIB_API(GUID_PKPixelFormat96bppRGBFloat), &JXRLIB_API(GUID_PKPixelFormat64bppRGBHalf), JXRLIB_API(RGB96Float_RGB64Half)}, // Rev
+    {&JXRLIB_API(GUID_PKPixelFormat48bppRGBHalf), &JXRLIB_API(GUID_PKPixelFormat96bppRGBFloat), JXRLIB_API(RGB48Half_RGB96Float)}, // Fwd
+    {&JXRLIB_API(GUID_PKPixelFormat96bppRGBFloat), &JXRLIB_API(GUID_PKPixelFormat48bppRGBHalf), JXRLIB_API(RGB96Float_RGB48Half)}, // Rev
+    {&JXRLIB_API(GUID_PKPixelFormat16bppGrayHalf), &JXRLIB_API(GUID_PKPixelFormat32bppGrayFloat), JXRLIB_API(Gray16Half_Gray32Float)}, // Fwd
+    {&JXRLIB_API(GUID_PKPixelFormat32bppGrayFloat), &JXRLIB_API(GUID_PKPixelFormat16bppGrayHalf), JXRLIB_API(Gray32Float_Gray16Half)}, // Rev
     {&JXRLIB_API(GUID_PKPixelFormat16bppRGB555), &JXRLIB_API(GUID_PKPixelFormat24bppRGB), JXRLIB_API(RGB555_RGB24)}, // Fwd
     {&JXRLIB_API(GUID_PKPixelFormat24bppRGB), &JXRLIB_API(GUID_PKPixelFormat16bppRGB555), JXRLIB_API(RGB24_RGB555)}, // Rev
     {&JXRLIB_API(GUID_PKPixelFormat16bppRGB565), &JXRLIB_API(GUID_PKPixelFormat24bppRGB), JXRLIB_API(RGB565_RGB24)}, // Fwd
     {&JXRLIB_API(GUID_PKPixelFormat24bppRGB), &JXRLIB_API(GUID_PKPixelFormat16bppRGB565), JXRLIB_API(RGB24_RGB565)}, // Rev
-    {&GUID_PKPixelFormat32bppRGB101010, &GUID_PKPixelFormat48bppRGB, JXRLIB_API(RGB101010_RGB48)}, // Fwd
-    {&GUID_PKPixelFormat48bppRGB, &GUID_PKPixelFormat32bppRGB101010, JXRLIB_API(RGB48_RGB101010)}, // Rev
-    {&GUID_PKPixelFormat32bppRGBA, &GUID_PKPixelFormat32bppBGRA, JXRLIB_API(RGBA32_BGRA32)}, // Fwd
-    {&GUID_PKPixelFormat32bppBGRA, &GUID_PKPixelFormat32bppRGBA, JXRLIB_API(BGRA32_RGBA32)}, // Rev
-    {&GUID_PKPixelFormat32bppPRGBA, &GUID_PKPixelFormat32bppPBGRA, JXRLIB_API(RGBA32_BGRA32)}, // Fwd
-    {&GUID_PKPixelFormat32bppPBGRA, &GUID_PKPixelFormat32bppPRGBA, JXRLIB_API(BGRA32_RGBA32)}, // Rev
+    {&JXRLIB_API(GUID_PKPixelFormat32bppRGB101010), &JXRLIB_API(GUID_PKPixelFormat48bppRGB), JXRLIB_API(RGB101010_RGB48)}, // Fwd
+    {&JXRLIB_API(GUID_PKPixelFormat48bppRGB), &JXRLIB_API(GUID_PKPixelFormat32bppRGB101010), JXRLIB_API(RGB48_RGB101010)}, // Rev
+    {&JXRLIB_API(GUID_PKPixelFormat32bppRGBA), &JXRLIB_API(GUID_PKPixelFormat32bppBGRA), JXRLIB_API(RGBA32_BGRA32)}, // Fwd
+    {&JXRLIB_API(GUID_PKPixelFormat32bppBGRA), &JXRLIB_API(GUID_PKPixelFormat32bppRGBA), JXRLIB_API(BGRA32_RGBA32)}, // Rev
+    {&JXRLIB_API(GUID_PKPixelFormat32bppPRGBA), &JXRLIB_API(GUID_PKPixelFormat32bppPBGRA), JXRLIB_API(RGBA32_BGRA32)}, // Fwd
+    {&JXRLIB_API(GUID_PKPixelFormat32bppPBGRA), &JXRLIB_API(GUID_PKPixelFormat32bppPRGBA), JXRLIB_API(BGRA32_RGBA32)}, // Rev
 
     // conversions to 8bppGray / 24bppRGB / 32bppRGBA
     {&JXRLIB_API(GUID_PKPixelFormatBlackWhite), &JXRLIB_API(GUID_PKPixelFormat8bppGray), JXRLIB_API(BlackWhite_Gray8)},
     {&JXRLIB_API(GUID_PKPixelFormat16bppGray), &JXRLIB_API(GUID_PKPixelFormat8bppGray), JXRLIB_API(Gray16_Gray8)},
-    {&GUID_PKPixelFormat48bppRGB, &JXRLIB_API(GUID_PKPixelFormat24bppRGB), JXRLIB_API(RGB48_RGB24)},
-    {&GUID_PKPixelFormat64bppRGBA, &GUID_PKPixelFormat32bppRGBA, JXRLIB_API(RGBA64_RGBA32)},
-    {&GUID_PKPixelFormat32bppGrayFloat, &JXRLIB_API(GUID_PKPixelFormat8bppGray), JXRLIB_API(Gray32Float_Gray8)},
-    {&GUID_PKPixelFormat96bppRGBFloat, &JXRLIB_API(GUID_PKPixelFormat24bppRGB), JXRLIB_API(RGB96Float_RGB24)},
-    {&GUID_PKPixelFormat128bppRGBFloat, &JXRLIB_API(GUID_PKPixelFormat24bppRGB), JXRLIB_API(RGB128Float_RGB24)},
-    {&GUID_PKPixelFormat128bppRGBAFloat, &GUID_PKPixelFormat32bppRGBA, JXRLIB_API(RGBA128Float_RGBA32)},
-    {&GUID_PKPixelFormat16bppGrayFixedPoint, &JXRLIB_API(GUID_PKPixelFormat8bppGray), JXRLIB_API(Gray16Fixed_Gray8)},
-    {&GUID_PKPixelFormat32bppGrayFixedPoint, &JXRLIB_API(GUID_PKPixelFormat8bppGray), JXRLIB_API(Gray32Fixed_Gray8)},
-    {&GUID_PKPixelFormat48bppRGBFixedPoint, &JXRLIB_API(GUID_PKPixelFormat24bppRGB), JXRLIB_API(RGB48Fixed_RGB24)},
-    {&GUID_PKPixelFormat64bppRGBFixedPoint, &JXRLIB_API(GUID_PKPixelFormat24bppRGB), JXRLIB_API(RGB64Fixed_RGB24)},
-    {&GUID_PKPixelFormat96bppRGBFixedPoint, &JXRLIB_API(GUID_PKPixelFormat24bppRGB), JXRLIB_API(RGB96Fixed_RGB24)},
-    {&GUID_PKPixelFormat128bppRGBFixedPoint, &JXRLIB_API(GUID_PKPixelFormat24bppRGB), JXRLIB_API(RGB128Fixed_RGB24)},
-    {&GUID_PKPixelFormat64bppRGBAFixedPoint, &GUID_PKPixelFormat32bppRGBA, JXRLIB_API(RGBA64Fixed_RGBA32)},
-    {&GUID_PKPixelFormat128bppRGBAFixedPoint, &GUID_PKPixelFormat32bppRGBA, JXRLIB_API(RGBA128Fixed_RGBA32)},
-    {&GUID_PKPixelFormat16bppGrayHalf, &JXRLIB_API(GUID_PKPixelFormat8bppGray), JXRLIB_API(Gray16Half_Gray8)},
-    {&GUID_PKPixelFormat48bppRGBHalf, &JXRLIB_API(GUID_PKPixelFormat24bppRGB), JXRLIB_API(RGB48Half_RGB24)},
-    {&GUID_PKPixelFormat64bppRGBHalf, &JXRLIB_API(GUID_PKPixelFormat24bppRGB), JXRLIB_API(RGB64Half_RGB24)},
-    {&GUID_PKPixelFormat64bppRGBAHalf, &GUID_PKPixelFormat32bppRGBA, JXRLIB_API(RGBA64Half_RGBA32)},
-    {&GUID_PKPixelFormat32bppRGB101010, &JXRLIB_API(GUID_PKPixelFormat24bppRGB), JXRLIB_API(RGB101010_RGB24)},
-    {&GUID_PKPixelFormat32bppRGBE, &JXRLIB_API(GUID_PKPixelFormat24bppRGB), JXRLIB_API(RGBE_RGB24)}
+    {&JXRLIB_API(GUID_PKPixelFormat48bppRGB), &JXRLIB_API(GUID_PKPixelFormat24bppRGB), JXRLIB_API(RGB48_RGB24)},
+    {&JXRLIB_API(GUID_PKPixelFormat64bppRGBA), &JXRLIB_API(GUID_PKPixelFormat32bppRGBA), JXRLIB_API(RGBA64_RGBA32)},
+    {&JXRLIB_API(GUID_PKPixelFormat32bppGrayFloat), &JXRLIB_API(GUID_PKPixelFormat8bppGray), JXRLIB_API(Gray32Float_Gray8)},
+    {&JXRLIB_API(GUID_PKPixelFormat96bppRGBFloat), &JXRLIB_API(GUID_PKPixelFormat24bppRGB), JXRLIB_API(RGB96Float_RGB24)},
+    {&JXRLIB_API(GUID_PKPixelFormat128bppRGBFloat), &JXRLIB_API(GUID_PKPixelFormat24bppRGB), JXRLIB_API(RGB128Float_RGB24)},
+    {&JXRLIB_API(GUID_PKPixelFormat128bppRGBAFloat), &JXRLIB_API(GUID_PKPixelFormat32bppRGBA), JXRLIB_API(RGBA128Float_RGBA32)},
+    {&JXRLIB_API(GUID_PKPixelFormat16bppGrayFixedPoint), &JXRLIB_API(GUID_PKPixelFormat8bppGray), JXRLIB_API(Gray16Fixed_Gray8)},
+    {&JXRLIB_API(GUID_PKPixelFormat32bppGrayFixedPoint), &JXRLIB_API(GUID_PKPixelFormat8bppGray), JXRLIB_API(Gray32Fixed_Gray8)},
+    {&JXRLIB_API(GUID_PKPixelFormat48bppRGBFixedPoint), &JXRLIB_API(GUID_PKPixelFormat24bppRGB), JXRLIB_API(RGB48Fixed_RGB24)},
+    {&JXRLIB_API(GUID_PKPixelFormat64bppRGBFixedPoint), &JXRLIB_API(GUID_PKPixelFormat24bppRGB), JXRLIB_API(RGB64Fixed_RGB24)},
+    {&JXRLIB_API(GUID_PKPixelFormat96bppRGBFixedPoint), &JXRLIB_API(GUID_PKPixelFormat24bppRGB), JXRLIB_API(RGB96Fixed_RGB24)},
+    {&JXRLIB_API(GUID_PKPixelFormat128bppRGBFixedPoint), &JXRLIB_API(GUID_PKPixelFormat24bppRGB), JXRLIB_API(RGB128Fixed_RGB24)},
+    {&JXRLIB_API(GUID_PKPixelFormat64bppRGBAFixedPoint), &JXRLIB_API(GUID_PKPixelFormat32bppRGBA), JXRLIB_API(RGBA64Fixed_RGBA32)},
+    {&JXRLIB_API(GUID_PKPixelFormat128bppRGBAFixedPoint), &JXRLIB_API(GUID_PKPixelFormat32bppRGBA), JXRLIB_API(RGBA128Fixed_RGBA32)},
+    {&JXRLIB_API(GUID_PKPixelFormat16bppGrayHalf), &JXRLIB_API(GUID_PKPixelFormat8bppGray), JXRLIB_API(Gray16Half_Gray8)},
+    {&JXRLIB_API(GUID_PKPixelFormat48bppRGBHalf), &JXRLIB_API(GUID_PKPixelFormat24bppRGB), JXRLIB_API(RGB48Half_RGB24)},
+    {&JXRLIB_API(GUID_PKPixelFormat64bppRGBHalf), &JXRLIB_API(GUID_PKPixelFormat24bppRGB), JXRLIB_API(RGB64Half_RGB24)},
+    {&JXRLIB_API(GUID_PKPixelFormat64bppRGBAHalf), &JXRLIB_API(GUID_PKPixelFormat32bppRGBA), JXRLIB_API(RGBA64Half_RGBA32)},
+    {&JXRLIB_API(GUID_PKPixelFormat32bppRGB101010), &JXRLIB_API(GUID_PKPixelFormat24bppRGB), JXRLIB_API(RGB101010_RGB24)},
+    {&JXRLIB_API(GUID_PKPixelFormat32bppRGBE), &JXRLIB_API(GUID_PKPixelFormat24bppRGB), JXRLIB_API(RGBE_RGB24)}
 };
 
 /* auxiliary data structure and hack to support valid encoding from/to configurations that
@@ -2190,12 +2190,12 @@ typedef struct tagPKPixelConverter2Info
 
 static PKPixelConverter2Info s_pcInfo2[] = {
     // This allows us to view an RGBA input file as RGB, for when we create a planar alpha file
-    {&GUID_PKPixelFormat128bppRGBFloat, &GUID_PKPixelFormat128bppRGBAFloat},
+    {&JXRLIB_API(GUID_PKPixelFormat128bppRGBFloat), &JXRLIB_API(GUID_PKPixelFormat128bppRGBAFloat)},
     // 16- and 32-bpp RGB input files are given the "DontCare" GUID, so the next three 
     // from/to combinations are ok, and allowed on encoding: 
     {&JXRLIB_API(GUID_PKPixelFormatDontCare), &JXRLIB_API(GUID_PKPixelFormat16bppRGB555)},
     {&JXRLIB_API(GUID_PKPixelFormatDontCare), &JXRLIB_API(GUID_PKPixelFormat16bppRGB565)},
-    {&JXRLIB_API(GUID_PKPixelFormatDontCare), &GUID_PKPixelFormat32bppBGRA}
+    {&JXRLIB_API(GUID_PKPixelFormatDontCare), &JXRLIB_API(GUID_PKPixelFormat32bppBGRA)}
 };
 
 ERR JXRLIB_API(PKFormatConverter_Initialize)(PKFormatConverter* pFC, PKImageDecode* pID, char* pExt, PKPixelFormatGUID enPF)
@@ -2228,10 +2228,10 @@ ERR JXRLIB_API(PKFormatConverter_InitializeConvert)(PKFormatConverter* pFC, cons
         enPFTo = JXRLIB_API(GUID_PKPixelFormat24bppBGR);
     if (pExt != NULL && (0 == JXRLIB_API(PKStrnicmp)(pExt, ".tif", strlen(pExt)) || 0 == JXRLIB_API(PKStrnicmp)(pExt, ".tiff", strlen(pExt))))
     {
-        if (IsEqualGUID(&enPFTo, &GUID_PKPixelFormat32bppBGRA))
-            enPFTo = GUID_PKPixelFormat32bppRGBA;
-        if (IsEqualGUID(&enPFTo, &GUID_PKPixelFormat32bppPBGRA))
-            enPFTo = GUID_PKPixelFormat32bppPRGBA;
+        if (IsEqualGUID(&enPFTo, &JXRLIB_API(GUID_PKPixelFormat32bppBGRA)))
+            enPFTo = JXRLIB_API(GUID_PKPixelFormat32bppRGBA);
+        if (IsEqualGUID(&enPFTo, &JXRLIB_API(GUID_PKPixelFormat32bppPBGRA)))
+            enPFTo = JXRLIB_API(GUID_PKPixelFormat32bppPRGBA);
     }
 
     //================================
