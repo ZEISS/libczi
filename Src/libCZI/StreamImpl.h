@@ -8,7 +8,7 @@
 #include "inc_libCZI_Config.h"
 #include <memory>
 #if LIBCZI_WINDOWSAPI_AVAILABLE
-#include <Windows.h>
+#include <windows.h>
 #endif
 
 /// <summary>   A simplistic output-stream implementation (based on C-runtime fopen). Note that this implementation is NOT thread-safe.</summary>

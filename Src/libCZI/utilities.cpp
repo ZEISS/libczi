@@ -10,7 +10,7 @@
 #include <cstring>
 #include <array>
 #if LIBCZI_WINDOWSAPI_AVAILABLE || LIBCZI_WINDOWS_UWPAPI_AVAILABLE
-#include <Windows.h>
+#include <windows.h>
 #else
 #include <random>
 #endif

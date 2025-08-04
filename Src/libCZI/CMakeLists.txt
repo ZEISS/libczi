@@ -338,7 +338,10 @@ if (LIBCZI_BUILD_DYNLIB)
     target_compile_options(libCZI PRIVATE -D_FILE_OFFSET_BITS=64)
   ENDIF(UNIX)
   if(LIBCZI_HAVE_WIN32_API)
-    target_link_libraries(libCZI PRIVATE ole32 Windowscodecs)
+    target_link_libraries(libCZI PRIVATE ole32)
+  endif()
+  if(LIBCZI_HAVE_WINCODECS_API)
+    target_link_libraries(libCZI PRIVATE Windowscodecs)
   endif()
   target_include_directories(libCZI
       PUBLIC
@@ -382,7 +385,10 @@ IF(UNIX)
   set_property(TARGET libCZIStatic PROPERTY POSITION_INDEPENDENT_CODE ON)
 ENDIF(UNIX)
 if(LIBCZI_HAVE_WIN32_API)
-    target_link_libraries(libCZIStatic PUBLIC ole32 Windowscodecs)
+    target_link_libraries(libCZIStatic PUBLIC ole32)
+endif()
+if(LIBCZI_HAVE_WINCODECS_API)
+    target_link_libraries(libCZIStatic PUBLIC Windowscodecs)
 endif()
 target_compile_definitions(libCZIStatic PUBLIC _LIBCZISTATICLIB)    # make sure that users of the static library get the correct definition
 

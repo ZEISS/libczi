@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.15)
 cmake_policy(SET CMP0091 NEW) # enable new "MSVC runtime library selection" (https://cmake.org/cmake/help/latest/variable/CMAKE_MSVC_RUNTIME_LIBRARY.html)
 
 project(libCZI 
-      VERSION 0.66.5
+      VERSION 0.66.6
       HOMEPAGE_URL "https://github.com/ZEISS/libczi"
       DESCRIPTION "libCZI is an Open Source Cross-Platform C++ library to read and write CZI")
 
@@ -81,6 +81,16 @@ detect_win32_api_mode(
     LIBCZI_HAVE_WIN32_API
     LIBCZI_HAVE_WIN32UWP_API
 )
+
+# Determine whether we are cross-compiling to Windows. When cross-compiling, there is insufficient support
+# for the Windows Imaging Component (WIC), so we disable it.
+if (LIBCZI_HAVE_WIN32_API)
+  if (CYGWIN OR MSYS OR MINGW)
+    set(LIBCZI_HAVE_WINCODECS_API OFF)
+  else()
+    set(LIBCZI_HAVE_WINCODECS_API ON)
+  endif()
+endif()
 
 # This option controls whether to build the curl-based http-/https-stream object. If this option is
 # "ON", the build will fail if the curl-library is not available (either as an external package or
