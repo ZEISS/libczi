@@ -778,7 +778,7 @@ static _FORCEINLINE Int DecodeSignificantAbsLevel(struct CAdaptiveHuffman* pAHex
     return iLevel;
 }
 
-U8 decodeQPIndex(BitIOInfo* pIO, U8 cBits)
+U8 JXRLIB_API(decodeQPIndex)(BitIOInfo* pIO, U8 cBits)
 {
     if (_getBit16(pIO, 1) == 0)
         return 0;
@@ -811,7 +811,7 @@ Int JXRLIB_API(DecodeMacroblockLowpass)(CWMImageStrCodec* pSC, CCodingContext* p
 
     readIS_L1(pSC, pIO);
     if ((pSC->WMISCP.bfBitstreamFormat != SPATIAL) && (pSC->pTile[pSC->cTileColumn].cBitsLP > 0))  // MB-based LP QP index
-        pMBInfo->iQIndexLP = decodeQPIndex(pIO, pSC->pTile[pSC->cTileColumn].cBitsLP);
+        pMBInfo->iQIndexLP = JXRLIB_API(decodeQPIndex)(pIO, pSC->pTile[pSC->cTileColumn].cBitsLP);
 
     // set arrays
     for (k = 0; k < (Int)pSC->m_param.cNumChannels; k++) {
@@ -1043,9 +1043,9 @@ Int JXRLIB_API(DecodeMacroblockDC)(CWMImageStrCodec* pSC, CCodingContext* pConte
 
     if (pSC->WMISCP.bfBitstreamFormat == SPATIAL && pSC->WMISCP.sbSubband != SB_DC_ONLY) {
         if (pTile->cBitsLP > 0)  // MB-based LP QP index
-            pMBInfo->iQIndexLP = decodeQPIndex(pIO, pTile->cBitsLP);
+            pMBInfo->iQIndexLP = JXRLIB_API(decodeQPIndex)(pIO, pTile->cBitsLP);
         if (pSC->WMISCP.sbSubband != SB_NO_HIGHPASS && pTile->cBitsHP > 0)  // MB-based HP QP index
-            pMBInfo->iQIndexHP = decodeQPIndex(pIO, pTile->cBitsHP);
+            pMBInfo->iQIndexHP = JXRLIB_API(decodeQPIndex)(pIO, pTile->cBitsHP);
     }
     if (pTile->cBitsHP == 0 && pTile->cNumQPHP > 1) // use LP QP
         pMBInfo->iQIndexHP = pMBInfo->iQIndexLP;
@@ -1149,7 +1149,7 @@ Int JXRLIB_API(DecodeMacroblockHighpass)(CWMImageStrCodec* pSC, CCodingContext* 
         }
     }
     if ((pSC->WMISCP.bfBitstreamFormat != SPATIAL) && (pSC->pTile[pSC->cTileColumn].cBitsHP > 0)) { // MB-based HP QP index
-        pSC->MBInfo.iQIndexHP = decodeQPIndex(pContext->m_pIOAC, pSC->pTile[pSC->cTileColumn].cBitsHP);
+        pSC->MBInfo.iQIndexHP = JXRLIB_API(decodeQPIndex)(pContext->m_pIOAC, pSC->pTile[pSC->cTileColumn].cBitsHP);
         if (pSC->MBInfo.iQIndexHP >= pSC->pTile[pSC->cTileColumn].cNumQPHP)
             goto ErrorExit;
     }

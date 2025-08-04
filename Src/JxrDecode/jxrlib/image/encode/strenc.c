@@ -415,7 +415,7 @@ static _FORCEINLINE PixelI forwardHalf(PixelI hHalf)
 //#include <Windows.h>
 //#define _WINDOWS_ 1
 
-Int StrIOEncInit(CWMImageStrCodec* pSC)
+Int JXRLIB_API(StrIOEncInit)(CWMImageStrCodec* pSC)
 {
 //#if false   // TODO TODO TODO
     pSC->m_param.bIndexTable = !(pSC->WMISCP.bfBitstreamFormat == SPATIAL && pSC->WMISCP.cNumOfSliceMinus1H + pSC->WMISCP.cNumOfSliceMinus1V == 0);
@@ -1080,7 +1080,7 @@ Int JXRLIB_API(StrEncInit)(CWMImageStrCodec* pSC)
         JXRLIB_API(setBitIOPointers)(pSC);
     }
     else {
-        StrIOEncInit(pSC);
+        JXRLIB_API(StrIOEncInit)(pSC);
         JXRLIB_API(setBitIOPointers)(pSC);
         JXRLIB_API(WriteWMIHeader)(pSC);
     }
