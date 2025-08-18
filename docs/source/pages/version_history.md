@@ -46,4 +46,4 @@ Version history
  0.66.3             | [144](https://github.com/ZEISS/libczi/pull/144)      | add (initial and experimental) support for building for UWP (Universal Windows Platform)
  0.66.4             | [145](https://github.com/ZEISS/libczi/pull/145)      | have embedded pugixml in its own namespace, replace md5sum implementation, update 3rd-party license texts
  0.66.5             | [146](https://github.com/ZEISS/libczi/pull/146)      | have jxrlib-symbols mangled to prevent conflicts with other libraries
- 0.66.6             | [147](https://github.com/ZEISS/libczi/pull/147)      | prepare for vcpkg features
+ 0.66.6             | [149](https://github.com/ZEISS/libczi/pull/149)      | prepare for vcpkg features
