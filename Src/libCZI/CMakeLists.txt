@@ -341,9 +341,13 @@ if (LIBCZI_BUILD_DYNLIB)
     target_link_libraries(libCZI PRIVATE ole32 Windowscodecs)
   endif()
   target_include_directories(libCZI
-      PUBLIC
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
-        $<INSTALL_INTERFACE:include>)
+    PUBLIC
+      $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+      $<INSTALL_INTERFACE:include>)
+  target_include_directories(libCZI
+    PUBLIC
+      $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/inc>
+      $<INSTALL_INTERFACE:include>)
 endif(LIBCZI_BUILD_DYNLIB)
 
 #
@@ -391,6 +395,10 @@ target_compile_definitions(libCZIStatic PUBLIC _LIBCZISTATICLIB)    # make sure 
 target_include_directories(libCZIStatic
   PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+    $<INSTALL_INTERFACE:include>)
+target_include_directories(libCZIStatic
+  PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/inc>
     $<INSTALL_INTERFACE:include>)
 
 if(LIBCZI_ENABLE_INSTALL)
