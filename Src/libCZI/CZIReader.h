@@ -7,7 +7,7 @@
 #include <functional>
 #include <memory>
 #include <mutex>
-#include "libCZI.h"
+#include "inc/libCZI.h"
 #include "CziSubBlockDirectory.h"
 #include "CziAttachmentsDirectory.h"
 #include "FileHeaderSegmentData.h"

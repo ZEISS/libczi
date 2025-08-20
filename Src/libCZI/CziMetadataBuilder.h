@@ -9,7 +9,7 @@
 #include <map>
 #include <tuple>
 #include <string>
-#include "libCZI.h"
+#include "inc/libCZI.h"
 #include "CziSubBlockDirectory.h"
 #include "pugixml.hpp"
 

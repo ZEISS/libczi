@@ -6,7 +6,7 @@
 
 #include <functional>
 #include <vector>
-#include "libCZI_Metadata.h"
+#include "inc/libCZI_Metadata.h"
 
 class CSplines
 {

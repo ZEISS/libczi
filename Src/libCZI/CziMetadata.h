@@ -6,7 +6,7 @@
 
 #include <memory>
 #include <string>
-#include "libCZI.h"
+#include "inc/libCZI.h"
 #include "pugixml.hpp"
 #include "XmlNodeWrapper.h"
 

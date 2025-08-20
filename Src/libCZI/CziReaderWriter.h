@@ -6,12 +6,12 @@
 
 #include <memory>
 #include <tuple>
-#include "libCZI.h"
+#include "inc/libCZI.h"
 #include "CziSubBlockDirectory.h"
 #include "CziAttachmentsDirectory.h"
 #include "CziStructs.h"
 #include "CziWriter.h"
-#include "libCZI_ReadWrite.h"
+#include "inc/libCZI_ReadWrite.h"
 #include "FileHeaderSegmentData.h"
 #include "CziParse.h"
 

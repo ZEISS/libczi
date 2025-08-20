@@ -7,7 +7,7 @@
 #include <memory>
 #include <vector>
 #include "CZIReader.h"
-#include "libCZI.h"
+#include "inc/libCZI.h"
 #include "SingleChannelAccessorBase.h"
 
 class CSingleChannelTileAccessor : public CSingleChannelAccessorBase, public libCZI::ISingleChannelTileAccessor

@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "../libCZI/libCZI.h"
+#include <libCZI.h>
 
 #include "../libCZI/splines.h"
 #include "../libCZI/bitmapData.h"

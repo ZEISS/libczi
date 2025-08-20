@@ -50,6 +50,7 @@ ADD_EXECUTABLE(libCZI_UnitTests
 
 TARGET_LINK_LIBRARIES(libCZI_UnitTests PRIVATE libCZIStatic GTest::gtest GTest::gmock)
 set_target_properties(libCZI_UnitTests PROPERTIES CXX_STANDARD 14)
+target_include_directories(libCZI_UnitTests PRIVATE ../libCZI "${CMAKE_CURRENT_LIST_DIR}/../libCZI/inc")
 
 target_compile_definitions(libCZI_UnitTests PRIVATE _LIBCZISTATICLIB)
 

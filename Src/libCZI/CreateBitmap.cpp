@@ -4,7 +4,7 @@
 
 #include "bitmapData.h"
 #include "Site.h"
-#include "libCZI.h"
+#include "inc/libCZI.h"
 #include "BitmapOperations.h"
 #include "inc_libCZI_Config.h"
 #include "CziSubBlock.h"

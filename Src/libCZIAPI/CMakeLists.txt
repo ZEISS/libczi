@@ -75,7 +75,9 @@ target_compile_definitions(libCZIAPIStatic PRIVATE _LIBCZISTATICLIB _LIBCZIAPIST
 target_link_libraries(libCZIAPI PRIVATE libCZIStatic)
 target_link_libraries(libCZIAPIStatic PRIVATE libCZIStatic)
 
+target_include_directories(libCZIAPI PRIVATE ../libCZI "${CMAKE_CURRENT_LIST_DIR}/../libCZI/inc")
 target_include_directories(libCZIAPI PRIVATE ../libCZI ${RAPIDJSON_INCLUDE_DIRS})
+target_include_directories(libCZIAPIStatic PRIVATE ../libCZI "${CMAKE_CURRENT_LIST_DIR}/../libCZI/inc")
 target_include_directories(libCZIAPIStatic PRIVATE ../libCZI ${RAPIDJSON_INCLUDE_DIRS})
 
 # Copy the resulting DLL to custom folders after the build 

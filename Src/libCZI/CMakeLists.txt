@@ -73,23 +73,23 @@ set(LIBCZISRCFILES
             decoder_wic.h
             decoder_zstd.h
             FileHeaderSegmentData.h
-            ImportExport.h
-            inc_libCZI_Config.h
             IndexSet.h
-            libCZI.h
-            libCZI_Compositor.h
-            libCZI_compress.h
-            libCZI_DimCoordinate.h
-            libCZI_exceptions.h
-            libCZI_Helpers.h
-            libCZI_Metadata.h
-            libCZI_Metadata2.h
-            libCZI_Pixels.h
-            libCZI_ReadWrite.h
-            libCZI_Site.h
-            libCZI_Utilities.h
-            libCZI_Write.h
-            libCZI_StreamsLib.h
+            inc/ImportExport.h
+            inc/libCZI.h
+            inc/libCZI_Compositor.h
+            inc/libCZI_compress.h
+            inc/libCZI_DimCoordinate.h
+            inc/libCZI_exceptions.h
+            inc/libCZI_Helpers.h
+            inc/libCZI_Metadata.h
+            inc/libCZI_Metadata2.h
+            inc/libCZI_Pixels.h
+            inc/libCZI_ReadWrite.h
+            inc/libCZI_Site.h
+            inc/libCZI_Utilities.h
+            inc/libCZI_Write.h
+            inc/libCZI_StreamsLib.h
+            inc_libCZI_Config.h
             MD5Sum.h
             MultiChannelCompositor.h
             SingleChannelAccessorBase.h
@@ -322,6 +322,7 @@ set_target_properties(libCZIStatic PROPERTIES CXX_STANDARD 14)
 target_compile_definitions(libCZIStatic PRIVATE _LIBCZISTATICLIB)
 set_target_properties(libCZIStatic PROPERTIES VERSION ${PROJECT_VERSION})
 # add the binary tree to the search path for include files so that we will find libCZI_Config.h
+target_include_directories(libCZIStatic PUBLIC   "${CMAKE_CURRENT_BINARY_DIR}/inc")
 target_include_directories(libCZIStatic PRIVATE  "${CMAKE_CURRENT_BINARY_DIR}")
 target_include_directories(libCZIStatic PRIVATE  ${EIGEN3_INCLUDE_DIR})
 set_target_properties(libCZIStatic PROPERTIES DEBUG_POSTFIX "d")

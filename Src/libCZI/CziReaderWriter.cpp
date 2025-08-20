@@ -4,9 +4,9 @@
 
 #include "CziReaderWriter.h"
 #include "CziMetadataSegment.h"
-#include "libCZI_Utilities.h"
+#include "inc/libCZI_Utilities.h"
 #include "CziUtils.h"
-#include "libCZI_exceptions.h"
+#include "inc/libCZI_exceptions.h"
 #include "CziMetadataBuilder.h"
 #include "utilities.h"
 #include "CziSubBlock.h"

@@ -10,7 +10,7 @@
 #include "CziSubBlockDirectory.h"
 #include "CziAttachmentsDirectory.h"
 #include "FileHeaderSegmentData.h"
-#include "libCZI.h"
+#include "inc/libCZI.h"
 
 class CCZIParse
 {

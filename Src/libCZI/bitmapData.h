@@ -6,7 +6,7 @@
 
 #include <memory>
 #include <atomic>
-#include "libCZI_Pixels.h"
+#include "inc/libCZI_Pixels.h"
 #include "CziUtils.h"
 #include "stdAllocator.h"
 #include "Site.h"

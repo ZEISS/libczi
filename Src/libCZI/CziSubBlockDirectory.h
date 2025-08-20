@@ -9,7 +9,7 @@
 #include <map>
 #include <functional>
 #include <set>
-#include "libCZI.h"
+#include "inc/libCZI.h"
 
 class CCziSubBlockDirectoryBase
 {

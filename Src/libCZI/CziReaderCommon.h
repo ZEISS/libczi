@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "libCZI.h"
+#include "inc/libCZI.h"
 #include "CziAttachment.h"
 #include <functional>
 

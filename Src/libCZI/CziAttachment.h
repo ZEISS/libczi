@@ -5,7 +5,7 @@
 #pragma once
 
 #include <memory>
-#include "libCZI.h"
+#include "inc/libCZI.h"
 #include "CziParse.h"
 
 class CCziAttachment : public  libCZI::IAttachment

@@ -22,5 +22,6 @@ TARGET_LINK_LIBRARIES(libCZIAPI_UnitTests PRIVATE libCZIAPIStatic GTest::gtest G
 
 target_compile_definitions(libCZIAPI_UnitTests PRIVATE _LIBCZISTATICLIB _LIBCZIAPISTATICLIB)
 target_include_directories(libCZIAPI_UnitTests PRIVATE ../libCZIAPI/inc ../libCZI "${RAPIDJSON_INCLUDE_DIRS}")
+target_include_directories(libCZIAPI_UnitTests PRIVATE ../libCZI "${CMAKE_CURRENT_LIST_DIR}/../libCZI/inc")
 
 add_test(NAME libCZIAPI_UnitTests COMMAND libCZIAPI_UnitTests)
