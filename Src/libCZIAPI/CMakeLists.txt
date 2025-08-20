@@ -75,10 +75,8 @@ target_compile_definitions(libCZIAPIStatic PRIVATE _LIBCZISTATICLIB _LIBCZIAPIST
 target_link_libraries(libCZIAPI PRIVATE libCZIStatic)
 target_link_libraries(libCZIAPIStatic PRIVATE libCZIStatic)
 
-target_include_directories(libCZIAPI PRIVATE ../libCZI "${CMAKE_CURRENT_LIST_DIR}/../libCZI/inc")
-target_include_directories(libCZIAPI PRIVATE ../libCZI ${RAPIDJSON_INCLUDE_DIRS})
-target_include_directories(libCZIAPIStatic PRIVATE ../libCZI "${CMAKE_CURRENT_LIST_DIR}/../libCZI/inc")
-target_include_directories(libCZIAPIStatic PRIVATE ../libCZI ${RAPIDJSON_INCLUDE_DIRS})
+target_include_directories(libCZIAPI PRIVATE ../libCZI ../libCZI/inc ${RAPIDJSON_INCLUDE_DIRS})
+target_include_directories(libCZIAPIStatic PRIVATE ../libCZI ../libCZI/inc ${RAPIDJSON_INCLUDE_DIRS})
 
 # Copy the resulting DLL to custom folders after the build 
 # TODO(JBL): This is a convenient way to copy the DLL to the output folder of the .NET project. It has to be seen

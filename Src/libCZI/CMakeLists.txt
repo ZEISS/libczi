@@ -359,7 +359,6 @@ set_target_properties(libCZIStatic PROPERTIES CXX_STANDARD 14)
 target_compile_definitions(libCZIStatic PRIVATE _LIBCZISTATICLIB)
 set_target_properties(libCZIStatic PROPERTIES VERSION ${PROJECT_VERSION})
 # add the binary tree to the search path for include files so that we will find libCZI_Config.h
-target_include_directories(libCZIStatic PUBLIC   "${CMAKE_CURRENT_BINARY_DIR}/inc")
 target_include_directories(libCZIStatic PRIVATE  "${CMAKE_CURRENT_BINARY_DIR}")
 target_include_directories(libCZIStatic PRIVATE  ${EIGEN3_INCLUDE_DIR})
 set_target_properties(libCZIStatic PROPERTIES DEBUG_POSTFIX "d")
