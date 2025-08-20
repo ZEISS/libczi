@@ -5,6 +5,7 @@
 include(FetchContent)
 include(CheckIncludeFiles)
 include(CheckSymbolExists)
+include(CMakePackageConfigHelpers)
 
 set(LIBCZISRCFILES 
             BitmapOperations.cpp
@@ -112,6 +113,8 @@ set(LIBCZISRCFILES
             StreamsLib/curlhttpinputstream.h
             StreamsLib/windowsfileinputstream.cpp
             StreamsLib/windowsfileinputstream.h
+            StreamsLib/uwpfileinputstream.cpp
+            StreamsLib/uwpfileinputstream.h
             StreamsLib/simplefileinputstream.cpp
             StreamsLib/simplefileinputstream.h
             StreamsLib/preadfileinputstream.cpp
@@ -156,34 +159,48 @@ endif()
 
 string(CONCAT libCZI_CompilerIdentification ${CMAKE_CXX_COMPILER_ID} " " ${CMAKE_CXX_COMPILER_VERSION} )
 
-# get the URL of the upstream repository
-execute_process(
-  COMMAND git remote get-url origin
-  WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-  OUTPUT_VARIABLE libCZI_REPOSITORYREMOTEURL
-  OUTPUT_STRIP_TRAILING_WHITESPACE
-)
-if (NOT DEFINED libCZI_REPOSITORYREMOTEURL OR "${libCZI_REPOSITORYREMOTEURL}" STREQUAL "")
+# get the URL and the hash of the source code we are building
+# the strategy is:
+# 1. allow for the information to be externally provided (via the variable LIBCZI_REPOSITORY_REMOTE, LIBCZI_REPOSITORY_BRANCH, LIBCZI_REPOSITORY_HASH)
+# 2. if not provided, try to get the information by trying to run git commands
+# 3. if that fails, set the information to "unknown"
+# Use values from cache if set by portfile or other means
+set(libCZI_REPOSITORYREMOTEURL "${LIBCZI_REPOSITORY_REMOTE}" CACHE STRING "")
+set(libCZI_REPOSITORYBRANCH "${LIBCZI_REPOSITORY_BRANCH}" CACHE STRING "")
+set(libCZI_REPOSITORYHASH "${LIBCZI_REPOSITORY_HASH}" CACHE STRING "")
+# Fallback to git commands if not already set
+if (NOT libCZI_REPOSITORYREMOTEURL)
+  execute_process(
+    COMMAND git remote get-url origin
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+    OUTPUT_VARIABLE libCZI_REPOSITORYREMOTEURL
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+  )
+endif()
+if (NOT libCZI_REPOSITORYBRANCH)
+  execute_process(
+    COMMAND git name-rev --name-only HEAD
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+    OUTPUT_VARIABLE libCZI_REPOSITORYBRANCH
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+  )
+endif()
+if (NOT libCZI_REPOSITORYHASH)
+  execute_process(
+    COMMAND git log -1 --format=%H
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+    OUTPUT_VARIABLE libCZI_REPOSITORYHASH
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+  )
+endif()
+# Final fallback
+if (NOT libCZI_REPOSITORYREMOTEURL)
   set(libCZI_REPOSITORYREMOTEURL "unknown")
 endif()
-
-execute_process(
-  COMMAND git name-rev --name-only HEAD
-  WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-  OUTPUT_VARIABLE libCZI_REPOSITORYBRANCH
-  OUTPUT_STRIP_TRAILING_WHITESPACE
-)
-if (NOT DEFINED libCZI_REPOSITORYBRANCH OR "${libCZI_REPOSITORYBRANCH}" STREQUAL "")
+if (NOT libCZI_REPOSITORYBRANCH)
   set(libCZI_REPOSITORYBRANCH "unknown")
 endif()
-
-execute_process(
-  COMMAND  git log -1 --format=%H
-  WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-  OUTPUT_VARIABLE libCZI_REPOSITORYHASH
-  OUTPUT_STRIP_TRAILING_WHITESPACE
-)
-if (NOT DEFINED libCZI_REPOSITORYHASH OR "${libCZI_REPOSITORYHASH}" STREQUAL "")
+if (NOT libCZI_REPOSITORYHASH)
   set(libCZI_REPOSITORYHASH "unknown")
 endif()
 
@@ -239,6 +256,13 @@ endif()
 
 if (LIBCZI_BUILD_PREFER_EXTERNALPACKAGE_ZSTD)
   find_package(zstd CONFIG REQUIRED)
+  if (TARGET zstd::libzstd_static)               # static triplet
+    set(LIBCZI_ZSTD_LINK_TARGET "zstd::libzstd_static")
+  elseif (TARGET zstd::libzstd_shared)           # shared triplet
+    set(LIBCZI_ZSTD_LINK_TARGET "zstd::libzstd_shared")
+  else()
+    message(FATAL_ERROR "No suitable zstd target found")
+  endif()
 else()
   FetchContent_Declare(
     zstd
@@ -261,6 +285,12 @@ if (LIBCZI_HAVE_WIN32_API)
   set(libCZI_WINDOWSAPIAVAILABLE 1)
 else()
   set(libCZI_WINDOWSAPIAVAILABLE 0)
+endif()
+
+if (LIBCZI_HAVE_WIN32UWP_API)
+  set(libCZI_WINDOWSAPI_UWP_AVAILABLE 1)
+else()
+  set(libCZI_WINDOWSAPI_UWP_AVAILABLE 0)
 endif()
 
 configure_file (
@@ -287,9 +317,8 @@ if (LIBCZI_BUILD_DYNLIB)
   target_include_directories(libCZI PRIVATE  "${CMAKE_CURRENT_BINARY_DIR}")
   target_include_directories(libCZI PRIVATE  ${EIGEN3_INCLUDE_DIR})
   set_target_properties(libCZI PROPERTIES DEBUG_POSTFIX "d")
-  set_target_properties(libCZI PROPERTIES PUBLIC_HEADER "${libCZIPublicHeaders}")
   if (LIBCZI_BUILD_PREFER_EXTERNALPACKAGE_ZSTD)
-   target_link_libraries(libCZI PRIVATE zstd::libzstd_static)
+   target_link_libraries(libCZI PRIVATE ${LIBCZI_ZSTD_LINK_TARGET})
   else()
    target_link_libraries(libCZI PRIVATE libzstd_static)
    target_include_directories(libCZI PRIVATE ${zstd_SOURCE_DIR}/lib)
@@ -311,6 +340,10 @@ if (LIBCZI_BUILD_DYNLIB)
   if(LIBCZI_HAVE_WIN32_API)
     target_link_libraries(libCZI PRIVATE ole32 Windowscodecs)
   endif()
+  target_include_directories(libCZI
+      PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+        $<INSTALL_INTERFACE:include>)
 endif(LIBCZI_BUILD_DYNLIB)
 
 #
@@ -326,9 +359,8 @@ target_include_directories(libCZIStatic PUBLIC   "${CMAKE_CURRENT_BINARY_DIR}/in
 target_include_directories(libCZIStatic PRIVATE  "${CMAKE_CURRENT_BINARY_DIR}")
 target_include_directories(libCZIStatic PRIVATE  ${EIGEN3_INCLUDE_DIR})
 set_target_properties(libCZIStatic PROPERTIES DEBUG_POSTFIX "d")
-set_target_properties(libCZIStatic PROPERTIES PUBLIC_HEADER "${libCZIPublicHeaders}")
 if (LIBCZI_BUILD_PREFER_EXTERNALPACKAGE_ZSTD)
-   target_link_libraries(libCZIStatic PRIVATE zstd::libzstd_static)
+   target_link_libraries(libCZIStatic PUBLIC ${LIBCZI_ZSTD_LINK_TARGET})
 else()
    target_link_libraries(libCZIStatic PRIVATE libzstd_static)
    target_include_directories(libCZIStatic PRIVATE ${zstd_SOURCE_DIR}/lib)
@@ -342,7 +374,7 @@ if (LIBCZI_BUILD_AZURESDK_BASED_STREAM)
 endif()
 
 if (LIBCZI_BUILD_PREFER_EXTERNALPACKAGE_EIGEN3)
-  target_link_libraries(libCZIStatic PRIVATE Eigen3::Eigen)
+  target_link_libraries(libCZIStatic PUBLIC Eigen3::Eigen)
 else()
   add_dependencies(libCZIStatic eigen_ext)
 endif()
@@ -353,22 +385,75 @@ ENDIF(UNIX)
 if(LIBCZI_HAVE_WIN32_API)
     target_link_libraries(libCZIStatic PUBLIC ole32 Windowscodecs)
 endif()
+target_compile_definitions(libCZIStatic PUBLIC _LIBCZISTATICLIB)    # make sure that users of the static library get the correct definition
 
-#
-# Notes: - the variables CMAKE_INSTALL_<...> have been defined in the module "GNUInstallDirs"
-#install(FILES ${libCZIPublicHeaders} DESTINATION  ${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME})
-if (LIBCZI_BUILD_DYNLIB)
-  install(TARGETS libCZI
-  #		 EXPORT "libCZI"
-     ARCHIVE  DESTINATION ${CMAKE_INSTALL_LIBDIR}
-     LIBRARY  DESTINATION ${CMAKE_INSTALL_LIBDIR}
-     RUNTIME  DESTINATION ${CMAKE_INSTALL_BINDIR}
-     PUBLIC_HEADER DESTINATION  ${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME})
-endif(LIBCZI_BUILD_DYNLIB)
+# Static library include directories
+target_include_directories(libCZIStatic
+  PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+    $<INSTALL_INTERFACE:include>)
 
-install(TARGETS libCZIStatic
-#		 EXPORT "libCZIStatic"
-     ARCHIVE  DESTINATION ${CMAKE_INSTALL_LIBDIR}
-     LIBRARY  DESTINATION ${CMAKE_INSTALL_LIBDIR}
-     RUNTIME  DESTINATION ${CMAKE_INSTALL_BINDIR}
-     PUBLIC_HEADER DESTINATION  ${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME})
+if(LIBCZI_ENABLE_INSTALL)
+
+    string(TOLOWER "${PROJECT_NAME}" PROJECT_NAME_LOWERCASE)
+    set(INSTALL_CMAKEDIR "${CMAKE_INSTALL_DATADIR}/${PROJECT_NAME_LOWERCASE}")
+
+    # Shared lib install
+    if(LIBCZI_BUILD_DYNLIB)
+        install(TARGETS libCZI
+                EXPORT libCZITargets
+                ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+                LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+                RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+                PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME}
+                CONFIGURATIONS Release RelWithDebInfo MinSizeRel)
+
+    else()
+        # Static lib install
+        install(TARGETS libCZIStatic
+                EXPORT libCZITargets
+                ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+                LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+                RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+                PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME}
+                CONFIGURATIONS Release RelWithDebInfo MinSizeRel)
+    endif()
+
+    # Manual install of public headers to include/libCZI (simulate structure without moving files)
+    install(FILES ${libCZIPublicHeaders}
+        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/libCZI)
+
+    # Export target definitions
+    if(TARGET libCZI)
+        set(_libczi_target libCZI)
+    elseif(TARGET libCZIStatic)
+        set(_libczi_target libCZIStatic)
+    endif()
+    if(DEFINED _libczi_target)
+        install(EXPORT libCZITargets
+                NAMESPACE libczi::
+                DESTINATION ${INSTALL_CMAKEDIR}
+                FILE libCZITargets.cmake
+                EXPORT_LINK_INTERFACE_LIBRARIES)
+    endif()
+
+    # Generate and install libcziConfig.cmake and version file
+    write_basic_package_version_file(
+        "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake"
+        VERSION ${PROJECT_VERSION}
+        COMPATIBILITY SameMajorVersion
+    )
+
+    configure_package_config_file(
+        "${CMAKE_CURRENT_SOURCE_DIR}/../../cmake/${PROJECT_NAME}Config.cmake.in"
+        "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake"
+        INSTALL_DESTINATION ${INSTALL_CMAKEDIR}
+    )
+
+    install(FILES
+        "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake"
+        "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake"
+        DESTINATION ${INSTALL_CMAKEDIR}
+    )
+
+endif()

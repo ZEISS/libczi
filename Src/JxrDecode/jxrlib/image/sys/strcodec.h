@@ -27,6 +27,7 @@
 //*@@@---@@@@******************************************************************
 #pragma once
 
+#include "../../common/include/jxrlib_symbol_mangle.h"
 #include <stddef.h>
 #include <stdint.h>
 
@@ -426,80 +427,80 @@ typedef struct CWMImageStrCodec {
 
 
 //================================================================
-ERR WMPAlloc(void** ppv, size_t cb);
-ERR WMPFree(void** ppv);
+ERR JXRLIB_API(WMPAlloc)(void** ppv, size_t cb);
+ERR JXRLIB_API(WMPFree)(void** ppv);
 
 //================================================================
-Void initMRPtr(CWMImageStrCodec*);
-Void advanceMRPtr(CWMImageStrCodec*);
-Void swapMRPtr(CWMImageStrCodec*);
+Void JXRLIB_API(initMRPtr)(CWMImageStrCodec*);
+Void JXRLIB_API(advanceMRPtr)(CWMImageStrCodec*);
+Void JXRLIB_API(swapMRPtr)(CWMImageStrCodec*);
 
-Int IDPEmpty(CWMImageStrCodec*);
-
-//================================================================
-extern const int dctIndex[3][16];
-extern const int blkOffset[16];
-extern const int blkOffsetUV[4];
-extern const int blkOffsetUV_422[8];
-
-extern const U8 idxCC[16][16];
-extern const U8 idxCC_420[8][8];
-
-extern const Char gGDISignature[];
+Int JXRLIB_API(IDPEmpty)(CWMImageStrCodec*);
 
 //================================================================
-Int allocatePredInfo(CWMImageStrCodec*);
-Void freePredInfo(CWMImageStrCodec*);
-Void advanceOneMBRow(CWMImageStrCodec*);
+extern const int JXRLIB_API(dctIndex)[3][16];
+extern const int JXRLIB_API(blkOffset)[16];
+extern const int JXRLIB_API(blkOffsetUV)[4];
+extern const int JXRLIB_API(blkOffsetUV_422)[8];
+
+extern const U8 JXRLIB_API(idxCC)[16][16];
+extern const U8 JXRLIB_API(idxCC_420)[8][8];
+
+extern const Char JXRLIB_API(gGDISignature)[];
+
+//================================================================
+Int JXRLIB_API(allocatePredInfo)(CWMImageStrCodec*);
+Void JXRLIB_API(freePredInfo)(CWMImageStrCodec*);
+Void JXRLIB_API(advanceOneMBRow)(CWMImageStrCodec*);
 
 //================================================================
 // bit I/O
 //================================================================
-Int allocateBitIOInfo(CWMImageStrCodec*);
-Int setBitIOPointers(CWMImageStrCodec* pSC);
+Int JXRLIB_API(allocateBitIOInfo)(CWMImageStrCodec*);
+Int JXRLIB_API(setBitIOPointers)(CWMImageStrCodec* pSC);
 
-U32 peekBit16(BitIOInfo* pIO, U32 cBits);
-U32 flushBit16(BitIOInfo* pIO, U32 cBits);
-U32 getBit16(BitIOInfo* pIO, U32 cBits);
-U32 getBool16(BitIOInfo* pIO);
-I32 getBit16s(BitIOInfo* pIO, U32 cBits);
-U32 getBit32(BitIOInfo* pIO, U32 cBits);
-U32 flushToByte(BitIOInfo* pIO);
+U32 JXRLIB_API(peekBit16)(BitIOInfo* pIO, U32 cBits);
+U32 JXRLIB_API(flushBit16)(BitIOInfo* pIO, U32 cBits);
+U32 JXRLIB_API(getBit16)(BitIOInfo* pIO, U32 cBits);
+U32 JXRLIB_API(getBool16)(BitIOInfo* pIO);
+I32 JXRLIB_API(getBit16s)(BitIOInfo* pIO, U32 cBits);
+U32 JXRLIB_API(getBit32)(BitIOInfo* pIO, U32 cBits);
+U32 JXRLIB_API(flushToByte)(BitIOInfo* pIO);
 
-Void putBit16z(BitIOInfo* pIO, U32 uiBits, U32 cBits);
-Void putBit16(BitIOInfo* pIO, U32 uiBits, U32 cBits);
-Void putBit32(BitIOInfo* pIO, U32 uiBits, U32 cBits);
-Void fillToByte(BitIOInfo* pIO);
+Void JXRLIB_API(putBit16z)(BitIOInfo* pIO, U32 uiBits, U32 cBits);
+Void JXRLIB_API(putBit16)(BitIOInfo* pIO, U32 uiBits, U32 cBits);
+Void JXRLIB_API(putBit32)(BitIOInfo* pIO, U32 uiBits, U32 cBits);
+Void JXRLIB_API(fillToByte)(BitIOInfo* pIO);
 
-U32 getSizeRead(BitIOInfo* pIO);
-U32 getSizeWrite(BitIOInfo* pIO);
+U32 JXRLIB_API(getSizeRead)(BitIOInfo* pIO);
+U32 JXRLIB_API(getSizeWrite)(BitIOInfo* pIO);
 
-U32 getPosRead(BitIOInfo* pIO);
+U32 JXRLIB_API(getPosRead)(BitIOInfo* pIO);
 
 // safe function, solely for the convenience of test code
-U32 getBit16_S(CWMImageStrCodec* pSC, BitIOInfo* pIO, U32 cBits);
+U32 JXRLIB_API(getBit16_S)(CWMImageStrCodec* pSC, BitIOInfo* pIO, U32 cBits);
 
 //================================================================
 // packet I/O
 //================================================================
-ERR attachISRead(BitIOInfo* pIO, struct tagWMPStream* pWS, CWMImageStrCodec* pSC);
-ERR readIS(CWMImageStrCodec* pSC, BitIOInfo* pIO);
-ERR detachISRead(CWMImageStrCodec* pSC, BitIOInfo* pIO);
+ERR JXRLIB_API(attachISRead)(BitIOInfo* pIO, struct tagWMPStream* pWS, CWMImageStrCodec* pSC);
+ERR JXRLIB_API(readIS)(CWMImageStrCodec* pSC, BitIOInfo* pIO);
+ERR JXRLIB_API(detachISRead)(CWMImageStrCodec* pSC, BitIOInfo* pIO);
 
-ERR attachISWrite(BitIOInfo* pIO, struct tagWMPStream* pWS);
-ERR writeIS(CWMImageStrCodec* pSC, BitIOInfo* pIO);
-ERR detachISWrite(CWMImageStrCodec* pSC, BitIOInfo* pIO);
+ERR JXRLIB_API(attachISWrite)(BitIOInfo* pIO, struct tagWMPStream* pWS);
+ERR JXRLIB_API(writeIS)(CWMImageStrCodec* pSC, BitIOInfo* pIO);
+ERR JXRLIB_API(detachISWrite)(CWMImageStrCodec* pSC, BitIOInfo* pIO);
 
 
 //================================================================
 // post processing for decoder
 //================================================================
-Int initPostProc(struct tagPostProcInfo* strPostProcInfo[MAX_CHANNELS][2], size_t mbWidth, size_t iNumChannels);
-Void termPostProc(struct tagPostProcInfo* strPostProcInfo[MAX_CHANNELS][2], size_t iNumChannels);
-Void slideOneMBRow(struct tagPostProcInfo* strPostProcInfo[MAX_CHANNELS][2], size_t iNumChannels, size_t mbWidth, Bool top, Bool bottom);
-Void updatePostProcInfo(struct tagPostProcInfo* strPostProcInfo[MAX_CHANNELS][2], PixelI* p, size_t mbX, size_t cc);
-Void postProcMB(struct tagPostProcInfo* strPostProcInfo[MAX_CHANNELS][2], PixelI* p0, PixelI* p1, size_t mbX, size_t cc, Int threshold);
-Void postProcBlock(struct tagPostProcInfo* strPostProcInfo[MAX_CHANNELS][2], PixelI* p0, PixelI* p1, size_t mbX, size_t cc, Int threshold);
+Int JXRLIB_API(initPostProc)(struct tagPostProcInfo* strPostProcInfo[MAX_CHANNELS][2], size_t mbWidth, size_t iNumChannels);
+Void JXRLIB_API(termPostProc)(struct tagPostProcInfo* strPostProcInfo[MAX_CHANNELS][2], size_t iNumChannels);
+Void JXRLIB_API(slideOneMBRow)(struct tagPostProcInfo* strPostProcInfo[MAX_CHANNELS][2], size_t iNumChannels, size_t mbWidth, Bool top, Bool bottom);
+Void JXRLIB_API(updatePostProcInfo)(struct tagPostProcInfo* strPostProcInfo[MAX_CHANNELS][2], PixelI* p, size_t mbX, size_t cc);
+Void JXRLIB_API(postProcMB)(struct tagPostProcInfo* strPostProcInfo[MAX_CHANNELS][2], PixelI* p0, PixelI* p1, size_t mbX, size_t cc, Int threshold);
+Void JXRLIB_API(postProcBlock)(struct tagPostProcInfo* strPostProcInfo[MAX_CHANNELS][2], PixelI* p0, PixelI* p1, size_t mbX, size_t cc, Int threshold);
 
 //================================================================
 // Simple BitIO access functions
@@ -512,51 +513,51 @@ typedef struct tagSimpleBitIO
     U32 cBitLeft;
 } SimpleBitIO;
 
-ERR attach_SB(SimpleBitIO* pSB, struct tagWMPStream* pWS);
-U32 getBit32_SB(SimpleBitIO* pSB, U32 cBits);
-Void flushToByte_SB(SimpleBitIO* pSB);
-U32 getByteRead_SB(SimpleBitIO* pSB);
-ERR detach_SB(SimpleBitIO* pSB);
+ERR JXRLIB_API(attach_SB)(SimpleBitIO* pSB, struct tagWMPStream* pWS);
+U32 JXRLIB_API(getBit32_SB)(SimpleBitIO* pSB, U32 cBits);
+Void JXRLIB_API(flushToByte_SB)(SimpleBitIO* pSB);
+U32 JXRLIB_API(getByteRead_SB)(SimpleBitIO* pSB);
+ERR JXRLIB_API(detach_SB)(SimpleBitIO* pSB);
 
 //----------------------------------------------------------------
-EXTERN_C Bool EOSWS_File(struct tagWMPStream* pWS);
+EXTERN_C Bool JXRLIB_API(EOSWS_File)(struct tagWMPStream* pWS);
 
-EXTERN_C ERR ReadWS_File(struct tagWMPStream* pWS, void* pv, size_t cb);
-EXTERN_C ERR WriteWS_File(struct tagWMPStream* pWS, const void* pv, size_t cb);
+EXTERN_C ERR JXRLIB_API(ReadWS_File)(struct tagWMPStream* pWS, void* pv, size_t cb);
+EXTERN_C ERR JXRLIB_API(WriteWS_File)(struct tagWMPStream* pWS, const void* pv, size_t cb);
 //EXTERN_C ERR GetLineWS_File(struct WMPStream* pWS, void* pv, size_t cb);
 
-EXTERN_C ERR SetPosWS_File(struct tagWMPStream* pWS, size_t offPos);
-EXTERN_C ERR GetPosWS_File(struct tagWMPStream* pWS, size_t* poffPos);
+EXTERN_C ERR JXRLIB_API(SetPosWS_File)(struct tagWMPStream* pWS, size_t offPos);
+EXTERN_C ERR JXRLIB_API(GetPosWS_File)(struct tagWMPStream* pWS, size_t* poffPos);
 
 //----------------------------------------------------------------
-EXTERN_C Bool EOSWS_Memory(struct tagWMPStream* pWS);
+EXTERN_C Bool JXRLIB_API(EOSWS_Memory)(struct tagWMPStream* pWS);
 
-EXTERN_C ERR ReadWS_Memory(struct tagWMPStream* pWS, void* pv, size_t cb);
-EXTERN_C ERR WriteWS_Memory(struct tagWMPStream* pWS, const void* pv, size_t cb);
+EXTERN_C ERR JXRLIB_API(ReadWS_Memory)(struct tagWMPStream* pWS, void* pv, size_t cb);
+EXTERN_C ERR JXRLIB_API(WriteWS_Memory)(struct tagWMPStream* pWS, const void* pv, size_t cb);
 //EXTERN_C ERR GetLineWS_Memory(struct tagWMPStream* pWS, void* pv, size_t cb);
 
-EXTERN_C ERR SetPosWS_Memory(struct tagWMPStream* pWS, size_t offPos);
-EXTERN_C ERR GetPosWS_Memory(struct tagWMPStream* pWS, size_t* poffPos);
+EXTERN_C ERR JXRLIB_API(SetPosWS_Memory)(struct tagWMPStream* pWS, size_t offPos);
+EXTERN_C ERR JXRLIB_API(GetPosWS_Memory)(struct tagWMPStream* pWS, size_t* poffPos);
 
 //----------------------------------------------------------------
-EXTERN_C ERR WriteWS_HeapBackedWriteableStream(struct tagWMPStream* pWS, const void* pv, size_t cb);
-EXTERN_C ERR SetPosWS_HeapBackedWriteableStream(struct tagWMPStream* pWS, size_t offPos);
-EXTERN_C ERR GetPosWS_HeapBackedWriteableStream(struct tagWMPStream* pWS, size_t* poffPos);
-EXTERN_C Bool EOSWS_HeapBackedWriteableStream(struct tagWMPStream* pWS);
-EXTERN_C ERR ReadWS_HeapBackedWriteableStream(struct tagWMPStream* pWS, void* pv, size_t cb);
+EXTERN_C ERR JXRLIB_API(WriteWS_HeapBackedWriteableStream)(struct tagWMPStream* pWS, const void* pv, size_t cb);
+EXTERN_C ERR JXRLIB_API(SetPosWS_HeapBackedWriteableStream)(struct tagWMPStream* pWS, size_t offPos);
+EXTERN_C ERR JXRLIB_API(GetPosWS_HeapBackedWriteableStream)(struct tagWMPStream* pWS, size_t* poffPos);
+EXTERN_C Bool JXRLIB_API(EOSWS_HeapBackedWriteableStream)(struct tagWMPStream* pWS);
+EXTERN_C ERR JXRLIB_API(ReadWS_HeapBackedWriteableStream)(struct tagWMPStream* pWS, void* pv, size_t cb);
 
 //EXTERN_C ERR GetPtrWS_Memory(struct tagWMPStream* pWS, size_t align, U8** ppb);
 //----------------------------------------------------------------
-EXTERN_C Bool EOSWS_List(struct tagWMPStream* pWS);
+EXTERN_C Bool JXRLIB_API(EOSWS_List)(struct tagWMPStream* pWS);
 
-EXTERN_C ERR ReadWS_List(struct tagWMPStream* pWS, void* pv, size_t cb);
-EXTERN_C ERR WriteWS_List(struct tagWMPStream* pWS, const void* pv, size_t cb);
+EXTERN_C ERR JXRLIB_API(ReadWS_List)(struct tagWMPStream* pWS, void* pv, size_t cb);
+EXTERN_C ERR JXRLIB_API(WriteWS_List)(struct tagWMPStream* pWS, const void* pv, size_t cb);
 
-EXTERN_C ERR SetPosWS_List(struct tagWMPStream* pWS, size_t offPos);
-EXTERN_C ERR GetPosWS_List(struct tagWMPStream* pWS, size_t* poffPos);
+EXTERN_C ERR JXRLIB_API(SetPosWS_List)(struct tagWMPStream* pWS, size_t offPos);
+EXTERN_C ERR JXRLIB_API(GetPosWS_List)(struct tagWMPStream* pWS, size_t* poffPos);
 
-EXTERN_C ERR CreateWS_List(struct tagWMPStream** ppWS);
-EXTERN_C ERR CloseWS_List(struct tagWMPStream** ppWS);
+EXTERN_C ERR JXRLIB_API(CreateWS_List)(struct tagWMPStream** ppWS);
+EXTERN_C ERR JXRLIB_API(CloseWS_List)(struct tagWMPStream** ppWS);
 
 /********************************************************************/
 // Stuff related to scale/spatial ordering
@@ -570,32 +571,32 @@ typedef struct PacketInfo
 /********************************************************************/
 
 /********************************************************************/
-const static Int blkIdxByRow[4][4] = { {0, 1, 4, 5}, {2, 3, 6, 7}, {8, 9, 12, 13}, {10, 11, 14, 15} };
-const static Int blkIdxByColumn[4][4] = { {0, 2, 8, 10}, {1, 3, 9, 11},{4, 6, 12, 14},{5, 7, 13, 15} };
+//const static Int blkIdxByRow[4][4] = { {0, 1, 4, 5}, {2, 3, 6, 7}, {8, 9, 12, 13}, {10, 11, 14, 15} };
+//const static Int blkIdxByColumn[4][4] = { {0, 2, 8, 10}, {1, 3, 9, 11},{4, 6, 12, 14},{5, 7, 13, 15} };
 
-Int getACPredMode(CWMIMBInfo*, COLORFORMAT);
-Int getDCACPredMode(CWMImageStrCodec*, size_t);
-Void updatePredInfo(CWMImageStrCodec* pSC, CWMIMBInfo*, size_t, COLORFORMAT);
+Int JXRLIB_API(getACPredMode)(CWMIMBInfo*, COLORFORMAT);
+Int JXRLIB_API(getDCACPredMode)(CWMImageStrCodec*, size_t);
+Void JXRLIB_API(updatePredInfo)(CWMImageStrCodec* pSC, CWMIMBInfo*, size_t, COLORFORMAT);
 
-Int AllocateCodingContextDec(struct CWMImageStrCodec* pSC, Int iNumContexts);
-Void ResetCodingContext(CCodingContext* pContext);
-Void getTilePos(CWMImageStrCodec* pSC, size_t mbX, size_t mbY);
-Void InitZigzagScan(CCodingContext* pSC);
-Int checkImageBuffer(CWMImageStrCodec*, size_t, size_t);
+Int JXRLIB_API(AllocateCodingContextDec)(struct CWMImageStrCodec* pSC, Int iNumContexts);
+Void JXRLIB_API(ResetCodingContext)(CCodingContext* pContext);
+Void JXRLIB_API(getTilePos)(CWMImageStrCodec* pSC, size_t mbX, size_t mbY);
+Void JXRLIB_API(InitZigzagScan)(CCodingContext* pSC);
+Int JXRLIB_API(checkImageBuffer)(CWMImageStrCodec*, size_t, size_t);
 
 //U32 log2(U32);
 
 //DQUANT stuff
-EXTERN_C Void remapQP(CWMIQuantizer*, I32, Bool);
-Int allocateTileInfo(CWMImageStrCodec*);
-Void freeTileInfo(CWMImageStrCodec*);
-Int allocateQuantizer(CWMIQuantizer* pQuantizer[MAX_CHANNELS], size_t, size_t);
-Void freeQuantizer(CWMIQuantizer* pQuantizer[MAX_CHANNELS]);
-Void setUniformQuantizer(CWMImageStrCodec*, size_t);
-Void useDCQuantizer(CWMImageStrCodec*, size_t);
-Void useLPQuantizer(CWMImageStrCodec*, size_t, size_t);
-Void formatQuantizer(CWMIQuantizer* pQuantizer[MAX_CHANNELS], U8, size_t, size_t, Bool, Bool);
-U8 dquantBits(U8);
+EXTERN_C Void JXRLIB_API(remapQP)(CWMIQuantizer*, I32, Bool);
+Int JXRLIB_API(allocateTileInfo)(CWMImageStrCodec*);
+Void JXRLIB_API(freeTileInfo)(CWMImageStrCodec*);
+Int JXRLIB_API(allocateQuantizer)(CWMIQuantizer* pQuantizer[MAX_CHANNELS], size_t, size_t);
+Void JXRLIB_API(freeQuantizer)(CWMIQuantizer* pQuantizer[MAX_CHANNELS]);
+Void JXRLIB_API(setUniformQuantizer)(CWMImageStrCodec*, size_t);
+Void JXRLIB_API(useDCQuantizer)(CWMImageStrCodec*, size_t);
+Void JXRLIB_API(useLPQuantizer)(CWMImageStrCodec*, size_t, size_t);
+Void JXRLIB_API(formatQuantizer)(CWMIQuantizer* pQuantizer[MAX_CHANNELS], U8, size_t, size_t, Bool, Bool);
+U8 JXRLIB_API(dquantBits)(U8);
 
 
 /*************************************************************************

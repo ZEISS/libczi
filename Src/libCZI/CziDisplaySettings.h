@@ -38,7 +38,7 @@ public:
     explicit CDisplaySettingsOnPod(const std::function<bool(int no, int&, libCZI::ChannelDisplaySettingsPOD& dispSetting)>& getChannelDisplaySettings);
     explicit CDisplaySettingsOnPod(const libCZI::DisplaySettingsPOD& pod);
 
-    static std::shared_ptr<libCZI::IDisplaySettings> CreateFromXml(pugi::xml_node node);
+    static std::shared_ptr<libCZI::IDisplaySettings> CreateFromXml(libCZI::pugi::xml_node node);
 public: // interface IDisplaySettings
     void EnumChannels(const std::function<bool(int)>& func) const override;
     std::shared_ptr<libCZI::IChannelDisplaySetting> GetChannelDisplaySettings(int chIndex) const override;

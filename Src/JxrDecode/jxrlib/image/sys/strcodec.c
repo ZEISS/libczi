@@ -25,6 +25,7 @@
 // POSSIBILITY OF SUCH DAMAGE.
 //
 //*@@@---@@@@******************************************************************
+#include "../../common/include/jxrlib_symbol_mangle.h"
 #include "strcodec.h"
 #include <JxrDecode_Config.h>
 //#include "perfTimer.h"
@@ -41,11 +42,11 @@
 //================================================================
 // Quantization index tables
 //================================================================
-const int blkOffset[16] = { 0, 64, 16, 80, 128, 192, 144, 208, 32, 96, 48, 112, 160, 224, 176, 240 };
-const int blkOffsetUV[4] = { 0, 32, 16, 48 };
-const int blkOffsetUV_422[8] = { 0, 64, 16, 80, 32, 96, 48, 112 };
+const int JXRLIB_API(blkOffset)[16] = { 0, 64, 16, 80, 128, 192, 144, 208, 32, 96, 48, 112, 160, 224, 176, 240 };
+const int JXRLIB_API(blkOffsetUV)[4] = { 0, 32, 16, 48 };
+const int JXRLIB_API(blkOffsetUV_422)[8] = { 0, 64, 16, 80, 32, 96, 48, 112 };
 
-const int dctIndex[3][16] = { /** permutation matrix tailored to the transform, nothing to do with ZZS **/
+const int JXRLIB_API(dctIndex)[3][16] = { /** permutation matrix tailored to the transform, nothing to do with ZZS **/
     {0,5,1,6, 10,12,8,14, 2,4,3,7, 9,13,11,15}, //AC 444
     {0,5,1,6, 10,12,8,14, 2,4,3,7, 9,13,11,15}, //AC 420
     {0,128,64,208, 32,240,48,224, 16,192,80,144, 112,176,96,160 }, //DC 444
@@ -54,7 +55,7 @@ const int dctIndex[3][16] = { /** permutation matrix tailored to the transform, 
 //================================================================
 // Color conversion index table
 //================================================================
-const U8 idxCC[16][16] =
+const U8 JXRLIB_API(idxCC)[16][16] =
 {
     {0x00, 0x01, 0x05, 0x04,  0x40, 0x41, 0x45, 0x44,  0x80, 0x81, 0x85, 0x84,  0xc0, 0xc1, 0xc5, 0xc4, },
     {0x02, 0x03, 0x07, 0x06,  0x42, 0x43, 0x47, 0x46,  0x82, 0x83, 0x87, 0x86,  0xc2, 0xc3, 0xc7, 0xc6, },
@@ -77,7 +78,7 @@ const U8 idxCC[16][16] =
     {0x38, 0x39, 0x3d, 0x3c,  0x78, 0x79, 0x7d, 0x7c,  0xb8, 0xb9, 0xbd, 0xbc,  0xf8, 0xf9, 0xfd, 0xfc, },
 };
 
-const U8 idxCC_420[8][8] =
+const U8 JXRLIB_API(idxCC_420)[8][8] =
 {
     {0x00, 0x01, 0x05, 0x04,  0x20, 0x21, 0x25, 0x24, },
     {0x02, 0x03, 0x07, 0x06,  0x22, 0x23, 0x27, 0x26, },
@@ -93,10 +94,10 @@ const U8 idxCC_420[8][8] =
 /*************************************************************************
     gGDISignature
 *************************************************************************/
-const Char gGDISignature[] = { 'W', 'M', 'P', 'H', 'O', 'T', 'O', '\0' };
+const Char JXRLIB_API(gGDISignature)[] = { 'W', 'M', 'P', 'H', 'O', 'T', 'O', '\0' };
 
 // check if enough memory allocated for the image buffer
-Int checkImageBuffer(CWMImageStrCodec* pSC, size_t cWidth, size_t cRows)
+Int JXRLIB_API(checkImageBuffer)(CWMImageStrCodec* pSC, size_t cWidth, size_t cRows)
 {
     const BITDEPTH_BITS bd = pSC->WMISCP.bYUVData ?
         BD_32S : pSC->WMII.bdBitDepth;
@@ -126,25 +127,25 @@ Int checkImageBuffer(CWMImageStrCodec* pSC, size_t cWidth, size_t cRows)
     return (cBytes > pSC->WMIBI.cbStride ? ICERR_ERROR : ICERR_OK);
 }
 
-Void writeQPIndex(BitIOInfo* pIO, U8 uiIndex, U32 cBits)
+Void JXRLIB_API(writeQPIndex)(BitIOInfo* pIO, U8 uiIndex, U32 cBits)
 {
     if (uiIndex == 0)
-        putBit16(pIO, 1, 1); // default QP
+        JXRLIB_API(putBit16)(pIO, 1, 1); // default QP
     else {
-        putBit16(pIO, 0, 1); // non default QP
-        putBit16(pIO, uiIndex - 1, cBits);
+        JXRLIB_API(putBit16)(pIO, 0, 1); // non default QP
+        JXRLIB_API(putBit16)(pIO, uiIndex - 1, cBits);
     }
 }
 
-U8 readQPIndex(BitIOInfo* pIO, U32 cBits)
+U8 JXRLIB_API(readQPIndex)(BitIOInfo* pIO, U32 cBits)
 {
-    if (getBit16(pIO, 1))
+    if (JXRLIB_API(getBit16)(pIO, 1))
         return 0; // default QP
 
-    return (U8)getBit16(pIO, cBits) + 1;
+    return (U8)JXRLIB_API(getBit16)(pIO, cBits) + 1;
 }
 
-Void getTilePos(CWMImageStrCodec* pSC, size_t mbX, size_t mbY)
+Void JXRLIB_API(getTilePos)(CWMImageStrCodec* pSC, size_t mbX, size_t mbY)
 {
     if (mbX == 0) { // left image boundary
         pSC->cTileColumn = 0;
@@ -175,7 +176,7 @@ Void getTilePos(CWMImageStrCodec* pSC, size_t mbX, size_t mbY)
 //================================================================
 // utility functions for 2 macro block rows
 //================================================================
-Void initMRPtr(CWMImageStrCodec* pSC)
+Void JXRLIB_API(initMRPtr)(CWMImageStrCodec* pSC)
 {
     size_t j, jend = (pSC->m_pNextSC != NULL);
 
@@ -186,10 +187,10 @@ Void initMRPtr(CWMImageStrCodec* pSC)
     }
 }
 
-Void advanceMRPtr(CWMImageStrCodec* pSC)
+Void JXRLIB_API(advanceMRPtr)(CWMImageStrCodec* pSC)
 {
     const COLORFORMAT cf = pSC->m_param.cfColorFormat;
-    const int cpChroma = cblkChromas[cf] * 16;
+    const int cpChroma = JXRLIB_API(cblkChromas)[cf] * 16;
     size_t i, j, jend = (pSC->m_pNextSC != NULL);
 
     assert(pSC->m_bSecondary == FALSE);
@@ -208,7 +209,7 @@ Void advanceMRPtr(CWMImageStrCodec* pSC)
 }
 
 /* advance to next MB row */
-Void advanceOneMBRow(CWMImageStrCodec* pSC)
+Void JXRLIB_API(advanceOneMBRow)(CWMImageStrCodec* pSC)
 {
     size_t i, j, jend = (pSC->m_pNextSC != NULL);
     CWMIPredInfo* pPredInfo;
@@ -223,7 +224,7 @@ Void advanceOneMBRow(CWMImageStrCodec* pSC)
     }
 }
 
-Void swapMRPtr(CWMImageStrCodec* pSC)
+Void JXRLIB_API(swapMRPtr)(CWMImageStrCodec* pSC)
 {
     PixelI* pTemp[MAX_CHANNELS];
     size_t j, jend = (pSC->m_pNextSC != NULL);
@@ -239,20 +240,20 @@ Void swapMRPtr(CWMImageStrCodec* pSC)
 //================================================================
 // Empty function to fill slot
 //================================================================
-Int IDPEmpty(CWMImageStrCodec* pSC)
+Int JXRLIB_API(IDPEmpty)(CWMImageStrCodec* pSC)
 {
     UNREFERENCED_PARAMETER(pSC);
 
     return ICERR_OK;
 }
 
-ERR WMPAlloc(void** ppv, size_t cb)
+ERR JXRLIB_API(WMPAlloc)(void** ppv, size_t cb)
 {
     *ppv = calloc(1, cb);
     return *ppv ? WMP_errSuccess : WMP_errOutOfMemory;
 }
 
-ERR WMPFree(void** ppv)
+ERR JXRLIB_API(WMPFree)(void** ppv)
 {
     if (*ppv)
     {
@@ -266,22 +267,22 @@ ERR WMPFree(void** ppv)
 //================================================================
 // Streaming I/O functions
 //================================================================
-ERR CreateWS_File(struct tagWMPStream** ppWS, const char* szFilename, const char* szMode)
+ERR JXRLIB_API(CreateWS_File)(struct tagWMPStream** ppWS, const char* szFilename, const char* szMode)
 {
     ERR err = WMP_errSuccess;
     struct tagWMPStream* pWS = NULL;
 
-    Call(WMPAlloc((void**)ppWS, sizeof(**ppWS)));
+    Call(JXRLIB_API(WMPAlloc)((void**)ppWS, sizeof(**ppWS)));
     pWS = *ppWS;
 
-    pWS->Close = CloseWS_File;
-    pWS->EOS = EOSWS_File;
+    pWS->Close = JXRLIB_API(CloseWS_File);
+    pWS->EOS = JXRLIB_API(EOSWS_File);
 
-    pWS->Read = ReadWS_File;
-    pWS->Write = WriteWS_File;
+    pWS->Read = JXRLIB_API(ReadWS_File);
+    pWS->Write = JXRLIB_API(WriteWS_File);
 
-    pWS->SetPos = SetPosWS_File;
-    pWS->GetPos = GetPosWS_File;
+    pWS->SetPos = JXRLIB_API(SetPosWS_File);
+    pWS->GetPos = JXRLIB_API(GetPosWS_File);
 
     pWS->state.file.pFile = fopen(szFilename, szMode);
     FailIf(NULL == pWS->state.file.pFile, WMP_errFileIO);
@@ -290,29 +291,29 @@ Cleanup:
     return err;
 }
 
-ERR CloseWS_File(struct tagWMPStream** ppWS)
+ERR JXRLIB_API(CloseWS_File)(struct tagWMPStream** ppWS)
 {
     ERR err = WMP_errSuccess;
     struct tagWMPStream* pWS = *ppWS;
 
     fclose(pWS->state.file.pFile);
-    Call(WMPFree((void**)ppWS));
+    Call(JXRLIB_API(WMPFree)((void**)ppWS));
 
 Cleanup:
     return err;
 }
 
-Bool EOSWS_File(struct tagWMPStream* pWS)
+Bool JXRLIB_API(EOSWS_File)(struct tagWMPStream* pWS)
 {
     return feof(pWS->state.file.pFile);
 }
 
-ERR ReadWS_File(struct tagWMPStream* pWS, void* pv, size_t cb)
+ERR JXRLIB_API(ReadWS_File)(struct tagWMPStream* pWS, void* pv, size_t cb)
 {
     return (fread(pv, cb, 1, pWS->state.file.pFile) == 1) ? WMP_errSuccess : WMP_errFileIO;
 }
 
-ERR WriteWS_File(struct tagWMPStream* pWS, const void* pv, size_t cb)
+ERR JXRLIB_API(WriteWS_File)(struct tagWMPStream* pWS, const void* pv, size_t cb)
 {
     ERR err = WMP_errSuccess;
 
@@ -325,7 +326,7 @@ Cleanup:
     return err;
 }
 
-ERR SetPosWS_File(struct tagWMPStream* pWS, size_t offPos)
+ERR JXRLIB_API(SetPosWS_File)(struct tagWMPStream* pWS, size_t offPos)
 {
     ERR err = WMP_errSuccess;
 
@@ -335,7 +336,7 @@ Cleanup:
     return err;
 }
 
-ERR GetPosWS_File(struct tagWMPStream* pWS, size_t* poffPos)
+ERR JXRLIB_API(GetPosWS_File)(struct tagWMPStream* pWS, size_t* poffPos)
 {
     ERR err = WMP_errSuccess;
     long lOff = 0;
@@ -348,47 +349,47 @@ Cleanup:
 }
 
 //----------------------------------------------------------------
-ERR CreateWS_Memory(struct tagWMPStream** ppWS, void* pv, size_t cb)
+ERR JXRLIB_API(CreateWS_Memory)(struct tagWMPStream** ppWS, void* pv, size_t cb)
 {
     ERR err = WMP_errSuccess;
     struct tagWMPStream* pWS = NULL;
 
-    Call(WMPAlloc((void**)ppWS, sizeof(**ppWS)));
+    Call(JXRLIB_API(WMPAlloc)((void**)ppWS, sizeof(**ppWS)));
     pWS = *ppWS;
 
     pWS->state.buf.pbBuf = pv;
     pWS->state.buf.cbBuf = cb;
     pWS->state.buf.cbCur = 0;
 
-    pWS->Close = CloseWS_Memory;
-    pWS->EOS = EOSWS_Memory;
+    pWS->Close = JXRLIB_API(CloseWS_Memory);
+    pWS->EOS = JXRLIB_API(EOSWS_Memory);
 
-    pWS->Read = ReadWS_Memory;
-    pWS->Write = WriteWS_Memory;
+    pWS->Read = JXRLIB_API(ReadWS_Memory);
+    pWS->Write = JXRLIB_API(WriteWS_Memory);
 
-    pWS->SetPos = SetPosWS_Memory;
-    pWS->GetPos = GetPosWS_Memory;
+    pWS->SetPos = JXRLIB_API(SetPosWS_Memory);
+    pWS->GetPos = JXRLIB_API(GetPosWS_Memory);
 
 Cleanup:
     return err;
 }
 
-ERR CloseWS_Memory(struct tagWMPStream** ppWS)
+ERR JXRLIB_API(CloseWS_Memory)(struct tagWMPStream** ppWS)
 {
     ERR err = WMP_errSuccess;
 
-    Call(WMPFree((void**)ppWS));
+    Call(JXRLIB_API(WMPFree)((void**)ppWS));
 
 Cleanup:
     return err;
 }
 
-Bool EOSWS_Memory(struct tagWMPStream* pWS)
+Bool JXRLIB_API(EOSWS_Memory)(struct tagWMPStream* pWS)
 {
     return pWS->state.buf.cbBuf <= pWS->state.buf.cbCur;
 }
 
-ERR ReadWS_Memory(struct tagWMPStream* pWS, void* pv, size_t cb)
+ERR JXRLIB_API(ReadWS_Memory)(struct tagWMPStream* pWS, void* pv, size_t cb)
 {
     ERR err = WMP_errSuccess;
 
@@ -409,7 +410,7 @@ Cleanup:
     return err;
 }
 
-ERR WriteWS_Memory(struct tagWMPStream* pWS, const void* pv, size_t cb)
+ERR JXRLIB_API(WriteWS_Memory)(struct tagWMPStream* pWS, const void* pv, size_t cb)
 {
     ERR err = WMP_errSuccess;
 
@@ -423,7 +424,7 @@ Cleanup:
     return err;
 }
 
-ERR SetPosWS_Memory(struct tagWMPStream* pWS, size_t offPos)
+ERR JXRLIB_API(SetPosWS_Memory)(struct tagWMPStream* pWS, size_t offPos)
 {
     ERR err = WMP_errSuccess;
 
@@ -436,7 +437,7 @@ ERR SetPosWS_Memory(struct tagWMPStream* pWS, size_t offPos)
     return err;
 }
 
-ERR GetPosWS_Memory(struct tagWMPStream* pWS, size_t* poffPos)
+ERR JXRLIB_API(GetPosWS_Memory)(struct tagWMPStream* pWS, size_t* poffPos)
 {
     *poffPos = pWS->state.buf.cbCur;
 
@@ -448,12 +449,12 @@ ERR GetPosWS_Memory(struct tagWMPStream* pWS, size_t* poffPos)
 // - the memory is allocated from the heao
 // - the allocated memory is dynamically resized as needed
 //=================================================================
-ERR CreateWS_HeapBackedWriteableStream(struct tagWMPStream** ppWS, size_t cbInitial, size_t cbGrowBy)
+ERR JXRLIB_API(CreateWS_HeapBackedWriteableStream)(struct tagWMPStream** ppWS, size_t cbInitial, size_t cbGrowBy)
 {
     ERR err = WMP_errSuccess;
     struct tagWMPStream* pWS = NULL;
 
-    Call(WMPAlloc((void**)ppWS, sizeof(**ppWS)));
+    Call(JXRLIB_API(WMPAlloc)((void**)ppWS, sizeof(**ppWS)));
     pWS = *ppWS;
 
     pWS->state.writeableHeapBased.cbCur = 0;
@@ -462,20 +463,20 @@ ERR CreateWS_HeapBackedWriteableStream(struct tagWMPStream** ppWS, size_t cbInit
     pWS->state.writeableHeapBased.cbGrowBy = cbGrowBy;
     pWS->state.writeableHeapBased.pbBuf = (U8*)malloc(cbInitial);
 
-    pWS->Close = CloseWS_HeapBackedWriteableStream;
-    pWS->EOS = EOSWS_HeapBackedWriteableStream;
+    pWS->Close = JXRLIB_API(CloseWS_HeapBackedWriteableStream);
+    pWS->EOS = JXRLIB_API(EOSWS_HeapBackedWriteableStream);
 
-    pWS->Read = ReadWS_HeapBackedWriteableStream;
-    pWS->Write = WriteWS_HeapBackedWriteableStream;
+    pWS->Read = JXRLIB_API(ReadWS_HeapBackedWriteableStream);
+    pWS->Write = JXRLIB_API(WriteWS_HeapBackedWriteableStream);
 
-    pWS->SetPos = SetPosWS_HeapBackedWriteableStream;
-    pWS->GetPos = GetPosWS_HeapBackedWriteableStream;
+    pWS->SetPos = JXRLIB_API(SetPosWS_HeapBackedWriteableStream);
+    pWS->GetPos = JXRLIB_API(GetPosWS_HeapBackedWriteableStream);
 
 Cleanup:
     return err;
 }
 
-ERR CloseWS_HeapBackedWriteableStream(struct tagWMPStream** ppWS)
+ERR JXRLIB_API(CloseWS_HeapBackedWriteableStream)(struct tagWMPStream** ppWS)
 {
     ERR err = WMP_errSuccess;
     struct tagWMPStream* pWS = *ppWS;
@@ -486,7 +487,7 @@ ERR CloseWS_HeapBackedWriteableStream(struct tagWMPStream** ppWS)
         pWS->state.writeableHeapBased.pbBuf = NULL;
     }
 
-    Call(WMPFree((void**)ppWS));
+    Call(JXRLIB_API(WMPFree)((void**)ppWS));
 
 Cleanup:
     return err;
@@ -526,7 +527,7 @@ Cleanup:
     return err;
 }
 
-ERR WriteWS_HeapBackedWriteableStream(struct tagWMPStream* pWS, const void* pv, size_t cb)
+ERR JXRLIB_API(WriteWS_HeapBackedWriteableStream)(struct tagWMPStream* pWS, const void* pv, size_t cb)
 {
     ERR err = WMP_errSuccess;
 
@@ -543,7 +544,7 @@ Cleanup:
     return err;
 }
 
-ERR SetPosWS_HeapBackedWriteableStream(struct tagWMPStream* pWS, size_t offPos)
+ERR JXRLIB_API(SetPosWS_HeapBackedWriteableStream)(struct tagWMPStream* pWS, size_t offPos)
 {
     ERR err = WMP_errSuccess;
     Call(EnsureSize_HeapBackedWriteableStream(pWS, offPos));
@@ -557,13 +558,13 @@ Cleanup:
     return err;
 }
 
-ERR GetPosWS_HeapBackedWriteableStream(struct tagWMPStream* pWS, size_t* poffPos)
+ERR JXRLIB_API(GetPosWS_HeapBackedWriteableStream)(struct tagWMPStream* pWS, size_t* poffPos)
 {
     *poffPos = pWS->state.writeableHeapBased.cbCur;
     return WMP_errSuccess;
 }
 
-void GetWS_HeapBackedWriteableStreamBuffer(struct tagWMPStream* pWS, void** ppbBuf, size_t* pcbBuf)
+void JXRLIB_API(GetWS_HeapBackedWriteableStreamBuffer)(struct tagWMPStream* pWS, void** ppbBuf, size_t* pcbBuf)
 {
     if (ppbBuf != NULL)
     {
@@ -576,12 +577,12 @@ void GetWS_HeapBackedWriteableStreamBuffer(struct tagWMPStream* pWS, void** ppbB
     }
 }
 
-Bool EOSWS_HeapBackedWriteableStream(struct tagWMPStream* pWS)
+Bool JXRLIB_API(EOSWS_HeapBackedWriteableStream)(struct tagWMPStream* pWS)
 {
     return WMP_errAbstractMethod;
 }
 
-ERR ReadWS_HeapBackedWriteableStream(struct tagWMPStream* pWS, void* pv, size_t cb)
+ERR JXRLIB_API(ReadWS_HeapBackedWriteableStream)(struct tagWMPStream* pWS, void* pv, size_t cb)
 {
     return WMP_errAbstractMethod;
 }
@@ -591,12 +592,12 @@ ERR ReadWS_HeapBackedWriteableStream(struct tagWMPStream* pWS, void* pv, size_t 
 // - for indefinite size, multiple stream out
 // - reads not supported in this mode
 //=================================================================
-ERR CreateWS_List(struct tagWMPStream** ppWS)
+ERR JXRLIB_API(CreateWS_List)(struct tagWMPStream** ppWS)
 {
     ERR err = WMP_errSuccess;
     struct tagWMPStream* pWS = NULL;
 
-    Call(WMPAlloc((void**)ppWS, sizeof(**ppWS) + PACKETLENGTH + sizeof(void*)));
+    Call(JXRLIB_API(WMPAlloc)((void**)ppWS, sizeof(**ppWS) + PACKETLENGTH + sizeof(void*)));
     pWS = *ppWS;
 
     pWS->state.buf.pbBuf = (U8*)pWS + sizeof(**ppWS) + sizeof(void*); // first buffer points here
@@ -606,14 +607,14 @@ ERR CreateWS_List(struct tagWMPStream** ppWS)
     pWS->state.buf.cbCur = 0;
     pWS->state.buf.cbBufCount = 0;
 
-    pWS->Close = CloseWS_List;
+    pWS->Close = JXRLIB_API(CloseWS_List);
     pWS->EOS = NULL; // doesn't get called
 
-    pWS->Read = ReadWS_List;
-    pWS->Write = WriteWS_List;
+    pWS->Read = JXRLIB_API(ReadWS_List);
+    pWS->Write = JXRLIB_API(WriteWS_List);
 
-    pWS->SetPos = SetPosWS_List;
-    pWS->GetPos = GetPosWS_List;
+    pWS->SetPos = JXRLIB_API(SetPosWS_List);
+    pWS->GetPos = JXRLIB_API(GetPosWS_List);
 
     //printf ("create buffer %d: %x\n", pWS->state.buf.cbBufCount, pWS->state.buf.pbBuf);
 
@@ -621,7 +622,7 @@ Cleanup:
     return err;
 }
 
-ERR CloseWS_List(struct tagWMPStream** ppWS)
+ERR JXRLIB_API(CloseWS_List)(struct tagWMPStream** ppWS)
 {
     ERR err = WMP_errSuccess;
 
@@ -633,16 +634,16 @@ ERR CloseWS_List(struct tagWMPStream** ppWS)
             pBuf = pNext;
             pNext = (U8*)(((void**)(pBuf))[0]);
             //printf ("delete buffer    %x\n", pBuf);
-            Call(WMPFree((void**)&pBuf));
+            Call(JXRLIB_API(WMPFree)((void**)&pBuf));
         }
     }
-    Call(WMPFree((void**)ppWS));
+    Call(JXRLIB_API(WMPFree)((void**)ppWS));
 
 Cleanup:
     return err;
 }
 
-ERR ReadWS_List(struct tagWMPStream* pWS, void* pv, size_t cb)
+ERR JXRLIB_API(ReadWS_List)(struct tagWMPStream* pWS, void* pv, size_t cb)
 {
     ERR err = WMP_errSuccess;
 
@@ -673,7 +674,7 @@ Cleanup:
     return err;
 }
 
-ERR WriteWS_List(struct tagWMPStream* pWS, const void* pv, size_t cb)
+ERR JXRLIB_API(WriteWS_List)(struct tagWMPStream* pWS, const void* pv, size_t cb)
 {
     ERR err = WMP_errSuccess;
 
@@ -691,7 +692,7 @@ ERR WriteWS_List(struct tagWMPStream* pWS, const void* pv, size_t cb)
         if (pWS->state.buf.cbCur == PACKETLENGTH) { // allocate next packet in list
             U8* pBuf = NULL;
             void** pPtrLoc = (void**)(pWS->state.buf.pbBuf - sizeof(void*));
-            Call(WMPAlloc((void**)&pBuf, PACKETLENGTH + sizeof(void*)));
+            Call(JXRLIB_API(WMPAlloc)((void**)&pBuf, PACKETLENGTH + sizeof(void*)));
             pPtrLoc[0] = (void*)pBuf;
             pWS->state.buf.pbBuf = pBuf + sizeof(void*);
             pWS->state.buf.cbBuf += PACKETLENGTH;
@@ -707,7 +708,7 @@ Cleanup:
     return err;
 }
 
-ERR SetPosWS_List(struct tagWMPStream* pWS, size_t offPos)
+ERR JXRLIB_API(SetPosWS_List)(struct tagWMPStream* pWS, size_t offPos)
 {
     ERR err = WMP_errSuccess;
 
@@ -733,7 +734,7 @@ Cleanup:
     return err;
 }
 
-ERR GetPosWS_List(struct tagWMPStream* pWS, size_t* poffPos)
+ERR JXRLIB_API(GetPosWS_List)(struct tagWMPStream* pWS, size_t* poffPos)
 {
     *poffPos = pWS->state.buf.cbCur + PACKETLENGTH * pWS->state.buf.cbBufCount;
 
@@ -744,7 +745,7 @@ ERR GetPosWS_List(struct tagWMPStream* pWS, size_t* poffPos)
 // Simple BitIO access functions
 //================================================================
 // init SimpleBitIO
-ERR attach_SB(SimpleBitIO* pSB, struct tagWMPStream* pWS)
+ERR JXRLIB_API(attach_SB)(SimpleBitIO* pSB, struct tagWMPStream* pWS)
 {
     pSB->pWS = pWS;
     pSB->cbRead = 0;
@@ -755,7 +756,7 @@ ERR attach_SB(SimpleBitIO* pSB, struct tagWMPStream* pWS)
 }
 
 // extract upto 32bit from input stream
-U32 getBit32_SB(SimpleBitIO* pSB, U32 cBits)
+U32 JXRLIB_API(getBit32_SB)(SimpleBitIO* pSB, U32 cBits)
 {
     U32 rc = 0;
 
@@ -780,19 +781,19 @@ U32 getBit32_SB(SimpleBitIO* pSB, U32 cBits)
 }
 
 // ignore input to byte boundary
-Void flushToByte_SB(SimpleBitIO* pSB)
+Void JXRLIB_API(flushToByte_SB)(SimpleBitIO* pSB)
 {
     pSB->bAccumulator = 0;
     pSB->cBitLeft = 0;
 }
 
 // return read byte count
-U32 getByteRead_SB(SimpleBitIO* pSB)
+U32 JXRLIB_API(getByteRead_SB)(SimpleBitIO* pSB)
 {
     return pSB->cbRead;
 }
 
-ERR detach_SB(SimpleBitIO* pSB)
+ERR JXRLIB_API(detach_SB)(SimpleBitIO* pSB)
 {
     assert(0 == pSB->cBitLeft);
     pSB->pWS = NULL;
@@ -806,7 +807,7 @@ ERR detach_SB(SimpleBitIO* pSB)
 #if JXRDECODE_ISBIGENDIANHOST
 #define jxr_byteswap_ulong(x)  (x)
 #else
-U32 jxr_byteswap_ulong(U32 bits)
+static U32 jxr_byteswap_ulong(U32 bits)
 {
 #if JXRDECODE_HAS_BUILTIN_BSWAP32
     return __builtin_bswap32(bits);
@@ -823,7 +824,7 @@ U32 jxr_byteswap_ulong(U32 bits)
 }
 #endif
 
-U32 load4BE(void* pv)
+static U32 load4BE(void* pv)
 {
 #if JXRDECODE_ISBIGENDIANHOST
     // on a big-endian host, we have nothing to do, so just load the value
@@ -871,7 +872,7 @@ U32 load4BE(void* pv)
 //================================================================
 // Bit I/O functions 
 //================================================================
-Int allocateBitIOInfo(CWMImageStrCodec* pSC)
+Int JXRLIB_API(allocateBitIOInfo)(CWMImageStrCodec* pSC)
 {
     U32 cNumBitIO;
     SUBBAND sbSubband = pSC->WMISCP.sbSubband;
@@ -921,7 +922,7 @@ Int allocateBitIOInfo(CWMImageStrCodec* pSC)
     return ICERR_OK;
 }
 
-Int setBitIOPointers(CWMImageStrCodec* pSC)
+Int JXRLIB_API(setBitIOPointers)(CWMImageStrCodec* pSC)
 {
     if (pSC->cNumBitIO > 0) {
         U32 i;
@@ -952,7 +953,7 @@ Int setBitIOPointers(CWMImageStrCodec* pSC)
     return ICERR_OK;
 }
 
-Int allocateTileInfo(CWMImageStrCodec* pSC)
+Int JXRLIB_API(allocateTileInfo)(CWMImageStrCodec* pSC)
 {
     size_t i;
 
@@ -969,35 +970,35 @@ Int allocateTileInfo(CWMImageStrCodec* pSC)
     return ICERR_OK;
 }
 
-Void freeTileInfo(CWMImageStrCodec* pSC)
+Void JXRLIB_API(freeTileInfo)(CWMImageStrCodec* pSC)
 {
     size_t iTile;
 
     if ((pSC->m_param.uQPMode & 1) != 0) {// not DC uniform
         for (iTile = 0; iTile <= pSC->WMISCP.cNumOfSliceMinus1V; iTile++)
-            freeQuantizer(pSC->pTile[iTile].pQuantizerDC);
+            JXRLIB_API(freeQuantizer)(pSC->pTile[iTile].pQuantizerDC);
     }
     else {
-        freeQuantizer(pSC->pTile[0].pQuantizerDC);
+        JXRLIB_API(freeQuantizer)(pSC->pTile[0].pQuantizerDC);
     }
 
     if (pSC->WMISCP.sbSubband != SB_DC_ONLY) {
         if ((pSC->m_param.uQPMode & 2) != 0) {// not LP uniform
             for (iTile = 0; iTile <= pSC->WMISCP.cNumOfSliceMinus1V; iTile++)
-                freeQuantizer(pSC->pTile[iTile].pQuantizerLP);
+                JXRLIB_API(freeQuantizer)(pSC->pTile[iTile].pQuantizerLP);
         }
         else {
-            freeQuantizer(pSC->pTile[0].pQuantizerLP);
+            JXRLIB_API(freeQuantizer)(pSC->pTile[0].pQuantizerLP);
         }
     }
 
     if (pSC->WMISCP.sbSubband != SB_DC_ONLY && pSC->WMISCP.sbSubband != SB_NO_HIGHPASS) {
         if ((pSC->m_param.uQPMode & 4) != 0) {// not HP uniform
             for (iTile = 0; iTile <= pSC->WMISCP.cNumOfSliceMinus1V; iTile++)
-                freeQuantizer(pSC->pTile[iTile].pQuantizerHP);
+                JXRLIB_API(freeQuantizer)(pSC->pTile[iTile].pQuantizerHP);
         }
         else {
-            freeQuantizer(pSC->pTile[0].pQuantizerHP);
+            JXRLIB_API(freeQuantizer)(pSC->pTile[0].pQuantizerHP);
         }
     }
 
@@ -1005,7 +1006,7 @@ Void freeTileInfo(CWMImageStrCodec* pSC)
         free(pSC->pTile);
 }
 
-Int allocateQuantizer(CWMIQuantizer* pQuantizer[MAX_CHANNELS], size_t cChannel, size_t cQP)
+Int JXRLIB_API(allocateQuantizer)(CWMIQuantizer* pQuantizer[MAX_CHANNELS], size_t cChannel, size_t cQP)
 {
     size_t iCh;
 
@@ -1021,13 +1022,13 @@ Int allocateQuantizer(CWMIQuantizer* pQuantizer[MAX_CHANNELS], size_t cChannel, 
     return ICERR_OK;
 }
 
-Void freeQuantizer(CWMIQuantizer* pQuantizer[MAX_CHANNELS])
+Void JXRLIB_API(freeQuantizer)(CWMIQuantizer* pQuantizer[MAX_CHANNELS])
 {
     if (pQuantizer[0] != NULL)
         free(pQuantizer[0]);
 }
 
-Void formatQuantizer(CWMIQuantizer* pQuantizer[MAX_CHANNELS], U8 cChMode, size_t cCh, size_t iPos, Bool bShiftedUV,
+Void JXRLIB_API(formatQuantizer)(CWMIQuantizer* pQuantizer[MAX_CHANNELS], U8 cChMode, size_t cCh, size_t iPos, Bool bShiftedUV,
     Bool bScaledArith)
 {
     size_t iCh;
@@ -1041,11 +1042,11 @@ Void formatQuantizer(CWMIQuantizer* pQuantizer[MAX_CHANNELS], U8 cChMode, size_t
                 pQuantizer[iCh][iPos] = pQuantizer[1][iPos];
             }
         }
-        remapQP(pQuantizer[iCh] + iPos, (iCh > 0 && bShiftedUV == TRUE) ? SHIFTZERO - 1 : SHIFTZERO, bScaledArith);
+        JXRLIB_API(remapQP)(pQuantizer[iCh] + iPos, (iCh > 0 && bShiftedUV == TRUE) ? SHIFTZERO - 1 : SHIFTZERO, bScaledArith);
     }
 }
 
-Void setUniformQuantizer(CWMImageStrCodec* pSC, size_t sb)
+Void JXRLIB_API(setUniformQuantizer)(CWMImageStrCodec* pSC, size_t sb)
 {
     size_t iCh, iTile;
 
@@ -1059,7 +1060,7 @@ Void setUniformQuantizer(CWMImageStrCodec* pSC, size_t sb)
                 pSC->pTile[iTile].pQuantizerHP[iCh] = pSC->pTile[0].pQuantizerHP[iCh];
 }
 
-Void useDCQuantizer(CWMImageStrCodec* pSC, size_t iTile)
+Void JXRLIB_API(useDCQuantizer)(CWMImageStrCodec* pSC, size_t iTile)
 {
     size_t iCh;
 
@@ -1067,7 +1068,7 @@ Void useDCQuantizer(CWMImageStrCodec* pSC, size_t iTile)
         pSC->pTile[iTile].pQuantizerLP[iCh][0] = *pSC->pTile[iTile].pQuantizerDC[iCh];
 }
 
-Void useLPQuantizer(CWMImageStrCodec* pSC, size_t cQP, size_t iTile)
+Void JXRLIB_API(useLPQuantizer)(CWMImageStrCodec* pSC, size_t cQP, size_t iTile)
 {
     size_t iCh, iQP;
 
@@ -1076,46 +1077,46 @@ Void useLPQuantizer(CWMImageStrCodec* pSC, size_t cQP, size_t iTile)
             pSC->pTile[iTile].pQuantizerHP[iCh][iQP] = pSC->pTile[iTile].pQuantizerLP[iCh][iQP];
 }
 
-U8 dquantBits(U8 cQP)
+U8 JXRLIB_API(dquantBits)(U8 cQP)
 {
     return (cQP < 2 ? 0 : (cQP < 4 ? 1 : (cQP < 6 ? 2 : (cQP < 10 ? 3 : 4))));
 }
 
-U32 peekBit16(BitIOInfo* pIO, U32 cBits)
+U32 JXRLIB_API(peekBit16)(BitIOInfo* pIO, U32 cBits)
 {
     PEEKBIT16(pIO, cBits);
 }
 
-U32 flushBit16(BitIOInfo* pIO, U32 cBits)
+U32 JXRLIB_API(flushBit16)(BitIOInfo* pIO, U32 cBits)
 {
     FLUSHBIT16(pIO, cBits);
 }
 
-U32 getBit16(BitIOInfo* pIO, U32 cBits)
+U32 JXRLIB_API(getBit16)(BitIOInfo* pIO, U32 cBits)
 {
-    U32 uiRet = peekBit16(pIO, cBits);
-    flushBit16(pIO, cBits);
+    U32 uiRet = JXRLIB_API(peekBit16)(pIO, cBits);
+    JXRLIB_API(flushBit16)(pIO, cBits);
 
     return uiRet;
 }
 
-U32 getBool16(BitIOInfo* pIO)
+U32 JXRLIB_API(getBool16)(BitIOInfo* pIO)
 {
-    U32 uiRet = peekBit16(pIO, 1);
-    flushBit16(pIO, 1);
+    U32 uiRet = JXRLIB_API(peekBit16)(pIO, 1);
+    JXRLIB_API(flushBit16)(pIO, 1);
     return uiRet;
 }
 
 /** this function returns cBits if zero is read, or a signed value if first cBits are not all zero **/
-I32 getBit16s(BitIOInfo* pIO, U32 cBits)
+I32 JXRLIB_API(getBit16s)(BitIOInfo* pIO, U32 cBits)
 {
-    U32 uiRet = peekBit16(pIO, cBits + 1);
+    U32 uiRet = JXRLIB_API(peekBit16)(pIO, cBits + 1);
     if (uiRet < 2) {
-        flushBit16(pIO, cBits);
+        JXRLIB_API(flushBit16)(pIO, cBits);
         return 0;
     }
     else {
-        flushBit16(pIO, cBits + 1);
+        JXRLIB_API(flushBit16)(pIO, cBits + 1);
         if (uiRet & 1)
             return (-(I32)(uiRet >> 1));
         else
@@ -1123,7 +1124,7 @@ I32 getBit16s(BitIOInfo* pIO, U32 cBits)
     }
 }
 
-U32 getBit32(BitIOInfo* pIO, U32 cBits)
+U32 JXRLIB_API(getBit32)(BitIOInfo* pIO, U32 cBits)
 {
     U32 uiRet = 0;
 
@@ -1131,23 +1132,23 @@ U32 getBit32(BitIOInfo* pIO, U32 cBits)
 
     if (16 < cBits)
     {
-        uiRet = getBit16(pIO, 16);
+        uiRet = JXRLIB_API(getBit16)(pIO, 16);
         cBits -= 16;
         uiRet <<= cBits;
     }
 
-    uiRet |= getBit16(pIO, cBits);
+    uiRet |= JXRLIB_API(getBit16)(pIO, cBits);
 
     return uiRet;
 }
 
-U32 flushToByte(BitIOInfo* pIO)
+U32 JXRLIB_API(flushToByte)(BitIOInfo* pIO)
 {
-    return flushBit16(pIO, (16 - pIO->cBitsUsed) & 7);
+    return JXRLIB_API(flushBit16)(pIO, (16 - pIO->cBitsUsed) & 7);
 }
 
 //----------------------------------------------------------------
-Void putBit16z(BitIOInfo* pIO, U32 uiBits, U32 cBits)
+Void JXRLIB_API(putBit16z)(BitIOInfo* pIO, U32 uiBits, U32 cBits)
 {
     assert(cBits <= 16);
     assert(0 == uiBits >> cBits);
@@ -1161,44 +1162,44 @@ Void putBit16z(BitIOInfo* pIO, U32 uiBits, U32 cBits)
     pIO->cBitsUsed &= 16 - 1;
 }
 
-Void putBit16(BitIOInfo* pIO, U32 uiBits, U32 cBits)
+Void JXRLIB_API(putBit16)(BitIOInfo* pIO, U32 uiBits, U32 cBits)
 {
     assert(cBits <= 16);
 
     uiBits &= ~(-1 << cBits);
-    putBit16z(pIO, uiBits, cBits);
+    JXRLIB_API(putBit16z)(pIO, uiBits, cBits);
 }
 
-Void putBit32(BitIOInfo* pIO, U32 uiBits, U32 cBits)
+Void JXRLIB_API(putBit32)(BitIOInfo* pIO, U32 uiBits, U32 cBits)
 {
     assert(0 <= (I32)cBits && cBits <= 32);
 
     if (16 < cBits)
     {
-        putBit16(pIO, uiBits >> (cBits - 16), 16);
+        JXRLIB_API(putBit16)(pIO, uiBits >> (cBits - 16), 16);
         cBits -= 16;
     }
 
-    putBit16(pIO, uiBits, cBits);
+    JXRLIB_API(putBit16)(pIO, uiBits, cBits);
 }
 
-Void fillToByte(BitIOInfo* pIO)
+Void JXRLIB_API(fillToByte)(BitIOInfo* pIO)
 {
-    putBit16z(pIO, 0, (16 - pIO->cBitsUsed) & 7);
+    JXRLIB_API(putBit16z)(pIO, 0, (16 - pIO->cBitsUsed) & 7);
 }
 
 //----------------------------------------------------------------
-U32 getBit16_S(CWMImageStrCodec* pSC, BitIOInfo* pIO, U32 cBits)
+U32 JXRLIB_API(getBit16_S)(CWMImageStrCodec* pSC, BitIOInfo* pIO, U32 cBits)
 {
-    U32 rc = getBit16(pIO, cBits);
+    U32 rc = JXRLIB_API(getBit16)(pIO, cBits);
     readIS_L1(pSC, pIO);
 
     return rc;
 }
 
-U32 putBit16_S(CWMImageStrCodec* pSC, BitIOInfo* pIO, U32 uiBits, U32 cBits)
+U32 JXRLIB_API(putBit16_S)(CWMImageStrCodec* pSC, BitIOInfo* pIO, U32 uiBits, U32 cBits)
 {
-    putBit16(pIO, uiBits, cBits);
+    JXRLIB_API(putBit16)(pIO, uiBits, cBits);
     writeIS_L1(pSC, pIO);
 
     return 0;
@@ -1209,12 +1210,12 @@ U32 putBit16_S(CWMImageStrCodec* pSC, BitIOInfo* pIO, U32 uiBits, U32 cBits)
 // Query buffered data size held in BitIOInfo
 // Write() for Enc, Read() for Dec
 //----------------------------------------------------------------
-U32 getSizeRead(BitIOInfo* pIO)
+U32 JXRLIB_API(getSizeRead)(BitIOInfo* pIO)
 {
     return (U32)(UINTPTR_T)(pIO->pbStart + PACKETLENGTH * 2 - pIO->pbCurrent) - pIO->cBitsUsed / 8;
 }
 
-U32 getSizeWrite(BitIOInfo* pIO)
+U32 JXRLIB_API(getSizeWrite)(BitIOInfo* pIO)
 {
     return (U32)(UINTPTR_T)(pIO->pbCurrent + (pIO->pbStart <= pIO->pbCurrent ? 0 : PACKETLENGTH * 2) - pIO->pbStart) + pIO->cBitsUsed / 8;
 }
@@ -1222,7 +1223,7 @@ U32 getSizeWrite(BitIOInfo* pIO)
 //----------------------------------------------------------------
 // Query stream offset from attached BitIO object for dec
 //----------------------------------------------------------------
-U32 getPosRead(BitIOInfo* pIO)
+U32 JXRLIB_API(getPosRead)(BitIOInfo* pIO)
 {
     size_t cbCached = (pIO->pbStart + PACKETLENGTH * 2 - pIO->pbCurrent) - pIO->cBitsUsed / 8;
     return (U32)(pIO->offRef - cbCached);
@@ -1231,7 +1232,7 @@ U32 getPosRead(BitIOInfo* pIO)
 //================================================================
 // Block I/O functions
 //================================================================
-ERR attachISRead(BitIOInfo* pIO, struct tagWMPStream* pWS, CWMImageStrCodec* pSC)
+ERR JXRLIB_API(attachISRead)(BitIOInfo* pIO, struct tagWMPStream* pWS, CWMImageStrCodec* pSC)
 {
     UNREFERENCED_PARAMETER(pSC);
 
@@ -1254,7 +1255,7 @@ ERR attachISRead(BitIOInfo* pIO, struct tagWMPStream* pWS, CWMImageStrCodec* pSC
     return WMP_errSuccess;
 }
 
-ERR readIS(CWMImageStrCodec* pSC, BitIOInfo* pIO)
+ERR JXRLIB_API(readIS)(CWMImageStrCodec* pSC, BitIOInfo* pIO)
 {
     ERR err = WMP_errSuccess;
 
@@ -1281,7 +1282,7 @@ ERR readIS(CWMImageStrCodec* pSC, BitIOInfo* pIO)
     return err;
 }
 
-ERR detachISRead(CWMImageStrCodec* pSC, BitIOInfo* pIO)
+ERR JXRLIB_API(detachISRead)(CWMImageStrCodec* pSC, BitIOInfo* pIO)
 {
     ERR err = WMP_errSuccess;
 
@@ -1289,7 +1290,7 @@ ERR detachISRead(CWMImageStrCodec* pSC, BitIOInfo* pIO)
     size_t cbRemain = 0;
 
     // we can ONLY detach IStream at byte boundary
-    flushToByte(pIO);
+    JXRLIB_API(flushToByte)(pIO);
     assert(0 == (pIO->cBitsUsed % 8));
     Call(readIS_L1(pSC, pIO));
 
@@ -1303,7 +1304,7 @@ Cleanup:
 }
 
 //----------------------------------------------------------------
-ERR attachISWrite(BitIOInfo* pIO, struct tagWMPStream* pWS)
+ERR JXRLIB_API(attachISWrite)(BitIOInfo* pIO, struct tagWMPStream* pWS)
 {
     pWS->GetPos(pWS, &pIO->offRef);
 
@@ -1319,7 +1320,7 @@ ERR attachISWrite(BitIOInfo* pIO, struct tagWMPStream* pWS)
 }
 
 // write out packet if we have >=1 packet data filled
-ERR writeIS(CWMImageStrCodec* pSC, BitIOInfo* pIO)
+ERR JXRLIB_API(writeIS)(CWMImageStrCodec* pSC, BitIOInfo* pIO)
 {
     ERR err = WMP_errSuccess;
 
@@ -1341,7 +1342,7 @@ Cleanup:
 }
 
 // write out partially filled buffer and detach bitIO from IStream
-ERR detachISWrite(CWMImageStrCodec* pSC, BitIOInfo* pIO)
+ERR JXRLIB_API(detachISWrite)(CWMImageStrCodec* pSC, BitIOInfo* pIO)
 {
     ERR err = WMP_errSuccess;
 

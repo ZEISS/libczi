@@ -9,7 +9,7 @@
 #include <sstream>
 #include <cstring>
 #include <array>
-#if LIBCZI_WINDOWSAPI_AVAILABLE
+#if LIBCZI_WINDOWSAPI_AVAILABLE || LIBCZI_WINDOWS_UWPAPI_AVAILABLE
 #include <Windows.h>
 #else
 #include <random>
@@ -93,7 +93,7 @@ tString trimImpl(const tString& str, const tString& whitespace)
 
 /*static*/std::wstring Utilities::convertUtf8ToWchar_t(const char* sz)
 {
-#if LIBCZI_WINDOWSAPI_AVAILABLE
+#if LIBCZI_WINDOWSAPI_AVAILABLE || LIBCZI_WINDOWS_UWPAPI_AVAILABLE
     if (*sz == '\0')
     {
         return {};
@@ -123,7 +123,7 @@ tString trimImpl(const tString& str, const tString& whitespace)
 
 /*static*/std::string Utilities::convertWchar_tToUtf8(const wchar_t* szw)
 {
-#if LIBCZI_WINDOWSAPI_AVAILABLE
+#if LIBCZI_WINDOWSAPI_AVAILABLE || LIBCZI_WINDOWS_UWPAPI_AVAILABLE
     if (*szw == L'\0')
     {
         return {};
@@ -171,7 +171,7 @@ tString trimImpl(const tString& str, const tString& whitespace)
 
 /*static*/libCZI::GUID Utilities::GenerateNewGuid()
 {
-#if LIBCZI_WINDOWSAPI_AVAILABLE
+#if LIBCZI_WINDOWSAPI_AVAILABLE || LIBCZI_WINDOWS_UWPAPI_AVAILABLE
     ::GUID guid;
     CoCreateGuid(&guid);
     libCZI::GUID guid_value

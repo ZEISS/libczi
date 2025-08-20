@@ -26,6 +26,7 @@
 //
 //*@@@---@@@@******************************************************************
 
+#include "../../common/include/jxrlib_symbol_mangle.h"
 #include <stdlib.h>
 #include "../sys/strcodec.h"
 #include "encode.h"
@@ -64,28 +65,28 @@ static Void EncodeSignificantAbsLevel(UInt iAbsLevel, struct CAdaptiveHuffman* p
         }
 
         pAHexpt->m_iDiscriminant += pAHexpt->m_pDelta[iIndex];
-        putBit16z(pOut, pAHexpt->m_pTable[iIndex * 2 + 1], pAHexpt->m_pTable[iIndex * 2 + 2]);
+        JXRLIB_API(putBit16z)(pOut, pAHexpt->m_pTable[iIndex * 2 + 1], pAHexpt->m_pTable[iIndex * 2 + 2]);
         if (iFixed > 18) {
-            putBit16z(pOut, 15, 4);
+            JXRLIB_API(putBit16z)(pOut, 15, 4);
             if (iFixed > 21) {
-                putBit16z(pOut, 3, 2);
-                putBit16(pOut, iFixed - 22, 3); // 22 - 29
+                JXRLIB_API(putBit16z)(pOut, 3, 2);
+                JXRLIB_API(putBit16)(pOut, iFixed - 22, 3); // 22 - 29
             }
             else
-                putBit16z(pOut, iFixed - 19, 2); // 19 20 21
+                JXRLIB_API(putBit16z)(pOut, iFixed - 19, 2); // 19 20 21
         }
         else {
-            putBit16z(pOut, (iFixed - 4), 4);
+            JXRLIB_API(putBit16z)(pOut, (iFixed - 4), 4);
         }
-        putBit32(pOut, iAbsLevel, iFixed);
+        JXRLIB_API(putBit32)(pOut, iAbsLevel, iFixed);
     }
     else {
         iIndex = aIndex[iAbsLevel];
         iFixed = aFixedLength[iIndex];
 
         pAHexpt->m_iDiscriminant += pAHexpt->m_pDelta[iIndex];
-        putBit16z(pOut, pAHexpt->m_pTable[iIndex * 2 + 1], pAHexpt->m_pTable[iIndex * 2 + 2]);
-        putBit32(pOut, iAbsLevel, iFixed);
+        JXRLIB_API(putBit16z)(pOut, pAHexpt->m_pTable[iIndex * 2 + 1], pAHexpt->m_pTable[iIndex * 2 + 2]);
+        JXRLIB_API(putBit32)(pOut, iAbsLevel, iFixed);
     }
 }
 
@@ -93,17 +94,17 @@ static Void EncodeSignificantAbsLevel(UInt iAbsLevel, struct CAdaptiveHuffman* p
     EncodeMacroblockDC
 *************************************************************************/
 
-Void encodeQPIndex(BitIOInfo* pIO, U8 iIndex, U8 cBits)
+Void JXRLIB_API(encodeQPIndex)(BitIOInfo* pIO, U8 iIndex, U8 cBits)
 {
     if (iIndex == 0)
-        putBit16z(pIO, 0, 1);
+        JXRLIB_API(putBit16z)(pIO, 0, 1);
     else {
-        putBit16z(pIO, 1, 1);
-        putBit16z(pIO, iIndex - 1, cBits);
+        JXRLIB_API(putBit16z)(pIO, 1, 1);
+        JXRLIB_API(putBit16z)(pIO, iIndex - 1, cBits);
     }
 }
 
-Int EncodeMacroblockDC(CWMImageStrCodec* pSC, CCodingContext* pContext, Int iMBX, Int iMBY)
+Int JXRLIB_API(EncodeMacroblockDC)(CWMImageStrCodec* pSC, CCodingContext* pContext, Int iMBX, Int iMBY)
 {
     CWMITile* pTile = pSC->pTile + pSC->cTileColumn;
     BitIOInfo* pIO = pContext->m_pIODC;
@@ -129,15 +130,15 @@ Int EncodeMacroblockDC(CWMImageStrCodec* pSC, CCodingContext* pContext, Int iMBX
 
     if (pSC->WMISCP.bfBitstreamFormat == SPATIAL && pSC->WMISCP.sbSubband != SB_DC_ONLY) {
         if (pTile->cBitsLP > 0)  // MB-based LP QP index
-            encodeQPIndex(pIO, pMBInfo->iQIndexLP, pTile->cBitsLP);
+            JXRLIB_API(encodeQPIndex)(pIO, pMBInfo->iQIndexLP, pTile->cBitsLP);
         if (pSC->WMISCP.sbSubband != SB_NO_HIGHPASS && pTile->cBitsHP > 0)  // MB-based HP QP index
-            encodeQPIndex(pIO, pMBInfo->iQIndexHP, pTile->cBitsHP);
+            JXRLIB_API(encodeQPIndex)(pIO, pMBInfo->iQIndexHP, pTile->cBitsHP);
     }
 
     if (pSC->m_param.bTranscode == FALSE)
         pSC->Quantize(pSC);
 
-    predMacroblockEnc(pSC);
+    JXRLIB_API(predMacroblockEnc)(pSC);
 
     /** code path for Y_ONLY, CMYK and N_CHANNEL DC **/
     if (cf == Y_ONLY || cf == CMYK || cf == NCOMPONENT) {
@@ -150,17 +151,17 @@ Int EncodeMacroblockDC(CWMImageStrCodec* pSC, CCodingContext* pContext, Int iMBX
 
             /** send luminance DC **/
             if (iQDC) {
-                putBit16z(pIO, 1, 1);
+                JXRLIB_API(putBit16z)(pIO, 1, 1);
                 EncodeSignificantAbsLevel((UInt)iQDC, pContext->m_pAHexpt[3], pIO);
                 *pLM += 1;
             }
             else {
-                putBit16z(pIO, 0, 1);
+                JXRLIB_API(putBit16z)(pIO, 0, 1);
             }
 
-            putBit16(pIO, iDC, iModelBits);
+            JXRLIB_API(putBit16)(pIO, iDC, iModelBits);
             if (iDC) {
-                putBit16z(pIO, iSign, 1);
+                JXRLIB_API(putBit16z)(pIO, iSign, 1);
             }
 
             pLM = aLaplacianMean + 1;
@@ -186,16 +187,16 @@ Int EncodeMacroblockDC(CWMImageStrCodec* pSC, CCodingContext* pContext, Int iMBX
         iModelBits = pContext->m_aModelDC.m_iFlcBits[0];
 
         iIndex = (iQDCY != 0) * 4 + (iQDCU != 0) * 2 + (iQDCV != 0);
-        putBit16z(pIO, pAH->m_pTable[iIndex * 2 + 1], pAH->m_pTable[iIndex * 2 + 2]);
+        JXRLIB_API(putBit16z)(pIO, pAH->m_pTable[iIndex * 2 + 1], pAH->m_pTable[iIndex * 2 + 2]);
 
         /** send luminance DC **/
         if (iQDCY) {
             EncodeSignificantAbsLevel((UInt)iQDCY, pContext->m_pAHexpt[3], pIO);
             *pLM += 1;
         }
-        putBit16(pIO, abs(iDCY), iModelBits);
+        JXRLIB_API(putBit16)(pIO, abs(iDCY), iModelBits);
         if (iDCY) {
-            putBit16z(pIO, (iDCY < 0), 1);
+            JXRLIB_API(putBit16z)(pIO, (iDCY < 0), 1);
         }
 
         /** send chroma DC **/
@@ -206,27 +207,27 @@ Int EncodeMacroblockDC(CWMImageStrCodec* pSC, CCodingContext* pContext, Int iMBX
             EncodeSignificantAbsLevel((UInt)iQDCU, pContext->m_pAHexpt[4], pIO);
             *pLM += 1;
         }
-        putBit16(pIO, abs(iDCU), iModelBits);
+        JXRLIB_API(putBit16)(pIO, abs(iDCU), iModelBits);
         if (iDCU) {
-            putBit16z(pIO, (iDCU < 0), 1);
+            JXRLIB_API(putBit16z)(pIO, (iDCU < 0), 1);
         }
 
         if (iQDCV) {
             EncodeSignificantAbsLevel((UInt)iQDCV, pContext->m_pAHexpt[4], pIO);
             *pLM += 1;
         }
-        putBit16(pIO, abs(iDCV), iModelBits);
+        JXRLIB_API(putBit16)(pIO, abs(iDCV), iModelBits);
         if (iDCV) {
-            putBit16z(pIO, (iDCV < 0), 1);
+            JXRLIB_API(putBit16z)(pIO, (iDCV < 0), 1);
         }
     }
 
-    UpdateModelMB(cf, iChannels, aLaplacianMean, &(pContext->m_aModelDC));
+    JXRLIB_API(UpdateModelMB)(cf, iChannels, aLaplacianMean, &(pContext->m_aModelDC));
 
     if (pSC->m_bResetContext && pSC->WMISCP.sbSubband == SB_DC_ONLY) {
-        AdaptDiscriminant(pContext->m_pAHexpt[2]);
-        AdaptDiscriminant(pContext->m_pAHexpt[3]);
-        AdaptDiscriminant(pContext->m_pAHexpt[4]);
+        JXRLIB_API(AdaptDiscriminant)(pContext->m_pAHexpt[2]);
+        JXRLIB_API(AdaptDiscriminant)(pContext->m_pAHexpt[3]);
+        JXRLIB_API(AdaptDiscriminant)(pContext->m_pAHexpt[4]);
     }
 
     return ICERR_OK;
@@ -464,7 +465,7 @@ static Int AdaptiveScan(const PixelI* pCoeffs, Int* pResidual,
 /*************************************************************************
     EncodeMacroblockLowpass
 *************************************************************************/
-Int EncodeMacroblockLowpass(CWMImageStrCodec* pSC, CCodingContext* pContext, Int iMBX, Int iMBY)
+Int JXRLIB_API(EncodeMacroblockLowpass)(CWMImageStrCodec* pSC, CCodingContext* pContext, Int iMBX, Int iMBY)
 {
     const COLORFORMAT cf = pSC->m_param.cfColorFormat;
     const Int iChannels = (Int)pSC->m_param.cNumChannels;
@@ -481,7 +482,7 @@ Int EncodeMacroblockLowpass(CWMImageStrCodec* pSC, CCodingContext* pContext, Int
     Int aRLCoeffs[MAX_CHANNELS][32], iNumCoeffs[MAX_CHANNELS];
     const I32* aDC[MAX_CHANNELS];
     Int aResidual[MAX_CHANNELS][16];
-    Void(*putBits)(BitIOInfo * pIO, U32 uiBits, U32 cBits) = putBit16;
+    Void(*putBits)(BitIOInfo * pIO, U32 uiBits, U32 cBits) = JXRLIB_API(putBit16);
 
     UNREFERENCED_PARAMETER(iMBX);
     UNREFERENCED_PARAMETER(iMBY);
@@ -490,7 +491,7 @@ Int EncodeMacroblockLowpass(CWMImageStrCodec* pSC, CCodingContext* pContext, Int
         return ICERR_ERROR;
 
     if ((pSC->WMISCP.bfBitstreamFormat != SPATIAL) && (pSC->pTile[pSC->cTileColumn].cBitsLP > 0))  // MB-based LP QP index
-        encodeQPIndex(pIO, pMBInfo->iQIndexLP, pSC->pTile[pSC->cTileColumn].cBitsLP);
+        JXRLIB_API(encodeQPIndex)(pIO, pMBInfo->iQIndexLP, pSC->pTile[pSC->cTileColumn].cBitsLP);
 
     // set arrays
     for (k = 0; k < iChannels; k++) {
@@ -560,14 +561,14 @@ Int EncodeMacroblockLowpass(CWMImageStrCodec* pSC, CCodingContext* pContext, Int
                 iVal = iMax - iCBP;
             }
             if (iVal == 0)
-                putBit16z(pIO, 0, 1);
+                JXRLIB_API(putBit16z)(pIO, 0, 1);
             else if (iVal == 1)
-                putBit16z(pIO, (iFullChannels + 1) & 0x6, iFullChannels);  // 2 or 4
+                JXRLIB_API(putBit16z)(pIO, (iFullChannels + 1) & 0x6, iFullChannels);  // 2 or 4
             else
-                putBit16z(pIO, iVal + iMax + 1, iFullChannels + 1);  // cbp + 4 or cbp + 8
+                JXRLIB_API(putBit16z)(pIO, iVal + iMax + 1, iFullChannels + 1);  // cbp + 4 or cbp + 8
         }
         else {
-            putBit16z(pIO, iCBP, iFullChannels);
+            JXRLIB_API(putBit16z)(pIO, iCBP, iFullChannels);
         }
 
         iCountM += 1 - 4 * (iCBP == iMax);//(b + c - 2*a);
@@ -586,13 +587,13 @@ Int EncodeMacroblockLowpass(CWMImageStrCodec* pSC, CCodingContext* pContext, Int
     }
     else { /** 1 or N channel **/
         for (iChannel = 0; iChannel < iChannels; iChannel++) {
-            putBit16z(pIO, (iNumCoeffs[iChannel] > 0), 1);
+            JXRLIB_API(putBit16z)(pIO, (iNumCoeffs[iChannel] > 0), 1);
         }
     }
 
     // set appropriate function pointer
     if (pContext->m_aModelLP.m_iFlcBits[0] > 14 || pContext->m_aModelLP.m_iFlcBits[1] > 14) {
-        putBits = putBit32;
+        putBits = JXRLIB_API(putBit32);
     }
 
     iModelBits = pContext->m_aModelLP.m_iFlcBits[0];
@@ -613,17 +614,17 @@ Int EncodeMacroblockLowpass(CWMImageStrCodec* pSC, CCodingContext* pContext, Int
                 for (k = 1; k < ((cf == YUV_420) ? 4 : 8); k++) {
                     putBits(pIO, abs(aDC[1][k]), iModelBits);
                     if (aBuf[0][k] == 0 && aDC[1][k]) {
-                        putBit16z(pIO, (aDC[1][k] < 0), 1);
+                        JXRLIB_API(putBit16z)(pIO, (aDC[1][k] < 0), 1);
                     }
                     putBits(pIO, abs(aDC[2][k]), iModelBits);
                     if (aBuf[1][k] == 0 && aDC[2][k]) {
-                        putBit16z(pIO, (aDC[2][k] < 0), 1);
+                        JXRLIB_API(putBit16z)(pIO, (aDC[2][k] < 0), 1);
                     }
                 }
             }
             else {  // normal case
                 for (k = 1; k < 16; k++) {
-                    putBit16z(pIO, aResidual[iChannel][k] >> 1, iModelBits + (aResidual[iChannel][k] & 1));
+                    JXRLIB_API(putBit16z)(pIO, aResidual[iChannel][k] >> 1, iModelBits + (aResidual[iChannel][k] & 1));
                 }
             }
         }
@@ -634,10 +635,10 @@ Int EncodeMacroblockLowpass(CWMImageStrCodec* pSC, CCodingContext* pContext, Int
 
     writeIS_L1(pSC, pIO);
 
-    UpdateModelMB(cf, iChannels, aLaplacianMean, &pContext->m_aModelLP);
+    JXRLIB_API(UpdateModelMB)(cf, iChannels, aLaplacianMean, &pContext->m_aModelLP);
 
     if (pSC->m_bResetContext) {
-        AdaptLowpassEnc(pContext);
+        JXRLIB_API(AdaptLowpassEnc)(pContext);
     }
 
     return ICERR_OK;
@@ -646,22 +647,22 @@ Int EncodeMacroblockLowpass(CWMImageStrCodec* pSC, CCodingContext* pContext, Int
 /*************************************************************************
     Adapt
 *************************************************************************/
-Void AdaptLowpassEnc(CCodingContext* pSC)
+Void JXRLIB_API(AdaptLowpassEnc)(CCodingContext* pSC)
 {
     Int kk;
     for (kk = 0; kk < CONTEXTX + CTDC; kk++) { /** adapt fixed code (index 0 and 1) as well **/
-        AdaptDiscriminant(pSC->m_pAHexpt[kk]);
+        JXRLIB_API(AdaptDiscriminant)(pSC->m_pAHexpt[kk]);
     }
 }
 
-Void AdaptHighpassEnc(CCodingContext* pSC)
+Void JXRLIB_API(AdaptHighpassEnc)(CCodingContext* pSC)
 {
     Int kk;
     //Adapt (pSC->m_pAdaptHuffCBPCY, FALSE);
-    AdaptDiscriminant(pSC->m_pAdaptHuffCBPCY);
-    AdaptDiscriminant(pSC->m_pAdaptHuffCBPCY1);
+    JXRLIB_API(AdaptDiscriminant)(pSC->m_pAdaptHuffCBPCY);
+    JXRLIB_API(AdaptDiscriminant)(pSC->m_pAdaptHuffCBPCY1);
     for (kk = 0; kk < CONTEXTX; kk++) { /** adapt fixed code **/
-        AdaptDiscriminant(pSC->m_pAHexpt[kk + CONTEXTX + CTDC]);
+        JXRLIB_API(AdaptDiscriminant)(pSC->m_pAHexpt[kk + CONTEXTX + CTDC]);
     }
 }
 
@@ -698,7 +699,7 @@ static Void EncodeSignificantRun(Int iRun, Int iMaxRun, struct CAdaptiveHuffman*
             //static const Int gCode[] = { 0, 1, 1, 1 };
         static const Int gLen[] = { 3, 3, 2, 1 };
         if (iMaxRun > 1)
-            putBit16z(pOut, (iMaxRun != iRun), gLen[iMaxRun - iRun] - (4 - iMaxRun));
+            JXRLIB_API(putBit16z)(pOut, (iMaxRun != iRun), gLen[iMaxRun - iRun] - (4 - iMaxRun));
         //}
         //else if (iMaxRun == 3) {
         //    if (iRun == 1) {
@@ -714,13 +715,13 @@ static Void EncodeSignificantRun(Int iRun, Int iMaxRun, struct CAdaptiveHuffman*
         return;
     }
 
-    iBin = gSignificantRunBin[iMaxRun];
+    iBin = JXRLIB_API(gSignificantRunBin)[iMaxRun];
     iIndex = aIndex[iRun + iBin * 14 - 1];
-    iFLC = gSignificantRunFixedLength[iIndex + iBin * 5];
-    putBit16z(pOut, pAHexpt->m_pTable[iIndex * 2 + 1], pAHexpt->m_pTable[iIndex * 2 + 2]);
+    iFLC = JXRLIB_API(gSignificantRunFixedLength)[iIndex + iBin * 5];
+    JXRLIB_API(putBit16z)(pOut, pAHexpt->m_pTable[iIndex * 2 + 1], pAHexpt->m_pTable[iIndex * 2 + 2]);
     //this always uses table 0
     //pAHexpt->m_iDiscriminant += pAHexpt->m_pDelta[iIndex];
-    putBit16(pOut, iRun + 1, iFLC);
+    JXRLIB_API(putBit16)(pOut, iRun + 1, iFLC);
 }
 
 #ifdef X86OPT_INLINE
@@ -735,7 +736,7 @@ static Void EncodeFirstIndex(Bool bChroma, Int iLoc, Int iCont, Int iIndex, Int 
     UNREFERENCED_PARAMETER(iCont);
     pAHexpt->m_iDiscriminant += pAHexpt->m_pDelta[iIndex];
     pAHexpt->m_iDiscriminant1 += pAHexpt->m_pDelta1[iIndex];
-    putBit16z(pOut, pAHexpt->m_pTable[iIndex * 2 + 1] * 2 + iSign, pAHexpt->m_pTable[iIndex * 2 + 2] + 1);
+    JXRLIB_API(putBit16z)(pOut, pAHexpt->m_pTable[iIndex * 2 + 1] * 2 + iSign, pAHexpt->m_pTable[iIndex * 2 + 2] + 1);
     return;
 }
 
@@ -751,16 +752,16 @@ static Void EncodeIndex(Bool bChroma, Int iLoc, Int iCont, Int iIndex, Int  iSig
         struct CAdaptiveHuffman* pAHexpt = ppAHexpt[iContext];
         pAHexpt->m_iDiscriminant += pAHexpt->m_pDelta[iIndex];
         pAHexpt->m_iDiscriminant1 += pAHexpt->m_pDelta1[iIndex];
-        putBit16z(pOut, pAHexpt->m_pTable[iIndex * 2 + 1] * 2 + iSign, pAHexpt->m_pTable[iIndex * 2 + 2] + 1);
+        JXRLIB_API(putBit16z)(pOut, pAHexpt->m_pTable[iIndex * 2 + 1] * 2 + iSign, pAHexpt->m_pTable[iIndex * 2 + 2] + 1);
     }
     else if (iLoc == 15) {
         static const U32 gCode[] = { 0, 6, 2, 7 };
         static const U32 gLen[] = { 1, 3, 2, 3 };
-        putBit16z(pOut, gCode[iIndex] * 2 + iSign, gLen[iIndex] + 1);
+        JXRLIB_API(putBit16z)(pOut, gCode[iIndex] * 2 + iSign, gLen[iIndex] + 1);
         return;
     }
     else {//if (iLoc == 16) {
-        putBit16z(pOut, iIndex * 2 + iSign, 1 + 1);
+        JXRLIB_API(putBit16z)(pOut, iIndex * 2 + iSign, 1 + 1);
         return;
     }
 }
@@ -891,13 +892,13 @@ static Int CodeCoeffs(CWMImageStrCodec* pSC, CCodingContext* pContext,
                 const PixelI* pCoeffs = NULL;
 
                 if (iBlock < 4) {
-                    pCoeffs = pSC->pPlane[i] + blkOffset[iIndex];
+                    pCoeffs = pSC->pPlane[i] + JXRLIB_API(blkOffset)[iIndex];
                 }
                 else if (cf == YUV_420) {
-                    pCoeffs = pSC->pPlane[iBlock - 3] + blkOffsetUV[iSubblock];
+                    pCoeffs = pSC->pPlane[iBlock - 3] + JXRLIB_API(blkOffsetUV)[iSubblock];
                 }
                 else if (cf == YUV_422) {
-                    pCoeffs = pSC->pPlane[1 + ((iBlock - 4) >> 1)] + blkOffsetUV_422[(iBlock & 1) * 4 + iSubblock];
+                    pCoeffs = pSC->pPlane[1 + ((iBlock - 4) >> 1)] + JXRLIB_API(blkOffsetUV_422)[(iBlock & 1) * 4 + iSubblock];
                 }
 
                 /** put AC bits **/
@@ -906,14 +907,14 @@ static Int CodeCoeffs(CWMImageStrCodec* pSC, CCodingContext* pContext,
                     if (iFlex) {
                         /**  FLC only, all else is skipped **/
                         for (k = 1; k < iNumCoeffs; k++) {
-                            Int data = pCoeffs[dctIndex[0][k]];
+                            Int data = pCoeffs[JXRLIB_API(dctIndex)[0][k]];
                             Int atdata = (abs(data) >> iTrim);
                             Int word = atdata & iMask, len = iFlex;
                             if (atdata) {
                                 word += word + (data < 0);
                                 len++;
                             }
-                            putBit16z(pIOFL, word, len);
+                            JXRLIB_API(putBit16z)(pIOFL, word, len);
                         }
                     }
                 }
@@ -931,7 +932,7 @@ static Int CodeCoeffs(CWMImageStrCodec* pSC, CCodingContext* pContext,
 
                     if (iFlex) {
                         for (k = 1; k < iNumCoeffs; k++) {
-                            putBit16z(pIOFL, aResidual[dctIndex[0][k]] >> 1, iFlex + (aResidual[dctIndex[0][k]] & 1));
+                            JXRLIB_API(putBit16z)(pIOFL, aResidual[JXRLIB_API(dctIndex)[0][k]] >> 1, iFlex + (aResidual[JXRLIB_API(dctIndex)[0][k]] & 1));
                         }
                     }
                 }
@@ -952,7 +953,7 @@ static Int CodeCoeffs(CWMImageStrCodec* pSC, CCodingContext* pContext,
     }
 
     /** update model at end of MB **/
-    UpdateModelMB(cf, iChannels, aLaplacianMean, &pContext->m_aModelAC);
+    JXRLIB_API(UpdateModelMB)(cf, iChannels, aLaplacianMean, &pContext->m_aModelAC);
 
     return ICERR_OK;
 }
@@ -977,7 +978,7 @@ static Void CodeCBP(CWMImageStrCodec* pSC, CCodingContext* pContext,
     UNREFERENCED_PARAMETER(iMBX);
     UNREFERENCED_PARAMETER(iMBY);
 
-    predCBPEnc(pSC, pContext);
+    JXRLIB_API(predCBPEnc)(pSC, pContext);
     writeIS_L1(pSC, pIO);
 
     iDiffCBPCU = pSC->MBInfo.iDiffCBP[1];
@@ -1028,10 +1029,10 @@ static Void CodeCBP(CWMImageStrCodec* pSC, CCodingContext* pContext,
 
         pAH = pContext->m_pAdaptHuffCBPCY1;
         iCount = aNumOnes[iPattern];
-        putBit16z(pIO, pAH->m_pTable[iCount * 2 + 1], pAH->m_pTable[iCount * 2 + 2]);
+        JXRLIB_API(putBit16z)(pIO, pAH->m_pTable[iCount * 2 + 1], pAH->m_pTable[iCount * 2 + 2]);
         pAH->m_iDiscriminant += pAH->m_pDelta[iCount];
         if (aTabLen[iPattern]) {
-            putBit16z(pIO, aTabCode[iPattern], aTabLen[iPattern]);
+            JXRLIB_API(putBit16z)(pIO, aTabCode[iPattern], aTabLen[iPattern]);
         }
 
         for (iBlock = 0; iBlock < 4; iBlock++) {
@@ -1090,25 +1091,25 @@ static Void CodeCBP(CWMImageStrCodec* pSC, CCodingContext* pContext,
                     val = gTab0[iCode] - 1;
                 }
                 pAH = pContext->m_pAdaptHuffCBPCY;
-                putBit16z(pIO, pAH->m_pTable[val * 2 + 1], pAH->m_pTable[val * 2 + 2]);
+                JXRLIB_API(putBit16z)(pIO, pAH->m_pTable[val * 2 + 1], pAH->m_pTable[val * 2 + 2]);
                 pAH->m_iDiscriminant += pAH->m_pDelta[val];
 
                 if (iChroma) {
                     if (iChroma == 1)
-                        putBit16z(pIO, 1, 1);
+                        JXRLIB_API(putBit16z)(pIO, 1, 1);
                     else
-                        putBit16z(pIO, 3 - iChroma, 2);
+                        JXRLIB_API(putBit16z)(pIO, 3 - iChroma, 2);
                 }
                 if (val == 8) {
                     if (gTab0[iCode] == 3) {
-                        putBit16z(pIO, 1, 1);
+                        JXRLIB_API(putBit16z)(pIO, 1, 1);
                     }
                     else {
-                        putBit16z(pIO, 5 - gTab0[iCode], 2);
+                        JXRLIB_API(putBit16z)(pIO, 5 - gTab0[iCode], 2);
                     }
                 }
                 if (gFL0[iCode]) {
-                    putBit16z(pIO, gCode0[iCode], gFL0[iCode]);
+                    JXRLIB_API(putBit16z)(pIO, gCode0[iCode], gFL0[iCode]);
                 }
 
                 if (cf == YUV_444) {
@@ -1118,9 +1119,9 @@ static Void CodeCBP(CWMImageStrCodec* pSC, CCodingContext* pContext,
                         if (iPattern) {
                             iCount = aNumOnes[iPattern];
                             iCount--;
-                            putBit16z(pIO, pAH->m_pTable[iCount * 2 + 1], pAH->m_pTable[iCount * 2 + 2]);
+                            JXRLIB_API(putBit16z)(pIO, pAH->m_pTable[iCount * 2 + 1], pAH->m_pTable[iCount * 2 + 2]);
                             if (aTabLen[iPattern]) {
-                                putBit16z(pIO, aTabCode[iPattern], aTabLen[iPattern]);
+                                JXRLIB_API(putBit16z)(pIO, aTabCode[iPattern], aTabLen[iPattern]);
                             }
                         }
                         iPattern = iCodeV;
@@ -1131,9 +1132,9 @@ static Void CodeCBP(CWMImageStrCodec* pSC, CCodingContext* pContext,
                     for (k = 0; k < 2; k++) {
                         if (iPattern) {
                             if (iPattern == 1)
-                                putBit16z(pIO, 1, 1);
+                                JXRLIB_API(putBit16z)(pIO, 1, 1);
                             else {
-                                putBit16z(pIO, 3 - iPattern, 2);
+                                JXRLIB_API(putBit16z)(pIO, 3 - iPattern, 2);
                             }
                         }
                         iPattern = iCodeV;
@@ -1147,13 +1148,13 @@ static Void CodeCBP(CWMImageStrCodec* pSC, CCodingContext* pContext,
 /*************************************************************************
     macroblock encode function using 4x4 transforms
 *************************************************************************/
-Int EncodeMacroblockHighpass(CWMImageStrCodec* pSC, CCodingContext* pContext, Int iMBX, Int iMBY)
+Int JXRLIB_API(EncodeMacroblockHighpass)(CWMImageStrCodec* pSC, CCodingContext* pContext, Int iMBX, Int iMBY)
 {
     BitIOInfo* pIO = pContext->m_pIOAC;
     BitIOInfo* pIOFL = pContext->m_pIOFL;
 
     if ((pSC->WMISCP.bfBitstreamFormat != SPATIAL) && (pSC->pTile[pSC->cTileColumn].cBitsHP > 0))  // MB-based HP QP index
-        encodeQPIndex(pIO, pSC->MBInfo.iQIndexHP, pSC->pTile[pSC->cTileColumn].cBitsHP);
+        JXRLIB_API(encodeQPIndex)(pIO, pSC->MBInfo.iQIndexHP, pSC->pTile[pSC->cTileColumn].cBitsHP);
 
     /** reset adaptive scan totals **/
     if (pSC->m_bResetRGITotals) {
@@ -1171,7 +1172,7 @@ Int EncodeMacroblockHighpass(CWMImageStrCodec* pSC, CCodingContext* pContext, In
         return ICERR_ERROR;
 
     if (pSC->m_bResetContext) {
-        AdaptHighpassEnc(pContext);
+        JXRLIB_API(AdaptHighpassEnc)(pContext);
     }
 
     return ICERR_OK;

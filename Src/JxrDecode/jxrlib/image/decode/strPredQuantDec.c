@@ -26,11 +26,12 @@
 //
 //*@@@---@@@@******************************************************************
 
+#include "../../common/include/jxrlib_symbol_mangle.h"
 #include "../sys/strcodec.h"
 
 #define DEQUANT(iRaw, iQP) ((iRaw) * (iQP))
 
-Void dequantizeBlock4x4(PixelI* pRec, Int* pOrg, const Int* pIndex, Int iQPLP)
+Void JXRLIB_API(dequantizeBlock4x4)(PixelI* pRec, Int* pOrg, const Int* pIndex, Int iQPLP)
 {
     Int i;
 
@@ -38,14 +39,14 @@ Void dequantizeBlock4x4(PixelI* pRec, Int* pOrg, const Int* pIndex, Int iQPLP)
         pRec[pIndex[i]] = DEQUANT(pOrg[i], iQPLP);
 }
 
-Void dequantizeBlock2x2(PixelI* pRec, Int* pOrg, Int iQPLP)
+Void JXRLIB_API(dequantizeBlock2x2)(PixelI* pRec, Int* pOrg, Int iQPLP)
 {
     pRec[32] = DEQUANT(pOrg[1], iQPLP);
     pRec[16] = DEQUANT(pOrg[2], iQPLP);
     pRec[48] = DEQUANT(pOrg[3], iQPLP);
 }
 
-Void dequantizeBlock4x2(PixelI* pRec, Int* pOrg, Int iQPLP)
+Void JXRLIB_API(dequantizeBlock4x2)(PixelI* pRec, Int* pOrg, Int iQPLP)
 {
     pRec[64] = DEQUANT(pOrg[1], iQPLP);
     pRec[16] = DEQUANT(pOrg[2], iQPLP);
@@ -57,7 +58,7 @@ Void dequantizeBlock4x2(PixelI* pRec, Int* pOrg, Int iQPLP)
 }
 
 
-Int dequantizeMacroblock(CWMImageStrCodec* pSC)
+Int JXRLIB_API(dequantizeMacroblock)(CWMImageStrCodec* pSC)
 {
     const COLORFORMAT cf = pSC->m_param.cfColorFormat;
     CWMIMBInfo* pMBInfo = &pSC->MBInfo;
@@ -72,13 +73,13 @@ Int dequantizeMacroblock(CWMImageStrCodec* pSC)
         // dequantize LP
         if (pSC->WMISCP.sbSubband != SB_DC_ONLY) {
             if (i == 0 || (cf != YUV_422 && cf != YUV_420)) {
-                dequantizeBlock4x4(pSC->p1MBbuffer[i], pMBInfo->iBlockDC[i], dctIndex[2], pTile->pQuantizerLP[i][pMBInfo->iQIndexLP].iQP);
+                JXRLIB_API(dequantizeBlock4x4)(pSC->p1MBbuffer[i], pMBInfo->iBlockDC[i], JXRLIB_API(dctIndex)[2], pTile->pQuantizerLP[i][pMBInfo->iQIndexLP].iQP);
             }
             else if (cf == YUV_422) {
-                dequantizeBlock4x2(pSC->p1MBbuffer[i], pMBInfo->iBlockDC[i], pTile->pQuantizerLP[i][pMBInfo->iQIndexLP].iQP);
+                JXRLIB_API(dequantizeBlock4x2)(pSC->p1MBbuffer[i], pMBInfo->iBlockDC[i], pTile->pQuantizerLP[i][pMBInfo->iQIndexLP].iQP);
             }
             else {// 420
-                dequantizeBlock2x2(pSC->p1MBbuffer[i], pMBInfo->iBlockDC[i], pTile->pQuantizerLP[i][pMBInfo->iQIndexLP].iQP);
+                JXRLIB_API(dequantizeBlock2x2)(pSC->p1MBbuffer[i], pMBInfo->iBlockDC[i], pTile->pQuantizerLP[i][pMBInfo->iQIndexLP].iQP);
             }
         }
     }
@@ -87,13 +88,13 @@ Int dequantizeMacroblock(CWMImageStrCodec* pSC)
 }
 
 /* frequency domain inverse DCAC prediction */
-Void predDCACDec(CWMImageStrCodec* pSC)
+Void JXRLIB_API(predDCACDec)(CWMImageStrCodec* pSC)
 {
     const COLORFORMAT cf = pSC->m_param.cfColorFormat;
     const Int iChannels = (cf == YUV_420 || cf == YUV_422) ? 1 : (Int)pSC->m_param.cNumChannels;
     CWMIMBInfo* pMBInfo = &(pSC->MBInfo);
     size_t mbX = pSC->cColumn;// mbY = pSC->cRow;
-    Int iDCACPredMode = getDCACPredMode(pSC, mbX);
+    Int iDCACPredMode = JXRLIB_API(getDCACPredMode)(pSC, mbX);
     Int iDCPredMode = (iDCACPredMode & 0x3);
     Int iADPredMode = (iDCACPredMode & 0xC);
     PixelI* pOrg, * pRef;
@@ -180,13 +181,13 @@ Void predDCACDec(CWMImageStrCodec* pSC)
         }
     }
 
-    pMBInfo->iOrientation = 2 - getACPredMode(pMBInfo, cf);
+    pMBInfo->iOrientation = 2 - JXRLIB_API(getACPredMode)(pMBInfo, cf);
 }
 
 /*************************************************************************
     Frequency domain inverse AC prediction
 *************************************************************************/
-Void predACDec(CWMImageStrCodec* pSC)
+Void JXRLIB_API(predACDec)(CWMImageStrCodec* pSC)
 {
     const COLORFORMAT cf = pSC->m_param.cfColorFormat;
     const Int iChannels = (cf == YUV_420 || cf == YUV_422) ? 1 : (Int)pSC->m_param.cNumChannels;
@@ -290,7 +291,7 @@ Void predACDec(CWMImageStrCodec* pSC)
                     // predict from top
                     for (j = 2; j < 8; j++)
                     {
-                        pOrg = pSrc + blkOffsetUV_422[j];
+                        pOrg = pSrc + JXRLIB_API(blkOffsetUV_422)[j];
                         pRef = pOrg - 16;
 
                         pOrg[10] += pRef[10];
@@ -304,7 +305,7 @@ Void predACDec(CWMImageStrCodec* pSC)
                     // predict from left
                     for (j = 1; j < 8; j += 2)
                     {
-                        pOrg = pSrc + blkOffsetUV_422[j];
+                        pOrg = pSrc + JXRLIB_API(blkOffsetUV_422)[j];
                         pRef = pOrg - 64;
 
                         pOrg[1] += pRef[1];
@@ -519,7 +520,7 @@ static Int predCBPC422Dec(CWMImageStrCodec* pSC, Int iCBP, size_t mbX, size_t mb
 
 
 /* Coded Block Pattern (CBP) prediction */
-Void predCBPDec(CWMImageStrCodec* pSC, CCodingContext* pContext)
+Void JXRLIB_API(predCBPDec)(CWMImageStrCodec* pSC, CCodingContext* pContext)
 {
     const COLORFORMAT cf = pSC->m_param.cfColorFormat;
     const size_t iChannels = (cf == YUV_420 || cf == YUV_422) ? 1 : pSC->m_param.cNumChannels;

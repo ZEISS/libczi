@@ -21,14 +21,14 @@ private:
         }
     };
 
-    pugi::xml_parse_result   parseResult;
-    pugi::xml_document doc;
+    libCZI::pugi::xml_parse_result   parseResult;
+    libCZI::pugi::xml_document doc;
     std::unique_ptr<XmlNodeWrapperReadonly<CCziMetadata, XmlNodeWrapperThrowExcp> > wrapper;
 public:
     explicit CCziMetadata(libCZI::IMetadataSegment* pMdSeg);
 
 public:
-    const pugi::xml_document& GetXmlDoc() const;
+    const libCZI::pugi::xml_document& GetXmlDoc() const;
 
 public: // interface ICziMetadata
     bool IsXmlValid() const override;
