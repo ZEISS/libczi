@@ -4,4 +4,4 @@
 
 #pragma once
 
-#include "../libCZI/libCZI.h"
+#include "../libCZI/inc/libCZI.h"
