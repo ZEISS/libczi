@@ -10,7 +10,7 @@
 #include <memory>
 #include <string>
 
-#include "../libCZI.h"
+#include "../inc/libCZI.h"
 #include <azure/storage/blobs.hpp>
 
 /// Implementation of stream object based on Azure-SDK C++ (https://github.com/Azure/azure-sdk-for-cpp).

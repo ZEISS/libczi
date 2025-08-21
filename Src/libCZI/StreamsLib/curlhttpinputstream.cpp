@@ -7,7 +7,7 @@
 #include <cstdint>
 #include <string>
 #include <sstream>
-#include "../libCZI_StreamsLib.h"
+#include "../inc/libCZI_StreamsLib.h"
 #include <curl/curl.h>
 
 using namespace std;

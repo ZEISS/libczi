@@ -7,7 +7,7 @@
 
 #if LIBCZI_WINDOWS_UWPAPI_AVAILABLE
 #include <string>
-#include "../libCZI.h"
+#include "../inc/libCZI.h"
 #include <Windows.h>
 
 /// Implementation of the IStream-interface for files based on the Win32-API.
