@@ -26,6 +26,7 @@
 //
 //*@@@---@@@@******************************************************************
 
+#include "../../common/include/jxrlib_symbol_mangle.h"
 #include "strcodec.h"
 
 #include <limits.h>
@@ -127,14 +128,14 @@ static const short g12HuffLookupTable[5][56] = { {
 /**********************************************************************
   Allocation and dellocation
 **********************************************************************/
-Void Clean(CAdaptiveHuffman* pAdHuff)
+Void JXRLIB_API(Clean)(CAdaptiveHuffman* pAdHuff)
 {
     if (pAdHuff == NULL)
         return;
     free(pAdHuff);
 }
 
-CAdaptiveHuffman* Allocate(Int iNSymbols, CODINGMODE cm)
+CAdaptiveHuffman* JXRLIB_API(Allocate)(Int iNSymbols, CODINGMODE cm)
 {
     CAdaptiveHuffman* pAdHuff = (CAdaptiveHuffman*)malloc(sizeof(CAdaptiveHuffman));
 
@@ -154,7 +155,7 @@ CAdaptiveHuffman* Allocate(Int iNSymbols, CODINGMODE cm)
     return pAdHuff;
 
 ErrorExit:
-    Clean(pAdHuff);
+    JXRLIB_API(Clean)(pAdHuff);
     return NULL;
 }
 
@@ -412,7 +413,7 @@ static const Int g12DeltaTable[] = {
 static const Int THRESHOLD = 8;
 static const Int MEMORY = 8;
 
-Void AdaptDiscriminant(CAdaptiveHuffman* pAdHuff)
+Void JXRLIB_API(AdaptDiscriminant)(CAdaptiveHuffman* pAdHuff)
 {
     Int iSym = pAdHuff->m_iNSymbols, t, dL, dH;
     const Int* pCodes, * pDelta = NULL;

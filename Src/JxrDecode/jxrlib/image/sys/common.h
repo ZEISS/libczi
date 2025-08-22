@@ -29,6 +29,8 @@
 #ifndef WMI_COMMON_H
 #define WMI_COMMON_H
 
+#include "../../common/include/jxrlib_symbol_mangle.h"
+
 /*************************************************************************
 // Common typedef's
 *************************************************************************/
@@ -98,31 +100,31 @@ typedef struct CCBPModel {
 /*************************************************************************
     globals
 *************************************************************************/
-extern Int grgiZigzagInv4x4_lowpass[];
-extern Int grgiZigzagInv4x4H[];
-extern Int grgiZigzagInv4x4V[];
-extern const Int gSignificantRunBin[];
-extern const Int gSignificantRunFixedLength[];
-static const Int cblkChromas[] = { 0,4,8,16, 16,16,16, 0,0 };
+extern Int JXRLIB_API(grgiZigzagInv4x4_lowpass)[];
+extern Int JXRLIB_API(grgiZigzagInv4x4H)[];
+extern Int JXRLIB_API(grgiZigzagInv4x4V)[];
+extern const Int JXRLIB_API(gSignificantRunBin)[];
+extern const Int JXRLIB_API(gSignificantRunFixedLength)[];
+static const Int JXRLIB_API(cblkChromas)[] = { 0,4,8,16, 16,16,16, 0,0 };
 /*************************************************************************
     function declarations
 *************************************************************************/
 // common utilities
-Void Clean(CAdaptiveHuffman* pAdHuff);
-CAdaptiveHuffman* Allocate(Int iNSymbols, CODINGMODE cm);
+Void JXRLIB_API(Clean)(CAdaptiveHuffman* pAdHuff);
+CAdaptiveHuffman* JXRLIB_API(Allocate)(Int iNSymbols, CODINGMODE cm);
 
 /* Timing functions */
-void    reset_timing(double* time);
-void    report_timing(const char* s, double time);
+//void    reset_timing(double* time);
+//void    report_timing(const char* s, double time);
 // static double   timeperclock;
 
 /** adaptive model functions **/
-Void UpdateModelMB(COLORFORMAT cf, Int iChannels, Int iLaplacianMean[], CAdaptiveModel* m_pModel);
+Void JXRLIB_API(UpdateModelMB)(COLORFORMAT cf, Int iChannels, Int iLaplacianMean[], CAdaptiveModel* m_pModel);
 
 /** adaptive huffman encoder / decoder functions **/
-Void Adapt(CAdaptiveHuffman* pAdHuff, Bool bFixedTables);
-Void AdaptFixed(CAdaptiveHuffman* pAdHuff);
-Void AdaptDiscriminant(CAdaptiveHuffman* pAdHuff);
+Void JXRLIB_API(Adapt)(CAdaptiveHuffman* pAdHuff, Bool bFixedTables);
+Void JXRLIB_API(AdaptFixed)(CAdaptiveHuffman* pAdHuff);
+Void JXRLIB_API(AdaptDiscriminant)(CAdaptiveHuffman* pAdHuff);
 
 #ifndef _PREFAST_
 #pragma warning(disable:4068)

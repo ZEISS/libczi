@@ -26,6 +26,7 @@
 //
 //*@@@---@@@@******************************************************************
 
+#include "../../common/include/jxrlib_symbol_mangle.h"
 #include "../sys/strTransform.h"
 #include "../sys/strcodec.h"
 #include "decode.h"
@@ -55,10 +56,10 @@ static Void strHSTdec1_edge(PixelI* pa, PixelI* pd);
 /**  4  5  6  7 **/
 /**  8  9 10 11 **/
 /** 12 13 14 15 **/
-Void strIDCT4x4Stage1(PixelI* p)
+Void JXRLIB_API(strIDCT4x4Stage1)(PixelI* p)
 {
     /** top left corner, butterfly => butterfly **/
-    strDCT2x2up(p + 0, p + 1, p + 2, p + 3);
+    JXRLIB_API(strDCT2x2up)(p + 0, p + 1, p + 2, p + 3);
 
     /** top right corner, -pi/8 rotation => butterfly **/
     invOdd(p + 5, p + 4, p + 7, p + 6);
@@ -71,10 +72,10 @@ Void strIDCT4x4Stage1(PixelI* p)
 
     /** butterfly **/
     //FOURBUTTERFLY(p, 0, 4, 8, 12, 1, 5, 9, 13, 2, 6, 10, 14, 3, 7, 11, 15);
-    FOURBUTTERFLY_HARDCODED1(p);
+    JXRLIB_API(FOURBUTTERFLY_HARDCODED1)(p);
 }
 
-Void strIDCT4x4Stage2(PixelI* p)
+Void JXRLIB_API(strIDCT4x4Stage2)(PixelI* p)
 {
     /** bottom left corner, butterfly => -pi/8 rotation **/
     invOdd(p + 32, p + 48, p + 96, p + 112);
@@ -86,13 +87,13 @@ Void strIDCT4x4Stage2(PixelI* p)
     invOddOdd(p + 160, p + 224, p + 176, p + 240);
 
     /** top left corner, butterfly => butterfly **/
-    strDCT2x2up(p + 0, p + 64, p + 16, p + 80);
+    JXRLIB_API(strDCT2x2up)(p + 0, p + 64, p + 16, p + 80);
 
     /** butterfly **/
     FOURBUTTERFLY(p, 0, 192, 48, 240, 64, 128, 112, 176, 16, 208, 32, 224, 80, 144, 96, 160);
 }
 
-Void strNormalizeDec(PixelI* p, Bool bChroma)
+Void JXRLIB_API(strNormalizeDec)(PixelI* p, Bool bChroma)
 {
     int i;
     if (!bChroma) {
@@ -108,7 +109,7 @@ Void strNormalizeDec(PixelI* p, Bool bChroma)
 }
 
 /** 2x2 DCT with post-scaling - for use on decoder side **/
-Void strDCT2x2dnDec(PixelI* pa, PixelI* pb, PixelI* pc, PixelI* pd)
+Void JXRLIB_API(strDCT2x2dnDec)(PixelI* pa, PixelI* pb, PixelI* pc, PixelI* pd)
 {
     PixelI a, b, c, d, C, t;
     a = *pa;
@@ -133,14 +134,14 @@ Void strDCT2x2dnDec(PixelI* pa, PixelI* pb, PixelI* pc, PixelI* pd)
 
 /** post filter stuff **/
 /** 2-point post for boundaries **/
-Void strPost2(PixelI* a, PixelI* b)
+Void JXRLIB_API(strPost2)(PixelI* a, PixelI* b)
 {
     *b += ((*a + 4) >> 3);
     *a += ((*b + 2) >> 2);
     *b += ((*a + 4) >> 3);
 }
 
-Void strPost2_alternate(PixelI* pa, PixelI* pb)
+Void JXRLIB_API(strPost2_alternate)(PixelI* pa, PixelI* pb)
 {
     PixelI a, b;
     a = *pa;
@@ -159,7 +160,7 @@ Void strPost2_alternate(PixelI* pa, PixelI* pb)
     *pb = b;
 }
 
-Void strPost2x2(PixelI* pa, PixelI* pb, PixelI* pc, PixelI* pd)
+Void JXRLIB_API(strPost2x2)(PixelI* pa, PixelI* pb, PixelI* pc, PixelI* pd)
 {
     PixelI a, b, c, d;
     a = *pa;
@@ -190,7 +191,7 @@ Void strPost2x2(PixelI* pa, PixelI* pb, PixelI* pc, PixelI* pd)
     *pd = d;
 }
 
-Void strPost2x2_alternate(PixelI* pa, PixelI* pb, PixelI* pc, PixelI* pd)
+Void JXRLIB_API(strPost2x2_alternate)(PixelI* pa, PixelI* pb, PixelI* pc, PixelI* pd)
 {
     PixelI a, b, c, d;
     a = *pa;
@@ -225,7 +226,7 @@ Void strPost2x2_alternate(PixelI* pa, PixelI* pb, PixelI* pc, PixelI* pd)
 }
 
 /** 4-point post for boundaries **/
-Void strPost4(PixelI* pa, PixelI* pb, PixelI* pc, PixelI* pd)
+Void JXRLIB_API(strPost4)(PixelI* pa, PixelI* pb, PixelI* pc, PixelI* pd)
 {
     PixelI a, b, c, d;
     a = *pa;
@@ -249,7 +250,7 @@ Void strPost4(PixelI* pa, PixelI* pb, PixelI* pc, PixelI* pd)
     *pd = d;
 }
 
-Void strPost4_alternate(PixelI* pa, PixelI* pb, PixelI* pc, PixelI* pd)
+Void JXRLIB_API(strPost4_alternate)(PixelI* pa, PixelI* pb, PixelI* pc, PixelI* pd)
 {
     PixelI a, b, c, d;
     a = *pa;
@@ -280,7 +281,7 @@ Void strPost4_alternate(PixelI* pa, PixelI* pb, PixelI* pc, PixelI* pd)
   ( 5)( 4)|( 0+64) (1+64) p1 ( 5)( 4)|(64)(65)
   ( 7)( 6)|( 2+64) (3+64)    ( 7)( 6)|(66)(67)
 *****************************************************************************************/
-Void DCCompensate(PixelI* a, PixelI* b, PixelI* c, PixelI* d, int iDC)
+Void JXRLIB_API(DCCompensate)(PixelI* a, PixelI* b, PixelI* c, PixelI* d, int iDC)
 {
     iDC = iDC >> 1;
     *a -= iDC;
@@ -297,7 +298,7 @@ Void DCCompensate(PixelI* a, PixelI* b, PixelI* c, PixelI* d, int iDC)
 #define min(a,b)            (((a) < (b)) ? (a) : (b))
 #endif
 
-int ClipDCL(int iDCL, int iAltDCL)
+int JXRLIB_API(ClipDCL)(int iDCL, int iAltDCL)
 {
     int iClipDCL = 0;
     if (iDCL > 0) {
@@ -315,7 +316,7 @@ int ClipDCL(int iDCL, int iAltDCL)
     return iClipDCL;
 }
 
-Void strPost4x4Stage1Split(PixelI* p0, PixelI* p1, Int iOffset, Int iHPQP, Bool bHPAbsent)
+Void JXRLIB_API(strPost4x4Stage1Split)(PixelI* p0, PixelI* p1, Int iOffset, Int iHPQP, Bool bHPAbsent)
 {
     int iDCLAlt1, iDCLAlt2, iDCLAlt3, iDCLAlt0;
     int iDCL1, iDCL2, iDCL3, iDCL0;
@@ -327,10 +328,10 @@ Void strPost4x4Stage1Split(PixelI* p0, PixelI* p1, Int iOffset, Int iHPQP, Bool 
     p1 += 4;
 
     /** buttefly **/
-    strDCT2x2dn(p0 + 0, p2 + 0, p1 + 0, p3 + 0);
-    strDCT2x2dn(p0 + 1, p2 + 1, p1 + 1, p3 + 1);
-    strDCT2x2dn(p0 + 2, p2 + 2, p1 + 2, p3 + 2);
-    strDCT2x2dn(p0 + 3, p2 + 3, p1 + 3, p3 + 3);
+    JXRLIB_API(strDCT2x2dn)(p0 + 0, p2 + 0, p1 + 0, p3 + 0);
+    JXRLIB_API(strDCT2x2dn)(p0 + 1, p2 + 1, p1 + 1, p3 + 1);
+    JXRLIB_API(strDCT2x2dn)(p0 + 2, p2 + 2, p1 + 2, p3 + 2);
+    JXRLIB_API(strDCT2x2dn)(p0 + 3, p2 + 3, p1 + 3, p3 + 3);
 
     /** bottom right corner: -pi/8 rotation => -pi/8 rotation **/
     invOddOddPost(p3 + 0, p3 + 1, p3 + 2, p3 + 3);
@@ -361,32 +362,32 @@ Void strPost4x4Stage1Split(PixelI* p0, PixelI* p1, Int iOffset, Int iHPQP, Bool 
     iDCL3 = (iTmp3 * 595 + 65536) >> 17;
     if ((abs(iDCL0) < iHPQP && iHPQP > 20) || bHPAbsent) {
         iDCLAlt0 = (*(p0 + 0) - *(p1 + 0) - *(p2 + 0) + *(p3 + 0)) >> 1;
-        iDCL0 = ClipDCL(iDCL0, iDCLAlt0);
-        DCCompensate(p0 + 0, p2 + 0, p1 + 0, p3 + 0, iDCL0);
+        iDCL0 = JXRLIB_API(ClipDCL)(iDCL0, iDCLAlt0);
+        JXRLIB_API(DCCompensate)(p0 + 0, p2 + 0, p1 + 0, p3 + 0, iDCL0);
     }
     if ((abs(iDCL1) < iHPQP && iHPQP > 20) || bHPAbsent) {
         iDCLAlt1 = (*(p0 + 1) - *(p1 + 1) - *(p2 + 1) + *(p3 + 1)) >> 1;
-        iDCL1 = ClipDCL(iDCL1, iDCLAlt1);
-        DCCompensate(p0 + 1, p2 + 1, p1 + 1, p3 + 1, iDCL1);
+        iDCL1 = JXRLIB_API(ClipDCL)(iDCL1, iDCLAlt1);
+        JXRLIB_API(DCCompensate)(p0 + 1, p2 + 1, p1 + 1, p3 + 1, iDCL1);
     }
     if ((abs(iDCL2) < iHPQP && iHPQP > 20) || bHPAbsent) {
         iDCLAlt2 = (*(p0 + 2) - *(p1 + 2) - *(p2 + 2) + *(p3 + 2)) >> 1;
-        iDCL2 = ClipDCL(iDCL2, iDCLAlt2);
-        DCCompensate(p0 + 2, p2 + 2, p1 + 2, p3 + 2, iDCL2);
+        iDCL2 = JXRLIB_API(ClipDCL)(iDCL2, iDCLAlt2);
+        JXRLIB_API(DCCompensate)(p0 + 2, p2 + 2, p1 + 2, p3 + 2, iDCL2);
     }
     if ((abs(iDCL3) < iHPQP && iHPQP > 20) || bHPAbsent) {
         iDCLAlt3 = (*(p0 + 3) - *(p1 + 3) - *(p2 + 3) + *(p3 + 3)) >> 1;
-        iDCL3 = ClipDCL(iDCL3, iDCLAlt3);
-        DCCompensate(p0 + 3, p2 + 3, p1 + 3, p3 + 3, iDCL3);
+        iDCL3 = JXRLIB_API(ClipDCL)(iDCL3, iDCLAlt3);
+        JXRLIB_API(DCCompensate)(p0 + 3, p2 + 3, p1 + 3, p3 + 3, iDCL3);
     }
 }
 
-Void strPost4x4Stage1(PixelI* p, Int iOffset, Int iHPQP, Bool bHPAbsent)
+Void JXRLIB_API(strPost4x4Stage1)(PixelI* p, Int iOffset, Int iHPQP, Bool bHPAbsent)
 {
-    strPost4x4Stage1Split(p, p + 16, iOffset, iHPQP, bHPAbsent);
+    JXRLIB_API(strPost4x4Stage1Split)(p, p + 16, iOffset, iHPQP, bHPAbsent);
 }
 
-Void strPost4x4Stage1Split_alternate(PixelI* p0, PixelI* p1, Int iOffset)
+Void JXRLIB_API(strPost4x4Stage1Split_alternate)(PixelI* p0, PixelI* p1, Int iOffset)
 {
     PixelI* p2 = p0 + 72 - iOffset;
     PixelI* p3 = p1 + 64 - iOffset;
@@ -394,10 +395,10 @@ Void strPost4x4Stage1Split_alternate(PixelI* p0, PixelI* p1, Int iOffset)
     p1 += 4;
 
     /** buttefly **/
-    strDCT2x2dn(p0 + 0, p2 + 0, p1 + 0, p3 + 0);
-    strDCT2x2dn(p0 + 1, p2 + 1, p1 + 1, p3 + 1);
-    strDCT2x2dn(p0 + 2, p2 + 2, p1 + 2, p3 + 2);
-    strDCT2x2dn(p0 + 3, p2 + 3, p1 + 3, p3 + 3);
+    JXRLIB_API(strDCT2x2dn)(p0 + 0, p2 + 0, p1 + 0, p3 + 0);
+    JXRLIB_API(strDCT2x2dn)(p0 + 1, p2 + 1, p1 + 1, p3 + 1);
+    JXRLIB_API(strDCT2x2dn)(p0 + 2, p2 + 2, p1 + 2, p3 + 2);
+    JXRLIB_API(strDCT2x2dn)(p0 + 3, p2 + 3, p1 + 3, p3 + 3);
 
     /** bottom right corner: -pi/8 rotation => -pi/8 rotation **/
     invOddOddPost(p3 + 0, p3 + 1, p3 + 2, p3 + 3);
@@ -419,9 +420,9 @@ Void strPost4x4Stage1Split_alternate(PixelI* p0, PixelI* p1, Int iOffset)
     strHSTdec(p0 + 3, p2 + 3, p1 + 3, p3 + 3);
 }
 
-Void strPost4x4Stage1_alternate(PixelI* p, Int iOffset)
+Void JXRLIB_API(strPost4x4Stage1_alternate)(PixelI* p, Int iOffset)
 {
-    strPost4x4Stage1Split_alternate(p, p + 16, iOffset);
+    JXRLIB_API(strPost4x4Stage1Split_alternate)(p, p + 16, iOffset);
 }
 
 /*****************************************************************************************
@@ -441,13 +442,13 @@ Void strPost4x4Stage1_alternate(PixelI* p, Int iOffset)
   (-128)(-64)|( 0)( 64) p1
   (-112)(-48)|(16)( 80)
 *****************************************************************************************/
-Void strPost4x4Stage2Split(PixelI* p0, PixelI* p1)
+Void JXRLIB_API(strPost4x4Stage2Split)(PixelI* p0, PixelI* p1)
 {
     /** buttefly **/
-    strDCT2x2dn(p0 - 96, p0 + 96, p1 - 112, p1 + 80);
-    strDCT2x2dn(p0 - 32, p0 + 32, p1 - 48, p1 + 16);
-    strDCT2x2dn(p0 - 80, p0 + 112, p1 - 128, p1 + 64);
-    strDCT2x2dn(p0 - 16, p0 + 48, p1 - 64, p1 + 0);
+    JXRLIB_API(strDCT2x2dn)(p0 - 96, p0 + 96, p1 - 112, p1 + 80);
+    JXRLIB_API(strDCT2x2dn)(p0 - 32, p0 + 32, p1 - 48, p1 + 16);
+    JXRLIB_API(strDCT2x2dn)(p0 - 80, p0 + 112, p1 - 128, p1 + 64);
+    JXRLIB_API(strDCT2x2dn)(p0 - 16, p0 + 48, p1 - 64, p1 + 0);
 
     /** bottom right corner: -pi/8 rotation => -pi/8 rotation **/
     invOddOddPost(p1 + 0, p1 + 64, p1 + 16, p1 + 80);
@@ -470,13 +471,13 @@ Void strPost4x4Stage2Split(PixelI* p0, PixelI* p1)
     strHSTdec(p0 - 16, p1 - 64, p0 + 48, p1 + 0);
 }
 
-Void strPost4x4Stage2Split_alternate(PixelI* p0, PixelI* p1)
+Void JXRLIB_API(strPost4x4Stage2Split_alternate)(PixelI* p0, PixelI* p1)
 {
     /** buttefly **/
-    strDCT2x2dn(p0 - 96, p0 + 96, p1 - 112, p1 + 80);
-    strDCT2x2dn(p0 - 32, p0 + 32, p1 - 48, p1 + 16);
-    strDCT2x2dn(p0 - 80, p0 + 112, p1 - 128, p1 + 64);
-    strDCT2x2dn(p0 - 16, p0 + 48, p1 - 64, p1 + 0);
+    JXRLIB_API(strDCT2x2dn)(p0 - 96, p0 + 96, p1 - 112, p1 + 80);
+    JXRLIB_API(strDCT2x2dn)(p0 - 32, p0 + 32, p1 - 48, p1 + 16);
+    JXRLIB_API(strDCT2x2dn)(p0 - 80, p0 + 112, p1 - 128, p1 + 64);
+    JXRLIB_API(strDCT2x2dn)(p0 - 16, p0 + 48, p1 - 64, p1 + 0);
 
     /** bottom right corner: -pi/8 rotation => -pi/8 rotation **/
     invOddOddPost(p1 + 0, p1 + 64, p1 + 16, p1 + 80);
@@ -653,7 +654,7 @@ static Void invOddOddPost(PixelI* pa, PixelI* pb, PixelI* pc, PixelI* pd)
 
 /** Kron(Rotate(-pi/8), [1 1; 1 -1]/sqrt(2)) **/
 /** [D C A B] => [a b c d] **/
-Void invOdd(PixelI* pa, PixelI* pb, PixelI* pc, PixelI* pd)
+static Void invOdd(PixelI* pa, PixelI* pb, PixelI* pc, PixelI* pd)
 {
     PixelI a, b, c, d;
     a = *pa;
@@ -686,7 +687,7 @@ Void invOdd(PixelI* pa, PixelI* pb, PixelI* pc, PixelI* pd)
 /*************************************************************************
   Top-level function to inverse tranform possible part of a macroblock
 *************************************************************************/
-Int  invTransformMacroblock(CWMImageStrCodec* pSC)
+Int  JXRLIB_API(invTransformMacroblock)(CWMImageStrCodec* pSC)
 {
     const OVERLAP olOverlap = pSC->WMISCP.olOverlap;
     const COLORFORMAT cfColorFormat = pSC->m_param.cfColorFormat;
@@ -715,7 +716,7 @@ Int  invTransformMacroblock(CWMImageStrCodec* pSC)
         }
 
         if (left) // a new MB row
-            slideOneMBRow(pSC->pPostProcInfo, pSC->m_param.cNumChannels, mbWidth, top, bottom);  // previous current row becomes previous row
+            JXRLIB_API(slideOneMBRow)(pSC->pPostProcInfo, pSC->m_param.cNumChannels, mbWidth, top, bottom);  // previous current row becomes previous row
     }
 
     //================================================================
@@ -734,11 +735,11 @@ Int  invTransformMacroblock(CWMImageStrCodec* pSC)
         if (!bottomORright)
         {
             if (pSC->WMII.cPostProcStrength > 0)
-                updatePostProcInfo(pSC->pPostProcInfo, p1, mbX, i); // update postproc info before IDCT
+                JXRLIB_API(updatePostProcInfo)(pSC->pPostProcInfo, p1, mbX, i); // update postproc info before IDCT
 
-            strIDCT4x4Stage2(p1);
+            JXRLIB_API(strIDCT4x4Stage2)(p1);
             if (pSC->m_param.bScaledArith) {
-                strNormalizeDec(p1, (i != 0));
+                JXRLIB_API(strNormalizeDec)(p1, (i != 0));
             }
         }
 
@@ -749,8 +750,8 @@ Int  invTransformMacroblock(CWMImageStrCodec* pSC)
             if (leftORright && (!topORbottom))
             {
                 j = left ? 0 : -128;
-                strPost4(p0 + j + 32, p0 + j + 48, p1 + j + 0, p1 + j + 16);
-                strPost4(p0 + j + 96, p0 + j + 112, p1 + j + 64, p1 + j + 80);
+                JXRLIB_API(strPost4)(p0 + j + 32, p0 + j + 48, p1 + j + 0, p1 + j + 16);
+                JXRLIB_API(strPost4)(p0 + j + 96, p0 + j + 112, p1 + j + 64, p1 + j + 80);
             }
 
             if (!leftORright)
@@ -758,19 +759,19 @@ Int  invTransformMacroblock(CWMImageStrCodec* pSC)
                 if (topORbottom)
                 {
                     p = top ? p1 : p0 + 32;
-                    strPost4(p - 128, p - 64, p + 0, p + 64);
-                    strPost4(p - 112, p - 48, p + 16, p + 80);
+                    JXRLIB_API(strPost4)(p - 128, p - 64, p + 0, p + 64);
+                    JXRLIB_API(strPost4)(p - 112, p - 48, p + 16, p + 80);
                     p = NULL;
                 }
                 else
                 {
-                    strPost4x4Stage2Split(p0, p1);
+                    JXRLIB_API(strPost4x4Stage2Split)(p0, p1);
                 }
             }
         }
 
         if (pSC->WMII.cPostProcStrength > 0)
-            postProcMB(pSC->pPostProcInfo, p0, p1, mbX, i, dcqp[i]); // second stage deblocking
+            JXRLIB_API(postProcMB)(pSC->pPostProcInfo, p0, p1, mbX, i, dcqp[i]); // second stage deblocking
 
         //================================
         // first level inverse transform
@@ -781,8 +782,8 @@ Int  invTransformMacroblock(CWMImageStrCodec* pSC)
         {
             for (j = (left ? 32 : -96); j < (right ? 32 : 160); j += 64)
             {
-                strIDCT4x4Stage1(p0 + j + 0);
-                strIDCT4x4Stage1(p0 + j + 16);
+                JXRLIB_API(strIDCT4x4Stage1)(p0 + j + 0);
+                JXRLIB_API(strIDCT4x4Stage1)(p0 + j + 16);
             }
         }
 
@@ -790,8 +791,8 @@ Int  invTransformMacroblock(CWMImageStrCodec* pSC)
         {
             for (j = (left ? 0 : -128); j < (right ? 0 : 128); j += 64)
             {
-                strIDCT4x4Stage1(p1 + j + 0);
-                strIDCT4x4Stage1(p1 + j + 16);
+                JXRLIB_API(strIDCT4x4Stage1)(p1 + j + 0);
+                JXRLIB_API(strIDCT4x4Stage1)(p1 + j + 16);
             }
         }
 
@@ -805,23 +806,23 @@ Int  invTransformMacroblock(CWMImageStrCodec* pSC)
                 if (!top)
                 {
                     p = p0 + 16 + j;
-                    strPost4(p + 0, p - 2, p + 6, p + 8);
-                    strPost4(p + 1, p - 1, p + 7, p + 9);
-                    strPost4(p + 16, p + 14, p + 22, p + 24);
-                    strPost4(p + 17, p + 15, p + 23, p + 25);
+                    JXRLIB_API(strPost4)(p + 0, p - 2, p + 6, p + 8);
+                    JXRLIB_API(strPost4)(p + 1, p - 1, p + 7, p + 9);
+                    JXRLIB_API(strPost4)(p + 16, p + 14, p + 22, p + 24);
+                    JXRLIB_API(strPost4)(p + 17, p + 15, p + 23, p + 25);
                     p = NULL;
                 }
                 if (!bottom)
                 {
                     p = p1 + j;
-                    strPost4(p + 0, p - 2, p + 6, p + 8);
-                    strPost4(p + 1, p - 1, p + 7, p + 9);
+                    JXRLIB_API(strPost4)(p + 0, p - 2, p + 6, p + 8);
+                    JXRLIB_API(strPost4)(p + 1, p - 1, p + 7, p + 9);
                     p = NULL;
                 }
                 if (!topORbottom)
                 {
-                    strPost4(p0 + 48 + j + 0, p0 + 48 + j - 2, p1 - 10 + j, p1 - 8 + j);
-                    strPost4(p0 + 48 + j + 1, p0 + 48 + j - 1, p1 - 9 + j, p1 - 7 + j);
+                    JXRLIB_API(strPost4)(p0 + 48 + j + 0, p0 + 48 + j - 2, p1 - 10 + j, p1 - 8 + j);
+                    JXRLIB_API(strPost4)(p0 + 48 + j + 1, p0 + 48 + j - 1, p1 - 9 + j, p1 - 7 + j);
                 }
             }
 
@@ -830,23 +831,23 @@ Int  invTransformMacroblock(CWMImageStrCodec* pSC)
                 for (j = (left ? 0 : -192); j < (right ? -64 : 64); j += 64)
                 {
                     p = p1 + j;
-                    strPost4(p + 5, p + 4, p + 64, p + 65);
-                    strPost4(p + 7, p + 6, p + 66, p + 67);
+                    JXRLIB_API(strPost4)(p + 5, p + 4, p + 64, p + 65);
+                    JXRLIB_API(strPost4)(p + 7, p + 6, p + 66, p + 67);
                     p = NULL;
 
-                    strPost4x4Stage1(p1 + j, 0, iHPQP, bHPAbsent);
+                    JXRLIB_API(strPost4x4Stage1)(p1 + j, 0, iHPQP, bHPAbsent);
                 }
             }
             else if (bottom)
             {
                 for (j = (left ? 0 : -192); j < (right ? -64 : 64); j += 64)
                 {
-                    strPost4x4Stage1(p0 + 16 + j, 0, iHPQP, bHPAbsent);
-                    strPost4x4Stage1(p0 + 32 + j, 0, iHPQP, bHPAbsent);
+                    JXRLIB_API(strPost4x4Stage1)(p0 + 16 + j, 0, iHPQP, bHPAbsent);
+                    JXRLIB_API(strPost4x4Stage1)(p0 + 32 + j, 0, iHPQP, bHPAbsent);
 
                     p = p0 + 48 + j;
-                    strPost4(p + 15, p + 14, p + 74, p + 75);
-                    strPost4(p + 13, p + 12, p + 72, p + 73);
+                    JXRLIB_API(strPost4)(p + 15, p + 14, p + 74, p + 75);
+                    JXRLIB_API(strPost4)(p + 13, p + 12, p + 72, p + 73);
                     p = NULL;
                 }
             }
@@ -854,16 +855,16 @@ Int  invTransformMacroblock(CWMImageStrCodec* pSC)
             {
                 for (j = (left ? 0 : -192); j < (right ? -64 : 64); j += 64)
                 {
-                    strPost4x4Stage1(p0 + 16 + j, 0, iHPQP, bHPAbsent);
-                    strPost4x4Stage1(p0 + 32 + j, 0, iHPQP, bHPAbsent);
-                    strPost4x4Stage1Split(p0 + 48 + j, p1 + j, 0, iHPQP, bHPAbsent);
-                    strPost4x4Stage1(p1 + j, 0, iHPQP, bHPAbsent);
+                    JXRLIB_API(strPost4x4Stage1)(p0 + 16 + j, 0, iHPQP, bHPAbsent);
+                    JXRLIB_API(strPost4x4Stage1)(p0 + 32 + j, 0, iHPQP, bHPAbsent);
+                    JXRLIB_API(strPost4x4Stage1Split)(p0 + 48 + j, p1 + j, 0, iHPQP, bHPAbsent);
+                    JXRLIB_API(strPost4x4Stage1)(p1 + j, 0, iHPQP, bHPAbsent);
                 }
             }
         }
 
         if (pSC->WMII.cPostProcStrength > 0 && (!topORleft))
-            postProcBlock(pSC->pPostProcInfo, p0, p1, mbX, i, qp[i]); // destairing and first stage deblocking
+            JXRLIB_API(postProcBlock)(pSC->pPostProcInfo, p0, p1, mbX, i, qp[i]); // destairing and first stage deblocking
     }
 
     //================================================================
@@ -882,10 +883,10 @@ Int  invTransformMacroblock(CWMImageStrCodec* pSC)
         if (!bottomORright)
         {
             if (!pSC->m_param.bScaledArith) {
-                strDCT2x2dn(p1, p1 + 32, p1 + 16, p1 + 48);
+                JXRLIB_API(strDCT2x2dn)(p1, p1 + 32, p1 + 16, p1 + 48);
             }
             else {
-                strDCT2x2dnDec(p1, p1 + 32, p1 + 16, p1 + 48);
+                JXRLIB_API(strDCT2x2dnDec)(p1, p1 + 32, p1 + 16, p1 + 48);
             }
         }
 
@@ -896,7 +897,7 @@ Int  invTransformMacroblock(CWMImageStrCodec* pSC)
             if (leftORright && !topORbottom)
             {
                 j = (left ? 0 : -32);
-                strPost2(p0 + j + 16, p1 + j);
+                JXRLIB_API(strPost2)(p0 + j + 16, p1 + j);
             }
 
             if (!leftORright)
@@ -904,11 +905,11 @@ Int  invTransformMacroblock(CWMImageStrCodec* pSC)
                 if (topORbottom)
                 {
                     p = (top ? p1 : p0 + 16);
-                    strPost2(p - 32, p);
+                    JXRLIB_API(strPost2)(p - 32, p);
                     p = NULL;
                 }
                 else {
-                    strPost2x2(p0 - 16, p0 + 16, p1 - 32, p1);
+                    JXRLIB_API(strPost2x2)(p0 - 16, p0 + 16, p1 - 32, p1);
                 }
             }
         }
@@ -922,7 +923,7 @@ Int  invTransformMacroblock(CWMImageStrCodec* pSC)
         {
             for (j = (left ? 16 : -16); j < (right ? 16 : 48); j += 32)
             {
-                strIDCT4x4Stage1(p0 + j);
+                JXRLIB_API(strIDCT4x4Stage1)(p0 + j);
             }
         }
 
@@ -930,7 +931,7 @@ Int  invTransformMacroblock(CWMImageStrCodec* pSC)
         {
             for (j = (left ? 0 : -32); j < (right ? 0 : 32); j += 32)
             {
-                strIDCT4x4Stage1(p1 + j);
+                JXRLIB_API(strIDCT4x4Stage1)(p1 + j);
             }
         }
 
@@ -945,8 +946,8 @@ Int  invTransformMacroblock(CWMImageStrCodec* pSC)
                     for (j = -48; j < (right ? -16 : 16); j += 32)
                     {
                         p = p0 + j;
-                        strPost4(p + 15, p + 14, p + 42, p + 43);
-                        strPost4(p + 13, p + 12, p + 40, p + 41);
+                        JXRLIB_API(strPost4)(p + 15, p + 14, p + 42, p + 43);
+                        JXRLIB_API(strPost4)(p + 13, p + 12, p + 40, p + 41);
                         p = NULL;
                     }
                 }
@@ -954,7 +955,7 @@ Int  invTransformMacroblock(CWMImageStrCodec* pSC)
                 {
                     for (j = -48; j < (right ? -16 : 16); j += 32)
                     {
-                        strPost4x4Stage1Split(p0 + j, p1 - 16 + j, 32, iHPQP, bHPAbsent);
+                        JXRLIB_API(strPost4x4Stage1Split)(p0 + j, p1 - 16 + j, 32, iHPQP, bHPAbsent);
                     }
                 }
 
@@ -962,27 +963,27 @@ Int  invTransformMacroblock(CWMImageStrCodec* pSC)
                 {
                     if (!bottom)
                     {
-                        strPost4(p0 - 2, p0 - 4, p1 - 28, p1 - 26);
-                        strPost4(p0 - 1, p0 - 3, p1 - 27, p1 - 25);
+                        JXRLIB_API(strPost4)(p0 - 2, p0 - 4, p1 - 28, p1 - 26);
+                        JXRLIB_API(strPost4)(p0 - 1, p0 - 3, p1 - 27, p1 - 25);
                     }
 
-                    strPost4(p0 - 18, p0 - 20, p0 - 12, p0 - 10);
-                    strPost4(p0 - 17, p0 - 19, p0 - 11, p0 - 9);
+                    JXRLIB_API(strPost4)(p0 - 18, p0 - 20, p0 - 12, p0 - 10);
+                    JXRLIB_API(strPost4)(p0 - 17, p0 - 19, p0 - 11, p0 - 9);
                 }
                 else
                 {
-                    strPost4x4Stage1(p0 - 32, 32, iHPQP, bHPAbsent);
+                    JXRLIB_API(strPost4x4Stage1)(p0 - 32, 32, iHPQP, bHPAbsent);
                 }
 
-                strPost4x4Stage1(p0 - 64, 32, iHPQP, bHPAbsent);
+                JXRLIB_API(strPost4x4Stage1)(p0 - 64, 32, iHPQP, bHPAbsent);
             }
             else if (top)
             {
                 for (j = (left ? 0 : -64); j < (right ? -32 : 0); j += 32)
                 {
                     p = p1 + j + 4;
-                    strPost4(p + 1, p + 0, p + 28, p + 29);
-                    strPost4(p + 3, p + 2, p + 30, p + 31);
+                    JXRLIB_API(strPost4)(p + 1, p + 0, p + 28, p + 29);
+                    JXRLIB_API(strPost4)(p + 3, p + 2, p + 30, p + 31);
                     p = NULL;
                 }
             }
@@ -990,12 +991,12 @@ Int  invTransformMacroblock(CWMImageStrCodec* pSC)
             {
                 if (!bottom)
                 {
-                    strPost4(p0 + 26, p0 + 24, p1 + 0, p1 + 2);
-                    strPost4(p0 + 27, p0 + 25, p1 + 1, p1 + 3);
+                    JXRLIB_API(strPost4)(p0 + 26, p0 + 24, p1 + 0, p1 + 2);
+                    JXRLIB_API(strPost4)(p0 + 27, p0 + 25, p1 + 1, p1 + 3);
                 }
 
-                strPost4(p0 + 10, p0 + 8, p0 + 16, p0 + 18);
-                strPost4(p0 + 11, p0 + 9, p0 + 17, p0 + 19);
+                JXRLIB_API(strPost4)(p0 + 10, p0 + 8, p0 + 16, p0 + 18);
+                JXRLIB_API(strPost4)(p0 + 11, p0 + 9, p0 + 17, p0 + 19);
             }
         }
     }
@@ -1020,12 +1021,12 @@ Int  invTransformMacroblock(CWMImageStrCodec* pSC)
             p1[32] += p1[0];
 
             if (!pSC->m_param.bScaledArith) {
-                strDCT2x2dn(p1 + 0, p1 + 64, p1 + 16, p1 + 80);
-                strDCT2x2dn(p1 + 32, p1 + 96, p1 + 48, p1 + 112);
+                JXRLIB_API(strDCT2x2dn)(p1 + 0, p1 + 64, p1 + 16, p1 + 80);
+                JXRLIB_API(strDCT2x2dn)(p1 + 32, p1 + 96, p1 + 48, p1 + 112);
             }
             else {
-                strDCT2x2dnDec(p1 + 0, p1 + 64, p1 + 16, p1 + 80);
-                strDCT2x2dnDec(p1 + 32, p1 + 96, p1 + 48, p1 + 112);
+                JXRLIB_API(strDCT2x2dnDec)(p1 + 0, p1 + 64, p1 + 16, p1 + 80);
+                JXRLIB_API(strDCT2x2dnDec)(p1 + 32, p1 + 96, p1 + 48, p1 + 112);
             }
         }
 
@@ -1040,29 +1041,29 @@ Int  invTransformMacroblock(CWMImageStrCodec* pSC)
                     if (!top)
                     {
                         j = (left ? 0 : -64);
-                        strPost2(p0 + 48 + j, p1 + j);
+                        JXRLIB_API(strPost2)(p0 + 48 + j, p1 + j);
                     }
 
                     j = (left ? 16 : -48);
-                    strPost2(p1 + j, p1 + j + 16);
+                    JXRLIB_API(strPost2)(p1 + j, p1 + j + 16);
                 }
                 else
                 {
                     if (top)
                     {
-                        strPost2(p1 - 64, p1);
+                        JXRLIB_API(strPost2)(p1 - 64, p1);
                     }
                     else
                     {
-                        strPost2x2(p0 - 16, p0 + 48, p1 - 64, p1);
+                        JXRLIB_API(strPost2x2)(p0 - 16, p0 + 48, p1 - 64, p1);
                     }
 
-                    strPost2x2(p1 - 48, p1 + 16, p1 - 32, p1 + 32);
+                    JXRLIB_API(strPost2x2)(p1 - 48, p1 + 16, p1 - 32, p1 + 32);
                 }
             }
             else if (!leftORright)
             {
-                strPost2(p0 - 16, p0 + 48);
+                JXRLIB_API(strPost2)(p0 - 16, p0 + 48);
             }
         }
 
@@ -1075,7 +1076,7 @@ Int  invTransformMacroblock(CWMImageStrCodec* pSC)
         {
             for (j = (left ? 48 : -16); j < (right ? 48 : 112); j += 64)
             {
-                strIDCT4x4Stage1(p0 + j);
+                JXRLIB_API(strIDCT4x4Stage1)(p0 + j);
             }
         }
 
@@ -1083,9 +1084,9 @@ Int  invTransformMacroblock(CWMImageStrCodec* pSC)
         {
             for (j = (left ? 0 : -64); j < (right ? 0 : 64); j += 64)
             {
-                strIDCT4x4Stage1(p1 + j + 0);
-                strIDCT4x4Stage1(p1 + j + 16);
-                strIDCT4x4Stage1(p1 + j + 32);
+                JXRLIB_API(strIDCT4x4Stage1)(p1 + j + 0);
+                JXRLIB_API(strIDCT4x4Stage1)(p1 + j + 16);
+                JXRLIB_API(strIDCT4x4Stage1)(p1 + j + 32);
             }
         }
 
@@ -1100,15 +1101,15 @@ Int  invTransformMacroblock(CWMImageStrCodec* pSC)
                     j = (left ? 32 + 10 : -32 + 14);
 
                     p = p0 + j;
-                    strPost4(p + 0, p - 2, p + 6, p + 8);
-                    strPost4(p + 1, p - 1, p + 7, p + 9);
+                    JXRLIB_API(strPost4)(p + 0, p - 2, p + 6, p + 8);
+                    JXRLIB_API(strPost4)(p + 1, p - 1, p + 7, p + 9);
 
                     p = NULL;
                 }
 
                 for (j = (left ? 0 : -128); j < (right ? -64 : 0); j += 64)
                 {
-                    strPost4x4Stage1(p0 + j + 32, 0, iHPQP, bHPAbsent);
+                    JXRLIB_API(strPost4x4Stage1)(p0 + j + 32, 0, iHPQP, bHPAbsent);
                 }
             }
 
@@ -1119,20 +1120,20 @@ Int  invTransformMacroblock(CWMImageStrCodec* pSC)
                     j = (left ? 0 + 10 : -64 + 14);
 
                     p = p1 + j;
-                    strPost4(p + 0, p - 2, p + 6, p + 8);
-                    strPost4(p + 1, p - 1, p + 7, p + 9);
+                    JXRLIB_API(strPost4)(p + 0, p - 2, p + 6, p + 8);
+                    JXRLIB_API(strPost4)(p + 1, p - 1, p + 7, p + 9);
 
                     p += 16;
-                    strPost4(p + 0, p - 2, p + 6, p + 8);
-                    strPost4(p + 1, p - 1, p + 7, p + 9);
+                    JXRLIB_API(strPost4)(p + 0, p - 2, p + 6, p + 8);
+                    JXRLIB_API(strPost4)(p + 1, p - 1, p + 7, p + 9);
 
                     p = NULL;
                 }
 
                 for (j = (left ? 0 : -128); j < (right ? -64 : 0); j += 64)
                 {
-                    strPost4x4Stage1(p1 + j + 0, 0, iHPQP, bHPAbsent);
-                    strPost4x4Stage1(p1 + j + 16, 0, iHPQP, bHPAbsent);
+                    JXRLIB_API(strPost4x4Stage1)(p1 + j + 0, 0, iHPQP, bHPAbsent);
+                    JXRLIB_API(strPost4x4Stage1)(p1 + j + 16, 0, iHPQP, bHPAbsent);
                 }
             }
 
@@ -1141,8 +1142,8 @@ Int  invTransformMacroblock(CWMImageStrCodec* pSC)
                 p = (top ? p1 + 5 : p0 + 48 + 13);
                 for (j = (left ? 0 : -128); j < (right ? -64 : 0); j += 64)
                 {
-                    strPost4(p + j + 0, p + j - 1, p + j + 59, p + j + 60);
-                    strPost4(p + j + 2, p + j + 1, p + j + 61, p + j + 62);
+                    JXRLIB_API(strPost4)(p + j + 0, p + j - 1, p + j + 59, p + j + 60);
+                    JXRLIB_API(strPost4)(p + j + 2, p + j + 1, p + j + 61, p + j + 62);
                 }
                 p = NULL;
             }
@@ -1151,13 +1152,13 @@ Int  invTransformMacroblock(CWMImageStrCodec* pSC)
                 if (leftORright)
                 {
                     j = (left ? 0 + 0 : -64 + 4);
-                    strPost4(p0 + j + 48 + 10 + 0, p0 + j + 48 + 10 - 2, p1 + j + 0, p1 + j + 2);
-                    strPost4(p0 + j + 48 + 10 + 1, p0 + j + 48 + 10 - 1, p1 + j + 1, p1 + j + 3);
+                    JXRLIB_API(strPost4)(p0 + j + 48 + 10 + 0, p0 + j + 48 + 10 - 2, p1 + j + 0, p1 + j + 2);
+                    JXRLIB_API(strPost4)(p0 + j + 48 + 10 + 1, p0 + j + 48 + 10 - 1, p1 + j + 1, p1 + j + 3);
                 }
 
                 for (j = (left ? 0 : -128); j < (right ? -64 : 0); j += 64)
                 {
-                    strPost4x4Stage1Split(p0 + j + 48, p1 + j + 0, 0, iHPQP, bHPAbsent);
+                    JXRLIB_API(strPost4x4Stage1Split)(p0 + j + 48, p1 + j + 0, 0, iHPQP, bHPAbsent);
                 }
             }
         }
@@ -1166,7 +1167,7 @@ Int  invTransformMacroblock(CWMImageStrCodec* pSC)
     return ICERR_OK;
 }
 
-Int  invTransformMacroblock_alteredOperators_hard(CWMImageStrCodec* pSC)
+Int  JXRLIB_API(invTransformMacroblock_alteredOperators_hard)(CWMImageStrCodec* pSC)
 {
     const OVERLAP olOverlap = pSC->WMISCP.olOverlap;
     const COLORFORMAT cfColorFormat = pSC->m_param.cfColorFormat;
@@ -1243,7 +1244,7 @@ Int  invTransformMacroblock_alteredOperators_hard(CWMImageStrCodec* pSC)
         }
 
         if (left) // a new MB row
-            slideOneMBRow(pSC->pPostProcInfo, pSC->m_param.cNumChannels, mbWidth, top, bottom);  // previous current row becomes previous row
+            JXRLIB_API(slideOneMBRow)(pSC->pPostProcInfo, pSC->m_param.cNumChannels, mbWidth, top, bottom);  // previous current row becomes previous row
     }
 
     //================================================================
@@ -1258,11 +1259,11 @@ Int  invTransformMacroblock_alteredOperators_hard(CWMImageStrCodec* pSC)
         if (!bottomORright)
         {
             if (pSC->WMII.cPostProcStrength > 0)
-                updatePostProcInfo(pSC->pPostProcInfo, p1, mbX, i); // update postproc info before IDCT
+                JXRLIB_API(updatePostProcInfo)(pSC->pPostProcInfo, p1, mbX, i); // update postproc info before IDCT
 
-            strIDCT4x4Stage2(p1);
+            JXRLIB_API(strIDCT4x4Stage2)(p1);
             if (pSC->m_param.bScaledArith) {
-                strNormalizeDec(p1, (i != 0));
+                JXRLIB_API(strNormalizeDec)(p1, (i != 0));
             }
         }
 
@@ -1272,24 +1273,24 @@ Int  invTransformMacroblock_alteredOperators_hard(CWMImageStrCodec* pSC)
         {
             /* Corner operations */
             if ((top || bHoriTileBoundary) && (left || bVertTileBoundary))
-                strPost4_alternate(p1 + 0, p1 + 64, p1 + 0 + 16, p1 + 64 + 16);
+                JXRLIB_API(strPost4_alternate)(p1 + 0, p1 + 64, p1 + 0 + 16, p1 + 64 + 16);
             if ((top || bHoriTileBoundary) && (right || bVertTileBoundary))
-                strPost4_alternate(p1 - 128, p1 - 64, p1 - 128 + 16, p1 - 64 + 16);
+                JXRLIB_API(strPost4_alternate)(p1 - 128, p1 - 64, p1 - 128 + 16, p1 - 64 + 16);
             if ((bottom || bHoriTileBoundary) && (left || bVertTileBoundary))
-                strPost4_alternate(p0 + 32, p0 + 96, p0 + 32 + 16, p0 + 96 + 16);
+                JXRLIB_API(strPost4_alternate)(p0 + 32, p0 + 96, p0 + 32 + 16, p0 + 96 + 16);
             if ((bottom || bHoriTileBoundary) && (right || bVertTileBoundary))
-                strPost4_alternate(p0 - 96, p0 - 32, p0 - 96 + 16, p0 - 32 + 16);
+                JXRLIB_API(strPost4_alternate)(p0 - 96, p0 - 32, p0 - 96 + 16, p0 - 32 + 16);
             if ((leftORright || bVertTileBoundary) && (!topORbottom && !bHoriTileBoundary))
             {
                 if (left || bVertTileBoundary) {
                     j = 0;
-                    strPost4_alternate(p0 + j + 32, p0 + j + 48, p1 + j + 0, p1 + j + 16);
-                    strPost4_alternate(p0 + j + 96, p0 + j + 112, p1 + j + 64, p1 + j + 80);
+                    JXRLIB_API(strPost4_alternate)(p0 + j + 32, p0 + j + 48, p1 + j + 0, p1 + j + 16);
+                    JXRLIB_API(strPost4_alternate)(p0 + j + 96, p0 + j + 112, p1 + j + 64, p1 + j + 80);
                 }
                 if (right || bVertTileBoundary) {
                     j = -128;
-                    strPost4_alternate(p0 + j + 32, p0 + j + 48, p1 + j + 0, p1 + j + 16);
-                    strPost4_alternate(p0 + j + 96, p0 + j + 112, p1 + j + 64, p1 + j + 80);
+                    JXRLIB_API(strPost4_alternate)(p0 + j + 32, p0 + j + 48, p1 + j + 0, p1 + j + 16);
+                    JXRLIB_API(strPost4_alternate)(p0 + j + 96, p0 + j + 112, p1 + j + 64, p1 + j + 80);
                 }
             }
 
@@ -1299,25 +1300,25 @@ Int  invTransformMacroblock_alteredOperators_hard(CWMImageStrCodec* pSC)
                 {
                     if (top || bHoriTileBoundary) {
                         p = p1;
-                        strPost4_alternate(p - 128, p - 64, p + 0, p + 64);
-                        strPost4_alternate(p - 112, p - 48, p + 16, p + 80);
+                        JXRLIB_API(strPost4_alternate)(p - 128, p - 64, p + 0, p + 64);
+                        JXRLIB_API(strPost4_alternate)(p - 112, p - 48, p + 16, p + 80);
                         p = NULL;
                     }
                     if (bottom || bHoriTileBoundary) {
                         p = p0 + 32;
-                        strPost4_alternate(p - 128, p - 64, p + 0, p + 64);
-                        strPost4_alternate(p - 112, p - 48, p + 16, p + 80);
+                        JXRLIB_API(strPost4_alternate)(p - 128, p - 64, p + 0, p + 64);
+                        JXRLIB_API(strPost4_alternate)(p - 112, p - 48, p + 16, p + 80);
                         p = NULL;
                     }
                 }
 
                 if (!topORbottom && !bHoriTileBoundary && !bVertTileBoundary)
-                    strPost4x4Stage2Split_alternate(p0, p1);
+                    JXRLIB_API(strPost4x4Stage2Split_alternate)(p0, p1);
             }
         }
 
         if (pSC->WMII.cPostProcStrength > 0)
-            postProcMB(pSC->pPostProcInfo, p0, p1, mbX, i, dcqp[i]); // second stage deblocking
+            JXRLIB_API(postProcMB)(pSC->pPostProcInfo, p0, p1, mbX, i, dcqp[i]); // second stage deblocking
 
         //================================
         // first level inverse transform
@@ -1328,8 +1329,8 @@ Int  invTransformMacroblock_alteredOperators_hard(CWMImageStrCodec* pSC)
         {
             for (j = (left ? 32 : -96); j < (right ? 32 : 160); j += 64)
             {
-                strIDCT4x4Stage1(p0 + j + 0);
-                strIDCT4x4Stage1(p0 + j + 16);
+                JXRLIB_API(strIDCT4x4Stage1)(p0 + j + 0);
+                JXRLIB_API(strIDCT4x4Stage1)(p0 + j + 16);
             }
         }
 
@@ -1341,8 +1342,8 @@ Int  invTransformMacroblock_alteredOperators_hard(CWMImageStrCodec* pSC)
                 //                    MIPgen(p1 + j + 0);
                 //                    MIPgen(p1 + j + 16);
                 //                }
-                strIDCT4x4Stage1(p1 + j + 0);
-                strIDCT4x4Stage1(p1 + j + 16);
+                JXRLIB_API(strIDCT4x4Stage1)(p1 + j + 0);
+                JXRLIB_API(strIDCT4x4Stage1)(p1 + j + 16);
             }
         }
 
@@ -1354,35 +1355,35 @@ Int  invTransformMacroblock_alteredOperators_hard(CWMImageStrCodec* pSC)
             {
                 /* Corner operations */
                 if ((top || bHoriTileBoundary) && (left || bVertTileBoundary))
-                    strPost4_alternate(p1 + 0, p1 + 1, p1 + 2, p1 + 3);
+                    JXRLIB_API(strPost4_alternate)(p1 + 0, p1 + 1, p1 + 2, p1 + 3);
                 if ((top || bHoriTileBoundary) && (right || bVertTileBoundary))
-                    strPost4_alternate(p1 - 59, p1 - 60, p1 - 57, p1 - 58);
+                    JXRLIB_API(strPost4_alternate)(p1 - 59, p1 - 60, p1 - 57, p1 - 58);
                 if ((bottom || bHoriTileBoundary) && (left || bVertTileBoundary))
-                    strPost4_alternate(p0 + 48 + 10, p0 + 48 + 11, p0 + 48 + 8, p0 + 48 + 9);
+                    JXRLIB_API(strPost4_alternate)(p0 + 48 + 10, p0 + 48 + 11, p0 + 48 + 8, p0 + 48 + 9);
                 if ((bottom || bHoriTileBoundary) && (right || bVertTileBoundary))
-                    strPost4_alternate(p0 - 1, p0 - 2, p0 - 3, p0 - 4);
+                    JXRLIB_API(strPost4_alternate)(p0 - 1, p0 - 2, p0 - 3, p0 - 4);
                 if (left || bVertTileBoundary) {
                     j = 0 + 10;
                     if (!top)
                     {
                         p = p0 + 16 + j;
-                        strPost4_alternate(p + 0, p - 2, p + 6, p + 8);
-                        strPost4_alternate(p + 1, p - 1, p + 7, p + 9);
-                        strPost4_alternate(p + 16, p + 14, p + 22, p + 24);
-                        strPost4_alternate(p + 17, p + 15, p + 23, p + 25);
+                        JXRLIB_API(strPost4_alternate)(p + 0, p - 2, p + 6, p + 8);
+                        JXRLIB_API(strPost4_alternate)(p + 1, p - 1, p + 7, p + 9);
+                        JXRLIB_API(strPost4_alternate)(p + 16, p + 14, p + 22, p + 24);
+                        JXRLIB_API(strPost4_alternate)(p + 17, p + 15, p + 23, p + 25);
                         p = NULL;
                     }
                     if (!bottom)
                     {
                         p = p1 + j;
-                        strPost4_alternate(p + 0, p - 2, p + 6, p + 8);
-                        strPost4_alternate(p + 1, p - 1, p + 7, p + 9);
+                        JXRLIB_API(strPost4_alternate)(p + 0, p - 2, p + 6, p + 8);
+                        JXRLIB_API(strPost4_alternate)(p + 1, p - 1, p + 7, p + 9);
                         p = NULL;
                     }
                     if (!topORbottom && !bHoriTileBoundary)
                     {
-                        strPost4_alternate(p0 + 48 + j + 0, p0 + 48 + j - 2, p1 - 10 + j, p1 - 8 + j);
-                        strPost4_alternate(p0 + 48 + j + 1, p0 + 48 + j - 1, p1 - 9 + j, p1 - 7 + j);
+                        JXRLIB_API(strPost4_alternate)(p0 + 48 + j + 0, p0 + 48 + j - 2, p1 - 10 + j, p1 - 8 + j);
+                        JXRLIB_API(strPost4_alternate)(p0 + 48 + j + 1, p0 + 48 + j - 1, p1 - 9 + j, p1 - 7 + j);
                     }
                 }
                 if (right || bVertTileBoundary) {
@@ -1390,23 +1391,23 @@ Int  invTransformMacroblock_alteredOperators_hard(CWMImageStrCodec* pSC)
                     if (!top)
                     {
                         p = p0 + 16 + j;
-                        strPost4_alternate(p + 0, p - 2, p + 6, p + 8);
-                        strPost4_alternate(p + 1, p - 1, p + 7, p + 9);
-                        strPost4_alternate(p + 16, p + 14, p + 22, p + 24);
-                        strPost4_alternate(p + 17, p + 15, p + 23, p + 25);
+                        JXRLIB_API(strPost4_alternate)(p + 0, p - 2, p + 6, p + 8);
+                        JXRLIB_API(strPost4_alternate)(p + 1, p - 1, p + 7, p + 9);
+                        JXRLIB_API(strPost4_alternate)(p + 16, p + 14, p + 22, p + 24);
+                        JXRLIB_API(strPost4_alternate)(p + 17, p + 15, p + 23, p + 25);
                         p = NULL;
                     }
                     if (!bottom)
                     {
                         p = p1 + j;
-                        strPost4_alternate(p + 0, p - 2, p + 6, p + 8);
-                        strPost4_alternate(p + 1, p - 1, p + 7, p + 9);
+                        JXRLIB_API(strPost4_alternate)(p + 0, p - 2, p + 6, p + 8);
+                        JXRLIB_API(strPost4_alternate)(p + 1, p - 1, p + 7, p + 9);
                         p = NULL;
                     }
                     if (!topORbottom && !bHoriTileBoundary)
                     {
-                        strPost4_alternate(p0 + 48 + j + 0, p0 + 48 + j - 2, p1 - 10 + j, p1 - 8 + j);
-                        strPost4_alternate(p0 + 48 + j + 1, p0 + 48 + j - 1, p1 - 9 + j, p1 - 7 + j);
+                        JXRLIB_API(strPost4_alternate)(p0 + 48 + j + 0, p0 + 48 + j - 2, p1 - 10 + j, p1 - 8 + j);
+                        JXRLIB_API(strPost4_alternate)(p0 + 48 + j + 1, p0 + 48 + j - 1, p1 - 9 + j, p1 - 7 + j);
                     }
                 }
             }
@@ -1417,11 +1418,11 @@ Int  invTransformMacroblock_alteredOperators_hard(CWMImageStrCodec* pSC)
                 {
                     if (!bVertTileBoundary || j != -64) {
                         p = p1 + j;
-                        strPost4_alternate(p + 5, p + 4, p + 64, p + 65);
-                        strPost4_alternate(p + 7, p + 6, p + 66, p + 67);
+                        JXRLIB_API(strPost4_alternate)(p + 5, p + 4, p + 64, p + 65);
+                        JXRLIB_API(strPost4_alternate)(p + 7, p + 6, p + 66, p + 67);
                         p = NULL;
 
-                        strPost4x4Stage1_alternate(p1 + j, 0);
+                        JXRLIB_API(strPost4x4Stage1_alternate)(p1 + j, 0);
                     }
                 }
             }
@@ -1431,12 +1432,12 @@ Int  invTransformMacroblock_alteredOperators_hard(CWMImageStrCodec* pSC)
                 for (j = (left ? 0 : -192); j < (right ? -64 : 64); j += 64)
                 {
                     if (!bVertTileBoundary || j != -64) {
-                        strPost4x4Stage1_alternate(p0 + 16 + j, 0);
-                        strPost4x4Stage1_alternate(p0 + 32 + j, 0);
+                        JXRLIB_API(strPost4x4Stage1_alternate)(p0 + 16 + j, 0);
+                        JXRLIB_API(strPost4x4Stage1_alternate)(p0 + 32 + j, 0);
 
                         p = p0 + 48 + j;
-                        strPost4_alternate(p + 15, p + 14, p + 74, p + 75);
-                        strPost4_alternate(p + 13, p + 12, p + 72, p + 73);
+                        JXRLIB_API(strPost4_alternate)(p + 15, p + 14, p + 74, p + 75);
+                        JXRLIB_API(strPost4_alternate)(p + 13, p + 12, p + 72, p + 73);
                         p = NULL;
                     }
                 }
@@ -1447,17 +1448,17 @@ Int  invTransformMacroblock_alteredOperators_hard(CWMImageStrCodec* pSC)
                 for (j = (left ? 0 : -192); j < (right ? -64 : 64); j += 64)
                 {
                     if (!bVertTileBoundary || j != -64) {
-                        strPost4x4Stage1_alternate(p0 + 16 + j, 0);
-                        strPost4x4Stage1_alternate(p0 + 32 + j, 0);
-                        strPost4x4Stage1Split_alternate(p0 + 48 + j, p1 + j, 0);
-                        strPost4x4Stage1_alternate(p1 + j, 0);
+                        JXRLIB_API(strPost4x4Stage1_alternate)(p0 + 16 + j, 0);
+                        JXRLIB_API(strPost4x4Stage1_alternate)(p0 + 32 + j, 0);
+                        JXRLIB_API(strPost4x4Stage1Split_alternate)(p0 + 48 + j, p1 + j, 0);
+                        JXRLIB_API(strPost4x4Stage1_alternate)(p1 + j, 0);
                     }
                 }
             }
         }
 
         if (pSC->WMII.cPostProcStrength > 0 && (!topORleft))
-            postProcBlock(pSC->pPostProcInfo, p0, p1, mbX, i, qp[i]); // destairing and first stage deblocking
+            JXRLIB_API(postProcBlock)(pSC->pPostProcInfo, p0, p1, mbX, i, qp[i]); // destairing and first stage deblocking
     }
 
     //================================================================
@@ -1472,10 +1473,10 @@ Int  invTransformMacroblock_alteredOperators_hard(CWMImageStrCodec* pSC)
         if (!bottomORright)
         {
             if (!pSC->m_param.bScaledArith) {
-                strDCT2x2dn(p1, p1 + 32, p1 + 16, p1 + 48);
+                JXRLIB_API(strDCT2x2dn)(p1, p1 + 32, p1 + 16, p1 + 48);
             }
             else {
-                strDCT2x2dnDec(p1, p1 + 32, p1 + 16, p1 + 48);
+                JXRLIB_API(strDCT2x2dnDec)(p1, p1 + 32, p1 + 16, p1 + 48);
             }
         }
 
@@ -1499,9 +1500,9 @@ Int  invTransformMacroblock_alteredOperators_hard(CWMImageStrCodec* pSC)
             if ((leftORright || bVertTileBoundary) && !topORbottom && !bHoriTileBoundary)
             {
                 if (left || bVertTileBoundary)
-                    strPost2_alternate(p0 + 0 + 16, p1 + 0);
+                    JXRLIB_API(strPost2_alternate)(p0 + 0 + 16, p1 + 0);
                 if (right || bVertTileBoundary)
-                    strPost2_alternate(p0 + -32 + 16, p1 + -32);
+                    JXRLIB_API(strPost2_alternate)(p0 + -32 + 16, p1 + -32);
             }
 
             if (!leftORright)
@@ -1509,12 +1510,12 @@ Int  invTransformMacroblock_alteredOperators_hard(CWMImageStrCodec* pSC)
                 if ((topORbottom || bHoriTileBoundary) && !bVertTileBoundary)
                 {
                     if (top || bHoriTileBoundary)
-                        strPost2_alternate(p1 - 32, p1);
+                        JXRLIB_API(strPost2_alternate)(p1 - 32, p1);
                     if (bottom || bHoriTileBoundary)
-                        strPost2_alternate(p0 + 16 - 32, p0 + 16);
+                        JXRLIB_API(strPost2_alternate)(p0 + 16 - 32, p0 + 16);
                 }
                 else if (!topORbottom && !bHoriTileBoundary && !bVertTileBoundary) {
-                    strPost2x2_alternate(p0 - 16, p0 + 16, p1 - 32, p1);
+                    JXRLIB_API(strPost2x2_alternate)(p0 - 16, p0 + 16, p1 - 32, p1);
                 }
             }
             if ((leftAdjacentColumn || bOneMBRightVertTB) && (top || bHoriTileBoundary))
@@ -1543,7 +1544,7 @@ Int  invTransformMacroblock_alteredOperators_hard(CWMImageStrCodec* pSC)
             // Thus left MB not processed until leftAdjacentColumn = 1
             for (j = ((left) ? 48 : ((leftAdjacentColumn || bOneMBRightVertTB) ? -48 : -16)); j < ((right || bVertTileBoundary) ? 16 : 48); j += 32)
             {
-                strIDCT4x4Stage1(p0 + j);
+                JXRLIB_API(strIDCT4x4Stage1)(p0 + j);
             }
         }
 
@@ -1554,7 +1555,7 @@ Int  invTransformMacroblock_alteredOperators_hard(CWMImageStrCodec* pSC)
             // Thus left MB not processed until leftAdjacentColumn = 1
             for (j = ((left) ? 32 : ((leftAdjacentColumn || bOneMBRightVertTB) ? -64 : -32)); j < ((right || bVertTileBoundary) ? 0 : 32); j += 32)
             {
-                strIDCT4x4Stage1(p1 + j);
+                JXRLIB_API(strIDCT4x4Stage1)(p1 + j);
             }
         }
 
@@ -1565,14 +1566,14 @@ Int  invTransformMacroblock_alteredOperators_hard(CWMImageStrCodec* pSC)
             /* Corner operations */
             /* Change because the top-left corner ICT will not have happened until leftAdjacentColumn ==1 */
             if ((top || bHoriTileBoundary) && (leftAdjacentColumn || bOneMBRightVertTB))
-                strPost4_alternate(p1 - 64 + 0, p1 - 64 + 1, p1 - 64 + 2, p1 - 64 + 3);
+                JXRLIB_API(strPost4_alternate)(p1 - 64 + 0, p1 - 64 + 1, p1 - 64 + 2, p1 - 64 + 3);
             if ((top || bHoriTileBoundary) && (right || bVertTileBoundary))
-                strPost4_alternate(p1 - 27, p1 - 28, p1 - 25, p1 - 26);
+                JXRLIB_API(strPost4_alternate)(p1 - 27, p1 - 28, p1 - 25, p1 - 26);
             /* Change because the bottom-left corner ICT will not have happened until leftAdjacentColumn ==1 */
             if ((bottom || bHoriTileBoundary) && (leftAdjacentColumn || bOneMBRightVertTB))
-                strPost4_alternate(p0 - 64 + 16 + 10, p0 - 64 + 16 + 11, p0 - 64 + 16 + 8, p0 - 64 + 16 + 9);
+                JXRLIB_API(strPost4_alternate)(p0 - 64 + 16 + 10, p0 - 64 + 16 + 11, p0 - 64 + 16 + 8, p0 - 64 + 16 + 9);
             if ((bottom || bHoriTileBoundary) && (right || bVertTileBoundary))
-                strPost4_alternate(p0 - 1, p0 - 2, p0 - 3, p0 - 4);
+                JXRLIB_API(strPost4_alternate)(p0 - 1, p0 - 2, p0 - 3, p0 - 4);
             if (!left && !top)
             {
                 /* Change because the vertical 1-D overlap operations of the left edge pixels cannot be performed until leftAdjacentColumn ==1 */
@@ -1580,53 +1581,53 @@ Int  invTransformMacroblock_alteredOperators_hard(CWMImageStrCodec* pSC)
                 {
                     if (!bottom && !bHoriTileBoundary)
                     {
-                        strPost4_alternate(p0 - 64 + 26, p0 - 64 + 24, p1 - 64 + 0, p1 - 64 + 2);
-                        strPost4_alternate(p0 - 64 + 27, p0 - 64 + 25, p1 - 64 + 1, p1 - 64 + 3);
+                        JXRLIB_API(strPost4_alternate)(p0 - 64 + 26, p0 - 64 + 24, p1 - 64 + 0, p1 - 64 + 2);
+                        JXRLIB_API(strPost4_alternate)(p0 - 64 + 27, p0 - 64 + 25, p1 - 64 + 1, p1 - 64 + 3);
                     }
 
-                    strPost4_alternate(p0 - 64 + 10, p0 - 64 + 8, p0 - 64 + 16, p0 - 64 + 18);
-                    strPost4_alternate(p0 - 64 + 11, p0 - 64 + 9, p0 - 64 + 17, p0 - 64 + 19);
+                    JXRLIB_API(strPost4_alternate)(p0 - 64 + 10, p0 - 64 + 8, p0 - 64 + 16, p0 - 64 + 18);
+                    JXRLIB_API(strPost4_alternate)(p0 - 64 + 11, p0 - 64 + 9, p0 - 64 + 17, p0 - 64 + 19);
                 }
                 if (bottom || bHoriTileBoundary)
                 {
                     p = p0 + -48;
-                    strPost4_alternate(p + 15, p + 14, p + 42, p + 43);
-                    strPost4_alternate(p + 13, p + 12, p + 40, p + 41);
+                    JXRLIB_API(strPost4_alternate)(p + 15, p + 14, p + 42, p + 43);
+                    JXRLIB_API(strPost4_alternate)(p + 13, p + 12, p + 40, p + 41);
                     p = NULL;
 
                     if (!right && !bVertTileBoundary)
                     {
                         p = p0 + -16;
-                        strPost4_alternate(p + 15, p + 14, p + 42, p + 43);
-                        strPost4_alternate(p + 13, p + 12, p + 40, p + 41);
+                        JXRLIB_API(strPost4_alternate)(p + 15, p + 14, p + 42, p + 43);
+                        JXRLIB_API(strPost4_alternate)(p + 13, p + 12, p + 40, p + 41);
                         p = NULL;
                     }
                 }
                 else
                 {
-                    strPost4x4Stage1Split_alternate(p0 + -48, p1 - 16 + -48, 32);
+                    JXRLIB_API(strPost4x4Stage1Split_alternate)(p0 + -48, p1 - 16 + -48, 32);
 
                     if (!right && !bVertTileBoundary)
-                        strPost4x4Stage1Split_alternate(p0 + -16, p1 - 16 + -16, 32);
+                        JXRLIB_API(strPost4x4Stage1Split_alternate)(p0 + -16, p1 - 16 + -16, 32);
                 }
 
                 if (right || bVertTileBoundary)
                 {
                     if (!bottom && !bHoriTileBoundary)
                     {
-                        strPost4_alternate(p0 - 2, p0 - 4, p1 - 28, p1 - 26);
-                        strPost4_alternate(p0 - 1, p0 - 3, p1 - 27, p1 - 25);
+                        JXRLIB_API(strPost4_alternate)(p0 - 2, p0 - 4, p1 - 28, p1 - 26);
+                        JXRLIB_API(strPost4_alternate)(p0 - 1, p0 - 3, p1 - 27, p1 - 25);
                     }
 
-                    strPost4_alternate(p0 - 18, p0 - 20, p0 - 12, p0 - 10);
-                    strPost4_alternate(p0 - 17, p0 - 19, p0 - 11, p0 - 9);
+                    JXRLIB_API(strPost4_alternate)(p0 - 18, p0 - 20, p0 - 12, p0 - 10);
+                    JXRLIB_API(strPost4_alternate)(p0 - 17, p0 - 19, p0 - 11, p0 - 9);
                 }
                 else
                 {
-                    strPost4x4Stage1_alternate(p0 - 32, 32);
+                    JXRLIB_API(strPost4x4Stage1_alternate)(p0 - 32, 32);
                 }
 
-                strPost4x4Stage1_alternate(p0 - 64, 32);
+                JXRLIB_API(strPost4x4Stage1_alternate)(p0 - 64, 32);
             }
 
             if (top || bHoriTileBoundary)
@@ -1634,16 +1635,16 @@ Int  invTransformMacroblock_alteredOperators_hard(CWMImageStrCodec* pSC)
                 if (!left)
                 {
                     p = p1 + -64 + 4;
-                    strPost4_alternate(p + 1, p + 0, p + 28, p + 29);
-                    strPost4_alternate(p + 3, p + 2, p + 30, p + 31);
+                    JXRLIB_API(strPost4_alternate)(p + 1, p + 0, p + 28, p + 29);
+                    JXRLIB_API(strPost4_alternate)(p + 3, p + 2, p + 30, p + 31);
                     p = NULL;
                 }
 
                 if (!left && !right && !bVertTileBoundary)
                 {
                     p = p1 + -32 + 4;
-                    strPost4_alternate(p + 1, p + 0, p + 28, p + 29);
-                    strPost4_alternate(p + 3, p + 2, p + 30, p + 31);
+                    JXRLIB_API(strPost4_alternate)(p + 1, p + 0, p + 28, p + 29);
+                    JXRLIB_API(strPost4_alternate)(p + 3, p + 2, p + 30, p + 31);
                     p = NULL;
                 }
             }
@@ -1666,12 +1667,12 @@ Int  invTransformMacroblock_alteredOperators_hard(CWMImageStrCodec* pSC)
             p1[32] += p1[0];
 
             if (!pSC->m_param.bScaledArith) {
-                strDCT2x2dn(p1 + 0, p1 + 64, p1 + 16, p1 + 80);
-                strDCT2x2dn(p1 + 32, p1 + 96, p1 + 48, p1 + 112);
+                JXRLIB_API(strDCT2x2dn)(p1 + 0, p1 + 64, p1 + 16, p1 + 80);
+                JXRLIB_API(strDCT2x2dn)(p1 + 32, p1 + 96, p1 + 48, p1 + 112);
             }
             else {
-                strDCT2x2dnDec(p1 + 0, p1 + 64, p1 + 16, p1 + 80);
-                strDCT2x2dnDec(p1 + 32, p1 + 96, p1 + 48, p1 + 112);
+                JXRLIB_API(strDCT2x2dnDec)(p1 + 0, p1 + 64, p1 + 16, p1 + 80);
+                JXRLIB_API(strDCT2x2dnDec)(p1 + 32, p1 + 96, p1 + 48, p1 + 112);
             }
         }
 
@@ -1702,32 +1703,32 @@ Int  invTransformMacroblock_alteredOperators_hard(CWMImageStrCodec* pSC)
                     if (!top && !bHoriTileBoundary)
                     {
                         if (left || bVertTileBoundary)
-                            strPost2_alternate(p0 + 48 + 0, p1 + 0);
+                            JXRLIB_API(strPost2_alternate)(p0 + 48 + 0, p1 + 0);
 
                         if (right || bVertTileBoundary)
-                            strPost2_alternate(p0 + 48 + -64, p1 + -64);
+                            JXRLIB_API(strPost2_alternate)(p0 + 48 + -64, p1 + -64);
                     }
 
                     if (left || bVertTileBoundary)
-                        strPost2_alternate(p1 + 16, p1 + 16 + 16);
+                        JXRLIB_API(strPost2_alternate)(p1 + 16, p1 + 16 + 16);
 
                     if (right || bVertTileBoundary)
-                        strPost2_alternate(p1 + -48, p1 + -48 + 16);
+                        JXRLIB_API(strPost2_alternate)(p1 + -48, p1 + -48 + 16);
                 }
 
                 if (!leftORright && !bVertTileBoundary)
                 {
                     if (top || bHoriTileBoundary)
-                        strPost2_alternate(p1 - 64, p1);
+                        JXRLIB_API(strPost2_alternate)(p1 - 64, p1);
                     else
-                        strPost2x2_alternate(p0 - 16, p0 + 48, p1 - 64, p1);
+                        JXRLIB_API(strPost2x2_alternate)(p0 - 16, p0 + 48, p1 - 64, p1);
 
-                    strPost2x2_alternate(p1 - 48, p1 + 16, p1 - 32, p1 + 32);
+                    JXRLIB_API(strPost2x2_alternate)(p1 - 48, p1 + 16, p1 - 32, p1 + 32);
                 }
             }
 
             if ((bottom || bHoriTileBoundary) && (!leftORright && !bVertTileBoundary))
-                strPost2_alternate(p0 - 16, p0 + 48);
+                JXRLIB_API(strPost2_alternate)(p0 - 16, p0 + 48);
 
             if ((leftAdjacentColumn || bOneMBRightVertTB) && (top || bHoriTileBoundary))
                 COMPUTE_CORNER_PRED_ADD(p1 - 128 + 0, *(p1 - 128 + 64));
@@ -1757,7 +1758,7 @@ Int  invTransformMacroblock_alteredOperators_hard(CWMImageStrCodec* pSC)
             // Since 422 has no vertical downsampling, no top MB delay of processing is necessary
             for (j = (left ? 112 : ((leftAdjacentColumn || bOneMBRightVertTB) ? -80 : -16)); j < ((right || bVertTileBoundary) ? 48 : 112); j += 64)
             {
-                strIDCT4x4Stage1(p0 + j);
+                JXRLIB_API(strIDCT4x4Stage1)(p0 + j);
             }
         }
 
@@ -1767,9 +1768,9 @@ Int  invTransformMacroblock_alteredOperators_hard(CWMImageStrCodec* pSC)
             // Since 422 has no vertical downsampling, no top MB delay of processing is necessary
             for (j = (left ? 64 : ((leftAdjacentColumn || bOneMBRightVertTB) ? -128 : -64)); j < ((right || bVertTileBoundary) ? 0 : 64); j += 64)
             {
-                strIDCT4x4Stage1(p1 + j + 0);
-                strIDCT4x4Stage1(p1 + j + 16);
-                strIDCT4x4Stage1(p1 + j + 32);
+                JXRLIB_API(strIDCT4x4Stage1)(p1 + j + 0);
+                JXRLIB_API(strIDCT4x4Stage1)(p1 + j + 16);
+                JXRLIB_API(strIDCT4x4Stage1)(p1 + j + 32);
             }
         }
 
@@ -1779,32 +1780,32 @@ Int  invTransformMacroblock_alteredOperators_hard(CWMImageStrCodec* pSC)
         {
             /* Corner operations */
             if ((top || bHoriTileBoundary) && (leftAdjacentColumn || bOneMBRightVertTB))
-                strPost4_alternate(p1 - 128 + 0, p1 - 128 + 1, p1 - 128 + 2, p1 - 128 + 3);
+                JXRLIB_API(strPost4_alternate)(p1 - 128 + 0, p1 - 128 + 1, p1 - 128 + 2, p1 - 128 + 3);
             if ((top || bHoriTileBoundary) && (right || bVertTileBoundary))
-                strPost4_alternate(p1 - 59, p1 - 60, p1 - 57, p1 - 58);
+                JXRLIB_API(strPost4_alternate)(p1 - 59, p1 - 60, p1 - 57, p1 - 58);
             if ((bottom || bHoriTileBoundary) && (leftAdjacentColumn || bOneMBRightVertTB))
-                strPost4_alternate(p0 - 128 + 48 + 10, p0 - 128 + 48 + 11, p0 - 128 + 48 + 8, p0 - 128 + 48 + 9);
+                JXRLIB_API(strPost4_alternate)(p0 - 128 + 48 + 10, p0 - 128 + 48 + 11, p0 - 128 + 48 + 8, p0 - 128 + 48 + 9);
             if ((bottom || bHoriTileBoundary) && (right || bVertTileBoundary))
-                strPost4_alternate(p0 - 1, p0 - 2, p0 - 3, p0 - 4);
+                JXRLIB_API(strPost4_alternate)(p0 - 1, p0 - 2, p0 - 3, p0 - 4);
             if (!top)
             {
                 // Need to delay processing of left column until leftAdjacentColumn = 1 for corner overlap operators
                 if (leftAdjacentColumn || bOneMBRightVertTB) {
                     p = p0 + 32 + 10 - 128;
-                    strPost4_alternate(p + 0, p - 2, p + 6, p + 8);
-                    strPost4_alternate(p + 1, p - 1, p + 7, p + 9);
+                    JXRLIB_API(strPost4_alternate)(p + 0, p - 2, p + 6, p + 8);
+                    JXRLIB_API(strPost4_alternate)(p + 1, p - 1, p + 7, p + 9);
                     p = NULL;
                 }
 
                 if (right || bVertTileBoundary) {
                     p = p0 + -32 + 14;
-                    strPost4_alternate(p + 0, p - 2, p + 6, p + 8);
-                    strPost4_alternate(p + 1, p - 1, p + 7, p + 9);
+                    JXRLIB_API(strPost4_alternate)(p + 0, p - 2, p + 6, p + 8);
+                    JXRLIB_API(strPost4_alternate)(p + 1, p - 1, p + 7, p + 9);
                     p = NULL;
                 }
 
                 for (j = (left ? 0 : -128); j < ((right || bVertTileBoundary) ? -64 : 0); j += 64)
-                    strPost4x4Stage1_alternate(p0 + j + 32, 0);
+                    JXRLIB_API(strPost4x4Stage1_alternate)(p0 + j + 32, 0);
             }
 
             if (!bottom)
@@ -1813,29 +1814,29 @@ Int  invTransformMacroblock_alteredOperators_hard(CWMImageStrCodec* pSC)
                 if (leftAdjacentColumn || bOneMBRightVertTB)
                 {
                     p = p1 + 0 + 10 - 128;
-                    strPost4_alternate(p + 0, p - 2, p + 6, p + 8);
-                    strPost4_alternate(p + 1, p - 1, p + 7, p + 9);
+                    JXRLIB_API(strPost4_alternate)(p + 0, p - 2, p + 6, p + 8);
+                    JXRLIB_API(strPost4_alternate)(p + 1, p - 1, p + 7, p + 9);
                     p += 16;
-                    strPost4_alternate(p + 0, p - 2, p + 6, p + 8);
-                    strPost4_alternate(p + 1, p - 1, p + 7, p + 9);
+                    JXRLIB_API(strPost4_alternate)(p + 0, p - 2, p + 6, p + 8);
+                    JXRLIB_API(strPost4_alternate)(p + 1, p - 1, p + 7, p + 9);
                     p = NULL;
                 }
 
                 if (right || bVertTileBoundary)
                 {
                     p = p1 + -64 + 14;
-                    strPost4_alternate(p + 0, p - 2, p + 6, p + 8);
-                    strPost4_alternate(p + 1, p - 1, p + 7, p + 9);
+                    JXRLIB_API(strPost4_alternate)(p + 0, p - 2, p + 6, p + 8);
+                    JXRLIB_API(strPost4_alternate)(p + 1, p - 1, p + 7, p + 9);
                     p += 16;
-                    strPost4_alternate(p + 0, p - 2, p + 6, p + 8);
-                    strPost4_alternate(p + 1, p - 1, p + 7, p + 9);
+                    JXRLIB_API(strPost4_alternate)(p + 0, p - 2, p + 6, p + 8);
+                    JXRLIB_API(strPost4_alternate)(p + 1, p - 1, p + 7, p + 9);
                     p = NULL;
                 }
 
                 for (j = (left ? 0 : -128); j < ((right || bVertTileBoundary) ? -64 : 0); j += 64)
                 {
-                    strPost4x4Stage1_alternate(p1 + j + 0, 0);
-                    strPost4x4Stage1_alternate(p1 + j + 16, 0);
+                    JXRLIB_API(strPost4x4Stage1_alternate)(p1 + j + 0, 0);
+                    JXRLIB_API(strPost4x4Stage1_alternate)(p1 + j + 16, 0);
                 }
             }
 
@@ -1845,8 +1846,8 @@ Int  invTransformMacroblock_alteredOperators_hard(CWMImageStrCodec* pSC)
                     p = p1 + 5;
                     for (j = (left ? 0 : -128); j < ((right || bVertTileBoundary) ? -64 : 0); j += 64)
                     {
-                        strPost4_alternate(p + j + 0, p + j - 1, p + j + 59, p + j + 60);
-                        strPost4_alternate(p + j + 2, p + j + 1, p + j + 61, p + j + 62);
+                        JXRLIB_API(strPost4_alternate)(p + j + 0, p + j - 1, p + j + 59, p + j + 60);
+                        JXRLIB_API(strPost4_alternate)(p + j + 2, p + j + 1, p + j + 61, p + j + 62);
                     }
                     p = NULL;
                 }
@@ -1855,8 +1856,8 @@ Int  invTransformMacroblock_alteredOperators_hard(CWMImageStrCodec* pSC)
                     p = p0 + 48 + 13;
                     for (j = (left ? 0 : -128); j < ((right || bVertTileBoundary) ? -64 : 0); j += 64)
                     {
-                        strPost4_alternate(p + j + 0, p + j - 1, p + j + 59, p + j + 60);
-                        strPost4_alternate(p + j + 2, p + j + 1, p + j + 61, p + j + 62);
+                        JXRLIB_API(strPost4_alternate)(p + j + 0, p + j - 1, p + j + 59, p + j + 60);
+                        JXRLIB_API(strPost4_alternate)(p + j + 2, p + j + 1, p + j + 61, p + j + 62);
                     }
                     p = NULL;
                 }
@@ -1867,19 +1868,19 @@ Int  invTransformMacroblock_alteredOperators_hard(CWMImageStrCodec* pSC)
                 if (leftAdjacentColumn || bOneMBRightVertTB)
                 {
                     j = 0 + 0 - 128;
-                    strPost4_alternate(p0 + j + 48 + 10 + 0, p0 + j + 48 + 10 - 2, p1 + j + 0, p1 + j + 2);
-                    strPost4_alternate(p0 + j + 48 + 10 + 1, p0 + j + 48 + 10 - 1, p1 + j + 1, p1 + j + 3);
+                    JXRLIB_API(strPost4_alternate)(p0 + j + 48 + 10 + 0, p0 + j + 48 + 10 - 2, p1 + j + 0, p1 + j + 2);
+                    JXRLIB_API(strPost4_alternate)(p0 + j + 48 + 10 + 1, p0 + j + 48 + 10 - 1, p1 + j + 1, p1 + j + 3);
                 }
 
                 if (right || bVertTileBoundary)
                 {
                     j = -64 + 4;
-                    strPost4_alternate(p0 + j + 48 + 10 + 0, p0 + j + 48 + 10 - 2, p1 + j + 0, p1 + j + 2);
-                    strPost4_alternate(p0 + j + 48 + 10 + 1, p0 + j + 48 + 10 - 1, p1 + j + 1, p1 + j + 3);
+                    JXRLIB_API(strPost4_alternate)(p0 + j + 48 + 10 + 0, p0 + j + 48 + 10 - 2, p1 + j + 0, p1 + j + 2);
+                    JXRLIB_API(strPost4_alternate)(p0 + j + 48 + 10 + 1, p0 + j + 48 + 10 - 1, p1 + j + 1, p1 + j + 3);
                 }
 
                 for (j = (left ? 0 : -128); j < ((right || bVertTileBoundary) ? -64 : 0); j += 64)
-                    strPost4x4Stage1Split_alternate(p0 + j + 48, p1 + j + 0, 0);
+                    JXRLIB_API(strPost4x4Stage1Split_alternate)(p0 + j + 48, p1 + j + 0, 0);
             }
         }
     }

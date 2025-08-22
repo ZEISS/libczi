@@ -26,6 +26,7 @@
 //
 //*@@@---@@@@******************************************************************
 
+#include "../../common/include/jxrlib_symbol_mangle.h"
 #include "strcodec.h"
 
 #define ORIENT_WEIGHT 4
@@ -76,7 +77,7 @@ static QPManExp gs_QPRecipTable[32] = {
     QPRemapping
 *************************************************************************/
 
-Void remapQP(CWMIQuantizer* pQP, I32 iShift, Bool bScaledArith)
+Void JXRLIB_API(remapQP)(CWMIQuantizer* pQP, I32 iShift, Bool bScaledArith)
 {
     U8 uiQPIndex = pQP->iIndex;
 
@@ -122,7 +123,7 @@ Void remapQP(CWMIQuantizer* pQP, I32 iShift, Bool bScaledArith)
 }
 
 /* allocate PredInfo buffers */
-Int allocatePredInfo(CWMImageStrCodec* pSC)
+Int JXRLIB_API(allocatePredInfo)(CWMImageStrCodec* pSC)
 {
     size_t i, j;
     // COLORFORMAT cf = pSC->m_param.cfColorFormat;
@@ -155,7 +156,7 @@ Int allocatePredInfo(CWMImageStrCodec* pSC)
 }
 
 /* clear PredInfo buffers */
-Void freePredInfo(CWMImageStrCodec* pSC)
+Void JXRLIB_API(freePredInfo)(CWMImageStrCodec* pSC)
 {
     if (pSC->pPredInfoMemory)
         free(pSC->pPredInfoMemory);
@@ -163,7 +164,7 @@ Void freePredInfo(CWMImageStrCodec* pSC)
 }
 
 /* get AC prediction mode: 0(from left) 1(from top) 2(none) */
-Int getACPredMode(CWMIMBInfo* pMBInfo, COLORFORMAT cf)
+Int JXRLIB_API(getACPredMode)(CWMIMBInfo* pMBInfo, COLORFORMAT cf)
 {
     //Int blkIdx = (cf == Y_ONLY ? 16 : (cf == YUV_420 ? 24 : (cf == YUV_422 ? 32 : 48)));
     PixelI* pCoeffs = pMBInfo->iBlockDC[0];
@@ -191,7 +192,7 @@ Int getACPredMode(CWMIMBInfo* pMBInfo, COLORFORMAT cf)
 }
 
 /* get DCAC prediction mode: 0(from left) 1(from top) 2(none) */
-Int getDCACPredMode(CWMImageStrCodec* pSC, size_t mbX)
+Int JXRLIB_API(getDCACPredMode)(CWMImageStrCodec* pSC, size_t mbX)
 {
     Int iDCMode, iADMode = 2;  // DC: 0(left) 1(top) 2(mean) 3(no)
     // AD: 0(left) 1(top) 2(no)
@@ -233,7 +234,7 @@ Int getDCACPredMode(CWMImageStrCodec* pSC, size_t mbX)
     return (iDCMode + (iADMode << 2));
 }
 
-Void copyAC(PixelI* src, PixelI* dst)
+Void JXRLIB_API(copyAC)(PixelI* src, PixelI* dst)
 {
     /* first row of ACs */
     dst[0] = src[1];
@@ -247,7 +248,7 @@ Void copyAC(PixelI* src, PixelI* dst)
 }
 
 /* info of current MB to be saved for future prediction */
-Void updatePredInfo(CWMImageStrCodec* pSC, CWMIMBInfo* pMBInfo, size_t mbX, COLORFORMAT cf)
+Void JXRLIB_API(updatePredInfo)(CWMImageStrCodec* pSC, CWMIMBInfo* pMBInfo, size_t mbX, COLORFORMAT cf)
 {
     CWMIPredInfo* pPredInfo;
     PixelI* p;
@@ -264,7 +265,7 @@ Void updatePredInfo(CWMImageStrCodec* pSC, CWMIMBInfo* pMBInfo, size_t mbX, COLO
         pPredInfo->iQPIndex = pMBInfo->iQIndexLP;
 
         /* first row and first column of ACs of DC block */
-        copyAC(p, pPredInfo->piAD);
+        JXRLIB_API(copyAC)(p, pPredInfo->piAD);
     }
 
     if (cf == YUV_420) { // 420 UV channels

@@ -73,6 +73,27 @@ namespace
         destination.majorVersion = source.majorVersion;
         destination.minorVersion = source.minorVersion;
     }
+
+    void CopyFromSubBlockInfoToSubBlockInfoInterop(const libCZI::SubBlockInfo& source, SubBlockInfoInterop& destination)
+    {
+        destination.compression_mode_raw = source.compressionModeRaw;
+        destination.pixel_type = static_cast<int32_t>(source.pixelType);
+        destination.coordinate = ParameterHelpers::ConvertIDimCoordinateToCoordinateInterop(&source.coordinate);
+        destination.logical_rect.x = source.logicalRect.x;
+        destination.logical_rect.y = source.logicalRect.y;
+        destination.logical_rect.w = source.logicalRect.w;
+        destination.logical_rect.h = source.logicalRect.h;
+        destination.physical_size.w = source.physicalSize.w;
+        destination.physical_size.h = source.physicalSize.h;
+        if (source.IsMindexValid())
+        {
+            destination.m_index = source.mIndex;
+        }
+        else
+        {
+            destination.m_index = numeric_limits<int32_t>::min();
+        }
+    }
 }
 
 void libCZI_Free(void* data)
@@ -824,23 +845,7 @@ LibCZIApiErrorCode libCZI_SubBlockGetInfo(SubBlockObjectHandle sub_block_object,
     try
     {
         const auto& sub_block_info_data = shared_sub_block_wrapping_object->shared_ptr_->GetSubBlockInfo();
-        sub_block_info->compression_mode_raw = sub_block_info_data.compressionModeRaw;
-        sub_block_info->pixel_type = static_cast<int32_t>(sub_block_info_data.pixelType);
-        sub_block_info->coordinate = ParameterHelpers::ConvertIDimCoordinateToCoordinateInterop(&sub_block_info_data.coordinate);
-        sub_block_info->logical_rect.x = sub_block_info_data.logicalRect.x;
-        sub_block_info->logical_rect.y = sub_block_info_data.logicalRect.y;
-        sub_block_info->logical_rect.w = sub_block_info_data.logicalRect.w;
-        sub_block_info->logical_rect.h = sub_block_info_data.logicalRect.h;
-        sub_block_info->physical_size.w = sub_block_info_data.physicalSize.w;
-        sub_block_info->physical_size.h = sub_block_info_data.physicalSize.h;
-        if (sub_block_info_data.IsMindexValid())
-        {
-            sub_block_info->m_index = sub_block_info_data.mIndex;
-        }
-        else
-        {
-            sub_block_info->m_index = numeric_limits<int32_t>::min();
-        }
+        CopyFromSubBlockInfoToSubBlockInfoInterop(sub_block_info_data, *sub_block_info);
 
         return LibCZIApi_ErrorCode_OK;
     }
@@ -918,6 +923,37 @@ LibCZIApiErrorCode libCZI_ReleaseSubBlock(SubBlockObjectHandle sub_block_object)
     delete shared_sub_block_wrapping_object;
 
     return LibCZIApi_ErrorCode_OK;
+}
+
+LibCZIApiErrorCode libCZI_TryGetSubBlockInfoForIndex(CziReaderObjectHandle reader_object, std::int32_t index, SubBlockInfoInterop* sub_block_info_interop)
+{
+    if (reader_object == kInvalidObjectHandle || sub_block_info_interop == nullptr)
+    {
+        return LibCZIApi_ErrorCode_InvalidArgument;
+    }
+
+    auto shared_czi_reader_wrapping_object = reinterpret_cast<SharedPtrWrapper<ICZIReader>*>(reader_object);
+    if (!shared_czi_reader_wrapping_object->IsValid())
+    {
+        return LibCZIApi_ErrorCode_InvalidHandle;
+    }
+
+    try
+    {
+        SubBlockInfo sub_block_info;
+        const bool b = shared_czi_reader_wrapping_object->shared_ptr_->TryGetSubBlockInfo(index, &sub_block_info);
+        if (!b)
+        {
+            return LibCZIApi_ErrorCode_IndexOutOfRange;
+        }
+
+        CopyFromSubBlockInfoToSubBlockInfoInterop(sub_block_info, *sub_block_info_interop);
+        return LibCZIApi_ErrorCode_OK;
+    }
+    catch (const std::exception&)
+    {
+        return LibCZIApi_ErrorCode_UnspecifiedError;
+    }
 }
 
 //****************************************************************************************************

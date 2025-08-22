@@ -30,6 +30,7 @@
 #define WMI_WINDOWSMEDIAPHOTO_H
 
 //================================================================
+#include "../../common/include/jxrlib_symbol_mangle.h" 
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -324,11 +325,11 @@ typedef struct tagWMPStream
     ERR(*GetPos)(struct tagWMPStream* me, size_t* poffPos);
 } WMPStream;
 
-EXTERN_C ERR CreateWS_File(struct tagWMPStream** ppWS, const char* szFilename, const char* szMode);
-EXTERN_C ERR CloseWS_File(struct tagWMPStream** ppWS);
+EXTERN_C ERR JXRLIB_API(CreateWS_File)(struct tagWMPStream** ppWS, const char* szFilename, const char* szMode);
+EXTERN_C ERR JXRLIB_API(CloseWS_File)(struct tagWMPStream** ppWS);
 
-EXTERN_C ERR CreateWS_Memory(struct tagWMPStream** ppWS, void* pv, size_t cb);
-EXTERN_C ERR CloseWS_Memory(struct tagWMPStream** ppWS);
+EXTERN_C ERR JXRLIB_API(CreateWS_Memory)(struct tagWMPStream** ppWS, void* pv, size_t cb);
+EXTERN_C ERR JXRLIB_API(CloseWS_Memory)(struct tagWMPStream** ppWS);
 
 /// Create a write-only memory stream that allocates memory from the heap.
 ///
@@ -338,15 +339,15 @@ EXTERN_C ERR CloseWS_Memory(struct tagWMPStream** ppWS);
 ///                             If 0, then the buffer will be grown by the current size of the buffer.
 ///
 /// \returns    An error code indicating success of failure.
-EXTERN_C ERR CreateWS_HeapBackedWriteableStream(struct tagWMPStream** ppWS, size_t cbInitial, size_t cbGrowBy);
-EXTERN_C ERR CloseWS_HeapBackedWriteableStream(struct tagWMPStream** ppWS);
+EXTERN_C ERR JXRLIB_API(CreateWS_HeapBackedWriteableStream)(struct tagWMPStream** ppWS, size_t cbInitial, size_t cbGrowBy);
+EXTERN_C ERR JXRLIB_API(CloseWS_HeapBackedWriteableStream)(struct tagWMPStream** ppWS);
 
 /// Gets (for a heap backed writeable stream buffer object) a pointer to the buffer and the size of the buffer.
 ///
 /// \param [in] pWS         The heap backed writeable stream buffer object.
 /// \param [in,out] ppbBuf  If non-null, a pointer to the buffer will be placed here.
 /// \param [in,out] pcbBuf  If non-null, the size of the buffer (in bytes) will be placed here.
-EXTERN_C void GetWS_HeapBackedWriteableStreamBuffer(struct tagWMPStream* pWS, void** ppbBuf, size_t* pcbBuf);
+EXTERN_C void JXRLIB_API(GetWS_HeapBackedWriteableStreamBuffer)(struct tagWMPStream* pWS, void** ppbBuf, size_t* pcbBuf);
 
 //================================================================
 // Enc/Dec data structure
@@ -451,16 +452,16 @@ typedef struct tagCWMImageBufferInfo {
 /****************************************************************/
 /* Encode API                                                   */
 /****************************************************************/
-EXTERN_C Int ImageStrEncInit(
+EXTERN_C Int JXRLIB_API(ImageStrEncInit)(
     CWMImageInfo* pII,
     CWMIStrCodecParam* pSCP,
     CTXSTRCODEC* pctxSC);
 
-EXTERN_C Int ImageStrEncEncode(
+EXTERN_C Int JXRLIB_API(ImageStrEncEncode)(
     CTXSTRCODEC ctxSC,
     const CWMImageBufferInfo* pBI);
 
-EXTERN_C Int ImageStrEncTerm(
+EXTERN_C Int JXRLIB_API(ImageStrEncTerm)(
     CTXSTRCODEC ctxSC);
 
 
@@ -469,16 +470,16 @@ EXTERN_C Int ImageStrEncTerm(
 /****************************************************************/
 struct CWMImageStrCodec;
 
-EXTERN_C Int ImageStrDecGetInfo(
+EXTERN_C Int JXRLIB_API(ImageStrDecGetInfo)(
     CWMImageInfo* pII,
     CWMIStrCodecParam* pSCP);
 
-EXTERN_C Int ImageStrDecInit(
+EXTERN_C Int JXRLIB_API(ImageStrDecInit)(
     CWMImageInfo* pII,
     CWMIStrCodecParam* pSCP,
     CTXSTRCODEC* pctxSC);
 
-EXTERN_C Int ImageStrDecDecode(
+EXTERN_C Int JXRLIB_API(ImageStrDecDecode)(
     CTXSTRCODEC ctxSC,
     const CWMImageBufferInfo* pBI
 #ifdef REENTRANT_MODE
@@ -486,10 +487,10 @@ EXTERN_C Int ImageStrDecDecode(
 #endif    
 );
 
-EXTERN_C Int ImageStrDecTerm(
+EXTERN_C Int JXRLIB_API(ImageStrDecTerm)(
     CTXSTRCODEC ctxSC);
 
-EXTERN_C Int WMPhotoValidate(
+EXTERN_C Int JXRLIB_API(WMPhotoValidate)(
     CWMImageInfo* pII,
     CWMIStrCodecParam* pSCP);
 
@@ -511,7 +512,7 @@ typedef struct tagCWMTranscodingParam {
     Bool bIgnoreOverlap;
 } CWMTranscodingParam;
 
-EXTERN_C Int WMPhotoTranscode(
+EXTERN_C Int JXRLIB_API(WMPhotoTranscode)(
     struct tagWMPStream* pStreamDec,   // input bitstrean
     struct tagWMPStream* pStreamEnc,   // output bitstream
     CWMTranscodingParam* pParam     // transcoding parameters
@@ -535,7 +536,7 @@ typedef struct tagCWMDetilingParam {
     size_t cbStride;
 } CWMDetilingParam;
 
-EXTERN_C Int WMPhotoDetile(
+EXTERN_C Int JXRLIB_API(WMPhotoDetile)(
     CWMDetilingParam* pParam   // detiling parameters
 );
 

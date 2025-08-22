@@ -13,6 +13,9 @@
 // whether the libCZI library is built with support for the Windows-API, i.e. whether it is being built for a Windows-environment
 #define LIBCZI_WINDOWSAPI_AVAILABLE @libCZI_WINDOWSAPIAVAILABLE@
 
+// whether the libCZI library is built with support for the Windows-UWP-API, i.e. whether it is being built for an UWP-environment
+#define LIBCZI_WINDOWS_UWPAPI_AVAILABLE @libCZI_WINDOWSAPI_UWP_AVAILABLE@
+
 // if the host system is a big-endian system, this is "1", otherwise 0
 #define LIBCZI_ISBIGENDIANHOST @libCZI_ISBIGENDIANHOST@
 
