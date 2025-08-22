@@ -376,7 +376,7 @@ if (LIBCZI_BUILD_AZURESDK_BASED_STREAM)
 endif()
 
 if (LIBCZI_BUILD_PREFER_EXTERNALPACKAGE_EIGEN3)
-  target_link_libraries(libCZIStatic PUBLIC Eigen3::Eigen)
+  target_link_libraries(libCZIStatic PRIVATE Eigen3::Eigen)
 else()
   add_dependencies(libCZIStatic eigen_ext)
 endif()
