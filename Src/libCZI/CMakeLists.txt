@@ -300,9 +300,9 @@ configure_file (
 
 
 #  Define headers for this library. PUBLIC headers are used for compiling the library, and will be added to consumers' build paths.
-set(libCZIPublicHeaders "ImportExport.h" "libCZI.h" "libCZI_Compositor.h" "libCZI_DimCoordinate.h" "libCZI_exceptions.h"
-               "libCZI_Helpers.h" "libCZI_Metadata.h" "libCZI_Metadata2.h" "libCZI_Pixels.h" "libCZI_ReadWrite.h"
-               "libCZI_Site.h" "libCZI_Utilities.h" "libCZI_Write.h" "libCZI_compress.h" "libCZI_StreamsLib.h")
+set(libCZIPublicHeaders "inc/ImportExport.h" "inc/libCZI.h" "inc/libCZI_Compositor.h" "inc/libCZI_DimCoordinate.h" "inc/libCZI_exceptions.h"
+               "inc/libCZI_Helpers.h" "inc/libCZI_Metadata.h" "inc/libCZI_Metadata2.h" "inc/libCZI_Pixels.h" "inc/libCZI_ReadWrite.h"
+               "inc/libCZI_Site.h" "inc/libCZI_Utilities.h" "inc/libCZI_Write.h" "inc/libCZI_compress.h" "inc/libCZI_StreamsLib.h")
 
 #
 #define the shared libCZI - library
