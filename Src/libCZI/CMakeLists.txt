@@ -397,29 +397,29 @@ target_include_directories(libCZIStatic PUBLIC
 
 
 
-  
-# DEBUG: dump interface includes as CMake sees them
-get_target_property(_ii libCZI INTERFACE_INCLUDE_DIRECTORIES)
-message(STATUS "libCZI INTERFACE_INCLUDE_DIRECTORIES = [${_ii}]")
-get_target_property(_ii libCZIStatic INTERFACE_INCLUDE_DIRECTORIES)
-message(STATUS "libCZIStatic INTERFACE_INCLUDE_DIRECTORIES = [${_ii}]")
 
-# ---- Force-clean INTERFACE include dirs to be relocatable ----
-# Split build paths into separate genex entries.
-foreach(t libCZI libCZIStatic)
-  if(TARGET ${t})
-    set_property(TARGET ${t} PROPERTY INTERFACE_INCLUDE_DIRECTORIES
-      $<BUILD_INTERFACE:${LIBCZI_PUBLIC_INC}>
-      $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
-      $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/libCZI>)
-  endif()
-endforeach()
+# # DEBUG: dump interface includes as CMake sees them
+# get_target_property(_ii libCZI INTERFACE_INCLUDE_DIRECTORIES)
+# message(STATUS "libCZI INTERFACE_INCLUDE_DIRECTORIES = [${_ii}]")
+# get_target_property(_ii libCZIStatic INTERFACE_INCLUDE_DIRECTORIES)
+# message(STATUS "libCZIStatic INTERFACE_INCLUDE_DIRECTORIES = [${_ii}]")
 
-# (optional) verify
-get_target_property(_ii libCZI INTERFACE_INCLUDE_DIRECTORIES)
-message(STATUS "CLEAN libCZI INTERFACE_INCLUDE_DIRECTORIES = [${_ii}]")
-get_target_property(_ii libCZIStatic INTERFACE_INCLUDE_DIRECTORIES)
-message(STATUS "CLEAN libCZIStatic INTERFACE_INCLUDE_DIRECTORIES = [${_ii}]")
+# # ---- Force-clean INTERFACE include dirs to be relocatable ----
+# # Split build paths into separate genex entries.
+# foreach(t libCZI libCZIStatic)
+#   if(TARGET ${t})
+#     set_property(TARGET ${t} PROPERTY INTERFACE_INCLUDE_DIRECTORIES
+#       $<BUILD_INTERFACE:${LIBCZI_PUBLIC_INC}>
+#       $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
+#       $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/libCZI>)
+#   endif()
+# endforeach()
+
+# # (optional) verify
+# get_target_property(_ii libCZI INTERFACE_INCLUDE_DIRECTORIES)
+# message(STATUS "CLEAN libCZI INTERFACE_INCLUDE_DIRECTORIES = [${_ii}]")
+# get_target_property(_ii libCZIStatic INTERFACE_INCLUDE_DIRECTORIES)
+# message(STATUS "CLEAN libCZIStatic INTERFACE_INCLUDE_DIRECTORIES = [${_ii}]")
 
 
 
