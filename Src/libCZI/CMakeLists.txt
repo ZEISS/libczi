@@ -343,10 +343,10 @@ if (LIBCZI_BUILD_DYNLIB)
   if(LIBCZI_HAVE_WIN32_API)
     target_link_libraries(libCZI PRIVATE ole32 Windowscodecs)
   endif()
-  target_include_directories(libCZI
-    PUBLIC
-      $<BUILD_INTERFACE:${LIBCZI_PUBLIC_INC};${CMAKE_CURRENT_BINARY_DIR}>
-      $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/libCZI>)
+  target_include_directories(libCZI PUBLIC
+    $<BUILD_INTERFACE:${LIBCZI_PUBLIC_INC}>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
+    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/libCZI>)
 endif(LIBCZI_BUILD_DYNLIB)
 
 #
@@ -390,17 +390,39 @@ endif()
 target_compile_definitions(libCZIStatic PUBLIC _LIBCZISTATICLIB)    # make sure that users of the static library get the correct definition
 
 # Static library include directories
-target_include_directories(libCZIStatic
-  PUBLIC
-    $<BUILD_INTERFACE:${LIBCZI_PUBLIC_INC};${CMAKE_CURRENT_BINARY_DIR}>
-    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/libCZI>)
+target_include_directories(libCZIStatic PUBLIC
+  $<BUILD_INTERFACE:${LIBCZI_PUBLIC_INC}>
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
+  $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/libCZI>)
 
 
+
+  
 # DEBUG: dump interface includes as CMake sees them
 get_target_property(_ii libCZI INTERFACE_INCLUDE_DIRECTORIES)
 message(STATUS "libCZI INTERFACE_INCLUDE_DIRECTORIES = [${_ii}]")
 get_target_property(_ii libCZIStatic INTERFACE_INCLUDE_DIRECTORIES)
 message(STATUS "libCZIStatic INTERFACE_INCLUDE_DIRECTORIES = [${_ii}]")
+
+# ---- Force-clean INTERFACE include dirs to be relocatable ----
+# Split build paths into separate genex entries.
+foreach(t libCZI libCZIStatic)
+  if(TARGET ${t})
+    set_property(TARGET ${t} PROPERTY INTERFACE_INCLUDE_DIRECTORIES
+      $<BUILD_INTERFACE:${LIBCZI_PUBLIC_INC}>
+      $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
+      $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/libCZI>)
+  endif()
+endforeach()
+
+# (optional) verify
+get_target_property(_ii libCZI INTERFACE_INCLUDE_DIRECTORIES)
+message(STATUS "CLEAN libCZI INTERFACE_INCLUDE_DIRECTORIES = [${_ii}]")
+get_target_property(_ii libCZIStatic INTERFACE_INCLUDE_DIRECTORIES)
+message(STATUS "CLEAN libCZIStatic INTERFACE_INCLUDE_DIRECTORIES = [${_ii}]")
+
+
+
 
 
 if(LIBCZI_ENABLE_INSTALL)
