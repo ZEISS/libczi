@@ -10,9 +10,9 @@
 
 namespace libCZI
 {
-    /// This is an utility in order to prepare the information
+    /// This is a utility in order to prepare the information
     /// required for the multi-channel-composition functions from
-    /// the display-settings (e. g. retrieved from metadata).
+    /// the display-settings (e.g. retrieved from metadata).
     /// If the gradation curve is given as gamma or as a spline,
     /// we calculate here the lookup-table. In addition, we 
     /// make sure that only channels which are "enabled" (in the

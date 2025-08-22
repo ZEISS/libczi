@@ -14,6 +14,7 @@
 #include "CziMetadataBuilder.h"
 #include "SubBlockMetadata.h"
 #include "inc_libCZI_Config.h"
+#include "SubblockAttachmentAccessor.h"
 
 using namespace libCZI;
 using namespace std;
@@ -157,4 +158,19 @@ std::shared_ptr<ISubBlockMetadata> libCZI::CreateSubBlockMetadataFromSubBlock(co
     auto raw_data = sub_block->GetRawData(libCZI::ISubBlock::MemBlkType::Metadata, &size_metadata);
     auto sub_block_metadata = make_shared<SubblockMetadata>((const char*)raw_data.get(), size_metadata);
     return sub_block_metadata;
+}
+
+LIBCZI_API std::shared_ptr<ISubBlockAttachmentAccessor> libCZI::CreateSubBlockAttachmentAccessor(std::shared_ptr<libCZI::ISubBlock> sub_block, std::shared_ptr<ISubBlockMetadata> sub_block_metadata)
+{
+    if (sub_block == nullptr)
+    {
+        throw std::invalid_argument("sub_block must not be null");
+    }
+
+    if (sub_block_metadata == nullptr)
+    {
+        throw std::invalid_argument("sub_block_metadata must not be null");
+    }
+
+    return std::make_shared<SubblockAttachmentAccessor>(sub_block, sub_block_metadata);
 }

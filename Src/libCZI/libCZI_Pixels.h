@@ -362,6 +362,36 @@ namespace libCZI
 
     //-------------------------------------------------------------------------
 
+    /// Information about a locked bitonal bitmap - allowing direct access to the image data in memory.
+    struct BitonalBitmapLockInfo
+    {
+        void* ptrData;              ///< Pointer to the start of the bitonal bitmap data.
+        std::uint32_t   stride;     ///< The stride of the bitmap data (pointed to by `ptrData`) in units of bytes.
+        std::uint64_t   size;       ///< The size of the bitmap data (pointed to by `ptrData`) in bytes.
+    };
+
+    class IBitonalBitmapData
+    {
+    public:
+        /// Gets the size of the bitmap (i.e. its width and height in pixels).
+        ///
+        /// \return The size (in pixels).
+        virtual IntSize GetSize() const = 0;
+
+        /// Gets a data structure allowing for direct access of the bitmap.
+        ///
+        /// \return The BitmapLockInfo allowing to directly access the data representing the bitmap.
+        virtual BitonalBitmapLockInfo Lock() = 0;
+
+        /// Inform the bitmap object that the data (previously retrieved by a call to Lock)
+        /// is no longer used.
+        virtual void Unlock() = 0;
+
+        virtual ~IBitonalBitmapData() = default;
+    };
+
+    //-------------------------------------------------------------------------
+
     /// Stream insertion operator for the libCZI::IntRect type. A string of the form '(x,y,width,height)' is output to the stream.
     /// \param [in] os     The stream to output the rect to.
     /// \param rect        The rectangle.

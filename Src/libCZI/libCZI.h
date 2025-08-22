@@ -67,6 +67,7 @@ namespace libCZI
     class IAttachment;
     class ISubBlockCache;
     class ISubBlockMetadata;
+    class ISubBlockAttachmentAccessor;
 
     /// This structure contains information about the compiler settings and the version of the source
     /// which was used to create the library.
@@ -219,6 +220,8 @@ namespace libCZI
     /// \param 	sub_block	The sub block.
    /// \returns	The newly created sub-block metadata object for accessing metadata of the specified sub-block.
     LIBCZI_API std::shared_ptr<ISubBlockMetadata> CreateSubBlockMetadataFromSubBlock(const libCZI::ISubBlock* sub_block);
+
+    LIBCZI_API std::shared_ptr<ISubBlockAttachmentAccessor> CreateSubBlockAttachmentAccessor(std::shared_ptr<libCZI::ISubBlock> sub_block, std::shared_ptr<ISubBlockMetadata> sub_block_metadata);
 
     /// Interface used for accessing the data-stream.  
     /// Implementations of this interface are expected to be thread-safe - it should be possible to
@@ -859,4 +862,4 @@ namespace libCZI
 #include "libCZI_Helpers.h"
 #include "libCZI_Write.h"
 #include "libCZI_ReadWrite.h"
-#include "libCZI_SubBlockMetadata.h"
+#include "libCZI_SubBlock.h"

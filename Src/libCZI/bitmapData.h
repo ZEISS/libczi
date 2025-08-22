@@ -162,3 +162,62 @@ template <typename tAllocator>
 }
 
 typedef CBitmapData<CHeapAllocator> CStdBitmapData;
+
+//-----------------------------------------------------------------------------
+
+template  <typename tAllocator = CHeapAllocator>
+class CBitonalBitmapData : public libCZI::IBitonalBitmapData
+{
+private:
+    CBitmapData<tAllocator> bitmapData_;
+public:
+    static std::shared_ptr<libCZI::IBitmapData> Create(std::uint32_t width, std::uint32_t height, std::uint32_t pitch = 0)
+    {
+        if (pitch == 0)
+        {
+            pitch = (width + 7) / 8; // 1 bit per pixel, so we need 1 byte for 8 pixels
+        }
+
+        return std::make_shared<CBitonalBitmapData>(width, height, pitch);
+    }
+
+    static std::shared_ptr<libCZI::IBitmapData> Create(tAllocator allocator, std::uint32_t width, std::uint32_t height, std::uint32_t pitch = 0)
+    {
+        if (pitch == 0)
+        {
+            pitch = (width + 7) / 8; // 1 bit per pixel, so we need 1 byte for 8 pixels
+        }
+
+        return std::make_shared<CBitonalBitmapData>(width, height, pitch);
+    }
+
+    CBitonalBitmapData(tAllocator allocator, std::uint32_t width, std::uint32_t height, std::uint32_t pitch)
+        : bitmapData_(allocator, libCZI::PixelType::Gray8, (width + 7) / 8, height, pitch, 0, 0)
+    {
+    }
+
+    CBitonalBitmapData(std::uint32_t width, std::uint32_t height, std::uint32_t pitch)
+        : bitmapData_(libCZI::PixelType::Gray8, (width + 7) / 8, height, pitch, 0, 0)
+    {
+    }
+
+    libCZI::IntSize GetSize() const override
+    {
+        return this->GetSize();
+    }
+
+    libCZI::BitonalBitmapLockInfo Lock() override
+    {
+        auto lock_info_bitmap = this->bitmapData_.Lock();
+        libCZI::BitonalBitmapLockInfo bitonal_bitmap_lock_info;
+        bitonal_bitmap_lock_info.ptrData = lock_info_bitmap.ptrData;
+        bitonal_bitmap_lock_info.stride = lock_info_bitmap.stride;
+        bitonal_bitmap_lock_info.size = lock_info_bitmap.size;
+        return bitonal_bitmap_lock_info;
+    }
+
+    void Unlock() override
+    {
+        this->bitmapData_.Unlock();
+    }
+};

@@ -47,7 +47,7 @@ ADD_EXECUTABLE(libCZI_UnitTests
 										test_SubBlockCache.cpp 
 										test_azureblobstream.cpp
 										test_frame_of_reference_transform.cpp
-										test_subblockmetadata.cpp)
+										test_subblockmetadata.cpp "test_subblockattachment.cpp")
 
 TARGET_LINK_LIBRARIES(libCZI_UnitTests PRIVATE libCZIStatic GTest::gtest GTest::gmock)
 set_target_properties(libCZI_UnitTests PROPERTIES CXX_STANDARD 14)

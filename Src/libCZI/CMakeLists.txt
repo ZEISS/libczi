@@ -91,7 +91,7 @@ set(LIBCZISRCFILES
             libCZI_Utilities.h
             libCZI_Write.h
             libCZI_StreamsLib.h
-            libCZI_SubBlockMetadata.h
+            libCZI_SubBlock.h
             MD5Sum.h
             MultiChannelCompositor.h
             SingleChannelAccessorBase.h
@@ -126,6 +126,8 @@ set(LIBCZISRCFILES
             subblock_cache.cpp
             SubblockMetadata.h
             SubblockMetadata.cpp
+            SubblockAttachmentAccessor.h
+            SubblockAttachmentAccessor.cpp
 )
 
 # prepare the configuration-file "libCZI_Config.h"

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "libCZI_SubBlockMetadata.h"
+#include "libCZI_SubBlock.h"
 
 #include "pugixml.hpp"
 #include "XmlNodeWrapper.h"
@@ -23,7 +23,7 @@ private:
 
     libCZI::pugi::xml_parse_result parse_result_;
     libCZI::pugi::xml_document doc_;
-    std::unique_ptr<XmlNodeWrapperReadonly<SubblockMetadata, XmlNodeWrapperThrowExcp> > wrapper_;
+    std::unique_ptr<XmlNodeWrapperReadonly<SubblockMetadata, XmlNodeWrapperThrowExcp>> wrapper_;
 public:
     SubblockMetadata(const char* xml, size_t xml_size);
     SubblockMetadata() = delete;

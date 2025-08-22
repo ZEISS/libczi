@@ -2,6 +2,7 @@
 
 #include <tuple>
 #include "libCZI_Metadata.h"
+#include "libCZI_Utilities.h"
 
 namespace libCZI
 {
@@ -56,7 +57,7 @@ namespace libCZI
 
     /// This interface is providing access to the sub-block metadata at XML-level via the IXmlNodeRead interface.
     /// Also, it has typed access to the metadata via the ISubBlockMetadataMetadataView interface.
-    class ISubBlockMetadata : public IXmlNodeRead, ISubBlockMetadataMetadataView
+    class ISubBlockMetadata : public IXmlNodeRead, public ISubBlockMetadataMetadataView
     {
     public:
         ISubBlockMetadata() = default;
@@ -78,4 +79,26 @@ namespace libCZI
         ISubBlockMetadata(ISubBlockMetadata&&) = delete;
         ISubBlockMetadata& operator=(ISubBlockMetadata&&) = delete;
     };
+
+    class ISubBlockAttachmentAccessor
+    {
+    public:
+        struct ChunkInfo
+        {
+            libCZI::GUID  guid;   ///< The name of the chunk (if available).
+            std::uint32_t offset; ///< The offset of the chunk in the attachment.
+            std::uint32_t size;   ///< The size of the chunk in bytes.
+        };
+
+        ISubBlockAttachmentAccessor() = default;
+        virtual ~ISubBlockAttachmentAccessor() = default;
+
+        virtual bool HasChunkContainer() const = 0;
+
+        virtual bool EnumerateChunksInChunkContainer(const std::function<bool(int index, const ChunkInfo& info)>& functor_enum) = 0;
+
+        
+    };
+
+
 } // namespace libCZI
