@@ -6,6 +6,7 @@ include(FetchContent)
 include(CheckIncludeFiles)
 include(CheckSymbolExists)
 include(CMakePackageConfigHelpers)
+include(GNUInstallDirs)
 
 set(LIBCZISRCFILES 
             BitmapOperations.cpp
@@ -74,23 +75,23 @@ set(LIBCZISRCFILES
             decoder_wic.h
             decoder_zstd.h
             FileHeaderSegmentData.h
-            ImportExport.h
-            inc_libCZI_Config.h
             IndexSet.h
-            libCZI.h
-            libCZI_Compositor.h
-            libCZI_compress.h
-            libCZI_DimCoordinate.h
-            libCZI_exceptions.h
-            libCZI_Helpers.h
-            libCZI_Metadata.h
-            libCZI_Metadata2.h
-            libCZI_Pixels.h
-            libCZI_ReadWrite.h
-            libCZI_Site.h
-            libCZI_Utilities.h
-            libCZI_Write.h
-            libCZI_StreamsLib.h
+            inc/ImportExport.h
+            inc/libCZI.h
+            inc/libCZI_Compositor.h
+            inc/libCZI_compress.h
+            inc/libCZI_DimCoordinate.h
+            inc/libCZI_exceptions.h
+            inc/libCZI_Helpers.h
+            inc/libCZI_Metadata.h
+            inc/libCZI_Metadata2.h
+            inc/libCZI_Pixels.h
+            inc/libCZI_ReadWrite.h
+            inc/libCZI_Site.h
+            inc/libCZI_Utilities.h
+            inc/libCZI_Write.h
+            inc/libCZI_StreamsLib.h
+            inc_libCZI_Config.h
             MD5Sum.h
             MultiChannelCompositor.h
             SingleChannelAccessorBase.h
@@ -298,11 +299,13 @@ configure_file (
   "${CMAKE_CURRENT_BINARY_DIR}/libCZI_Config.h"
   ESCAPE_QUOTES @ONLY)
 
+# one place to reference the public header dir in the source tree
+set(LIBCZI_PUBLIC_INC "${CMAKE_CURRENT_SOURCE_DIR}/inc")  
 
 #  Define headers for this library. PUBLIC headers are used for compiling the library, and will be added to consumers' build paths.
-set(libCZIPublicHeaders "ImportExport.h" "libCZI.h" "libCZI_Compositor.h" "libCZI_DimCoordinate.h" "libCZI_exceptions.h"
-               "libCZI_Helpers.h" "libCZI_Metadata.h" "libCZI_Metadata2.h" "libCZI_Pixels.h" "libCZI_ReadWrite.h"
-               "libCZI_Site.h" "libCZI_Utilities.h" "libCZI_Write.h" "libCZI_compress.h" "libCZI_StreamsLib.h")
+set(libCZIPublicHeaders "inc/ImportExport.h" "inc/libCZI.h" "inc/libCZI_Compositor.h" "inc/libCZI_DimCoordinate.h" "inc/libCZI_exceptions.h"
+               "inc/libCZI_Helpers.h" "inc/libCZI_Metadata.h" "inc/libCZI_Metadata2.h" "inc/libCZI_Pixels.h" "inc/libCZI_ReadWrite.h"
+               "inc/libCZI_Site.h" "inc/libCZI_Utilities.h" "inc/libCZI_Write.h" "inc/libCZI_compress.h" "inc/libCZI_StreamsLib.h")
 
 #
 #define the shared libCZI - library
@@ -340,10 +343,10 @@ if (LIBCZI_BUILD_DYNLIB)
   if(LIBCZI_HAVE_WIN32_API)
     target_link_libraries(libCZI PRIVATE ole32 Windowscodecs)
   endif()
-  target_include_directories(libCZI
-      PUBLIC
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
-        $<INSTALL_INTERFACE:include>)
+  target_include_directories(libCZI PUBLIC
+    $<BUILD_INTERFACE:${LIBCZI_PUBLIC_INC}>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
+    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/libCZI>)
 endif(LIBCZI_BUILD_DYNLIB)
 
 #
@@ -373,7 +376,7 @@ if (LIBCZI_BUILD_AZURESDK_BASED_STREAM)
 endif()
 
 if (LIBCZI_BUILD_PREFER_EXTERNALPACKAGE_EIGEN3)
-  target_link_libraries(libCZIStatic PUBLIC Eigen3::Eigen)
+  target_link_libraries(libCZIStatic PRIVATE Eigen3::Eigen)
 else()
   add_dependencies(libCZIStatic eigen_ext)
 endif()
@@ -387,10 +390,40 @@ endif()
 target_compile_definitions(libCZIStatic PUBLIC _LIBCZISTATICLIB)    # make sure that users of the static library get the correct definition
 
 # Static library include directories
-target_include_directories(libCZIStatic
-  PUBLIC
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
-    $<INSTALL_INTERFACE:include>)
+target_include_directories(libCZIStatic PUBLIC
+  $<BUILD_INTERFACE:${LIBCZI_PUBLIC_INC}>
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
+  $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/libCZI>)
+
+
+
+
+# # DEBUG: dump interface includes as CMake sees them
+# get_target_property(_ii libCZI INTERFACE_INCLUDE_DIRECTORIES)
+# message(STATUS "libCZI INTERFACE_INCLUDE_DIRECTORIES = [${_ii}]")
+# get_target_property(_ii libCZIStatic INTERFACE_INCLUDE_DIRECTORIES)
+# message(STATUS "libCZIStatic INTERFACE_INCLUDE_DIRECTORIES = [${_ii}]")
+
+# # ---- Force-clean INTERFACE include dirs to be relocatable ----
+# # Split build paths into separate genex entries.
+# foreach(t libCZI libCZIStatic)
+#   if(TARGET ${t})
+#     set_property(TARGET ${t} PROPERTY INTERFACE_INCLUDE_DIRECTORIES
+#       $<BUILD_INTERFACE:${LIBCZI_PUBLIC_INC}>
+#       $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
+#       $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/libCZI>)
+#   endif()
+# endforeach()
+
+# # (optional) verify
+# get_target_property(_ii libCZI INTERFACE_INCLUDE_DIRECTORIES)
+# message(STATUS "CLEAN libCZI INTERFACE_INCLUDE_DIRECTORIES = [${_ii}]")
+# get_target_property(_ii libCZIStatic INTERFACE_INCLUDE_DIRECTORIES)
+# message(STATUS "CLEAN libCZIStatic INTERFACE_INCLUDE_DIRECTORIES = [${_ii}]")
+
+
+
+
 
 if(LIBCZI_ENABLE_INSTALL)
 

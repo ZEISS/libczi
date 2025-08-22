@@ -6,7 +6,7 @@
 
 #include <memory>
 #include <algorithm>
-#include "libCZI_Pixels.h"
+#include "inc/libCZI_Pixels.h"
 
 class CBitmapOperations
 {

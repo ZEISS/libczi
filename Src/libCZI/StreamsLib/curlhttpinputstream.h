@@ -10,7 +10,7 @@
 #include <mutex>
 #include <cstdint>
 #include <string>
-#include "../libCZI.h"
+#include "../inc/libCZI.h"
 #include <curl/curl.h>
 
 /// A simplistic implementation of a stream which uses the curl library to read from an http or https stream.

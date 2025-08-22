@@ -6,7 +6,7 @@
 
 #include <vector>
 #include <tuple>
-#include "libCZI.h"
+#include "inc/libCZI.h"
 
 class CIndexSet : public libCZI::IIndexSet
 {

@@ -9,8 +9,8 @@
 #if LIBCZI_WINDOWSAPI_AVAILABLE
 
 #include <memory>
-#include "libCZI_Pixels.h"
-#include "libCZI_Site.h"
+#include "inc/libCZI_Pixels.h"
+#include "inc/libCZI_Site.h"
 
 struct IWICBitmapDecoder;
 struct IWICImagingFactory;

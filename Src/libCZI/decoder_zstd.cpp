@@ -10,7 +10,7 @@
 #include <common/zstd_errors.h>
 #endif
 #include "bitmapData.h"
-#include "libCZI_Utilities.h"
+#include "inc/libCZI_Utilities.h"
 #include "utilities.h"
 #include <cstring>
 

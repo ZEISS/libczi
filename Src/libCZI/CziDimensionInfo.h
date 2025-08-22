@@ -5,7 +5,7 @@
 #pragma once
 
 #include <vector>
-#include "libCZI.h"
+#include "inc/libCZI.h"
 #include "CziMetadata.h"
 
 class CCziDimensionInfo : public libCZI::IDimensionInfo

@@ -8,7 +8,7 @@
 #include <map>
 #include <vector>
 #include "CZIReader.h"
-#include "libCZI.h"
+#include "inc/libCZI.h"
 #include "SingleChannelAccessorBase.h"
 
 class CSingleChannelPyramidLevelTileAccessor : public CSingleChannelAccessorBase, public libCZI::ISingleChannelPyramidLayerTileAccessor

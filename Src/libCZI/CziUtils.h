@@ -6,8 +6,8 @@
 
 #include <functional>
 #include <cstdint>
-#include "libCZI_Pixels.h"
-#include "libCZI_DimCoordinate.h"
+#include "inc/libCZI_Pixels.h"
+#include "inc/libCZI_DimCoordinate.h"
 
 enum class CompareResult
 {

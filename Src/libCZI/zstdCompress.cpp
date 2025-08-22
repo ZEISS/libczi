@@ -11,7 +11,7 @@
 #include <common/zstd_errors.h>
 #endif
 #include "BitmapOperations.h"
-#include "libCZI_compress.h"
+#include "inc/libCZI_compress.h"
 #include "utilities.h"
 
 using namespace std;

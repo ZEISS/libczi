@@ -10,8 +10,8 @@
 #include <functional>
 #include <vector>
 #include <map>
-#include "libCZI_Pixels.h"
-#include "libCZI_Utilities.h"
+#include "inc/libCZI_Pixels.h"
+#include "inc/libCZI_Utilities.h"
 
 class Utilities
 {

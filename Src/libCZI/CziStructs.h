@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "libCZI_Utilities.h"
+#include "inc/libCZI_Utilities.h"
 
 #if !defined(__GNUC__)
 #include <pshpack2.h>

@@ -9,7 +9,7 @@
 #include <cstdio>
 #include <mutex>
 
-#include "../libCZI.h"
+#include "../inc/libCZI.h"
 
 /// Implementation of the IStream-interface for files based on C-API fseek/fread.
 /// Since seeking is not thread-safe with this API, we need to have a critical section

@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: LGPL-3.0-or-later
 
-#include "libCZI.h"
+#include "inc/libCZI.h"
 #include "inc_libCZI_Config.h"
 #include "decoder.h"
 #include "decoder_zstd.h"

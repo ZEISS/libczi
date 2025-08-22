@@ -6,7 +6,7 @@
 #include <vector>
 #include <map>
 #include <memory>
-#include "libCZI.h"
+#include "inc/libCZI.h"
 #include "splines.h"
 #include "pugixml.hpp"
 

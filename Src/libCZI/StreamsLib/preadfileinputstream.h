@@ -6,7 +6,7 @@
 #include <libCZI_Config.h>
 
 #if LIBCZI_USE_PREADPWRITEBASED_STREAMIMPL
-#include "../libCZI.h"
+#include "../inc/libCZI.h"
 
 /// Implementation of the IStream-interface for files based on the Unix-specific pread-API.
 /// It leverages the pread function passing in an offset, thus allowing for concurrent

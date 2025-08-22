@@ -6,7 +6,7 @@
 #include "BitmapOperations.h"
 #include "MD5Sum.h"
 #include "utilities.h"
-#include "libCZI.h"
+#include "inc/libCZI.h"
 #include "Site.h"
 #include "inc_libCZI_Config.h"
 

@@ -5,8 +5,8 @@
 #pragma once
 
 #include <memory>
-#include "libCZI_Pixels.h"
-#include "libCZI_Site.h"
+#include "inc/libCZI_Pixels.h"
+#include "inc/libCZI_Site.h"
 
 class CZstd0Decoder : public libCZI::IDecoder
 {

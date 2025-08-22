@@ -6,7 +6,7 @@
 
 #include <memory>
 #include <vector>
-#include "libCZI.h"
+#include "inc/libCZI.h"
 #include "utilities.h"
 
 class CAttributeId : public libCZI::IAttributeId

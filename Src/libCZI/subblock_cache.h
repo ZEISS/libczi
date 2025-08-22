@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "libCZI.h"
+#include "inc/libCZI.h"
 #include <map>
 #include <cstdint>
 #include <mutex>

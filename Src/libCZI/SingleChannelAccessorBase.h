@@ -5,7 +5,7 @@
 #pragma once
 
 #include <memory>
-#include "libCZI.h"
+#include "inc/libCZI.h"
 
 class CSingleChannelAccessorBase
 {

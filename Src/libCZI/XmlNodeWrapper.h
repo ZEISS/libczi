@@ -9,12 +9,12 @@
 #include <vector>
 #include <utility>
 
-#include "libCZI_Metadata.h"
+#include "inc/libCZI_Metadata.h"
 #include <regex>
 #include <exception>
 #include "utilities.h"
 #include "pugixml.hpp"
-#include "libCZI_exceptions.h"
+#include "inc/libCZI_exceptions.h"
 
 /// A utility for parsing an "XML path specifier" (as used with IXmlNodeRead).
 ///

@@ -4,4 +4,4 @@
 
 #pragma once
 
-#include "libCZI_Compositor.h"
+#include "inc/libCZI_Compositor.h"

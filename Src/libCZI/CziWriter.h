@@ -7,7 +7,7 @@
 #include <memory>
 #include <string>
 #include <tuple>
-#include "libCZI.h"
+#include "inc/libCZI.h"
 #include "CziSubBlockDirectory.h"
 #include "CziAttachmentsDirectory.h"
 #include "CziStructs.h"

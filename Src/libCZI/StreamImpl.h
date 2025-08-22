@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "libCZI.h"
+#include "inc/libCZI.h"
 #include "inc_libCZI_Config.h"
 #include <memory>
 #if LIBCZI_WINDOWSAPI_AVAILABLE

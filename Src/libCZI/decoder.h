@@ -5,9 +5,9 @@
 #pragma once
 
 #include <memory>
-#include "libCZI_Pixels.h"
-#include "libCZI_compress.h"
-#include "libCZI_Site.h"
+#include "inc/libCZI_Pixels.h"
+#include "inc/libCZI_compress.h"
+#include "inc/libCZI_Site.h"
 
 class CJxrLibDecoder : public libCZI::IDecoder
 {
