@@ -298,6 +298,8 @@ configure_file (
   "${CMAKE_CURRENT_BINARY_DIR}/libCZI_Config.h"
   ESCAPE_QUOTES @ONLY)
 
+# one place to reference the public header dir in the source tree
+set(LIBCZI_PUBLIC_INC "${CMAKE_CURRENT_SOURCE_DIR}/inc")  
 
 #  Define headers for this library. PUBLIC headers are used for compiling the library, and will be added to consumers' build paths.
 set(libCZIPublicHeaders "inc/ImportExport.h" "inc/libCZI.h" "inc/libCZI_Compositor.h" "inc/libCZI_DimCoordinate.h" "inc/libCZI_exceptions.h"
@@ -342,8 +344,8 @@ if (LIBCZI_BUILD_DYNLIB)
   endif()
   target_include_directories(libCZI
     PUBLIC
-      $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/inc>
-      $<INSTALL_INTERFACE:include>)
+      $<BUILD_INTERFACE:${LIBCZI_PUBLIC_INC};${CMAKE_CURRENT_BINARY_DIR}>
+      $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/libCZI>)
 endif(LIBCZI_BUILD_DYNLIB)
 
 #
@@ -389,8 +391,8 @@ target_compile_definitions(libCZIStatic PUBLIC _LIBCZISTATICLIB)    # make sure 
 # Static library include directories
 target_include_directories(libCZIStatic
   PUBLIC
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/inc>
-    $<INSTALL_INTERFACE:include>)
+    $<BUILD_INTERFACE:${LIBCZI_PUBLIC_INC};${CMAKE_CURRENT_BINARY_DIR}>
+    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/libCZI>)
 
 if(LIBCZI_ENABLE_INSTALL)
 
