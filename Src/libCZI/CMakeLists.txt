@@ -6,6 +6,7 @@ include(FetchContent)
 include(CheckIncludeFiles)
 include(CheckSymbolExists)
 include(CMakePackageConfigHelpers)
+include(GNUInstallDirs)
 
 set(LIBCZISRCFILES 
             BitmapOperations.cpp
