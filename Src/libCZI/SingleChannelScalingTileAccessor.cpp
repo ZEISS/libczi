@@ -6,7 +6,6 @@
 #include "utilities.h"
 #include "BitmapOperations.h"
 #include "Site.h"
-#include <algorithm>
 
 using namespace libCZI;
 using namespace std;
@@ -315,7 +314,7 @@ void CSingleChannelScalingTileAccessor::Paint(libCZI::IBitmapData* bmDest, const
 {
     // make the pyramid-layer limit a bit smaller (5% smaller) so that right at the edge of a pyramid layer, we do not
     //  exclude subblocks which happen to have an inaccurate zoom-level (e.g. due to quantization)
-    const int idxOf1stSubBlockOfZoomGreater = this->GetIdxOf1stSubBlockWithZoomGreater(sbSetSortedByZoom.subBlocks, sbSetSortedByZoom.sortedByZoom, min(zoom / 1.05f, 1.f));
+    const int idxOf1stSubBlockOfZoomGreater = this->GetIdxOf1stSubBlockWithZoomGreater(sbSetSortedByZoom.subBlocks, sbSetSortedByZoom.sortedByZoom, zoom / 1.05f);
     if (idxOf1stSubBlockOfZoomGreater < 0)
     {
         // this means that we would need to overzoom (i.e. the requested zoom is less than the lowest level we find in the subblock-repository)
