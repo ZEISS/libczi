@@ -31,7 +31,7 @@ public:
     SubblockMetadata(SubblockMetadata&&) = delete;
     SubblockMetadata& operator=(const SubblockMetadata&) = delete;
     SubblockMetadata& operator=(SubblockMetadata&&) = delete;
-    virtual ~SubblockMetadata() = default;
+    ~SubblockMetadata() override = default;
 
 public:
     // interface IXmlNodeRead
