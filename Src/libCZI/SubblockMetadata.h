@@ -21,11 +21,11 @@ private:
         }
     };
 
-    pugi::xml_parse_result   parseResult;
-    pugi::xml_document doc;
-    std::unique_ptr<XmlNodeWrapperReadonly<SubblockMetadata, XmlNodeWrapperThrowExcp> > wrapper;
+    libCZI::pugi::xml_parse_result parse_result_;
+    libCZI::pugi::xml_document doc_;
+    std::unique_ptr<XmlNodeWrapperReadonly<SubblockMetadata, XmlNodeWrapperThrowExcp> > wrapper_;
 public:
-    SubblockMetadata(const char* xml, size_t xmlSize);
+    SubblockMetadata(const char* xml, size_t xml_size);
     SubblockMetadata() = delete;
     SubblockMetadata(const SubblockMetadata&) = delete;
     SubblockMetadata(SubblockMetadata&&) = delete;
@@ -44,8 +44,8 @@ public:
 
     // interface ISubBlockMetadataMetadataView
     bool TryGetAttachmentDataFormat(std::wstring* data_format) override;
-    bool TryGetTagAsDouble(std::wstring tag_name, double* value) override;
-    bool TryGetTagAsString(std::wstring tag_name, std::wstring* value) override;
+    bool TryGetTagAsDouble(const std::wstring& tag_name, double* value) override;
+    bool TryGetTagAsString(const std::wstring& tag_name, std::wstring* value) override;
     bool TryGetStagePositionFromTags(std::tuple<double, double>* stage_position) override;
 
     bool IsXmlValid() const override;

@@ -214,6 +214,10 @@ namespace libCZI
     /// \return The newly created metadata-builder-object.
     LIBCZI_API std::shared_ptr<ICziMetadataBuilder> CreateMetadataBuilderFromXml(const std::string& xml);
 
+    /// Creates a sub-block metadata object from the specified sub-block. This can be used for typed access to the
+    /// sub-block metadata (if present).
+    /// \param 	sub_block	The sub block.
+   /// \returns	The newly created sub-block metadata object for accessing metadata of the specified sub-block.
     LIBCZI_API std::shared_ptr<ISubBlockMetadata> CreateSubBlockMetadataFromSubBlock(const libCZI::ISubBlock* sub_block);
 
     /// Interface used for accessing the data-stream.  

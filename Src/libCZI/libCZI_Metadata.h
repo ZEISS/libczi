@@ -782,7 +782,7 @@ namespace libCZI
         /// \param [out] value If non-null, the value of the XML-node will be put here (if successful).
         ///
         /// \return True if it succeeds, false if it fails.
-        virtual bool    TryGetValue(std::wstring* value) const = 0;
+        virtual bool TryGetValue(std::wstring* value) const = 0;
 
         /// Gets a child node for the specified path/attribute specification if it
         /// exists. Otherwise, a nullptr is returned. 

@@ -5,17 +5,45 @@
 
 namespace libCZI
 {
+    /// This interface provides typed access to the metadata of a sub-block.
     class ISubBlockMetadataMetadataView
     {
     public:
         ISubBlockMetadataMetadataView() = default;
         virtual ~ISubBlockMetadataMetadataView() = default;
 
+        /// Attempts to get "attachment data format" - the format of data in the attachment of the sub-block.
+        /// This information is retrieved from the node "METADATA/AttachmentSchema/DataFormat".
+        /// 
+        /// \param [out]	data_format	If non-null, the data format is output here.
+        /// \returns	True if it succeeds; false otherwise.
         virtual bool TryGetAttachmentDataFormat(std::wstring* data_format)= 0;
 
-        virtual bool TryGetTagAsDouble(std::wstring tag_name, double* value) = 0;
-        virtual bool TryGetTagAsString(std::wstring tag_name, std::wstring* value) = 0;
+        /// Attempts to get the specified tag, parsed as a double, from the sub-block metadata.
+        /// The data is retrieved from the node "METADATA/Tags/<tag-name>".
+        ///
+        /// \param 		   	tag_name	The tag name.
+        /// \param [in,out]	value   	If non-null, the value is put here
+        ///
+        /// \returns	True if it succeeds; false otherwise.
+        virtual bool TryGetTagAsDouble(const std::wstring& tag_name, double* value) = 0;
 
+        /// Attempts to get the content of the specified tag from the sub-block metadata.
+        /// The data is retrieved from the node "METADATA/Tags/<tag-name>".
+        ///
+        /// \param 		   	tag_name	The tag name.
+        /// \param [in,out]	value   	If non-null, the content is put here
+        ///
+        /// \returns	True if it succeeds; false otherwise.
+        virtual bool TryGetTagAsString(const std::wstring& tag_name, std::wstring* value) = 0;
+
+        /// Attempts to get "stage position" from the sub-block metadata.
+        /// This information is retrieved from the node "METADATA/Tags/StageXPosition" and "METADATA/Tags/StageYPosition".
+        /// Note that X and Y need to be present in order to have this function return true.
+        ///
+        /// \param [in,out]	stage_position	If non-null, the stage position is put here.
+        ///
+        /// \returns	True if it succeeds; false otherwise.
         virtual bool TryGetStagePositionFromTags(std::tuple<double, double>* stage_position) = 0;
 
         // Delete copy constructor and copy assignment operator
@@ -26,13 +54,20 @@ namespace libCZI
         ISubBlockMetadataMetadataView& operator=(ISubBlockMetadataMetadataView&&) = delete;
     };
 
+    /// This interface is providing access to the sub-block metadata at XML-level via the IXmlNodeRead interface.
+    /// Also, it has typed access to the metadata via the ISubBlockMetadataMetadataView interface.
     class ISubBlockMetadata : public IXmlNodeRead, ISubBlockMetadataMetadataView
     {
     public:
         ISubBlockMetadata() = default;
         ~ISubBlockMetadata() override = default;
 
+        /// Query if the sub-block metadata is well-formed and valid XML (and was parsed successfully).
+        /// \returns	True if the XML is valid, false if not.
         virtual bool IsXmlValid() const = 0;
+
+        /// Gets the sub-block metadata as an unprocessed UTF8-encoded XML-string.
+        /// \returns	The XML.
         virtual std::string GetXml() const = 0;
 
         // Delete copy constructor and copy assignment operator

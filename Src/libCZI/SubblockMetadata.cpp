@@ -1,53 +1,53 @@
 #include "SubblockMetadata.h"
 #include <sstream>
 
-using namespace pugi;
+using namespace libCZI::pugi;
 using namespace libCZI;
 using namespace std;
 
 SubblockMetadata::SubblockMetadata(const char* xml, size_t xml_size)
 {
-    this->parseResult = this->doc.load_buffer(xml, xml_size, pugi::parse_default, pugi::encoding_utf8);
-    if (this->parseResult)
+    this->parse_result_ = this->doc_.load_buffer(xml, xml_size, pugi::parse_default, pugi::encoding_utf8);
+    if (this->parse_result_)
     {
-        this->wrapper = std::make_unique<XmlNodeWrapperReadonly<SubblockMetadata, XmlNodeWrapperThrowExcp>>(this->doc.internal_object());
+        this->wrapper_ = std::make_unique<XmlNodeWrapperReadonly<SubblockMetadata, XmlNodeWrapperThrowExcp>>(this->doc_.internal_object());
     }
 }
 
 bool SubblockMetadata::TryGetAttribute(const wchar_t* attributeName, std::wstring* attribValue) const
 {
     this->ThrowIfXmlInvalid();
-    return this->wrapper->TryGetAttribute(attributeName, attribValue);
+    return this->wrapper_->TryGetAttribute(attributeName, attribValue);
 }
 
 void SubblockMetadata::EnumAttributes(const std::function<bool(const std::wstring& attribName, const std::wstring& attribValue)>& enumFunc) const
 {
     this->ThrowIfXmlInvalid();
-    this->wrapper->EnumAttributes(enumFunc);
+    this->wrapper_->EnumAttributes(enumFunc);
 }
 
 bool SubblockMetadata::TryGetValue(std::wstring* value) const
 {
     this->ThrowIfXmlInvalid();
-    return this->wrapper->TryGetValue(value);
+    return this->wrapper_->TryGetValue(value);
 }
 
 std::shared_ptr<libCZI::IXmlNodeRead> SubblockMetadata::GetChildNodeReadonly(const char* path)
 {
     this->ThrowIfXmlInvalid();
-    return this->wrapper->GetChildNodeReadonly(path, this->shared_from_this());
+    return this->wrapper_->GetChildNodeReadonly(path, this->shared_from_this());
 }
 
 std::wstring SubblockMetadata::Name() const
 {
     this->ThrowIfXmlInvalid();
-    return this->wrapper->Name();
+    return this->wrapper_->Name();
 }
 
 void SubblockMetadata::EnumChildren(const std::function<bool(std::shared_ptr<libCZI::IXmlNodeRead>)>& enumChildren)
 {
     this->ThrowIfXmlInvalid();
-    return this->wrapper->EnumChildren(enumChildren, this->shared_from_this());
+    return this->wrapper_->EnumChildren(enumChildren, this->shared_from_this());
 }
 
 void SubblockMetadata::ThrowIfXmlInvalid() const
@@ -55,25 +55,25 @@ void SubblockMetadata::ThrowIfXmlInvalid() const
     if (!this->IsXmlValid())
     {
         stringstream ss;
-        ss << "Error parsing XML [offset " << this->parseResult.offset << "]: " << this->parseResult.description();
+        ss << "Error parsing XML [offset " << this->parse_result_.offset << "]: " << this->parse_result_.description();
         throw LibCZIXmlParseException(ss.str().c_str());
     }
 }
 
 bool SubblockMetadata::IsXmlValid() const
 {
-    return this->parseResult;
+    return this->parse_result_;
 }
 
 std::string SubblockMetadata::GetXml() const
 {
-    static pugi::char_t Indent[] = PUGIXML_TEXT(" ");
+    static libCZI::pugi::char_t Indent[] = PUGIXML_TEXT(" ");
 
     this->ThrowIfXmlInvalid();
 
     std::ostringstream stream;
     xml_writer_stream writer(stream);
-    this->doc.save(writer, Indent, format_default, encoding_utf8);
+    this->doc_.save(writer, Indent, format_default, encoding_utf8);
     stream.flush();
     return stream.str();
 }
@@ -90,7 +90,7 @@ bool SubblockMetadata::TryGetAttachmentDataFormat(std::wstring* data_format)
     return node->TryGetValue(data_format);
 }
 
-bool SubblockMetadata::TryGetTagAsDouble(std::wstring tag_name, double* value) 
+bool SubblockMetadata::TryGetTagAsDouble(const std::wstring& tag_name, double* value) 
 {
     this->ThrowIfXmlInvalid();
     const auto node = this->GetChildNodeReadonly("METADATA/Tags");
@@ -109,7 +109,7 @@ bool SubblockMetadata::TryGetTagAsDouble(std::wstring tag_name, double* value)
     return requested_node->TryGetValueAsDouble(value);
 }
 
-bool SubblockMetadata::TryGetTagAsString(std::wstring tag_name, std::wstring* value) 
+bool SubblockMetadata::TryGetTagAsString(const std::wstring& tag_name, std::wstring* value) 
 {
     this->ThrowIfXmlInvalid();
     const auto node = this->GetChildNodeReadonly("METADATA/Tags");
