@@ -15,78 +15,83 @@ using namespace std;
 
 namespace
 {
-
     class MockSubBlockOnlyAttachment : public ISubBlock
     {
     public:
-        // ---- The ONE method you’re allowed to use in tests ----
-        MOCK_METHOD(void, DangerousGetRawData,
-                    (MemBlkType type, const void*& ptr, size_t& size),
-                    (const, override));
-
-        // ---- Everything else: report error if called ----
-        const SubBlockInfo& GetSubBlockInfo() const override {
+        const SubBlockInfo& GetSubBlockInfo() const override
+        {
             ADD_FAILURE() << "GetSubBlockInfo() must not be called on MockSubBlockOnlyAttachment.";
             return dummy_info_;
         }
 
-        std::shared_ptr<const void> GetRawData(MemBlkType type, size_t* ptrSize) const override {
-            const void* p = nullptr;
-            size_t sz = 0;
-            this->DangerousGetRawData(type, p, sz);   // reuse your test’s setup
-            if (ptrSize) *ptrSize = sz;
-            if (!p || sz == 0) return {};
+        std::shared_ptr<const void> GetRawData(MemBlkType type, size_t* ptrSize) const override
+        {
+            auto buffer_and_size = this->BufferFor(type);
+            if (ptrSize)
+            {
+                *ptrSize = std::get<1>(buffer_and_size);
+            }
 
-            auto owner = std::make_shared<std::vector<unsigned char>>(
-                static_cast<const unsigned char*>(p),
-                static_cast<const unsigned char*>(p) + sz);
-            return std::shared_ptr<const void>(owner, owner->data()); // aliasing ptr
+            return get<0>(buffer_and_size);
         }
 
-        std::shared_ptr<IBitmapData> CreateBitmap(const CreateBitmapOptions* /*options*/) override {
+        void DangerousGetRawData(MemBlkType type, const void*& ptr, size_t& size) const override
+        {
+            auto buffer_and_size = this->BufferFor(type);
+            ptr = get<0>(buffer_and_size).get();
+            size = get<1>(buffer_and_size);
+        }
+
+        std::shared_ptr<IBitmapData> CreateBitmap(const CreateBitmapOptions* /*options*/) override
+        {
             ADD_FAILURE() << "CreateBitmap() must not be called on MockSubBlockOnlyAttachment.";
             return {}; // nullptr
         }
 
-        // ---- Optional helpers to make DangerousGetRawData easy to use ----
-        void SetBuffer(MemBlkType t, std::vector<std::uint8_t> bytes) {
-            BufferFor(t) = std::move(bytes);
-        }
-
-        // Sets a default action so DangerousGetRawData returns pointers into our buffers.
-        // You can still override with EXPECT_CALL(...) in a specific test if needed.
-        void SetDefaultDangerousRawBehavior() {
-            using ::testing::_;
-            using ::testing::A;
-            using ::testing::Invoke;
-
-            ON_CALL(*this, DangerousGetRawData(_, A<const void*&>(), A<size_t&>()))
-                .WillByDefault(Invoke([this](MemBlkType t, const void*& outPtr, size_t& outSize) {
-                auto& buf = BufferFor(t);
-                outPtr = buf.empty() ? nullptr : static_cast<const void*>(buf.data());
-                outSize = buf.size();
-                }));
-        }
-
-    private:
-        std::vector<unsigned char>& BufferFor(MemBlkType t) {
-            switch (t) {
-            case Metadata:   return metadata_;
-            case Data:       return data_;
-            case Attachment: return attachment_;
+        void SetBuffer(MemBlkType t, const vector<std::uint8_t>& bytes)
+        {
+            auto buffer = shared_ptr<void>(malloc(bytes.size()), free);
+            memcpy(const_cast<void*>(buffer.get()), bytes.data(), bytes.size());
+            switch (t)
+            {
+            case Metadata:
+                this->metadata_ = buffer;
+                this->size_metadata_ = bytes.size();
+                break;
+            case Data:
+                this->data_ = buffer;
+                this->size_data_ = bytes.size();
+                break;
+            case Attachment:
+                this->attachment_ = buffer;
+                this->size_attachment_ = bytes.size();
+                break;
+            default:
+                throw runtime_error("invalid memory block type");
             }
-            // Fallback (should never happen)
-            return data_;
+        }
+    private:
+        tuple<shared_ptr<const void>, size_t> BufferFor(MemBlkType t) const
+        {
+            switch (t)
+            {
+            case Metadata:   return make_tuple(this->metadata_, this->size_metadata_);
+            case Data:       return make_tuple(this->data_, this->size_data_);
+            case Attachment: return make_tuple(this->attachment_, this->size_attachment_);
+            }
+
+            throw runtime_error("invalid memory block type");
         }
 
-        // backing storage for the helper
-        std::vector<unsigned char> metadata_;
-        std::vector<unsigned char> data_;
-        std::vector<unsigned char> attachment_;
+        shared_ptr<const void> metadata_;
+        size_t size_metadata_{ 0 };
+        shared_ptr<const void> data_;
+        size_t size_data_{ 0 };
+        shared_ptr<const void> attachment_;
+        size_t size_attachment_{ 0 };
         SubBlockInfo dummy_info_{}; // used only to satisfy reference return when erroring
     };
 }
-
 
 TEST(SubBlockAttachment, BasicTest)
 {
@@ -99,7 +104,6 @@ TEST(SubBlockAttachment, BasicTest)
     vector<uint8_t> metadata(xml_string.begin(), xml_string.end());
 
     auto mockSubBlock = make_shared<MockSubBlockOnlyAttachment>();
-    mockSubBlock->SetDefaultDangerousRawBehavior();
     mockSubBlock->SetBuffer(libCZI::ISubBlock::MemBlkType::Metadata, metadata);
     mockSubBlock->SetBuffer(libCZI::ISubBlock::MemBlkType::Attachment,
         {
@@ -122,4 +126,7 @@ TEST(SubBlockAttachment, BasicTest)
         });
 
     ASSERT_EQ(chunks.size(), 1);
+    ASSERT_EQ(chunks[0].offset, 20);
+    const GUID g{ 0x04030201, 0x0605, 0x0807, { 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f, 0x10 } };
+    ASSERT_EQ(chunks[0].guid, g);
 }
