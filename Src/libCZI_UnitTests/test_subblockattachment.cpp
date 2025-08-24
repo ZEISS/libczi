@@ -156,8 +156,8 @@ TEST(SubBlockAttachment, InvalidChunkContainer1Test)
     auto sub_block_metadata_accessor = CreateSubBlockAttachmentAccessor(mockSubBlock, sub_block_metadata);
 
     vector<ISubBlockAttachmentAccessor::ChunkInfo> chunks;
-    // Option 2: Use EXPECT_ANY_THROW if you don't care about specific exception type
-    EXPECT_ANY_THROW(
+
+    EXPECT_THROW(
         sub_block_metadata_accessor->EnumerateChunksInChunkContainer(
             [&chunks](int index, const ISubBlockAttachmentAccessor::ChunkInfo& info)
             {
