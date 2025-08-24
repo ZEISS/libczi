@@ -185,7 +185,7 @@ CCZIReader::CCZIReader() :
             info.pixelType = CziUtils::PixelTypeFromInt(entry.PixelType);
             info.coordinate = entry.coordinate;
             info.logicalRect = IntRect{ entry.x,entry.y,entry.width,entry.height };
-            info.physicalSize = IntSize{ (std::uint32_t)entry.storedWidth, (std::uint32_t)entry.storedHeight };
+            info.physicalSize = IntSize{ static_cast<std::uint32_t>(entry.storedWidth), static_cast<std::uint32_t>(entry.storedHeight) };
             info.mIndex = entry.mIndex;
             info.pyramidType = CziUtils::PyramidTypeFromByte(entry.pyramid_type_from_spare);
             info.filePosition = entry.FilePosition;
