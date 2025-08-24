@@ -12,7 +12,7 @@
 #include "CziWriter.h"
 #include "CziReaderWriter.h"
 #include "CziMetadataBuilder.h"
-#include "SubBlockMetadata.h"
+#include "SubblockMetadata.h"
 #include "inc_libCZI_Config.h"
 #include "SubblockAttachmentAccessor.h"
 
