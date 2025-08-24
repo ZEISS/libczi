@@ -176,7 +176,7 @@ TEST(SubBlockAttachment, GetValidPixelMaskFromChunkContainerScenario1Test)
         "    <DataFormat>CHUNKCONTAINER</DataFormat>\n"
         "  </AttachmentSchema>\n"
         "</METADATA>";
-    vector<uint8_t> metadata(xml_string.begin(), xml_string.end());
+    const vector<uint8_t> metadata(xml_string.begin(), xml_string.end());
 
     const auto mockSubBlock = make_shared<MockSubBlockOnlyAttachment>();
     mockSubBlock->SetBuffer(libCZI::ISubBlock::MemBlkType::Metadata, metadata);
@@ -218,7 +218,7 @@ TEST(SubBlockAttachment, GetValidPixelMaskFromChunkContainerScenario2Test)
     mockSubBlock->SetBuffer(libCZI::ISubBlock::MemBlkType::Attachment,
         {
             0x67, 0xea, 0xe3, 0xcb, 0xfc, 0x5b, 0x2b, 0x49, 0xA1, 0x6A, 0xEC, 0xE3, 0x78, 0x03, 0x14, 0x48,
-            15, 0, 0 ,0,
+            15, 0, 0, 0,
             22, 0, 0, 0,        // width
             23, 0, 0, 0,        // height
             0,  0, 0, 0,        // type of representation
@@ -250,14 +250,14 @@ TEST(SubBlockAttachment, CreateBitonalBitmapFromMaskInfoScenario1Test)
         "    <DataFormat>CHUNKCONTAINER</DataFormat>\n"
         "  </AttachmentSchema>\n"
         "</METADATA>";
-    vector<uint8_t> metadata(xml_string.begin(), xml_string.end());
+    const vector<uint8_t> metadata(xml_string.begin(), xml_string.end());
 
     const auto mockSubBlock = make_shared<MockSubBlockOnlyAttachment>();
     mockSubBlock->SetBuffer(libCZI::ISubBlock::MemBlkType::Metadata, metadata);
     mockSubBlock->SetBuffer(libCZI::ISubBlock::MemBlkType::Attachment,
         {
             0x67, 0xea, 0xe3, 0xcb, 0xfc, 0x5b, 0x2b, 0x49, 0xA1, 0x6A, 0xEC, 0xE3, 0x78, 0x03, 0x14, 0x48,
-            18, 0, 0 ,0,
+            18, 0, 0, 0,
             3, 0, 0, 0,        // width
             2, 0, 0, 0,        // height
             0, 0, 0, 0,        // type of representation
