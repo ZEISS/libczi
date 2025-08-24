@@ -159,11 +159,87 @@ TEST(SubBlockAttachment, InvalidChunkContainer1Test)
 
     EXPECT_THROW(
         sub_block_metadata_accessor->EnumerateChunksInChunkContainer(
-            [&chunks](int index, const ISubBlockAttachmentAccessor::ChunkInfo& info)
-            {
-                chunks.push_back(info);
-                return true; // continue enumeration
-            }),
+        [&chunks](int index, const ISubBlockAttachmentAccessor::ChunkInfo& info)
+        {
+            chunks.push_back(info);
+            return true; // continue enumeration
+        }),
         libCZI::LibCZIException
     );
+}
+
+TEST(SubBlockAttachment, GetValidPixelMaskFromChunkContainerScenario1Test)
+{
+    string xml_string =
+        "<METADATA>\n"
+        "  <AttachmentSchema>\n"
+        "    <DataFormat>CHUNKCONTAINER</DataFormat>\n"
+        "  </AttachmentSchema>\n"
+        "</METADATA>";
+    vector<uint8_t> metadata(xml_string.begin(), xml_string.end());
+
+    auto mockSubBlock = make_shared<MockSubBlockOnlyAttachment>();
+    mockSubBlock->SetBuffer(libCZI::ISubBlock::MemBlkType::Metadata, metadata);
+    mockSubBlock->SetBuffer(libCZI::ISubBlock::MemBlkType::Attachment,
+        {
+
+            0x67, 0xea, 0xe3, 0xcb, 0xfc, 0x5b, 0x2b, 0x49, 0xA1, 0x6A, 0xEC, 0xE3, 0x78, 0x03, 0x14, 0x48,
+            12 , 0 , 0 ,0,
+            22, 0 , 0, 0, // width
+            23, 0 , 0, 0, // height
+            0,  0 , 0, 0, // type of representation 
+        });
+
+    auto sub_block_metadata = CreateSubBlockMetadataFromSubBlock(mockSubBlock.get());
+    ASSERT_NE(sub_block_metadata, nullptr);
+
+    auto sub_block_metadata_accessor = CreateSubBlockAttachmentAccessor(mockSubBlock, sub_block_metadata);
+
+    auto mask_info = sub_block_metadata_accessor->GetValidPixelMaskFromChunkContainer();
+
+    ASSERT_EQ(mask_info.width, 22u);
+    ASSERT_EQ(mask_info.height, 23u);
+    ASSERT_EQ(mask_info.type_of_representation, 0u);
+    ASSERT_EQ(mask_info.size_data, 0u);
+    ASSERT_FALSE(mask_info.data);
+}
+
+TEST(SubBlockAttachment, GetValidPixelMaskFromChunkContainerScenario2Test)
+{
+    string xml_string =
+        "<METADATA>\n"
+        "  <AttachmentSchema>\n"
+        "    <DataFormat>CHUNKCONTAINER</DataFormat>\n"
+        "  </AttachmentSchema>\n"
+        "</METADATA>";
+    vector<uint8_t> metadata(xml_string.begin(), xml_string.end());
+
+    auto mockSubBlock = make_shared<MockSubBlockOnlyAttachment>();
+    mockSubBlock->SetBuffer(libCZI::ISubBlock::MemBlkType::Metadata, metadata);
+    mockSubBlock->SetBuffer(libCZI::ISubBlock::MemBlkType::Attachment,
+        {
+
+            0x67, 0xea, 0xe3, 0xcb, 0xfc, 0x5b, 0x2b, 0x49, 0xA1, 0x6A, 0xEC, 0xE3, 0x78, 0x03, 0x14, 0x48,
+            15 , 0 , 0 ,0,
+            22, 0 , 0, 0,       // width
+            23, 0 , 0, 0,       // height
+            0,  0 , 0, 0,       // type of representation
+            0x50, 0x51, 0x53,   // some data
+        });
+
+    auto sub_block_metadata = CreateSubBlockMetadataFromSubBlock(mockSubBlock.get());
+    ASSERT_NE(sub_block_metadata, nullptr);
+
+    auto sub_block_metadata_accessor = CreateSubBlockAttachmentAccessor(mockSubBlock, sub_block_metadata);
+
+    auto mask_info = sub_block_metadata_accessor->GetValidPixelMaskFromChunkContainer();
+
+    ASSERT_EQ(mask_info.width, 22u);
+    ASSERT_EQ(mask_info.height, 23u);
+    ASSERT_EQ(mask_info.type_of_representation, 0u);
+    ASSERT_EQ(mask_info.size_data, 3u);
+    ASSERT_TRUE(mask_info.data);
+    ASSERT_EQ(static_cast<const uint8_t*>(mask_info.data.get())[0], 0x50);
+    ASSERT_EQ(static_cast<const uint8_t*>(mask_info.data.get())[1], 0x51);
+    ASSERT_EQ(static_cast<const uint8_t*>(mask_info.data.get())[2], 0x53);
 }

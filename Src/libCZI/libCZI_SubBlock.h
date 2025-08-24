@@ -18,7 +18,7 @@ namespace libCZI
         /// 
         /// \param [out]	data_format	If non-null, the data format is output here.
         /// \returns	True if it succeeds; false otherwise.
-        virtual bool TryGetAttachmentDataFormat(std::wstring* data_format)= 0;
+        virtual bool TryGetAttachmentDataFormat(std::wstring* data_format) = 0;
 
         /// Attempts to get the specified tag, parsed as a double, from the sub-block metadata.
         /// The data is retrieved from the node "METADATA/Tags/<tag-name>".
@@ -80,6 +80,24 @@ namespace libCZI
         ISubBlockMetadata& operator=(ISubBlockMetadata&&) = delete;
     };
 
+    struct SubBlockAttachmentMaskInfoGeneral
+    {
+        std::uint32_t width;
+        std::uint32_t height;
+        std::uint32_t type_of_representation;
+        size_t size_data;
+        std::shared_ptr<const void> data;
+    };
+
+    struct SubBlockAttachmentMaskInfoUncompressedBitonalBitmap
+    {
+        std::uint32_t width;
+        std::uint32_t height;
+        std::uint32_t stride;
+        size_t size_data;
+        std::shared_ptr<const void> data;
+    };
+
     class ISubBlockAttachmentAccessor
     {
     public:
@@ -92,12 +110,25 @@ namespace libCZI
 
         ISubBlockAttachmentAccessor() = default;
         virtual ~ISubBlockAttachmentAccessor() = default;
+        ISubBlockAttachmentAccessor(const ISubBlockAttachmentAccessor&) = delete;
+        void operator=(const ISubBlockAttachmentAccessor&) = delete;
 
         virtual bool HasChunkContainer() const = 0;
+        virtual bool EnumerateChunksInChunkContainer(const std::function<bool(int index, const ChunkInfo& info)>& functor_enum) const = 0;
+        virtual libCZI::SubBlockAttachmentMaskInfoGeneral GetValidPixelMaskFromChunkContainer() const = 0;
 
-        virtual bool EnumerateChunksInChunkContainer(const std::function<bool(int index, const ChunkInfo& info)>& functor_enum) = 0;
+        libCZI::SubBlockAttachmentMaskInfoUncompressedBitonalBitmap GetValidPixelMaskAsUncompressedBitonalBitmap() const
+        {
+            return libCZI::ISubBlockAttachmentAccessor::GetValidPixelMaskAsUncompressedBitonalBitmap(this);
+        }
 
-        
+        std::shared_ptr<libCZI::IBitonalBitmapData>CreateBitonalBitmapFromMaskInfo() const
+        {
+            return libCZI::ISubBlockAttachmentAccessor::CreateBitonalBitmapFromMaskInfo(this);
+        }
+
+        static SubBlockAttachmentMaskInfoUncompressedBitonalBitmap  GetValidPixelMaskAsUncompressedBitonalBitmap(const ISubBlockAttachmentAccessor* accessor);
+        static std::shared_ptr<libCZI::IBitonalBitmapData> CreateBitonalBitmapFromMaskInfo(const ISubBlockAttachmentAccessor* accessor);
     };
 
 

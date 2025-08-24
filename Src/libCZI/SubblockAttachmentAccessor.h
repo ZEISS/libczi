@@ -1,8 +1,25 @@
 #pragma once
 
-#include "SubblockAttachmentAccessor.h"
+#include <memory>
 #include "libCZI.h"
 
+//struct SubBlockAttachmentMaskInfoGeneral
+//{
+//    std::uint32_t width;
+//    std::uint32_t height;
+//    std::int8_t type_of_representation;
+//    size_t size_data;
+//    std::shared_ptr<const void> data;
+//};
+//
+//struct SubBlockAttachmentMaskInfoUncompressedBitonalBitmap
+//{
+//    std::uint32_t width;
+//    std::uint32_t height;
+//    std::uint32_t stride;
+//    size_t size_data;
+//    std::shared_ptr<const void> data;
+//};
 
 class SubblockAttachmentAccessor : public libCZI::ISubBlockAttachmentAccessor
 {
@@ -15,6 +32,11 @@ public:
 
     bool HasChunkContainer() const override;
 
-    bool EnumerateChunksInChunkContainer(const std::function<bool(int index, const ChunkInfo& info)>& functor_enum) override;
+    bool EnumerateChunksInChunkContainer(const std::function<bool(int index, const ChunkInfo& info)>& functor_enum) const override;
+
+    libCZI::SubBlockAttachmentMaskInfoGeneral GetValidPixelMaskFromChunkContainer() const override;
+    //libCZI::SubBlockAttachmentMaskInfoUncompressedBitonalBitmap GetValidPixelMaskAsUncompressedBitonalBitmap() const override;
+
+    static libCZI::SubBlockAttachmentMaskInfoUncompressedBitonalBitmap  GetValidPixelMaskAsUncompressedBitonalBitmap(const ISubBlockAttachmentAccessor* accessor);
 };
 

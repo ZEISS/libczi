@@ -171,7 +171,7 @@ class CBitonalBitmapData : public libCZI::IBitonalBitmapData
 private:
     CBitmapData<tAllocator> bitmapData_;
 public:
-    static std::shared_ptr<libCZI::IBitmapData> Create(std::uint32_t width, std::uint32_t height, std::uint32_t pitch = 0)
+    static std::shared_ptr<libCZI::IBitonalBitmapData> Create(std::uint32_t width, std::uint32_t height, std::uint32_t pitch = 0)
     {
         if (pitch == 0)
         {
@@ -181,14 +181,14 @@ public:
         return std::make_shared<CBitonalBitmapData>(width, height, pitch);
     }
 
-    static std::shared_ptr<libCZI::IBitmapData> Create(tAllocator allocator, std::uint32_t width, std::uint32_t height, std::uint32_t pitch = 0)
+    static std::shared_ptr<libCZI::IBitonalBitmapData> Create(tAllocator allocator, std::uint32_t width, std::uint32_t height, std::uint32_t pitch = 0)
     {
         if (pitch == 0)
         {
             pitch = (width + 7) / 8; // 1 bit per pixel, so we need 1 byte for 8 pixels
         }
 
-        return std::make_shared<CBitonalBitmapData>(width, height, pitch);
+        return std::make_shared<CBitonalBitmapData<tAllocator>>(allocator, width, height, pitch);
     }
 
     CBitonalBitmapData(tAllocator allocator, std::uint32_t width, std::uint32_t height, std::uint32_t pitch)
