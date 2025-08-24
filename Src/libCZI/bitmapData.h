@@ -169,6 +169,7 @@ template  <typename tAllocator = CHeapAllocator>
 class CBitonalBitmapData : public libCZI::IBitonalBitmapData
 {
 private:
+    std::uint32_t width_in_pixels_;
     CBitmapData<tAllocator> bitmapData_;
 public:
     static std::shared_ptr<libCZI::IBitonalBitmapData> Create(std::uint32_t width, std::uint32_t height, std::uint32_t pitch = 0)
@@ -192,18 +193,20 @@ public:
     }
 
     CBitonalBitmapData(tAllocator allocator, std::uint32_t width, std::uint32_t height, std::uint32_t pitch)
-        : bitmapData_(allocator, libCZI::PixelType::Gray8, (width + 7) / 8, height, pitch, 0, 0)
+        : width_in_pixels_(width),
+          bitmapData_(allocator, libCZI::PixelType::Gray8, (width + 7) / 8, height, pitch, 0, 0)
     {
     }
 
     CBitonalBitmapData(std::uint32_t width, std::uint32_t height, std::uint32_t pitch)
-        : bitmapData_(libCZI::PixelType::Gray8, (width + 7) / 8, height, pitch, 0, 0)
+        : width_in_pixels_(width),
+          bitmapData_(libCZI::PixelType::Gray8, (width + 7) / 8, height, pitch, 0, 0)
     {
     }
 
     libCZI::IntSize GetSize() const override
     {
-        return this->GetSize();
+        return { width_in_pixels_, this->bitmapData_.GetHeight() };
     }
 
     libCZI::BitonalBitmapLockInfo Lock() override

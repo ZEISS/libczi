@@ -122,7 +122,7 @@ namespace libCZI
             return libCZI::ISubBlockAttachmentAccessor::GetValidPixelMaskAsUncompressedBitonalBitmap(this);
         }
 
-        std::shared_ptr<libCZI::IBitonalBitmapData>CreateBitonalBitmapFromMaskInfo() const
+        std::shared_ptr<libCZI::IBitonalBitmapData> CreateBitonalBitmapFromMaskInfo() const
         {
             return libCZI::ISubBlockAttachmentAccessor::CreateBitonalBitmapFromMaskInfo(this);
         }

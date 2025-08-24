@@ -51,7 +51,7 @@ namespace
         void SetBuffer(MemBlkType t, const vector<std::uint8_t>& bytes)
         {
             auto buffer = shared_ptr<void>(malloc(bytes.size()), free);
-            memcpy(const_cast<void*>(buffer.get()), bytes.data(), bytes.size());
+            memcpy(buffer.get(), bytes.data(), bytes.size());
             switch (t)
             {
             case Metadata:
@@ -184,7 +184,7 @@ TEST(SubBlockAttachment, GetValidPixelMaskFromChunkContainerScenario1Test)
         {
 
             0x67, 0xea, 0xe3, 0xcb, 0xfc, 0x5b, 0x2b, 0x49, 0xA1, 0x6A, 0xEC, 0xE3, 0x78, 0x03, 0x14, 0x48,
-            12 , 0 , 0 ,0,
+            12, 0 , 0 ,0,
             22, 0 , 0, 0, // width
             23, 0 , 0, 0, // height
             0,  0 , 0, 0, // type of representation 
@@ -220,7 +220,7 @@ TEST(SubBlockAttachment, GetValidPixelMaskFromChunkContainerScenario2Test)
         {
 
             0x67, 0xea, 0xe3, 0xcb, 0xfc, 0x5b, 0x2b, 0x49, 0xA1, 0x6A, 0xEC, 0xE3, 0x78, 0x03, 0x14, 0x48,
-            15 , 0 , 0 ,0,
+            15, 0 , 0 ,0,
             22, 0 , 0, 0,       // width
             23, 0 , 0, 0,       // height
             0,  0 , 0, 0,       // type of representation
@@ -242,4 +242,39 @@ TEST(SubBlockAttachment, GetValidPixelMaskFromChunkContainerScenario2Test)
     ASSERT_EQ(static_cast<const uint8_t*>(mask_info.data.get())[0], 0x50);
     ASSERT_EQ(static_cast<const uint8_t*>(mask_info.data.get())[1], 0x51);
     ASSERT_EQ(static_cast<const uint8_t*>(mask_info.data.get())[2], 0x53);
+}
+
+TEST(SubBlockAttachment, CreateBitonalBitmapFromMaskInfoScenario1Test)
+{
+    string xml_string =
+        "<METADATA>\n"
+        "  <AttachmentSchema>\n"
+        "    <DataFormat>CHUNKCONTAINER</DataFormat>\n"
+        "  </AttachmentSchema>\n"
+        "</METADATA>";
+    vector<uint8_t> metadata(xml_string.begin(), xml_string.end());
+
+    auto mockSubBlock = make_shared<MockSubBlockOnlyAttachment>();
+    mockSubBlock->SetBuffer(libCZI::ISubBlock::MemBlkType::Metadata, metadata);
+    mockSubBlock->SetBuffer(libCZI::ISubBlock::MemBlkType::Attachment,
+        {
+
+            0x67, 0xea, 0xe3, 0xcb, 0xfc, 0x5b, 0x2b, 0x49, 0xA1, 0x6A, 0xEC, 0xE3, 0x78, 0x03, 0x14, 0x48,
+            18, 0 , 0 ,0,
+            3, 0 , 0, 0,       // width
+            2, 0 , 0, 0,       // height
+            0, 0 , 0, 0,      // type of representation
+            1, 0, 0, 0,        // stride
+            0x55, 0x56,        // some data
+        });
+
+    auto sub_block_metadata = CreateSubBlockMetadataFromSubBlock(mockSubBlock.get());
+    ASSERT_NE(sub_block_metadata, nullptr);
+
+    auto sub_block_metadata_accessor = CreateSubBlockAttachmentAccessor(mockSubBlock, sub_block_metadata);
+
+    auto mask_bitonal_bitmap = sub_block_metadata_accessor->CreateBitonalBitmapFromMaskInfo();
+
+    ASSERT_EQ(mask_bitonal_bitmap->GetSize().w, 3);
+    ASSERT_EQ(mask_bitonal_bitmap->GetSize().h, 2);
 }
