@@ -130,3 +130,40 @@ TEST(SubBlockAttachment, BasicTest)
     const GUID g{ 0x04030201, 0x0605, 0x0807, { 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f, 0x10 } };
     ASSERT_EQ(chunks[0].guid, g);
 }
+
+TEST(SubBlockAttachment, InvalidChunkContainer1Test)
+{
+    string xml_string =
+        "<METADATA>\n"
+        "  <AttachmentSchema>\n"
+        "    <DataFormat>CHUNKCONTAINER</DataFormat>\n"
+        "  </AttachmentSchema>\n"
+        "</METADATA>";
+    vector<uint8_t> metadata(xml_string.begin(), xml_string.end());
+
+    auto mockSubBlock = make_shared<MockSubBlockOnlyAttachment>();
+    mockSubBlock->SetBuffer(libCZI::ISubBlock::MemBlkType::Metadata, metadata);
+    mockSubBlock->SetBuffer(libCZI::ISubBlock::MemBlkType::Attachment,
+        {
+            // this is too short to be a valid chunk container
+            1, 2, 3, 4 , 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
+            1 , 0 , 0 ,0
+        });
+
+    auto sub_block_metadata = CreateSubBlockMetadataFromSubBlock(mockSubBlock.get());
+    ASSERT_NE(sub_block_metadata, nullptr);
+
+    auto sub_block_metadata_accessor = CreateSubBlockAttachmentAccessor(mockSubBlock, sub_block_metadata);
+
+    vector<ISubBlockAttachmentAccessor::ChunkInfo> chunks;
+    // Option 2: Use EXPECT_ANY_THROW if you don't care about specific exception type
+    EXPECT_ANY_THROW(
+        sub_block_metadata_accessor->EnumerateChunksInChunkContainer(
+            [&chunks](int index, const ISubBlockAttachmentAccessor::ChunkInfo& info)
+            {
+                chunks.push_back(info);
+                return true; // continue enumeration
+            }),
+        libCZI::LibCZIException
+    );
+}
