@@ -4,7 +4,7 @@
 
 #include "pugixml.hpp"
 #include "XmlNodeWrapper.h"
-#include "libCZI_Exceptions.h"
+#include "libCZI_exceptions.h"
 
 #include <memory>
 #include <string>
