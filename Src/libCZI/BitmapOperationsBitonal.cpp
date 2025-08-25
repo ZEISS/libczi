@@ -149,7 +149,7 @@ namespace
         for (int x = 0; x < numberOfDwords; ++x)
         {
             uint8_t byteAfter = GetByteAfter(ptrSrc, (x * 4) + 4, widthSrc);
-            uint32_t dw = CEndianessConv::BswapDWORD(GetDword(y, height, (void*)(((uintptr_t)ptrSrc) + x * 4), strideSrc));
+            uint32_t dw = CEndianessConv::BswapDWORD(DecimateHelpers<tregionSize>::GetDword(y, height, (void*)(((uintptr_t)ptrSrc) + x * 4), strideSrc)); ///< The double-word
             uint16_t dest = FilterDword(dw, byteBefore, byteAfter);
             byteBefore = (uint8_t)(dw);
             *((uint16_t*)(((uintptr_t)ptrDest) + 2 * x)) = CEndianessConv::BswapUSHORT(dest);
@@ -159,7 +159,7 @@ namespace
         if (bitsRemaining > 0)
         {
             // we continue to operate DWORD-wise, we are just careful...
-            uint32_t dw = CEndianessConv::BswapDWORD(GetDwordPartial(y, height, (void*)(((uintptr_t)ptrSrc) + numberOfDwords * 4), bitsRemaining, strideSrc));
+            uint32_t dw = CEndianessConv::BswapDWORD(DecimateHelpers<tregionSize>::GetDwordPartial(y, height, (void*)(((uintptr_t)ptrSrc) + numberOfDwords * 4), bitsRemaining, strideSrc));
 
             // the filter the DWORD as usually
             uint16_t dest = FilterDword(dw, byteBefore, 0xff);
