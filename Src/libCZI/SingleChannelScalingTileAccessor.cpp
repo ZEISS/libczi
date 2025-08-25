@@ -153,7 +153,14 @@ void CSingleChannelScalingTileAccessor::ScaleBlt(libCZI::IBitmapData* bmDest, fl
             dstRoi.w *= bmDest->GetWidth();
             dstRoi.h *= bmDest->GetHeight();
 
-            BitmapOperationsBitonal::NNResizeMaskAware(source.get(), source_mask.get(), bmDest, srcRoi, dstRoi);
+            if (source_mask)
+            {
+                BitmapOperationsBitonal::NNResizeMaskAware(source.get(), source_mask.get(), bmDest, srcRoi, dstRoi);
+            }
+            else
+            {
+                CBitmapOperations::NNResize(source.get(), bmDest, srcRoi, dstRoi);
+            }
         }
         else
         {

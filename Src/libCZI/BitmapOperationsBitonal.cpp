@@ -613,48 +613,29 @@ namespace
     const libCZI::DblRect& roiDst)
 {
     // Implement the nearest neighbor resizing with mask awareness 
+    ScopedBitmapLockerP lckSrc{ bmSrc };
+    ScopedBitmapLockerP lckDst{ bmDest };
+    ScopedBitonalBitmapLockerP lckSrcMask{ bmSrcMask };
+
     NNResizeMaskAwareInfo2Dbl resizeInfo;
+    resizeInfo.srcPtr = lckSrc.ptrDataRoi;
+    resizeInfo.srcStride = lckSrc.stride;
+    resizeInfo.srcMaskPtr = lckSrcMask.ptrData;
+    resizeInfo.srcMaskStride = lckSrcMask.stride;
     resizeInfo.srcRoiX = roiSrc.x;
     resizeInfo.srcRoiY = roiSrc.y;
     resizeInfo.srcRoiW = roiSrc.w;
     resizeInfo.srcRoiH = roiSrc.h;
     resizeInfo.srcWidth = bmSrc->GetWidth();
     resizeInfo.srcHeight = bmSrc->GetHeight();
+    resizeInfo.dstPtr = lckDst.ptrDataRoi;
+    resizeInfo.dstStride = lckDst.stride;
     resizeInfo.dstRoiX = roiDst.x;
     resizeInfo.dstRoiY = roiDst.y;
     resizeInfo.dstRoiW = roiDst.w;
     resizeInfo.dstRoiH = roiDst.h;
     resizeInfo.dstWidth = bmDest->GetWidth();
     resizeInfo.dstHeight = bmDest->GetHeight();
-
-    if (bmSrcMask == nullptr)
-    {
-        ScopedBitmapLockerP lckSrc{ bmSrc };
-        ScopedBitmapLockerP lckDst{ bmDest };
-
-        NNResizeMaskAwareInfo2Dbl resizeInfo;
-        resizeInfo.srcPtr = lckSrc.ptrDataRoi;
-        resizeInfo.srcStride = lckSrc.stride;
-        resizeInfo.srcMaskPtr = nullptr;
-        resizeInfo.srcMaskStride = 0;
-        resizeInfo.dstPtr = lckDst.ptrDataRoi;
-        resizeInfo.dstStride = lckDst.stride;
-        NNScaleMaskAware2<double>(bmSrc->GetPixelType(), bmDest->GetPixelType(), resizeInfo);
-    }
-    else
-    {
-        ScopedBitmapLockerP lckSrc{ bmSrc };
-        ScopedBitmapLockerP lckDst{ bmDest };
-        ScopedBitonalBitmapLockerP lckSrcMask{ bmSrcMask };
-
-        NNResizeMaskAwareInfo2Dbl resizeInfo;
-        resizeInfo.srcPtr = lckSrc.ptrDataRoi;
-        resizeInfo.srcStride = lckSrc.stride;
-        resizeInfo.srcMaskPtr = lckSrcMask.ptrData;
-        resizeInfo.srcMaskStride = lckSrcMask.stride;
-        resizeInfo.dstPtr = lckDst.ptrDataRoi;
-        resizeInfo.dstStride = lckDst.stride;
-        NNScaleMaskAware2<double>(bmSrc->GetPixelType(), bmDest->GetPixelType(), resizeInfo);
-    }
+    NNScaleMaskAware2<double>(bmSrc->GetPixelType(), bmDest->GetPixelType(), resizeInfo);
 }
 
