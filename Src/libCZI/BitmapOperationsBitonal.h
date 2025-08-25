@@ -5,6 +5,7 @@
 
 #include "libCZI_Pixels.h"
 
+/// Here we gather operations that are specific to bitonal bitmaps.
 class BitmapOperationsBitonal
 {
 public:
@@ -30,6 +31,23 @@ public:
         return (*ptr & (1 << (7 - (x % 8)))) != 0;
     }
 
+    /// Get a value indicating if the pixel specified by its x and y coordinate is true or false.
+    /// This version does not check whether x or y exceeds the size of the bitmap (so it is the caller's
+    /// responsibility to ensure that x and y are within bounds).
+    ///
+    /// \param 	x	   	The x coordinate of the pixel to query.
+    /// \param 	y	   	The y coordinate of the pixel to query.
+    /// \param 	width  	The width of the bitonal bitmap.
+    /// \param 	height 	The height of the bitonal bitmap.
+    /// \param 	ptrData	Pointer to the start of the bitonal bitmap data.
+    /// \param 	stride 	The stride (in units of bytes).
+    ///
+    /// \returns	True if the pixel is "1", false if the pixel is "0".
+    static bool GetPixelFromBitonalUnchecked(std::uint32_t x, std::uint32_t y, std::uint32_t width, std::uint32_t height, const void* ptrData, std::uint32_t stride)
+    {
+        const std::uint8_t* ptr = static_cast<const std::uint8_t*>(ptrData) + static_cast<size_t>(y) * stride + (x / 8);
+        return (*ptr & (1 << (7 - (x % 8)))) != 0;
+    }
 
     /// Decimates the bitonal image by a factor of two. A bit in the destination bitmap is set if all
     /// bits in a neighborhood with size specified by region_size are set in the source bitmap.

@@ -450,7 +450,7 @@ namespace
                     srcXInt = resizeInfo.srcWidth - 1;
                 }
 
-                if (BitmapOperationsBitonal::GetPixelFromBitonal(srcXInt, srcYInt, resizeInfo.srcWidth, resizeInfo.srcHeight, resizeInfo.srcMaskPtr, resizeInfo.srcMaskStride))
+                if (BitmapOperationsBitonal::GetPixelFromBitonalUnchecked(srcXInt, srcYInt, resizeInfo.srcWidth, resizeInfo.srcHeight, resizeInfo.srcMaskPtr, resizeInfo.srcMaskStride))
                 {
                     const char* pSrc = pSrcLine + srcXInt * static_cast<size_t>(bytesPerPelSrc);
                     char* pDst = pDstLine + x * static_cast<size_t>(bytesPerPelDest);
