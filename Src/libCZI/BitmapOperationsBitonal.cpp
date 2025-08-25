@@ -74,8 +74,8 @@ namespace
         static std::uint32_t ReadPartial(const void* ptr, int bitcount);
     };
 
-    template <int regionSize, class CEndianessConv = EndianConverterForHost>
-    class DecimateBitonal : DecimateHelpers < regionSize >
+    template <int tregionSize, class CEndianessConv = EndianConverterForHost>
+    class DecimateBitonal : DecimateHelpers<tregionSize>
     {
     public:
         static void Decimate(const void* ptrSrc, int strideSrc, int widthSrc, int heightSrc, void* ptrDest, int strideDest, int widthDest, int heightDest);
@@ -108,8 +108,8 @@ namespace
     };
 
 
-    template <int regionSize, class CEndianessConv>
-    /*static*/void DecimateBitonal<regionSize, CEndianessConv>::Decimate(const void* ptrSrc, int strideSrc, int widthSrc, int heightSrc, void* ptrDest, int strideDest, int widthDest, int heightDest)
+    template <int tregionSize, class CEndianessConv>
+    /*static*/void DecimateBitonal<tregionSize, CEndianessConv>::Decimate(const void* ptrSrc, int strideSrc, int widthSrc, int heightSrc, void* ptrDest, int strideDest, int widthDest, int heightDest)
     {
         for (int y = 0; y < heightDest; ++y)
         {
@@ -126,8 +126,8 @@ namespace
         }
     }
 
-    template <int regionSize, class CEndianessConv>
-    /*static*/std::uint16_t DecimateBitonal<regionSize, CEndianessConv>::FilterDword(std::uint32_t dw, std::uint8_t byteBefore, std::uint8_t byteAfter)
+    template <int tregionSize, class CEndianessConv>
+    /*static*/std::uint16_t DecimateBitonal<tregionSize, CEndianessConv>::FilterDword(std::uint32_t dw, std::uint8_t byteBefore, std::uint8_t byteAfter)
     {
         const std::uint64_t v0 = byteAfter | (((std::uint64_t)dw) << 8) | (((std::uint64_t)byteBefore) << 40);
         const std::uint64_t v = Filter(v0);
@@ -139,8 +139,8 @@ namespace
         return dest;
     }
 
-    template <int regionSize, class CEndianessConv>
-    /*static*/void DecimateBitonal<regionSize, CEndianessConv>::DecimateLine(int y, int height, int regionSize, const uint8_t* ptrSrc, int widthSrc, int strideSrc, uint8_t* ptrDest, int widthDest, int strideDest)
+    template <int tregionSize, class CEndianessConv>
+    /*static*/void DecimateBitonal<tregionSize, CEndianessConv>::DecimateLine(int y, int height, int regionSize, const uint8_t* ptrSrc, int widthSrc, int strideSrc, uint8_t* ptrDest, int widthDest, int strideDest)
     {
         uint8_t byteBefore = 0xff;
 
@@ -175,8 +175,8 @@ namespace
         }
     }
 
-    template <int regionSize, class CEndianessConv>
-    uint8_t DecimateBitonal<regionSize, CEndianessConv>::GetByteAfter(const void* ptr, int x, int width)
+    template <int tregionSize, class CEndianessConv>
+    uint8_t DecimateBitonal<tregionSize, CEndianessConv>::GetByteAfter(const void* ptr, int x, int width)
     {
         if (x < width)
         {
