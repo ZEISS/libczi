@@ -450,17 +450,12 @@ namespace
                     srcXInt = resizeInfo.srcWidth - 1;
                 }
 
-                if (resizeInfo.srcMaskPtr != nullptr)
+                if (BitmapOperationsBitonal::GetPixelFromBitonal(srcXInt, srcYInt, resizeInfo.srcWidth, resizeInfo.srcHeight, resizeInfo.srcMaskPtr, resizeInfo.srcMaskStride))
                 {
-                    if (BitmapOperationsBitonal::GetPixelFromBitonal(srcXInt, srcYInt, resizeInfo.srcWidth, resizeInfo.srcHeight, resizeInfo.srcMaskPtr, resizeInfo.srcMaskStride) == false)
-                    {
-                        continue;
-                    }
+                    const char* pSrc = pSrcLine + srcXInt * static_cast<size_t>(bytesPerPelSrc);
+                    char* pDst = pDstLine + x * static_cast<size_t>(bytesPerPelDest);
+                    conv.ConvertPixel(pDst, pSrc);
                 }
-
-                const char* pSrc = pSrcLine + srcXInt * static_cast<size_t>(bytesPerPelSrc);
-                char* pDst = pDstLine + x * static_cast<size_t>(bytesPerPelDest);
-                conv.ConvertPixel(pDst, pSrc);
             }
         }
     }
