@@ -8,13 +8,7 @@
 include(CheckSymbolExists)
 include(CheckCSourceCompiles)
 
-function(BoolToYesNo var result_text)
-  if (${var})
-    set( ${result_text} "yes" PARENT_SCOPE)
-  else()
-    set( ${result_text} "no" PARENT_SCOPE)
-  endif()
-endfunction()
+
 
 add_library(JxrDecodeStatic OBJECT 
 							"JxrDecode.h"
@@ -71,6 +65,9 @@ if (CRASH_ON_UNALIGNED_ACCESS)
 else()
   set (jxrdecode_CrashOnUnalignedIntegers 0)
 endif()
+
+#[[
+if (LIBCZI_BUILDCONFIG_HAS_BUILTIN_BSWAP32)
 # c.f. https://stackoverflow.com/questions/41770887/cross-platform-definition-of-byteswap-uint64-and-byteswap-ulong
 # not exactly sure why check_symbol_exists() does not work here, but it does not for me - so we do it the hard way and try to compile a test program
 check_c_source_compiles(
@@ -98,6 +95,22 @@ if (NOT jxrdecode_Has_byteswap_long_in_stdlib)
 endif()
 if (NOT jxrdecode_Has_bswap_long_in_sys_endian)
   set (jxrdecode_Has_bswap_long_in_sys_endian 0)
+endif()
+]]
+if (LIBCZI_BUILDCONFIG_HAS_BUILTIN_BSWAP32)
+	set (jxrdecode_Has_builtin_bswap32 1)
+else()	
+	set (jxrdecode_Has_builtin_bswap32 0)	
+endif()
+if (LIBCZI_BUILDCONFIG_HAS_BYTESWAP_IN_STDLIB_BSWAP32)
+	set (jxrdecode_Has_byteswap_long_in_stdlib 1)
+else()	
+	set (jxrdecode_Has_byteswap_long_in_stdlib 0)
+endif()
+if (LIBCZI_BUILDCONFIG_HAS_BSWAP_IN_SYS_ENDIAN)
+	set (jxrdecode_Has_bswap_long_in_sys_endian 1)
+else()	
+	set (jxrdecode_Has_bswap_long_in_sys_endian 0)
 endif()
 
 # Here we check for the _rotl() function - c.f. https://stackoverflow.com/questions/776508/best-practices-for-circular-shift-rotate-operations-in-c
