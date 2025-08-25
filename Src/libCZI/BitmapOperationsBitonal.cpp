@@ -130,7 +130,7 @@ namespace
     /*static*/std::uint16_t DecimateBitonal<tregionSize, CEndianessConv>::FilterDword(std::uint32_t dw, std::uint8_t byteBefore, std::uint8_t byteAfter)
     {
         const std::uint64_t v0 = byteAfter | (((std::uint64_t)dw) << 8) | (((std::uint64_t)byteBefore) << 40);
-        const std::uint64_t v = Filter(v0);
+        const std::uint64_t v = DecimateHelpers<tregionSize>::Filter(v0);
         const std::uint16_t b1 = DecimateBitonalTable[(std::uint8_t)(v >> 8)];
         const std::uint16_t b2 = DecimateBitonalTable[(std::uint8_t)(v >> 16)];
         const std::uint16_t b3 = DecimateBitonalTable[(std::uint8_t)(v >> 24)];
