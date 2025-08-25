@@ -47,3 +47,4 @@ Version history
  0.66.4             | [145](https://github.com/ZEISS/libczi/pull/145)      | have embedded pugixml in its own namespace, replace md5sum implementation, update 3rd-party license texts
  0.66.5             | [146](https://github.com/ZEISS/libczi/pull/146)      | have jxrlib-symbols mangled to prevent conflicts with other libraries
  0.66.6             | [149](https://github.com/ZEISS/libczi/pull/149)      | prepare for vcpkg features
+ 0.66.7             | [151](https://github.com/ZEISS/libczi/pull/151)      | fix for missing tiles with scaling compositor in rare circumstances
