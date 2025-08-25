@@ -456,7 +456,6 @@ namespace
                     {
                         continue;
                     }
-
                 }
 
                 const char* pSrc = pSrcLine + srcXInt * static_cast<size_t>(bytesPerPelSrc);

@@ -139,8 +139,6 @@ private:
     }
 };
 
-
-
 template <typename tAllocator>
 /*static*/inline std::shared_ptr<libCZI::IBitmapData> CBitmapData<tAllocator>::Create(libCZI::PixelType pixeltype, std::uint32_t width, std::uint32_t height, std::uint32_t pitch /*= 0*/, std::uint32_t extraRows /*= 0*/, std::uint32_t extraColumns /*= 0*/)
 {
@@ -150,7 +148,6 @@ template <typename tAllocator>
     }
 
     auto s = std::make_shared<CBitmapData<tAllocator>>(pixeltype, width, height, pitch, extraRows, extraColumns);
-
     return s;
 }
 
@@ -194,13 +191,13 @@ public:
 
     CBitonalBitmapData(tAllocator allocator, std::uint32_t width, std::uint32_t height, std::uint32_t pitch)
         : width_in_pixels_(width),
-          bitmapData_(allocator, libCZI::PixelType::Gray8, (width + 7) / 8, height, pitch, 0, 0)
+        bitmapData_(allocator, libCZI::PixelType::Gray8, (width + 7) / 8, height, pitch, 0, 0)
     {
     }
 
     CBitonalBitmapData(std::uint32_t width, std::uint32_t height, std::uint32_t pitch)
         : width_in_pixels_(width),
-          bitmapData_(libCZI::PixelType::Gray8, (width + 7) / 8, height, pitch, 0, 0)
+        bitmapData_(libCZI::PixelType::Gray8, (width + 7) / 8, height, pitch, 0, 0)
     {
     }
 
@@ -219,8 +216,15 @@ public:
         return bitonal_bitmap_lock_info;
     }
 
+    int GetLockCount() const override
+    {
+        return this->bitmapData_.GetLockCount();
+    }
+
     void Unlock() override
     {
         this->bitmapData_.Unlock();
     }
 };
+
+typedef CBitonalBitmapData<CHeapAllocator> CStdBitonalBitmapData;

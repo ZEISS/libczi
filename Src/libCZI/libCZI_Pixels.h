@@ -196,6 +196,8 @@ namespace libCZI
     class IBitmapData
     {
     public:
+        /// Default constructor.
+        IBitmapData() = default;
 
         /// Gets pixel type.
         ///
@@ -229,6 +231,18 @@ namespace libCZI
         ///
         /// \returns    The lock count.
         virtual int             GetLockCount() const = 0;
+
+        /// Copy-Constructor - deleted.
+        IBitmapData(const IBitmapData& other) = delete;
+
+        /// move constructor - deleted.
+        IBitmapData(IBitmapData&& other) noexcept = delete;
+
+        /// move assignment - deleted.
+        IBitmapData& operator=(IBitmapData&& other) noexcept = delete;
+
+        /// Copy assignment operator - deleted.
+        IBitmapData& operator=(const IBitmapData& other) = delete;
 
         virtual ~IBitmapData() {}
 
@@ -345,6 +359,30 @@ namespace libCZI
             return *this;
         }
 
+        /// Copy assignment operator.
+        /// \param other The other object.
+        ScopedBitmapLocker<tBitmap>& operator=(const ScopedBitmapLocker<tBitmap>& other)
+        {
+            if (this != &other)
+            {
+                // Unlock current bitmap if we have one
+                if (this->bmData)
+                {
+                    this->bmData->Unlock();
+                }
+
+                // Copy the bitmap reference and lock it
+                this->bmData = other.bmData;
+                auto lockInfo = this->bmData->Lock();
+                this->ptrData = lockInfo.ptrData;
+                this->ptrDataRoi = lockInfo.ptrDataRoi;
+                this->stride = lockInfo.stride;
+                this->size = lockInfo.size;
+            }
+
+            return *this;
+        }
+
         ~ScopedBitmapLocker()
         {
             if (this->bmData)
@@ -372,9 +410,18 @@ namespace libCZI
         std::uint64_t   size;       ///< The size of the bitmap data (pointed to by `ptrData`) in bytes.
     };
 
+    /// This interface is used to represent a bitonal bitmap - i.e. a bitmap where each pixel is represented by a single bit.
+    ///
+    /// In order to access the pixel data, the Lock-method must be called. The information returned 
+    /// from the Lock-method is to be considered valid only until Unlock is called. If a bitmap is
+    /// destroyed while it is locked, this is considered to be a fatal error. It is legal to call Lock
+    /// multiple times, but the calls to Lock and Unlock must be balanced.
     class IBitonalBitmapData
     {
     public:
+        /// Default constructor.
+        IBitonalBitmapData() = default;
+
         /// Gets the size of the bitmap (i.e. its width and height in pixels).
         ///
         /// \return The size (in pixels).
@@ -389,22 +436,74 @@ namespace libCZI
         /// is no longer used.
         virtual void Unlock() = 0;
 
+        /// Get the lock count. Note that this value is only momentarily valid.
+        ///
+        /// \returns    The lock count.
+        virtual int GetLockCount() const = 0;
+
+        /// Copy-Constructor - deleted.
+        IBitonalBitmapData(const IBitonalBitmapData& other) = delete;
+
+        /// move constructor - deleted.
+        IBitonalBitmapData(IBitonalBitmapData&& other) noexcept = delete;
+
+        /// move assignment - deleted.
+        IBitonalBitmapData& operator=(IBitonalBitmapData&& other) noexcept = delete;
+
+        /// Copy assignment operator - deleted.
+        IBitonalBitmapData& operator=(const IBitonalBitmapData& other) = delete;
+
         virtual ~IBitonalBitmapData() = default;
     };
 
     //-------------------------------------------------------------------------
 
-    template <typename tBitmap>
+    /// A helper class used to scope the lock state of a bitonal bitmap.
+    ///
+    /// It is intended to be used like this:
+    /// \code{.cpp}
+    ///          
+    /// libCZI::IBitonalBitmapData* bm = ... // assume that we have a pointer to a bitonal bitmap
+    /// 
+    /// // access the bitonal bitmap's pixels directly within this scope
+    /// libCZI::ScopedBitonalBitmapLocker<libCZI::IBitonalBitmapData*> lckBm{ bm };   // <- will call bm->Lock here
+    /// for (std::uint32_t y  = 0; y < bm->GetHeight(); ++y)
+    /// {
+    ///     const std::uint8_t* ptrLine = ((const std::uint8_t*)lckBm.ptrData) + y * lckBm.stride;
+    ///     // do something with the pixel data...
+    /// }
+    ///     
+    /// // when lckBm goes out of scope, bm->Unlock will be called
+    ///
+    /// \endcode
+    /// 
+    /// For convenience two typedef are provided: `ScopedBitonalBitmapLockerP` and `ScopedBitonalBitmapLockerSP` for
+    /// use with the types `IBitonalBitmapData*` and `std::shared_ptr<IBitonalBitmapData>`.
+    ///
+    ///  \code{.cpp}
+    /// typedef ScopedBitonalBitmapLocker<IBitonalBitmapData*> ScopedBitonalBitmapLockerP;
+    /// typedef ScopedBitonalBitmapLocker<std::shared_ptr<IBitonalBitmapData>> ScopedBitonalBitmapLockerSP;
+    /// \endcode
+    /// 
+    /// So in above sample we could have used 
+    /// \code{.cpp}
+    /// libCZI::ScopedBitonalBitmapLockerP lckBm{ bm };
+    /// \endcode
+    /// 
+    /// This utility is intended to help adhering to the RAII-pattern, since it makes writing exception-safe
+    /// code easier - in case of an exception (within the scope of the ScopedBitonalBitmapLocker object) the bitmap's
+    /// Unlock method will be called (which is cumbersome to achieve otherwise).
+    template <typename tBitonalBitmap>
     class ScopedBitonalBitmapLocker : public BitonalBitmapLockInfo
     {
     private:
-        tBitmap bmData;
+        tBitonalBitmap bmData;
     public:
         ScopedBitonalBitmapLocker() = delete;
 
         /// Constructor taking the object for which we provide the scope-guard.
         /// \param bmData The object for which we are to provide the scope-guard.
-        explicit ScopedBitonalBitmapLocker(tBitmap bmData) : bmData(bmData)
+        explicit ScopedBitonalBitmapLocker(tBitonalBitmap bmData) : bmData(bmData)
         {
             auto lockInfo = bmData->Lock();
             this->ptrData = lockInfo.ptrData;
@@ -414,7 +513,7 @@ namespace libCZI
 
         /// Copy-Constructor .
         /// \param other The other object.
-        ScopedBitonalBitmapLocker(const ScopedBitonalBitmapLocker<tBitmap>& other) : bmData(other.bmData)
+        ScopedBitonalBitmapLocker(const ScopedBitonalBitmapLocker<tBitonalBitmap>& other) : bmData(other.bmData)
         {
             auto lockInfo = other.bmData->Lock();
             this->ptrData = lockInfo.ptrData;
@@ -423,13 +522,13 @@ namespace libCZI
         }
 
         /// move constructor
-        ScopedBitonalBitmapLocker(ScopedBitmapLocker<tBitmap>&& other) noexcept : bmData(tBitmap())
+        ScopedBitonalBitmapLocker(ScopedBitonalBitmapLocker<tBitonalBitmap>&& other) noexcept : bmData(tBitonalBitmap())
         {
             *this = std::move(other);
         }
 
         /// move assignment
-        ScopedBitonalBitmapLocker<tBitmap>& operator=(ScopedBitonalBitmapLocker<tBitmap>&& other) noexcept
+        ScopedBitonalBitmapLocker<tBitonalBitmap>& operator=(ScopedBitonalBitmapLocker<tBitonalBitmap>&& other) noexcept
         {
             if (this != &other)
             {
@@ -443,7 +542,30 @@ namespace libCZI
                 this->stride = other.stride;
                 this->size = other.size;
                 other.ptrData = nullptr;
-                other.bmData = tBitmap();
+                other.bmData = tBitonalBitmap();
+            }
+
+            return *this;
+        }
+
+        /// Copy assignment operator.
+        /// \param other The other object.
+        ScopedBitonalBitmapLocker<tBitonalBitmap>& operator=(const ScopedBitonalBitmapLocker<tBitonalBitmap>& other)
+        {
+            if (this != &other)
+            {
+                // Unlock current bitmap if we have one
+                if (this->bmData)
+                {
+                    this->bmData->Unlock();
+                }
+
+                // Copy the bitonal bitmap reference and lock it
+                this->bmData = other.bmData;
+                auto lockInfo = this->bmData->Lock();
+                this->ptrData = lockInfo.ptrData;
+                this->stride = lockInfo.stride;
+                this->size = lockInfo.size;
             }
 
             return *this;
@@ -458,10 +580,10 @@ namespace libCZI
         }
     };
 
-    /// Defines an alias representing the scoped bitmap locker for use with libCZI::IBitmapData.
+    /// Defines an alias representing the scoped bitmap locker for use with libCZI::IBitonalBitmapData.
     typedef ScopedBitonalBitmapLocker<IBitonalBitmapData*> ScopedBitonalBitmapLockerP;
 
-    /// Defines an alias representing the scoped bitmap locker for use with a shared_ptr of type libCZI::IBitmapData.
+    /// Defines an alias representing the scoped bitmap locker for use with a shared_ptr of type libCZI::IBitonalBitmapData.
     typedef ScopedBitonalBitmapLocker<std::shared_ptr<IBitonalBitmapData>> ScopedBitonalBitmapLockerSP;
 
     //-------------------------------------------------------------------------
