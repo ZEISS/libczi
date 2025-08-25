@@ -5,6 +5,7 @@
 #include "SingleChannelScalingTileAccessor.h"
 #include "utilities.h"
 #include "BitmapOperations.h"
+#include "BitmapOperationsBitonal.h"
 #include "Site.h"
 
 using namespace libCZI;
@@ -82,11 +83,13 @@ CSingleChannelScalingTileAccessor::CSingleChannelScalingTileAccessor(const std::
 
 void CSingleChannelScalingTileAccessor::ScaleBlt(libCZI::IBitmapData* bmDest, float zoom, const libCZI::IntRect& roi, const SbInfo& sbInfo, const libCZI::ISingleChannelScalingTileAccessor::Options& options)
 {
-    auto subblock_bitmap_data = CSingleChannelAccessorBase::GetSubBlockDataForSubBlockIndex(
-        this->sbBlkRepository,
-        options.subBlockCache,
-        sbInfo.index,
-        options.onlyUseSubBlockCacheForCompressedData);
+    auto subblock_bitmap_data = options.maskAware ?
+                                    CSingleChannelAccessorBase::GetSubBlockDataIncludingMaskForSubBlockIndex(this->sbBlkRepository,sbInfo.index) :
+                                    CSingleChannelAccessorBase::GetSubBlockDataForSubBlockIndex(
+                                        this->sbBlkRepository,
+                                        options.subBlockCache,
+                                        sbInfo.index,
+                                        options.onlyUseSubBlockCacheForCompressedData);
     if (GetSite()->IsEnabled(LOGLEVEL_CHATTYINFORMATION))
     {
         stringstream ss;
@@ -95,6 +98,7 @@ void CSingleChannelScalingTileAccessor::ScaleBlt(libCZI::IBitmapData* bmDest, fl
     }
 
     const auto& source = subblock_bitmap_data.bitmap;
+    const auto& source_mask = subblock_bitmap_data.mask;
 
     // In order not to run into trouble with floating point precision, if the scale is exactly 1, we refrain from using the scaling operation
     //  and do instead a simple copy operation. This should ensure a pixel-accurate result if zoom is exactly 1.
@@ -121,33 +125,66 @@ void CSingleChannelScalingTileAccessor::ScaleBlt(libCZI::IBitmapData* bmDest, fl
     }
     else
     {
-        // calculate the intersection of the subblock (logical rect) and the destination
-        const auto intersect = Utilities::Intersect(sbInfo.logicalRect, roi);
+        if (options.maskAware)
+        {
+            // calculate the intersection of the subblock (logical rect) and the destination
+            const auto intersect = Utilities::Intersect(sbInfo.logicalRect, roi);
 
-        const double roiSrcTopLeftX = static_cast<double>(intersect.x - sbInfo.logicalRect.x) / sbInfo.logicalRect.w;
-        const double roiSrcTopLeftY = static_cast<double>(intersect.y - sbInfo.logicalRect.y) / sbInfo.logicalRect.h;
-        const double roiSrcBttmRightX = static_cast<double>(intersect.x + intersect.w - sbInfo.logicalRect.x) / sbInfo.logicalRect.w;
-        const double roiSrcBttmRightY = static_cast<double>(intersect.y + intersect.h - sbInfo.logicalRect.y) / sbInfo.logicalRect.h;
+            const double roiSrcTopLeftX = static_cast<double>(intersect.x - sbInfo.logicalRect.x) / sbInfo.logicalRect.w;
+            const double roiSrcTopLeftY = static_cast<double>(intersect.y - sbInfo.logicalRect.y) / sbInfo.logicalRect.h;
+            const double roiSrcBttmRightX = static_cast<double>(intersect.x + intersect.w - sbInfo.logicalRect.x) / sbInfo.logicalRect.w;
+            const double roiSrcBttmRightY = static_cast<double>(intersect.y + intersect.h - sbInfo.logicalRect.y) / sbInfo.logicalRect.h;
 
-        const double destTopLeftX = static_cast<double>(intersect.x - roi.x) / roi.w;
-        const double destTopLeftY = static_cast<double>(intersect.y - roi.y) / roi.h;
-        const double destBttmRightX = static_cast<double>(intersect.x + intersect.w - roi.x) / roi.w;
-        const double destBttmRightY = static_cast<double>(intersect.y + intersect.h - roi.y) / roi.h;
+            const double destTopLeftX = static_cast<double>(intersect.x - roi.x) / roi.w;
+            const double destTopLeftY = static_cast<double>(intersect.y - roi.y) / roi.h;
+            const double destBttmRightX = static_cast<double>(intersect.x + intersect.w - roi.x) / roi.w;
+            const double destBttmRightY = static_cast<double>(intersect.y + intersect.h - roi.y) / roi.h;
 
-        DblRect srcRoi{ roiSrcTopLeftX ,roiSrcTopLeftY,roiSrcBttmRightX - roiSrcTopLeftX ,roiSrcBttmRightY - roiSrcTopLeftY };
-        DblRect dstRoi{ destTopLeftX ,destTopLeftY,destBttmRightX - destTopLeftX ,destBttmRightY - destTopLeftY };
+            DblRect srcRoi{ roiSrcTopLeftX ,roiSrcTopLeftY,roiSrcBttmRightX - roiSrcTopLeftX ,roiSrcBttmRightY - roiSrcTopLeftY };
+            DblRect dstRoi{ destTopLeftX ,destTopLeftY,destBttmRightX - destTopLeftX ,destBttmRightY - destTopLeftY };
 
-        srcRoi.x *= sbInfo.physicalSize.w;
-        srcRoi.y *= sbInfo.physicalSize.h;
-        srcRoi.w *= sbInfo.physicalSize.w;
-        srcRoi.h *= sbInfo.physicalSize.h;
+            srcRoi.x *= sbInfo.physicalSize.w;
+            srcRoi.y *= sbInfo.physicalSize.h;
+            srcRoi.w *= sbInfo.physicalSize.w;
+            srcRoi.h *= sbInfo.physicalSize.h;
 
-        dstRoi.x *= bmDest->GetWidth();
-        dstRoi.y *= bmDest->GetHeight();
-        dstRoi.w *= bmDest->GetWidth();
-        dstRoi.h *= bmDest->GetHeight();
+            dstRoi.x *= bmDest->GetWidth();
+            dstRoi.y *= bmDest->GetHeight();
+            dstRoi.w *= bmDest->GetWidth();
+            dstRoi.h *= bmDest->GetHeight();
 
-        CBitmapOperations::NNResize(source.get(), bmDest, srcRoi, dstRoi);
+            BitmapOperationsBitonal::NNResizeMaskAware(source.get(), source_mask.get(), bmDest, srcRoi, dstRoi);
+        }
+        else
+        {
+            // calculate the intersection of the subblock (logical rect) and the destination
+            const auto intersect = Utilities::Intersect(sbInfo.logicalRect, roi);
+
+            const double roiSrcTopLeftX = static_cast<double>(intersect.x - sbInfo.logicalRect.x) / sbInfo.logicalRect.w;
+            const double roiSrcTopLeftY = static_cast<double>(intersect.y - sbInfo.logicalRect.y) / sbInfo.logicalRect.h;
+            const double roiSrcBttmRightX = static_cast<double>(intersect.x + intersect.w - sbInfo.logicalRect.x) / sbInfo.logicalRect.w;
+            const double roiSrcBttmRightY = static_cast<double>(intersect.y + intersect.h - sbInfo.logicalRect.y) / sbInfo.logicalRect.h;
+
+            const double destTopLeftX = static_cast<double>(intersect.x - roi.x) / roi.w;
+            const double destTopLeftY = static_cast<double>(intersect.y - roi.y) / roi.h;
+            const double destBttmRightX = static_cast<double>(intersect.x + intersect.w - roi.x) / roi.w;
+            const double destBttmRightY = static_cast<double>(intersect.y + intersect.h - roi.y) / roi.h;
+
+            DblRect srcRoi{ roiSrcTopLeftX ,roiSrcTopLeftY,roiSrcBttmRightX - roiSrcTopLeftX ,roiSrcBttmRightY - roiSrcTopLeftY };
+            DblRect dstRoi{ destTopLeftX ,destTopLeftY,destBttmRightX - destTopLeftX ,destBttmRightY - destTopLeftY };
+
+            srcRoi.x *= sbInfo.physicalSize.w;
+            srcRoi.y *= sbInfo.physicalSize.h;
+            srcRoi.w *= sbInfo.physicalSize.w;
+            srcRoi.h *= sbInfo.physicalSize.h;
+
+            dstRoi.x *= bmDest->GetWidth();
+            dstRoi.y *= bmDest->GetHeight();
+            dstRoi.w *= bmDest->GetWidth();
+            dstRoi.h *= bmDest->GetHeight();
+
+            CBitmapOperations::NNResize(source.get(), bmDest, srcRoi, dstRoi);
+        }
     }
 }
 

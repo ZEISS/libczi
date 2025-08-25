@@ -70,6 +70,7 @@ protected:
     struct SubBlockData
     {
         std::shared_ptr<libCZI::IBitmapData> bitmap;
+        std::shared_ptr<libCZI::IBitonalBitmapData> mask;
         libCZI::SubBlockInfo subBlockInfo;
     };
 
@@ -78,4 +79,9 @@ protected:
         const std::shared_ptr<libCZI::ISubBlockCacheOperation>& cache,
         int subBlockIndex,
         bool onlyAddCompressedSubBlockToCache);
+
+    // EXPERIMENTAL EXPERIMENTAL EXPERIMENTAL EXPERIMENTAL EXPERIMENTAL EXPERIMENTAL EXPERIMENTAL 
+    static SubBlockData GetSubBlockDataIncludingMaskForSubBlockIndex(
+        const std::shared_ptr<libCZI::ISubBlockRepository>& sbBlkRepository, 
+        int subBlockIndex);
 };

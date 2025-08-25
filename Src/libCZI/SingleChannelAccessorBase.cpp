@@ -179,3 +179,29 @@ std::vector<int> CSingleChannelAccessorBase::CheckForVisibility(const libCZI::In
 
     return result;
 }
+
+/*static*/CSingleChannelAccessorBase::SubBlockData CSingleChannelAccessorBase::GetSubBlockDataIncludingMaskForSubBlockIndex(
+    const std::shared_ptr<libCZI::ISubBlockRepository>& sbBlkRepository,
+    int subBlockIndex)
+{
+    SubBlockData result;
+
+    const auto subblock = sbBlkRepository->ReadSubBlock(subBlockIndex);
+    result.bitmap = subblock->CreateBitmap();
+    result.subBlockInfo = subblock->GetSubBlockInfo();
+
+    auto sub_block_metadata = CreateSubBlockMetadataFromSubBlock(subblock.get());
+    if (sub_block_metadata->IsXmlValid())
+    {
+        auto sub_block_attachment_accessor = CreateSubBlockAttachmentAccessor(subblock, sub_block_metadata);
+        try
+        {
+            result.mask = sub_block_attachment_accessor->CreateBitonalBitmapFromMaskInfo();
+        }
+        catch (LibCZIException&)
+        {
+        }
+    }
+
+    return result;
+}

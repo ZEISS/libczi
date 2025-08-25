@@ -492,6 +492,8 @@ namespace libCZI
             /// If true, then only bitmaps from sub-blocks with compressed data are added to the cache.
             bool onlyUseSubBlockCacheForCompressedData;
 
+            bool maskAware;
+
             /// Clears this object to its blank state.
             void Clear()
             {
@@ -500,6 +502,7 @@ namespace libCZI
                 this->backGroundColor.r = this->backGroundColor.g = this->backGroundColor.b = std::numeric_limits<float>::quiet_NaN();
                 this->sceneFilter.reset();
                 this->useVisibilityCheckOptimization = false;
+                this->maskAware = true; // EXPERIMENTAL EXPERIMENTAL EXPERIMENTAL EXPERIMENTAL EXPERIMENTAL EXPERIMENTAL EXPERIMENTAL 
                 this->subBlockCache.reset();
                 this->onlyUseSubBlockCacheForCompressedData = true;
             }

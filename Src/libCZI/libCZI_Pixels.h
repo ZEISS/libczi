@@ -360,6 +360,8 @@ namespace libCZI
     /// Defines an alias representing the scoped bitmap locker for use with a shared_ptr of type libCZI::IBitmapData.
     typedef ScopedBitmapLocker<std::shared_ptr<IBitmapData>> ScopedBitmapLockerSP;
 
+    
+
     //-------------------------------------------------------------------------
 
     /// Information about a locked bitonal bitmap - allowing direct access to the image data in memory.
@@ -389,6 +391,78 @@ namespace libCZI
 
         virtual ~IBitonalBitmapData() = default;
     };
+
+    //-------------------------------------------------------------------------
+
+    template <typename tBitmap>
+    class ScopedBitonalBitmapLocker : public BitonalBitmapLockInfo
+    {
+    private:
+        tBitmap bmData;
+    public:
+        ScopedBitonalBitmapLocker() = delete;
+
+        /// Constructor taking the object for which we provide the scope-guard.
+        /// \param bmData The object for which we are to provide the scope-guard.
+        explicit ScopedBitonalBitmapLocker(tBitmap bmData) : bmData(bmData)
+        {
+            auto lockInfo = bmData->Lock();
+            this->ptrData = lockInfo.ptrData;
+            this->stride = lockInfo.stride;
+            this->size = lockInfo.size;
+        }
+
+        /// Copy-Constructor .
+        /// \param other The other object.
+        ScopedBitonalBitmapLocker(const ScopedBitonalBitmapLocker<tBitmap>& other) : bmData(other.bmData)
+        {
+            auto lockInfo = other.bmData->Lock();
+            this->ptrData = lockInfo.ptrData;
+            this->stride = lockInfo.stride;
+            this->size = lockInfo.size;
+        }
+
+        /// move constructor
+        ScopedBitonalBitmapLocker(ScopedBitmapLocker<tBitmap>&& other) noexcept : bmData(tBitmap())
+        {
+            *this = std::move(other);
+        }
+
+        /// move assignment
+        ScopedBitonalBitmapLocker<tBitmap>& operator=(ScopedBitonalBitmapLocker<tBitmap>&& other) noexcept
+        {
+            if (this != &other)
+            {
+                if (this->bmData)
+                {
+                    this->bmData->Unlock();
+                }
+
+                this->bmData = std::move(other.bmData);
+                this->ptrData = other.ptrData;
+                this->stride = other.stride;
+                this->size = other.size;
+                other.ptrData = nullptr;
+                other.bmData = tBitmap();
+            }
+
+            return *this;
+        }
+
+        ~ScopedBitonalBitmapLocker()
+        {
+            if (this->bmData)
+            {
+                this->bmData->Unlock();
+            }
+        }
+    };
+
+    /// Defines an alias representing the scoped bitmap locker for use with libCZI::IBitmapData.
+    typedef ScopedBitonalBitmapLocker<IBitonalBitmapData*> ScopedBitonalBitmapLockerP;
+
+    /// Defines an alias representing the scoped bitmap locker for use with a shared_ptr of type libCZI::IBitmapData.
+    typedef ScopedBitonalBitmapLocker<std::shared_ptr<IBitonalBitmapData>> ScopedBitonalBitmapLockerSP;
 
     //-------------------------------------------------------------------------
 

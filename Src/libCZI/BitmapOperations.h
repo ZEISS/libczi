@@ -81,18 +81,6 @@ public:
     static std::shared_ptr<libCZI::IBitmapData> ConvertToBigEndian(libCZI::IBitmapData* source);
     static void CopyConvertBigEndian(libCZI::PixelType pixelType, const void* ptrSrc, int srcStride, void* ptrDst, int dstStride, std::uint32_t width, std::uint32_t height);
 
-    /// Get a value indicating if the pixel specified by its x and y coordinate is true or false.
-    /// If x or y exceeds the size of the bitmap, an exception is thrown.
-    ///
-    /// \param 	x	   	The x coordinate of the pixel to query.
-    /// \param 	y	   	The y coordinate of the pixel to query.
-    /// \param 	width  	The width of the bitonal bitmap.
-    /// \param 	height 	The height of the bitonal bitmap.
-    /// \param 	ptrData	Pointer to the start of the bitonal bitmap data.
-    /// \param 	stride 	The stride (in units of bytes).
-    ///
-    /// \returns	True if the pixel is "1", false if the pixel is "0".
-    static bool GetPixelFromBitonal(std::uint32_t x, std::uint32_t y, std::uint32_t width, std::uint32_t height, const void* ptrData, std::uint32_t stride);
 private:
 
     template <libCZI::PixelType tSrcPixelType, libCZI::PixelType tDstPixelType, typename tPixelConverter, typename tFlt>

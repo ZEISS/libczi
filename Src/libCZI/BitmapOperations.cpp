@@ -419,15 +419,3 @@ void CBitmapOperations::Fill_Bgra32(int w, int h, void* ptr, int stride, std::ui
         throw std::logic_error("Function not yet implemented for the specified pixeltype.");
     }
 }
-
-
-bool CBitmapOperations::GetPixelFromBitonal(std::uint32_t x, std::uint32_t y, std::uint32_t width, std::uint32_t height, const void* ptrData, std::uint32_t stride)
-{
-    if (x >= width || y >= height)
-    {
-        throw std::out_of_range("Coordinates out of bounds.");
-    }
-
-    const std::uint8_t* ptr = static_cast<const std::uint8_t*>(ptrData) + static_cast<size_t>(y) * stride + (x / 8);
-    return (*ptr & (1 << (7 - (x % 8)))) != 0;
-}

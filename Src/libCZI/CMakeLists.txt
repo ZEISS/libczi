@@ -128,6 +128,8 @@ set(LIBCZISRCFILES
             SubblockMetadata.cpp
             SubblockAttachmentAccessor.h
             SubblockAttachmentAccessor.cpp
+            BitmapOperationsBitonal.h
+            BitmapOperationsBitonal.cpp
 )
 
 # prepare the configuration-file "libCZI_Config.h"
