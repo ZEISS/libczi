@@ -109,7 +109,7 @@ namespace libCZI
     public:
         /// Gets the bitmap for the specified subblock-index. If the subblock is not in the cache, then a nullptr is returned.
         /// \param  subblock_index  The subblock index to get.
-        /// \returns    If the subblock is in the cache, then a std::shared_ptr&lt;libCZI::IBitmapData&gt; is returned. Otherwise a nullptr is returned.
+        /// \returns    If the subblock is in the cache, then a std::shared_ptr&lt;libCZI::IBitmapData&gt; is returned. Otherwise, a nullptr is returned.
         virtual std::shared_ptr<IBitmapData> Get(int subblock_index) = 0;
 
         /// Adds the specified bitmap for the specified subblock_index to the cache. If the subblock is already in the cache, then it is overwritten.
@@ -131,7 +131,7 @@ namespace libCZI
     ///   to a cache object, where the subblock-index is the key.
     /// * Whenever a bitmap is needed (for a given subblock-index), the cache object is first queried whether it contains the bitmap. If yes, then the bitmap  
     ///   returned may be used instead of executing the subblock-read-and-decode operation.
-    /// In order to control the memory usage of the cache, the cache object must be pruned (i.e. subblocks are removed from the cache). Currently this means,
+    /// In order to control the memory usage of the cache, the cache object must be pruned (i.e. subblocks are removed from the cache). Currently, this means,
     /// that the Prune-method must be called manually. The cache object does not do any pruning automatically.
     /// The operations of Adding, Querying and Pruning the cache object are thread-safe.
     class ISubBlockCache : public ISubBlockCacheStatistics, public ISubBlockCacheControl, public ISubBlockCacheOperation
@@ -146,7 +146,7 @@ namespace libCZI
         ISubBlockCache& operator=(ISubBlockCache&&) noexcept = delete;
     };
 
-    /// The base interface (all accessor-interface must derive from this).
+    /// The base interface (all accessor-interfaces must derive from this).
     class IAccessor
     {
     protected:
