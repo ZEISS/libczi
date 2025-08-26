@@ -82,6 +82,11 @@ protected:
 
     // EXPERIMENTAL EXPERIMENTAL EXPERIMENTAL EXPERIMENTAL EXPERIMENTAL EXPERIMENTAL EXPERIMENTAL 
     static SubBlockData GetSubBlockDataIncludingMaskForSubBlockIndex(
-        const std::shared_ptr<libCZI::ISubBlockRepository>& sbBlkRepository, 
-        int subBlockIndex);
+        const std::shared_ptr<libCZI::ISubBlockRepository>& sbBlkRepository,
+        const std::shared_ptr<libCZI::ISubBlockCacheOperation>& cache,
+        int subBlockIndex,
+        bool onlyAddCompressedSubBlockToCache,
+        bool mask_aware_mode);
+
+    static std::shared_ptr<libCZI::IBitonalBitmapData> TryToGetMaskBitmapFromSubBlock(const std::shared_ptr<libCZI::ISubBlock>& sub_block);
 };

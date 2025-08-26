@@ -83,13 +83,19 @@ CSingleChannelScalingTileAccessor::CSingleChannelScalingTileAccessor(const std::
 
 void CSingleChannelScalingTileAccessor::ScaleBlt(libCZI::IBitmapData* bmDest, float zoom, const libCZI::IntRect& roi, const SbInfo& sbInfo, const libCZI::ISingleChannelScalingTileAccessor::Options& options)
 {
-    auto subblock_bitmap_data = options.maskAware ?
+    auto subblock_bitmap_data = CSingleChannelAccessorBase::GetSubBlockDataIncludingMaskForSubBlockIndex(
+                                                                            this->sbBlkRepository,
+                                                                            options.subBlockCache,
+                                                                            sbInfo.index,
+                                                                            options.onlyUseSubBlockCacheForCompressedData,
+                                                                            options.maskAware);
+    /*auto subblock_bitmap_data = options.maskAware ?
                                     CSingleChannelAccessorBase::GetSubBlockDataIncludingMaskForSubBlockIndex(this->sbBlkRepository,sbInfo.index) :
                                     CSingleChannelAccessorBase::GetSubBlockDataForSubBlockIndex(
                                         this->sbBlkRepository,
                                         options.subBlockCache,
                                         sbInfo.index,
-                                        options.onlyUseSubBlockCacheForCompressedData);
+                                        options.onlyUseSubBlockCacheForCompressedData);*/
     if (GetSite()->IsEnabled(LOGLEVEL_CHATTYINFORMATION))
     {
         stringstream ss;

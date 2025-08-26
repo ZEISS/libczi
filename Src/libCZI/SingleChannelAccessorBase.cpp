@@ -153,7 +153,7 @@ std::vector<int> CSingleChannelAccessorBase::CheckForVisibility(const libCZI::In
     else
     {
         const auto bitmap_from_cache = cache->Get(subBlockIndex);
-        if (bitmap_from_cache)
+        if (bitmap_from_cache.IsValid())
         {
             const bool b = sbBlkRepository->TryGetSubBlockInfo(subBlockIndex, &result.subBlockInfo);
             if (!b)
@@ -163,7 +163,7 @@ std::vector<int> CSingleChannelAccessorBase::CheckForVisibility(const libCZI::In
                 throw logic_error(ss.str());
             }
 
-            result.bitmap = bitmap_from_cache;
+            result.bitmap = bitmap_from_cache.bitmap;
         }
         else
         {
@@ -172,7 +172,7 @@ std::vector<int> CSingleChannelAccessorBase::CheckForVisibility(const libCZI::In
             result.subBlockInfo = subblock->GetSubBlockInfo();
             if (!onlyAddCompressedSubBlockToCache || result.subBlockInfo.GetCompressionMode() != CompressionMode::UnCompressed)
             {
-                cache->Add(subBlockIndex, result.bitmap);
+                cache->Add(subBlockIndex, { result.bitmap, nullptr });
             }
         }
     }
@@ -182,8 +182,63 @@ std::vector<int> CSingleChannelAccessorBase::CheckForVisibility(const libCZI::In
 
 /*static*/CSingleChannelAccessorBase::SubBlockData CSingleChannelAccessorBase::GetSubBlockDataIncludingMaskForSubBlockIndex(
     const std::shared_ptr<libCZI::ISubBlockRepository>& sbBlkRepository,
-    int subBlockIndex)
+    const std::shared_ptr<libCZI::ISubBlockCacheOperation>& cache,
+    int subBlockIndex,
+    bool onlyAddCompressedSubBlockToCache,
+    bool mask_aware_mode)
 {
+    SubBlockData result;
+
+    // if no cache-object is given, then we simply read the subblock and create a bitmap from it
+    if (!cache)
+    {
+        const auto subblock = sbBlkRepository->ReadSubBlock(subBlockIndex);
+        result.bitmap = subblock->CreateBitmap();
+        result.subBlockInfo = subblock->GetSubBlockInfo();
+        result.mask = mask_aware_mode ? CSingleChannelAccessorBase::TryToGetMaskBitmapFromSubBlock(subblock) : nullptr;
+    }
+    else
+    {
+        const auto bitmap_from_cache = cache->Get(subBlockIndex);
+        if (bitmap_from_cache.IsValid())
+        {
+            const bool b = sbBlkRepository->TryGetSubBlockInfo(subBlockIndex, &result.subBlockInfo);
+            if (!b)
+            {
+                stringstream ss;
+                ss << "SubBlockInfo not found in repository for subblock index " << subBlockIndex << ".";
+                throw logic_error(ss.str());
+            }
+
+            result.bitmap = bitmap_from_cache.bitmap;
+            result.mask = bitmap_from_cache.mask;
+        }
+        else
+        {
+            const auto subblock = sbBlkRepository->ReadSubBlock(subBlockIndex);
+            result.bitmap = subblock->CreateBitmap();
+            result.mask = mask_aware_mode ? CSingleChannelAccessorBase::TryToGetMaskBitmapFromSubBlock(subblock) : nullptr;
+            result.subBlockInfo = subblock->GetSubBlockInfo();
+            if (!onlyAddCompressedSubBlockToCache || result.subBlockInfo.GetCompressionMode() != CompressionMode::UnCompressed)
+            {
+                cache->Add(subBlockIndex, { result.bitmap, result.mask });
+            }
+        }
+    }
+
+    return result;
+
+    /*
+
+
+
+
+
+
+
+
+
+
     SubBlockData result;
 
     const auto subblock = sbBlkRepository->ReadSubBlock(subBlockIndex);
@@ -204,4 +259,23 @@ std::vector<int> CSingleChannelAccessorBase::CheckForVisibility(const libCZI::In
     }
 
     return result;
+    */
+}
+
+/*static*/std::shared_ptr<libCZI::IBitonalBitmapData> CSingleChannelAccessorBase::TryToGetMaskBitmapFromSubBlock(const std::shared_ptr<libCZI::ISubBlock>& sub_block)
+{
+    auto sub_block_metadata = CreateSubBlockMetadataFromSubBlock(sub_block.get());
+    if (sub_block_metadata->IsXmlValid())
+    {
+        auto sub_block_attachment_accessor = CreateSubBlockAttachmentAccessor(sub_block, sub_block_metadata);
+        try
+        {
+            return sub_block_attachment_accessor->CreateBitonalBitmapFromMaskInfo();
+        }
+        catch (LibCZIException&)
+        {
+        }
+    }
+
+    return {};
 }

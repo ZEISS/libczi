@@ -107,15 +107,30 @@ namespace libCZI
     class ISubBlockCacheOperation
     {
     public:
+        struct CacheItem
+        {
+            CacheItem() = default;
+            CacheItem(std::shared_ptr<IBitmapData> bitmap) : bitmap(std::move(bitmap)) {}
+            CacheItem(std::shared_ptr<IBitmapData> bitmap, std::shared_ptr<IBitonalBitmapData> mask) : bitmap(std::move(bitmap)), mask(std::move(mask)) {}
+
+            std::shared_ptr<IBitmapData> bitmap;
+            std::shared_ptr<IBitonalBitmapData> mask;
+
+            bool IsValid() const
+            {
+                return static_cast<bool>(this->bitmap);
+            }
+        };
+
         /// Gets the bitmap for the specified subblock-index. If the subblock is not in the cache, then a nullptr is returned.
         /// \param  subblock_index  The subblock index to get.
-        /// \returns    If the subblock is in the cache, then a std::shared_ptr&lt;libCZI::IBitmapData&gt; is returned. Otherwise, a nullptr is returned.
-        virtual std::shared_ptr<IBitmapData> Get(int subblock_index) = 0;
+        /// \returns    If the subblock is in the cache, then a valid CacheItem is returned, otherwise an invalid CacheItem (i.e. CacheItem::IsValid() returns false).
+        virtual CacheItem Get(int subblock_index) = 0;
 
         /// Adds the specified bitmap for the specified subblock_index to the cache. If the subblock is already in the cache, then it is overwritten.
         /// \param  subblock_index  The subblock index to add.
         /// \param  pBitmap         The bitmap.
-        virtual void Add(int subblock_index, std::shared_ptr<IBitmapData> pBitmap) = 0;
+        virtual void Add(int subblock_index, /*std::shared_ptr<IBitmapData> pBitmap*/const CacheItem& cache_item) = 0;
 
         virtual ~ISubBlockCacheOperation() = default;
 

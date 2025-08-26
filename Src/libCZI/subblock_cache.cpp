@@ -38,38 +38,40 @@ ISubBlockCacheStatistics::Statistics SubBlockCache::GetStatistics(std::uint8_t m
     return result;
 }
 
-std::shared_ptr<IBitmapData> SubBlockCache::Get(int subblock_index)
+ISubBlockCacheOperation::CacheItem/*std::shared_ptr<IBitmapData>*/ SubBlockCache::Get(int subblock_index)
 {
     lock_guard<mutex> lck(this->mutex_);
     const auto element = this->cache_.find(subblock_index);
     if (element != this->cache_.end())
     {
         element->second.lru_value = this->lru_counter_.fetch_add(1);
-        return element->second.bitmap;
+        return { element->second.bitmap, element->second.mask };
     }
 
     return {};
 }
 
-void SubBlockCache::Add(int subblock_index, std::shared_ptr<IBitmapData> bitmap)
+void SubBlockCache::Add(int subblock_index, /*std::shared_ptr<IBitmapData> bitmap*/const ISubBlockCacheOperation::CacheItem& cache_item)
 {
-    const auto size_in_bytes_of_added_bitmap = SubBlockCache::CalculateSizeInBytes(bitmap.get());
-    const auto entry_to_be_added = CacheEntry{ bitmap, this->lru_counter_.fetch_add(1) };
+    const auto size_of_added_cache_item = SubBlockCache::CalculateSizeInBytes(cache_item.bitmap.get(), cache_item.mask.get());
+    //const auto size_in_bytes_of_added_bitmap = SubBlockCache::CalculateSizeInBytes(cache_item.bitmap.get()/*bitmap.get()*/);
+    //const auto size_in_bytes_of_added_mask = SubBlockCache::CalculateSizeInBytes(cache_item.mask.get());
+    const auto entry_to_be_added = CacheEntry{ cache_item.bitmap, cache_item.mask, this->lru_counter_.fetch_add(1) };
 
     lock_guard<mutex> lck(this->mutex_);
     const auto result = this->cache_.insert({ subblock_index, entry_to_be_added });
     if (result.second)
     {
         // New element inserted
-        this->cache_size_in_bytes_ += size_in_bytes_of_added_bitmap;
+        this->cache_size_in_bytes_ += size_of_added_cache_item;// size_in_bytes_of_added_bitmap;
         ++this->cache_subblock_count_;
     }
     else
     {
         // Element with the same key already existed
-        this->cache_size_in_bytes_ -= SubBlockCache::CalculateSizeInBytes(result.first->second.bitmap.get());
+        this->cache_size_in_bytes_ -= SubBlockCache::CalculateSizeInBytes(result.first->second.bitmap.get(), result.first->second.mask.get());//SubBlockCache::CalculateSizeInBytes(result.first->second.bitmap.get());
         result.first->second = entry_to_be_added;
-        this->cache_size_in_bytes_ += size_in_bytes_of_added_bitmap;
+        this->cache_size_in_bytes_ += size_of_added_cache_item/*size_in_bytes_of_added_bitmap*/;
     }
 }
 
@@ -97,7 +99,7 @@ void SubBlockCache::PruneByMemoryUsageAndElementCount(std::uint64_t max_memory_u
             break;
         }
 
-        this->cache_size_in_bytes_ -= SubBlockCache::CalculateSizeInBytes(oldest_element->second.bitmap.get());
+        this->cache_size_in_bytes_ -= SubBlockCache::CalculateSizeInBytes(oldest_element->second); /// SubBlockCache::CalculateSizeInBytes(oldest_element->second.bitmap.get());
         --this->cache_subblock_count_;
         this->cache_.erase(oldest_element);
     }
@@ -107,6 +109,27 @@ void SubBlockCache::PruneByMemoryUsageAndElementCount(std::uint64_t max_memory_u
 {
     const IntSize size = bitmap->GetSize();
     return static_cast<uint64_t>(size.w) * size.h * Utils::GetBytesPerPixel(bitmap->GetPixelType());
+}
+
+/*static*/std::uint64_t SubBlockCache::CalculateSizeInBytes(const libCZI::IBitonalBitmapData* mask)
+{
+    if (mask == nullptr)
+    {
+        return 0;
+    }
+
+    const IntSize size = mask->GetSize();
+    return static_cast<uint64_t>((size.w + 7) / 8) * size.h;
+}
+
+/*static*/std::uint64_t SubBlockCache::CalculateSizeInBytes(const libCZI::IBitmapData* bitmap, const libCZI::IBitonalBitmapData* mask)
+{
+    return SubBlockCache::CalculateSizeInBytes(bitmap) + SubBlockCache::CalculateSizeInBytes(mask);
+}
+
+/*static*/std::uint64_t SubBlockCache::CalculateSizeInBytes(const CacheEntry& entry)
+{
+    return SubBlockCache::CalculateSizeInBytes(entry.bitmap.get(), entry.mask.get());
 }
 
 /*static*/bool SubBlockCache::CompareForLruValue(const std::pair<int, CacheEntry>& a, const std::pair<int, CacheEntry>& b)
