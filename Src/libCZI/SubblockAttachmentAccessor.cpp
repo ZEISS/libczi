@@ -24,6 +24,11 @@ SubblockAttachmentAccessor::SubblockAttachmentAccessor(std::shared_ptr<libCZI::I
     }
 }
 
+std::shared_ptr<libCZI::ISubBlockMetadata> SubblockAttachmentAccessor::GetSubBlockMetadata()
+{
+    return this->sub_block_metadata_;
+}
+
 bool SubblockAttachmentAccessor::HasChunkContainer() const
 {
     return this->has_chunk_container_;
@@ -127,46 +132,6 @@ libCZI::SubBlockAttachmentMaskInfoGeneral SubblockAttachmentAccessor::GetValidPi
     return mask_info_general;
 }
 
-#if false
-libCZI::SubBlockAttachmentMaskInfoUncompressedBitonalBitmap SubblockAttachmentAccessor::GetValidPixelMaskAsUncompressedBitonalBitmap() const
-{
-    if (!this->HasChunkContainer())
-    {
-        throw LibCZIException("Subblock does not have a chunk container.");
-    }
-
-    ChunkInfo chunk_info_valid_pixel_mask;
-    this->EnumerateChunksInChunkContainer(
-        [&chunk_info_valid_pixel_mask](int /*index*/, const ChunkInfo& info)
-        {
-            if (info.guid == kGuidValidPixelMask)
-            {
-                chunk_info_valid_pixel_mask = info;
-                return false; // stop enumeration
-            }
-
-            return true; // continue enumeration
-        });
-
-    SubBlockAttachmentMaskInfoUncompressedBitonalBitmap mask_info_general;
-    shared_ptr<const void> spData = this->sub_block_->GetRawData(ISubBlock::MemBlkType::Attachment, nullptr);
-    mask_info_general.width = *reinterpret_cast<const std::uint32_t*>((uint8_t*)spData.get() + chunk_info_valid_pixel_mask.offset);
-    mask_info_general.height = *reinterpret_cast<const std::uint32_t*>((uint8_t*)spData.get() + chunk_info_valid_pixel_mask.offset + sizeof(uint32_t));
-    uint32_t type_of_representation = *(reinterpret_cast<const std::uint32_t*>((uint8_t*)spData.get() + chunk_info_valid_pixel_mask.offset + 2 * sizeof(uint32_t)));
-    if (type_of_representation != 0)
-    {
-        throw LibCZIException("Valid pixel mask is not an uncompressed bitonal bitmap.");
-    }
-
-    mask_info_general.stride = *reinterpret_cast<const std::uint32_t*>((uint8_t*)spData.get() + chunk_info_valid_pixel_mask.offset + 3 * sizeof(uint32_t));
-
-    // create an aliasing shared_ptr that points to the correct offset
-    mask_info_general.data = shared_ptr<const void>(spData, (uint8_t*)spData.get() + chunk_info_valid_pixel_mask.offset + 4 * sizeof(uint32_t));
-    mask_info_general.size_data = chunk_info_valid_pixel_mask.size - (4 * sizeof(uint32_t));
-    return mask_info_general;
-}
-#endif
-
 /*static*/SubBlockAttachmentMaskInfoUncompressedBitonalBitmap ISubBlockAttachmentAccessor::GetValidPixelMaskAsUncompressedBitonalBitmap(const ISubBlockAttachmentAccessor* accessor)
 {
     auto mask_info_general = accessor->GetValidPixelMaskFromChunkContainer();
@@ -198,22 +163,25 @@ libCZI::SubBlockAttachmentMaskInfoUncompressedBitonalBitmap SubblockAttachmentAc
 {
     SubBlockAttachmentMaskInfoUncompressedBitonalBitmap mask_info = accessor->GetValidPixelMaskAsUncompressedBitonalBitmap();
 
+    if (mask_info.width == 0 || mask_info.height == 0)
+    {
+        throw LibCZIException("Invalid dimensions for uncompressed bitonal bitmap.");
+    }
+
     const uint32_t minimal_stride = (mask_info.width + 7) / 8;
     if (mask_info.stride < minimal_stride)
     {
         throw LibCZIException("Invalid stride for uncompressed bitonal bitmap.");
     }
 
-    size_t minimal_size = (mask_info.height - 1) * mask_info.stride + minimal_stride;
+    size_t minimal_size = (mask_info.height - 1) * static_cast<size_t>(mask_info.stride) + minimal_stride;
     if (mask_info.size_data < minimal_size)
     {
         throw LibCZIException("Insufficient size of uncompressed bitonal bitmap pixel mask data.");
     }
-
-  // TODO(JBL): Check plausibility of the data (size, stride, width, height)
-
+    
+    // Create a new bitonal bitmap data object (but using the existing data buffer!).
     CSharedPtrAllocator sharedPtrAllocator(mask_info.data); 
-    // Create a new bitonal bitmap data object
     auto bitonal_bitmap = CBitonalBitmapData<CSharedPtrAllocator>::Create(
                                                                     sharedPtrAllocator,
                                                                     mask_info.width,

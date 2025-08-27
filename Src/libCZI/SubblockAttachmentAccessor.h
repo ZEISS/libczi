@@ -30,6 +30,8 @@ private:
 public:
     SubblockAttachmentAccessor(std::shared_ptr<libCZI::ISubBlock> sub_block, std::shared_ptr<libCZI::ISubBlockMetadata> sub_block_metadata);
 
+    std::shared_ptr<libCZI::ISubBlockMetadata> GetSubBlockMetadata() override;
+
     bool HasChunkContainer() const override;
 
     bool EnumerateChunksInChunkContainer(const std::function<bool(int index, const ChunkInfo& info)>& functor_enum) const override;

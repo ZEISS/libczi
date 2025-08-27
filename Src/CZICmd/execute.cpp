@@ -747,11 +747,12 @@ public:
         auto accessor = reader->CreateSingleChannelScalingTileAccessor();
 
         auto roi = GetRoiFromOptions(options, subBlockStatistics);
-        libCZI::CDimCoordinate coordinate = options.GetPlaneCoordinate();
+        const libCZI::CDimCoordinate& coordinate = options.GetPlaneCoordinate();
         libCZI::ISingleChannelScalingTileAccessor::Options scstaOptions; scstaOptions.Clear();
         scstaOptions.backGroundColor = GetBackgroundColorFromOptions(options);
         scstaOptions.sceneFilter = options.GetSceneIndexSet();
         scstaOptions.useVisibilityCheckOptimization = options.GetUseVisibilityCheckOptimization();
+        scstaOptions.maskAware = options.GetUseMaskAwareCompositing();
 
         auto re = accessor->Get(roi, &coordinate, options.GetZoom(), &scstaOptions);
 

@@ -113,6 +113,7 @@ namespace libCZI
         ISubBlockAttachmentAccessor(const ISubBlockAttachmentAccessor&) = delete;
         void operator=(const ISubBlockAttachmentAccessor&) = delete;
 
+        virtual std::shared_ptr<libCZI::ISubBlockMetadata> GetSubBlockMetadata() = 0;
         virtual bool HasChunkContainer() const = 0;
         virtual bool EnumerateChunksInChunkContainer(const std::function<bool(int index, const ChunkInfo& info)>& functor_enum) const = 0;
         virtual libCZI::SubBlockAttachmentMaskInfoGeneral GetValidPixelMaskFromChunkContainer() const = 0;

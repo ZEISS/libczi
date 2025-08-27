@@ -430,11 +430,11 @@ struct GeneratorPixelTypeValidator : public CLI::Validator
 };
 
 /// CLI11-validator for the option "--cachesize".
-struct CachesizeValidator : public CLI::Validator
+struct CacheSizeValidator : public CLI::Validator
 {
-    CachesizeValidator()
+    CacheSizeValidator()
     {
-        this->name_ = "CachesizeValidator";
+        this->name_ = "CacheSizeValidator";
         this->func_ = [](const std::string& str) -> string
             {
                 const bool parsed_ok = CCmdLineOptions::TryParseSubBlockCacheSize(str, nullptr);
@@ -561,7 +561,7 @@ CCmdLineOptions::ParseResult CCmdLineOptions::Parse(int argc, char** argv)
     const static CreateSubblockMetadataValidator createsubblockmetadata_validator;
     const static CompressionOptionsValidator compressionoptions_validator;
     const static GeneratorPixelTypeValidator generatorpixeltype_validator;
-    const static CachesizeValidator cachesize_validator;
+    const static CacheSizeValidator cachesize_validator;
     const static TileSizeForPlaneScanValidator tile_size_for_plane_scan_validator;
 
     Command argument_command;
@@ -597,6 +597,7 @@ CCmdLineOptions::ParseResult CCmdLineOptions::Parse(int argc, char** argv)
     string argument_source_stream_class;
     string argument_source_stream_creation_propbag;
     bool argument_use_visibility_check_optimization = false;
+    bool argument_use_mask_aware_compositing = false;
 
     // editorconfig-checker-disable
     cli_app.add_option("-c,--command", argument_command,
@@ -773,6 +774,8 @@ CCmdLineOptions::ParseResult CCmdLineOptions::Parse(int argc, char** argv)
         ->check(tile_size_for_plane_scan_validator);
     cli_app.add_flag("--use-visibility-check-optimization", argument_use_visibility_check_optimization,
         "Whether to enable the experimental \"visibility check optimization\" for the accessors.");
+    cli_app.add_flag("--mask-aware-compositing", argument_use_mask_aware_compositing,
+        "Whether to use mask-aware compositing. This is subject to the availability of mask data in the CZI-file.");
     cli_app.add_flag("--version", argument_versionflag,
         "Print extended version-info and supported operations, then exit.");
 
@@ -808,6 +811,7 @@ CCmdLineOptions::ParseResult CCmdLineOptions::Parse(int argc, char** argv)
     this->drawTileBoundaries = argument_drawtileboundaries;
     this->command = argument_command;
     this->useVisibilityCheckOptimization = argument_use_visibility_check_optimization;
+    this->use_mask_aware_compositing_ = argument_use_mask_aware_compositing;
 
     try
     {
@@ -1116,6 +1120,7 @@ void CCmdLineOptions::Clear()
     this->subBlockCacheSize = 0;
     this->tilesSizeForPlaneScan = make_tuple(512, 512);
     this->useVisibilityCheckOptimization = false;
+    this->use_mask_aware_compositing_ = false;
 }
 
 bool CCmdLineOptions::IsLogLevelEnabled(int level) const
