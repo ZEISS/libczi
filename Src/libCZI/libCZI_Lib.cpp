@@ -156,7 +156,7 @@ std::shared_ptr<ISubBlockMetadata> libCZI::CreateSubBlockMetadataFromSubBlock(co
 
     size_t size_metadata;
     auto raw_data = sub_block->GetRawData(libCZI::ISubBlock::MemBlkType::Metadata, &size_metadata);
-    auto sub_block_metadata = make_shared<SubblockMetadata>((const char*)raw_data.get(), size_metadata);
+    auto sub_block_metadata = make_shared<SubblockMetadata>(static_cast<const char*>(raw_data.get()), size_metadata);
     return sub_block_metadata;
 }
 
