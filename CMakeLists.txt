@@ -49,6 +49,12 @@ else()
  message("identified a little-endian platform")
 endif()
 
+include(CheckForAdditionalLibsRequiredForAtomic)
+CheckForAdditionalLibsRequiredForAtomic(ADDITIONAL_LIBS_REQUIRED_FOR_ATOMIC)
+if (ADDITIONAL_LIBS_REQUIRED_FOR_ATOMIC)
+  message(STATUS "It was determined that linking to those additional libraries is necessary for using 'atomic': ${ADDITIONAL_LIBS_REQUIRED_FOR_ATOMIC}.")
+endif()
+
 check_include_file_CXX(endian.h HAVE_ENDIAN_H)
 BoolToFoundNotFound(HAVE_ENDIAN_H HAVE_ENDIAN_H_TEXT)
 if (NOT DEFINED HAVE_ENDIAN_H OR NOT HAVE_ENDIAN_H)
