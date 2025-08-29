@@ -52,7 +52,6 @@ bool SubblockAttachmentAccessor::EnumerateChunksInChunkContainer(const std::func
 
     std::uint32_t offset = 0;
 
-
     for (int index = 0;;)
     {
         ChunkInfo chunk_info;
