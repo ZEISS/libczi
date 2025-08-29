@@ -441,6 +441,16 @@ namespace libCZI
         /// \returns    The lock count.
         virtual int GetLockCount() const = 0;
 
+        /// Gets the width of the bitmap in pixels.
+        ///
+        /// \return The width in pixels.
+        std::uint32_t GetWidth() const { return this->GetSize().w; }
+
+        /// Gets the height of the bitmap in pixels.
+        ///
+        /// \return The height in pixels
+        std::uint32_t GetHeight() const { return this->GetSize().h; }
+
         /// Copy-Constructor - deleted.
         IBitonalBitmapData(const IBitonalBitmapData& other) = delete;
 
