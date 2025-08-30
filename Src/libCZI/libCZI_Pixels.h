@@ -596,6 +596,28 @@ namespace libCZI
     /// Defines an alias representing the scoped bitmap locker for use with a shared_ptr of type libCZI::IBitonalBitmapData.
     typedef ScopedBitonalBitmapLocker<std::shared_ptr<IBitonalBitmapData>> ScopedBitonalBitmapLockerSP;
 
+    class BitonalBitmapOperations
+    {
+    public:
+        /// Get the value of a specific pixel in a bitonal bitmap.
+        /// \param bmData    The bitonal bitmap.
+        /// \param x         The x-coordinate of the pixel (0-based).
+        /// \param y         The y-coordinate of the pixel (0-based).
+        /// \return          The value of the pixel (true for "set", false for "not set").
+        static bool GetPixelValue(const std::shared_ptr<IBitonalBitmapData> bmData, std::uint32_t x, std::uint32_t y)
+        {
+            ScopedBitonalBitmapLockerSP lock_bitmap{ bmData };
+            return GetPixelValue(lock_bitmap, bmData->GetSize(), x, y);
+        }
+
+        static bool GetPixelValue(const BitonalBitmapLockInfo& lockInfo, const libCZI::IntSize& extent, std::uint32_t x, std::uint32_t y);
+
+        static bool GetPixelValue(const IBitonalBitmapData* bitonal_bitmap, const BitonalBitmapLockInfo& lock_info, std::uint32_t x, std::uint32_t y)
+        {
+            return GetPixelValue(lock_info, bitonal_bitmap->GetSize(), x, y);
+        }
+    };
+
     //-------------------------------------------------------------------------
 
     /// Stream insertion operator for the libCZI::IntRect type. A string of the form '(x,y,width,height)' is output to the stream.

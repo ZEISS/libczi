@@ -27,7 +27,7 @@ namespace
             "</AttachmentSchema>"
             "</METADATA>";
         constexpr size_t sub_block_metadata_xml_size = sizeof(sub_block_metadata_xml) - 1;
-        
+
         {
             ScopedBitmapLockerSP lockBm{ bitmap };
             AddSubBlockInfoStridedBitmap addSbBlkInfo;
@@ -59,9 +59,9 @@ namespace
             0x04, 0x00, 0x00, 0x00, // the height (4 pixels)
             0x00, 0x00, 0x00, 0x00, // the representation type (0 -> uncompressed bitonal bitmap)
             0x01, 0x00, 0x00, 0x00, // the stride (1 byte per row)
-            0xc0,       // the actual mask data - a 4x4 checkerboard pattern   X_X_
+            0xa0,       // the actual mask data - a 4x4 checkerboard pattern   X_X_
             0x50,       //                                                     _X_X
-            0xc0,       //                                                     X_X_
+            0xa0,       //                                                     X_X_
             0x50        //                                                     _X_X
         };
 
@@ -96,29 +96,67 @@ namespace
     }
 }
 
-TEST(MaskAwareComposition, CompositionOfTwoSubBlocksWithMask)
+TEST(MaskAwareComposition, ReadSubBlockWithMaskAndExamineIt)
 {
     // arrange
     const auto czi_and_size = CreateCziDocumentWithTwoOverlappingSubblocksWithMaskData();
-
-    //FILE* fp = fopen("D:\\test.czi", "wb");
-    //if (fp != nullptr)
-    //{
-    //    fwrite(get<0>(czi_and_size).get(), 1, get<1>(czi_and_size), fp);
-    //    fclose(fp);
-    //}
-
-    // act
     const auto inputStream = CreateStreamFromMemory(get<0>(czi_and_size), get<1>(czi_and_size));
     const auto reader = CreateCZIReader();
     reader->Open(inputStream);
+
+    // act
     const auto sub_block = reader->ReadSubBlock(1);
 
     // assert
     auto sub_block_attachment_accessor = CreateSubBlockAttachmentAccessor(sub_block, nullptr);
     ASSERT_TRUE(sub_block_attachment_accessor->HasChunkContainer());
+    const auto sub_block_attachment_mask_info_general = sub_block_attachment_accessor->GetValidPixelMaskFromChunkContainer();
+    ASSERT_EQ(sub_block_attachment_mask_info_general.width, 4);
+    ASSERT_EQ(sub_block_attachment_mask_info_general.height, 4);
+    ASSERT_EQ(sub_block_attachment_mask_info_general.type_of_representation, 0);
+    ASSERT_EQ(sub_block_attachment_mask_info_general.size_data, 8);
+    static const uint8_t expected_bitonal_bitmap_data[8] = { 0x01, 0x00, 0x00, 0x00, 0xa0, 0x50, 0xa0, 0x50 };
+    ASSERT_EQ(memcmp(sub_block_attachment_mask_info_general.data.get(), expected_bitonal_bitmap_data, 8), 0);
+
     const auto mask_bitonal_bitmap = sub_block_attachment_accessor->CreateBitonalBitmapFromMaskInfo();
     ASSERT_TRUE(mask_bitonal_bitmap);
     ASSERT_TRUE(mask_bitonal_bitmap->GetWidth() == 4);
     ASSERT_TRUE(mask_bitonal_bitmap->GetHeight() == 4);
+    ASSERT_TRUE(BitonalBitmapOperations::GetPixelValue(mask_bitonal_bitmap, 0, 0));
+    ASSERT_FALSE(BitonalBitmapOperations::GetPixelValue(mask_bitonal_bitmap, 1, 0));
+    ASSERT_TRUE(BitonalBitmapOperations::GetPixelValue(mask_bitonal_bitmap, 2, 0));
+    ASSERT_FALSE(BitonalBitmapOperations::GetPixelValue(mask_bitonal_bitmap, 3, 0));
+    ASSERT_FALSE(BitonalBitmapOperations::GetPixelValue(mask_bitonal_bitmap, 0, 1));
+    ASSERT_TRUE(BitonalBitmapOperations::GetPixelValue(mask_bitonal_bitmap, 1, 1));
+    ASSERT_FALSE(BitonalBitmapOperations::GetPixelValue(mask_bitonal_bitmap, 2, 1));
+    ASSERT_TRUE(BitonalBitmapOperations::GetPixelValue(mask_bitonal_bitmap, 3, 1));
+    ASSERT_TRUE(BitonalBitmapOperations::GetPixelValue(mask_bitonal_bitmap, 0, 2));
+    ASSERT_FALSE(BitonalBitmapOperations::GetPixelValue(mask_bitonal_bitmap, 1, 2));
+    ASSERT_TRUE(BitonalBitmapOperations::GetPixelValue(mask_bitonal_bitmap, 2, 2));
+    ASSERT_FALSE(BitonalBitmapOperations::GetPixelValue(mask_bitonal_bitmap, 3, 2));
+    ASSERT_FALSE(BitonalBitmapOperations::GetPixelValue(mask_bitonal_bitmap, 0, 3));
+    ASSERT_TRUE(BitonalBitmapOperations::GetPixelValue(mask_bitonal_bitmap, 1, 3));
+    ASSERT_FALSE(BitonalBitmapOperations::GetPixelValue(mask_bitonal_bitmap, 2, 3));
+    ASSERT_TRUE(BitonalBitmapOperations::GetPixelValue(mask_bitonal_bitmap, 3, 3));
+}
+
+TEST(MaskAwareComposition, SingleChannelScalingTileAccessorWithMaskScenario1)
+{
+    // arrange
+    const auto czi_and_size = CreateCziDocumentWithTwoOverlappingSubblocksWithMaskData();
+    const auto inputStream = CreateStreamFromMemory(get<0>(czi_and_size), get<1>(czi_and_size));
+    const auto reader = CreateCZIReader();
+    reader->Open(inputStream);
+
+    auto accessor = reader->CreateSingleChannelScalingTileAccessor();
+
+    ISingleChannelScalingTileAccessor::Options options;
+    options.Clear();
+    options.backGroundColor = RgbFloatColor{ 0.5f, 0.5f, 0.5f };
+    options.maskAware = true;
+    const CDimCoordinate plane_coordinate{ {DimensionIndex::C, 0} };
+    auto composition = accessor->Get(IntRect{ 0,0,6,6 }, &plane_coordinate, 1.f, &options);
+    ASSERT_TRUE(composition);
+    ScopedBitmapLockerSP locker_composition{ composition };
+    ASSERT_TRUE(locker_composition.ptrDataRoi);
 }

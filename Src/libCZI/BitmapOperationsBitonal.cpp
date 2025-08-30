@@ -7,6 +7,7 @@
 #include <stdexcept>
 #include <libCZI_Utilities.h>
 #include "inc_libCZI_Config.h"
+#include "utilities.h"
 
 using namespace std;
 using namespace libCZI;
@@ -27,8 +28,8 @@ namespace
             return bswap_32(dw);
 #else
             return (((dw & 0xff000000u) >> 24) |
-                    ((dw & 0x00ff0000u) >> 8)  |
-                    ((dw & 0x0000ff00u) << 8)  |
+                    ((dw & 0x00ff0000u) >> 8) |
+                    ((dw & 0x0000ff00u) << 8) |
                     ((dw & 0x000000ffu) << 24));
 #endif
         }
@@ -450,7 +451,7 @@ namespace
                     srcXInt = resizeInfo.srcWidth - 1;
                 }
 
-                if (BitmapOperationsBitonal::GetPixelFromBitonalUnchecked(srcXInt, srcYInt, resizeInfo.srcWidth, resizeInfo.srcHeight, resizeInfo.srcMaskPtr, resizeInfo.srcMaskStride))
+                if (BitmapOperationsBitonal::GetPixelFromBitonalUnchecked(srcXInt, srcYInt, resizeInfo.srcMaskPtr, resizeInfo.srcMaskStride))
                 {
                     const char* pSrc = pSrcLine + srcXInt * static_cast<size_t>(bytesPerPelSrc);
                     char* pDst = pDstLine + x * static_cast<size_t>(bytesPerPelDest);
@@ -599,6 +600,175 @@ namespace
     }
 }
 
+namespace
+{
+    template <libCZI::PixelType tSrcDstPixelType>
+    void CopySamePixelTypeWithMask(const void* srcPtr, int srcStride, void* dstPtr, int dstStride, int width, int height, const void* src_mask_ptr, int src_mask_stride, int mask_offset_x, int mask_offset_y,bool drawTileBorder)
+    {
+        auto bytesPerPel = CziUtils::BytesPerPel<tSrcDstPixelType>();
+        int bytesToCopy = width * bytesPerPel;
+
+        if (drawTileBorder == false)
+        {
+            for (int y = 0; y < height; ++y)
+            {
+                char* dest = static_cast<char*>(dstPtr) + y * static_cast<std::ptrdiff_t>(dstStride);
+                const char* src = static_cast<const char*>(srcPtr) + y * static_cast<std::ptrdiff_t>(srcStride);
+
+                for (int x = 0; x < width; ++x)
+                {
+                    if (BitmapOperationsBitonal::GetPixelFromBitonalUnchecked(x + mask_offset_x, y + mask_offset_y, src_mask_ptr, src_mask_stride))
+                    {
+                        char* destPixel = dest + x * bytesPerPel;
+                        const char* srcPixel = src + x * bytesPerPel;
+                        memcpy(destPixel, srcPixel, bytesPerPel);
+                    }
+                }
+            }
+        }
+        else
+        {
+            memset(dstPtr, 0, bytesToCopy);
+            for (int y = 1; y < height - 1; ++y)
+            {
+                char* dest = ((char*)dstPtr) + y * ((std::ptrdiff_t)dstStride);
+                const char* src = ((const char*)srcPtr) + y * ((std::ptrdiff_t)srcStride);
+                memcpy(dest + bytesPerPel, src, bytesToCopy - 2 * bytesPerPel);
+                memset(dest, 0, bytesPerPel);
+                memset(dest + bytesToCopy - bytesPerPel, 0, bytesPerPel);
+            }
+
+            memset(((char*)dstPtr) + (height - 1) * dstStride, 0, bytesToCopy);
+        }
+    }
+
+    template <libCZI::PixelType tSrcPixelType, libCZI::PixelType tDstPixelType>
+    void CopyWithMask(const void* srcPtr, int srcStride, void* dstPtr, int dstStride, int width, int height, const void* src_mask_ptr, int src_mask_stride, int mask_offset_x, int mask_offset_y,bool drawTileBorder);
+    
+    template <>
+    inline void CopyWithMask<libCZI::PixelType::Gray8, libCZI::PixelType::Gray8>(const void* srcPtr, int srcStride, void* dstPtr, int dstStride, int width, int height, const void* src_mask_ptr, int src_mask_stride, int mask_offset_x, int mask_offset_y, bool drawTileBorder)
+    {
+        CopySamePixelTypeWithMask<libCZI::PixelType::Gray8>(srcPtr, srcStride, dstPtr, dstStride, width, height, src_mask_ptr, src_mask_stride, mask_offset_x, mask_offset_y, drawTileBorder);
+    }
+
+    void CopyWithMask(
+        libCZI::PixelType srcPixelType, const void* srcPtr, int srcStride,
+        libCZI::PixelType dstPixelType, void* dstPtr, int dstStride,
+        int width, int height, const void* src_mask_ptr, int src_mask_stride, int mask_offset_x, int mask_offset_y,
+        bool drawTileBorder)
+    {
+        switch (srcPixelType)
+        {
+        case PixelType::Gray8:
+            switch (dstPixelType)
+            {
+            case PixelType::Gray8:
+                CopyWithMask<PixelType::Gray8, PixelType::Gray8>(srcPtr, srcStride, dstPtr, dstStride, width, height, src_mask_ptr, src_mask_stride, mask_offset_x, mask_offset_y, drawTileBorder);
+                return;
+           /* case PixelType::Gray16:
+                CopyWithMask<PixelType::Gray8, PixelType::Gray16>(srcPtr, srcStride, dstPtr, dstStride, width, height, drawTileBorder);
+                return;
+            case PixelType::Gray32Float:
+                CopyWithMask<PixelType::Gray8, PixelType::Gray32Float>(srcPtr, srcStride, dstPtr, dstStride, width, height, drawTileBorder);
+                return;
+            case PixelType::Bgr24:
+                CopyWithMask<PixelType::Gray8, PixelType::Bgr24>(srcPtr, srcStride, dstPtr, dstStride, width, height, drawTileBorder);
+                return;
+            case PixelType::Bgr48:
+                CopyWithMask<PixelType::Gray8, PixelType::Bgr48>(srcPtr, srcStride, dstPtr, dstStride, width, height, drawTileBorder);
+                return;*/
+            default:break;
+            }
+            break;
+/*
+        case PixelType::Gray16:
+            switch (dstPixelType)
+            {
+            case PixelType::Gray8:
+                CopyWithMask<PixelType::Gray16, PixelType::Gray8>(srcPtr, srcStride, dstPtr, dstStride, width, height, drawTileBorder);
+                return;
+            case PixelType::Gray16:
+                CopyWithMask<PixelType::Gray16, PixelType::Gray16>(srcPtr, srcStride, dstPtr, dstStride, width, height, drawTileBorder);
+                return;
+            case PixelType::Gray32Float:
+                CopyWithMask<PixelType::Gray16, PixelType::Gray32Float>(srcPtr, srcStride, dstPtr, dstStride, width, height, drawTileBorder);
+                return;
+            case PixelType::Bgr24:
+                CopyWithMask<PixelType::Gray16, PixelType::Bgr24>(srcPtr, srcStride, dstPtr, dstStride, width, height, drawTileBorder);
+                return;
+            case PixelType::Bgr48:
+                CopyWithMask<PixelType::Gray16, PixelType::Bgr48>(srcPtr, srcStride, dstPtr, dstStride, width, height, drawTileBorder);
+                return;
+            default:break;
+            }
+            break;
+
+        case PixelType::Gray32Float:
+            switch (dstPixelType)
+            {
+            case PixelType::Gray8:break;
+            case PixelType::Gray16:break;
+            case PixelType::Gray32Float:
+                CopyWithMask<PixelType::Gray32Float, PixelType::Gray32Float>(srcPtr, srcStride, dstPtr, dstStride, width, height, drawTileBorder);
+                return;
+            case PixelType::Bgr24:break;
+            case PixelType::Bgr48:break;
+            default:break;
+            }
+            break;
+
+        case PixelType::Bgr24:
+            switch (dstPixelType)
+            {
+            case PixelType::Gray8:
+                CopyWithMask<PixelType::Bgr24, PixelType::Gray8>(srcPtr, srcStride, dstPtr, dstStride, width, height, drawTileBorder);
+                return;
+            case PixelType::Gray16:
+                CopyWithMask<PixelType::Bgr24, PixelType::Gray16>(srcPtr, srcStride, dstPtr, dstStride, width, height, drawTileBorder);
+                return;
+            case PixelType::Gray32Float:
+                CopyWithMask<PixelType::Bgr24, PixelType::Gray32Float>(srcPtr, srcStride, dstPtr, dstStride, width, height, drawTileBorder);
+                return;
+            case PixelType::Bgr24:
+                CopyWithMask<PixelType::Bgr24, PixelType::Bgr24>(srcPtr, srcStride, dstPtr, dstStride, width, height, drawTileBorder);
+                return;
+            case PixelType::Bgr48:
+                CopyWithMask<PixelType::Bgr24, PixelType::Bgr48>(srcPtr, srcStride, dstPtr, dstStride, width, height, drawTileBorder);
+                return;
+            default:break;
+            }
+            break;
+
+        case PixelType::Bgr48:
+            switch (dstPixelType)
+            {
+            case PixelType::Gray8:
+                CopyWithMask<PixelType::Bgr48, PixelType::Gray8>(srcPtr, srcStride, dstPtr, dstStride, width, height, drawTileBorder);
+                return;
+            case PixelType::Gray16:
+                CopyWithMask<PixelType::Bgr48, PixelType::Gray16>(srcPtr, srcStride, dstPtr, dstStride, width, height, drawTileBorder);
+                return;
+            case PixelType::Gray32Float:
+                CopyWithMask<PixelType::Bgr48, PixelType::Gray32Float>(srcPtr, srcStride, dstPtr, dstStride, width, height, drawTileBorder);
+                return;
+            case PixelType::Bgr24:
+                CopyWithMask<PixelType::Bgr48, PixelType::Bgr24>(srcPtr, srcStride, dstPtr, dstStride, width, height, drawTileBorder);
+                return;
+            case PixelType::Bgr48:
+                CopyWithMask<PixelType::Bgr48, PixelType::Bgr48>(srcPtr, srcStride, dstPtr, dstStride, width, height, drawTileBorder);
+                return;
+            default:break;
+            }
+            break;
+            */
+        default:break;
+        }
+
+        throw std::logic_error("It seems that this conversion is not implemented...");
+    }
+
+}
+
 /*static*/void BitmapOperationsBitonal::NNResizeMaskAware(
     libCZI::IBitmapData* bmSrc,
     libCZI::IBitonalBitmapData* bmSrcMask,
@@ -633,3 +803,32 @@ namespace
     NNScaleMaskAware2<double>(bmSrc->GetPixelType(), bmDest->GetPixelType(), resizeInfo);
 }
 
+/*static*/void BitmapOperationsBitonal::CopyWithOffsetAndMask(const CopyWithOffsetAndMaskInfo& info)
+{
+    if (info.maskPtr == nullptr)
+    {
+        CBitmapOperations::CopyWithOffset(info);
+        return;
+    }
+
+    // If we reach here, it means we have a valid maskPtr
+    const IntRect srcRect = IntRect{ info.xOffset,info.yOffset,info.srcWidth,info.srcHeight };
+    const IntRect dstRect = IntRect{ 0,0,info.dstWidth,info.dstHeight };
+    const IntRect intersection = Utilities::Intersect(srcRect, dstRect);
+
+    if (intersection.w == 0 || intersection.h == 0)
+    {
+        return;
+    }
+
+    void* ptrDestination = static_cast<char*>(info.dstPtr) + intersection.y * static_cast<size_t>(info.dstStride) + intersection.x * static_cast<size_t>(CziUtils::GetBytesPerPel(info.dstPixelType));
+    const void* ptrSource = static_cast<const char*>(info.srcPtr) + (std::max)(-info.yOffset, 0) * static_cast<size_t>(info.srcStride) + (std::max)(-info.xOffset, 0) * static_cast<size_t>(CziUtils::GetBytesPerPel(info.srcPixelType));
+
+    CopyWithMask(
+    info.srcPixelType, ptrSource, info.srcStride,
+    info.dstPixelType, ptrDestination, info.dstStride,
+    intersection.w, intersection.h,
+    info.maskPtr, info.maskStride,
+    (std::max)(-info.xOffset, 0), (std::max)(-info.yOffset, 0),
+    info.drawTileBorder);
+}

@@ -49,6 +49,9 @@ else()
  message("identified a little-endian platform")
 endif()
 
+# for some ancient platforms it is necessary to link against additional libraries when using C++'s 'std::atomic'.
+# This test is compiling a test program, which is problematic in cross-compilation scenarios. In order to prevent
+# problems in cross-compilation scenarios, the user can set the variable 'ADDITIONAL_LIBS_REQUIRED_FOR_ATOMIC' manually.
 include(CheckForAdditionalLibsRequiredForAtomic)
 CheckForAdditionalLibsRequiredForAtomic(ADDITIONAL_LIBS_REQUIRED_FOR_ATOMIC)
 if (ADDITIONAL_LIBS_REQUIRED_FOR_ATOMIC)

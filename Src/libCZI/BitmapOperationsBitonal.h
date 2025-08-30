@@ -4,6 +4,7 @@
 #include <stdexcept>
 
 #include "libCZI_Pixels.h"
+#include "BitmapOperations.h"
 
 /// Here we gather operations that are specific to bitonal bitmaps.
 class BitmapOperationsBitonal
@@ -43,7 +44,7 @@ public:
     /// \param 	stride 	The stride (in units of bytes).
     ///
     /// \returns	True if the pixel is "1", false if the pixel is "0".
-    static bool GetPixelFromBitonalUnchecked(std::uint32_t x, std::uint32_t y, std::uint32_t width, std::uint32_t height, const void* ptrData, std::uint32_t stride)
+    static bool GetPixelFromBitonalUnchecked(std::uint32_t x, std::uint32_t y, const void* ptrData, std::uint32_t stride)
     {
         const std::uint8_t* ptr = static_cast<const std::uint8_t*>(ptrData) + static_cast<size_t>(y) * stride + (x / 8);
         return (*ptr & (1 << (7 - (x % 8)))) != 0;
@@ -78,4 +79,32 @@ public:
         libCZI::IBitmapData* bmDest,
         const libCZI::DblRect& roiSrc, 
         const libCZI::DblRect& roiDst);
+
+    /// This structure gathers the information needed to copy a source bitmap with a specified mask into
+    /// a destination bitmap at a specified offset.
+    struct CopyWithOffsetAndMaskInfo : CBitmapOperations::CopyWithOffsetInfo
+    {
+        const void* maskPtr;                 ///< Pointer to the mask bitmap (may be null, in which case all pixels are considered valid).
+        int maskStride;                      ///< The stride of the mask bitmap in bytes.
+        int maskWidth;                       ///< The width of the mask bitmap in pixels.
+        int maskHeight;                      ///< The height of the mask bitmap in pixels.
+    };
+
+    static void CopyWithOffsetAndMask(const CopyWithOffsetAndMaskInfo& info);
+
+    static void Copy(
+            libCZI::PixelType srcPixelType, 
+            const void* srcPtr, 
+            int srcStride, 
+            libCZI::PixelType dstPixelType, 
+            void* dstPtr, 
+            int dstStride, 
+            int width, 
+            int height,
+            const void* src_mask_ptr,
+            int src_mask_stride,
+            int mask_offset_x,
+            int mask_offset_y,
+            bool drawTileBorder);
+
 };

@@ -112,7 +112,7 @@ void CSingleChannelScalingTileAccessor::ScaleBlt(libCZI::IBitmapData* bmDest, fl
     {
         ScopedBitmapLockerSP srcLck{ source };
         ScopedBitmapLockerP dstLck{ bmDest };
-        CBitmapOperations::CopyWithOffsetInfo info;
+        /*CBitmapOperations::CopyWithOffsetInfo info;
         info.xOffset = sbInfo.logicalRect.x - roi.x;
         info.yOffset = sbInfo.logicalRect.y - roi.y;
         info.srcPixelType = source->GetPixelType();
@@ -127,7 +127,34 @@ void CSingleChannelScalingTileAccessor::ScaleBlt(libCZI::IBitmapData* bmDest, fl
         info.dstHeight = bmDest->GetHeight();
         info.drawTileBorder = false;
 
-        CBitmapOperations::CopyWithOffset(info);
+        CBitmapOperations::CopyWithOffset(info);*/
+        BitmapOperationsBitonal::CopyWithOffsetAndMaskInfo info;
+        info.xOffset = sbInfo.logicalRect.x - roi.x;
+        info.yOffset = sbInfo.logicalRect.y - roi.y;
+        info.srcPixelType = source->GetPixelType();
+        info.srcPtr = srcLck.ptrDataRoi;
+        info.srcStride = srcLck.stride;
+        info.srcWidth = source->GetWidth();
+        info.srcHeight = source->GetHeight();
+        info.dstPixelType = bmDest->GetPixelType();
+        info.dstPtr = dstLck.ptrDataRoi;
+        info.dstStride = dstLck.stride;
+        info.dstWidth = bmDest->GetWidth();
+        info.dstHeight = bmDest->GetHeight();
+        info.drawTileBorder = false;
+        if (options.maskAware && source_mask)
+        {
+            ScopedBitonalBitmapLockerSP maskLck{ source_mask };
+            info.maskPtr = maskLck.ptrData;
+            info.maskStride = maskLck.stride;
+            info.maskWidth = source_mask->GetWidth();
+            info.maskHeight = source_mask->GetHeight();
+            BitmapOperationsBitonal::CopyWithOffsetAndMask(info);
+        }
+        else
+        {
+            CBitmapOperations::CopyWithOffset(info);
+        }
     }
     else
     {

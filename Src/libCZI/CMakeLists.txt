@@ -86,6 +86,7 @@ set(LIBCZISRCFILES
             libCZI_Metadata.h
             libCZI_Metadata2.h
             libCZI_Pixels.h
+            libCZI_Pixels.cpp
             libCZI_ReadWrite.h
             libCZI_Site.h
             libCZI_Utilities.h
