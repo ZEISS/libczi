@@ -605,8 +605,8 @@ namespace
     template <libCZI::PixelType tSrcDstPixelType>
     void CopySamePixelTypeWithMask(const void* srcPtr, int srcStride, void* dstPtr, int dstStride, int width, int height, const void* src_mask_ptr, int src_mask_stride, int mask_offset_x, int mask_offset_y,bool drawTileBorder)
     {
-        auto bytesPerPel = CziUtils::BytesPerPel<tSrcDstPixelType>();
-        int bytesToCopy = width * bytesPerPel;
+        const auto bytesPerPel = CziUtils::BytesPerPel<tSrcDstPixelType>();
+        const int bytesToCopy = width * bytesPerPel;
 
         if (drawTileBorder == false)
         {
