@@ -305,3 +305,73 @@ TEST(MaskAwareComposition, SingleChannelScalingTileAccessorWithMaskScenario3)
     }
 }
 
+TEST(MaskAwareComposition, SingleChannelTileAccessorWithMaskScenario3)
+{
+    // arrange
+    const auto czi_and_size = CreateCziDocumentWithTwoOverlappingSubblocksWithMaskData();
+    const auto inputStream = CreateStreamFromMemory(get<0>(czi_and_size), get<1>(czi_and_size));
+    const auto reader = CreateCZIReader();
+    reader->Open(inputStream);
+    auto accessor = reader->CreateSingleChannelTileAccessor();
+
+    auto destination_bitmap = CreateRandomBitmap(PixelType::Gray8, 5, 5);
+
+    // create a copy of the original background
+    auto copy_of_background = CStdBitmapData::Create(destination_bitmap->GetPixelType(), destination_bitmap->GetWidth(), destination_bitmap->GetHeight());
+    {
+        ScopedBitmapLockerSP lockCopy{ copy_of_background };
+        ScopedBitmapLockerSP sourceLock{ destination_bitmap };
+        CBitmapOperations::Copy(
+            destination_bitmap->GetPixelType(),
+            sourceLock.ptrDataRoi,
+            sourceLock.stride,
+            copy_of_background->GetPixelType(),
+            lockCopy.ptrDataRoi,
+            lockCopy.stride,
+            destination_bitmap->GetWidth(),
+            destination_bitmap->GetHeight(),
+            false);
+    }
+
+    // act
+    ISingleChannelTileAccessor::Options options;
+    options.Clear();
+    // instruct to NOT clear the background, i.e. the content of 'destination_bitmap' is the background
+    options.backGroundColor = RgbFloatColor{ numeric_limits<float>::quiet_NaN(), numeric_limits<float>::quiet_NaN(), numeric_limits<float>::quiet_NaN() };
+    options.maskAware = true;
+    const CDimCoordinate plane_coordinate{ {DimensionIndex::C, 0} };
+    accessor->Get(
+                destination_bitmap.get(),
+                IntPointAndFrameOfReference{ CZIFrameOfReference::PixelCoordinateSystem,IntPoint{ 2,2 } },
+                &plane_coordinate,
+                &options);
+
+    // assert
+    ScopedBitmapLockerSP copy_of_background_locker{ copy_of_background };
+    ScopedBitmapLockerSP destination_locker{ destination_bitmap };
+    for (size_t y = 0; y < destination_bitmap->GetHeight(); ++y)
+    {
+        const uint8_t* copy_of_background_line = static_cast<const uint8_t*>(copy_of_background_locker.ptrDataRoi) + y * copy_of_background_locker.stride;
+        const uint8_t* destination_line = static_cast<const uint8_t*>(destination_locker.ptrDataRoi) + y * destination_locker.stride;
+        for (size_t x = 0; x < destination_bitmap->GetWidth(); ++x)
+        {
+            const uint8_t pixel_value_composition = destination_line[x];
+            if (x == 1 && y == 0 || x == 0 && y == 1)
+            {
+                // for those pixels, we expect the subblock#0 (=0x00)
+                ASSERT_EQ(pixel_value_composition, 0);
+            }
+            else if ((y == 0 && (x == 0 || x == 2)) || (y == 1 && (x == 1 || x == 3)) || (y == 2 && (x == 0 || x == 2)) || (y == 3 && (x == 1 || x == 3)))
+            {
+                // for those pixels, we expect the (valid) pixels of subblock#1 (=0xff)
+                ASSERT_EQ(pixel_value_composition, 0xff);
+            }
+            else
+            {
+                // otherwise - we expect the original pixel value
+                ASSERT_EQ(pixel_value_composition, copy_of_background_line[x]);
+            }
+        }
+    }
+}
+
