@@ -16,15 +16,15 @@
 template <libCZI::PixelType tSrcDstPixelType>
 inline void CBitmapOperations::CopySamePixelType(const void* srcPtr, int srcStride, void* dstPtr, int dstStride, int width, int height, bool drawTileBorder)
 {
-    auto bytesPerPel = CziUtils::BytesPerPel<tSrcDstPixelType>();
-    int bytesToCopy = width * bytesPerPel;
+    constexpr auto bytesPerPel = CziUtils::BytesPerPel<tSrcDstPixelType>();
+    const int bytesToCopy = width * bytesPerPel;
 
     if (drawTileBorder == false)
     {
         for (int y = 0; y < height; ++y)
         {
-            char* dest = ((char*)dstPtr) + y * ((std::ptrdiff_t)dstStride);
-            const char* src = ((const char*)srcPtr) + y * ((std::ptrdiff_t)srcStride);
+            char* dest = static_cast<char*>(dstPtr) + y * static_cast<std::ptrdiff_t>(dstStride);
+            const char* src = static_cast<const char*>(srcPtr) + y * static_cast<std::ptrdiff_t>(srcStride);
             memcpy(dest, src, bytesToCopy);
         }
     }
@@ -33,14 +33,14 @@ inline void CBitmapOperations::CopySamePixelType(const void* srcPtr, int srcStri
         memset(dstPtr, 0, bytesToCopy);
         for (int y = 1; y < height - 1; ++y)
         {
-            char* dest = ((char*)dstPtr) + y * ((std::ptrdiff_t)dstStride);
-            const char* src = ((const char*)srcPtr) + y * ((std::ptrdiff_t)srcStride);
+            char* dest = static_cast<char*>(dstPtr) + y * static_cast<std::ptrdiff_t>(dstStride);
+            const char* src = static_cast<const char*>(srcPtr) + y * static_cast<std::ptrdiff_t>(srcStride);
             memcpy(dest + bytesPerPel, src, bytesToCopy - 2 * bytesPerPel);
             memset(dest, 0, bytesPerPel);
             memset(dest + bytesToCopy - bytesPerPel, 0, bytesPerPel);
         }
 
-        memset(((char*)dstPtr) + (height - 1) * dstStride, 0, bytesToCopy);
+        memset(static_cast<char*>(dstPtr) + (height - 1) * static_cast<size_t>(dstStride), 0, bytesToCopy);
     }
 }
 
@@ -322,8 +322,6 @@ inline void CBitmapOperations::Copy<libCZI::PixelType::Bgr48, libCZI::PixelType:
     CopySamePixelType<libCZI::PixelType::Bgr48>(srcPtr, srcStride, dstPtr, dstStride, width, height, drawTileBorder);
 }
 
-// TODO: -implement the missing conversions
-//       -can we make IPP an option?
 template <>
 inline void CBitmapOperations::Copy<libCZI::PixelType::Bgr24, libCZI::PixelType::Gray8>(const void* srcPtr, int srcStride, void* dstPtr, int dstStride, int width, int height, bool drawTileBorder)
 {
