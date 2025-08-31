@@ -774,14 +774,12 @@ namespace
         CopyWithMask<libCZI::PixelType::Bgr48, libCZI::PixelType::Bgr24, CConvBgr48ToBgr24>(CConvBgr48ToBgr24(), parameters);
     }
 
-    void CopyWithMask(
-        libCZI::PixelType srcPixelType, libCZI::PixelType dstPixelType,
-        const CopyParameters& parameters)
+    void CopyWithMask(libCZI::PixelType source_pixel_type, libCZI::PixelType destination_pixel_type, const CopyParameters& parameters)
     {
-        switch (srcPixelType)
+        switch (source_pixel_type)
         {
         case PixelType::Gray8:
-            switch (dstPixelType)
+            switch (destination_pixel_type)
             {
             case PixelType::Gray8:
                 CopyWithMask<PixelType::Gray8, PixelType::Gray8>(parameters);
@@ -803,7 +801,7 @@ namespace
             break;
 
         case PixelType::Gray16:
-            switch (dstPixelType)
+            switch (destination_pixel_type)
             {
             case PixelType::Gray8:
                 CopyWithMask<PixelType::Gray16, PixelType::Gray8>(parameters);
@@ -825,7 +823,7 @@ namespace
             break;
 
         case PixelType::Gray32Float:
-            switch (dstPixelType)
+            switch (destination_pixel_type)
             {
             case PixelType::Gray8:break;
             case PixelType::Gray16:break;
@@ -839,7 +837,7 @@ namespace
             break;
 
         case PixelType::Bgr24:
-            switch (dstPixelType)
+            switch (destination_pixel_type)
             {
             case PixelType::Gray8:
                 CopyWithMask<PixelType::Bgr24, PixelType::Gray8>(parameters);
@@ -861,7 +859,7 @@ namespace
             break;
 
         case PixelType::Bgr48:
-            switch (dstPixelType)
+            switch (destination_pixel_type)
             {
             case PixelType::Gray8:
                 CopyWithMask<PixelType::Bgr48, PixelType::Gray8>(parameters);
