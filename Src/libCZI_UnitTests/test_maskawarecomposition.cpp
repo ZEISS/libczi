@@ -466,3 +466,165 @@ TEST(MaskAwareComposition, SingleChannelTileAccessorWithMaskScenario3)
     }
 }
 
+TEST(MaskAwareComposition, SingleChannelPyramidLayerAccessorWithMaskScenario1)
+{
+    // arrange
+    const auto czi_and_size = CreateCziDocumentWithTwoOverlappingSubblocksWithMaskData();
+    const auto inputStream = CreateStreamFromMemory(get<0>(czi_and_size), get<1>(czi_and_size));
+    const auto reader = CreateCZIReader();
+    reader->Open(inputStream);
+
+    auto accessor = reader->CreateSingleChannelPyramidLayerTileAccessor();
+
+    ISingleChannelPyramidLayerTileAccessor::Options options;
+    options.Clear();
+    options.backGroundColor = RgbFloatColor{ 0.5f, 0.5f, 0.5f };
+    options.maskAware = true;
+    const CDimCoordinate plane_coordinate{ {DimensionIndex::C, 0} };
+    auto composition = accessor->Get(IntRect{ 0, 0, 6, 6 }, &plane_coordinate, ISingleChannelPyramidLayerTileAccessor::PyramidLayerInfo{ 2,0 }, &options);
+    ASSERT_TRUE(composition);
+    ASSERT_EQ(composition->GetWidth(), 6);
+    ASSERT_EQ(composition->GetHeight(), 6);
+
+    // The expected result is a 6x6 image where:
+    // - The background is gray (128,128,128).
+    // - then, the first sub-block (black, 0) is drawn at (0,0) - (4,4)
+    // - then, the second sub-block (white, 255) is drawn at (2,2) - (6,6) with the checkerboard mask applied
+    static const uint8_t expected_result[] =
+    {
+        0x00, 0x00, 0x00, 0x00, 0x80, 0x80,
+        0x00, 0x00, 0x00, 0x00, 0x80, 0x80,
+        0x00, 0x00, 0xff, 0x00, 0xff, 0x80,
+        0x00, 0x00, 0x00, 0xff, 0x80, 0xff,
+        0x80, 0x80, 0xff, 0x80, 0xff, 0x80,
+        0x80, 0x80, 0x80, 0xff, 0x80, 0xff,
+    };
+
+    ScopedBitmapLockerSP locker_composition{ composition };
+    ASSERT_TRUE(locker_composition.ptrDataRoi != nullptr);
+    for (size_t y = 0; y < composition->GetHeight(); ++y)
+    {
+        const uint8_t* composition_line = static_cast<const uint8_t*>(locker_composition.ptrDataRoi) + y * locker_composition.stride;
+        int r = memcmp(composition_line, expected_result + y * 6, 6);
+        ASSERT_EQ(r, 0);
+    }
+}
+
+TEST(MaskAwareComposition, SingleChannelPyramidLayerAccessorWithMaskScenario2)
+{
+    // arrange
+    const auto czi_and_size = CreateCziDocumentWithTwoOverlappingSubblocksWithMaskData();
+    const auto inputStream = CreateStreamFromMemory(get<0>(czi_and_size), get<1>(czi_and_size));
+    const auto reader = CreateCZIReader();
+    reader->Open(inputStream);
+
+    auto accessor = reader->CreateSingleChannelPyramidLayerTileAccessor();
+
+    // act
+    ISingleChannelPyramidLayerTileAccessor::Options options;
+    options.Clear();
+    options.backGroundColor = RgbFloatColor{ 0.25f, 0.25f, 0.25f };
+    options.maskAware = true;
+    const CDimCoordinate plane_coordinate{ {DimensionIndex::C, 0} };
+    auto composition = accessor->Get(IntRect{ -1, -1, 8, 8 }, &plane_coordinate, ISingleChannelPyramidLayerTileAccessor::PyramidLayerInfo{ 2,0 }, &options);
+    ASSERT_TRUE(composition);
+    ASSERT_EQ(composition->GetWidth(), 8);
+    ASSERT_EQ(composition->GetHeight(), 8);
+
+    // The expected result is a 8x8 image where:
+    // - The background is gray (64,64,64).
+    // - then, the first sub-block (black, 0) is drawn at 1,1) - (5,5)
+    // - then, the second sub-block (white, 255) is drawn at (3,3) - (7,7) with the checkerboard mask applied
+    static const uint8_t expected_result[] =
+    {
+        0x40, 0x40, 0x40, 0x40, 0x40, 0x40, 0x40, 0x40,
+        0x40, 0x00, 0x00, 0x00, 0x00, 0x40, 0x40, 0x40,
+        0x40, 0x00, 0x00, 0x00, 0x00, 0x40, 0x40, 0x40,
+        0x40, 0x00, 0x00, 0xff, 0x00, 0xff, 0x40, 0x40,
+        0x40, 0x00, 0x00, 0x00, 0xff, 0x40, 0xff, 0x40,
+        0x40, 0x40, 0x40, 0xff, 0x40, 0xff, 0x40, 0x40,
+        0x40, 0x40, 0x40, 0x40, 0xff, 0x40, 0xff, 0x40,
+        0x40, 0x40, 0x40, 0x40, 0x40, 0x40, 0x40, 0x40,
+    };
+
+    // assert
+    ScopedBitmapLockerSP locker_composition{ composition };
+    ASSERT_TRUE(locker_composition.ptrDataRoi != nullptr);
+    for (size_t y = 0; y < composition->GetHeight(); ++y)
+    {
+        const uint8_t* composition_line = static_cast<const uint8_t*>(locker_composition.ptrDataRoi) + y * locker_composition.stride;
+        int r = memcmp(composition_line, expected_result + y * 8, 8);
+        ASSERT_EQ(r, 0);
+    }
+}
+
+TEST(MaskAwareComposition, SingleChannelPyramidLayerTileAccessorWithMaskScenario3)
+{
+    // arrange
+    const auto czi_and_size = CreateCziDocumentWithTwoOverlappingSubblocksWithMaskData();
+    const auto inputStream = CreateStreamFromMemory(get<0>(czi_and_size), get<1>(czi_and_size));
+    const auto reader = CreateCZIReader();
+    reader->Open(inputStream);
+    auto accessor = reader->CreateSingleChannelPyramidLayerTileAccessor();
+
+    auto destination_bitmap = CreateRandomBitmap(PixelType::Gray8, 5, 5);
+
+    // create a copy of the original background
+    auto copy_of_background = CStdBitmapData::Create(destination_bitmap->GetPixelType(), destination_bitmap->GetWidth(), destination_bitmap->GetHeight());
+    {
+        ScopedBitmapLockerSP lockCopy{ copy_of_background };
+        ScopedBitmapLockerSP sourceLock{ destination_bitmap };
+        CBitmapOperations::Copy(
+            destination_bitmap->GetPixelType(),
+            sourceLock.ptrDataRoi,
+            sourceLock.stride,
+            copy_of_background->GetPixelType(),
+            lockCopy.ptrDataRoi,
+            lockCopy.stride,
+            destination_bitmap->GetWidth(),
+            destination_bitmap->GetHeight(),
+            false);
+    }
+
+    // act
+    ISingleChannelPyramidLayerTileAccessor::Options options;
+    options.Clear();
+    // instruct to NOT clear the background, i.e. the content of 'destination_bitmap' is the background
+    options.backGroundColor = RgbFloatColor{ numeric_limits<float>::quiet_NaN(), numeric_limits<float>::quiet_NaN(), numeric_limits<float>::quiet_NaN() };
+    options.maskAware = true;
+    const CDimCoordinate plane_coordinate{ {DimensionIndex::C, 0} };
+    accessor->Get(
+                destination_bitmap.get(),
+                IntPointAndFrameOfReference{ CZIFrameOfReference::PixelCoordinateSystem,IntPoint{ 2,2 } },
+                &plane_coordinate,
+                ISingleChannelPyramidLayerTileAccessor::PyramidLayerInfo{ 2,0 }, // pyramid layer 0
+                &options);
+
+    // assert
+    ScopedBitmapLockerSP copy_of_background_locker{ copy_of_background };
+    ScopedBitmapLockerSP destination_locker{ destination_bitmap };
+    for (size_t y = 0; y < destination_bitmap->GetHeight(); ++y)
+    {
+        const uint8_t* copy_of_background_line = static_cast<const uint8_t*>(copy_of_background_locker.ptrDataRoi) + y * copy_of_background_locker.stride;
+        const uint8_t* destination_line = static_cast<const uint8_t*>(destination_locker.ptrDataRoi) + y * destination_locker.stride;
+        for (size_t x = 0; x < destination_bitmap->GetWidth(); ++x)
+        {
+            const uint8_t pixel_value_composition = destination_line[x];
+            if (x == 1 && y == 0 || x == 0 && y == 1)
+            {
+                // for those pixels, we expect the subblock#0 (=0x00)
+                ASSERT_EQ(pixel_value_composition, 0);
+            }
+            else if ((y == 0 && (x == 0 || x == 2)) || (y == 1 && (x == 1 || x == 3)) || (y == 2 && (x == 0 || x == 2)) || (y == 3 && (x == 1 || x == 3)))
+            {
+                // for those pixels, we expect the (valid) pixels of subblock#1 (=0xff)
+                ASSERT_EQ(pixel_value_composition, 0xff);
+            }
+            else
+            {
+                // otherwise - we expect the original pixel value
+                ASSERT_EQ(pixel_value_composition, copy_of_background_line[x]);
+            }
+        }
+    }
+}
