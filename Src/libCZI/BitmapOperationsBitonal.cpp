@@ -399,60 +399,60 @@ namespace
     typedef NNResizeMaskAwareInfo2<double> NNResizeMaskAwareInfo2Dbl;
 
     template <libCZI::PixelType tSrcPixelType, libCZI::PixelType tDstPixelType, typename tPixelConverter, typename tFlt>
-    void InternalNNScaleMaskAware2(const tPixelConverter& conv, const NNResizeMaskAwareInfo2<tFlt>& resizeInfo)
+    void InternalNNScaleMaskAware2(const tPixelConverter& conv, const NNResizeMaskAwareInfo2<tFlt>& resize_info)
     {
         constexpr uint8_t bytesPerPelSrc = CziUtils::BytesPerPel<tSrcPixelType>();
         constexpr uint8_t bytesPerPelDest = CziUtils::BytesPerPel<tDstPixelType>();
 
-        const int dstXStart = (std::max)(static_cast<int>(resizeInfo.dstRoiX), 0);
-        const int dstXEnd = (std::min)(static_cast<int>(resizeInfo.dstRoiX + resizeInfo.dstRoiW), resizeInfo.dstWidth - 1);
+        const int dstXStart = (std::max)(static_cast<int>(resize_info.dstRoiX), 0);
+        const int dstXEnd = (std::min)(static_cast<int>(resize_info.dstRoiX + resize_info.dstRoiW), resize_info.dstWidth - 1);
 
-        const int dstYStart = (std::max)(static_cast<int>(resizeInfo.dstRoiY), 0);
-        const int dstYEnd = (std::min)(static_cast<int>(resizeInfo.dstRoiY + resizeInfo.dstRoiH), resizeInfo.dstHeight - 1);
+        const int dstYStart = (std::max)(static_cast<int>(resize_info.dstRoiY), 0);
+        const int dstYEnd = (std::min)(static_cast<int>(resize_info.dstRoiY + resize_info.dstRoiH), resize_info.dstHeight - 1);
 
-        auto yMin = ((0 - resizeInfo.srcRoiY) * resizeInfo.dstRoiH) / (resizeInfo.srcRoiH) + resizeInfo.dstRoiY;
-        auto yMax = ((resizeInfo.srcHeight - 1 - resizeInfo.srcRoiY) * (resizeInfo.dstRoiH)) / resizeInfo.srcRoiH + resizeInfo.dstRoiY;
-        auto xMin = ((0 - resizeInfo.srcRoiX) * resizeInfo.dstRoiW) / (resizeInfo.srcRoiW) + resizeInfo.dstRoiX;
-        auto xMax = ((resizeInfo.srcWidth - 1 - resizeInfo.srcRoiX) * (resizeInfo.dstRoiW)) / resizeInfo.srcRoiW + resizeInfo.dstRoiX;
+        auto yMin = ((0 - resize_info.srcRoiY) * resize_info.dstRoiH) / (resize_info.srcRoiH) + resize_info.dstRoiY;
+        auto yMax = ((resize_info.srcHeight - 1 - resize_info.srcRoiY) * (resize_info.dstRoiH)) / resize_info.srcRoiH + resize_info.dstRoiY;
+        auto xMin = ((0 - resize_info.srcRoiX) * resize_info.dstRoiW) / (resize_info.srcRoiW) + resize_info.dstRoiX;
+        auto xMax = ((resize_info.srcWidth - 1 - resize_info.srcRoiX) * (resize_info.dstRoiW)) / resize_info.srcRoiW + resize_info.dstRoiX;
 
         const int dstXStartClipped = (std::max)(static_cast<int>(std::ceil(xMin)), dstXStart);
         const int dstXEndClipped = (std::min)(static_cast<int>(std::ceil(xMax)), dstXEnd);
         const int dstYStartClipped = (std::max)(static_cast<int>(std::ceil(yMin)), dstYStart);
         const int dstYEndClipped = (std::min)(static_cast<int>(std::ceil(yMax)), dstYEnd);
 
-        const auto srcWidthOverDstWidth = resizeInfo.srcRoiW / resizeInfo.dstRoiW;
-        const auto srcHeightOverDstHeight = resizeInfo.srcRoiH / resizeInfo.dstRoiH;
+        const auto srcWidthOverDstWidth = resize_info.srcRoiW / resize_info.dstRoiW;
+        const auto srcHeightOverDstHeight = resize_info.srcRoiH / resize_info.dstRoiH;
 
         for (int y = dstYStartClipped; y <= dstYEndClipped; ++y)
         {
-            tFlt srcY = (y - resizeInfo.dstRoiY) * srcHeightOverDstHeight + resizeInfo.srcRoiY;
+            tFlt srcY = (y - resize_info.dstRoiY) * srcHeightOverDstHeight + resize_info.srcRoiY;
             long srcYInt = lround(srcY);
             if (srcYInt < 0)
             {
                 srcYInt = 0;
             }
-            else if (srcYInt >= resizeInfo.srcHeight)
+            else if (srcYInt >= resize_info.srcHeight)
             {
-                srcYInt = resizeInfo.srcHeight - 1;
+                srcYInt = resize_info.srcHeight - 1;
             }
 
-            const char* pSrcLine = (static_cast<const char*>(resizeInfo.srcPtr) + srcYInt * static_cast<size_t>(resizeInfo.srcStride));
-            char* pDstLine = static_cast<char*>(resizeInfo.dstPtr) + y * static_cast<size_t>(resizeInfo.dstStride);
+            const char* pSrcLine = (static_cast<const char*>(resize_info.srcPtr) + srcYInt * static_cast<size_t>(resize_info.srcStride));
+            char* pDstLine = static_cast<char*>(resize_info.dstPtr) + y * static_cast<size_t>(resize_info.dstStride);
             for (int x = dstXStartClipped; x <= dstXEndClipped; ++x)
             {
                 // now transform this pixel into the source-ROI
-                tFlt srcX = (x - resizeInfo.dstRoiX) * srcWidthOverDstWidth + resizeInfo.srcRoiX;
+                tFlt srcX = (x - resize_info.dstRoiX) * srcWidthOverDstWidth + resize_info.srcRoiX;
                 long srcXInt = lround(srcX);
                 if (srcXInt < 0)
                 {
                     srcXInt = 0;
                 }
-                else if (srcXInt >= resizeInfo.srcWidth)
+                else if (srcXInt >= resize_info.srcWidth)
                 {
-                    srcXInt = resizeInfo.srcWidth - 1;
+                    srcXInt = resize_info.srcWidth - 1;
                 }
 
-                if (BitmapOperationsBitonal::GetPixelFromBitonalUnchecked(srcXInt, srcYInt, resizeInfo.srcMaskPtr, resizeInfo.srcMaskStride))
+                if (BitmapOperationsBitonal::GetPixelFromBitonalUnchecked(srcXInt, srcYInt, resize_info.srcMaskPtr, resize_info.srcMaskStride))
                 {
                     const char* pSrc = pSrcLine + srcXInt * static_cast<size_t>(bytesPerPelSrc);
                     char* pDst = pDstLine + x * static_cast<size_t>(bytesPerPelDest);
@@ -463,140 +463,140 @@ namespace
     }
 
     template <libCZI::PixelType tSrcPixelType, libCZI::PixelType tDstPixelType, typename tPixelConverter, typename tFlt>
-    void InternalNNScaleMaskAware2(const NNResizeMaskAwareInfo2<tFlt>& resizeInfo)
+    void InternalNNScaleMaskAware2(const NNResizeMaskAwareInfo2<tFlt>& resize_info)
     {
         tPixelConverter conv;
-        InternalNNScaleMaskAware2<tSrcPixelType, tDstPixelType, tPixelConverter>(conv, resizeInfo);
+        InternalNNScaleMaskAware2<tSrcPixelType, tDstPixelType, tPixelConverter>(conv, resize_info);
     }
 
-    [[noreturn]] void ThrowUnsupportedConversion(libCZI::PixelType srcPixelType, libCZI::PixelType dstPixelType)
+    [[noreturn]] void ThrowUnsupportedConversion(libCZI::PixelType source_pixel_type, libCZI::PixelType destination_pixel_type)
     {
         stringstream ss;
-        ss << "Operation not implemented for source pixeltype='" << libCZI::Utils::PixelTypeToInformalString(srcPixelType) << "' and destination pixeltype='" << libCZI::Utils::PixelTypeToInformalString(dstPixelType) << "'.";
+        ss << "Operation not implemented for source pixeltype='" << libCZI::Utils::PixelTypeToInformalString(source_pixel_type) << "' and destination pixeltype='" << libCZI::Utils::PixelTypeToInformalString(destination_pixel_type) << "'.";
         throw LibCZIException(ss.str().c_str());
     }
 
     template <typename tFlt>
-    void NNScaleMaskAware2(libCZI::PixelType srcPixelType, libCZI::PixelType dstPixelType, const NNResizeMaskAwareInfo2<tFlt>& resizeInfo)
+    void NNScaleMaskAware2(libCZI::PixelType source_pixel_type, libCZI::PixelType destination_pixel_type, const NNResizeMaskAwareInfo2<tFlt>& resize_info)
     {
-        switch (srcPixelType)
+        switch (source_pixel_type)
         {
         case libCZI::PixelType::Gray8:
-            switch (dstPixelType)
+            switch (destination_pixel_type)
             {
             case libCZI::PixelType::Gray8:
-                InternalNNScaleMaskAware2<libCZI::PixelType::Gray8, libCZI::PixelType::Gray8, CConvGray8ToGray8>(resizeInfo);
+                InternalNNScaleMaskAware2<libCZI::PixelType::Gray8, libCZI::PixelType::Gray8, CConvGray8ToGray8>(resize_info);
                 break;
             case libCZI::PixelType::Gray16:
-                InternalNNScaleMaskAware2<libCZI::PixelType::Gray8, libCZI::PixelType::Gray16, CConvGray8ToGray16>(resizeInfo);
+                InternalNNScaleMaskAware2<libCZI::PixelType::Gray8, libCZI::PixelType::Gray16, CConvGray8ToGray16>(resize_info);
                 break;
             case libCZI::PixelType::Bgr24:
-                InternalNNScaleMaskAware2<libCZI::PixelType::Gray8, libCZI::PixelType::Bgr24, CConvGray8ToBgr24>(resizeInfo);
+                InternalNNScaleMaskAware2<libCZI::PixelType::Gray8, libCZI::PixelType::Bgr24, CConvGray8ToBgr24>(resize_info);
                 break;
             case libCZI::PixelType::Bgr48:
-                InternalNNScaleMaskAware2<libCZI::PixelType::Gray8, libCZI::PixelType::Bgr48, CConvGray8ToBgr48>(resizeInfo);
+                InternalNNScaleMaskAware2<libCZI::PixelType::Gray8, libCZI::PixelType::Bgr48, CConvGray8ToBgr48>(resize_info);
                 break;
             case libCZI::PixelType::Gray32Float:
-                InternalNNScaleMaskAware2<libCZI::PixelType::Gray8, libCZI::PixelType::Gray32Float, CConvGray8ToGray32Float>(resizeInfo);
+                InternalNNScaleMaskAware2<libCZI::PixelType::Gray8, libCZI::PixelType::Gray32Float, CConvGray8ToGray32Float>(resize_info);
                 break;
             default:
-                ThrowUnsupportedConversion(srcPixelType, dstPixelType);
+                ThrowUnsupportedConversion(source_pixel_type, destination_pixel_type);
             }
 
             break;
         case libCZI::PixelType::Bgr24:
-            switch (dstPixelType)
+            switch (destination_pixel_type)
             {
             case libCZI::PixelType::Gray8:
-                InternalNNScaleMaskAware2<libCZI::PixelType::Bgr24, libCZI::PixelType::Gray8, CConvBgr24ToGray8>(resizeInfo);
+                InternalNNScaleMaskAware2<libCZI::PixelType::Bgr24, libCZI::PixelType::Gray8, CConvBgr24ToGray8>(resize_info);
                 break;
             case libCZI::PixelType::Gray16:
-                InternalNNScaleMaskAware2<libCZI::PixelType::Bgr24, libCZI::PixelType::Gray16, CConvBgr24ToGray16>(resizeInfo);
+                InternalNNScaleMaskAware2<libCZI::PixelType::Bgr24, libCZI::PixelType::Gray16, CConvBgr24ToGray16>(resize_info);
                 break;
             case libCZI::PixelType::Gray32Float:
-                InternalNNScaleMaskAware2<libCZI::PixelType::Bgr24, libCZI::PixelType::Gray32Float, CConvBgr24ToGray32Float>(resizeInfo);
+                InternalNNScaleMaskAware2<libCZI::PixelType::Bgr24, libCZI::PixelType::Gray32Float, CConvBgr24ToGray32Float>(resize_info);
                 break;
             case libCZI::PixelType::Bgr24:
-                InternalNNScaleMaskAware2<libCZI::PixelType::Bgr24, libCZI::PixelType::Bgr24, CConvBgr24ToBgr24>(resizeInfo);
+                InternalNNScaleMaskAware2<libCZI::PixelType::Bgr24, libCZI::PixelType::Bgr24, CConvBgr24ToBgr24>(resize_info);
                 break;
             case libCZI::PixelType::Bgr48:
-                InternalNNScaleMaskAware2<libCZI::PixelType::Bgr24, libCZI::PixelType::Bgr48, CConvBgr24ToBgr48>(resizeInfo);
+                InternalNNScaleMaskAware2<libCZI::PixelType::Bgr24, libCZI::PixelType::Bgr48, CConvBgr24ToBgr48>(resize_info);
                 break;
             default:
-                ThrowUnsupportedConversion(srcPixelType, dstPixelType);
+                ThrowUnsupportedConversion(source_pixel_type, destination_pixel_type);
             }
 
             break;
         case libCZI::PixelType::Bgra32:
-            switch (dstPixelType)
+            switch (destination_pixel_type)
             {
             case libCZI::PixelType::Bgra32:
-                InternalNNScaleMaskAware2<libCZI::PixelType::Bgra32, libCZI::PixelType::Bgra32, CConvBgra32ToBgra32>(resizeInfo);
+                InternalNNScaleMaskAware2<libCZI::PixelType::Bgra32, libCZI::PixelType::Bgra32, CConvBgra32ToBgra32>(resize_info);
                 break;
             default:
-                ThrowUnsupportedConversion(srcPixelType, dstPixelType);
+                ThrowUnsupportedConversion(source_pixel_type, destination_pixel_type);
             }
 
             break;
         case libCZI::PixelType::Gray16:
-            switch (dstPixelType)
+            switch (destination_pixel_type)
             {
             case libCZI::PixelType::Gray8:
-                InternalNNScaleMaskAware2<libCZI::PixelType::Gray16, libCZI::PixelType::Gray8, CConvGray16ToGray8>(resizeInfo);
+                InternalNNScaleMaskAware2<libCZI::PixelType::Gray16, libCZI::PixelType::Gray8, CConvGray16ToGray8>(resize_info);
                 break;
             case libCZI::PixelType::Gray16:
-                InternalNNScaleMaskAware2<libCZI::PixelType::Gray16, libCZI::PixelType::Gray16, CConvGray16ToGray16>(resizeInfo);
+                InternalNNScaleMaskAware2<libCZI::PixelType::Gray16, libCZI::PixelType::Gray16, CConvGray16ToGray16>(resize_info);
                 break;
             case libCZI::PixelType::Gray32Float:
-                InternalNNScaleMaskAware2<libCZI::PixelType::Gray16, libCZI::PixelType::Gray32Float, CConvGray16ToGray32Float>(resizeInfo);
+                InternalNNScaleMaskAware2<libCZI::PixelType::Gray16, libCZI::PixelType::Gray32Float, CConvGray16ToGray32Float>(resize_info);
                 break;
             case libCZI::PixelType::Bgr24:
-                InternalNNScaleMaskAware2<libCZI::PixelType::Gray16, libCZI::PixelType::Bgr24, CConvGray16ToBgr24>(resizeInfo);
+                InternalNNScaleMaskAware2<libCZI::PixelType::Gray16, libCZI::PixelType::Bgr24, CConvGray16ToBgr24>(resize_info);
                 break;
             case libCZI::PixelType::Bgr48:
-                InternalNNScaleMaskAware2<libCZI::PixelType::Gray16, libCZI::PixelType::Bgr48, CConvGray16ToBgr48>(resizeInfo);
+                InternalNNScaleMaskAware2<libCZI::PixelType::Gray16, libCZI::PixelType::Bgr48, CConvGray16ToBgr48>(resize_info);
                 break;
             default:
-                ThrowUnsupportedConversion(srcPixelType, dstPixelType);
+                ThrowUnsupportedConversion(source_pixel_type, destination_pixel_type);
             }
 
             break;
         case libCZI::PixelType::Bgr48:
-            switch (dstPixelType)
+            switch (destination_pixel_type)
             {
             case libCZI::PixelType::Gray8:
-                InternalNNScaleMaskAware2<libCZI::PixelType::Bgr48, libCZI::PixelType::Gray8, CConvBgr48ToGray8>(resizeInfo);
+                InternalNNScaleMaskAware2<libCZI::PixelType::Bgr48, libCZI::PixelType::Gray8, CConvBgr48ToGray8>(resize_info);
                 break;
             case libCZI::PixelType::Gray16:
-                InternalNNScaleMaskAware2<libCZI::PixelType::Bgr48, libCZI::PixelType::Gray16, CConvBgr48ToGray16>(resizeInfo);
+                InternalNNScaleMaskAware2<libCZI::PixelType::Bgr48, libCZI::PixelType::Gray16, CConvBgr48ToGray16>(resize_info);
                 break;
             case libCZI::PixelType::Gray32Float:
-                InternalNNScaleMaskAware2<libCZI::PixelType::Bgr48, libCZI::PixelType::Gray32Float, CConvBgr48ToGray32Float>(resizeInfo);
+                InternalNNScaleMaskAware2<libCZI::PixelType::Bgr48, libCZI::PixelType::Gray32Float, CConvBgr48ToGray32Float>(resize_info);
                 break;
             case libCZI::PixelType::Bgr24:
-                InternalNNScaleMaskAware2<libCZI::PixelType::Bgr48, libCZI::PixelType::Bgr24, CConvBgr48ToBgr24>(resizeInfo);
+                InternalNNScaleMaskAware2<libCZI::PixelType::Bgr48, libCZI::PixelType::Bgr24, CConvBgr48ToBgr24>(resize_info);
                 break;
             case libCZI::PixelType::Bgr48:
-                InternalNNScaleMaskAware2<libCZI::PixelType::Bgr48, libCZI::PixelType::Bgr48, CConvBgr48ToBgr48>(resizeInfo);
+                InternalNNScaleMaskAware2<libCZI::PixelType::Bgr48, libCZI::PixelType::Bgr48, CConvBgr48ToBgr48>(resize_info);
                 break;
             default:
-                ThrowUnsupportedConversion(srcPixelType, dstPixelType);
+                ThrowUnsupportedConversion(source_pixel_type, destination_pixel_type);
             }
 
             break;
         case libCZI::PixelType::Gray32Float:
-            switch (dstPixelType)
+            switch (destination_pixel_type)
             {
             case libCZI::PixelType::Gray32Float:
-                InternalNNScaleMaskAware2<libCZI::PixelType::Gray32Float, libCZI::PixelType::Gray32Float, CConvGray32FloatToGray32Float>(resizeInfo);
+                InternalNNScaleMaskAware2<libCZI::PixelType::Gray32Float, libCZI::PixelType::Gray32Float, CConvGray32FloatToGray32Float>(resize_info);
                 break;
             default:
-                ThrowUnsupportedConversion(srcPixelType, dstPixelType);
+                ThrowUnsupportedConversion(source_pixel_type, destination_pixel_type);
             }
 
             break;
         default:
-            ThrowUnsupportedConversion(srcPixelType, dstPixelType);
+            ThrowUnsupportedConversion(source_pixel_type, destination_pixel_type);
         }
     }
 }
