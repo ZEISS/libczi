@@ -97,10 +97,11 @@ void CSingleChannelPyramidLevelTileAccessor::InternalGet(libCZI::IBitmapData* pD
 
 void CSingleChannelPyramidLevelTileAccessor::ComposeTiles(libCZI::IBitmapData* bm, int xPos, int yPos, int sizeOfPixel, int bitmapCnt, const Options& options, const std::function<SbInfo(int)>& getSbInfo)
 {
-    Compositors::ComposeSingleTileOptions composeOptions; composeOptions.Clear();
+    Compositors::ComposeSingleTileOptions composeOptions;
+    composeOptions.Clear();
     composeOptions.drawTileBorder = options.drawTileBorder;
 
-    Compositors::ComposeSingleChannelTiles(
+   /* Compositors::ComposeSingleChannelTiles(
         [&](int index, std::shared_ptr<libCZI::IBitmapData>& spBm, int& xPosTile, int& yPosTile)->bool
         {
             if (index < bitmapCnt)
@@ -114,6 +115,32 @@ void CSingleChannelPyramidLevelTileAccessor::ComposeTiles(libCZI::IBitmapData* b
                 spBm = subblock_bitmap_data.bitmap;
                 xPosTile = (subblock_bitmap_data.subBlockInfo.logicalRect.x - xPos) / sizeOfPixel;
                 yPosTile = (subblock_bitmap_data.subBlockInfo.logicalRect.y - yPos) / sizeOfPixel;
+                return true;
+            }
+
+            return false;
+        },
+        bm,
+        0,
+        0,
+        &composeOptions);
+        */
+    Compositors::ComposeSingleChannelTilesMaskAware(
+        [&](int index, std::shared_ptr<libCZI::IBitmapData>& out_bitmap, std::shared_ptr<libCZI::IBitonalBitmapData>& out_mask_bitmap, int& tile_x_position, int& tile_y_position)->bool
+        {
+            if (index < bitmapCnt)
+            {
+                const SbInfo sub_block_info = getSbInfo(index);
+                const auto subblock_bitmap_data = CSingleChannelAccessorBase::GetSubBlockDataIncludingMaskForSubBlockIndex(
+                        this->sbBlkRepository,
+                        options.subBlockCache,
+                        sub_block_info.index,
+                        options.onlyUseSubBlockCacheForCompressedData,
+                        options.maskAware);
+                out_bitmap = subblock_bitmap_data.bitmap;
+                out_mask_bitmap = subblock_bitmap_data.mask;
+                tile_x_position = (subblock_bitmap_data.subBlockInfo.logicalRect.x - xPos) / sizeOfPixel;
+                tile_y_position = (subblock_bitmap_data.subBlockInfo.logicalRect.y - yPos) / sizeOfPixel;
                 return true;
             }
 

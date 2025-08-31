@@ -237,6 +237,7 @@ namespace libCZI
             /// increased memory usage.
             bool onlyUseSubBlockCacheForCompressedData;
 
+            /// If true, then masks (if present) are taken into account when composing the tile-composite.
             bool maskAware;
 
             /// Clears this object to its blank state.
@@ -249,6 +250,7 @@ namespace libCZI
                 this->sceneFilter.reset();
                 this->subBlockCache.reset();
                 this->onlyUseSubBlockCacheForCompressedData = true;
+                this->maskAware = false;
             }
         };
 
@@ -391,6 +393,9 @@ namespace libCZI
             /// If true, then only bitmaps from sub-blocks with compressed data are added to the cache.
             bool onlyUseSubBlockCacheForCompressedData;
 
+            /// If true, then masks (if present) are taken into account when composing the tile-composite.
+            bool maskAware;
+
             /// Clears this object to its blank state.
             void Clear()
             {
@@ -400,6 +405,7 @@ namespace libCZI
                 this->sceneFilter.reset();
                 this->subBlockCache.reset();
                 this->onlyUseSubBlockCacheForCompressedData = true;
+                this->maskAware = false;
             }
         };
 
@@ -524,6 +530,7 @@ namespace libCZI
             /// If true, then only bitmaps from sub-blocks with compressed data are added to the cache.
             bool onlyUseSubBlockCacheForCompressedData;
 
+            /// If true, then masks (if present) are taken into account when composing the tile-composite.
             bool maskAware;
 
             /// Clears this object to its blank state.
@@ -534,7 +541,7 @@ namespace libCZI
                 this->backGroundColor.r = this->backGroundColor.g = this->backGroundColor.b = std::numeric_limits<float>::quiet_NaN();
                 this->sceneFilter.reset();
                 this->useVisibilityCheckOptimization = false;
-                this->maskAware = true; // EXPERIMENTAL EXPERIMENTAL EXPERIMENTAL EXPERIMENTAL EXPERIMENTAL EXPERIMENTAL EXPERIMENTAL 
+                this->maskAware = false;
                 this->subBlockCache.reset();
                 this->onlyUseSubBlockCacheForCompressedData = true;
             }
