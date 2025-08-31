@@ -100,31 +100,7 @@ void CSingleChannelPyramidLevelTileAccessor::ComposeTiles(libCZI::IBitmapData* b
     Compositors::ComposeSingleTileOptions composeOptions;
     composeOptions.Clear();
     composeOptions.drawTileBorder = options.drawTileBorder;
-
-   /* Compositors::ComposeSingleChannelTiles(
-        [&](int index, std::shared_ptr<libCZI::IBitmapData>& spBm, int& xPosTile, int& yPosTile)->bool
-        {
-            if (index < bitmapCnt)
-            {
-                const SbInfo sbinfo = getSbInfo(index);
-                const auto subblock_bitmap_data = CSingleChannelAccessorBase::GetSubBlockDataForSubBlockIndex(
-                        this->sbBlkRepository,
-                        options.subBlockCache,
-                        sbinfo.index,
-                        options.onlyUseSubBlockCacheForCompressedData);
-                spBm = subblock_bitmap_data.bitmap;
-                xPosTile = (subblock_bitmap_data.subBlockInfo.logicalRect.x - xPos) / sizeOfPixel;
-                yPosTile = (subblock_bitmap_data.subBlockInfo.logicalRect.y - yPos) / sizeOfPixel;
-                return true;
-            }
-
-            return false;
-        },
-        bm,
-        0,
-        0,
-        &composeOptions);
-        */
+ 
     Compositors::ComposeSingleChannelTilesMaskAware(
         [&](int index, std::shared_ptr<libCZI::IBitmapData>& out_bitmap, std::shared_ptr<libCZI::IBitonalBitmapData>& out_mask_bitmap, int& tile_x_position, int& tile_y_position)->bool
         {
