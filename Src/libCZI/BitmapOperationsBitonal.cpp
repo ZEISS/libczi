@@ -687,115 +687,92 @@ namespace
         }
     }
 
-    template <libCZI::PixelType tSrcPixelType, libCZI::PixelType tDstPixelType>
-    void CopyWithMask(const CopyParameters& parameters);
+    template <libCZI::PixelType tSrcPixelType, libCZI::PixelType tDstPixelType> void CopyWithMask(const CopyParameters& parameters);
 
-    template <>
-    void CopyWithMask<libCZI::PixelType::Gray8, libCZI::PixelType::Gray8>(const CopyParameters& parameters)
+    template <> void CopyWithMask<libCZI::PixelType::Gray8, libCZI::PixelType::Gray8>(const CopyParameters& parameters)
     {
         CopySamePixelTypeWithMask<libCZI::PixelType::Gray8>(parameters);
     }
-    template <>
-    void CopyWithMask<libCZI::PixelType::Gray16, libCZI::PixelType::Gray16>(const CopyParameters& parameters)
+    template <> void CopyWithMask<libCZI::PixelType::Gray16, libCZI::PixelType::Gray16>(const CopyParameters& parameters)
     {
         CopySamePixelTypeWithMask<libCZI::PixelType::Gray16>(parameters);
     }
-    template <>
-    void CopyWithMask<libCZI::PixelType::Gray32Float, libCZI::PixelType::Gray32Float>(const CopyParameters& parameters)
+    template <> void CopyWithMask<libCZI::PixelType::Gray32Float, libCZI::PixelType::Gray32Float>(const CopyParameters& parameters)
     {
         CopySamePixelTypeWithMask<libCZI::PixelType::Gray32Float>(parameters);
     }
-    template <>
-    void CopyWithMask<libCZI::PixelType::Bgr24, libCZI::PixelType::Bgr24>(const CopyParameters& parameters)
+    template <> void CopyWithMask<libCZI::PixelType::Bgr24, libCZI::PixelType::Bgr24>(const CopyParameters& parameters)
     {
         CopySamePixelTypeWithMask<libCZI::PixelType::Bgr24>(parameters);
     }
-    template <>
-    void CopyWithMask<libCZI::PixelType::Bgr48, libCZI::PixelType::Bgr48>(const CopyParameters& parameters)
+    template <> void CopyWithMask<libCZI::PixelType::Bgr48, libCZI::PixelType::Bgr48>(const CopyParameters& parameters)
     {
         CopySamePixelTypeWithMask<libCZI::PixelType::Bgr48>(parameters);
     }
-    template <>
-    void CopyWithMask<libCZI::PixelType::Bgr24, libCZI::PixelType::Gray8>(const CopyParameters& parameters)
+    template <> void CopyWithMask<libCZI::PixelType::Bgr24, libCZI::PixelType::Gray8>(const CopyParameters& parameters)
     {
         CopyWithMask<libCZI::PixelType::Bgr24, libCZI::PixelType::Gray8, CConvBgr24ToGray8>(CConvBgr24ToGray8(), parameters);
     }
-    template <>
-    void CopyWithMask<libCZI::PixelType::Gray8, libCZI::PixelType::Bgr24>(const CopyParameters& parameters)
+    template <> void CopyWithMask<libCZI::PixelType::Gray8, libCZI::PixelType::Bgr24>(const CopyParameters& parameters)
     {
         CopyWithMask<libCZI::PixelType::Gray8, libCZI::PixelType::Bgr24, CConvGray8ToBgr24>(CConvGray8ToBgr24(), parameters);
     }
-    template <>
-    void CopyWithMask<libCZI::PixelType::Gray8, libCZI::PixelType::Bgr48>(const CopyParameters& parameters)
+    template <> void CopyWithMask<libCZI::PixelType::Gray8, libCZI::PixelType::Bgr48>(const CopyParameters& parameters)
     {
         CopyWithMask<libCZI::PixelType::Gray8, libCZI::PixelType::Bgr48, CConvGray8ToBgr48>(CConvGray8ToBgr48(), parameters);
     }
-    template <>
-    void CopyWithMask<libCZI::PixelType::Gray8, libCZI::PixelType::Gray16>(const CopyParameters& parameters)
+    template <> void CopyWithMask<libCZI::PixelType::Gray8, libCZI::PixelType::Gray16>(const CopyParameters& parameters)
     {
         CopyWithMask<libCZI::PixelType::Gray8, libCZI::PixelType::Gray16, CConvGray8ToGray16>(CConvGray8ToGray16(), parameters);
     }
-    template <>
-    void CopyWithMask<libCZI::PixelType::Gray8, libCZI::PixelType::Gray32Float>(const CopyParameters& parameters)
+    template <> void CopyWithMask<libCZI::PixelType::Gray8, libCZI::PixelType::Gray32Float>(const CopyParameters& parameters)
     {
         CopyWithMask<libCZI::PixelType::Gray8, libCZI::PixelType::Gray32Float, CConvGray8ToGray32Float>(CConvGray8ToGray32Float(), parameters);
     }
-    template <>
-    void CopyWithMask<libCZI::PixelType::Bgr24, libCZI::PixelType::Gray32Float>(const CopyParameters& parameters)
+    template <> void CopyWithMask<libCZI::PixelType::Bgr24, libCZI::PixelType::Gray32Float>(const CopyParameters& parameters)
     {
         CopyWithMask<libCZI::PixelType::Bgr24, libCZI::PixelType::Gray32Float, CConvBgr24ToGray32Float>(CConvBgr24ToGray32Float(), parameters);
     }
-    template <>
-    void CopyWithMask<libCZI::PixelType::Bgr24, libCZI::PixelType::Gray16>(const CopyParameters& parameters)
+    template <> void CopyWithMask<libCZI::PixelType::Bgr24, libCZI::PixelType::Gray16>(const CopyParameters& parameters)
     {
         CopyWithMask<libCZI::PixelType::Bgr24, libCZI::PixelType::Gray16, CConvBgr24ToGray16>(CConvBgr24ToGray16(), parameters);
     }
-    template <>
-    void CopyWithMask<libCZI::PixelType::Bgr24, libCZI::PixelType::Bgr48>(const CopyParameters& parameters)
+    template <> void CopyWithMask<libCZI::PixelType::Bgr24, libCZI::PixelType::Bgr48>(const CopyParameters& parameters)
     {
         CopyWithMask<libCZI::PixelType::Bgr24, libCZI::PixelType::Bgr48, CConvBgr24ToBgr48>(CConvBgr24ToBgr48(), parameters);
     }
-    template <>
-    void CopyWithMask<libCZI::PixelType::Gray16, libCZI::PixelType::Gray8>(const CopyParameters& parameters)
+    template <> void CopyWithMask<libCZI::PixelType::Gray16, libCZI::PixelType::Gray8>(const CopyParameters& parameters)
     {
         CopyWithMask<libCZI::PixelType::Gray16, libCZI::PixelType::Gray8, CConvGray16ToGray8>(CConvGray16ToGray8(), parameters);
     }
-    template <>
-    void CopyWithMask<libCZI::PixelType::Gray16, libCZI::PixelType::Gray32Float>(const CopyParameters& parameters)
+    template <> void CopyWithMask<libCZI::PixelType::Gray16, libCZI::PixelType::Gray32Float>(const CopyParameters& parameters)
     {
         CopyWithMask<libCZI::PixelType::Gray16, libCZI::PixelType::Gray32Float, CConvGray16ToGray32Float>(CConvGray16ToGray32Float(), parameters);
     }
-    template <>
-    void CopyWithMask<libCZI::PixelType::Gray16, libCZI::PixelType::Bgr24>(const CopyParameters& parameters)
+    template <> void CopyWithMask<libCZI::PixelType::Gray16, libCZI::PixelType::Bgr24>(const CopyParameters& parameters)
     {
         CopyWithMask<libCZI::PixelType::Gray16, libCZI::PixelType::Bgr24, CConvGray16ToBgr24>(CConvGray16ToBgr24(), parameters);
     }
-    template <>
-    void CopyWithMask<libCZI::PixelType::Gray16, libCZI::PixelType::Bgr48>(const CopyParameters& parameters)
+    template <> void CopyWithMask<libCZI::PixelType::Gray16, libCZI::PixelType::Bgr48>(const CopyParameters& parameters)
     {
         CopyWithMask<libCZI::PixelType::Gray16, libCZI::PixelType::Bgr48, CConvGray16ToBgr48>(CConvGray16ToBgr48(), parameters);
     }
-    template <>
-    void CopyWithMask<libCZI::PixelType::Bgr48, libCZI::PixelType::Gray8>(const CopyParameters& parameters)
+    template <> void CopyWithMask<libCZI::PixelType::Bgr48, libCZI::PixelType::Gray8>(const CopyParameters& parameters)
     {
         CopyWithMask<libCZI::PixelType::Bgr48, libCZI::PixelType::Gray8, CConvBgr48ToGray8>(CConvBgr48ToGray8(), parameters);
     }
-    template <>
-    void CopyWithMask<libCZI::PixelType::Bgr48, libCZI::PixelType::Gray16>(const CopyParameters& parameters)
+    template <> void CopyWithMask<libCZI::PixelType::Bgr48, libCZI::PixelType::Gray16>(const CopyParameters& parameters)
     {
         CopyWithMask<libCZI::PixelType::Bgr48, libCZI::PixelType::Gray16, CConvBgr48ToGray16>(CConvBgr48ToGray16(), parameters);
     }
-    template <>
-    void CopyWithMask<libCZI::PixelType::Bgr48, libCZI::PixelType::Gray32Float>(const CopyParameters& parameters)
+    template <> void CopyWithMask<libCZI::PixelType::Bgr48, libCZI::PixelType::Gray32Float>(const CopyParameters& parameters)
     {
         CopyWithMask<libCZI::PixelType::Bgr48, libCZI::PixelType::Gray32Float, CConvBgr48ToGray32Float>(CConvBgr48ToGray32Float(), parameters);
     }
-    template <>
-    void CopyWithMask<libCZI::PixelType::Bgr48, libCZI::PixelType::Bgr24>(const CopyParameters& parameters)
+    template <> void CopyWithMask<libCZI::PixelType::Bgr48, libCZI::PixelType::Bgr24>(const CopyParameters& parameters)
     {
         CopyWithMask<libCZI::PixelType::Bgr48, libCZI::PixelType::Bgr24, CConvBgr48ToBgr24>(CConvBgr48ToBgr24(), parameters);
     }
-
 
     void CopyWithMask(
         libCZI::PixelType srcPixelType, libCZI::PixelType dstPixelType,
@@ -909,124 +886,6 @@ namespace
 
         throw std::logic_error("It seems that this conversion is not implemented...");
     }
-
-#if false
-    void CopyWithMask(
-        libCZI::PixelType srcPixelType, const void* srcPtr, int srcStride,
-        libCZI::PixelType dstPixelType, void* dstPtr, int dstStride,
-        int width, int height, const void* src_mask_ptr, int src_mask_stride, int mask_offset_x, int mask_offset_y,
-        bool drawTileBorder)
-    {
-        switch (srcPixelType)
-        {
-        case PixelType::Gray8:
-            switch (dstPixelType)
-            {
-            case PixelType::Gray8:
-                CopyWithMask<PixelType::Gray8, PixelType::Gray8>(srcPtr, srcStride, dstPtr, dstStride, width, height, src_mask_ptr, src_mask_stride, mask_offset_x, mask_offset_y, drawTileBorder);
-                return;
-            case PixelType::Gray16:
-                CopyWithMask<PixelType::Gray8, PixelType::Gray16>(srcPtr, srcStride, dstPtr, dstStride, width, height, src_mask_ptr, src_mask_stride, mask_offset_x, mask_offset_y, drawTileBorder);
-                return;
-                /*case PixelType::Gray32Float:
-                    CopyWithMask<PixelType::Gray8, PixelType::Gray32Float>(srcPtr, srcStride, dstPtr, dstStride, width, height, drawTileBorder);
-                    return;
-                case PixelType::Bgr24:
-                    CopyWithMask<PixelType::Gray8, PixelType::Bgr24>(srcPtr, srcStride, dstPtr, dstStride, width, height, drawTileBorder);
-                    return;
-                case PixelType::Bgr48:
-                    CopyWithMask<PixelType::Gray8, PixelType::Bgr48>(srcPtr, srcStride, dstPtr, dstStride, width, height, drawTileBorder);
-                    return;*/
-            default:break;
-            }
-            break;
-            /*
-                    case PixelType::Gray16:
-                        switch (dstPixelType)
-                        {
-                        case PixelType::Gray8:
-                            CopyWithMask<PixelType::Gray16, PixelType::Gray8>(srcPtr, srcStride, dstPtr, dstStride, width, height, drawTileBorder);
-                            return;
-                        case PixelType::Gray16:
-                            CopyWithMask<PixelType::Gray16, PixelType::Gray16>(srcPtr, srcStride, dstPtr, dstStride, width, height, drawTileBorder);
-                            return;
-                        case PixelType::Gray32Float:
-                            CopyWithMask<PixelType::Gray16, PixelType::Gray32Float>(srcPtr, srcStride, dstPtr, dstStride, width, height, drawTileBorder);
-                            return;
-                        case PixelType::Bgr24:
-                            CopyWithMask<PixelType::Gray16, PixelType::Bgr24>(srcPtr, srcStride, dstPtr, dstStride, width, height, drawTileBorder);
-                            return;
-                        case PixelType::Bgr48:
-                            CopyWithMask<PixelType::Gray16, PixelType::Bgr48>(srcPtr, srcStride, dstPtr, dstStride, width, height, drawTileBorder);
-                            return;
-                        default:break;
-                        }
-                        break;
-
-                    case PixelType::Gray32Float:
-                        switch (dstPixelType)
-                        {
-                        case PixelType::Gray8:break;
-                        case PixelType::Gray16:break;
-                        case PixelType::Gray32Float:
-                            CopyWithMask<PixelType::Gray32Float, PixelType::Gray32Float>(srcPtr, srcStride, dstPtr, dstStride, width, height, drawTileBorder);
-                            return;
-                        case PixelType::Bgr24:break;
-                        case PixelType::Bgr48:break;
-                        default:break;
-                        }
-                        break;
-
-                    case PixelType::Bgr24:
-                        switch (dstPixelType)
-                        {
-                        case PixelType::Gray8:
-                            CopyWithMask<PixelType::Bgr24, PixelType::Gray8>(srcPtr, srcStride, dstPtr, dstStride, width, height, drawTileBorder);
-                            return;
-                        case PixelType::Gray16:
-                            CopyWithMask<PixelType::Bgr24, PixelType::Gray16>(srcPtr, srcStride, dstPtr, dstStride, width, height, drawTileBorder);
-                            return;
-                        case PixelType::Gray32Float:
-                            CopyWithMask<PixelType::Bgr24, PixelType::Gray32Float>(srcPtr, srcStride, dstPtr, dstStride, width, height, drawTileBorder);
-                            return;
-                        case PixelType::Bgr24:
-                            CopyWithMask<PixelType::Bgr24, PixelType::Bgr24>(srcPtr, srcStride, dstPtr, dstStride, width, height, drawTileBorder);
-                            return;
-                        case PixelType::Bgr48:
-                            CopyWithMask<PixelType::Bgr24, PixelType::Bgr48>(srcPtr, srcStride, dstPtr, dstStride, width, height, drawTileBorder);
-                            return;
-                        default:break;
-                        }
-                        break;
-
-                    case PixelType::Bgr48:
-                        switch (dstPixelType)
-                        {
-                        case PixelType::Gray8:
-                            CopyWithMask<PixelType::Bgr48, PixelType::Gray8>(srcPtr, srcStride, dstPtr, dstStride, width, height, drawTileBorder);
-                            return;
-                        case PixelType::Gray16:
-                            CopyWithMask<PixelType::Bgr48, PixelType::Gray16>(srcPtr, srcStride, dstPtr, dstStride, width, height, drawTileBorder);
-                            return;
-                        case PixelType::Gray32Float:
-                            CopyWithMask<PixelType::Bgr48, PixelType::Gray32Float>(srcPtr, srcStride, dstPtr, dstStride, width, height, drawTileBorder);
-                            return;
-                        case PixelType::Bgr24:
-                            CopyWithMask<PixelType::Bgr48, PixelType::Bgr24>(srcPtr, srcStride, dstPtr, dstStride, width, height, drawTileBorder);
-                            return;
-                        case PixelType::Bgr48:
-                            CopyWithMask<PixelType::Bgr48, PixelType::Bgr48>(srcPtr, srcStride, dstPtr, dstStride, width, height, drawTileBorder);
-                            return;
-                        default:break;
-                        }
-                        break;
-                        */
-        default:break;
-        }
-
-        throw std::logic_error("It seems that this conversion is not implemented...");
-    }
-#endif
 }
 
 /*static*/void BitmapOperationsBitonal::NNResizeMaskAware(
@@ -1099,12 +958,4 @@ namespace
     copy_parameters.drawTileBorder = info.drawTileBorder;
 
     CopyWithMask(info.srcPixelType, info.dstPixelType, copy_parameters);
-
-    /*CopyWithMask(
-                info.srcPixelType, ptr_source, info.srcStride,
-                info.dstPixelType, ptr_destination, info.dstStride,
-                intersection.w, intersection.h,
-                info.maskPtr, info.maskStride,
-                top_left_src_bitmap.x, top_left_src_bitmap.y,
-                info.drawTileBorder);*/
 }
