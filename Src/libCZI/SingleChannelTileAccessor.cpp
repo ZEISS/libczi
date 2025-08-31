@@ -95,58 +95,30 @@ void CSingleChannelTileAccessor::ComposeTiles(libCZI::IBitmapData* pBm, int xPos
     }
     else
     {
-      /*  if (options.maskAware)
-        {*/
-            Compositors::ComposeSingleChannelTilesMaskAware(
-                [&](int index, std::shared_ptr<libCZI::IBitmapData>& spBm, std::shared_ptr<libCZI::IBitonalBitmapData>& spMask, int& xPosTile, int& yPosTile)->bool
+        Compositors::ComposeSingleChannelTilesMaskAware(
+            [&](int index, std::shared_ptr<libCZI::IBitmapData>& spBm, std::shared_ptr<libCZI::IBitonalBitmapData>& spMask, int& xPosTile, int& yPosTile)->bool
+            {
+                if (index < static_cast<int>(subBlocksSet.size()))
                 {
-                    if (index < static_cast<int>(subBlocksSet.size()))
-                    {
-                        const auto subblock_data = CSingleChannelAccessorBase::GetSubBlockDataIncludingMaskForSubBlockIndex(
-                            this->sbBlkRepository,
-                            options.subBlockCache,
-                            subBlocksSet[index].index,
-                            options.onlyUseSubBlockCacheForCompressedData,
-                            options.maskAware);
-                        spBm = subblock_data.bitmap;
-                        spMask = subblock_data.mask;
-                        xPosTile = subblock_data.subBlockInfo.logicalRect.x;
-                        yPosTile = subblock_data.subBlockInfo.logicalRect.y;
-                        return true;
-                    }
+                    const auto subblock_data = CSingleChannelAccessorBase::GetSubBlockDataIncludingMaskForSubBlockIndex(
+                        this->sbBlkRepository,
+                        options.subBlockCache,
+                        subBlocksSet[index].index,
+                        options.onlyUseSubBlockCacheForCompressedData,
+                        options.maskAware);
+                    spBm = subblock_data.bitmap;
+                    spMask = subblock_data.mask;
+                    xPosTile = subblock_data.subBlockInfo.logicalRect.x;
+                    yPosTile = subblock_data.subBlockInfo.logicalRect.y;
+                    return true;
+                }
 
-                    return false;
-                },
-                pBm,
-                xPos,
-                yPos,
-                &composeOptions);
-        //}
-        //else
-        //{
-        //    Compositors::ComposeSingleChannelTiles(
-        //        [&](int index, std::shared_ptr<libCZI::IBitmapData>& spBm, int& xPosTile, int& yPosTile)->bool
-        //        {
-        //                if (index < static_cast<int>(subBlocksSet.size()))
-        //                {
-        //                    const auto subblock_data = CSingleChannelAccessorBase::GetSubBlockDataForSubBlockIndex(
-        //                        this->sbBlkRepository,
-        //                        options.subBlockCache,
-        //                        subBlocksSet[index].index,
-        //                        options.onlyUseSubBlockCacheForCompressedData);
-        //                    spBm = subblock_data.bitmap;
-        //                    xPosTile = subblock_data.subBlockInfo.logicalRect.x;
-        //                    yPosTile = subblock_data.subBlockInfo.logicalRect.y;
-        //                    return true;
-        //                }
-
-        //                return false;
-        //        },
-        //        pBm,
-        //        xPos,
-        //        yPos,
-        //        &composeOptions);
-        //}
+                return false;
+            },
+            pBm,
+            xPos,
+            yPos,
+            &composeOptions);
     }
 }
 
