@@ -304,6 +304,50 @@ TEST(MaskAwareComposition, SingleChannelScalingTileAccessorWithMaskScenario3)
     }
 }
 
+TEST(MaskAwareComposition, SingleChannelTileAccessorWithMaskScenario1)
+{
+    // arrange
+    const auto czi_and_size = CreateCziDocumentWithTwoOverlappingSubblocksWithMaskData();
+    const auto inputStream = CreateStreamFromMemory(get<0>(czi_and_size), get<1>(czi_and_size));
+    const auto reader = CreateCZIReader();
+    reader->Open(inputStream);
+
+    auto accessor = reader->CreateSingleChannelTileAccessor();
+
+    ISingleChannelTileAccessor::Options options;
+    options.Clear();
+    options.backGroundColor = RgbFloatColor{ 0.5f, 0.5f, 0.5f };
+    options.maskAware = true;
+    const CDimCoordinate plane_coordinate{ {DimensionIndex::C, 0} };
+    auto composition = accessor->Get(0, 0, 6, 6, &plane_coordinate, &options);
+    ASSERT_TRUE(composition);
+    ASSERT_EQ(composition->GetWidth(), 6);
+    ASSERT_EQ(composition->GetHeight(), 6);
+
+    // The expected result is a 6x6 image where:
+    // - The background is gray (128,128,128).
+    // - then, the first sub-block (black, 0) is drawn at (0,0) - (4,4)
+    // - then, the second sub-block (white, 255) is drawn at (2,2) - (6,6) with the checkerboard mask applied
+    static const uint8_t expected_result[] =
+    {
+        0x00, 0x00, 0x00, 0x00, 0x80, 0x80,
+        0x00, 0x00, 0x00, 0x00, 0x80, 0x80,
+        0x00, 0x00, 0xff, 0x00, 0xff, 0x80,
+        0x00, 0x00, 0x00, 0xff, 0x80, 0xff,
+        0x80, 0x80, 0xff, 0x80, 0xff, 0x80,
+        0x80, 0x80, 0x80, 0xff, 0x80, 0xff,
+    };
+
+    ScopedBitmapLockerSP locker_composition{ composition };
+    ASSERT_TRUE(locker_composition.ptrDataRoi != nullptr);
+    for (size_t y = 0; y < composition->GetHeight(); ++y)
+    {
+        const uint8_t* composition_line = static_cast<const uint8_t*>(locker_composition.ptrDataRoi) + y * locker_composition.stride;
+        int r = memcmp(composition_line, expected_result + y * 6, 6);
+        ASSERT_EQ(r, 0);
+    }
+}
+
 TEST(MaskAwareComposition, SingleChannelTileAccessorWithMaskScenario2)
 {
     // arrange
