@@ -1,12 +1,13 @@
 #include "BitmapOperationsBitonal.h"
 
-#include "BitmapOperations.h"
 #include <cstdint>
 #include <algorithm>
 #include <sstream>
 #include <stdexcept>
-#include <libCZI_Utilities.h>
+
 #include "inc_libCZI_Config.h"
+#include "BitmapOperations.h"
+#include <libCZI_Utilities.h>
 #include "utilities.h"
 
 using namespace std;
