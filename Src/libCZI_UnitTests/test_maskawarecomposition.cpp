@@ -222,7 +222,6 @@ TEST(MaskAwareComposition, SingleChannelScalingTileAccessorWithMaskScenario2)
         0x40, 0x40, 0x40, 0x40, 0x40, 0x40, 0x40, 0x40,
     };
 
-
     // assert
     ScopedBitmapLockerSP locker_composition{ composition };
     ASSERT_TRUE(locker_composition.ptrDataRoi != nullptr);
@@ -291,7 +290,7 @@ TEST(MaskAwareComposition, SingleChannelScalingTileAccessorWithMaskScenario3)
                 // for those pixels, we expect the subblock#0 (=0x00)
                 ASSERT_EQ(pixel_value_composition, 0);
             }
-            else if ( (y==0 && (x==0 || x==2)) || (y==1 && (x==1 || x==3)) || (y==2 && (x==0 || x==2)) ||  (y==3 && (x==1 || x==3))) 
+            else if ((y == 0 && (x == 0 || x == 2)) || (y == 1 && (x == 1 || x == 3)) || (y == 2 && (x == 0 || x == 2)) || (y == 3 && (x == 1 || x == 3)))
             {
                 // for those pixels, we expect the (valid) pixels of subblock#1 (=0xff)
                 ASSERT_EQ(pixel_value_composition, 0xff);
@@ -302,6 +301,54 @@ TEST(MaskAwareComposition, SingleChannelScalingTileAccessorWithMaskScenario3)
                 ASSERT_EQ(pixel_value_composition, copy_of_background_line[x]);
             }
         }
+    }
+}
+
+TEST(MaskAwareComposition, SingleChannelTileAccessorWithMaskScenario2)
+{
+    // arrange
+    const auto czi_and_size = CreateCziDocumentWithTwoOverlappingSubblocksWithMaskData();
+    const auto inputStream = CreateStreamFromMemory(get<0>(czi_and_size), get<1>(czi_and_size));
+    const auto reader = CreateCZIReader();
+    reader->Open(inputStream);
+
+    auto accessor = reader->CreateSingleChannelTileAccessor();
+
+    // act
+    ISingleChannelTileAccessor::Options options;
+    options.Clear();
+    options.backGroundColor = RgbFloatColor{ 0.25f, 0.25f, 0.25f };
+    options.maskAware = true;
+    const CDimCoordinate plane_coordinate{ {DimensionIndex::C, 0} };
+    auto composition = accessor->Get(-1, -1, 8, 8, &plane_coordinate, &options);
+    ASSERT_TRUE(composition);
+    ASSERT_EQ(composition->GetWidth(), 8);
+    ASSERT_EQ(composition->GetHeight(), 8);
+
+    // The expected result is a 8x8 image where:
+    // - The background is gray (64,64,64).
+    // - then, the first sub-block (black, 0) is drawn at 1,1) - (5,5)
+    // - then, the second sub-block (white, 255) is drawn at (3,3) - (7,7) with the checkerboard mask applied
+    static const uint8_t expected_result[] =
+    {
+        0x40, 0x40, 0x40, 0x40, 0x40, 0x40, 0x40, 0x40,
+        0x40, 0x00, 0x00, 0x00, 0x00, 0x40, 0x40, 0x40,
+        0x40, 0x00, 0x00, 0x00, 0x00, 0x40, 0x40, 0x40,
+        0x40, 0x00, 0x00, 0xff, 0x00, 0xff, 0x40, 0x40,
+        0x40, 0x00, 0x00, 0x00, 0xff, 0x40, 0xff, 0x40,
+        0x40, 0x40, 0x40, 0xff, 0x40, 0xff, 0x40, 0x40,
+        0x40, 0x40, 0x40, 0x40, 0xff, 0x40, 0xff, 0x40,
+        0x40, 0x40, 0x40, 0x40, 0x40, 0x40, 0x40, 0x40,
+    };
+
+    // assert
+    ScopedBitmapLockerSP locker_composition{ composition };
+    ASSERT_TRUE(locker_composition.ptrDataRoi != nullptr);
+    for (size_t y = 0; y < composition->GetHeight(); ++y)
+    {
+        const uint8_t* composition_line = static_cast<const uint8_t*>(locker_composition.ptrDataRoi) + y * locker_composition.stride;
+        int r = memcmp(composition_line, expected_result + y * 8, 8);
+        ASSERT_EQ(r, 0);
     }
 }
 
