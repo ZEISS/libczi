@@ -30,8 +30,8 @@ public:
     SubBlockCache() = default;
     ~SubBlockCache() override = default;
 
-    CacheItem/*std::shared_ptr<libCZI::IBitmapData>*/ Get(int subblock_index) override;
-    void Add(int subblock_index, /*std::shared_ptr<libCZI::IBitmapData> bitmap*/const CacheItem& cache_item) override;
+    CacheItem Get(int subblock_index) override;
+    void Add(int subblock_index, const CacheItem& cache_item) override;
     void Prune(const PruneOptions& options) override;
     Statistics GetStatistics(std::uint8_t mask) const override;
 private:

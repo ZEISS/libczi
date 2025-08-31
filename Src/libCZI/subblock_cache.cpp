@@ -38,7 +38,7 @@ ISubBlockCacheStatistics::Statistics SubBlockCache::GetStatistics(std::uint8_t m
     return result;
 }
 
-ISubBlockCacheOperation::CacheItem/*std::shared_ptr<IBitmapData>*/ SubBlockCache::Get(int subblock_index)
+ISubBlockCacheOperation::CacheItem SubBlockCache::Get(int subblock_index)
 {
     lock_guard<mutex> lck(this->mutex_);
     const auto element = this->cache_.find(subblock_index);
@@ -51,7 +51,7 @@ ISubBlockCacheOperation::CacheItem/*std::shared_ptr<IBitmapData>*/ SubBlockCache
     return {};
 }
 
-void SubBlockCache::Add(int subblock_index, /*std::shared_ptr<IBitmapData> bitmap*/const ISubBlockCacheOperation::CacheItem& cache_item)
+void SubBlockCache::Add(int subblock_index, const ISubBlockCacheOperation::CacheItem& cache_item)
 {
     const auto size_of_added_cache_item = SubBlockCache::CalculateSizeInBytes(cache_item.bitmap.get(), cache_item.mask.get());
     //const auto size_in_bytes_of_added_bitmap = SubBlockCache::CalculateSizeInBytes(cache_item.bitmap.get()/*bitmap.get()*/);
