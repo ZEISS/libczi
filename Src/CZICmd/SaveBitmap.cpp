@@ -261,7 +261,7 @@ private:
 
     void SavePng(const wchar_t* fileName, libCZI::IBitmapData* bitmap, int bit_depth, int color_type)
     {
-        std::unique_ptr<FILE, decltype (&fclose)> fp(this->OpenDestForWrite(fileName), &fclose);
+        std::unique_ptr<FILE, void(*)(FILE*)> fp(this->OpenDestForWrite(fileName), [](FILE* p) { fclose(p); });
 
         PngStructInfoGuard pngStructInfo;
         pngStructInfo.png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
