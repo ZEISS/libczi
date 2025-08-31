@@ -91,7 +91,6 @@ void CSingleChannelTileAccessor::ComposeTiles(libCZI::IBitmapData* pBm, int xPos
                 xPos,
                 yPos,
                 &composeOptions);
-      
     }
     else
     {
@@ -174,4 +173,3 @@ void CSingleChannelTileAccessor::GetAllSubBlocks(const IntRect& roi, const IDimC
             return true;
         });
 }
-
