@@ -135,6 +135,7 @@ std::vector<int> CSingleChannelAccessorBase::CheckForVisibility(const libCZI::In
     return result;
 }
 
+#if false
 /*static*/CSingleChannelAccessorBase::SubBlockData CSingleChannelAccessorBase::GetSubBlockDataForSubBlockIndex(
     const std::shared_ptr<libCZI::ISubBlockRepository>& sbBlkRepository,
     const std::shared_ptr<libCZI::ISubBlockCacheOperation>& cache,
@@ -179,6 +180,7 @@ std::vector<int> CSingleChannelAccessorBase::CheckForVisibility(const libCZI::In
 
     return result;
 }
+#endif
 
 /*static*/CSingleChannelAccessorBase::SubBlockData CSingleChannelAccessorBase::GetSubBlockDataIncludingMaskForSubBlockIndex(
     const std::shared_ptr<libCZI::ISubBlockRepository>& sbBlkRepository,

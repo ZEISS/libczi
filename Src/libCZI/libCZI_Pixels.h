@@ -604,7 +604,7 @@ namespace libCZI
         /// \param x         The x-coordinate of the pixel (0-based).
         /// \param y         The y-coordinate of the pixel (0-based).
         /// \return          The value of the pixel (true for "set", false for "not set").
-        static bool GetPixelValue(const std::shared_ptr<IBitonalBitmapData> bmData, std::uint32_t x, std::uint32_t y)
+        static bool GetPixelValue(const std::shared_ptr<IBitonalBitmapData>& bmData, std::uint32_t x, std::uint32_t y)
         {
             ScopedBitonalBitmapLockerSP lock_bitmap{ bmData };
             return GetPixelValue(lock_bitmap, bmData->GetSize(), x, y);
@@ -616,6 +616,16 @@ namespace libCZI
         {
             return GetPixelValue(lock_info, bitonal_bitmap->GetSize(), x, y);
         }
+
+        static void SetPixelValue(const std::shared_ptr<IBitonalBitmapData>& bitonal_bitmap_data, std::uint32_t x, std::uint32_t y, bool value)
+    {
+            ScopedBitonalBitmapLockerSP bitonal_bitmap_locker{ bitonal_bitmap_data };
+            SetPixelValue(bitonal_bitmap_locker, bitonal_bitmap_data->GetSize(), x, y, value);
+    }
+
+        static void SetPixelValue(const BitonalBitmapLockInfo& lockInfo, const libCZI::IntSize& extent, std::uint32_t x, std::uint32_t y, bool value);
+
+        static void CopyAt(libCZI::IBitmapData* source_bitmap, libCZI::IBitonalBitmapData* mask, const libCZI::IntPoint& offset, libCZI::IBitmapData* destination_bitmap);
     };
 
     //-------------------------------------------------------------------------

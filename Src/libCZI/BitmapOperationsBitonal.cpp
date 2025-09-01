@@ -929,8 +929,13 @@ namespace
         return;
     }
 
+    // If the width (or height) of the mask is less than the width (or height) of the source bitmap, we consider
+    //  the surplus pixels as "masked out".
+    const int min_width_source_bitmap_and_mask = (std::min)(info.srcWidth, info.maskWidth);
+    const int min_height_source_bitmap_and_mask = (std::min)(info.srcHeight, info.maskHeight);
+
     // If we reach here, it means we have a valid maskPtr
-    const IntRect src_rect = IntRect{ info.xOffset,info.yOffset,info.srcWidth,info.srcHeight };
+    const IntRect src_rect = IntRect{ info.xOffset,info.yOffset,/*info.srcWidth*/min_width_source_bitmap_and_mask,/*info.srcHeight*/min_height_source_bitmap_and_mask };
     const IntRect dst_rect = IntRect{ 0,0,info.dstWidth,info.dstHeight };
     const IntRect intersection = Utilities::Intersect(src_rect, dst_rect);
 

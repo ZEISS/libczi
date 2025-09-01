@@ -74,13 +74,22 @@ protected:
         libCZI::SubBlockInfo subBlockInfo;
     };
 
-    static SubBlockData GetSubBlockDataForSubBlockIndex(
-        const std::shared_ptr<libCZI::ISubBlockRepository>& sbBlkRepository, 
-        const std::shared_ptr<libCZI::ISubBlockCacheOperation>& cache,
-        int subBlockIndex,
-        bool onlyAddCompressedSubBlockToCache);
+    //static SubBlockData GetSubBlockDataForSubBlockIndex(
+    //    const std::shared_ptr<libCZI::ISubBlockRepository>& sbBlkRepository, 
+    //    const std::shared_ptr<libCZI::ISubBlockCacheOperation>& cache,
+    //    int subBlockIndex,
+    //    bool onlyAddCompressedSubBlockToCache);
 
-    // EXPERIMENTAL EXPERIMENTAL EXPERIMENTAL EXPERIMENTAL EXPERIMENTAL EXPERIMENTAL EXPERIMENTAL 
+    /// 
+    ///
+    /// \param 	sbBlkRepository						The block repository.
+    /// \param 	cache								The cache.
+    /// \param 	subBlockIndex						Zero-based index of the sub block.
+    /// \param 	onlyAddCompressedSubBlockToCache	True to only add compressed sub block to cache.
+    /// \param 	mask_aware_mode						True to enable mask aware mode, false to disable
+    /// 	it.
+    ///
+    /// \returns	The sub block data including mask for sub block index.
     static SubBlockData GetSubBlockDataIncludingMaskForSubBlockIndex(
         const std::shared_ptr<libCZI::ISubBlockRepository>& sbBlkRepository,
         const std::shared_ptr<libCZI::ISubBlockCacheOperation>& cache,

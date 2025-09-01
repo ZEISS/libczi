@@ -17,7 +17,7 @@ public:
     /// \param 	y	   	The y coordinate of the pixel to query.
     /// \param 	width  	The width of the bitonal bitmap.
     /// \param 	height 	The height of the bitonal bitmap.
-    /// \param 	ptrData	Pointer to the start of the bitonal bitmap data.
+    /// \param 	ptrData	Pointer to thee start of the bitonal bitmap data.
     /// \param 	stride 	The stride (in units of bytes).
     ///
     /// \returns	True if the pixel is "1", false if the pixel is "0".
@@ -30,6 +30,24 @@ public:
 
         const std::uint8_t* ptr = static_cast<const std::uint8_t*>(ptrData) + static_cast<size_t>(y) * stride + (x / 8);
         return (*ptr & (1 << (7 - (x % 8)))) != 0;
+    }
+
+    static void SetPixelInBitonal(std::uint32_t x, std::uint32_t y, std::uint32_t width, std::uint32_t height, void* ptrData, std::uint32_t stride, bool value)
+    {
+        if (x >= width || y >= height)
+        {
+            throw std::out_of_range("Coordinates out of bounds.");
+        }
+
+        std::uint8_t* ptr = static_cast<std::uint8_t*>(ptrData) + static_cast<size_t>(y) * stride + (x / 8);
+        if (value)
+        {
+            *ptr |= (1 << (7 - (x % 8)));
+        }
+        else
+        {
+            *ptr &= ~(1 << (7 - (x % 8)));
+        }
     }
 
     /// Get a value indicating if the pixel specified by its x and y coordinate is true or false.
@@ -48,6 +66,19 @@ public:
     {
         const std::uint8_t* ptr = static_cast<const std::uint8_t*>(ptrData) + static_cast<size_t>(y) * stride + (x / 8);
         return (*ptr & (1 << (7 - (x % 8)))) != 0;
+    }
+
+    static bool SetPixelInBitonalUnchecked(std::uint32_t x, std::uint32_t y, void* ptrData, std::uint32_t stride, bool value)
+    {
+        std::uint8_t* ptr = static_cast<std::uint8_t*>(ptrData) + static_cast<size_t>(y) * stride + (x / 8);
+        if (value)
+        {
+            *ptr |= (1 << (7 - (x % 8)));
+        }
+        else
+        {
+            *ptr &= ~(1 << (7 - (x % 8)));
+        }
     }
 
     /// Decimates the bitonal image by a factor of two. A bit in the destination bitmap is set if all
@@ -86,10 +117,18 @@ public:
     {
         const void* maskPtr;                 ///< Pointer to the mask bitmap (may be null, in which case all pixels are considered valid).
         int maskStride;                      ///< The stride of the mask bitmap in bytes.
-        int maskWidth;                       ///< The width of the mask bitmap in pixels.
-        int maskHeight;                      ///< The height of the mask bitmap in pixels.
+        int maskWidth;                       ///< The width of the mask bitmap in pixels. If the width of the mask bitmap is less than the width of the source bitmap, the pixels
+                                             ///< in the source bitmap for which there is no corresponding pixel in the mask bitmap are considered invalid (i.e. not copied).
+        int maskHeight;                      ///< The height of the mask bitmap in pixels. If the height of the mask bitmap is less than the height of the source bitmap, the pixels
+                                             ///< in the source bitmap for which there is no corresponding pixel in the mask bitmap are considered invalid (i.e. not copied).
     };
 
+    /// Copies the specified source bitmap into the specified destination bitmap at the specified offset, using the specified mask.
+    /// If the mask pointer is null, the function behaves like CBitmapOperations::CopyWithOffset.
+    /// If the width (or height) of the mask is less than the width (or height) of the source bitmap, the pixels
+    /// in the source bitmap for which there is no corresponding pixel in the mask bitmap are considered invalid (i.e. not copied).
+    ///
+    /// \param 	info	The information.
     static void CopyWithOffsetAndMask(const CopyWithOffsetAndMaskInfo& info);
 
     static void Copy(
