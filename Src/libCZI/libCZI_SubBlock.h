@@ -3,6 +3,10 @@
 #include <tuple>
 #include "libCZI_Metadata.h"
 #include "libCZI_Utilities.h"
+#include <cstdint>
+#include <memory>
+#include <string>
+#include <functional>
 
 namespace libCZI
 {
@@ -80,11 +84,13 @@ namespace libCZI
         ISubBlockMetadata& operator=(ISubBlockMetadata&&) = delete;
     };
 
+    /// The data structure "Mask Info" (as found in the sub-block attachment of type "chunkstore") which describes
+    /// a valid pixel mask.
     struct SubBlockAttachmentMaskInfoGeneral
     {
-        std::uint32_t width;
-        std::uint32_t height;
-        std::uint32_t type_of_representation;
+        std::uint32_t width;	///< The width th of the mask in pixels.
+        std::uint32_t height;   ///< The height of the mask in pixels.
+        std::uint32_t type_of_representation;   ///< The type of representation (0 = uncompressed bitonal bitmap).
         size_t size_data;
         std::shared_ptr<const void> data;
     };

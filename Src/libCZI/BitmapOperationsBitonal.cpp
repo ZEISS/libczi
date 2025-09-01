@@ -388,6 +388,7 @@ namespace
         int srcWidth, srcHeight;
         const void* srcMaskPtr;
         int srcMaskStride;
+        int maskWidth, maskHeight;
         tFlt srcRoiX, srcRoiY, srcRoiW, srcRoiH;
         void* dstPtr;
         int dstStride;
@@ -452,7 +453,9 @@ namespace
                     srcXInt = resize_info.srcWidth - 1;
                 }
 
-                if (BitmapOperationsBitonal::GetPixelFromBitonalUnchecked(srcXInt, srcYInt, resize_info.srcMaskPtr, resize_info.srcMaskStride))
+                if (srcXInt < resize_info.maskWidth &&
+                    srcYInt < resize_info.maskHeight &&
+                    BitmapOperationsBitonal::GetPixelFromBitonalUnchecked(srcXInt, srcYInt, resize_info.srcMaskPtr, resize_info.srcMaskStride))
                 {
                     const char* pSrc = pSrcLine + srcXInt * static_cast<size_t>(bytesPerPelSrc);
                     char* pDst = pDstLine + x * static_cast<size_t>(bytesPerPelDest);
@@ -904,6 +907,8 @@ namespace
     resizeInfo.srcStride = lckSrc.stride;
     resizeInfo.srcMaskPtr = lckSrcMask.ptrData;
     resizeInfo.srcMaskStride = lckSrcMask.stride;
+    resizeInfo.maskWidth = bmSrcMask->GetWidth();
+    resizeInfo.maskHeight = bmSrcMask->GetHeight();
     resizeInfo.srcRoiX = roiSrc.x;
     resizeInfo.srcRoiY = roiSrc.y;
     resizeInfo.srcRoiW = roiSrc.w;
@@ -935,7 +940,7 @@ namespace
     const int min_height_source_bitmap_and_mask = (std::min)(info.srcHeight, info.maskHeight);
 
     // If we reach here, it means we have a valid maskPtr
-    const IntRect src_rect = IntRect{ info.xOffset,info.yOffset,/*info.srcWidth*/min_width_source_bitmap_and_mask,/*info.srcHeight*/min_height_source_bitmap_and_mask };
+    const IntRect src_rect = IntRect{ info.xOffset,info.yOffset, min_width_source_bitmap_and_mask, min_height_source_bitmap_and_mask };
     const IntRect dst_rect = IntRect{ 0,0,info.dstWidth,info.dstHeight };
     const IntRect intersection = Utilities::Intersect(src_rect, dst_rect);
 
