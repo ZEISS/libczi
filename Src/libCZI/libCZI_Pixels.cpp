@@ -60,3 +60,13 @@ void BitonalBitmapOperations::CopyAt(libCZI::IBitmapData* source_bitmap, libCZI:
         CBitmapOperations::CopyWithOffset(info);
     }
 }
+
+/*static*/void BitonalBitmapOperations::SetAllPixels(const BitonalBitmapLockInfo& lockInfo, const libCZI::IntSize& extent, bool value)
+{
+    BitmapOperationsBitonal::Set(extent.w, extent.h,lockInfo.ptrData, lockInfo.stride, value);
+}
+
+/*static*/void BitonalBitmapOperations::Fill(const BitonalBitmapLockInfo& lockInfo, const libCZI::IntSize& extent, const libCZI::IntRect& roi, bool value)
+{
+    BitmapOperationsBitonal::Fill(extent.w, extent.h, lockInfo.ptrData, lockInfo.stride, roi, value);
+}

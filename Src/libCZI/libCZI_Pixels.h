@@ -174,7 +174,7 @@ namespace libCZI
     {
         Invalid = 0xff,     ///< Invalid pyramid type.
         None = 0,           ///< No pyramid (indicating that the subblock is not a pyramid subblock, but a layer-0 subblock).    
-        SingleSubBlock= 1,  ///< The subblock is a pyramid subblock, and it covers a single subblock of the lower layer (or: it is a minification of a single lower-layer-subblock).
+        SingleSubBlock = 1, ///< The subblock is a pyramid subblock, and it covers a single subblock of the lower layer (or: it is a minification of a single lower-layer-subblock).
         MultiSubBlock = 2   ///< The subblock is a pyramid subblock, and it covers multiple subblocks of the lower layer.
     };
 
@@ -398,7 +398,7 @@ namespace libCZI
     /// Defines an alias representing the scoped bitmap locker for use with a shared_ptr of type libCZI::IBitmapData.
     typedef ScopedBitmapLocker<std::shared_ptr<IBitmapData>> ScopedBitmapLockerSP;
 
-    
+
 
     //-------------------------------------------------------------------------
 
@@ -617,13 +617,51 @@ namespace libCZI
             return GetPixelValue(lock_info, bitonal_bitmap->GetSize(), x, y);
         }
 
+        static void SetPixelValue(IBitonalBitmapData* bitonal_bitmap_data, std::uint32_t x, std::uint32_t y, bool value)
+        {
+            ScopedBitonalBitmapLockerP bitonal_bitmap_locker{ bitonal_bitmap_data };
+            BitonalBitmapOperations::SetPixelValue(bitonal_bitmap_locker, bitonal_bitmap_data->GetSize(), x, y, value);
+        }
+
         static void SetPixelValue(const std::shared_ptr<IBitonalBitmapData>& bitonal_bitmap_data, std::uint32_t x, std::uint32_t y, bool value)
-    {
-            ScopedBitonalBitmapLockerSP bitonal_bitmap_locker{ bitonal_bitmap_data };
-            SetPixelValue(bitonal_bitmap_locker, bitonal_bitmap_data->GetSize(), x, y, value);
-    }
+        {
+            BitonalBitmapOperations::SetPixelValue(bitonal_bitmap_data.get(), x, y, value);
+        }
 
         static void SetPixelValue(const BitonalBitmapLockInfo& lockInfo, const libCZI::IntSize& extent, std::uint32_t x, std::uint32_t y, bool value);
+
+        static void Fill(IBitonalBitmapData* bitonal_bitmap_data, const libCZI::IntRect& rect, bool value)
+        {
+            ScopedBitonalBitmapLockerP bitonal_bitmap_locker{ bitonal_bitmap_data };
+            BitonalBitmapOperations::Fill(bitonal_bitmap_locker, bitonal_bitmap_data->GetSize(), rect, value);
+        }
+
+        static void Fill(const std::shared_ptr<IBitonalBitmapData>& bitonal_bitmap_data, const libCZI::IntRect& rect, bool value)
+        {
+            BitonalBitmapOperations::Fill(bitonal_bitmap_data.get(), rect, value);
+        }
+
+        /// Fills a rectangular region of interest (ROI) in a bitonal bitmap with a specified value.
+        ///
+        /// \param 	lockInfo	Information describing the locked bitonal bitmap data.
+        /// \param 	extent  	The extent of the bitonal bitmap.
+        /// \param 	roi		    The region of interest to fill. The ROI is clipped to the bitmap extent.
+        /// \param 	value   	The value to fill the ROI with.
+        static void Fill(const BitonalBitmapLockInfo& lockInfo, const libCZI::IntSize& extent, const libCZI::IntRect& roi, bool value);
+
+        static void SetAllPixels(const std::shared_ptr<IBitonalBitmapData>& bitonal_bitmap_data, bool value)
+        {
+            BitonalBitmapOperations::SetAllPixels(bitonal_bitmap_data.get(), value);
+        }
+
+        static void SetAllPixels(IBitonalBitmapData* bitonal_bitmap_data, bool value)
+        {
+            ScopedBitonalBitmapLockerP bitonal_bitmap_locker{ bitonal_bitmap_data };
+            SetAllPixels(bitonal_bitmap_locker, bitonal_bitmap_data->GetSize(), value);
+        }
+
+        static void SetAllPixels(const BitonalBitmapLockInfo& lockInfo, const libCZI::IntSize& extent, bool value);
+
 
         static void CopyAt(libCZI::IBitmapData* source_bitmap, libCZI::IBitonalBitmapData* mask, const libCZI::IntPoint& offset, libCZI::IBitmapData* destination_bitmap);
     };

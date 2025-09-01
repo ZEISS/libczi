@@ -17,7 +17,7 @@ public:
     /// \param 	y	   	The y coordinate of the pixel to query.
     /// \param 	width  	The width of the bitonal bitmap.
     /// \param 	height 	The height of the bitonal bitmap.
-    /// \param 	ptrData	Pointer to thee start of the bitonal bitmap data.
+    /// \param 	ptrData	Pointer to the start of the bitonal bitmap data.
     /// \param 	stride 	The stride (in units of bytes).
     ///
     /// \returns	True if the pixel is "1", false if the pixel is "0".
@@ -29,9 +29,19 @@ public:
         }
 
         const std::uint8_t* ptr = static_cast<const std::uint8_t*>(ptrData) + static_cast<size_t>(y) * stride + (x / 8);
-        return (*ptr & (1 << (7 - (x % 8)))) != 0;
+        return (*ptr & 1 << (7 - x % 8)) != 0;
     }
 
+    /// Sets pixel in bitonal bitmap to the specified value.
+    /// If x or y exceeds the size of the bitmap, an exception is thrown.
+    ///
+    /// \param 	x	   	The x coordinate of the pixel to query.
+    /// \param 	y	   	The y coordinate of the pixel to query.
+    /// \param 	width  	The width of the bitonal bitmap.
+    /// \param 	height 	The height of the bitonal bitmap.
+    /// \param 	ptrData	Pointer to the start of the bitonal bitmap data.
+    /// \param 	stride 	The stride (in units of bytes).
+    /// \param  value  	The value to set the pixel to.
     static void SetPixelInBitonal(std::uint32_t x, std::uint32_t y, std::uint32_t width, std::uint32_t height, void* ptrData, std::uint32_t stride, bool value)
     {
         if (x >= width || y >= height)
@@ -42,11 +52,11 @@ public:
         std::uint8_t* ptr = static_cast<std::uint8_t*>(ptrData) + static_cast<size_t>(y) * stride + (x / 8);
         if (value)
         {
-            *ptr |= (1 << (7 - (x % 8)));
+            *ptr |= 1 << (7 - x % 8);
         }
         else
         {
-            *ptr &= ~(1 << (7 - (x % 8)));
+            *ptr &= ~(1 << (7 - x % 8));
         }
     }
 
@@ -56,8 +66,6 @@ public:
     ///
     /// \param 	x	   	The x coordinate of the pixel to query.
     /// \param 	y	   	The y coordinate of the pixel to query.
-    /// \param 	width  	The width of the bitonal bitmap.
-    /// \param 	height 	The height of the bitonal bitmap.
     /// \param 	ptrData	Pointer to the start of the bitonal bitmap data.
     /// \param 	stride 	The stride (in units of bytes).
     ///
@@ -68,7 +76,16 @@ public:
         return (*ptr & (1 << (7 - (x % 8)))) != 0;
     }
 
-    static bool SetPixelInBitonalUnchecked(std::uint32_t x, std::uint32_t y, void* ptrData, std::uint32_t stride, bool value)
+    /// Sets pixel in bitonal bitmap to the specified value.
+    /// This version does not check whether x or y exceeds the size of the bitmap (so it is the caller's
+    /// responsibility to ensure that x and y are within bounds).
+    ///
+    /// \param 	x	   	The x coordinate of the pixel to query.
+    /// \param 	y	   	The y coordinate of the pixel to query.
+    /// \param 	ptrData	Pointer to the start of the bitonal bitmap data.
+    /// \param 	stride 	The stride (in units of bytes).
+    /// \param  value  	The value to set the pixel to.
+    static void SetPixelInBitonalUnchecked(std::uint32_t x, std::uint32_t y, void* ptrData, std::uint32_t stride, bool value)
     {
         std::uint8_t* ptr = static_cast<std::uint8_t*>(ptrData) + static_cast<size_t>(y) * stride + (x / 8);
         if (value)
@@ -81,10 +98,29 @@ public:
         }
     }
 
+    /// Fills a rectangular region of interest (ROI) in a bitonal bitmap with a specified value.
+    ///
+    /// \param 		   	width  	The width of the bitmap in pixels.
+    /// \param 		   	height 	The height of the bitmap in pixels.
+    /// \param      	ptrData	Pointer to the bitmap data.
+    /// \param 		   	stride 	The stride (in units of bytes).
+    /// \param 		   	roi	   	The region of interest to fill. The ROI is clipped to the bitmap extent.
+    /// \param 		   	value  	The value to fill the ROI with.
+    static void Fill(std::uint32_t width, std::uint32_t height, void* ptrData, std::uint32_t stride, const libCZI::IntRect& roi, bool value);
+
+    /// Sets all bits in the specified bitonal bitmap to the specified value.
+    ///
+    /// \param 		   	width  	The width.
+    /// \param 		   	height 	The height.
+    /// \param          ptrData	Pointer to the start of the bitonal bitmap data.
+    /// \param 		   	stride  The stride (in units of bytes).
+    /// \param 		   	value  	The value to set all pixels to.
+    static void Set(std::uint32_t width, std::uint32_t height, void* ptrData, std::uint32_t stride, bool value);
+
     /// Decimates the bitonal image by a factor of two. A bit in the destination bitmap is set if all
     /// bits in a neighborhood with size specified by region_size are set in the source bitmap.
     ///
-    /// \param 		   	region_size	Size of the neighborhood - must be greater or equal to 0 and less than 8. Otherwise an exception is thrown.
+    /// \param 		   	region_size	Size of the neighborhood - must be greater or equal to 0 and less than 8. Otherwise, an exception is thrown.
     /// \param 		   	mask_src   	The bitonal source bitmap.
     /// \param 		   	stride_src 	The stride of the bitonal source in units of bytes.
     /// \param 		   	width_src  	The width of the bitonal source.

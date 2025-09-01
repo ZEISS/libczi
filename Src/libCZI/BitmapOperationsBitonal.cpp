@@ -963,3 +963,108 @@ namespace
 
     CopyWithMask(info.srcPixelType, info.dstPixelType, copy_parameters);
 }
+
+/*static*/void BitmapOperationsBitonal::Set(std::uint32_t width, std::uint32_t height, void* ptrData, std::uint32_t stride, bool value)
+{
+    // TODO(JBL): check arguments
+    size_t line_length = (width + 7) / 8;
+    const uint8_t byte_to_set = value ? 0xFF : 0x00;
+    for (std::uint32_t y = 0; y < height; ++y)
+    {
+        memset(static_cast<char*>(ptrData) + y * static_cast<size_t>(stride), byte_to_set, line_length);
+    }
+}
+
+namespace
+{
+    void SetByte(uint8_t value, uint8_t* ptr, std::uint32_t stride, const IntSize& size)
+    {
+        for (uint32_t y = 0; y < size.h; ++y)
+        {
+            memset(ptr, value, size.w);
+            ptr += stride;
+        }
+    }
+
+    void OrByte(uint8_t value, uint8_t* ptr, std::uint32_t stride, const IntSize& size)
+    {
+        for (uint32_t y = 0; y < size.h; ++y)
+        {
+            *ptr |= value;
+            ptr += stride;
+        }
+    }
+
+    void AndByte(uint8_t value, uint8_t* ptr, std::uint32_t stride, const IntSize& size)
+    {
+        for (uint32_t y = 0; y < size.h; ++y)
+        {
+            *ptr &= value;
+            ptr += stride;
+        }
+    }
+}
+
+/*static*/void BitmapOperationsBitonal::Fill(std::uint32_t width, std::uint32_t height, void* ptrData, std::uint32_t stride, const libCZI::IntRect& roi, bool value)
+{
+    const int x1 = (std::max)(roi.x, 0);
+    const int y1 = (std::max)(roi.y, 0);
+    const int x2 = (std::min)(static_cast<uint32_t>(roi.x + roi.w), width);
+    const int y2 = (std::min)(static_cast<uint32_t>(roi.y + roi.h), height);
+    const int w = x2 - x1;
+    const int h = y2 - y1;
+
+    if (w <= 0 || h <= 0)
+    {
+        return;
+    }
+
+    // first, fill the "bulk"
+    const int x1RoundedUp = ((x1 + 7) / 8) * 8;
+    const int wRounded = w - (x1RoundedUp - x1);
+    if (wRounded >= 8)
+    {
+        SetByte(
+            (value == true) ? 0xff : 0,
+            static_cast<uint8_t*>(ptrData) + static_cast<size_t>(stride) * y1 + x1RoundedUp / 8,
+            stride,
+            { static_cast<uint32_t>(wRounded) / 8, static_cast<uint32_t>(h) });
+    }
+
+    // ...now we just have to deal with the two vertical borders...
+    int rem = x1 % 8;
+    if (rem != 0)
+    {
+        const uint8_t v = w >= 8 ? 0xff : (0xff << (8 - w));    // we must not set more bits than our width
+        const uint8_t leftBorderValue = v >> rem;
+        const IntSize s{ 1, static_cast<uint32_t>(h) };
+        uint8_t* ptrBorder = static_cast<uint8_t*>(ptrData) + x1 / 8 + y1 * static_cast<size_t>(stride);
+        if (value == true)
+        {
+            OrByte(leftBorderValue, ptrBorder, stride, s);
+        }
+        else
+        {
+            AndByte(~leftBorderValue, ptrBorder, stride, s);
+        }
+    }
+
+    if (rem == 0 || x1 / 8 < x2 / 8)	// check whether the "right border" is a different byte than the left border, otherwise - nothing to do here
+    {
+        rem = x2 % 8;
+        if (rem != 0)
+        {
+            const uint8_t rightBorderValue = static_cast<uint8_t>(0xff << (8 - rem));
+            const IntSize s{ 1, static_cast<uint32_t>(h) };
+            uint8_t* ptrBorder = static_cast<uint8_t*>(ptrData) + x2 / 8 + y1 * static_cast<size_t>(stride);
+            if (value == true)
+            {
+                OrByte(rightBorderValue, ptrBorder, stride, s);
+            }
+            else
+            {
+                AndByte(~rightBorderValue, ptrBorder, stride, s);
+            }
+        }
+    }
+}
