@@ -5,13 +5,12 @@ Valid-Pixel-Mask Concept
 Introduction
 ------------
 
-With the term *valid-pixel-mask* (or *mask* for short) we refer to a binary mask which indicates which pixels in a sub-block are valid and which are not. 
+With the term "valid-pixel-mask" (or "mask" for short) we refer to a binary mask which indicates which pixels in a sub-block are valid and which are not. 
 Basically, a sub-block in a CZI document is a rectangular image, and there is no way to indicate that some pixels in that rectangle are not valid. It is
 therefore not possible to represent non-rectangular images directly. The valid-pixel-mask is a way to overcome this limitation.   
 The concept is:
-
 * An additional bitonal (i.e. 1 bit per pixel) bitmap is stored with each sub-block.
-* A **zero** in this mask bitmap marks the corresponding pixel in the sub-block as **not valid**, a **one** declares the pixel as **valid**.
+* A _zero_ in this mask bitmap marks the corresponding pixel in the sub-block as _not valid_, a _one_ declares the pixel as valid.
 * For a multi-tile composition, non-valid pixels are not rendered.
 
 Mask in pyramids
