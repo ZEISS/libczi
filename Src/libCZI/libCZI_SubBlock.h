@@ -111,12 +111,14 @@ namespace libCZI
         std::shared_ptr<const void> data; ///< The actual data blob representing the uncompressed bitonal bitmap.
     };
 
+    /// This interface provides access to the attachment of a sub-block.
     class ISubBlockAttachmentAccessor
     {
     public:
+        /// For each chunk in a chunk container, this struct provides information about the chunk.
         struct ChunkInfo
         {
-            libCZI::GUID  guid;   ///< The name of the chunk (if available).
+            libCZI::GUID  guid;   ///< The Guid identifying the chunk.
             std::uint32_t offset; ///< The offset of the chunk in the attachment.
             std::uint32_t size;   ///< The size of the chunk in bytes.
         };
@@ -126,22 +128,57 @@ namespace libCZI
         ISubBlockAttachmentAccessor(const ISubBlockAttachmentAccessor&) = delete;
         void operator=(const ISubBlockAttachmentAccessor&) = delete;
 
+        /// Gets access to the sub block metadata object (for the sub-block this attachment belongs to).
+        ///
+        /// \returns	The sub block metadata object.
         virtual std::shared_ptr<libCZI::ISubBlockMetadata> GetSubBlockMetadata() = 0;
+
+        /// Query if the attachment is a chunk container.
+        ///
+        /// \returns	True if the attachment is a chunk container, false if not.
         virtual bool HasChunkContainer() const = 0;
+
+        /// Enumerate chunks in the chunk container (provided the attachment is a chunk container).
+        ///
+        /// \param 	functor_enum	The functor that will be called for each chunk. The functor takes two parameters:
+        /// 						the index of the chunk (starting with 0) and a ChunkInfo-structure containing information about the chunk.
+        ///
+        /// \returns	True if at least one chunk was found, false if no chunks were found (and the functor called at least once).
         virtual bool EnumerateChunksInChunkContainer(const std::function<bool(int index, const ChunkInfo& info)>& functor_enum) const = 0;
+
+        /// Gets the valid pixel mask information from the chunk container (provided the attachment is a chunk container and contains a valid pixel mask).
         virtual libCZI::SubBlockAttachmentMaskInfoGeneral GetValidPixelMaskFromChunkContainer() const = 0;
 
+        /// Gets the "valid pixel mask as an uncompressed bitonal bitmap" information (provided the attachment is a chunk container 
+        /// and contains a valid pixel mask and used representation type '0').
+        ///
+        /// \returns	The "valid pixel mask as uncompressed bitonal bitmap" information.
         libCZI::SubBlockAttachmentMaskInfoUncompressedBitonalBitmap GetValidPixelMaskAsUncompressedBitonalBitmap() const
         {
             return libCZI::ISubBlockAttachmentAccessor::GetValidPixelMaskAsUncompressedBitonalBitmap(this);
         }
 
+        /// Gets a bitonal bitmap created from the mask information (provided the attachment contains mask information of type '0' - i.e. uncompressed bitonal bitmap).
+        ///
+        /// \returns	The bitonal bitmap representing the valid pixel mask.
         std::shared_ptr<libCZI::IBitonalBitmapData> CreateBitonalBitmapFromMaskInfo() const
         {
             return libCZI::ISubBlockAttachmentAccessor::CreateBitonalBitmapFromMaskInfo(this);
         }
 
+        /// Gets the valid pixel mask as an uncompressed bitonal bitmap (static version, taking an accessor as argument).
+        ///
+        /// \param 	accessor	The accessor.
+        ///
+        /// \returns	The "valid pixel mask as uncompressed bitonal bitmap" information.
         static SubBlockAttachmentMaskInfoUncompressedBitonalBitmap GetValidPixelMaskAsUncompressedBitonalBitmap(const ISubBlockAttachmentAccessor* accessor);
+
+        /// Gets a bitonal bitmap created from the mask information (provided the attachment contains mask information of type '0' - i.e. uncompressed bitonal bitmap).
+        /// This is the static version, taking an accessor as argument.
+        ///
+        /// \param 	accessor	The accessor.
+        ///
+        /// \returns	The bitonal bitmap representing the valid pixel mask.
         static std::shared_ptr<libCZI::IBitonalBitmapData> CreateBitonalBitmapFromMaskInfo(const ISubBlockAttachmentAccessor* accessor);
     };
 

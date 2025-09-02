@@ -666,11 +666,16 @@ namespace libCZI
         /// specifies the top-left corner. The tiles (retrieved from the functor) are positioned at the
         /// coordinate as reported by the functor-call. Then the intersection area of source and
         /// destination is copied to the destination bitmap. If the intersection is empty, then nothing
-        /// is copied.
-        /// \param getTiles [in]    The functor which is called in order to retrieve the tiles to compose. The second and
-        ///                         the third parameter specify the x- and y-position of this tile.
-        ///                         We address a tile with the parameter index. If the index is out-of-range, then this functor
-        ///                         is expected to return false.
+        /// is copied. If a mask is provided for a tile, then the mask is taken into account when
+        /// copying the tile to the destination bitmap. In this case, only those pixels are copied
+        /// which are set in the mask. If no mask is provided (i.e. the pointer is null), then all pixels of the tile are copied.
+        /// If the width/height of the mask does not match the width/height of the tile, the following rules apply:
+        /// - If the mask is smaller than the tile, then only that area of the tile is considered which is covered by the mask.  
+        /// - If the mask is larger than the tile, then the exceeding area of the mask is ignored.
+        /// \param getTilesAndMask [in]     The functor which is called in order to retrieve the tiles (and the respective mask) to compose. The second and
+        ///                                 the third parameter specify the x- and y-position of this tile. The mask is optional.
+        ///                                 We address a tile with the parameter index. If the index is out-of-range, then this functor
+        ///                                 is expected to return false.
         /// \param dest [in,out]    The destination bitmap.
         /// \param xPos             The x-coordinate of the top-left of the destination bitmap.
         /// \param yPos             The y-coordinate of the top-left of the destination bitmap.

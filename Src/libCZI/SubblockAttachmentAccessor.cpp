@@ -55,6 +55,7 @@ bool SubblockAttachmentAccessor::EnumerateChunksInChunkContainer(const std::func
     }
 
     std::uint32_t offset = 0;
+    bool chunk_delivered = false;
 
     for (int index = 0;;)
     {
@@ -78,6 +79,7 @@ bool SubblockAttachmentAccessor::EnumerateChunksInChunkContainer(const std::func
 
         chunk_info.offset = offset + 20;
 
+        chunk_delivered = true;
         const bool b = functor_enum(index, chunk_info);
         if (b == false)
         {
@@ -93,7 +95,7 @@ bool SubblockAttachmentAccessor::EnumerateChunksInChunkContainer(const std::func
         }
     }
 
-    return true;
+    return chunk_delivered;
 }
 
 libCZI::SubBlockAttachmentMaskInfoGeneral SubblockAttachmentAccessor::GetValidPixelMaskFromChunkContainer() const
