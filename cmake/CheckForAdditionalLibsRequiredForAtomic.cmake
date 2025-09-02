@@ -59,6 +59,6 @@ function(CheckForAdditionalLibsRequiredForAtomic VARIABLE)
           message(FATAL_ERROR "Unable to compile code which uses 'atomic'.")
         endif()
      endif()
-  endif (NOT DEFINED ${ADDITIONAL_LIBS_TO_LINK})
+  endif (NOT DEFINED ${VARIABLE})
 
 endfunction(CheckForAdditionalLibsRequiredForAtomic VARIABLE)
