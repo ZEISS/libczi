@@ -1,8 +1,12 @@
+// SPDX-FileCopyrightText: 2025 Carl Zeiss Microscopy GmbH
+//
+// SPDX-License-Identifier: LGPL-3.0-or-later
+
 #include "SubblockAttachmentAccessor.h"
 #include "libCZI.h"
 #include "stdAllocator.h"
 #include "utilities.h"
-#include <bitmapData.h>
+#include "bitmapData.h"
 
 using namespace libCZI;
 using namespace std;
