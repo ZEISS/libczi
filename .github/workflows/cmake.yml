@@ -82,8 +82,8 @@ jobs:
           # Configure for a cross-compilation to ARM64.
           # Note that since we are doing a cross compilation, we cannot execute code in order to determine platform
           # characteristics like endianess and whether unaligned access is allowed. Therefore, we need to set the following
-          # variables manually: CRASH_ON_UNALIGNED_ACCESS=OFF and IS_BIG_ENDIAN=FALSE.
-          cmake -B "${{github.workspace}}/arm64build" -A ARM64 -DCMAKE_BUILD_TYPE=${{matrix.build}} -DLIBCZI_BUILD_CZICMD=ON -DLIBCZI_BUILD_CURL_BASED_STREAM=ON -DLIBCZI_BUILD_AZURESDK_BASED_STREAM=ON -DLIBCZI_BUILD_PREFER_EXTERNALPACKAGE_LIBCURL=ON -DLIBCZI_BUILD_LIBCZIAPI=ON -DCMAKE_TOOLCHAIN_FILE="$env:VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake" -DVCPKG_TARGET_TRIPLET=arm64-windows-static -DCRASH_ON_UNALIGNED_ACCESS=OFF -DIS_BIG_ENDIAN=FALSE
+          # variables manually: CRASH_ON_UNALIGNED_ACCESS=OFF, IS_BIG_ENDIAN=FALSE and ADDITIONAL_LIBS_REQUIRED_FOR_ATOMIC=.
+          cmake -B "${{github.workspace}}/arm64build" -A ARM64 -DCMAKE_BUILD_TYPE=${{matrix.build}} -DLIBCZI_BUILD_CZICMD=ON -DLIBCZI_BUILD_CURL_BASED_STREAM=ON -DLIBCZI_BUILD_AZURESDK_BASED_STREAM=ON -DLIBCZI_BUILD_PREFER_EXTERNALPACKAGE_LIBCURL=ON -DLIBCZI_BUILD_LIBCZIAPI=ON -DCMAKE_TOOLCHAIN_FILE="$env:VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake" -DVCPKG_TARGET_TRIPLET=arm64-windows-static -DCRASH_ON_UNALIGNED_ACCESS=OFF -DIS_BIG_ENDIAN=FALSE -DADDITIONAL_LIBS_REQUIRED_FOR_ATOMIC=
 
       - name: Configure CMake (Linux)
         if: ${{ (matrix.OS == 'ubuntu-latest') }}
