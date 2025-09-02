@@ -14,7 +14,7 @@ The concept is:
 * A **zero** in this mask bitmap marks the corresponding pixel in the sub-block as **not valid**, a **one** declares the pixel as **valid**.
 * For a multi-tile composition, non-valid pixels are not rendered.
 
-Mask in pyramids
+Mask in Pyramids
 ----------------
 
 The immediate use-case for this mask-concept is with pyramids. Pyramids with CZI are constructed **per scene**, and the axis-aligned bounding-box of scenes may be overlapping - as shown here: 
@@ -29,5 +29,5 @@ Although the tiles of different scenes are not overlapping, the axis-aligned bou
 
 Therefore, the pyramid-tiles of each scene can be provided with a valid-pixel-mask, and the composition then looks like this:
 
-.. image:: ../_static/images/scene-composite-wo_mask.png
+.. image:: ../_static/images/scene-composite-w_mask.png
    :alt: composition with mask
