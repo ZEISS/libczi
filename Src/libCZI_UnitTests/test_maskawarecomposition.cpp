@@ -50,8 +50,8 @@ namespace
             addSbBlkInfo.PixelType = bitmap->GetPixelType();
             addSbBlkInfo.ptrBitmap = lockBm.ptrDataRoi;
             addSbBlkInfo.strideBitmap = lockBm.stride;
-            addSbBlkInfo.ptrSbBlkMetadata = nullptr;// sub_block_metadata_xml;
-            addSbBlkInfo.sbBlkMetadataSize = 0;// sub_block_metadata_xml_size;
+            addSbBlkInfo.ptrSbBlkMetadata = nullptr;
+            addSbBlkInfo.sbBlkMetadataSize = 0;
             writer->SyncAddSubBlock(addSbBlkInfo);
         }
 

@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include "ImportExport.h"
 #include <cstdint>
 #include <memory>
 #include <algorithm>
@@ -13,7 +14,7 @@
 namespace libCZI
 {
     /// A rectangle (with integer coordinates).
-    struct IntRect
+    struct LIBCZI_API IntRect
     {
         int x;  ///< The x-coordinate of the upper-left point of the rectangle.
         int y;  ///< The y-coordinate of the upper-left point of the rectangle.
@@ -193,7 +194,7 @@ namespace libCZI
     /// from the Lock-method is to be considered valid only until Unlock is called. If a bitmap is
     /// destroyed while it is locked, this is considered to be a fatal error. It is legal to call Lock
     /// multiple times, but the calls to Lock and Unlock must be balanced.
-    class IBitmapData
+    class LIBCZI_API IBitmapData
     {
     public:
         /// Default constructor.
@@ -414,7 +415,7 @@ namespace libCZI
     /// from the Lock-method is to be considered valid only until Unlock is called. If a bitmap is
     /// destroyed while it is locked, this is considered to be a fatal error. It is legal to call Lock
     /// multiple times, but the calls to Lock and Unlock must be balanced.
-    class IBitonalBitmapData
+    class LIBCZI_API IBitonalBitmapData
     {
     public:
         /// Default constructor.
@@ -641,7 +642,7 @@ namespace libCZI
     /// libCZI::BitonalBitmapOperations::CopyAt(src.get(), mask.get(),
     ///     libCZI::IntPoint{100, 50}, dst.get());
     /// \endcode
-    class BitonalBitmapOperations
+    class LIBCZI_API BitonalBitmapOperations
     {
     public:
         /// Gets the value of a specific pixel in a bitonal bitmap.

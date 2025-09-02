@@ -15,7 +15,7 @@
 namespace libCZI
 {
     /// This interface provides typed access to the metadata of a sub-block.
-    class ISubBlockMetadataMetadataView
+    class LIBCZI_API ISubBlockMetadataMetadataView
     {
     public:
         ISubBlockMetadataMetadataView() = default;
@@ -65,7 +65,7 @@ namespace libCZI
 
     /// This interface is providing access to the sub-block metadata at XML-level via the IXmlNodeRead interface.
     /// Also, it has typed access to the metadata via the ISubBlockMetadataMetadataView interface.
-    class ISubBlockMetadata : public IXmlNodeRead, public ISubBlockMetadataMetadataView
+    class LIBCZI_API ISubBlockMetadata : public IXmlNodeRead, public ISubBlockMetadataMetadataView
     {
     public:
         ISubBlockMetadata() = default;
@@ -112,7 +112,7 @@ namespace libCZI
     };
 
     /// This interface provides access to the attachment of a sub-block.
-    class ISubBlockAttachmentAccessor
+    class LIBCZI_API ISubBlockAttachmentAccessor
     {
     public:
         /// For each chunk in a chunk container, this struct provides information about the chunk.
@@ -127,6 +127,8 @@ namespace libCZI
         virtual ~ISubBlockAttachmentAccessor() = default;
         ISubBlockAttachmentAccessor(const ISubBlockAttachmentAccessor&) = delete;
         void operator=(const ISubBlockAttachmentAccessor&) = delete;
+        ISubBlockAttachmentAccessor(ISubBlockAttachmentAccessor&&) = delete;
+        ISubBlockAttachmentAccessor& operator=(ISubBlockAttachmentAccessor&&) = delete;
 
         /// Gets access to the sub block metadata object (for the sub-block this attachment belongs to).
         ///
