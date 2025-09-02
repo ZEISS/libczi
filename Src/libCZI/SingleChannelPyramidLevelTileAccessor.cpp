@@ -100,7 +100,7 @@ void CSingleChannelPyramidLevelTileAccessor::ComposeTiles(libCZI::IBitmapData* b
     Compositors::ComposeSingleTileOptions composeOptions;
     composeOptions.Clear();
     composeOptions.drawTileBorder = options.drawTileBorder;
- 
+
     Compositors::ComposeSingleChannelTilesMaskAware(
         [&](int index, std::shared_ptr<libCZI::IBitmapData>& out_bitmap, std::shared_ptr<libCZI::IBitonalBitmapData>& out_mask_bitmap, int& tile_x_position, int& tile_y_position)->bool
         {

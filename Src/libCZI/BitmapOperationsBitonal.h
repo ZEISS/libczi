@@ -155,12 +155,12 @@ public:
     /// a destination bitmap at a specified offset.
     struct CopyWithOffsetAndMaskInfo : CBitmapOperations::CopyWithOffsetInfo
     {
-        const void* maskPtr;                 ///< Pointer to the mask bitmap (may be null, in which case all pixels are considered valid).
-        int maskStride;                      ///< The stride of the mask bitmap in bytes.
-        int maskWidth;                       ///< The width of the mask bitmap in pixels. If the width of the mask bitmap is less than the width of the source bitmap, the pixels
-                                             ///< in the source bitmap for which there is no corresponding pixel in the mask bitmap are considered invalid (i.e. not copied).
-        int maskHeight;                      ///< The height of the mask bitmap in pixels. If the height of the mask bitmap is less than the height of the source bitmap, the pixels
-                                             ///< in the source bitmap for which there is no corresponding pixel in the mask bitmap are considered invalid (i.e. not copied).
+        const void* maskPtr;                ///< Pointer to the mask bitmap (may be null, in which case all pixels are considered valid).
+        int maskStride;                     ///< The stride of the mask bitmap in bytes.
+        int maskWidth;                      ///< The width of the mask bitmap in pixels. If the width of the mask bitmap is less than the width of the source bitmap, the pixels
+                                            ///< in the source bitmap for which there is no corresponding pixel in the mask bitmap are considered invalid (i.e. not copied).
+        int maskHeight;                     ///< The height of the mask bitmap in pixels. If the height of the mask bitmap is less than the height of the source bitmap, the pixels
+                                            ///< in the source bitmap for which there is no corresponding pixel in the mask bitmap are considered invalid (i.e. not copied).
     };
 
     /// Copies the specified source bitmap into the specified destination bitmap at the specified offset, using the specified mask.
