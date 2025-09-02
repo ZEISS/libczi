@@ -319,7 +319,9 @@ CCZIReader::CCZIReader() :
 
 std::shared_ptr<ISubBlock> CCZIReader::ReadSubBlock(const CCziSubBlockDirectory::SubBlkEntry& entry)
 {
-    const CCZIParse::SubBlockStorageAllocate allocateInfo{ malloc,free };
+    static constexpr auto kAllocationAlloc = malloc;
+    static constexpr auto kAllocationFree = free;
+    const CCZIParse::SubBlockStorageAllocate allocateInfo{ kAllocationAlloc, kAllocationFree };
 
     // For thread-safety, we need to ensure that we hold a reference to the stream for the whole duration of the call, 
     //  in order to prepare for concurrent calls to Close() (which will reset the stream-shared_ptr).
@@ -338,7 +340,7 @@ std::shared_ptr<ISubBlock> CCZIReader::ReadSubBlock(const CCziSubBlockDirectory:
     auto subBlkData = CCZIParse::ReadSubBlock(stream_reference.get(), entry.FilePosition, allocateInfo);
 
     // RAII wrapper to ensure memory cleanup in case of exceptions
-    auto dataDeleter = [&allocateInfo](void* ptr) { if (ptr) { allocateInfo.free(ptr); } };
+    auto dataDeleter = [](void* ptr) { if (ptr) { kAllocationFree(ptr); } };
     std::unique_ptr<void, decltype(dataDeleter)> dataGuard(subBlkData.ptrData, dataDeleter);
     std::unique_ptr<void, decltype(dataDeleter)> attachmentGuard(subBlkData.ptrAttachment, dataDeleter);
     std::unique_ptr<void, decltype(dataDeleter)> metadataGuard(subBlkData.ptrMetadata, dataDeleter);

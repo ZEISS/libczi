@@ -54,8 +54,6 @@ ISubBlockCacheOperation::CacheItem SubBlockCache::Get(int subblock_index)
 void SubBlockCache::Add(int subblock_index, const ISubBlockCacheOperation::CacheItem& cache_item)
 {
     const auto size_of_added_cache_item = SubBlockCache::CalculateSizeInBytes(cache_item.bitmap.get(), cache_item.mask.get());
-    //const auto size_in_bytes_of_added_bitmap = SubBlockCache::CalculateSizeInBytes(cache_item.bitmap.get()/*bitmap.get()*/);
-    //const auto size_in_bytes_of_added_mask = SubBlockCache::CalculateSizeInBytes(cache_item.mask.get());
     const auto entry_to_be_added = CacheEntry{ cache_item.bitmap, cache_item.mask, this->lru_counter_.fetch_add(1) };
 
     lock_guard<mutex> lck(this->mutex_);
@@ -63,15 +61,15 @@ void SubBlockCache::Add(int subblock_index, const ISubBlockCacheOperation::Cache
     if (result.second)
     {
         // New element inserted
-        this->cache_size_in_bytes_ += size_of_added_cache_item;// size_in_bytes_of_added_bitmap;
+        this->cache_size_in_bytes_ += size_of_added_cache_item;
         ++this->cache_subblock_count_;
     }
     else
     {
         // Element with the same key already existed
-        this->cache_size_in_bytes_ -= SubBlockCache::CalculateSizeInBytes(result.first->second.bitmap.get(), result.first->second.mask.get());//SubBlockCache::CalculateSizeInBytes(result.first->second.bitmap.get());
+        this->cache_size_in_bytes_ -= SubBlockCache::CalculateSizeInBytes(result.first->second.bitmap.get(), result.first->second.mask.get());
         result.first->second = entry_to_be_added;
-        this->cache_size_in_bytes_ += size_of_added_cache_item/*size_in_bytes_of_added_bitmap*/;
+        this->cache_size_in_bytes_ += size_of_added_cache_item;
     }
 }
 
