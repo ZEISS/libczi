@@ -366,13 +366,15 @@ void CSingleChannelScalingTileAccessor::InternalGet(libCZI::IBitmapData* bmDest,
 
 void CSingleChannelScalingTileAccessor::Paint(libCZI::IBitmapData* bmDest, const libCZI::IntRect& roi, const SubSetSortedByZoom& sbSetSortedByZoom, float zoom, const libCZI::ISingleChannelScalingTileAccessor::Options& options)
 {
-    const int idxOf1stSubBlockOfZoomGreater = this->GetIdxOf1stSubBlockWithZoomGreater(sbSetSortedByZoom.subBlocks, sbSetSortedByZoom.sortedByZoom, zoom);
+    // make the pyramid-layer limit a bit smaller (5% smaller) so that right at the edge of a pyramid layer, we do not
+    //  exclude subblocks which happen to have an inaccurate zoom-level (e.g. due to quantization)
+    const int idxOf1stSubBlockOfZoomGreater = this->GetIdxOf1stSubBlockWithZoomGreater(sbSetSortedByZoom.subBlocks, sbSetSortedByZoom.sortedByZoom, zoom / 1.05f);
     if (idxOf1stSubBlockOfZoomGreater < 0)
     {
         // this means that we would need to overzoom (i.e. the requested zoom is less than the lowest level we find in the subblock-repository)
         // TODO: this requires special consideration, for the time being -> bail out
-        // ...we end up here e. g. when lowest level does not cover all the range, so - this is not
-        //    something where we want to throw an excpetion
+        // ...we end up here e.g. when lowest level does not cover all the range, so - this is not
+        //    something where we want to throw an exception
         //throw LibCZIAccessorException("Overzoom not supported", LibCZIAccessorException::ErrorType::Unspecified);
         return;
     }
