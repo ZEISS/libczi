@@ -94,18 +94,21 @@ namespace libCZI
     {
         std::uint32_t width;	///< The width of the mask in pixels.
         std::uint32_t height;   ///< The height of the mask in pixels.
-        std::uint32_t type_of_representation;   ///< The type of representation (0 = uncompressed bitonal bitmap).
-        size_t size_data;
-        std::shared_ptr<const void> data;
+        std::uint32_t type_of_representation;   ///< The type of representation of the mask data (in the blob given by 'data' below).
+                                                ///< Currently, the only defined type is: 
+                                                ///< 0 : uncompressed bitonal bitmap.
+        size_t size_data;                       ///< The size of the data blob (in bytes).
+        std::shared_ptr<const void> data;       ///< The actual data blob representing the mask.
     };
 
+    /// This data structure represents the valid pixel mask as an uncompressed bitonal bitmap (i.e. if the field 'type_of_representation' is 0).
     struct SubBlockAttachmentMaskInfoUncompressedBitonalBitmap
     {
-        std::uint32_t width;
-        std::uint32_t height;
-        std::uint32_t stride;
-        size_t size_data;
-        std::shared_ptr<const void> data;
+        std::uint32_t width;    ///< The width of the mask in pixels.
+        std::uint32_t height;   ///< The height of the mask in pixels.
+        std::uint32_t stride;   ///< The stride of the bitonal bitmap (in bytes).
+        size_t size_data;       ///< The size of the data blob (in bytes) which contains an uncompressed bitonal bitmap.
+        std::shared_ptr<const void> data; ///< The actual data blob representing the uncompressed bitonal bitmap.
     };
 
     class ISubBlockAttachmentAccessor

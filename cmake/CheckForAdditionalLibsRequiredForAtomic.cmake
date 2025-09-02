@@ -11,7 +11,7 @@ include(CheckCXXSourceRuns)
 
 function(CheckForAdditionalLibsRequiredForAtomic VARIABLE)
 
-  if (NOT DEFINED ${ADDITIONAL_LIBS_TO_LINK})
+  if (NOT DEFINED ${VARIABLE})
 
      # define a small test program which uses 'std::atomic' with a couple of types. It seems, with the Risc-V case, 'uchar' is the only type which fails.
      set (_CHECK_ATOMIC_PROG "
