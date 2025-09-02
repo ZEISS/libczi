@@ -92,7 +92,7 @@ namespace libCZI
     /// a valid pixel mask.
     struct SubBlockAttachmentMaskInfoGeneral
     {
-        std::uint32_t width;	///< The width th of the mask in pixels.
+        std::uint32_t width;	///< The width of the mask in pixels.
         std::uint32_t height;   ///< The height of the mask in pixels.
         std::uint32_t type_of_representation;   ///< The type of representation (0 = uncompressed bitonal bitmap).
         size_t size_data;
