@@ -596,46 +596,150 @@ namespace libCZI
     /// Defines an alias representing the scoped bitmap locker for use with a shared_ptr of type libCZI::IBitonalBitmapData.
     typedef ScopedBitonalBitmapLocker<std::shared_ptr<IBitonalBitmapData>> ScopedBitonalBitmapLockerSP;
 
+    /// \brief Utility functions for working with 1‑bit‑per‑pixel (bitonal) bitmaps.
+    ///
+    /// This class contains static helpers to read, write, and bulk-edit bitonal images that
+    /// implement libCZI::IBitonalBitmapData. It provides overloads that:
+    /// - Accept IBitonalBitmapData* or std::shared_ptr<IBitonalBitmapData> and manage Lock/Unlock
+    ///   internally via ScopedBitonalBitmapLocker.
+    /// - Accept a pre-acquired BitonalBitmapLockInfo plus the bitmap extent for zero-overhead
+    ///   operations where the caller controls the lock lifetime.
+    ///
+    /// Provided operations:
+    /// - GetPixelValue(...) - read a single pixel.
+    /// - SetPixelValue(...) - write a single pixel.
+    /// - Fill(...) - fill a rectangular ROI; the ROI is clipped to the bitmap extent.
+    /// - SetAllPixels(...) - set all pixels to a uniform value.
+    /// - CopyAt(...) - masked copy from a source bitmap to a destination bitmap; only pixels for
+    ///   which the mask bit is set are copied, starting at the given destination offset. Regions
+    ///   outside the destination are ignored.
+    ///
+    /// Locking and thread-safety:
+    /// - Pointer/shared_ptr overloads perform Lock/Unlock internally and are safe to call even when
+    ///   other threads also lock the same bitmap (IBitonalBitmapData permits multiple locks).
+    /// - LockInfo overloads assume the caller holds a valid lock for the duration of the call. When
+    ///   writing, ensure exclusive access to avoid data races.
+    ///
+    /// Memory layout:
+    /// - Pixels are packed at 1 bit per pixel in scanlines separated by stride bytes.
+    /// - Callers should not depend on the bit ordering within each byte; use these helpers instead
+    ///   of decoding bits directly.
+    ///
+    /// Coordinates and clipping:
+    /// - x and y are 0-based. All operations clip to [0, width) x [0, height).
+    ///
+    /// Example:
+    /// \code{.cpp}
+    /// // Clear an ROI and then set one pixel
+    /// libCZI::IntRect roi{10, 20, 32, 8};
+    /// libCZI::BitonalBitmapOperations::Fill(bitonal.get(), roi, false);
+    /// libCZI::BitonalBitmapOperations::SetPixelValue(bitonal.get(), 12, 22, true);
+    ///
+    /// // High-performance path with a pre-acquired lock
+    /// libCZI::ScopedBitonalBitmapLockerSP lock{ bitonal };
+    /// libCZI::BitonalBitmapOperations::Fill(lock, bitonal->GetSize(), roi, true);
+    ///
+    /// // Masked copy into destination at (100, 50)
+    /// libCZI::BitonalBitmapOperations::CopyAt(src.get(), mask.get(),
+    ///     libCZI::IntPoint{100, 50}, dst.get());
+    /// \endcode
     class BitonalBitmapOperations
     {
     public:
-        /// Get the value of a specific pixel in a bitonal bitmap.
-        /// \param bmData    The bitonal bitmap.
-        /// \param x         The x-coordinate of the pixel (0-based).
-        /// \param y         The y-coordinate of the pixel (0-based).
-        /// \return          The value of the pixel (true for "set", false for "not set").
+        /// Gets the value of a specific pixel in a bitonal bitmap.
+        ///
+        /// This overload locks and unlocks the bitmap internally.
+        ///
+        /// \param  bmData  The bitonal bitmap.
+        /// \param  x       The x-coordinate of the pixel (0-based).
+        /// \param  y       The y-coordinate of the pixel (0-based).
+        /// \return         The value of the pixel (true for set/1, false for clear/0).
         static bool GetPixelValue(const std::shared_ptr<IBitonalBitmapData>& bmData, std::uint32_t x, std::uint32_t y)
         {
             ScopedBitonalBitmapLockerSP lock_bitmap{ bmData };
             return GetPixelValue(lock_bitmap, bmData->GetSize(), x, y);
         }
 
+        /// Gets the value of a specific pixel in a locked bitonal bitmap.
+        ///
+        /// \param  lockInfo    Information describing the locked bitonal bitmap data
+        ///                     (ptrData points to the first scanline; stride is in bytes).
+        /// \param  extent      The bitmap extent (width/height).
+        /// \param  x           The x-coordinate of the pixel (0-based).
+        /// \param  y           The y-coordinate of the pixel (0-based).
+        /// \return             The value of the pixel (true for set/1, false for clear/0).
         static bool GetPixelValue(const BitonalBitmapLockInfo& lockInfo, const libCZI::IntSize& extent, std::uint32_t x, std::uint32_t y);
 
+        /// Gets the value of a specific pixel in a locked bitonal bitmap.
+        ///
+        /// Convenience overload when the extent can be taken from the bitmap.
+        ///
+        /// \param  bitonal_bitmap  The bitonal bitmap the lock was acquired from.
+        /// \param  lock_info       The lock information corresponding to bitonal_bitmap.
+        /// \param  x               The x-coordinate of the pixel (0-based).
+        /// \param  y               The y-coordinate of the pixel (0-based).
+        /// \return                 The value of the pixel (true for set/1, false for clear/0).
         static bool GetPixelValue(const IBitonalBitmapData* bitonal_bitmap, const BitonalBitmapLockInfo& lock_info, std::uint32_t x, std::uint32_t y)
         {
             return GetPixelValue(lock_info, bitonal_bitmap->GetSize(), x, y);
         }
 
+        /// Sets the value of a specific pixel in a bitonal bitmap.
+        ///
+        /// This overload locks and unlocks the bitmap internally.
+        ///
+        /// \param  bitonal_bitmap_data The bitonal bitmap to modify.
+        /// \param  x                   The x-coordinate of the pixel (0-based).
+        /// \param  y                   The y-coordinate of the pixel (0-based).
+        /// \param  value               The value to write (true for set/1, false for clear/0).
         static void SetPixelValue(IBitonalBitmapData* bitonal_bitmap_data, std::uint32_t x, std::uint32_t y, bool value)
         {
             ScopedBitonalBitmapLockerP bitonal_bitmap_locker{ bitonal_bitmap_data };
             BitonalBitmapOperations::SetPixelValue(bitonal_bitmap_locker, bitonal_bitmap_data->GetSize(), x, y, value);
         }
 
+        /// Sets the value of a specific pixel in a bitonal bitmap.
+        ///
+        /// This overload locks and unlocks the bitmap internally.
+        ///
+        /// \param  bitonal_bitmap_data The bitonal bitmap to modify (shared_ptr).
+        /// \param  x                   The x-coordinate of the pixel (0-based).
+        /// \param  y                   The y-coordinate of the pixel (0-based).
+        /// \param  value               The value to write (true for set/1, false for clear/0).
         static void SetPixelValue(const std::shared_ptr<IBitonalBitmapData>& bitonal_bitmap_data, std::uint32_t x, std::uint32_t y, bool value)
         {
             BitonalBitmapOperations::SetPixelValue(bitonal_bitmap_data.get(), x, y, value);
         }
-
+        
+        /// Sets the value of a specific pixel in a locked bitonal bitmap.
+        ///
+        /// \param  lockInfo    Information describing the locked bitonal bitmap data.
+        /// \param  extent      The bitmap extent (width/height).
+        /// \param  x           The x-coordinate of the pixel (0-based).
+        /// \param  y           The y-coordinate of the pixel (0-based).
+        /// \param  value       The value to write (true for set/1, false for clear/0).
         static void SetPixelValue(const BitonalBitmapLockInfo& lockInfo, const libCZI::IntSize& extent, std::uint32_t x, std::uint32_t y, bool value);
 
+        /// Fills a rectangular region of interest (ROI) in a bitonal bitmap with a specified value.
+        ///
+        /// This overload locks and unlocks the bitmap internally.
+        ///
+        /// \param  bitonal_bitmap_data The bitonal bitmap to modify.
+        /// \param  rect                The rectangle to fill. The ROI is clipped to the bitmap extent.
+        /// \param  value               The value to fill the ROI with (true for set/1, false for clear/0).
         static void Fill(IBitonalBitmapData* bitonal_bitmap_data, const libCZI::IntRect& rect, bool value)
         {
             ScopedBitonalBitmapLockerP bitonal_bitmap_locker{ bitonal_bitmap_data };
             BitonalBitmapOperations::Fill(bitonal_bitmap_locker, bitonal_bitmap_data->GetSize(), rect, value);
         }
 
+        /// Fills a rectangular region of interest (ROI) in a bitonal bitmap with a specified value.
+        ///
+        /// This overload locks and unlocks the bitmap internally.
+        ///
+        /// \param  bitonal_bitmap_data The bitonal bitmap to modify.
+        /// \param  rect                The rectangle to fill. The ROI is clipped to the bitmap extent.
+        /// \param  value               The value to fill the ROI with (true for set/1, false for clear/0).
         static void Fill(const std::shared_ptr<IBitonalBitmapData>& bitonal_bitmap_data, const libCZI::IntRect& rect, bool value)
         {
             BitonalBitmapOperations::Fill(bitonal_bitmap_data.get(), rect, value);
@@ -649,20 +753,52 @@ namespace libCZI
         /// \param 	value   	The value to fill the ROI with.
         static void Fill(const BitonalBitmapLockInfo& lockInfo, const libCZI::IntSize& extent, const libCZI::IntRect& roi, bool value);
 
+        /// Sets all pixels in the bitonal bitmap to a uniform value.
+        ///
+        /// This overload locks and unlocks the bitmap internally.
+        ///
+        /// \param  bitonal_bitmap_data The bitonal bitmap to modify (shared_ptr).
+        /// \param  value               The value to assign to every pixel (true for set/1, false for clear/0).
         static void SetAllPixels(const std::shared_ptr<IBitonalBitmapData>& bitonal_bitmap_data, bool value)
         {
             BitonalBitmapOperations::SetAllPixels(bitonal_bitmap_data.get(), value);
         }
 
+        /// Sets all pixels in the bitonal bitmap to a uniform value.
+        ///
+        /// This overload locks and unlocks the bitmap internally.
+        ///
+        /// \param  bitonal_bitmap_data The bitonal bitmap to modify.
+        /// \param  value               The value to assign to every pixel (true for set/1, false for clear/0).
         static void SetAllPixels(IBitonalBitmapData* bitonal_bitmap_data, bool value)
         {
             ScopedBitonalBitmapLockerP bitonal_bitmap_locker{ bitonal_bitmap_data };
             SetAllPixels(bitonal_bitmap_locker, bitonal_bitmap_data->GetSize(), value);
         }
 
+        /// Sets all pixels in a locked bitonal bitmap to a uniform value.
+        ///
+        /// \param  lockInfo    Information describing the locked bitonal bitmap data.
+        /// \param  extent      The bitmap extent (width/height).
+        /// \param  value       The value to assign to every pixel (true for set/1, false for clear/0).
         static void SetAllPixels(const BitonalBitmapLockInfo& lockInfo, const libCZI::IntSize& extent, bool value);
 
-
+        /// Copies pixels from a source bitmap into a destination bitmap using a bitonal mask.
+        ///
+        /// For every mask pixel that is set (true), the corresponding source pixel is copied
+        /// to destination at position (offset.x + x, offset.y + y), where (x, y) is the mask/source
+        /// coordinate. Regions outside any involved extent are ignored.
+        ///
+        /// Preconditions and notes:
+        /// - source_bitmap and destination_bitmap must have the same PixelType and compatible strides.
+        /// - The effective copy area is the intersection of:
+        ///   mask extent shifted by offset, destination extent, and source extent.
+        /// - The function will lock/unlock the involved bitmaps internally as needed.
+        ///
+        /// \param  source_bitmap       Source image providing the pixels to copy.
+        /// \param  mask                Bitonal mask controlling which pixels to copy.
+        /// \param  offset              Destination offset where mask (0,0) maps to.
+        /// \param  destination_bitmap  Destination image receiving copied pixels.
         static void CopyAt(libCZI::IBitmapData* source_bitmap, libCZI::IBitonalBitmapData* mask, const libCZI::IntPoint& offset, libCZI::IBitmapData* destination_bitmap);
     };
 
