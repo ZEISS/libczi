@@ -188,8 +188,8 @@ TEST(MaskAwareComposition, ReadSubBlockWithMaskAndExamineIt)
 
     const auto mask_bitonal_bitmap = sub_block_attachment_accessor->CreateBitonalBitmapFromMaskInfo();
     ASSERT_TRUE(mask_bitonal_bitmap);
-    ASSERT_TRUE(mask_bitonal_bitmap->GetWidth() == 4);
-    ASSERT_TRUE(mask_bitonal_bitmap->GetHeight() == 4);
+    ASSERT_EQ(mask_bitonal_bitmap->GetWidth(), 4);
+    ASSERT_EQ(mask_bitonal_bitmap->GetHeight(), 4);
     ASSERT_TRUE(BitonalBitmapOperations::GetPixelValue(mask_bitonal_bitmap, 0, 0));
     ASSERT_FALSE(BitonalBitmapOperations::GetPixelValue(mask_bitonal_bitmap, 1, 0));
     ASSERT_TRUE(BitonalBitmapOperations::GetPixelValue(mask_bitonal_bitmap, 2, 0));
