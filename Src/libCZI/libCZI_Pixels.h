@@ -398,8 +398,6 @@ namespace libCZI
     /// Defines an alias representing the scoped bitmap locker for use with a shared_ptr of type libCZI::IBitmapData.
     typedef ScopedBitmapLocker<std::shared_ptr<IBitmapData>> ScopedBitmapLockerSP;
 
-
-
     //-------------------------------------------------------------------------
 
     /// Information about a locked bitonal bitmap - allowing direct access to the image data in memory.
