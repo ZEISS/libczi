@@ -22,7 +22,12 @@ The immediate use-case for this mask-concept is with pyramids. Pyramids with CZI
 .. image:: ../_static/images/overlapping_scenes.jpg
    :alt: overlapping scenes
 
-Although the tiles of different scenes are not overlapping, the axis-aligned bounding-boxes of the scenes evidently are. This means that pyramid-tiles **are overlapping**, and it is then impossible to then render a scene-composite which would give the complete image data. The result is then a composition like this: 
+Although the tiles of different scenes are not overlapping, the axis-aligned bounding-boxes of the scenes evidently are. This means that pyramid-tiles **are overlapping**, and it is then impossible to render a scene-composite which would give the complete image data. The result is then a composition like this: 
 
 .. image:: ../_static/images/scene-composite-wo_mask.png
-   :alt: overlapping scenes
+   :alt: composition without mask
+
+Therefore, the pyramid-tiles of each scene can be provided with a valid-pixel-mask, and the composition then looks like this:
+
+.. image:: ../_static/images/scene-composite-wo_mask.png
+   :alt: composition with mask
