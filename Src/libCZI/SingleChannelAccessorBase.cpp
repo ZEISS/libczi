@@ -135,53 +135,6 @@ std::vector<int> CSingleChannelAccessorBase::CheckForVisibility(const libCZI::In
     return result;
 }
 
-#if false
-/*static*/CSingleChannelAccessorBase::SubBlockData CSingleChannelAccessorBase::GetSubBlockDataForSubBlockIndex(
-    const std::shared_ptr<libCZI::ISubBlockRepository>& sbBlkRepository,
-    const std::shared_ptr<libCZI::ISubBlockCacheOperation>& cache,
-    int subBlockIndex,
-    bool onlyAddCompressedSubBlockToCache)
-{
-    SubBlockData result;
-
-    // if no cache-object is given, then we simply read the subblock and create a bitmap from it
-    if (!cache)
-    {
-        const auto subblock = sbBlkRepository->ReadSubBlock(subBlockIndex);
-        result.bitmap = subblock->CreateBitmap();
-        result.subBlockInfo = subblock->GetSubBlockInfo();
-    }
-    else
-    {
-        const auto bitmap_from_cache = cache->Get(subBlockIndex);
-        if (bitmap_from_cache.IsValid())
-        {
-            const bool b = sbBlkRepository->TryGetSubBlockInfo(subBlockIndex, &result.subBlockInfo);
-            if (!b)
-            {
-                stringstream ss;
-                ss << "SubBlockInfo not found in repository for subblock index " << subBlockIndex << ".";
-                throw logic_error(ss.str());
-            }
-
-            result.bitmap = bitmap_from_cache.bitmap;
-        }
-        else
-        {
-            const auto subblock = sbBlkRepository->ReadSubBlock(subBlockIndex);
-            result.bitmap = subblock->CreateBitmap();
-            result.subBlockInfo = subblock->GetSubBlockInfo();
-            if (!onlyAddCompressedSubBlockToCache || result.subBlockInfo.GetCompressionMode() != CompressionMode::UnCompressed)
-            {
-                cache->Add(subBlockIndex, { result.bitmap, nullptr });
-            }
-        }
-    }
-
-    return result;
-}
-#endif
-
 /*static*/CSingleChannelAccessorBase::SubBlockData CSingleChannelAccessorBase::GetSubBlockDataIncludingMaskForSubBlockIndex(
     const std::shared_ptr<libCZI::ISubBlockRepository>& sbBlkRepository,
     const std::shared_ptr<libCZI::ISubBlockCacheOperation>& cache,
