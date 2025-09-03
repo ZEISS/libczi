@@ -80,3 +80,50 @@ attachment. The steps to enumerate all chunks are therefore (under the precondit
 #. If offset of next chunk ≥ total size of attachment → stop
 #. Goto step 1
 
+The Guid which identifies the *ValidPixelMask* is: :code:`{CBE3EA67-5BFC-492B-A16A-ECE378031448}`.   
+The memory layout of the payload of a *ValidPixelMask* chunk is as follows:
+
+.. list-table::
+   :header-rows: 1
+   :widths: 16 10 28 46
+
+   * - Offset
+     - Type
+     - Name
+     - Comment
+   * - ``0``
+     - Int
+     - ``width``
+     - The width (specified in pixels).
+   * - ``4``
+     - Int
+     - ``height``
+     - The height (specified in pixels).
+   * - ``8``
+     - Int
+     - ``Type of representation = 0``
+     - The following is only valid for “type of representation = 0”
+   * - ``12``
+     - Int
+     - ``Stride``
+     - Length of a line specified in bytes.
+   * - ``16...16+stride-1``
+     - Byte[]
+     - (first line of) mask data in bitmap representation
+     - 
+   * - ``(16+stride) ... (16 + stride * height - 1)``
+     - Byte[]
+     - (second to ``height``) lines of mask
+     - 
+
+The bitonal bitmap representation uses a scheme where the leftmost pixel in a byte is the most significant bit, as depicted here:
+
+.. image:: ../_static/images/memory_layout_bitonal_bitmap.png
+   :alt: memory layout bitonal bitmap
+
+
+In the sub-block metadata, the attachment format is defined with the element DataFormat in the XML-section ``<Attachment>``. The value for a chunk-container (which
+in turn may contain a valid-pixel-mask) is ``CHUNKCONTAINER``.
+
+.. code-block:: xml
+<METADATA> <AttachmentSchema> <DataFormat>CHUNKCONTAINER</DataFormat> </AttachmentSchema> </METADATA>
