@@ -1044,7 +1044,7 @@ namespace
     int rem = x1 % 8;
     if (rem != 0)
     {
-        const uint8_t v = w >= 8 ? 0xff : (0xff << (8 - w));    // we must not set more bits than our width
+        const uint8_t v = w >= 8 ? 0xff : static_cast<uint8_t>(0xff << (8 - w));    // we must not set more bits than our width
         const uint8_t leftBorderValue = v >> rem;
         const IntSize s{ 1, static_cast<uint32_t>(h) };
         uint8_t* ptrBorder = static_cast<uint8_t*>(ptrData) + x1 / 8 + y1 * static_cast<size_t>(stride);
