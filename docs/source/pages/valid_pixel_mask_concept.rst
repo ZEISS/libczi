@@ -1,4 +1,4 @@
-Valid-Pixel-Mask Concept
+﻿Valid-Pixel-Mask Concept
 ========================
 
 
@@ -17,7 +17,7 @@ The concept is:
 Mask in Pyramids
 ----------------
 
-The immediate use-case for this mask-concept is with pyramids. Pyramids with CZI are constructed **per scene**, and the axis-aligned bounding-box of scenes may be overlapping - as shown here: 
+The immediate use-case for this mask-concept is with pyramids. With CZI, pyramids are constructed **per scene**, and the axis-aligned bounding-box of scenes may be overlapping - as shown here: 
 
 .. image:: ../_static/images/overlapping_scenes.jpg
    :alt: overlapping scenes
@@ -31,3 +31,52 @@ Therefore, the pyramid-tiles of each scene can be provided with a valid-pixel-ma
 
 .. image:: ../_static/images/scene-composite-w_mask.png
    :alt: composition with mask
+
+
+Data-Layout of Mask in CZI
+--------------------------
+
+At CZI-level, the mask is stored in the *attachment* of a sub-block. Reminder: a subblock is constituted by three parts: the pixel-data, the metadata and the attachment (where the latter two are optional).   
+The attachment is a binary blob which can contain arbitrary data. The format of the attachment is specified in the metadata of the sub-block.   
+The attachment format in which the mask is stored is called **CHUNKCONTAINER**. It is a mechanism to subdivide the attachment blob into chunks, where each chunk has a type and a length. The mask is then stored in a chunk of type **VALIDPIXELMASK**.
+
+The memory layout of a **CHUNKCONTAINER** is as follows:
+
+.. list-table::
+   :header-rows: 1
+   :widths: 12 12 40
+
+   * - Offset
+     - Type
+     - Purpose
+   * - 0
+     - Guid
+     - Identifies the type of the payload
+   * - 16
+     - Int
+     - Size of payload
+   * - 20...20+size
+     - Byte[]
+     - The first chunk (payload)
+   * - 20+size
+     - Guid
+     - (optionally) identifies the type of the (next) payload
+   * - 20+size+16
+     - Int
+     - Size of payload
+   * - 20+size+20
+     - Byte[]
+     - The second chunk (payload)
+
+A chunk starts with a Guid which uniquely identifies what kind of data is to be found at the payload-section. The Guid is followed by an integer which gives 
+the size of the payload that immediately follows. If there is a second chunk in the chunk-container, it will immediately follow after the payload 
+(with its Guid, size and payload).   
+The size of the chunk-container is implictly given (because it is put into an attachment section), and the total size of the chunk-container is used to terminate 
+the search for a new chunk. That is, the last chunk has been found if the offset pointed to by its size-field is greater or equal than the size of the whole 
+attachment. The steps to enumerate all chunks are therefore (under the precondition, that its total size is known):
+
+#. Read chunk-header
+#. Determine offset of next chunk
+#. If offset of next chunk ≥ total size of attachment → stop
+#. Goto step 1
+
