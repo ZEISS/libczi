@@ -122,8 +122,13 @@ The bitonal bitmap representation uses a scheme where the leftmost pixel in a by
    :alt: memory layout bitonal bitmap
 
 
-In the sub-block metadata, the attachment format is defined with the element DataFormat in the XML-section ``<Attachment>``. The value for a chunk-container (which
+In the sub-block metadata, the attachment format is defined with the element DataFormat in the XML-section ``<AttachmentSchema>``. The value for a chunk-container (which
 in turn may contain a valid-pixel-mask) is ``CHUNKCONTAINER``.
 
 .. code-block:: xml
-<METADATA> <AttachmentSchema> <DataFormat>CHUNKCONTAINER</DataFormat> </AttachmentSchema> </METADATA>
+
+   <METADATA>
+     <AttachmentSchema>
+       <DataFormat>CHUNKCONTAINER</DataFormat>
+     </AttachmentSchema>
+   </METADATA>
