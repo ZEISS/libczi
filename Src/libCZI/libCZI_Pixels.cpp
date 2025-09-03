@@ -3,6 +3,8 @@
 // SPDX-License-Identifier: LGPL-3.0-or-later
 
 #include "libCZI_Pixels.h"
+
+#include "bitmapData.h"
 #include "BitmapOperationsBitonal.h"
 
 using namespace libCZI;
@@ -73,4 +75,21 @@ void BitonalBitmapOperations::CopyAt(libCZI::IBitmapData* source_bitmap, libCZI:
 /*static*/void BitonalBitmapOperations::Fill(const BitonalBitmapLockInfo& lockInfo, const libCZI::IntSize& extent, const libCZI::IntRect& roi, bool value)
 {
     BitmapOperationsBitonal::Fill(extent.w, extent.h, lockInfo.ptrData, lockInfo.stride, roi, value);
+}
+
+/*static*/shared_ptr<IBitonalBitmapData> BitonalBitmapOperations::Decimate(int neighborhood_size, const BitonalBitmapLockInfo& lockInfo, const libCZI::IntSize& extent)
+{
+    auto destination = CStdBitonalBitmapData::Create(extent.w / 2, extent.h / 2);
+    ScopedBitonalBitmapLockerSP destination_locker{ destination};
+    BitmapOperationsBitonal::BitonalDecimate(
+        neighborhood_size, 
+        static_cast<const uint8_t*>(lockInfo.ptrData), 
+        lockInfo.stride, 
+        extent.w,
+        extent.h,
+        static_cast<uint8_t*>(destination_locker.ptrData),
+        destination_locker.stride,
+        destination->GetWidth(),
+        destination->GetHeight());
+    return destination;
 }

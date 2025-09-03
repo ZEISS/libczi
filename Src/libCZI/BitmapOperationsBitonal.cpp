@@ -69,7 +69,7 @@ namespace
 #endif
         EndianConverterForHost;
 
-    template <int regionSize>
+    template <int RegionSize>
     class DecimateHelpers
     {
     protected:
@@ -80,8 +80,8 @@ namespace
         static std::uint32_t ReadPartial(const void* ptr, int bitcount);
     };
 
-    template <int tregionSize, class CEndianessConv = EndianConverterForHost>
-    class DecimateBitonal : DecimateHelpers<tregionSize>
+    template <int RegionSize, class EndianessConv = EndianConverterForHost>
+    class DecimateBitonal : DecimateHelpers<RegionSize>
     {
     public:
         static void Decimate(const void* ptrSrc, int strideSrc, int widthSrc, int heightSrc, void* ptrDest, int strideDest, int widthDest, int heightDest);
@@ -92,8 +92,8 @@ namespace
         static std::uint16_t FilterDword(std::uint32_t dw, uint8_t byteBefore, uint8_t byteAfter);
     };
 
-    template <int regionSize, class CEndianessConv>
-    /*static*/const uint8_t DecimateBitonal<regionSize, CEndianessConv>::DecimateBitonalTable[256] =
+    template <int RegionSize, class EndianessConv>
+    /*static*/const uint8_t DecimateBitonal<RegionSize, EndianessConv>::DecimateBitonalTable[256] =
     {
         0, 0, 1, 1, 0, 0, 1, 1, 2, 2, 3, 3, 2, 2, 3, 3,
         0, 0, 1, 1, 0, 0, 1, 1, 2, 2, 3, 3, 2, 2, 3, 3,
@@ -114,8 +114,8 @@ namespace
     };
 
 
-    template <int tregionSize, class CEndianessConv>
-    /*static*/void DecimateBitonal<tregionSize, CEndianessConv>::Decimate(const void* ptrSrc, int strideSrc, int widthSrc, int heightSrc, void* ptrDest, int strideDest, int widthDest, int heightDest)
+    template <int RegionSize, class EndianessConv>
+    /*static*/void DecimateBitonal<RegionSize, EndianessConv>::Decimate(const void* ptrSrc, int strideSrc, int widthSrc, int heightSrc, void* ptrDest, int strideDest, int widthDest, int heightDest)
     {
         for (int y = 0; y < heightDest; ++y)
         {
@@ -123,30 +123,30 @@ namespace
                 y * 2,
                 heightSrc,
                 1,
-                ((const std::uint8_t*)ptrSrc) + strideSrc * y * 2,
+                static_cast<const std::uint8_t*>(ptrSrc) + strideSrc * static_cast<size_t>(y) * 2,
                 widthSrc,
                 strideSrc,
-                ((std::uint8_t*)ptrDest) + strideDest * y,
+                static_cast<std::uint8_t*>(ptrDest) + strideDest * static_cast<size_t>(y),
                 widthDest,
                 strideDest);
         }
     }
 
-    template <int tregionSize, class CEndianessConv>
-    /*static*/std::uint16_t DecimateBitonal<tregionSize, CEndianessConv>::FilterDword(std::uint32_t dw, std::uint8_t byteBefore, std::uint8_t byteAfter)
+    template <int RegionSize, class EndianessConv>
+    /*static*/std::uint16_t DecimateBitonal<RegionSize, EndianessConv>::FilterDword(std::uint32_t dw, std::uint8_t byteBefore, std::uint8_t byteAfter)
     {
-        const std::uint64_t v0 = byteAfter | (((std::uint64_t)dw) << 8) | (((std::uint64_t)byteBefore) << 40);
-        const std::uint64_t v = DecimateHelpers<tregionSize>::Filter(v0);
-        const std::uint16_t b1 = DecimateBitonalTable[(std::uint8_t)(v >> 8)];
-        const std::uint16_t b2 = DecimateBitonalTable[(std::uint8_t)(v >> 16)];
-        const std::uint16_t b3 = DecimateBitonalTable[(std::uint8_t)(v >> 24)];
-        const std::uint16_t b4 = DecimateBitonalTable[(std::uint8_t)(v >> 32)];
-        const std::uint16_t dest = b1 | (b2 << 4) | (b3 << 8) | (b4 << 12);
+        const std::uint64_t v0 = byteAfter | (static_cast<std::uint64_t>(dw) << 8) | (static_cast<std::uint64_t>(byteBefore) << 40);
+        const std::uint64_t v = DecimateHelpers<RegionSize>::Filter(v0);
+        const std::uint16_t b1 = DecimateBitonalTable[static_cast<std::uint8_t>(v >> 8)];
+        const std::uint16_t b2 = DecimateBitonalTable[static_cast<std::uint8_t>(v >> 16)];
+        const std::uint16_t b3 = DecimateBitonalTable[static_cast<std::uint8_t>(v >> 24)];
+        const std::uint16_t b4 = DecimateBitonalTable[static_cast<std::uint8_t>(v >> 32)];
+        const std::uint16_t dest = b1 | static_cast<uint16_t>(b2 << 4) | static_cast<uint16_t>(b3 << 8) | static_cast<uint16_t>(b4 << 12);
         return dest;
     }
 
-    template <int tregionSize, class CEndianessConv>
-    /*static*/void DecimateBitonal<tregionSize, CEndianessConv>::DecimateLine(int y, int height, int regionSize, const uint8_t* ptrSrc, int widthSrc, int strideSrc, uint8_t* ptrDest, int widthDest, int strideDest)
+    template <int RegionSize, class EndianessConv>
+    /*static*/void DecimateBitonal<RegionSize, EndianessConv>::DecimateLine(int y, int height, int regionSize, const uint8_t* ptrSrc, int widthSrc, int strideSrc, uint8_t* ptrDest, int widthDest, int strideDest)
     {
         uint8_t byteBefore = 0xff;
 
@@ -155,38 +155,38 @@ namespace
         for (int x = 0; x < numberOfDwords; ++x)
         {
             uint8_t byteAfter = GetByteAfter(ptrSrc, (x * 4) + 4, widthSrc);
-            uint32_t dw = CEndianessConv::BswapDWORD(DecimateHelpers<tregionSize>::GetDword(y, height, (void*)(((uintptr_t)ptrSrc) + x * 4), strideSrc)); ///< The double-word
+            uint32_t dw = EndianessConv::BswapDWORD(DecimateHelpers<RegionSize>::GetDword(y, height, ptrSrc + static_cast<size_t>(x) * 4, strideSrc)); ///< The double-word
             uint16_t dest = FilterDword(dw, byteBefore, byteAfter);
-            byteBefore = (uint8_t)(dw);
-            *((uint16_t*)(((uintptr_t)ptrDest) + 2 * x)) = CEndianessConv::BswapUSHORT(dest);
+            byteBefore = static_cast<uint8_t>(dw);
+            *reinterpret_cast<uint16_t*>(reinterpret_cast<uintptr_t>(ptrDest) + 2 * static_cast<size_t>(x)) = EndianessConv::BswapUSHORT(dest);
         }
 
         int bitsRemaining = widthSrc - numberOfDwords * 32;
         if (bitsRemaining > 0)
         {
             // we continue to operate DWORD-wise, we are just careful...
-            uint32_t dw = CEndianessConv::BswapDWORD(DecimateHelpers<tregionSize>::GetDwordPartial(y, height, (void*)(((uintptr_t)ptrSrc) + numberOfDwords * 4), bitsRemaining, strideSrc));
+            uint32_t dw = EndianessConv::BswapDWORD(DecimateHelpers<RegionSize>::GetDwordPartial(y, height, ptrSrc + static_cast<size_t>(numberOfDwords) * 4, bitsRemaining, strideSrc));
 
             // the filter the DWORD as usually
             uint16_t dest = FilterDword(dw, byteBefore, 0xff);
 
             if (bitsRemaining <= 16)
             {
-                *((uint8_t*)(((uintptr_t)ptrDest) + 2 * numberOfDwords)) = (uint8_t)CEndianessConv::BswapUSHORT(dest);
+                *reinterpret_cast<uint8_t*>(reinterpret_cast<uintptr_t>(ptrDest) + 2 * static_cast<size_t>(numberOfDwords)) = static_cast<uint8_t>(EndianessConv::BswapUSHORT(dest));
             }
             else
             {
-                *((uint16_t*)(((uintptr_t)ptrDest) + 2 * numberOfDwords)) = CEndianessConv::BswapUSHORT(dest);
+                *reinterpret_cast<uint16_t*>(reinterpret_cast<uintptr_t>(ptrDest) + 2 * static_cast<size_t>(numberOfDwords)) = EndianessConv::BswapUSHORT(dest);
             }
         }
     }
 
-    template <int tregionSize, class CEndianessConv>
-    uint8_t DecimateBitonal<tregionSize, CEndianessConv>::GetByteAfter(const void* ptr, int x, int width)
+    template <int RegionSize, class EndianessConv>
+    uint8_t DecimateBitonal<RegionSize, EndianessConv>::GetByteAfter(const void* ptr, int x, int width)
     {
         if (x < width)
         {
-            return *(((const uint8_t*)ptr) + x);
+            return *(static_cast<const uint8_t*>(ptr) + x);
         }
 
         return 0xff;
@@ -243,94 +243,94 @@ namespace
     template <>
     /*static*/uint32_t DecimateHelpers<0>::GetDword(int y, int height, const void* ptrSrc, int pitchSrc)
     {
-        return *((const uint32_t*)ptrSrc);
+        return *static_cast<const uint32_t*>(ptrSrc);
     }
 
     template <>
     /*static*/uint32_t DecimateHelpers<1>::GetDword(int y, int height, const void* ptrSrc, int pitchSrc)
     {
-        uint32_t dw = *((const uint32_t*)ptrSrc);
+        uint32_t dw = *static_cast<const uint32_t*>(ptrSrc);
         if (y > 0)
         {
-            dw &= *((const uint32_t*)(((uintptr_t)ptrSrc) - pitchSrc));
+            dw &= *reinterpret_cast<const uint32_t*>(static_cast<const uint8_t*>(ptrSrc) - pitchSrc);
         }
 
         if (y < height - 1)
         {
-            dw &= *((const uint32_t*)(((uintptr_t)ptrSrc) + pitchSrc));
+            dw &= *reinterpret_cast<const uint32_t*>(static_cast<const uint8_t*>(ptrSrc) + pitchSrc);
         }
 
         return dw;
     }
 
-    template <int regionSize>
-    /*static*/uint32_t DecimateHelpers<regionSize>::GetDword(int y, int height, const void* ptrSrc, int pitchSrc)
+    template <int RegionSize>
+    /*static*/uint32_t DecimateHelpers<RegionSize>::GetDword(int y, int height, const void* ptrSrc, int pitchSrc)
     {
         uint32_t dw = 0xffffffff;
 
-        int start = (std::max)(y - regionSize, 0);
-        int end = (std::min)(y + regionSize, height - 1);
+        int start = (std::max)(y - RegionSize, 0);
+        int end = (std::min)(y + RegionSize, height - 1);
 
-        const uint32_t* ptr = (const uint32_t*)(((uintptr_t)ptrSrc) - ((y - start) * pitchSrc));
+        const uint32_t* ptr = reinterpret_cast<const uint32_t*>(static_cast<const uint8_t*>(ptrSrc) - ((y - start) * static_cast<size_t>(pitchSrc)));
 
         for (int i = start; i <= end; ++i)
         {
             dw &= *ptr;
-            ptr = (const uint32_t*)(((uintptr_t)ptr) + pitchSrc);
+            ptr = reinterpret_cast<const uint32_t*>(static_cast<const uint8_t*>(ptrSrc) + pitchSrc);
         }
 
         return dw;
     }
 
-    template <int regionSize>
-    /*static*/uint32_t DecimateHelpers<regionSize>::GetDwordPartial(int y, int height, const void* ptrSrc, int bitCount, int pitchSrc)
+    template <int RegionSize>
+    /*static*/uint32_t DecimateHelpers<RegionSize>::GetDwordPartial(int y, int height, const void* ptrSrc, int bitCount, int pitchSrc)
     {
         uint32_t dw = 0xffffffff;
 
-        int start = (std::max)(y - regionSize, 0);
-        int end = (std::min)(y + regionSize, height - 1);
+        int start = (std::max)(y - RegionSize, 0);
+        int end = (std::min)(y + RegionSize, height - 1);
 
-        const uint32_t* ptr = (const uint32_t*)(((uintptr_t)ptrSrc) - ((y - start) * pitchSrc));
+        const uint32_t* ptr = reinterpret_cast<const uint32_t*>(static_cast<const uint8_t*>(ptrSrc) - ((y - start) * static_cast<size_t>(pitchSrc)));
 
         for (int i = start; i <= end; ++i)
         {
             dw &= ReadPartial(ptr, bitCount);
-            ptr = (const uint32_t*)(((uintptr_t)ptr) + pitchSrc);
+            ptr = reinterpret_cast<const uint32_t*>(reinterpret_cast<const uint8_t*>(ptr) + pitchSrc);
         }
 
         return dw;
     }
 
-    template <int regionSize>
-    /*static*/uint32_t DecimateHelpers<regionSize>::ReadPartial(const void* ptr, int bitcount)
+    template <int RegionSize>
+    /*static*/uint32_t DecimateHelpers<RegionSize>::ReadPartial(const void* ptr, int bitcount)
     {
         if (bitcount <= 8)
         {
-            uint8_t b = *((const uint8_t*)ptr);
+            uint8_t b = *static_cast<const uint8_t*>(ptr);
             b |= (0xff >> (bitcount));
             return 0xffffff00 | b;
         }
         else if (bitcount <= 16)
         {
-            uint8_t b1 = *((const uint8_t*)(((uintptr_t)ptr) + 0));
-            uint8_t b2 = *((const uint8_t*)(((uintptr_t)ptr) + 1));
+            uint8_t b1 = *(static_cast<const uint8_t*>(ptr) + 0);
+            uint8_t b2 = *(static_cast<const uint8_t*>(ptr) + 1);
             b2 |= (0xff >> (bitcount - 8));
-            return 0xffff0000 | (((uint32_t)b2) << 8) | b1;
+            return 0xffff0000 | (static_cast<uint32_t>(b2) << 8) | b1;
         }
         else if (bitcount <= 24)
         {
-            uint8_t b1 = *((const uint8_t*)(((uintptr_t)ptr) + 0));
-            uint8_t b2 = *((const uint8_t*)(((uintptr_t)ptr) + 1));
-            uint8_t b3 = *((const uint8_t*)(((uintptr_t)ptr) + 2));
+            uint8_t b1 = *(static_cast<const uint8_t*>(ptr) + 0);
+            uint8_t b2 = *(static_cast<const uint8_t*>(ptr) + 1);
+            uint8_t b3 = *(static_cast<const uint8_t*>(ptr) + 2);
             b3 |= (0xff >> (bitcount - 16));
 
-            return 0xff000000 | (((uint32_t)b3) << 16) | (((uint32_t)b2) << 8) | b1;
+            return 0xff000000 | (static_cast<uint32_t>(b3) << 16) | (static_cast<uint32_t>(b2) << 8) | b1;
         }
         else
         {
-            uint32_t dw = *((const uint32_t*)ptr);
+            uint32_t dw = *static_cast<const uint32_t*>(ptr);
             uint8_t m = 0xff >> (bitcount - 24);
-            dw |= (((uint32_t)m) << 24);
+            dw |= (static_cast<uint32_t>(m) << 24);
             return dw;
         }
     }

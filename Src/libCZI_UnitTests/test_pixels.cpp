@@ -298,3 +298,57 @@ TEST(Pixels, BitonalFillScenario5)
         "......................................................................";
     EXPECT_EQ(BitonalBitmapToString(bm.get()), expected_result);
 }
+
+TEST(Pixels, BitonalDecimateScenario1)
+{
+    // arrange
+    auto source = CStdBitonalBitmapData::Create(6,6);
+
+    {
+        ScopedBitonalBitmapLockerSP source_locker{ source };
+        static_cast<uint8_t*>(source_locker.ptrData)[0] = 0b11110100;
+        static_cast<uint8_t*>(source_locker.ptrData)[1] = 0b11110000;
+        static_cast<uint8_t*>(source_locker.ptrData)[2] = 0b01101000;
+        static_cast<uint8_t*>(source_locker.ptrData)[3] = 0b10000000;
+        static_cast<uint8_t*>(source_locker.ptrData)[4] = 0b11000010;
+        static_cast<uint8_t*>(source_locker.ptrData)[5] = 0b11000001;
+    }
+
+    // act
+    auto decimated = BitonalBitmapOperations::Decimate(1, source.get());
+
+    // assert
+    constexpr char expected_result[] =
+        "**."
+        "..."
+        "...";
+
+    EXPECT_EQ(BitonalBitmapToString(decimated.get()), expected_result);
+}
+
+TEST(Pixels, BitonalDecimateScenario2)
+{
+    // arrange
+    auto source = CStdBitonalBitmapData::Create(6,6);
+
+    {
+        ScopedBitonalBitmapLockerSP source_locker{ source };
+        static_cast<uint8_t*>(source_locker.ptrData)[0] = 0b11110100;
+        static_cast<uint8_t*>(source_locker.ptrData)[1] = 0b11110000;
+        static_cast<uint8_t*>(source_locker.ptrData)[2] = 0b01101000;
+        static_cast<uint8_t*>(source_locker.ptrData)[3] = 0b10000000;
+        static_cast<uint8_t*>(source_locker.ptrData)[4] = 0b11000010;
+        static_cast<uint8_t*>(source_locker.ptrData)[5] = 0b11000001;
+    }
+
+    // act
+    auto decimated = BitonalBitmapOperations::Decimate(0, source.get());
+
+    // assert
+    constexpr char expected_result[] =
+        "**."
+        ".**"
+        "*..";
+
+    EXPECT_EQ(BitonalBitmapToString(decimated.get()), expected_result);
+}

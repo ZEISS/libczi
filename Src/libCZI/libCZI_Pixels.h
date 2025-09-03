@@ -709,7 +709,7 @@ namespace libCZI
         {
             BitonalBitmapOperations::SetPixelValue(bitonal_bitmap_data.get(), x, y, value);
         }
-        
+
         /// Sets the value of a specific pixel in a locked bitonal bitmap.
         ///
         /// \param  lockInfo    Information describing the locked bitonal bitmap data.
@@ -799,6 +799,42 @@ namespace libCZI
         /// \param  offset              Destination offset where mask (0,0) maps to.
         /// \param  destination_bitmap  Destination image receiving copied pixels.
         static void CopyAt(libCZI::IBitmapData* source_bitmap, libCZI::IBitonalBitmapData* mask, const libCZI::IntPoint& offset, libCZI::IBitmapData* destination_bitmap);
+
+        /// Decimates a bitonal bitmap - every second pixel is discarded in each direction. A pixel is set to 1
+        /// in the decimated bitmap if all the pixels in the neighborhood in the source bitmap are set to 1. The neighborhood
+        /// is specified by the neighborhood_size parameter, and is a square of size (2 x neighborhood_size + 1) x (2 x neighborhood_size + 1)
+        /// around the pixel in question. The size of the decimated bitmap is half the size of the source bitmap (rounded down).
+        ///
+        /// \param 		   	neighborhood_size	Size of the neighborhood - this parameter must be in the range 0 to 7.
+        ///                                     A value of 0 means only the center pixel is considered, while larger values
+        ///                                     create a larger square neighborhood for the filtering operation.
+        /// \param [in,out]	source_bitmap	 	The source bitmap.
+        ///
+        /// \returns	The decimated bitmap.
+        static std::shared_ptr<libCZI::IBitonalBitmapData> Decimate(int neighborhood_size, libCZI::IBitonalBitmapData* source_bitmap)
+        {
+            ScopedBitonalBitmapLockerP bitonal_bitmap_locker{ source_bitmap };
+            return BitonalBitmapOperations::Decimate(neighborhood_size, bitonal_bitmap_locker, source_bitmap->GetSize());
+        }
+
+        /// Decimates a bitonal bitmap using pre-acquired lock information - every second pixel is discarded in each direction. 
+        /// A pixel is set to 1 in the decimated bitmap if all the pixels in the neighborhood in the source bitmap are set to 1. 
+        /// The neighborhood is specified by the neighborhood_size parameter, and is a square of size 
+        /// (2 x neighborhood_size + 1) x (2 x neighborhood_size + 1) around the pixel in question. 
+        /// The size of the decimated bitmap is half the size of the source bitmap (rounded down).
+        ///
+        /// This overload operates on pre-acquired lock information for optimal performance when the caller
+        /// already holds a lock on the source bitmap.
+        ///
+        /// \param neighborhood_size    Size of the neighborhood - this parameter must be in the range 0 to 7.
+        ///                             A value of 0 means only the center pixel is considered, while larger values
+        ///                             create a larger square neighborhood for the filtering operation.
+        /// \param lockInfo             Information describing the locked bitonal bitmap data of the source bitmap.
+        /// \param extent               The extent (width and height) of the source bitmap.
+        ///
+        /// \returns                   A new decimated bitonal bitmap with dimensions (extent.w/2, extent.h/2).
+        ///                            The returned bitmap is a newly allocated IBitonalBitmapData object.
+        static std::shared_ptr<libCZI::IBitonalBitmapData> Decimate(int neighborhood_size, const BitonalBitmapLockInfo& lockInfo, const libCZI::IntSize& extent);
     };
 
     //-------------------------------------------------------------------------
