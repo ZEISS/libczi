@@ -62,12 +62,12 @@ bool SubblockAttachmentAccessor::EnumerateChunksInChunkContainer(const std::func
         ChunkInfo chunk_info;
 
         // Read the GUID (16 bytes)
-        chunk_info.guid = *reinterpret_cast<const GUID*>(attachment_data);
+        memcpy(&chunk_info.guid, attachment_data, 16);
         Utilities::ConvertGuidToHostByteOrder(&chunk_info.guid);
         attachment_data += 16;
 
         // Read the size (4 bytes)
-        chunk_info.size = *reinterpret_cast<const std::uint32_t*>(attachment_data);
+        memcpy(&chunk_info.size, attachment_data, 4);
         Utilities::ConvertUint32ToHostByteOrder(&chunk_info.size);
         attachment_data += 4;
 
