@@ -139,3 +139,16 @@ For a chunk container (which may contain a valid-pixel mask), the value **must**
        <DataFormat>CHUNKCONTAINER</DataFormat>
      </AttachmentSchema>
    </METADATA>
+
+
+
+Mask-support in libCZI
+----------------------
+
+libCZI has support for accessing the valid-pixel mask of a sub-block. And the compositors are capable of using the mask when rendering multi-tile compositions.
+
+E.g., for the ``ISingleChannelTileAccessor`` interface, in the respective ``Options`` structure, mask support can be enabled by setting the ``maskAware`` member to true. If
+the sub-blocks have a valid-pixel mask, it will be used when rendering the tile. Note that ``maskAware`` is false by default, so mask support must be explicitly enabled.   
+Operation with a sub-block cache is also supported. However, there is one subtlety: If a sub-block is cached (by a render-operation of the accessor), the mask is only
+cached if ``maskAware`` is true (for this operation). If ``maskAware`` is false, the sub-block is cached without the mask. If later a render-operation is performed with ``maskAware`` set to true,
+the sub-block (from cache) is treated as if it has no mask.
