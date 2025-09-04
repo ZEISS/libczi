@@ -152,3 +152,18 @@ the sub-blocks have a valid-pixel mask, it will be used when rendering the tile.
 Operation with a sub-block cache is also supported. However, there is one subtlety: If a sub-block is cached (by a render-operation of the accessor), the mask is only
 cached if ``maskAware`` is true (for this operation). If ``maskAware`` is false, the sub-block is cached without the mask. If later a render-operation is performed with ``maskAware`` set to true,
 the sub-block (from cache) is treated as if it has no mask.
+
+
+
+Resolution protocol for ill-formed masks
+----------------------------------------
+
+The mask has to have the same width and height as the sub-block it belongs to. If this is not the case, libCZI applies the following protocol:
+
+1. **Mask is larger than bitmap**: The surplus pixels are ignored (cropped).
+
+2. **Mask is smaller than bitmap**: The mask is expanded by adding non-valid pixels (zeros) to the right and/or bottom.
+
+Note that a mask is strictly optional. If no mask is present, the sub-block is treated as "all pixels are valid".
+
+
