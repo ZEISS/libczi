@@ -22,6 +22,16 @@ void BitonalBitmapOperations::SetPixelValue(const BitonalBitmapLockInfo& lockInf
 
 void BitonalBitmapOperations::CopyAt(libCZI::IBitmapData* source_bitmap, libCZI::IBitonalBitmapData* mask, const libCZI::IntPoint& offset, libCZI::IBitmapData* destination_bitmap)
 {
+    if (source_bitmap == nullptr)
+    {
+        throw std::invalid_argument("source_bitmap must not be null.");
+    }
+
+    if (destination_bitmap == nullptr)
+    {
+        throw std::invalid_argument("destination_bitmap must not be null.");
+    }
+
     ScopedBitmapLockerP source_locker{ source_bitmap };
     ScopedBitmapLockerP destination_locker{ destination_bitmap };
     if (mask)
