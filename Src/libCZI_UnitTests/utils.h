@@ -37,7 +37,8 @@ std::shared_ptr<libCZI::IBitmapData> CreateTestBitmap(libCZI::PixelType pixeltyp
 std::shared_ptr<libCZI::IBitmapData> CreateRandomBitmap(libCZI::PixelType pixeltype, std::uint32_t width, std::uint32_t height);
 
 
-std::shared_ptr<libCZI::IBitmapData> CreateGray8BitmapAndFill(std::uint32_t width, std::uint32_t height, uint8_t value);
+std::shared_ptr<libCZI::IBitmapData> CreateGray8BitmapAndFill(std::uint32_t width, std::uint32_t height, std::uint8_t value);
+std::shared_ptr<libCZI::IBitmapData> CreateGray16BitmapAndFill(std::uint32_t width, std::uint32_t height, std::uint16_t value);
 
 /**
  * \brief	Creates an object with Zeiss logo bitmap image, which has fixed size of image width, height and pixel types
