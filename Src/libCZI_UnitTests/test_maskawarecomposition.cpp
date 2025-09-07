@@ -459,6 +459,44 @@ TEST(MaskAwareComposition, SingleChannelTileAccessorWithMaskScenario1)
     }
 }
 
+TEST(MaskAwareComposition, SingleChannelTileAccessorScalingWithMaskScenario1)
+{
+    // arrange
+    const auto czi_and_size = CreateCziDocumentWithTwoOverlappingSubblocksWithMaskData();
+    const auto inputStream = CreateStreamFromMemory(get<0>(czi_and_size), get<1>(czi_and_size));
+    const auto reader = CreateCZIReader();
+    reader->Open(inputStream);
+
+    auto accessor = reader->CreateSingleChannelScalingTileAccessor();
+
+    ISingleChannelScalingTileAccessor::Options options;
+    options.Clear();
+    options.backGroundColor = RgbFloatColor{ 0.5f, 0.5f, 0.5f };
+    options.maskAware = true;
+    const CDimCoordinate plane_coordinate{ {DimensionIndex::C, 0} };
+    auto composition = accessor->Get(IntRect{ 0, 0, 6, 6 }, &plane_coordinate, 0.5f, &options);
+    ASSERT_TRUE(composition);
+    ASSERT_EQ(composition->GetWidth(), 3);
+    ASSERT_EQ(composition->GetHeight(), 3);
+
+    // We expect a nearby-neighbor scaling of the previous expected result
+    static const uint8_t expected_result[] =
+    {
+        0x00, 0x00, 0x00, 
+        0x00, 0xff, 0xff,
+        0x00, 0xff, 0xff
+    };
+
+    ScopedBitmapLockerSP locker_composition{ composition };
+    ASSERT_TRUE(locker_composition.ptrDataRoi != nullptr);
+    for (size_t y = 0; y < composition->GetHeight(); ++y)
+    {
+        const uint8_t* composition_line = static_cast<const uint8_t*>(locker_composition.ptrDataRoi) + y * locker_composition.stride;
+        int r = memcmp(composition_line, expected_result + y * 3, 3);
+        ASSERT_EQ(r, 0);
+    }
+}
+
 TEST(MaskAwareComposition, SingleChannelTileAccessorWithMaskScenario2)
 {
     // arrange
