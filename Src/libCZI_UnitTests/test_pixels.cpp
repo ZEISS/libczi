@@ -6,6 +6,8 @@
 #include "inc_libCZI.h"
 #include "../libCZI/bitmapData.h"
 
+#include <random>
+
 using namespace libCZI;
 using namespace std;
 
@@ -387,4 +389,23 @@ TEST(Pixels, CallSetPixelValueWithInvalidArgumentsAndExpectException2)
     bitonal_bitmap = CStdBitonalBitmapData::Create(10, 10);
     EXPECT_ANY_THROW(BitonalBitmapOperations::SetPixelValue(bitonal_bitmap, 10, 0, true));
     EXPECT_ANY_THROW(BitonalBitmapOperations::SetPixelValue(bitonal_bitmap, 0, 10, true));
+}
+
+TEST(Pixels, SetPixelValueAndGetPixelValue)
+{
+    const auto bitonal_bitmap = CStdBitonalBitmapData::Create(10, 10);
+
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<> dis(0, 1);
+
+    for (int y = 0; y < bitonal_bitmap->GetHeight(); ++y)
+    {
+        for (int x = 0; x < bitonal_bitmap->GetWidth(); ++x)
+        {
+            const bool value = dis(gen) == 1;
+            BitonalBitmapOperations::SetPixelValue(bitonal_bitmap, x, y, value);
+            EXPECT_EQ(BitonalBitmapOperations::GetPixelValue(bitonal_bitmap, x, y), value);
+        }
+    }
 }
