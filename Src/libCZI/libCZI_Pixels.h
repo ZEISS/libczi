@@ -306,20 +306,20 @@ namespace libCZI
     class ScopedBitmapLocker : public BitmapLockInfo
     {
     private:
-        tBitmap bmData;
+        tBitmap bitmap_data_;
     public:
         ScopedBitmapLocker() = delete;
 
         /// Constructor taking the object for which we provide the scope-guard.
         /// \param bmData The object for which we are to provide the scope-guard.
-        explicit ScopedBitmapLocker(tBitmap bmData) : bmData(bmData)
+        explicit ScopedBitmapLocker(tBitmap bitmap_data) : bitmap_data_(bitmap_data)
         {
-            if (!bmData)
+            if (!bitmap_data)
             {
-                throw std::invalid_argument("bmData must not be null");
+                throw std::invalid_argument("bitmap_data_ must not be null");
             }
 
-            auto lockInfo = bmData->Lock();
+            auto lockInfo = bitmap_data->Lock();
             this->ptrData = lockInfo.ptrData;
             this->ptrDataRoi = lockInfo.ptrDataRoi;
             this->stride = lockInfo.stride;
@@ -328,9 +328,9 @@ namespace libCZI
 
         /// Copy-Constructor .
         /// \param other The other object.
-        ScopedBitmapLocker(const ScopedBitmapLocker<tBitmap>& other) : bmData(other.bmData)
+        ScopedBitmapLocker(const ScopedBitmapLocker<tBitmap>& other) : bitmap_data_(other.bitmap_data_)
         {
-            auto lockInfo = other.bmData->Lock();
+            auto lockInfo = other.bitmap_data_->Lock();
             this->ptrData = lockInfo.ptrData;
             this->ptrDataRoi = lockInfo.ptrDataRoi;
             this->stride = lockInfo.stride;
@@ -338,7 +338,7 @@ namespace libCZI
         }
 
         /// move constructor
-        ScopedBitmapLocker(ScopedBitmapLocker<tBitmap>&& other) noexcept : bmData(tBitmap())
+        ScopedBitmapLocker(ScopedBitmapLocker<tBitmap>&& other) noexcept : bitmap_data_(tBitmap())
         {
             *this = std::move(other);
         }
@@ -348,18 +348,18 @@ namespace libCZI
         {
             if (this != &other)
             {
-                if (this->bmData)
+                if (this->bitmap_data_)
                 {
-                    this->bmData->Unlock();
+                    this->bitmap_data_->Unlock();
                 }
 
-                this->bmData = std::move(other.bmData);
+                this->bitmap_data_ = std::move(other.bitmap_data_);
                 this->ptrData = other.ptrData;
                 this->ptrDataRoi = other.ptrDataRoi;
                 this->stride = other.stride;
                 this->size = other.size;
                 other.ptrData = other.ptrDataRoi = nullptr;
-                other.bmData = tBitmap();
+                other.bitmap_data_ = tBitmap();
             }
 
             return *this;
@@ -372,14 +372,14 @@ namespace libCZI
             if (this != &other)
             {
                 // Unlock current bitmap if we have one
-                if (this->bmData)
+                if (this->bitmap_data_)
                 {
-                    this->bmData->Unlock();
+                    this->bitmap_data_->Unlock();
                 }
 
                 // Copy the bitmap reference and lock it
-                this->bmData = other.bmData;
-                auto lockInfo = this->bmData->Lock();
+                this->bitmap_data_ = other.bitmap_data_;
+                auto lockInfo = this->bitmap_data_->Lock();
                 this->ptrData = lockInfo.ptrData;
                 this->ptrDataRoi = lockInfo.ptrDataRoi;
                 this->stride = lockInfo.stride;
@@ -391,9 +391,9 @@ namespace libCZI
 
         ~ScopedBitmapLocker()
         {
-            if (this->bmData)
+            if (this->bitmap_data_)
             {
-                this->bmData->Unlock();
+                this->bitmap_data_->Unlock();
             }
         }
     };
