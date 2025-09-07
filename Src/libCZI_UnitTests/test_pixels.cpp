@@ -352,3 +352,39 @@ TEST(Pixels, BitonalDecimateScenario2)
 
     EXPECT_EQ(BitonalBitmapToString(decimated.get()), expected_result);
 }
+
+TEST(Pixels, CallSetPixelValueWithInvalidArgumentsAndExpectException1)
+{
+    BitonalBitmapLockInfo lockInfo;
+    lockInfo.ptrData = nullptr;
+    lockInfo.stride = 10;
+    lockInfo.size = 100;
+    const IntSize extent{ 80, 1 };
+    EXPECT_ANY_THROW(BitonalBitmapOperations::SetPixelValue(lockInfo, extent, 0, 0, true));
+
+    auto data = std::make_unique<uint8_t[]>(100);
+    lockInfo.ptrData = data.get();
+    lockInfo.stride = 9;        // this tride it too small (should be at least 10)
+    lockInfo.size = 100;
+    EXPECT_ANY_THROW(BitonalBitmapOperations::SetPixelValue(lockInfo, extent, 10, 0, true));
+
+    lockInfo.stride = 10;        
+    lockInfo.size = 9;      // this size it too small (should be at least 10)
+    EXPECT_ANY_THROW(BitonalBitmapOperations::SetPixelValue(lockInfo, extent, 10, 0, true));
+
+    lockInfo.size = 100;
+    // now, the x-position is out of bounds
+    EXPECT_ANY_THROW(BitonalBitmapOperations::SetPixelValue(lockInfo, extent, 80, 0, true));
+    // now, the y-position is out of bounds
+    EXPECT_ANY_THROW(BitonalBitmapOperations::SetPixelValue(lockInfo, extent, 10, 1, true));
+}
+
+TEST(Pixels, CallSetPixelValueWithInvalidArgumentsAndExpectException2)
+{
+    shared_ptr<IBitonalBitmapData> bitonal_bitmap;
+    EXPECT_ANY_THROW(BitonalBitmapOperations::SetPixelValue(bitonal_bitmap, 0, 0, true));
+
+    bitonal_bitmap = CStdBitonalBitmapData::Create(10, 10);
+    EXPECT_ANY_THROW(BitonalBitmapOperations::SetPixelValue(bitonal_bitmap, 10, 0, true));
+    EXPECT_ANY_THROW(BitonalBitmapOperations::SetPixelValue(bitonal_bitmap, 0, 10, true));
+}

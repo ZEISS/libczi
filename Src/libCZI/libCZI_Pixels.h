@@ -314,6 +314,11 @@ namespace libCZI
         /// \param bmData The object for which we are to provide the scope-guard.
         explicit ScopedBitmapLocker(tBitmap bmData) : bmData(bmData)
         {
+            if (!bmData)
+            {
+                throw std::invalid_argument("bmData must not be null");
+            }
+
             auto lockInfo = bmData->Lock();
             this->ptrData = lockInfo.ptrData;
             this->ptrDataRoi = lockInfo.ptrDataRoi;
@@ -506,15 +511,20 @@ namespace libCZI
     class ScopedBitonalBitmapLocker : public BitonalBitmapLockInfo
     {
     private:
-        tBitonalBitmap bmData;
+        tBitonalBitmap bitonal_bitmap_data_;
     public:
         ScopedBitonalBitmapLocker() = delete;
 
         /// Constructor taking the object for which we provide the scope-guard.
         /// \param bmData The object for which we are to provide the scope-guard.
-        explicit ScopedBitonalBitmapLocker(tBitonalBitmap bmData) : bmData(bmData)
+        explicit ScopedBitonalBitmapLocker(tBitonalBitmap bitonal_bitmap_data) : bitonal_bitmap_data_(bitonal_bitmap_data)
         {
-            auto lockInfo = bmData->Lock();
+            if (!bitonal_bitmap_data)
+            {
+                throw std::invalid_argument("bitonal_bitmap_data must not be null");
+            }
+
+            auto lockInfo = bitonal_bitmap_data->Lock();
             this->ptrData = lockInfo.ptrData;
             this->stride = lockInfo.stride;
             this->size = lockInfo.size;
@@ -522,16 +532,16 @@ namespace libCZI
 
         /// Copy-Constructor .
         /// \param other The other object.
-        ScopedBitonalBitmapLocker(const ScopedBitonalBitmapLocker<tBitonalBitmap>& other) : bmData(other.bmData)
+        ScopedBitonalBitmapLocker(const ScopedBitonalBitmapLocker<tBitonalBitmap>& other) : bitonal_bitmap_data_(other.bitonal_bitmap_data_)
         {
-            auto lockInfo = other.bmData->Lock();
+            auto lockInfo = other.bitonal_bitmap_data_->Lock();
             this->ptrData = lockInfo.ptrData;
             this->stride = lockInfo.stride;
             this->size = lockInfo.size;
         }
 
         /// move constructor
-        ScopedBitonalBitmapLocker(ScopedBitonalBitmapLocker<tBitonalBitmap>&& other) noexcept : bmData(tBitonalBitmap())
+        ScopedBitonalBitmapLocker(ScopedBitonalBitmapLocker<tBitonalBitmap>&& other) noexcept : bitonal_bitmap_data_(tBitonalBitmap())
         {
             *this = std::move(other);
         }
@@ -541,17 +551,17 @@ namespace libCZI
         {
             if (this != &other)
             {
-                if (this->bmData)
+                if (this->bitonal_bitmap_data_)
                 {
-                    this->bmData->Unlock();
+                    this->bitonal_bitmap_data_->Unlock();
                 }
 
-                this->bmData = std::move(other.bmData);
+                this->bitonal_bitmap_data_ = std::move(other.bitonal_bitmap_data_);
                 this->ptrData = other.ptrData;
                 this->stride = other.stride;
                 this->size = other.size;
                 other.ptrData = nullptr;
-                other.bmData = tBitonalBitmap();
+                other.bitonal_bitmap_data_ = tBitonalBitmap();
             }
 
             return *this;
@@ -564,14 +574,14 @@ namespace libCZI
             if (this != &other)
             {
                 // Unlock current bitmap if we have one
-                if (this->bmData)
+                if (this->bitonal_bitmap_data_)
                 {
-                    this->bmData->Unlock();
+                    this->bitonal_bitmap_data_->Unlock();
                 }
 
                 // Copy the bitonal bitmap reference and lock it
-                this->bmData = other.bmData;
-                auto lockInfo = this->bmData->Lock();
+                this->bitonal_bitmap_data_ = other.bitonal_bitmap_data_;
+                auto lockInfo = this->bitonal_bitmap_data_->Lock();
                 this->ptrData = lockInfo.ptrData;
                 this->stride = lockInfo.stride;
                 this->size = lockInfo.size;
@@ -582,9 +592,9 @@ namespace libCZI
 
         ~ScopedBitonalBitmapLocker()
         {
-            if (this->bmData)
+            if (this->bitonal_bitmap_data_)
             {
-                this->bmData->Unlock();
+                this->bitonal_bitmap_data_->Unlock();
             }
         }
     };
