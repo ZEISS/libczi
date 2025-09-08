@@ -669,7 +669,6 @@ TEST(MaskAwareComposition, SingleChannelTileAccessorScalingGray16WithMaskScenari
     }
 }
 
-
 TEST(MaskAwareComposition, SingleChannelTileAccessorWithMaskScenario2)
 {
     // arrange
