@@ -593,7 +593,7 @@ TEST(MaskAwareComposition, SingleChannelTileAccessorWithMaskScenario1)
     }
 }
 
-TEST(MaskAwareComposition, SingleChannelTileAccessorScalingWithMaskScenario1)
+TEST(MaskAwareComposition, SingleChannelTileAccessorScalingGray8WithMaskScenario1)
 {
     // arrange
     const auto czi_and_size = CreateCziDocumentWithTwoOverlappingSubblocksGray8WithMaskData();
@@ -630,6 +630,45 @@ TEST(MaskAwareComposition, SingleChannelTileAccessorScalingWithMaskScenario1)
         ASSERT_EQ(r, 0);
     }
 }
+
+TEST(MaskAwareComposition, SingleChannelTileAccessorScalingGray16WithMaskScenario1)
+{
+    // arrange
+    const auto czi_and_size = CreateCziDocumentWithTwoOverlappingSubblocksGray16WithMaskData();
+    const auto inputStream = CreateStreamFromMemory(get<0>(czi_and_size), get<1>(czi_and_size));
+    const auto reader = CreateCZIReader();
+    reader->Open(inputStream);
+
+    auto accessor = reader->CreateSingleChannelScalingTileAccessor();
+
+    ISingleChannelScalingTileAccessor::Options options;
+    options.Clear();
+    options.backGroundColor = RgbFloatColor{ 0.5f, 0.5f, 0.5f };
+    options.maskAware = true;
+    const CDimCoordinate plane_coordinate{ {DimensionIndex::C, 0} };
+    auto composition = accessor->Get(IntRect{ 0, 0, 6, 6 }, &plane_coordinate, 0.5f, &options);
+    ASSERT_TRUE(composition);
+    ASSERT_EQ(composition->GetWidth(), 3);
+    ASSERT_EQ(composition->GetHeight(), 3);
+
+    // We expect a nearby-neighbor scaling of the previous expected result
+    static const uint16_t expected_result[] =
+    {
+        0x0000, 0x0000, 0x0000,
+        0x0000, 0x0100, 0x0100,
+        0x0000, 0x0100, 0x0100
+    };
+
+    ScopedBitmapLockerSP locker_composition{ composition };
+    ASSERT_TRUE(locker_composition.ptrDataRoi != nullptr);
+    for (size_t y = 0; y < composition->GetHeight(); ++y)
+    {
+        const uint16_t* composition_line = reinterpret_cast<const uint16_t*>(static_cast<const uint8_t*>(locker_composition.ptrDataRoi) + y * locker_composition.stride);
+        int r = memcmp(composition_line, expected_result + y * 3, 3 * sizeof(uint16_t));
+        ASSERT_EQ(r, 0);
+    }
+}
+
 
 TEST(MaskAwareComposition, SingleChannelTileAccessorWithMaskScenario2)
 {
