@@ -16,8 +16,8 @@
 template <libCZI::PixelType tSrcDstPixelType>
 inline void CBitmapOperations::CopySamePixelType(const void* srcPtr, int srcStride, void* dstPtr, int dstStride, int width, int height, bool drawTileBorder)
 {
-    constexpr auto bytesPerPel = CziUtils::BytesPerPel<tSrcDstPixelType>();
-    const int bytesToCopy = width * bytesPerPel;
+    constexpr auto kBytesPerPel = CziUtils::BytesPerPel<tSrcDstPixelType>();
+    const int bytes_to_copy = width * kBytesPerPel;
 
     if (drawTileBorder == false)
     {
@@ -25,22 +25,22 @@ inline void CBitmapOperations::CopySamePixelType(const void* srcPtr, int srcStri
         {
             char* dest = static_cast<char*>(dstPtr) + y * static_cast<std::ptrdiff_t>(dstStride);
             const char* src = static_cast<const char*>(srcPtr) + y * static_cast<std::ptrdiff_t>(srcStride);
-            memcpy(dest, src, bytesToCopy);
+            memcpy(dest, src, bytes_to_copy);
         }
     }
     else
     {
-        memset(dstPtr, 0, bytesToCopy);
+        memset(dstPtr, 0, bytes_to_copy);
         for (int y = 1; y < height - 1; ++y)
         {
             char* dest = static_cast<char*>(dstPtr) + y * static_cast<std::ptrdiff_t>(dstStride);
             const char* src = static_cast<const char*>(srcPtr) + y * static_cast<std::ptrdiff_t>(srcStride);
-            memcpy(dest + bytesPerPel, src, bytesToCopy - 2 * bytesPerPel);
-            memset(dest, 0, bytesPerPel);
-            memset(dest + bytesToCopy - bytesPerPel, 0, bytesPerPel);
+            memcpy(dest + kBytesPerPel, src, bytes_to_copy - 2 * kBytesPerPel);
+            memset(dest, 0, kBytesPerPel);
+            memset(dest + bytes_to_copy - kBytesPerPel, 0, kBytesPerPel);
         }
 
-        memset(static_cast<char*>(dstPtr) + (height - 1) * static_cast<size_t>(dstStride), 0, bytesToCopy);
+        memset(static_cast<char*>(dstPtr) + (height - 1) * static_cast<size_t>(dstStride), 0, bytes_to_copy);
     }
 }
 
