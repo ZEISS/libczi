@@ -13,6 +13,7 @@
 #include <memory>
 #include <string>
 #include <functional>
+#include <tuple>
 
 class SubblockMetadata : public libCZI::ISubBlockMetadata, public std::enable_shared_from_this<SubblockMetadata>
 {

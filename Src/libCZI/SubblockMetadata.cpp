@@ -109,7 +109,6 @@ bool SubblockMetadata::TryGetTagAsDouble(const std::wstring& tag_name, double* v
         return false;
     }
 
-
     return requested_node->TryGetValueAsDouble(value);
 }
 
