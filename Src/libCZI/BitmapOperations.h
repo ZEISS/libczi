@@ -80,9 +80,7 @@ public:
 
     static std::shared_ptr<libCZI::IBitmapData> ConvertToBigEndian(libCZI::IBitmapData* source);
     static void CopyConvertBigEndian(libCZI::PixelType pixelType, const void* ptrSrc, int srcStride, void* ptrDst, int dstStride, std::uint32_t width, std::uint32_t height);
-
 private:
-
     template <libCZI::PixelType tSrcPixelType, libCZI::PixelType tDstPixelType, typename tPixelConverter, typename tFlt>
     static void InternalNNScale2(const tPixelConverter& conv, const NNResizeInfo2<tFlt>& resizeInfo);
 
