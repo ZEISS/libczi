@@ -233,6 +233,8 @@ namespace libCZI
         /// \returns    The lock count.
         virtual int             GetLockCount() const = 0;
 
+        virtual ~IBitmapData() = default;
+
         /// Copy-Constructor - deleted.
         IBitmapData(const IBitmapData& other) = delete;
 
@@ -244,8 +246,6 @@ namespace libCZI
 
         /// Copy assignment operator - deleted.
         IBitmapData& operator=(const IBitmapData& other) = delete;
-
-        virtual ~IBitmapData() {}
 
         /// Gets the width of the bitmap in pixels.
         ///
@@ -289,7 +289,7 @@ namespace libCZI
     /// For convenience two typedef are provided: `ScopedBitmapLockerP` and `ScopedBitmapLockerSP` for
     /// use with the types `IBitmapData*` and `std::shared_ptr<IBitmapData>`.
     ///
-    ///  \code{.cpp}
+    /// \code{.cpp}
     /// typedef ScopedBitmapLocker<IBitmapData*> ScopedBitmapLockerP;
     /// typedef ScopedBitmapLocker<std::shared_ptr<IBitmapData>> ScopedBitmapLockerSP;
     /// \endcode
@@ -445,15 +445,7 @@ namespace libCZI
         /// \returns    The lock count.
         virtual int GetLockCount() const = 0;
 
-        /// Gets the width of the bitmap in pixels.
-        ///
-        /// \return The width in pixels.
-        std::uint32_t GetWidth() const { return this->GetSize().w; }
-
-        /// Gets the height of the bitmap in pixels.
-        ///
-        /// \return The height in pixels
-        std::uint32_t GetHeight() const { return this->GetSize().h; }
+        virtual ~IBitonalBitmapData() = default;
 
         /// Copy-Constructor - deleted.
         IBitonalBitmapData(const IBitonalBitmapData& other) = delete;
@@ -467,7 +459,15 @@ namespace libCZI
         /// Copy assignment operator - deleted.
         IBitonalBitmapData& operator=(const IBitonalBitmapData& other) = delete;
 
-        virtual ~IBitonalBitmapData() = default;
+        /// Gets the width of the bitmap in pixels.
+        ///
+        /// \return The width in pixels.
+        std::uint32_t GetWidth() const { return this->GetSize().w; }
+
+        /// Gets the height of the bitmap in pixels.
+        ///
+        /// \return The height in pixels
+        std::uint32_t GetHeight() const { return this->GetSize().h; }
     };
 
     //-------------------------------------------------------------------------
@@ -494,7 +494,7 @@ namespace libCZI
     /// For convenience two typedef are provided: `ScopedBitonalBitmapLockerP` and `ScopedBitonalBitmapLockerSP` for
     /// use with the types `IBitonalBitmapData*` and `std::shared_ptr<IBitonalBitmapData>`.
     ///
-    ///  \code{.cpp}
+    /// \code{.cpp}
     /// typedef ScopedBitonalBitmapLocker<IBitonalBitmapData*> ScopedBitonalBitmapLockerP;
     /// typedef ScopedBitonalBitmapLocker<std::shared_ptr<IBitonalBitmapData>> ScopedBitonalBitmapLockerSP;
     /// \endcode
