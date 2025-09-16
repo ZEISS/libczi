@@ -88,7 +88,7 @@ bool SubblockAttachmentAccessor::EnumerateChunksInChunkContainer(const std::func
 
         offset += 20 + chunk_info.size;
 
-        // if there are not at least 21 bytes left, we are done
+        // if there are not at least 21 bytes left, we are done (note that we require at least 1 byte of payload!)
         if (size_attachment_data < offset + 21)
         {
             break;
@@ -120,11 +120,11 @@ libCZI::SubBlockAttachmentMaskInfoGeneral SubblockAttachmentAccessor::GetValidPi
 
     SubBlockAttachmentMaskInfoGeneral mask_info_general;
     shared_ptr<const void> spData = this->sub_block_->GetRawData(ISubBlock::MemBlkType::Attachment, nullptr);
-    mask_info_general.width = *reinterpret_cast<const std::uint32_t*>(static_cast<const uint8_t*>(spData.get()) + chunk_info_valid_pixel_mask.offset);
+    memcpy(&mask_info_general.width, static_cast<const uint8_t*>(spData.get()) + chunk_info_valid_pixel_mask.offset, sizeof(mask_info_general.width));
     Utilities::ConvertUint32ToHostByteOrder(&mask_info_general.width);
-    mask_info_general.height = *reinterpret_cast<const std::uint32_t*>(static_cast<const uint8_t*>(spData.get()) + chunk_info_valid_pixel_mask.offset + sizeof(uint32_t));
+    memcpy(&mask_info_general.height, static_cast<const uint8_t*>(spData.get()) + chunk_info_valid_pixel_mask.offset + sizeof(uint32_t), sizeof(mask_info_general.height));
     Utilities::ConvertUint32ToHostByteOrder(&mask_info_general.height);
-    mask_info_general.type_of_representation = *(reinterpret_cast<const std::uint32_t*>(static_cast<const uint8_t*>(spData.get()) + chunk_info_valid_pixel_mask.offset + 2 * sizeof(uint32_t)));
+    memcpy(&mask_info_general.type_of_representation, static_cast<const uint8_t*>(spData.get()) + chunk_info_valid_pixel_mask.offset + 2 * sizeof(uint32_t), sizeof(mask_info_general.type_of_representation));
     Utilities::ConvertUint32ToHostByteOrder(&mask_info_general.type_of_representation);
 
     // create an aliasing shared_ptr that points to the correct offset
