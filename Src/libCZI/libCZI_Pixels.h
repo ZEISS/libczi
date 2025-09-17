@@ -339,8 +339,14 @@ namespace libCZI
 
         /// Move constructor.
         ScopedBitmapLocker(ScopedBitmapLocker<TBitmap>&& other) noexcept
+            : BitmapLockInfo{other}
+            , bitmap_data_(std::move(other.bitmap_data_))
         {
-            *this = std::move(other);
+            // 'other' is now in a moved-from state. We must ensure it
+             // no longer owns the bitmap lock or the data pointers.
+            other.ptrData = nullptr;
+            other.ptrDataRoi = nullptr;
+            other.bitmap_data_ = TBitmap();
         }
 
         /// Move assignment operator.
@@ -541,9 +547,14 @@ namespace libCZI
         }
 
         /// Move constructor.
-        ScopedBitonalBitmapLocker(ScopedBitonalBitmapLocker<TBitonalBitmap>&& other) noexcept : bitonal_bitmap_data_(TBitonalBitmap())
+        ScopedBitonalBitmapLocker(ScopedBitonalBitmapLocker<TBitonalBitmap>&& other) noexcept
+            : BitonalBitmapLockInfo{other}
+            , bitonal_bitmap_data_(std::move(other.bitonal_bitmap_data_))
         {
-            *this = std::move(other);
+            // 'other' is now in a moved-from state. We must ensure it
+            // no longer owns the bitmap lock or the data pointers.
+            other.ptrData = nullptr;
+            other.bitonal_bitmap_data_ = TBitonalBitmap();
         }
 
         /// Move assignment operator.
