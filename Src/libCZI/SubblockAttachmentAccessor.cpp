@@ -158,7 +158,7 @@ libCZI::SubBlockAttachmentMaskInfoGeneral SubblockAttachmentAccessor::GetValidPi
     mask_info_uncompressed_bitonal_bitmap.size_data = mask_info_general.size_data - sizeof(uint32_t);
     if (mask_info_uncompressed_bitonal_bitmap.size_data > 0)
     {
-        mask_info_uncompressed_bitonal_bitmap.data = shared_ptr<const void>(mask_info_general.data, sizeof(uint32_t) + static_cast<const uint8_t*>(mask_info_general.data.get()));
+        mask_info_uncompressed_bitonal_bitmap.data = shared_ptr<const void>(mask_info_general.data,static_cast<const uint8_t*>(mask_info_general.data.get()) +  sizeof(uint32_t));
     }
 
     return mask_info_uncompressed_bitonal_bitmap;
@@ -166,7 +166,7 @@ libCZI::SubBlockAttachmentMaskInfoGeneral SubblockAttachmentAccessor::GetValidPi
 
 /*static*/std::shared_ptr<libCZI::IBitonalBitmapData> ISubBlockAttachmentAccessor::CreateBitonalBitmapFromMaskInfo(const ISubBlockAttachmentAccessor* accessor)
 {
-    SubBlockAttachmentMaskInfoUncompressedBitonalBitmap mask_info = accessor->GetValidPixelMaskAsUncompressedBitonalBitmap();
+    const SubBlockAttachmentMaskInfoUncompressedBitonalBitmap mask_info = accessor->GetValidPixelMaskAsUncompressedBitonalBitmap();
 
     if (mask_info.width == 0 || mask_info.height == 0)
     {
