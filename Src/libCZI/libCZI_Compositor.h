@@ -176,7 +176,7 @@ namespace libCZI
         ISubBlockCache& operator=(ISubBlockCache&&) noexcept = delete;
     };
 
-    /// The base interface (all accessor-interfaces must derive from this).
+    /// The base interface (all accessor interfaces must derive from this).
     class IAccessor
     {
     protected:
