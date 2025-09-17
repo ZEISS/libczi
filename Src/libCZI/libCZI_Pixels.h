@@ -343,7 +343,7 @@ namespace libCZI
             , bitmap_data_(std::move(other.bitmap_data_))
         {
             // 'other' is now in a moved-from state. We must ensure it
-             // no longer owns the bitmap lock or the data pointers.
+            // no longer owns the bitmap lock or the data pointers.
             other.ptrData = nullptr;
             other.ptrDataRoi = nullptr;
             other.bitmap_data_ = TBitmap();
