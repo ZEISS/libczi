@@ -139,7 +139,7 @@ libCZI::SubBlockAttachmentMaskInfoGeneral SubblockAttachmentAccessor::GetValidPi
 
 /*static*/SubBlockAttachmentMaskInfoUncompressedBitonalBitmap ISubBlockAttachmentAccessor::GetValidPixelMaskAsUncompressedBitonalBitmap(const ISubBlockAttachmentAccessor* accessor)
 {
-    auto mask_info_general = accessor->GetValidPixelMaskFromChunkContainer();
+    const auto mask_info_general = accessor->GetValidPixelMaskFromChunkContainer();
     if (mask_info_general.type_of_representation != 0)
     {
         throw LibCZIException("Valid pixel mask is not an uncompressed bitonal bitmap.");
@@ -153,12 +153,12 @@ libCZI::SubBlockAttachmentMaskInfoGeneral SubblockAttachmentAccessor::GetValidPi
         throw LibCZIException("Invalid uncompressed bitonal bitmap pixel mask ");
     }
 
-    mask_info_uncompressed_bitonal_bitmap.stride = *reinterpret_cast<const std::uint32_t*>((uint8_t*)mask_info_general.data.get());
+    mask_info_uncompressed_bitonal_bitmap.stride = *reinterpret_cast<const std::uint32_t*>(static_cast<const uint8_t*>(mask_info_general.data.get()));
     Utilities::ConvertUint32ToHostByteOrder(&mask_info_uncompressed_bitonal_bitmap.stride);
     mask_info_uncompressed_bitonal_bitmap.size_data = mask_info_general.size_data - sizeof(uint32_t);
     if (mask_info_uncompressed_bitonal_bitmap.size_data > 0)
     {
-        mask_info_uncompressed_bitonal_bitmap.data = shared_ptr<const void>(mask_info_general.data, sizeof(uint32_t) + (uint8_t*)mask_info_general.data.get());
+        mask_info_uncompressed_bitonal_bitmap.data = shared_ptr<const void>(mask_info_general.data, sizeof(uint32_t) + static_cast<const uint8_t*>(mask_info_general.data.get()));
     }
 
     return mask_info_uncompressed_bitonal_bitmap;
