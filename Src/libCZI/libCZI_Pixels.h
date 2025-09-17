@@ -35,13 +35,15 @@ namespace libCZI
         /// \return True if the two rectangles intersect, false otherwise.
         bool IntersectsWith(const IntRect& r) const
         {
-            const IntRect is = this->Intersect(r);
-            if (is.w <= 0 || is.h <= 0)
+            if (!this->IsValid() || !r.IsValid())
             {
                 return false;
             }
 
-            return true;
+            return !(this->x + this->w <= r.x ||
+                     r.x + r.w <= this->x ||
+                     this->y + this->h <= r.y ||
+                     r.y + r.h <= this->y);
         }
 
         /// Calculate the intersection with the specified rectangle.
@@ -319,27 +321,30 @@ namespace libCZI
                 throw std::invalid_argument("bitmap_data must not be null");
             }
 
-            auto lockInfo = bitmap_data->Lock();
-            this->ptrData = lockInfo.ptrData;
-            this->ptrDataRoi = lockInfo.ptrDataRoi;
-            this->stride = lockInfo.stride;
-            this->size = lockInfo.size;
+            const auto lock_info = bitmap_data->Lock();
+            this->ptrData = lock_info.ptrData;
+            this->ptrDataRoi = lock_info.ptrDataRoi;
+            this->stride = lock_info.stride;
+            this->size = lock_info.size;
         }
 
         /// Copy-Constructor.
         /// \param other The other object.
         ScopedBitmapLocker(const ScopedBitmapLocker<TBitmap>& other) : bitmap_data_(other.bitmap_data_)
         {
-            auto lockInfo = other.bitmap_data_->Lock();
-            this->ptrData = lockInfo.ptrData;
-            this->ptrDataRoi = lockInfo.ptrDataRoi;
-            this->stride = lockInfo.stride;
-            this->size = lockInfo.size;
+            if (this->bitmap_data_)
+            {
+                const auto lock_info = this->bitmap_data_->Lock();
+                this->ptrData = lock_info.ptrData;
+                this->ptrDataRoi = lock_info.ptrDataRoi;
+                this->stride = lock_info.stride;
+                this->size = lock_info.size;
+            }
         }
 
         /// Move constructor.
         ScopedBitmapLocker(ScopedBitmapLocker<TBitmap>&& other) noexcept
-            : BitmapLockInfo{other}
+            : BitmapLockInfo{ other }
             , bitmap_data_(std::move(other.bitmap_data_))
         {
             // 'other' is now in a moved-from state. We must ensure it
@@ -385,11 +390,21 @@ namespace libCZI
 
                 // Copy the bitmap reference and lock it
                 this->bitmap_data_ = other.bitmap_data_;
-                auto lockInfo = this->bitmap_data_->Lock();
-                this->ptrData = lockInfo.ptrData;
-                this->ptrDataRoi = lockInfo.ptrDataRoi;
-                this->stride = lockInfo.stride;
-                this->size = lockInfo.size;
+                if (this->bitmap_data_)
+                {
+                    const auto lock_info = this->bitmap_data_->Lock();
+                    this->ptrData = lock_info.ptrData;
+                    this->ptrDataRoi = lock_info.ptrDataRoi;
+                    this->stride = lock_info.stride;
+                    this->size = lock_info.size;
+                }
+                else
+                {
+                    this->ptrData = nullptr;
+                    this->ptrDataRoi = nullptr;
+                    this->stride = 0;
+                    this->size = 0;
+                }
             }
 
             return *this;
@@ -540,15 +555,24 @@ namespace libCZI
         /// \param other The other object.
         ScopedBitonalBitmapLocker(const ScopedBitonalBitmapLocker<TBitonalBitmap>& other) : bitonal_bitmap_data_(other.bitonal_bitmap_data_)
         {
-            auto lock_info = other.bitonal_bitmap_data_->Lock();
-            this->ptrData = lock_info.ptrData;
-            this->stride = lock_info.stride;
-            this->size = lock_info.size;
+            if (this->bitonal_bitmap_data_)
+            {
+                const auto lock_info = this->bitonal_bitmap_data_->Lock();
+                this->ptrData = lock_info.ptrData;
+                this->stride = lock_info.stride;
+                this->size = lock_info.size;
+            }
+            else
+            {
+                this->ptrData = nullptr;
+                this->stride = 0;
+                this->size = 0;
+            }
         }
 
         /// Move constructor.
         ScopedBitonalBitmapLocker(ScopedBitonalBitmapLocker<TBitonalBitmap>&& other) noexcept
-            : BitonalBitmapLockInfo{other}
+            : BitonalBitmapLockInfo{ other }
             , bitonal_bitmap_data_(std::move(other.bitonal_bitmap_data_))
         {
             // 'other' is now in a moved-from state. We must ensure it
@@ -592,10 +616,19 @@ namespace libCZI
 
                 // Copy the bitonal bitmap reference and lock it
                 this->bitonal_bitmap_data_ = other.bitonal_bitmap_data_;
-                auto lockInfo = this->bitonal_bitmap_data_->Lock();
-                this->ptrData = lockInfo.ptrData;
-                this->stride = lockInfo.stride;
-                this->size = lockInfo.size;
+                if (this->bitonal_bitmap_data_)
+                {
+                    const auto lock_info = this->bitonal_bitmap_data_->Lock();
+                    this->ptrData = lock_info.ptrData;
+                    this->stride = lock_info.stride;
+                    this->size = lock_info.size;
+                }
+                else
+                {
+                    this->ptrData = nullptr;
+                    this->stride = 0;
+                    this->size = 0;
+                }
             }
 
             return *this;
