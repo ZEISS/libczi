@@ -316,7 +316,7 @@ namespace libCZI
         {
             if (!bitmap_data)
             {
-                throw std::invalid_argument("bitmap_data_ must not be null");
+                throw std::invalid_argument("bitmap_data must not be null");
             }
 
             auto lockInfo = bitmap_data->Lock();
