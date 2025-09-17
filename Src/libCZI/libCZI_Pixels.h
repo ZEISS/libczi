@@ -41,9 +41,9 @@ namespace libCZI
             }
 
             return !(this->x + this->w <= r.x ||
-                     r.x + r.w <= this->x ||
-                     this->y + this->h <= r.y ||
-                     r.y + r.h <= this->y);
+                        r.x + r.w <= this->x ||
+                        this->y + this->h <= r.y ||
+                        r.y + r.h <= this->y);
         }
 
         /// Calculate the intersection with the specified rectangle.
