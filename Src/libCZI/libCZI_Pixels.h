@@ -671,13 +671,13 @@ namespace libCZI
 
         /// Gets the value of a specific pixel in a locked bitonal bitmap.
         ///
-        /// \param  lockInfo    Information describing the locked bitonal bitmap data
+        /// \param  lock_info   Information describing the locked bitonal bitmap data
         ///                     (ptrData points to the first scanline; stride is in bytes).
         /// \param  extent      The bitmap extent (width/height).
         /// \param  x           The x-coordinate of the pixel (0-based).
         /// \param  y           The y-coordinate of the pixel (0-based).
         /// \return             The value of the pixel (true for set/1, false for clear/0).
-        static bool GetPixelValue(const BitonalBitmapLockInfo& lockInfo, const libCZI::IntSize& extent, std::uint32_t x, std::uint32_t y);
+        static bool GetPixelValue(const BitonalBitmapLockInfo& lock_info, const libCZI::IntSize& extent, std::uint32_t x, std::uint32_t y);
 
         /// Gets the value of a specific pixel in a locked bitonal bitmap.
         ///
@@ -722,12 +722,12 @@ namespace libCZI
 
         /// Sets the value of a specific pixel in a locked bitonal bitmap.
         ///
-        /// \param  lockInfo    Information describing the locked bitonal bitmap data.
+        /// \param  lock_info   Information describing the locked bitonal bitmap data.
         /// \param  extent      The bitmap extent (width/height).
         /// \param  x           The x-coordinate of the pixel (0-based).
         /// \param  y           The y-coordinate of the pixel (0-based).
         /// \param  value       The value to write (true for set/1, false for clear/0).
-        static void SetPixelValue(const BitonalBitmapLockInfo& lockInfo, const libCZI::IntSize& extent, std::uint32_t x, std::uint32_t y, bool value);
+        static void SetPixelValue(const BitonalBitmapLockInfo& lock_info, const libCZI::IntSize& extent, std::uint32_t x, std::uint32_t y, bool value);
 
         /// Fills a rectangular region of interest (ROI) in a bitonal bitmap with a specified value.
         ///
@@ -756,11 +756,11 @@ namespace libCZI
 
         /// Fills a rectangular region of interest (ROI) in a bitonal bitmap with a specified value.
         ///
-        /// \param 	lockInfo	Information describing the locked bitonal bitmap data.
+        /// \param 	lock_info	Information describing the locked bitonal bitmap data.
         /// \param 	extent  	The extent of the bitonal bitmap.
         /// \param 	roi		    The region of interest to fill. The ROI is clipped to the bitmap extent.
         /// \param 	value   	The value to fill the ROI with.
-        static void Fill(const BitonalBitmapLockInfo& lockInfo, const libCZI::IntSize& extent, const libCZI::IntRect& roi, bool value);
+        static void Fill(const BitonalBitmapLockInfo& lock_info, const libCZI::IntSize& extent, const libCZI::IntRect& roi, bool value);
 
         /// Sets all pixels in the bitonal bitmap to a uniform value.
         ///
@@ -787,10 +787,10 @@ namespace libCZI
 
         /// Sets all pixels in a locked bitonal bitmap to a uniform value.
         ///
-        /// \param  lockInfo    Information describing the locked bitonal bitmap data.
+        /// \param  lock_info   Information describing the locked bitonal bitmap data.
         /// \param  extent      The bitmap extent (width/height).
         /// \param  value       The value to assign to every pixel (true for set/1, false for clear/0).
-        static void SetAllPixels(const BitonalBitmapLockInfo& lockInfo, const libCZI::IntSize& extent, bool value);
+        static void SetAllPixels(const BitonalBitmapLockInfo& lock_info, const libCZI::IntSize& extent, bool value);
 
         /// Copies pixels from a source bitmap into a destination bitmap using a bitonal mask.
         ///
@@ -818,7 +818,7 @@ namespace libCZI
         /// \param 		   	neighborhood_size	Size of the neighborhood - this parameter must be in the range 0 to 7.
         ///                                     A value of 0 means only the center pixel is considered, while larger values
         ///                                     create a larger square neighborhood for the filtering operation.
-        /// \param [in,out]	source_bitmap	 	The source bitmap.
+        /// \param [in]	    source_bitmap	 	The source bitmap.
         ///
         /// \returns	The decimated bitmap.
         static std::shared_ptr<libCZI::IBitonalBitmapData> Decimate(int neighborhood_size, libCZI::IBitonalBitmapData* source_bitmap)
@@ -839,12 +839,12 @@ namespace libCZI
         /// \param neighborhood_size    Size of the neighborhood - this parameter must be in the range 0 to 7.
         ///                             A value of 0 means only the center pixel is considered, while larger values
         ///                             create a larger square neighborhood for the filtering operation.
-        /// \param lockInfo             Information describing the locked bitonal bitmap data of the source bitmap.
+        /// \param lock_info            Information describing the locked bitonal bitmap data of the source bitmap.
         /// \param extent               The extent (width and height) of the source bitmap.
         ///
         /// \returns                   A new decimated bitonal bitmap with dimensions (extent.w/2, extent.h/2).
         ///                            The returned bitmap is a newly allocated IBitonalBitmapData object.
-        static std::shared_ptr<libCZI::IBitonalBitmapData> Decimate(int neighborhood_size, const BitonalBitmapLockInfo& lockInfo, const libCZI::IntSize& extent);
+        static std::shared_ptr<libCZI::IBitonalBitmapData> Decimate(int neighborhood_size, const BitonalBitmapLockInfo& lock_info, const libCZI::IntSize& extent);
     };
 
     //-------------------------------------------------------------------------

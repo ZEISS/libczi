@@ -38,16 +38,16 @@ namespace
     }
 }
 
-bool BitonalBitmapOperations::GetPixelValue(const BitonalBitmapLockInfo& lockInfo, const libCZI::IntSize& extent, std::uint32_t x, std::uint32_t y)
+bool BitonalBitmapOperations::GetPixelValue(const BitonalBitmapLockInfo& lock_info, const libCZI::IntSize& extent, std::uint32_t x, std::uint32_t y)
 {
-    CheckLockInfoAndThrow(lockInfo, extent);
-    return BitmapOperationsBitonal::GetPixelFromBitonal(x, y, extent.w, extent.h, lockInfo.ptrData, lockInfo.stride);
+    CheckLockInfoAndThrow(lock_info, extent);
+    return BitmapOperationsBitonal::GetPixelFromBitonal(x, y, extent.w, extent.h, lock_info.ptrData, lock_info.stride);
 }
 
-void BitonalBitmapOperations::SetPixelValue(const BitonalBitmapLockInfo& lockInfo, const libCZI::IntSize& extent, std::uint32_t x, std::uint32_t y, bool value)
+void BitonalBitmapOperations::SetPixelValue(const BitonalBitmapLockInfo& lock_info, const libCZI::IntSize& extent, std::uint32_t x, std::uint32_t y, bool value)
 {
-    CheckLockInfoAndThrow(lockInfo, extent);
-    BitmapOperationsBitonal::SetPixelInBitonal(x, y, extent.w, extent.h, lockInfo.ptrData, lockInfo.stride, value);
+    CheckLockInfoAndThrow(lock_info, extent);
+    BitmapOperationsBitonal::SetPixelInBitonal(x, y, extent.w, extent.h, lock_info.ptrData, lock_info.stride, value);
 }
 
 void BitonalBitmapOperations::CopyAt(libCZI::IBitmapData* source_bitmap, libCZI::IBitonalBitmapData* mask, const libCZI::IntPoint& offset, libCZI::IBitmapData* destination_bitmap)
@@ -107,27 +107,27 @@ void BitonalBitmapOperations::CopyAt(libCZI::IBitmapData* source_bitmap, libCZI:
     }
 }
 
-/*static*/void BitonalBitmapOperations::SetAllPixels(const BitonalBitmapLockInfo& lockInfo, const libCZI::IntSize& extent, bool value)
+/*static*/void BitonalBitmapOperations::SetAllPixels(const BitonalBitmapLockInfo& lock_info, const libCZI::IntSize& extent, bool value)
 {
-    CheckLockInfoAndThrow(lockInfo, extent);
-    BitmapOperationsBitonal::Set(extent.w, extent.h, lockInfo.ptrData, lockInfo.stride, value);
+    CheckLockInfoAndThrow(lock_info, extent);
+    BitmapOperationsBitonal::Set(extent.w, extent.h, lock_info.ptrData, lock_info.stride, value);
 }
 
-/*static*/void BitonalBitmapOperations::Fill(const BitonalBitmapLockInfo& lockInfo, const libCZI::IntSize& extent, const libCZI::IntRect& roi, bool value)
+/*static*/void BitonalBitmapOperations::Fill(const BitonalBitmapLockInfo& lock_info, const libCZI::IntSize& extent, const libCZI::IntRect& roi, bool value)
 {
-    CheckLockInfoAndThrow(lockInfo, extent);
-    BitmapOperationsBitonal::Fill(extent.w, extent.h, lockInfo.ptrData, lockInfo.stride, roi, value);
+    CheckLockInfoAndThrow(lock_info, extent);
+    BitmapOperationsBitonal::Fill(extent.w, extent.h, lock_info.ptrData, lock_info.stride, roi, value);
 }
 
-/*static*/shared_ptr<IBitonalBitmapData> BitonalBitmapOperations::Decimate(int neighborhood_size, const BitonalBitmapLockInfo& lockInfo, const libCZI::IntSize& extent)
+/*static*/shared_ptr<IBitonalBitmapData> BitonalBitmapOperations::Decimate(int neighborhood_size, const BitonalBitmapLockInfo& lock_info, const libCZI::IntSize& extent)
 {
-    CheckLockInfoAndThrow(lockInfo, extent);
+    CheckLockInfoAndThrow(lock_info, extent);
     auto destination = CStdBitonalBitmapData::Create(extent.w / 2, extent.h / 2);
     ScopedBitonalBitmapLockerSP destination_locker{ destination };
     BitmapOperationsBitonal::BitonalDecimate(
         neighborhood_size,
-        static_cast<const uint8_t*>(lockInfo.ptrData),
-        lockInfo.stride,
+        static_cast<const uint8_t*>(lock_info.ptrData),
+        lock_info.stride,
         extent.w,
         extent.h,
         static_cast<uint8_t*>(destination_locker.ptrData),

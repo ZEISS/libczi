@@ -619,9 +619,10 @@ std::string ParameterHelpers::trim(const std::string& str, const std::string& wh
         if (!document.HasParseError() && document.IsObject())
         {
             static const char* kKeyMaskAware = "mask_aware";
-            if (document.HasMember(kKeyMaskAware) && document[kKeyMaskAware].IsBool())
+            const auto it = document.FindMember(kKeyMaskAware);
+            if (it != document.MemberEnd() && it->value.IsBool())
             {
-                single_channel_tile_accessor_options.maskAware = document[kKeyMaskAware].GetBool();
+                single_channel_tile_accessor_options.maskAware = it->value.GetBool();
             }
         }
     }
