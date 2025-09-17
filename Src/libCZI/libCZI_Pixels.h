@@ -106,7 +106,7 @@ namespace libCZI
     };
 
     /// A rectangle (with double coordinates).
-    struct DblRect
+    struct LIBCZI_API DblRect
     {
         double x;   ///< The x-coordinate of the upper-left point of the rectangle.
         double y;   ///< The y-coordinate of the upper-left point of the rectangle.
@@ -302,17 +302,17 @@ namespace libCZI
     /// This utility is intended to help adhering to the RAII-pattern, since it makes writing exception-safe
     /// code easier - in case of an exception (within the scope of the ScopedBitmapLocker object) the bitmap's
     /// Unlock method will be called (which is cumbersome to achieve otherwise).
-    template <typename tBitmap>
+    template <typename TBitmap>
     class ScopedBitmapLocker : public BitmapLockInfo
     {
     private:
-        tBitmap bitmap_data_;
+        TBitmap bitmap_data_;
     public:
         ScopedBitmapLocker() = delete;
 
         /// Constructor taking the object for which we provide the scope-guard.
-        /// \param bmData The object for which we are to provide the scope-guard.
-        explicit ScopedBitmapLocker(tBitmap bitmap_data) : bitmap_data_(bitmap_data)
+        /// \param bitmap_data The object for which we are to provide the scope-guard.
+        explicit ScopedBitmapLocker(const TBitmap& bitmap_data) : bitmap_data_(bitmap_data)
         {
             if (!bitmap_data)
             {
@@ -326,9 +326,9 @@ namespace libCZI
             this->size = lockInfo.size;
         }
 
-        /// Copy-Constructor .
+        /// Copy-Constructor.
         /// \param other The other object.
-        ScopedBitmapLocker(const ScopedBitmapLocker<tBitmap>& other) : bitmap_data_(other.bitmap_data_)
+        ScopedBitmapLocker(const ScopedBitmapLocker<TBitmap>& other) : bitmap_data_(other.bitmap_data_)
         {
             auto lockInfo = other.bitmap_data_->Lock();
             this->ptrData = lockInfo.ptrData;
@@ -337,14 +337,14 @@ namespace libCZI
             this->size = lockInfo.size;
         }
 
-        /// move constructor
-        ScopedBitmapLocker(ScopedBitmapLocker<tBitmap>&& other) noexcept : bitmap_data_(tBitmap())
+        /// Move constructor.
+        ScopedBitmapLocker(ScopedBitmapLocker<TBitmap>&& other) noexcept
         {
             *this = std::move(other);
         }
 
-        /// move assignment
-        ScopedBitmapLocker<tBitmap>& operator=(ScopedBitmapLocker<tBitmap>&& other) noexcept
+        /// Move assignment operator.
+        ScopedBitmapLocker<TBitmap>& operator=(ScopedBitmapLocker<TBitmap>&& other) noexcept
         {
             if (this != &other)
             {
@@ -359,7 +359,7 @@ namespace libCZI
                 this->stride = other.stride;
                 this->size = other.size;
                 other.ptrData = other.ptrDataRoi = nullptr;
-                other.bitmap_data_ = tBitmap();
+                other.bitmap_data_ = TBitmap();
             }
 
             return *this;
@@ -367,7 +367,7 @@ namespace libCZI
 
         /// Copy assignment operator.
         /// \param other The other object.
-        ScopedBitmapLocker<tBitmap>& operator=(const ScopedBitmapLocker<tBitmap>& other)
+        ScopedBitmapLocker<TBitmap>& operator=(const ScopedBitmapLocker<TBitmap>& other)
         {
             if (this != &other)
             {
@@ -507,47 +507,47 @@ namespace libCZI
     /// This utility is intended to help adhering to the RAII-pattern, since it makes writing exception-safe
     /// code easier - in case of an exception (within the scope of the ScopedBitonalBitmapLocker object) the bitmap's
     /// Unlock method will be called (which is cumbersome to achieve otherwise).
-    template <typename tBitonalBitmap>
+    template <typename TBitonalBitmap>
     class ScopedBitonalBitmapLocker : public BitonalBitmapLockInfo
     {
     private:
-        tBitonalBitmap bitonal_bitmap_data_;
+        TBitonalBitmap bitonal_bitmap_data_;
     public:
         ScopedBitonalBitmapLocker() = delete;
 
         /// Constructor taking the object for which we provide the scope-guard.
-        /// \param bmData The object for which we are to provide the scope-guard.
-        explicit ScopedBitonalBitmapLocker(tBitonalBitmap bitonal_bitmap_data) : bitonal_bitmap_data_(bitonal_bitmap_data)
+        /// \param bitonal_bitmap_data The object for which we are to provide the scope-guard.
+        explicit ScopedBitonalBitmapLocker(const TBitonalBitmap& bitonal_bitmap_data) : bitonal_bitmap_data_(bitonal_bitmap_data)
         {
             if (!bitonal_bitmap_data)
             {
                 throw std::invalid_argument("bitonal_bitmap_data must not be null");
             }
 
-            auto lockInfo = bitonal_bitmap_data->Lock();
-            this->ptrData = lockInfo.ptrData;
-            this->stride = lockInfo.stride;
-            this->size = lockInfo.size;
+            auto lock_info = bitonal_bitmap_data->Lock();
+            this->ptrData = lock_info.ptrData;
+            this->stride = lock_info.stride;
+            this->size = lock_info.size;
         }
 
-        /// Copy-Constructor .
+        /// Copy-Constructor.
         /// \param other The other object.
-        ScopedBitonalBitmapLocker(const ScopedBitonalBitmapLocker<tBitonalBitmap>& other) : bitonal_bitmap_data_(other.bitonal_bitmap_data_)
+        ScopedBitonalBitmapLocker(const ScopedBitonalBitmapLocker<TBitonalBitmap>& other) : bitonal_bitmap_data_(other.bitonal_bitmap_data_)
         {
-            auto lockInfo = other.bitonal_bitmap_data_->Lock();
-            this->ptrData = lockInfo.ptrData;
-            this->stride = lockInfo.stride;
-            this->size = lockInfo.size;
+            auto lock_info = other.bitonal_bitmap_data_->Lock();
+            this->ptrData = lock_info.ptrData;
+            this->stride = lock_info.stride;
+            this->size = lock_info.size;
         }
 
-        /// move constructor
-        ScopedBitonalBitmapLocker(ScopedBitonalBitmapLocker<tBitonalBitmap>&& other) noexcept : bitonal_bitmap_data_(tBitonalBitmap())
+        /// Move constructor.
+        ScopedBitonalBitmapLocker(ScopedBitonalBitmapLocker<TBitonalBitmap>&& other) noexcept : bitonal_bitmap_data_(TBitonalBitmap())
         {
             *this = std::move(other);
         }
 
-        /// move assignment
-        ScopedBitonalBitmapLocker<tBitonalBitmap>& operator=(ScopedBitonalBitmapLocker<tBitonalBitmap>&& other) noexcept
+        /// Move assignment operator.
+        ScopedBitonalBitmapLocker<TBitonalBitmap>& operator=(ScopedBitonalBitmapLocker<TBitonalBitmap>&& other) noexcept
         {
             if (this != &other)
             {
@@ -561,7 +561,7 @@ namespace libCZI
                 this->stride = other.stride;
                 this->size = other.size;
                 other.ptrData = nullptr;
-                other.bitonal_bitmap_data_ = tBitonalBitmap();
+                other.bitonal_bitmap_data_ = TBitonalBitmap();
             }
 
             return *this;
@@ -569,7 +569,7 @@ namespace libCZI
 
         /// Copy assignment operator.
         /// \param other The other object.
-        ScopedBitonalBitmapLocker<tBitonalBitmap>& operator=(const ScopedBitonalBitmapLocker<tBitonalBitmap>& other)
+        ScopedBitonalBitmapLocker<TBitonalBitmap>& operator=(const ScopedBitonalBitmapLocker<TBitonalBitmap>& other)
         {
             if (this != &other)
             {
