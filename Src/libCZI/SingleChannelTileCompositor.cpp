@@ -11,20 +11,20 @@ using namespace libCZI;
 
 /*static*/void CSingleChannelTileCompositor::Compose(libCZI::IBitmapData* dest, libCZI::IBitmapData* source, int x, int y, bool drawTileBorder)
 {
-    const ScopedBitmapLockerP srcLck{ source };
-    const ScopedBitmapLockerP dstLck{ dest };
+    const ScopedBitmapLockerP source_locker{ source };
+    const ScopedBitmapLockerP destination_locker{ dest };
     CBitmapOperations::CopyWithOffsetInfo info;
     info.xOffset = x;
     info.yOffset = y;
     info.srcPixelType = source->GetPixelType();
-    info.srcPtr = srcLck.ptrDataRoi;
-    info.srcStride = srcLck.stride;
+    info.srcPtr = source_locker.ptrDataRoi;
+    info.srcStride = source_locker.stride;
     info.srcWidth = source->GetWidth();
     info.srcHeight = source->GetHeight();
 
     info.dstPixelType = dest->GetPixelType();
-    info.dstPtr = dstLck.ptrDataRoi;
-    info.dstStride = dstLck.stride;
+    info.dstPtr = destination_locker.ptrDataRoi;
+    info.dstStride = destination_locker.stride;
     info.dstWidth = dest->GetWidth();
     info.dstHeight = dest->GetHeight();
 
@@ -42,28 +42,28 @@ using namespace libCZI;
         return;
     }
 
-    const ScopedBitmapLockerP srcLck{ source };
-    const ScopedBitmapLockerP dstLck{ dest };
-    const ScopedBitonalBitmapLockerP maskLck{ sourceMask };
+    const ScopedBitmapLockerP source_locker{ source };
+    const ScopedBitmapLockerP destination_locker{ dest };
+    const ScopedBitonalBitmapLockerP mask_locker{ sourceMask };
     BitmapOperationsBitonal::CopyWithOffsetAndMaskInfo info;
     info.xOffset = x;
     info.yOffset = y;
     info.srcPixelType = source->GetPixelType();
-    info.srcPtr = srcLck.ptrDataRoi;
-    info.srcStride = srcLck.stride;
+    info.srcPtr = source_locker.ptrDataRoi;
+    info.srcStride = source_locker.stride;
     info.srcWidth = source->GetWidth();
     info.srcHeight = source->GetHeight();
 
     info.dstPixelType = dest->GetPixelType();
-    info.dstPtr = dstLck.ptrDataRoi;
-    info.dstStride = dstLck.stride;
+    info.dstPtr = destination_locker.ptrDataRoi;
+    info.dstStride = destination_locker.stride;
     info.dstWidth = dest->GetWidth();
     info.dstHeight = dest->GetHeight();
 
     info.drawTileBorder = drawTileBorder;
 
-    info.maskPtr = maskLck.ptrData;
-    info.maskStride = maskLck.stride;
+    info.maskPtr = mask_locker.ptrData;
+    info.maskStride = mask_locker.stride;
     info.maskWidth = sourceMask->GetWidth();
     info.maskHeight = sourceMask->GetHeight();
 
@@ -121,14 +121,14 @@ using namespace libCZI;
     {
         int posXTile, posYTile;
         std::shared_ptr<libCZI::IBitmapData> src;
-        std::shared_ptr<IBitonalBitmapData> srcMask;
-        const bool b = getTilesAndMask(i, src, srcMask, posXTile, posYTile);
+        std::shared_ptr<IBitonalBitmapData> src_mask;
+        const bool b = getTilesAndMask(i, src, src_mask, posXTile, posYTile);
         if (b != true)
         {
             break;
         }
 
         // TODO: check return values?
-        CSingleChannelTileCompositor::ComposeMaskAware(dest, src.get(), srcMask.get(), posXTile - xPos, posYTile - yPos, pOptions->drawTileBorder);
+        CSingleChannelTileCompositor::ComposeMaskAware(dest, src.get(), src_mask.get(), posXTile - xPos, posYTile - yPos, pOptions->drawTileBorder);
     }
 }
