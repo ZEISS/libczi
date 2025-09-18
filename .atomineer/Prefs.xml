@@ -1,0 +1,244 @@
+<?xml version="1.0"?>
+<Prefs>
+  <DocComment>
+    <CommentStyle value="Doxygen" />
+    <Separator value="(none)" />
+    <SeparatorB value="(none)" />
+    <LineHeader2 value="/// " />
+    <AlignBlockStartColumns value="true" />
+    <LineHeader />
+    <SeparatorClipCol value="-1" />
+    <SeparatorOnFirstLine value="false" />
+    <BlanksAbove value="1" />
+    <BlanksAfterRegion value="1" />
+    <BlanksAfterScope value="0" />
+    <BlanksBelow value="0" />
+    <BlanksBetweenEntries value="false" />
+    <WordWrapRelative value="true" />
+    <SimpleFormatForOneLiners value="true" />
+    <InsertLocation value="AboveDecl" />
+    <SingleLinePrefix value="///&lt; " />
+    <SingleLineSuffix value="(None)" />
+    <SingleLineMinColumn value="0" />
+    <LineCommentOnSameLine value="false" />
+    <ImmediateDelete value="false" />
+    <DateCulture value="" />
+    <WordWrapColumn value="100" />
+    <AutoDocReplacements value="true" />
+    <SeeUseTypePrefix value="false" />
+    <WrapTags value="true" />
+    <SuppressAuthor value="true" />
+    <SuppressDate value="true" />
+    <PreserveExceptions value="false" />
+    <ThisObjectName value="object" />
+    <DuplicateBaseDocs value="true" />
+    <AddSeeForBases value="false" />
+    <SummaryOnlyForBases value="false" />
+    <AddSeeForOverrides value="false" />
+    <SummaryOnlyForOverrides value="false" />
+    <GenerateInheritdoc value="false" />
+    <DocAllAddFileHeader value="true" />
+    <DateFormat value="d" />
+    <LiveCommentUpdate value="true" />
+    <LiveCommentCreation value="true" />
+    <LiveTabNav value="false" />
+    <ConvertEntities value="true" />
+    <ConvertSquigglies value="false" />
+    <TidyOnPaste value="true" />
+    <ConvertDoubleSlashComments value="true" />
+    <EmitParamType value="false" />
+    <EmitParamTypeWithBrace value="true" />
+    <AddDocTableForEnums value="false" />
+    <LiveSLCommentUpdate value="true" />
+  </DocComment>
+  <Doxygen>
+    <CommandPrefix value="\" />
+    <SuppressBriefTags value="true" />
+    <SuppressPrototypes value="true" />
+    <FullClassDecl value="false" />
+  </Doxygen>
+  <Format>
+    <EntrySuppressNewlines value="true" />
+    <EntryTag value="Indent" />
+    <EntryNewline value="Align" />
+    <EntryBody value="Nothing" />
+    <SingleTag value="Indent" />
+    <SingleBody value="Space" />
+    <GroupSuppressNewlines value="true" />
+    <GroupTag value="Indent" />
+    <GroupNewline value="Align" />
+    <GroupBody value="Nothing" />
+    <AlignBlockStartColumns value="true" />
+    <AccessLevelsToComment value="all" />
+    <AccessLevelsApplyToAllCmds value="false" />
+    <DeleteIllegalBlock value="true" />
+  </Format>
+  <Misc>
+    <RulesPath value="" />
+    <UserName value="(Use login name)" />
+    <Language value="English (US)" />
+    <MMAddDocComment value="true" />
+    <MMDocThisScope value="true" />
+    <MMDocThisFile value="true" />
+    <MMDocThisProject value="true" />
+    <MMDocThisSolution value="true" />
+    <MMDocAll value="true" />
+    <MMReformatDocComment value="true" />
+    <MMRebuildDocComment value="true" />
+    <MMDeleteDocsFromFile value="true" />
+    <MMShowDocWindow value="true" />
+    <MMColumnise value="true" />
+    <MMOutlineDocComments value="true" />
+    <MMImplementMethod value="true" />
+    <MMAddAccessMethods value="true" />
+    <MMAddProperty value="true" />
+    <MMCopyAsText value="true" />
+    <MMCheckForUpdates value="true" />
+    <CMAddDocComment value="true" />
+    <CMDocThisScope value="false" />
+    <CMDocThisFile value="false" />
+    <CMDocAll value="false" />
+    <CMReformatDocComment value="false" />
+    <CMRebuildDocComment value="false" />
+    <CMShowDocWindow value="false" />
+    <CMColumnise value="false" />
+    <CMCopyAsText value="false" />
+    <CMAddProperty value="false" />
+    <CMAddAccessMethods value="false" />
+    <EditXmlWithVerb value="edit" />
+    <EditXmlInNotepad />
+  </Misc>
+  <Natural>
+    <TagPrefix value="" />
+    <TagSuffix value=":" />
+    <Casing value="Sentence" />
+  </Natural>
+  <DocXml>
+    <BlockFormatNew />
+    <BlockFormatOld />
+    <BlockFormatForGroup />
+  </DocXml>
+  <DocBox>
+    <FillColour value="" />
+    <BorderColour value="" />
+    <Enabled value="false" />
+  </DocBox>
+  <Variables>
+    <StyleCop value="false" />
+    <ise value="ize" />
+    <initialise value="initialize" />
+  </Variables>
+  <OutlineDocComment>
+    <OnOpenDoc value="false" />
+    <SkipFirstLine value="true" />
+    <EatTrailingBlank value="true" />
+  </OutlineDocComment>
+  <OutlineAttr>
+    <OnOpenDoc value="false" />
+    <EatBlanks value="true" />
+  </OutlineAttr>
+  <CopyAsText>
+    <StripIndent value="true" />
+    <TabSize value="4" />
+  </CopyAsText>
+  <AddAccessMethods>
+    <VarTemplate value="varName" />
+    <MemberPrefix />
+    <MultilineAutoProp value="false" />
+    <UseThis value="false" />
+    <UseLambda value="false" />
+    <MethodTemplate value="GetVarName,SetVarName" />
+    <ParamTemplate value="varName" />
+  </AddAccessMethods>
+  <DocEditor>
+    <ParaStyle value="" />
+    <ListStyle value="*" />
+  </DocEditor>
+  <ImplementMethod>
+    <AddDocComment value="true" />
+    <ReturnToOrigDoc value="false" />
+  </ImplementMethod>
+  <Columnise>
+    <MinimiseWhitespace value="true" />
+  </Columnise>
+  <PrefSet name="C and C++" filetypes=".h.hpp.hxx.chh.hh.c.cpp.cxx.cc.ino">
+    <Format>
+      <EntrySuppressNewlines value="true" />
+      <GroupSuppressNewlines value="true" />
+      <AlignBlockStartColumns value="true" />
+      <EntryTag value="Indent" />
+      <EntryNewline value="Indent" />
+      <EntryBody value="Nothing" />
+      <GroupTag value="Indent" />
+      <GroupNewline value="Indent" />
+      <GroupBody value="Nothing" />
+      <SingleTag value="Indent" />
+      <SingleBody value="Space" />
+    </Format>
+    <DocComment>
+      <WordWrapColumn value="100" />
+      <WordWrapRelative value="true" />
+      <CommentStyle value="Doxygen" />
+      <Separator value="(No first line separator)" />
+      <LineHeader2 value="/// " />
+      <SeparatorB value="(No last line separator)" />
+      <BlanksAbove value="1" />
+      <BlanksAfterRegion value="1" />
+      <BlanksAfterScope value="0" />
+      <BlanksBelow value="0" />
+      <BlanksBetweenEntries value="true" />
+      <SimpleFormatForOneLiners value="true" />
+      <InsertLocation value="AboveDecl" />
+      <LineCommentOnSameLine value="true" />
+      <SingleLinePrefix value="///&lt; " />
+      <SingleLineSuffix value="(None)" />
+      <SingleLineMinColumn value="0" />
+      <LineHeader />
+    </DocComment>
+    <DocBox>
+      <Enabled value="false" />
+      <FillColour value="" />
+      <BorderColour value="" />
+    </DocBox>
+  </PrefSet>
+  <PrefSet name="C#" filetypes=".cs">
+    <Format>
+      <EntrySuppressNewlines value="true" />
+      <GroupSuppressNewlines value="true" />
+      <AlignBlockStartColumns value="true" />
+      <EntryTag value="Space" />
+      <EntryNewline value="Align" />
+      <EntryBody value="Nothing" />
+      <GroupTag value="Space" />
+      <GroupNewline value="Align" />
+      <GroupBody value="Nothing" />
+      <SingleTag value="Space" />
+      <SingleBody value="Nothing" />
+    </Format>
+    <DocComment>
+      <WordWrapColumn value="100" />
+      <WordWrapRelative value="true" />
+      <CommentStyle value="DocXml" />
+      <Separator value="(No first line separator)" />
+      <LineHeader2 value="/// " />
+      <SeparatorB value="(No last line separator)" />
+      <BlanksAbove value="1" />
+      <BlanksAfterRegion value="1" />
+      <BlanksAfterScope value="0" />
+      <BlanksBelow value="0" />
+      <BlanksBetweenEntries value="false" />
+      <SimpleFormatForOneLiners value="true" />
+      <InsertLocation value="AboveDecl" />
+      <LineCommentOnSameLine value="false" />
+      <SingleLinePrefix value="///&lt; " />
+      <SingleLineSuffix value="(None)" />
+      <SingleLineMinColumn value="0" />
+      <LineHeader />
+    </DocComment>
+    <DocBox>
+      <Enabled value="false" />
+      <FillColour value="" />
+      <BorderColour value="" />
+    </DocBox>
+  </PrefSet>
+</Prefs>

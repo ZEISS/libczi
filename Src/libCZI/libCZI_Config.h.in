@@ -57,3 +57,12 @@
 #define LIBCZI_AZURESDK_BASED_STREAM_AVAILABLE  @libCZI_AzureStorage_available@
 
 #define LIBCZI_AZURESDK_VERSION_INFO "@libCZI_AzureStorage_SDK_Version_Info@"
+
+// whether the intrinsic "__builtin_bswap32" is available (in the header-file byteswap.h)
+#define LIBCZI_HAS_BUILTIN_BSWAP32 @libCZI_Has_builtin_bswap32@
+
+// whether the function "_byteswap_ulong" is available (in the header-file stdlib.h)
+#define LIBCZI_HAS_BYTESWAP_IN_STDLIB @libCZI_Has_byteswap_long_in_stdlib@
+
+// whether the function "bswap32" is available (in the header-file sys/endian.h)
+#define LIBCZI_HAS_BSWAP_LONG_IN_SYS_ENDIAN @libCZI_Has_bswap_long_in_sys_endian@

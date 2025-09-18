@@ -2,10 +2,34 @@
 #
 # SPDX-License-Identifier: LGPL-3.0-or-later
 
+include(utilities)
+include(CheckCSourceCompiles)
+
 if (LIBCZI_BUILD_PREFER_EXTERNALPACKAGE_EIGEN3)
  find_package (Eigen3 3.3 REQUIRED NO_MODULE)
 else()
  include(ExternalEIGEN3)
+endif()
+
+# check for availability of "bswap"
+#
+# c.f. https://stackoverflow.com/questions/41770887/cross-platform-definition-of-byteswap-uint64-and-byteswap-ulong
+# not exactly sure why check_symbol_exists() does not work here, but it does not for me - so we do it the hard way and try to compile a test program
+check_c_source_compiles(
+		"#include <byteswap.h>
+		 int main() {__builtin_bswap32(0x12345678);}"
+        LIBCZI_BUILDCONFIG_HAS_BUILTIN_BSWAP32)
+BoolToYesNo(LIBCZI_BUILDCONFIG_HAS_BUILTIN_BSWAP32 check_result_text)
+message("Has_builtin_bswap32 = ${check_result_text}.")
+if (NOT LIBCZI_BUILDCONFIG_HAS_BUILTIN_BSWAP32)
+	check_symbol_exists(_byteswap_ulong "stdlib.h" LIBCZI_BUILDCONFIG_HAS_BYTESWAP_IN_STDLIB_BSWAP32)
+	BoolToYesNo(LIBCZI_BUILDCONFIG_HAS_BYTESWAP_IN_STDLIB_BSWAP32 check_result_text)
+	message("Has_byteswap_long_in_stdlib = ${check_result_text}.")
+    if (NOT LIBCZI_BUILDCONFIG_HAS_BYTESWAP_IN_STDLIB_BSWAP32)
+	  check_symbol_exists(bswap32 "sys/endian.h" LIBCZI_BUILDCONFIG_HAS_BSWAP_IN_SYS_ENDIAN)
+      BoolToYesNo(LIBCZI_BUILDCONFIG_HAS_BSWAP_IN_SYS_ENDIAN check_result_text)
+	  message("Has_bswap_long_in_sys_endian = ${check_result_text}.")
+	endif()
 endif()
 
 add_subdirectory(JxrDecode)

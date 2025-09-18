@@ -5,6 +5,7 @@
 #include "SingleChannelScalingTileAccessor.h"
 #include "utilities.h"
 #include "BitmapOperations.h"
+#include "BitmapOperationsBitonal.h"
 #include "Site.h"
 
 using namespace libCZI;
@@ -82,11 +83,12 @@ CSingleChannelScalingTileAccessor::CSingleChannelScalingTileAccessor(const std::
 
 void CSingleChannelScalingTileAccessor::ScaleBlt(libCZI::IBitmapData* bmDest, float zoom, const libCZI::IntRect& roi, const SbInfo& sbInfo, const libCZI::ISingleChannelScalingTileAccessor::Options& options)
 {
-    auto subblock_bitmap_data = CSingleChannelAccessorBase::GetSubBlockDataForSubBlockIndex(
-        this->sbBlkRepository,
-        options.subBlockCache,
-        sbInfo.index,
-        options.onlyUseSubBlockCacheForCompressedData);
+    auto subblock_bitmap_data = CSingleChannelAccessorBase::GetSubBlockDataIncludingMaskForSubBlockIndex(
+                                                                            this->sbBlkRepository,
+                                                                            options.subBlockCache,
+                                                                            sbInfo.index,
+                                                                            options.onlyUseSubBlockCacheForCompressedData,
+                                                                            options.maskAware);
     if (GetSite()->IsEnabled(LOGLEVEL_CHATTYINFORMATION))
     {
         stringstream ss;
@@ -95,6 +97,7 @@ void CSingleChannelScalingTileAccessor::ScaleBlt(libCZI::IBitmapData* bmDest, fl
     }
 
     const auto& source = subblock_bitmap_data.bitmap;
+    const auto& source_mask = subblock_bitmap_data.mask;
 
     // In order not to run into trouble with floating point precision, if the scale is exactly 1, we refrain from using the scaling operation
     //  and do instead a simple copy operation. This should ensure a pixel-accurate result if zoom is exactly 1.
@@ -102,7 +105,7 @@ void CSingleChannelScalingTileAccessor::ScaleBlt(libCZI::IBitmapData* bmDest, fl
     {
         ScopedBitmapLockerSP srcLck{ source };
         ScopedBitmapLockerP dstLck{ bmDest };
-        CBitmapOperations::CopyWithOffsetInfo info;
+        BitmapOperationsBitonal::CopyWithOffsetAndMaskInfo info;
         info.xOffset = sbInfo.logicalRect.x - roi.x;
         info.yOffset = sbInfo.logicalRect.y - roi.y;
         info.srcPixelType = source->GetPixelType();
@@ -116,8 +119,19 @@ void CSingleChannelScalingTileAccessor::ScaleBlt(libCZI::IBitmapData* bmDest, fl
         info.dstWidth = bmDest->GetWidth();
         info.dstHeight = bmDest->GetHeight();
         info.drawTileBorder = false;
-
-        CBitmapOperations::CopyWithOffset(info);
+        if (options.maskAware && source_mask)
+        {
+            ScopedBitonalBitmapLockerSP maskLck{ source_mask };
+            info.maskPtr = maskLck.ptrData;
+            info.maskStride = maskLck.stride;
+            info.maskWidth = source_mask->GetWidth();
+            info.maskHeight = source_mask->GetHeight();
+            BitmapOperationsBitonal::CopyWithOffsetAndMask(info);
+        }
+        else
+        {
+            CBitmapOperations::CopyWithOffset(info);
+        }
     }
     else
     {
@@ -147,7 +161,14 @@ void CSingleChannelScalingTileAccessor::ScaleBlt(libCZI::IBitmapData* bmDest, fl
         dstRoi.w *= bmDest->GetWidth();
         dstRoi.h *= bmDest->GetHeight();
 
-        CBitmapOperations::NNResize(source.get(), bmDest, srcRoi, dstRoi);
+        if (options.maskAware && source_mask)
+        {
+            BitmapOperationsBitonal::NNResizeMaskAware(source.get(), source_mask.get(), bmDest, srcRoi, dstRoi);
+        }
+        else
+        {
+            CBitmapOperations::NNResize(source.get(), bmDest, srcRoi, dstRoi);
+        }
     }
 }
 

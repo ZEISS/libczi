@@ -376,13 +376,13 @@ void CBitmapOperations::Fill_Bgra32(int w, int h, void* ptr, int stride, std::ui
 
 /*static*/std::shared_ptr<libCZI::IBitmapData> CBitmapOperations::ConvertToBigEndian(libCZI::IBitmapData* source)
 {
-    auto pxltype = source->GetPixelType();
-    auto dst = GetSite()->CreateBitmap(pxltype, source->GetWidth(), source->GetHeight());
+    const auto pixel_type = source->GetPixelType();
+    auto dst = GetSite()->CreateBitmap(pixel_type, source->GetWidth(), source->GetHeight());
 
-    ScopedBitmapLockerP lckSrc{ source };
-    ScopedBitmapLockerSP lckDst{ dst };
+    const ScopedBitmapLockerP source_locker{ source };
+    const ScopedBitmapLockerSP destination_locker{ dst };
 
-    CBitmapOperations::CopyConvertBigEndian(pxltype, lckSrc.ptrDataRoi, lckSrc.stride, lckDst.ptrDataRoi, lckDst.stride, source->GetWidth(), source->GetHeight());
+    CBitmapOperations::CopyConvertBigEndian(pixel_type, source_locker.ptrDataRoi, source_locker.stride, destination_locker.ptrDataRoi, destination_locker.stride, source->GetWidth(), source->GetHeight());
 
     return dst;
 }
@@ -398,7 +398,7 @@ void CBitmapOperations::Fill_Bgra32(int w, int h, void* ptr, int stride, std::ui
             uint16_t* pDst = reinterpret_cast<uint16_t*>(static_cast<char*>(ptrDst) + y * static_cast<ptrdiff_t>(dstStride));
             for (uint32_t x = 0; x < width; ++x)
             {
-                *(pDst + x) = ((*(pSrc + x)) << 8) | ((*(pSrc + x)) >> 8);
+                *(pDst + x) = static_cast<uint16_t>((*(pSrc + x)) << 8) | static_cast<uint16_t>((*(pSrc + x)) >> 8);
             }
         }
 
@@ -410,7 +410,7 @@ void CBitmapOperations::Fill_Bgra32(int w, int h, void* ptr, int stride, std::ui
             uint16_t* pDst = reinterpret_cast<uint16_t*>(static_cast<char*>(ptrDst) + y * static_cast<ptrdiff_t>(dstStride));
             for (uint32_t x = 0; x < 3 * width; ++x)
             {
-                *(pDst + x) = ((*(pSrc + x)) << 8) | ((*(pSrc + x)) >> 8);
+                *(pDst + x) = static_cast<uint16_t>((*(pSrc + x)) << 8) | static_cast<uint16_t>((*(pSrc + x)) >> 8);
             }
         }
 

@@ -766,7 +766,7 @@ namespace libCZI
         /// Attempts to get the attribute with the name specified by "attributeName". If it exists, the value is stored in
         /// "attribValue" (if it is non-null) and the return value is true. Otherwise, the return value is false.
         ///
-        /// \param          attributeName Name of the attribute.
+        /// \param       attributeName Name of the attribute.
         /// \param [out] attribValue   If non-null, the attribute value will be put here (if the attribute exists).
         ///
         /// \return True if it succeeds, false if it fails.

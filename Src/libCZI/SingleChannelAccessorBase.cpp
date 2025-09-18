@@ -135,47 +135,69 @@ std::vector<int> CSingleChannelAccessorBase::CheckForVisibility(const libCZI::In
     return result;
 }
 
-/*static*/CSingleChannelAccessorBase::SubBlockData CSingleChannelAccessorBase::GetSubBlockDataForSubBlockIndex(
-    const std::shared_ptr<libCZI::ISubBlockRepository>& sbBlkRepository,
+/*static*/CSingleChannelAccessorBase::SubBlockData CSingleChannelAccessorBase::GetSubBlockDataIncludingMaskForSubBlockIndex(
+    const std::shared_ptr<libCZI::ISubBlockRepository>& sub_block_repository,
     const std::shared_ptr<libCZI::ISubBlockCacheOperation>& cache,
-    int subBlockIndex,
-    bool onlyAddCompressedSubBlockToCache)
+    int sub_block_index,
+    bool only_add_compressed_sub_blocks_to_cache,
+    bool mask_aware_mode)
 {
     SubBlockData result;
 
     // if no cache-object is given, then we simply read the subblock and create a bitmap from it
     if (!cache)
     {
-        const auto subblock = sbBlkRepository->ReadSubBlock(subBlockIndex);
+        const auto subblock = sub_block_repository->ReadSubBlock(sub_block_index);
         result.bitmap = subblock->CreateBitmap();
         result.subBlockInfo = subblock->GetSubBlockInfo();
+        result.mask = mask_aware_mode ? CSingleChannelAccessorBase::TryToGetMaskBitmapFromSubBlock(subblock) : nullptr;
     }
     else
     {
-        const auto bitmap_from_cache = cache->Get(subBlockIndex);
-        if (bitmap_from_cache)
+        const auto bitmap_from_cache = cache->Get(sub_block_index);
+        if (bitmap_from_cache.IsValid())
         {
-            const bool b = sbBlkRepository->TryGetSubBlockInfo(subBlockIndex, &result.subBlockInfo);
+            const bool b = sub_block_repository->TryGetSubBlockInfo(sub_block_index, &result.subBlockInfo);
             if (!b)
             {
                 stringstream ss;
-                ss << "SubBlockInfo not found in repository for subblock index " << subBlockIndex << ".";
+                ss << "SubBlockInfo not found in repository for subblock index " << sub_block_index << ".";
                 throw logic_error(ss.str());
             }
 
-            result.bitmap = bitmap_from_cache;
+            result.bitmap = bitmap_from_cache.bitmap;
+            result.mask = bitmap_from_cache.mask;
         }
         else
         {
-            const auto subblock = sbBlkRepository->ReadSubBlock(subBlockIndex);
+            const auto subblock = sub_block_repository->ReadSubBlock(sub_block_index);
             result.bitmap = subblock->CreateBitmap();
+            result.mask = mask_aware_mode ? CSingleChannelAccessorBase::TryToGetMaskBitmapFromSubBlock(subblock) : nullptr;
             result.subBlockInfo = subblock->GetSubBlockInfo();
-            if (!onlyAddCompressedSubBlockToCache || result.subBlockInfo.GetCompressionMode() != CompressionMode::UnCompressed)
+            if (!only_add_compressed_sub_blocks_to_cache || result.subBlockInfo.GetCompressionMode() != CompressionMode::UnCompressed)
             {
-                cache->Add(subBlockIndex, result.bitmap);
+                cache->Add(sub_block_index, { result.bitmap, result.mask });
             }
         }
     }
 
     return result;
+}
+
+/*static*/std::shared_ptr<libCZI::IBitonalBitmapData> CSingleChannelAccessorBase::TryToGetMaskBitmapFromSubBlock(const std::shared_ptr<libCZI::ISubBlock>& sub_block)
+{
+    auto sub_block_metadata = CreateSubBlockMetadataFromSubBlock(sub_block.get());
+    if (sub_block_metadata->IsXmlValid())
+    {
+        auto sub_block_attachment_accessor = CreateSubBlockAttachmentAccessor(sub_block, sub_block_metadata);
+        try
+        {
+            return sub_block_attachment_accessor->CreateBitonalBitmapFromMaskInfo();
+        }
+        catch (LibCZIException&)
+        {
+        }
+    }
+
+    return {};
 }

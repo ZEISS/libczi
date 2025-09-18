@@ -86,11 +86,13 @@ set(LIBCZISRCFILES
             libCZI_Metadata.h
             libCZI_Metadata2.h
             libCZI_Pixels.h
+            libCZI_Pixels.cpp
             libCZI_ReadWrite.h
             libCZI_Site.h
             libCZI_Utilities.h
             libCZI_Write.h
             libCZI_StreamsLib.h
+            libCZI_SubBlock.h
             MD5Sum.h
             MultiChannelCompositor.h
             SingleChannelAccessorBase.h
@@ -123,6 +125,12 @@ set(LIBCZISRCFILES
             StreamsLib/azureblobinputstream.cpp
             subblock_cache.h
             subblock_cache.cpp
+            SubblockMetadata.h
+            SubblockMetadata.cpp
+            SubblockAttachmentAccessor.h
+            SubblockAttachmentAccessor.cpp
+            BitmapOperationsBitonal.h
+            BitmapOperationsBitonal.cpp
 )
 
 # prepare the configuration-file "libCZI_Config.h"
@@ -144,6 +152,22 @@ else()
 endif()
 
 set(libCZI_HAVE_ENDIAN_H ${HAVE_ENDIAN_H})
+
+if (LIBCZI_BUILDCONFIG_HAS_BUILTIN_BSWAP32)
+	set (libCZI_Has_builtin_bswap32 1)
+else()	
+	set (libCZI_Has_builtin_bswap32 0)	
+endif()
+if (LIBCZI_BUILDCONFIG_HAS_BYTESWAP_IN_STDLIB_BSWAP32)
+	set (libCZI_Has_byteswap_long_in_stdlib 1)
+else()	
+	set (libCZI_Has_byteswap_long_in_stdlib 0)
+endif()
+if (LIBCZI_BUILDCONFIG_HAS_BSWAP_IN_SYS_ENDIAN)
+	set (libCZI_Has_bswap_long_in_sys_endian 1)
+else()	
+	set (libCZI_Has_bswap_long_in_sys_endian 0)
+endif()
 
 if (CRASH_ON_UNALIGNED_ACCESS)
   set (libCZI_CrashOnUnalignedIntegers 1)
@@ -302,7 +326,7 @@ configure_file (
 #  Define headers for this library. PUBLIC headers are used for compiling the library, and will be added to consumers' build paths.
 set(libCZIPublicHeaders "ImportExport.h" "libCZI.h" "libCZI_Compositor.h" "libCZI_DimCoordinate.h" "libCZI_exceptions.h"
                "libCZI_Helpers.h" "libCZI_Metadata.h" "libCZI_Metadata2.h" "libCZI_Pixels.h" "libCZI_ReadWrite.h"
-               "libCZI_Site.h" "libCZI_Utilities.h" "libCZI_Write.h" "libCZI_compress.h" "libCZI_StreamsLib.h")
+               "libCZI_Site.h" "libCZI_Utilities.h" "libCZI_Write.h" "libCZI_compress.h" "libCZI_StreamsLib.h" "libCZI_SubBlock.h")
 
 #
 #define the shared libCZI - library
@@ -316,6 +340,7 @@ if (LIBCZI_BUILD_DYNLIB)
   # add the binary tree to the search path for include files so that we will find libCZI_Config.h
   target_include_directories(libCZI PRIVATE  "${CMAKE_CURRENT_BINARY_DIR}")
   target_include_directories(libCZI PRIVATE  ${EIGEN3_INCLUDE_DIR})
+  target_link_libraries(libCZI PRIVATE  ${ADDITIONAL_LIBS_REQUIRED_FOR_ATOMIC})
   set_target_properties(libCZI PROPERTIES DEBUG_POSTFIX "d")
   if (LIBCZI_BUILD_PREFER_EXTERNALPACKAGE_ZSTD)
    target_link_libraries(libCZI PRIVATE ${LIBCZI_ZSTD_LINK_TARGET})
@@ -357,6 +382,7 @@ set_target_properties(libCZIStatic PROPERTIES VERSION ${PROJECT_VERSION})
 # add the binary tree to the search path for include files so that we will find libCZI_Config.h
 target_include_directories(libCZIStatic PRIVATE  "${CMAKE_CURRENT_BINARY_DIR}")
 target_include_directories(libCZIStatic PRIVATE  ${EIGEN3_INCLUDE_DIR})
+target_link_libraries(libCZIStatic PRIVATE  ${ADDITIONAL_LIBS_REQUIRED_FOR_ATOMIC})
 set_target_properties(libCZIStatic PROPERTIES DEBUG_POSTFIX "d")
 if (LIBCZI_BUILD_PREFER_EXTERNALPACKAGE_ZSTD)
    target_link_libraries(libCZIStatic PUBLIC ${LIBCZI_ZSTD_LINK_TARGET})

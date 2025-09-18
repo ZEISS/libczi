@@ -157,7 +157,7 @@ namespace libCZI
     {
     private:
         bool forceFileGuid;
-        GUID fileGuid;          ///< The GUID to be set as the CZI's file-guid.
+        libCZI::GUID fileGuid;          ///< The GUID to be set as the CZI's file-guid.
         libCZI::CZIFrameOfReference defaultFrameOfReference;
     public:
         /// Default constructor - sets all information to "invalid" and sets fileGuid to GUID_NULL.

@@ -814,7 +814,7 @@ static U32 jxr_byteswap_ulong(U32 bits)
 #elif JXRDECODE_HAS_BYTESWAP_IN_STDLIB
     return _byteswap_ulong(bits);
 #elif JXRDECODE_HAS_BSWAP_LONG_IN_SYS_ENDIAN
-    return bswap_32(v);
+    return bswap_32(bits);
 #else
     return (((bits & 0xff000000u) >> 24) |
         ((bits & 0x00ff0000u) >> 8) |

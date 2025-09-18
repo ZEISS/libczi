@@ -209,7 +209,7 @@ public:
 private:
     void SaveBgr24(const wchar_t* fileName, libCZI::IBitmapData* bitmap)
     {
-        this->SavePngTweakLineBeforeWritng(fileName, bitmap, 8, PNG_COLOR_TYPE_RGB,
+        this->SavePngTweakLineBeforeWriting(fileName, bitmap, 8, PNG_COLOR_TYPE_RGB,
             [](std::uint32_t width, void* ptrData)->void
             {
                 char* p = (char*)ptrData;
@@ -223,7 +223,7 @@ private:
 
     void SaveBgra32(const wchar_t* fileName, libCZI::IBitmapData* bitmap)
     {
-        this->SavePngTweakLineBeforeWritng(fileName, bitmap, 8, PNG_COLOR_TYPE_RGB_ALPHA,
+        this->SavePngTweakLineBeforeWriting(fileName, bitmap, 8, PNG_COLOR_TYPE_RGB_ALPHA,
             [](std::uint32_t width, void* ptrData)->void
             {
                 char* p = (char*)ptrData;
@@ -237,7 +237,7 @@ private:
 
     void SaveBgr48(const wchar_t* fileName, libCZI::IBitmapData* bitmap)
     {
-        this->SavePngTweakLineBeforeWritng(fileName, bitmap, 16, PNG_COLOR_TYPE_RGB,
+        this->SavePngTweakLineBeforeWriting(fileName, bitmap, 16, PNG_COLOR_TYPE_RGB,
             [](std::uint32_t width, void* ptrData)->void
             {
                 unsigned short* p = (unsigned short*)ptrData;
@@ -261,7 +261,7 @@ private:
 
     void SavePng(const wchar_t* fileName, libCZI::IBitmapData* bitmap, int bit_depth, int color_type)
     {
-        std::unique_ptr<FILE, decltype (&fclose)> fp(this->OpenDestForWrite(fileName), &fclose);
+        std::unique_ptr<FILE, void(*)(FILE*)> fp(this->OpenDestForWrite(fileName), [](FILE* p) { fclose(p); });
 
         PngStructInfoGuard pngStructInfo;
         pngStructInfo.png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
@@ -288,9 +288,9 @@ private:
         png_write_end(pngStructInfo.png_ptr, NULL);
     }
 
-    void SavePngTweakLineBeforeWritng(const wchar_t* fileName, libCZI::IBitmapData* bitmap, int bit_depth, int color_type, std::function<void(std::uint32_t, void*)> tweakLine)
+    void SavePngTweakLineBeforeWriting(const wchar_t* fileName, libCZI::IBitmapData* bitmap, int bit_depth, int color_type, const std::function<void(std::uint32_t, void*)>& tweakLine)
     {
-        std::unique_ptr<FILE, decltype (&fclose)> fp(this->OpenDestForWrite(fileName), &fclose);
+        std::unique_ptr<FILE, void(*)(FILE*)> fp(this->OpenDestForWrite(fileName), [](FILE* p) { fclose(p); });
 
         PngStructInfoGuard pngStructInfo;
         pngStructInfo.png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);

@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.15)
 cmake_policy(SET CMP0091 NEW) # enable new "MSVC runtime library selection" (https://cmake.org/cmake/help/latest/variable/CMAKE_MSVC_RUNTIME_LIBRARY.html)
 
 project(libCZI 
-      VERSION 0.66.7
+      VERSION 0.67.0
       HOMEPAGE_URL "https://github.com/ZEISS/libczi"
       DESCRIPTION "libCZI is an Open Source Cross-Platform C++ library to read and write CZI")
 
@@ -47,6 +47,15 @@ if (IS_BIG_ENDIAN)
  message("identified a big-endian platform")
 else()
  message("identified a little-endian platform")
+endif()
+
+# for some ancient platforms it is necessary to link against additional libraries when using C++'s 'std::atomic'.
+# This test is compiling a test program, which is problematic in cross-compilation scenarios. In order to prevent
+# problems in cross-compilation scenarios, the user can set the variable 'ADDITIONAL_LIBS_REQUIRED_FOR_ATOMIC' manually.
+include(CheckForAdditionalLibsRequiredForAtomic)
+CheckForAdditionalLibsRequiredForAtomic(ADDITIONAL_LIBS_REQUIRED_FOR_ATOMIC)
+if (ADDITIONAL_LIBS_REQUIRED_FOR_ATOMIC)
+  message(STATUS "It was determined that linking to those additional libraries is necessary for using 'atomic': ${ADDITIONAL_LIBS_REQUIRED_FOR_ATOMIC}.")
 endif()
 
 check_include_file_CXX(endian.h HAVE_ENDIAN_H)

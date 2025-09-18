@@ -197,6 +197,7 @@ private:
     std::tuple<std::uint32_t, std::uint32_t> tilesSizeForPlaneScan; ///< The size of the tiles in pixels for the plane scan operation.
 
     bool useVisibilityCheckOptimization;
+    bool use_mask_aware_compositing_;
 public:
     /// Values that represent the result of the "Parse"-operation.
     enum class ParseResult
@@ -267,6 +268,7 @@ public:
     std::uint64_t GetSubBlockCacheSize() const { return this->subBlockCacheSize; }
     const std::tuple<std::uint32_t, std::uint32_t>& GetTileSizeForPlaneScan() const { return this->tilesSizeForPlaneScan; }
     bool GetUseVisibilityCheckOptimization() const { return this->useVisibilityCheckOptimization; }
+    bool GetUseMaskAwareCompositing() const { return this->use_mask_aware_compositing_; }
 private:
     friend struct RegionOfInterestValidator;
     friend struct DisplaySettingsValidator;
@@ -286,7 +288,7 @@ private:
     friend struct CreateSubblockMetadataValidator;
     friend struct CompressionOptionsValidator;
     friend struct GeneratorPixelTypeValidator;
-    friend struct CachesizeValidator;
+    friend struct CacheSizeValidator;
     friend struct TileSizeForPlaneScanValidator;
 
     bool CheckArgumentConsistency() const;

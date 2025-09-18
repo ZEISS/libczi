@@ -1,0 +1,188 @@
+// SPDX-FileCopyrightText: 2025 Carl Zeiss Microscopy GmbH
+//
+// SPDX-License-Identifier: LGPL-3.0-or-later
+
+#pragma once
+
+#include <tuple>
+#include "libCZI_Metadata.h"
+#include "libCZI_Utilities.h"
+#include <cstdint>
+#include <memory>
+#include <string>
+#include <functional>
+
+namespace libCZI
+{
+    /// This interface provides typed access to the metadata of a sub-block.
+    class LIBCZI_API ISubBlockMetadataMetadataView
+    {
+    public:
+        ISubBlockMetadataMetadataView() = default;
+        virtual ~ISubBlockMetadataMetadataView() = default;
+
+        /// Attempts to get "attachment data format" - the format of data in the attachment of the sub-block.
+        /// This information is retrieved from the node "METADATA/AttachmentSchema/DataFormat".
+        /// 
+        /// \param [out]	data_format	If non-null, the data format is output here.
+        /// \returns	True if it succeeds; false otherwise.
+        virtual bool TryGetAttachmentDataFormat(std::wstring* data_format) = 0;
+
+        /// Attempts to get the specified tag, parsed as a double, from the sub-block metadata.
+        /// The data is retrieved from the node "METADATA/Tags/<tag-name>".
+        ///
+        /// \param 		   	tag_name	The tag name.
+        /// \param [in,out]	value   	If non-null, the value is put here
+        ///
+        /// \returns	True if it succeeds; false otherwise.
+        virtual bool TryGetTagAsDouble(const std::wstring& tag_name, double* value) = 0;
+
+        /// Attempts to get the content of the specified tag from the sub-block metadata.
+        /// The data is retrieved from the node "METADATA/Tags/<tag-name>".
+        ///
+        /// \param 		   	tag_name	The tag name.
+        /// \param [in,out]	value   	If non-null, the content is put here
+        ///
+        /// \returns	True if it succeeds; false otherwise.
+        virtual bool TryGetTagAsString(const std::wstring& tag_name, std::wstring* value) = 0;
+
+        /// Attempts to get "stage position" from the sub-block metadata.
+        /// This information is retrieved from the node "METADATA/Tags/StageXPosition" and "METADATA/Tags/StageYPosition".
+        /// Note that X and Y need to be present in order to have this function return true.
+        ///
+        /// \param [in,out]	stage_position	If non-null, the stage position is put here.
+        ///
+        /// \returns	True if it succeeds; false otherwise.
+        virtual bool TryGetStagePositionFromTags(std::tuple<double, double>* stage_position) = 0;
+
+        // Delete copy constructor and copy assignment operator
+        ISubBlockMetadataMetadataView(const ISubBlockMetadataMetadataView&) = delete;
+        ISubBlockMetadataMetadataView& operator=(const ISubBlockMetadataMetadataView&) = delete;
+        // Delete move constructor and move assignment operator
+        ISubBlockMetadataMetadataView(ISubBlockMetadataMetadataView&&) = delete;
+        ISubBlockMetadataMetadataView& operator=(ISubBlockMetadataMetadataView&&) = delete;
+    };
+
+    /// This interface is providing access to the sub-block metadata at XML-level via the IXmlNodeRead interface.
+    /// Also, it has typed access to the metadata via the ISubBlockMetadataMetadataView interface.
+    class LIBCZI_API ISubBlockMetadata : public IXmlNodeRead, public ISubBlockMetadataMetadataView
+    {
+    public:
+        ISubBlockMetadata() = default;
+        ~ISubBlockMetadata() override = default;
+
+        /// Query if the sub-block metadata is well-formed and valid XML (and was parsed successfully).
+        /// \returns	True if the XML is valid, false if not.
+        virtual bool IsXmlValid() const = 0;
+
+        /// Gets the sub-block metadata as an unprocessed UTF8-encoded XML-string.
+        /// \returns	The XML.
+        virtual std::string GetXml() const = 0;
+
+        // Delete copy constructor and copy assignment operator
+        ISubBlockMetadata(const ISubBlockMetadata&) = delete;
+        ISubBlockMetadata& operator=(const ISubBlockMetadata&) = delete;
+
+        // Delete move constructor and move assignment operator
+        ISubBlockMetadata(ISubBlockMetadata&&) = delete;
+        ISubBlockMetadata& operator=(ISubBlockMetadata&&) = delete;
+    };
+
+    /// The data structure "Mask Info" (as found in the sub-block attachment of type "chunkstore") which describes
+    /// a valid pixel mask.
+    struct SubBlockAttachmentMaskInfoGeneral
+    {
+        std::uint32_t width;	///< The width of the mask in pixels.
+        std::uint32_t height;   ///< The height of the mask in pixels.
+        std::uint32_t type_of_representation;   ///< The type of representation of the mask data (in the blob given by 'data' below).
+                                                ///< Currently, the only defined type is: 
+                                                ///< 0 : uncompressed bitonal bitmap.
+        size_t size_data;                       ///< The size of the data blob (in bytes).
+        std::shared_ptr<const void> data;       ///< The actual data blob representing the mask.
+    };
+
+    /// This data structure represents the valid pixel mask as an uncompressed bitonal bitmap (i.e. if the field 'type_of_representation' is 0).
+    struct SubBlockAttachmentMaskInfoUncompressedBitonalBitmap
+    {
+        std::uint32_t width;    ///< The width of the mask in pixels.
+        std::uint32_t height;   ///< The height of the mask in pixels.
+        std::uint32_t stride;   ///< The stride of the bitonal bitmap (in bytes).
+        size_t size_data;       ///< The size of the data blob (in bytes) which contains an uncompressed bitonal bitmap.
+        std::shared_ptr<const void> data; ///< The actual data blob representing the uncompressed bitonal bitmap.
+    };
+
+    /// This interface provides access to the attachment of a sub-block.
+    class LIBCZI_API ISubBlockAttachmentAccessor
+    {
+    public:
+        /// For each chunk in a chunk container, this struct provides information about the chunk.
+        struct ChunkInfo
+        {
+            libCZI::GUID  guid;   ///< The Guid identifying the chunk.
+            std::uint32_t offset; ///< The offset of the chunk in the attachment.
+            std::uint32_t size;   ///< The size of the chunk in bytes.
+        };
+
+        ISubBlockAttachmentAccessor() = default;
+        virtual ~ISubBlockAttachmentAccessor() = default;
+        ISubBlockAttachmentAccessor(const ISubBlockAttachmentAccessor&) = delete;
+        void operator=(const ISubBlockAttachmentAccessor&) = delete;
+        ISubBlockAttachmentAccessor(ISubBlockAttachmentAccessor&&) = delete;
+        ISubBlockAttachmentAccessor& operator=(ISubBlockAttachmentAccessor&&) = delete;
+
+        /// Gets access to the sub block metadata object (for the sub-block this attachment belongs to).
+        ///
+        /// \returns	The sub block metadata object.
+        virtual std::shared_ptr<libCZI::ISubBlockMetadata> GetSubBlockMetadata() = 0;
+
+        /// Query if the attachment is a chunk container.
+        ///
+        /// \returns	True if the attachment is a chunk container, false if not.
+        virtual bool HasChunkContainer() const = 0;
+
+        /// Enumerate chunks in the chunk container (provided the attachment is a chunk container).
+        ///
+        /// \param 	functor_enum	The functor that will be called for each chunk. The functor takes two parameters:
+        /// 						the index of the chunk (starting with 0) and a ChunkInfo-structure containing information about the chunk.
+        ///
+        /// \returns	True if at least one chunk was found, false if no chunks were found (and the functor called at least once).
+        virtual bool EnumerateChunksInChunkContainer(const std::function<bool(int index, const ChunkInfo& info)>& functor_enum) const = 0;
+
+        /// Gets the valid pixel mask information from the chunk container (provided the attachment is a chunk container and contains a valid pixel mask).
+        virtual libCZI::SubBlockAttachmentMaskInfoGeneral GetValidPixelMaskFromChunkContainer() const = 0;
+
+        /// Gets the "valid pixel mask as an uncompressed bitonal bitmap" information (provided the attachment is a chunk container 
+        /// and contains a valid pixel mask and used representation type '0').
+        ///
+        /// \returns	The "valid pixel mask as uncompressed bitonal bitmap" information.
+        libCZI::SubBlockAttachmentMaskInfoUncompressedBitonalBitmap GetValidPixelMaskAsUncompressedBitonalBitmap() const
+        {
+            return libCZI::ISubBlockAttachmentAccessor::GetValidPixelMaskAsUncompressedBitonalBitmap(this);
+        }
+
+        /// Gets a bitonal bitmap created from the mask information (provided the attachment contains mask information of type '0' - i.e. uncompressed bitonal bitmap).
+        ///
+        /// \returns	The bitonal bitmap representing the valid pixel mask.
+        std::shared_ptr<libCZI::IBitonalBitmapData> CreateBitonalBitmapFromMaskInfo() const
+        {
+            return libCZI::ISubBlockAttachmentAccessor::CreateBitonalBitmapFromMaskInfo(this);
+        }
+
+        /// Gets the valid pixel mask as an uncompressed bitonal bitmap (static version, taking an accessor as argument).
+        ///
+        /// \param 	accessor	The accessor.
+        ///
+        /// \returns	The "valid pixel mask as uncompressed bitonal bitmap" information.
+        static SubBlockAttachmentMaskInfoUncompressedBitonalBitmap GetValidPixelMaskAsUncompressedBitonalBitmap(const ISubBlockAttachmentAccessor* accessor);
+
+        /// Gets a bitonal bitmap created from the mask information (provided the attachment contains mask information of type '0' - i.e. uncompressed bitonal bitmap).
+        /// This is the static version, taking an accessor as argument.
+        ///
+        /// \param 	accessor	The accessor.
+        ///
+        /// \returns	The bitonal bitmap representing the valid pixel mask.
+        static std::shared_ptr<libCZI::IBitonalBitmapData> CreateBitonalBitmapFromMaskInfo(const ISubBlockAttachmentAccessor* accessor);
+    };
+
+
+} // namespace libCZI

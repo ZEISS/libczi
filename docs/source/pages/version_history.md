@@ -48,3 +48,4 @@ Version history
  0.66.5             | [146](https://github.com/ZEISS/libczi/pull/146)      | have jxrlib-symbols mangled to prevent conflicts with other libraries
  0.66.6             | [149](https://github.com/ZEISS/libczi/pull/149)      | prepare for vcpkg features
  0.66.7             | [151](https://github.com/ZEISS/libczi/pull/151)      | fix for missing tiles with scaling compositor in rare circumstances
+ 0.67.0             | [153](https://github.com/ZEISS/libczi/pull/153)	   | add mask support
