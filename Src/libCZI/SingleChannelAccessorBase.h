@@ -14,7 +14,8 @@ protected:
 
     explicit CSingleChannelAccessorBase(const std::shared_ptr<libCZI::ISubBlockRepository>& sbBlkRepository)
         : sbBlkRepository(sbBlkRepository)
-    {}
+    {
+    }
 
     bool TryGetPixelType(const libCZI::IDimCoordinate* planeCoordinate, libCZI::PixelType& pixeltype);
 
@@ -94,15 +95,15 @@ protected:
     ///   pixel operations during composition or rendering.
     /// - When using cache with mask awareness, both bitmap and mask are cached together.
     ///
-    /// \param  sbBlkRepository                 The subblock repository to read from. Must be valid.
+    /// \param  sub_block_repository            The subblock repository to read from. Must be valid.
     /// \param  cache                           Optional cache for storing/retrieving decoded subblock data.
     ///                                         If nullptr, no caching is performed.
-    /// \param  subBlockIndex                   Zero-based index of the subblock to retrieve. Must be valid
+    /// \param  sub_block_index                 Zero-based index of the subblock to retrieve. Must be valid
     ///                                         within the repository's range.
-    /// \param  onlyAddCompressedSubBlockToCache When true and cache is provided, only compressed subblocks
-    ///                                         are added to the cache. Uncompressed subblocks are not cached
-    ///                                         to avoid unnecessary memory usage for data that doesn't benefit
-    ///                                         significantly from caching.
+    /// \param  only_add_compressed_sub_blocks_to_cache When true and cache is provided, only compressed subblocks
+    ///                                                 are added to the cache. Uncompressed subblocks are not cached
+    ///                                                 to avoid unnecessary memory usage for data that doesn't benefit
+    ///                                                 significantly from caching.
     /// \param  mask_aware_mode                 When true, attempts to extract and include mask information
     ///                                         from the subblock's attachment data. When false, the mask
     ///                                         field in the returned data will be nullptr.
@@ -121,10 +122,10 @@ protected:
     /// \remarks This method is thread-safe when used with appropriate cache implementations.
     ///          The returned bitmap and mask objects are independent and can be used concurrently.
     static SubBlockData GetSubBlockDataIncludingMaskForSubBlockIndex(
-        const std::shared_ptr<libCZI::ISubBlockRepository>& sbBlkRepository,
+        const std::shared_ptr<libCZI::ISubBlockRepository>& sub_block_repository,
         const std::shared_ptr<libCZI::ISubBlockCacheOperation>& cache,
-        int subBlockIndex,
-        bool onlyAddCompressedSubBlockToCache,
+        int sub_block_index,
+        bool only_add_compressed_sub_blocks_to_cache,
         bool mask_aware_mode);
 
     static std::shared_ptr<libCZI::IBitonalBitmapData> TryToGetMaskBitmapFromSubBlock(const std::shared_ptr<libCZI::ISubBlock>& sub_block);
