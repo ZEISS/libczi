@@ -4,7 +4,7 @@
 Introduction
 ------------
 
-The term *valid-pixel mask* (or simply *mask*) refers to a binary bitmap that marks which pixels in a sub-block are valid and which are not.
+The term *valid-pixel mask* (or simply *mask*) refers to a binary bitmap that marks which pixels are in a sub-block are valid and which are not.
 A sub-block in a CZI document is always rectangular and cannot directly indicate invalid pixels within the rectangle. Therefore, it is not
 possible to represent non-rectangular images directly. The valid-pixel mask overcomes this limitation.
 
