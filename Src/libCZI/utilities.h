@@ -140,7 +140,9 @@ public:
 
     static void ConvertInt16ToHostByteOrder(std::int16_t* p);
     static void ConvertInt32ToHostByteOrder(std::int32_t* p);
+    static void ConvertUint32ToHostByteOrder(std::uint32_t* p) { ConvertInt32ToHostByteOrder(reinterpret_cast<int32_t*>(p)); }
     static void ConvertInt64ToHostByteOrder(std::int64_t* p);
+    static void ConvertUint64ToHostByteOrder(std::uint64_t* p) { ConvertInt64ToHostByteOrder(reinterpret_cast<int64_t*>(p)); }
     static void ConvertGuidToHostByteOrder(libCZI::GUID* p);
 
     static bool TryGetRgb8ColorFromString(const std::wstring& strXml, libCZI::Rgb8Color& color);

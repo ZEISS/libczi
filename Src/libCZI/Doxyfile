@@ -959,7 +959,9 @@ INPUT                  = ./libCZI.h \
                          ./libCZI_Write.h \
                          ./libCZI_ReadWrite.h \
                          ./libCZI_compress.h \
-                         ./libCZI_StreamsLib.h
+                         ./libCZI_StreamsLib.h \
+                         ./libCZI_SubBlock.h \
+                         ./libCZI_Helpers.h
 
 # This tag can be used to specify the character encoding of the source files
 # that doxygen parses. Internally doxygen uses the UTF-8 encoding. Doxygen uses

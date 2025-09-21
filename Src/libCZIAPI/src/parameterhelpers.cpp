@@ -612,6 +612,21 @@ std::string ParameterHelpers::trim(const std::string& str, const std::string& wh
     single_channel_tile_accessor_options.sortByM = options->sort_by_m;
     single_channel_tile_accessor_options.useVisibilityCheckOptimization = options->use_visibility_check_optimization;
 
+    if (options->additional_parameters != nullptr)
+    {
+        rapidjson::Document document;
+        document.Parse(options->additional_parameters);
+        if (!document.HasParseError() && document.IsObject())
+        {
+            static const char* kKeyMaskAware = "mask_aware";
+            const auto it = document.FindMember(kKeyMaskAware);
+            if (it != document.MemberEnd() && it->value.IsBool())
+            {
+                single_channel_tile_accessor_options.maskAware = it->value.GetBool();
+            }
+        }
+    }
+
     return single_channel_tile_accessor_options;
 }
 

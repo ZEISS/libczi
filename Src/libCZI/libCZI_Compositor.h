@@ -107,15 +107,45 @@ namespace libCZI
     class ISubBlockCacheOperation
     {
     public:
-        /// Gets the bitmap for the specified subblock-index. If the subblock is not in the cache, then a nullptr is returned.
+        /// This struct defines the information which we maintain in the cache. It contains the bitmap and optionally
+        /// a mask. The bitmap is always present, the mask may be a nullptr.
+        struct CacheItem
+        {
+            /// Default constructor.
+            CacheItem() = default;
+
+            /// Constructor taking only the bitmap.
+            ///
+            /// \param 	bitmap	The bitmap.
+            CacheItem(std::shared_ptr<IBitmapData> bitmap) : bitmap(std::move(bitmap)) {}
+
+            /// Constructor taking the bitmap and the mask.
+            ///
+            /// \param 	bitmap	The bitmap.
+            /// \param 	mask  	The mask.
+            CacheItem(std::shared_ptr<IBitmapData> bitmap, std::shared_ptr<IBitonalBitmapData> mask) : bitmap(std::move(bitmap)), mask(std::move(mask)) {}
+
+            std::shared_ptr<IBitmapData> bitmap;	    ///< The bitmap.
+            std::shared_ptr<IBitonalBitmapData> mask;	///< The bitonal mask.
+
+            /// Query if this object is valid (i.e. contains a valid bitmap).
+            ///
+            /// \returns	True if valid, false if not.
+            bool IsValid() const
+            {
+                return static_cast<bool>(this->bitmap);
+            }
+        };
+
+        /// Gets the bitmap for the specified subblock-index. If the subblock is not in the cache, then an invalid CacheItem is returned.
         /// \param  subblock_index  The subblock index to get.
-        /// \returns    If the subblock is in the cache, then a std::shared_ptr&lt;libCZI::IBitmapData&gt; is returned. Otherwise a nullptr is returned.
-        virtual std::shared_ptr<IBitmapData> Get(int subblock_index) = 0;
+        /// \returns    If the subblock is in the cache, then a valid CacheItem is returned, otherwise an invalid CacheItem (i.e. CacheItem::IsValid() returns false).
+        virtual CacheItem Get(int subblock_index) = 0;
 
         /// Adds the specified bitmap for the specified subblock_index to the cache. If the subblock is already in the cache, then it is overwritten.
         /// \param  subblock_index  The subblock index to add.
-        /// \param  pBitmap         The bitmap.
-        virtual void Add(int subblock_index, std::shared_ptr<IBitmapData> pBitmap) = 0;
+        /// \param  cache_item      The cache item to be added.
+        virtual void Add(int subblock_index, const CacheItem& cache_item) = 0;
 
         virtual ~ISubBlockCacheOperation() = default;
 
@@ -131,7 +161,7 @@ namespace libCZI
     ///   to a cache object, where the subblock-index is the key.
     /// * Whenever a bitmap is needed (for a given subblock-index), the cache object is first queried whether it contains the bitmap. If yes, then the bitmap  
     ///   returned may be used instead of executing the subblock-read-and-decode operation.
-    /// In order to control the memory usage of the cache, the cache object must be pruned (i.e. subblocks are removed from the cache). Currently this means,
+    /// In order to control the memory usage of the cache, the cache object must be pruned (i.e. subblocks are removed from the cache). Currently, this means,
     /// that the Prune-method must be called manually. The cache object does not do any pruning automatically.
     /// The operations of Adding, Querying and Pruning the cache object are thread-safe.
     class ISubBlockCache : public ISubBlockCacheStatistics, public ISubBlockCacheControl, public ISubBlockCacheOperation
@@ -146,7 +176,7 @@ namespace libCZI
         ISubBlockCache& operator=(ISubBlockCache&&) noexcept = delete;
     };
 
-    /// The base interface (all accessor-interface must derive from this).
+    /// The base interface (all accessor interfaces must derive from this).
     class IAccessor
     {
     protected:
@@ -207,6 +237,9 @@ namespace libCZI
             /// increased memory usage.
             bool onlyUseSubBlockCacheForCompressedData;
 
+            /// If true, then masks (if present) are taken into account when composing the tile-composite.
+            bool maskAware;
+
             /// Clears this object to its blank state.
             void Clear()
             {
@@ -217,6 +250,7 @@ namespace libCZI
                 this->sceneFilter.reset();
                 this->subBlockCache.reset();
                 this->onlyUseSubBlockCacheForCompressedData = true;
+                this->maskAware = false;
             }
         };
 
@@ -359,6 +393,9 @@ namespace libCZI
             /// If true, then only bitmaps from sub-blocks with compressed data are added to the cache.
             bool onlyUseSubBlockCacheForCompressedData;
 
+            /// If true, then masks (if present) are taken into account when composing the tile-composite.
+            bool maskAware;
+
             /// Clears this object to its blank state.
             void Clear()
             {
@@ -368,6 +405,7 @@ namespace libCZI
                 this->sceneFilter.reset();
                 this->subBlockCache.reset();
                 this->onlyUseSubBlockCacheForCompressedData = true;
+                this->maskAware = false;
             }
         };
 
@@ -492,6 +530,9 @@ namespace libCZI
             /// If true, then only bitmaps from sub-blocks with compressed data are added to the cache.
             bool onlyUseSubBlockCacheForCompressedData;
 
+            /// If true, then masks (if present) are taken into account when composing the tile-composite.
+            bool maskAware;
+
             /// Clears this object to its blank state.
             void Clear()
             {
@@ -500,6 +541,7 @@ namespace libCZI
                 this->backGroundColor.r = this->backGroundColor.g = this->backGroundColor.b = std::numeric_limits<float>::quiet_NaN();
                 this->sceneFilter.reset();
                 this->useVisibilityCheckOptimization = false;
+                this->maskAware = false;
                 this->subBlockCache.reset();
                 this->onlyUseSubBlockCacheForCompressedData = true;
             }
@@ -614,6 +656,32 @@ namespace libCZI
         /// \param pOptions         Options for controlling the operation. This argument is optional (may be nullptr).
         static void ComposeSingleChannelTiles(
             const std::function<bool(int index, std::shared_ptr<libCZI::IBitmapData>& src, int& x, int& y)>& getTiles,
+            libCZI::IBitmapData* dest,
+            int xPos,
+            int yPos,
+            const ComposeSingleTileOptions* pOptions);
+
+        /// Composes a set of tiles (which are retrieved by calling the getTiles-functor) in the
+        /// following way: The destination bitmap is taken to be positioned at (xPos,yPos) - which
+        /// specifies the top-left corner. The tiles (retrieved from the functor) are positioned at the
+        /// coordinate as reported by the functor-call. Then the intersection area of source and
+        /// destination is copied to the destination bitmap. If the intersection is empty, then nothing
+        /// is copied. If a mask is provided for a tile, then the mask is taken into account when
+        /// copying the tile to the destination bitmap. In this case, only those pixels are copied
+        /// which are set in the mask. If no mask is provided (i.e. the pointer is null), then all pixels of the tile are copied.
+        /// If the width/height of the mask does not match the width/height of the tile, the following rules apply:
+        /// - If the mask is smaller than the tile, then only that area of the tile is considered which is covered by the mask.  
+        /// - If the mask is larger than the tile, then the exceeding area of the mask is ignored.
+        /// \param getTilesAndMask [in]     The functor which is called in order to retrieve the tiles (and the respective mask) to compose. The second and
+        ///                                 the third parameter specify the x- and y-position of this tile. The mask is optional.
+        ///                                 We address a tile with the parameter index. If the index is out-of-range, then this functor
+        ///                                 is expected to return false.
+        /// \param dest [in,out]    The destination bitmap.
+        /// \param xPos             The x-coordinate of the top-left of the destination bitmap.
+        /// \param yPos             The y-coordinate of the top-left of the destination bitmap.
+        /// \param pOptions         Options for controlling the operation. This argument is optional (may be nullptr).
+        static void ComposeSingleChannelTilesMaskAware(
+            const std::function<bool(int index, std::shared_ptr<libCZI::IBitmapData>& src, std::shared_ptr<libCZI::IBitonalBitmapData>& srcMask, int& x, int& y)>& getTilesAndMask,
             libCZI::IBitmapData* dest,
             int xPos,
             int yPos,

@@ -1,171 +1,56 @@
-// SPDX-FileCopyrightText: 1991-2 RSA Data Security, Inc.
+// SPDX-FileCopyrightText: 2025 Carl Zeiss Microscopy GmbH
 //
-// SPDX-License-Identifier: RSA-MD
+// SPDX-License-Identifier: LGPL-3.0-or-later
 
 #pragma once
+
+#include <cstddef>
 #include <cstdint>
 
-/* Copyright (C) 1991-2, RSA Data Security, Inc. Created 1991. All rights reserved.
-
-License to copy and use this software is granted provided that it
-is identified as the "RSA Data Security, Inc. MD5 Message-Digest
-Algorithm" in all material mentioning or referencing this software
-or this function.
-
-License is also granted to make and use derivative works provided
-that such works are identified as "derived from the RSA Data
-Security, Inc. MD5 Message-Digest Algorithm" in all material
-mentioning or referencing the derived work.
-
-RSA Data Security, Inc. makes no representations concerning either
-the merchantability of this software or the suitability of this
-software for any particular purpose. It is provided "as is"
-without express or implied warranty of any kind.
-
-These notices must be retained in any copies of any part of this
-documentation and/or software.
-*/
-
-class CMd5Sum {
-
-public:
-
-    CMd5Sum();										// init
-
-    void update(const void* pData, size_t dwSize);
-    void complete();
-    void getHash(char* pHash);
-
+/// A simplistic implementation of the MD5 hash algorithm.
+/// The implementation is derived from the public domain (licensed under the "Unlicense license") MD5 implementation https://github.com/galenguyer/md5.
+/// The mode of operation is:
+/// * Initialize the MD5 context with `CMd5Sum()`  
+/// * Add data to the MD5 context with `update(const void* buffer, size_t buffer_size)` (as many times as needed)  
+/// * Call `complete()` to finalize the MD5 context and compute the hash  
+/// * Call `getHash(char* pHash)` to retrieve the computed MD5 hash as a 16 byte binary data blob.
+class CMd5Sum
+{
 private:
+    constexpr static size_t MD5_HASH_SIZE = 16;
 
-    void MD5Update(unsigned char* input, size_t inputLen);
-    void MD5Final(unsigned char* digest);
-    void MD5_init();
-
-    // private types.
-    typedef unsigned char* POINTER;
-    typedef std::uint16_t      UINT2;
-    typedef std::uint32_t      UINT4;
-
-    // MD5 context.
-    UINT4 m_state[4];							// state (ABCD)
-    UINT4 m_count[2];							// number of bits, modulo 2^64 (lsb first)
-    unsigned char m_buffer[64];					// input buffer
-
-    // MD5
-    unsigned char m_digest[16];					// message digest.
-
-    bool m_complete;
-
-    enum {										// Constants for MD5Transform routine.
-        S11 = 7,
-        S12 = 12,
-        S13 = 17,
-        S14 = 22,
-        S21 = 5,
-        S22 = 9,
-        S23 = 14,
-        S24 = 20,
-        S31 = 4,
-        S32 = 11,
-        S33 = 16,
-        S34 = 23,
-        S41 = 6,
-        S42 = 10,
-        S43 = 15,
-        S44 = 21
+    struct md5_context
+    {
+        // state
+        std::uint32_t a;
+        std::uint32_t b;
+        std::uint32_t c;
+        std::uint32_t d;
+        // number of bits, modulo 2^64 (lsb first)
+        std::uint32_t count[2];
+        // input buffer
+        std::uint8_t input[64];
+        // current block
+        std::uint32_t block[16];
     };
 
-    void MD5Transform(unsigned char* block);
-    static void Encode(unsigned char* output, const UINT4* input, size_t len);
-    static void Decode(UINT4* output, unsigned char* input, size_t len);
+    struct md5_digest
+    {
+        std::uint8_t bytes[MD5_HASH_SIZE];
+    };
 
-    // Note: Replace "for loop" with standard memXXX if possible.
-    static inline void MD5_memcpy(POINTER output, POINTER input, size_t len);
-    static inline void MD5_memset(POINTER output, int value, size_t len);
+    md5_context ctx_;
+    md5_digest digest_;
+public:
+    CMd5Sum();
+    void update(const void* buffer, size_t buffer_size);
+    void complete();
 
-    static unsigned char PADDING[64];
-
-    // F, G, H and I are basic MD5 functions.
-    static inline UINT4 F(UINT4 X, UINT4 Y, UINT4 Z);
-    static inline UINT4 G(UINT4 X, UINT4 Y, UINT4 Z);
-    static inline UINT4 H(UINT4 X, UINT4 Y, UINT4 Z);
-    static inline UINT4 I(UINT4 X, UINT4 Y, UINT4 Z);
-
-    // ROTATE_LEFT rotates x left n bits.
-    static inline UINT4 ROTATE_LEFT(UINT4 x, UINT4 n);
-
-    // FF, GG, HH, and II transformations for rounds 1, 2, 3, and 4.
-    // Rotation is separate from addition to prevent recomputation.
-    static inline void FF(UINT4& a, UINT4 b, UINT4 c, UINT4 d, UINT4 x, UINT4 s, UINT4 ac);
-    static inline void GG(UINT4& a, UINT4 b, UINT4 c, UINT4 d, UINT4 x, UINT4 s, UINT4 ac);
-    static inline void HH(UINT4& a, UINT4 b, UINT4 c, UINT4 d, UINT4 x, UINT4 s, UINT4 ac);
-    static inline void II(UINT4& a, UINT4 b, UINT4 c, UINT4 d, UINT4 x, UINT4 s, UINT4 ac);
+    /// Copy the resulting MD5 hash into the specified buffer. The buffer must be at least 16 bytes long.
+    ///
+    /// \param	    pHash	Pointer to a buffer where the MD5 hash will be copied. The hash code is 16 bytes long,
+    /// 					and the destination buffer must therefore be at least 16 bytes long.
+    void getHash(char* pHash);
+private:
+    static const std::uint8_t* md5_transform(md5_context* ctx, const void* data, std::uintmax_t size);
 };
-
-
-
-inline CMd5Sum::UINT4 CMd5Sum::F(CMd5Sum::UINT4 X, CMd5Sum::UINT4 Y, CMd5Sum::UINT4 Z)
-{
-    return (X & Y) | (~X & Z);
-}
-
-inline CMd5Sum::UINT4 CMd5Sum::G(CMd5Sum::UINT4 X, CMd5Sum::UINT4 Y, CMd5Sum::UINT4 Z)
-{
-    return (X & Z) | (Y & ~Z);
-}
-
-inline CMd5Sum::UINT4 CMd5Sum::H(CMd5Sum::UINT4 X, CMd5Sum::UINT4 Y, CMd5Sum::UINT4 Z)
-{
-    return X ^ Y ^ Z;
-}
-
-inline CMd5Sum::UINT4 CMd5Sum::I(CMd5Sum::UINT4 X, CMd5Sum::UINT4 Y, CMd5Sum::UINT4 Z)
-{
-    return Y ^ (X | ~Z);
-}
-
-inline CMd5Sum::UINT4 CMd5Sum::ROTATE_LEFT(CMd5Sum::UINT4 x, CMd5Sum::UINT4 n)
-{
-    return ((x << n) | (x >> (32 - n)));
-}
-
-inline void CMd5Sum::FF(CMd5Sum::UINT4& a, CMd5Sum::UINT4 b, CMd5Sum::UINT4 c, CMd5Sum::UINT4 d, CMd5Sum::UINT4 x, CMd5Sum::UINT4 s, CMd5Sum::UINT4 ac)
-{
-    a += F(b, c, d) + x + ac;
-    a = ROTATE_LEFT(a, s);
-    a += b;
-}
-
-inline void CMd5Sum::GG(CMd5Sum::UINT4& a, CMd5Sum::UINT4 b, CMd5Sum::UINT4 c, CMd5Sum::UINT4 d, CMd5Sum::UINT4 x, CMd5Sum::UINT4 s, CMd5Sum::UINT4 ac)
-{
-    a += G(b, c, d) + x + ac;
-    a = ROTATE_LEFT(a, s);
-    a += (b);
-}
-
-inline void CMd5Sum::HH(CMd5Sum::UINT4& a, CMd5Sum::UINT4 b, CMd5Sum::UINT4 c, CMd5Sum::UINT4 d, CMd5Sum::UINT4 x, CMd5Sum::UINT4 s, CMd5Sum::UINT4 ac)
-{
-    a += H(b, c, d) + x + ac;
-    a = ROTATE_LEFT(a, s);
-    a += b;
-}
-
-inline void CMd5Sum::II(CMd5Sum::UINT4& a, CMd5Sum::UINT4 b, CMd5Sum::UINT4 c, CMd5Sum::UINT4 d, CMd5Sum::UINT4 x, CMd5Sum::UINT4 s, CMd5Sum::UINT4 ac)
-{
-    a += I(b, c, d) + x + ac;
-    a = ROTATE_LEFT(a, s);
-    a += b;
-}
-
-inline void CMd5Sum::MD5_memcpy(CMd5Sum::POINTER output, CMd5Sum::POINTER input, size_t len)
-{
-    memcpy(output, input, len);
-}
-
-inline void CMd5Sum::MD5_memset(CMd5Sum::POINTER output, int value, size_t len)
-{
-    memset(output, value, len);
-}
-
-

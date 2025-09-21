@@ -65,6 +65,8 @@ namespace libCZI
     class ISubBlockRepository;
     class IAttachment;
     class ISubBlockCache;
+    class ISubBlockMetadata;
+    class ISubBlockAttachmentAccessor;
 
     /// This structure contains information about the compiler settings and the version of the source
     /// which was used to create the library.
@@ -212,6 +214,24 @@ namespace libCZI
     /// \return The newly created metadata-builder-object.
     LIBCZI_API std::shared_ptr<ICziMetadataBuilder> CreateMetadataBuilderFromXml(const std::string& xml);
 
+    /// Creates a sub-block metadata object from the specified sub-block. This can be used for typed access to the
+    /// sub-block metadata (if present).
+    /// \param 	sub_block	The sub block.
+    /// \returns	The newly created sub-block metadata object for accessing metadata of the specified sub-block.
+    LIBCZI_API std::shared_ptr<ISubBlockMetadata> CreateSubBlockMetadataFromSubBlock(const libCZI::ISubBlock* sub_block);
+
+    /// Creates sub-block-attachment-accessor object for accessing attachments of a sub-block. Note that this version
+    /// accepts an existing sub-block metadata object. If such an object is already available, then it can be passed in
+    /// here and reused. However - in this case it is the caller's responsibility to ensure that the metadata object passed in
+    /// is actually the correct one for the sub-block passed in.
+    ///
+    /// \param 	sub_block		  	The sub-block.
+    /// \param 	sub_block_metadata	The sub-block-metadata object (which must correspond the sub-block passed in as first argument). If this
+    /// 							is null, then a new sub-block metadata object will be created internally.
+    ///
+    /// \returns	The newly created sub-block-attachment-accessor object.
+    LIBCZI_API std::shared_ptr<ISubBlockAttachmentAccessor> CreateSubBlockAttachmentAccessor(const std::shared_ptr<libCZI::ISubBlock>& sub_block, const std::shared_ptr<ISubBlockMetadata>& sub_block_metadata);
+
     /// Interface used for accessing the data-stream.  
     /// Implementations of this interface are expected to be thread-safe - it should be possible to
     /// call the Read-method from multiple threads simultaneously.
@@ -352,7 +372,7 @@ namespace libCZI
         /// \param type             The type.
         /// \param [out] ptrSize    If non-null, size of the data buffer is stored here.
         /// \return The raw data.
-        virtual std::shared_ptr<const void> GetRawData(MemBlkType type, size_t* ptrSize) = 0;
+        virtual std::shared_ptr<const void> GetRawData(MemBlkType type, size_t* ptrSize) const = 0;
 
         /// Creates a bitmap (from the data of this sub-block).
         /// \remark
@@ -851,3 +871,4 @@ namespace libCZI
 #include "libCZI_Helpers.h"
 #include "libCZI_Write.h"
 #include "libCZI_ReadWrite.h"
+#include "libCZI_SubBlock.h"

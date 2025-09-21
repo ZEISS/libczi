@@ -26,6 +26,7 @@
 //
 //*@@@---@@@@******************************************************************
 
+#include "../../common/include/jxrlib_symbol_mangle.h"
 #include "../sys/strcodec.h"
 #include "decode.h"
 #include <JxrDecode_Config.h>
@@ -50,9 +51,9 @@
  #define CAN_USE_ROTL 0
 #endif
 
-extern const int dctIndex[3][16];
-extern const int blkOffset[16];
-extern const int blkOffsetUV[4];
+extern const int JXRLIB_API(dctIndex)[3][16];
+extern const int JXRLIB_API(blkOffset)[16];
+extern const int JXRLIB_API(blkOffsetUV)[4];
 static Int DecodeSignificantAbsLevel(struct CAdaptiveHuffman* pAHexpt, BitIOInfo* pIO);
 
 #define _FORCEINLINE inline
@@ -120,17 +121,17 @@ static _FORCEINLINE U32 _getBit16(BitIOInfo* pIO, U32 cBits)
 /***********************************************************************************************************
   Huffman decode (input is a fully built Huffman table)
 ***********************************************************************************************************/
-Int getHuff(const short* pDecodeTable, BitIOInfo* pIO)
+Int JXRLIB_API(getHuff)(const short* pDecodeTable, BitIOInfo* pIO)
 {
     Int iSymbol, iSymbolHuff;
-    iSymbol = pDecodeTable[peekBit16(pIO, HUFFMAN_DECODE_ROOT_BITS)];
+    iSymbol = pDecodeTable[JXRLIB_API(peekBit16)(pIO, HUFFMAN_DECODE_ROOT_BITS)];
 
-    flushBit16(pIO, iSymbol < 0 ? HUFFMAN_DECODE_ROOT_BITS : iSymbol & ((1 << HUFFMAN_DECODE_ROOT_BITS_LOG) - 1));
+    JXRLIB_API(flushBit16)(pIO, iSymbol < 0 ? HUFFMAN_DECODE_ROOT_BITS : iSymbol & ((1 << HUFFMAN_DECODE_ROOT_BITS_LOG) - 1));
     iSymbolHuff = iSymbol >> HUFFMAN_DECODE_ROOT_BITS_LOG;
 
     if (iSymbolHuff < 0) {
         iSymbolHuff = iSymbol;
-        while ((iSymbolHuff = pDecodeTable[iSymbolHuff + SIGN_BIT(pDecodeTable[0]) + getBit16(pIO, 1)]) < 0);
+        while ((iSymbolHuff = pDecodeTable[iSymbolHuff + SIGN_BIT(pDecodeTable[0]) + JXRLIB_API(getBit16)(pIO, 1)]) < 0);
     }
     return (iSymbolHuff);
 }
@@ -186,7 +187,7 @@ static _FORCEINLINE Int _getHuffShort(const short* pDecodeTable, BitIOInfo* pIO)
     Int iSymbol = pDecodeTable[_peekBit16(pIO, HUFFMAN_DECODE_ROOT_BITS)];
     assert(iSymbol >= 0);
     // for some strange reason, inlining flushBit doesn't work well
-    flushBit16(pIO, iSymbol & ((1 << HUFFMAN_DECODE_ROOT_BITS_LOG) - 1));
+    JXRLIB_API(flushBit16)(pIO, iSymbol & ((1 << HUFFMAN_DECODE_ROOT_BITS_LOG) - 1));
     return (iSymbol >> HUFFMAN_DECODE_ROOT_BITS_LOG);
 }
 /*************************************************************************
@@ -194,7 +195,7 @@ static _FORCEINLINE Int _getHuffShort(const short* pDecodeTable, BitIOInfo* pIO)
 *************************************************************************/
 static Int AdaptDecFixed(CAdaptiveHuffman* pAH)
 {
-    AdaptDiscriminant(pAH);
+    JXRLIB_API(AdaptDiscriminant)(pAH);
     return ICERR_OK;
 }
 
@@ -249,7 +250,7 @@ static Void DecodeCBP(CWMImageStrCodec* pSC, CCodingContext* pContext)
                 static const UInt gFLC0[] = { 0,2,1,2,2,0 };
                 static const UInt gOff0[] = { 0,4,2,8,12,1 };
                 static const UInt gOut0[] = { 0,15,3,12, 1,2,4,8, 5,6,9,10, 7,11,13,14 };
-                Int iNumBlockCBP = getHuff(pAHCBP->m_hufDecTable, pIO);
+                Int iNumBlockCBP = JXRLIB_API(getHuff)(pAHCBP->m_hufDecTable, pIO);
                 unsigned int val = (unsigned int)iNumBlockCBP + 1, iCode1;
 
                 pAHCBP->m_iDiscriminant += pAHCBP->m_pDelta[iNumBlockCBP];
@@ -380,7 +381,7 @@ static Int _FORCEINLINE DecodeSignificantRun(Int iMaxRun, struct CAdaptiveHuffma
 {
     Int iIndex;
     static const Int aRemap[] = { 1,2,3,5,7,   1,2,3,5,7,   /*1,2,3,4,6,  */1,2,3,4,5 };
-    Int iBin = gSignificantRunBin[iMaxRun];
+    Int iBin = JXRLIB_API(gSignificantRunBin)[iMaxRun];
     Int iRun = 0, iFLC = 0;
 
     if (iMaxRun < 5) {
@@ -401,7 +402,7 @@ static Int _FORCEINLINE DecodeSignificantRun(Int iMaxRun, struct CAdaptiveHuffma
     iIndex = _getHuffShort(pAHexpt->m_hufDecTable, pIO);
     iIndex += iBin * 5;
     iRun = aRemap[iIndex];
-    iFLC = gSignificantRunFixedLength[iIndex];
+    iFLC = JXRLIB_API(gSignificantRunFixedLength)[iIndex];
     if (iFLC) {
         iRun += _getBit16(pIO, iFLC);
     }
@@ -412,7 +413,7 @@ static _FORCEINLINE Void DecodeFirstIndex(Int* pIndex, struct CAdaptiveHuffman* 
     BitIOInfo* pIO)
 {
     Int iIndex;
-    iIndex = getHuff(pAHexpt->m_hufDecTable, pIO);
+    iIndex = JXRLIB_API(getHuff)(pAHexpt->m_hufDecTable, pIO);
     pAHexpt->m_iDiscriminant += pAHexpt->m_pDelta[iIndex];
     pAHexpt->m_iDiscriminant1 += pAHexpt->m_pDelta1[iIndex];
     *pIndex = iIndex;
@@ -657,7 +658,7 @@ static _FORCEINLINE Int DecodeCoeffs(CWMImageStrCodec* pSC, CCodingContext* pCon
     Int i, iBlock, iSubblock, iNBlocks = 4;
     Int iModelBits = pContext->m_aModelAC.m_iFlcBits[0];
     Int aLaplacianMean[2] = { 0, 0 }, * pLM = aLaplacianMean + 0;
-    const Int* pOrder = dctIndex[0];
+    const Int* pOrder = JXRLIB_API(dctIndex)[0];
     const Int iOrient = pSC->MBInfo.iOrientation;
     Bool bChroma = FALSE;
 
@@ -700,7 +701,7 @@ static _FORCEINLINE Int DecodeCoeffs(CWMImageStrCodec* pSC, CCodingContext* pCon
             iQP = (pSC->m_param.bTranscode ? 1 : pTile->pQuantizerHP[iPlanes > 1 ? i : (iBlock > 3 ? (cf == YUV_420 ? iBlock - 3 : iBlock / 2 - 1) : 0)][pSC->MBInfo.iQIndexHP].iQP);
 
             for (iSubblock = 0; iSubblock < 4; iSubblock++, iIndex++, iCBPCY >>= 1) {
-                pCoeffs = pSC->p1MBbuffer[i] + blkOffset[iIndex & 0xf];
+                pCoeffs = pSC->p1MBbuffer[i] + JXRLIB_API(blkOffset)[iIndex & 0xf];
 
                 //if (iBlock < 4) {//(cf == YUV_444) {
                     //bBlockNoSkip = ((iTempCBPC & (1 << iIndex1)) != 0);
@@ -709,10 +710,10 @@ static _FORCEINLINE Int DecodeCoeffs(CWMImageStrCodec* pSC, CCodingContext* pCon
                 //else {
                 if (iBlock >= 4) {
                     if (cf == YUV_420) {
-                        pCoeffs = pSC->p1MBbuffer[iBlock - 3] + blkOffsetUV[iSubblock];
+                        pCoeffs = pSC->p1MBbuffer[iBlock - 3] + JXRLIB_API(blkOffsetUV)[iSubblock];
                     }
                     else { // YUV_422
-                        pCoeffs = pSC->p1MBbuffer[1 + (1 & (iBlock >> 1))] + ((iBlock & 1) * 32) + blkOffsetUV_422[iSubblock];
+                        pCoeffs = pSC->p1MBbuffer[1 + (1 & (iBlock >> 1))] + ((iBlock & 1) * 32) + JXRLIB_API(blkOffsetUV_422)[iSubblock];
                     }
                 }
 
@@ -738,7 +739,7 @@ static _FORCEINLINE Int DecodeCoeffs(CWMImageStrCodec* pSC, CCodingContext* pCon
     }
 
     /** update model at end of MB **/
-    UpdateModelMB(cf, iChannels, aLaplacianMean, &(pContext->m_aModelAC));
+    JXRLIB_API(UpdateModelMB)(cf, iChannels, aLaplacianMean, &(pContext->m_aModelAC));
     return ICERR_OK;
 }
 
@@ -752,7 +753,7 @@ static _FORCEINLINE Int DecodeSignificantAbsLevel(struct CAdaptiveHuffman* pAHex
     static const Int aRemap[] = { 2, 3, 4, 6, 10, 14 };
     static const Int aFixedLength[] = { 0, 0, 1, 2, 2, 2 };
 
-    iIndex = (UInt)getHuff(pAHexpt->m_hufDecTable, pIO);
+    iIndex = (UInt)JXRLIB_API(getHuff)(pAHexpt->m_hufDecTable, pIO);
     assert(iIndex <= 6);
     pAHexpt->m_iDiscriminant += pAHexpt->m_pDelta[iIndex];
     if (iIndex < 2) {
@@ -771,13 +772,13 @@ static _FORCEINLINE Int DecodeSignificantAbsLevel(struct CAdaptiveHuffman* pAHex
             }
         }
         iLevel = 2 + (1 << iFixed);
-        iIndex = getBit32(pIO, iFixed);
+        iIndex = JXRLIB_API(getBit32)(pIO, iFixed);
         iLevel += iIndex;
     }
     return iLevel;
 }
 
-U8 decodeQPIndex(BitIOInfo* pIO, U8 cBits)
+U8 JXRLIB_API(decodeQPIndex)(BitIOInfo* pIO, U8 cBits)
 {
     if (_getBit16(pIO, 1) == 0)
         return 0;
@@ -787,7 +788,7 @@ U8 decodeQPIndex(BitIOInfo* pIO, U8 cBits)
 /*************************************************************************
     DecodeSecondStageCoeff
 *************************************************************************/
-Int DecodeMacroblockLowpass(CWMImageStrCodec* pSC, CCodingContext* pContext,
+Int JXRLIB_API(DecodeMacroblockLowpass)(CWMImageStrCodec* pSC, CCodingContext* pContext,
     Int iMBX, Int iMBYdummy)
 {
     const COLORFORMAT cf = pSC->m_param.cfColorFormat;
@@ -810,7 +811,7 @@ Int DecodeMacroblockLowpass(CWMImageStrCodec* pSC, CCodingContext* pContext,
 
     readIS_L1(pSC, pIO);
     if ((pSC->WMISCP.bfBitstreamFormat != SPATIAL) && (pSC->pTile[pSC->cTileColumn].cBitsLP > 0))  // MB-based LP QP index
-        pMBInfo->iQIndexLP = decodeQPIndex(pIO, pSC->pTile[pSC->cTileColumn].cBitsLP);
+        pMBInfo->iQIndexLP = JXRLIB_API(decodeQPIndex)(pIO, pSC->pTile[pSC->cTileColumn].cBitsLP);
 
     // set arrays
     for (k = 0; k < (Int)pSC->m_param.cNumChannels; k++) {
@@ -868,7 +869,7 @@ Int DecodeMacroblockLowpass(CWMImageStrCodec* pSC, CCodingContext* pContext,
     }
 
     if (pContext->m_aModelLP.m_iFlcBits[0] > 14 || pContext->m_aModelLP.m_iFlcBits[1] > 14) {
-        getBits = getBit32;
+        getBits = JXRLIB_API(getBit32);
     }
 
     for (iChannel = 0; iChannel < iFullPlanes; iChannel++) {
@@ -987,10 +988,10 @@ Int DecodeMacroblockLowpass(CWMImageStrCodec* pSC, CCodingContext* pContext,
         iCBP >>= 1;
     }
 
-    UpdateModelMB(cf, iChannels, aLaplacianMean, &(pContext->m_aModelLP));
+    JXRLIB_API(UpdateModelMB)(cf, iChannels, aLaplacianMean, &(pContext->m_aModelLP));
 
     if (pSC->m_bResetContext) {
-        AdaptLowpassDec(pContext);
+        JXRLIB_API(AdaptLowpassDec)(pContext);
     }
 
     return ICERR_OK;
@@ -1016,7 +1017,7 @@ Int DecodeMacroblockLowpass(CWMImageStrCodec* pSC, CCodingContext* pContext,
     x [0..3]
     [8..11] [4..7,12..15]
 *************************************************************************/
-Int DecodeMacroblockDC(CWMImageStrCodec* pSC, CCodingContext* pContext, Int iMBX, Int iMBY)
+Int JXRLIB_API(DecodeMacroblockDC)(CWMImageStrCodec* pSC, CCodingContext* pContext, Int iMBX, Int iMBY)
 {
     CWMITile* pTile = pSC->pTile + pSC->cTileColumn;
     CWMIMBInfo* pMBInfo = &pSC->MBInfo;
@@ -1042,9 +1043,9 @@ Int DecodeMacroblockDC(CWMImageStrCodec* pSC, CCodingContext* pContext, Int iMBX
 
     if (pSC->WMISCP.bfBitstreamFormat == SPATIAL && pSC->WMISCP.sbSubband != SB_DC_ONLY) {
         if (pTile->cBitsLP > 0)  // MB-based LP QP index
-            pMBInfo->iQIndexLP = decodeQPIndex(pIO, pTile->cBitsLP);
+            pMBInfo->iQIndexLP = JXRLIB_API(decodeQPIndex)(pIO, pTile->cBitsLP);
         if (pSC->WMISCP.sbSubband != SB_NO_HIGHPASS && pTile->cBitsHP > 0)  // MB-based HP QP index
-            pMBInfo->iQIndexHP = decodeQPIndex(pIO, pTile->cBitsHP);
+            pMBInfo->iQIndexHP = JXRLIB_API(decodeQPIndex)(pIO, pTile->cBitsHP);
     }
     if (pTile->cBitsHP == 0 && pTile->cNumQPHP > 1) // use LP QP
         pMBInfo->iQIndexHP = pMBInfo->iQIndexLP;
@@ -1073,7 +1074,7 @@ Int DecodeMacroblockDC(CWMImageStrCodec* pSC, CCodingContext* pContext, Int iMBX
     else {
         /** find significant level in 3D **/
         pAH = pContext->m_pAHexpt[2];
-        iIndex = getHuff(pAH->m_hufDecTable, pIO);
+        iIndex = JXRLIB_API(getHuff)(pAH->m_hufDecTable, pIO);
         iQDCY = iIndex >> 2;
         iQDCU = (iIndex >> 1) & 1;
         iQDCV = iIndex & 1;
@@ -1117,7 +1118,7 @@ Int DecodeMacroblockDC(CWMImageStrCodec* pSC, CCodingContext* pContext, Int iMBX
         pMBInfo->iBlockDC[2][0] = iQDCV;
     }
 
-    UpdateModelMB(cf, iChannels, aLaplacianMean, &(pContext->m_aModelDC));
+    JXRLIB_API(UpdateModelMB)(cf, iChannels, aLaplacianMean, &(pContext->m_aModelDC));
 
     if (((!(pSC->WMISCP.bfBitstreamFormat != FREQUENCY || pSC->m_Dparam->cThumbnailScale < 16)) || pSC->WMISCP.sbSubband == SB_DC_ONLY) && pSC->m_bResetContext) {
         Int kk;
@@ -1134,7 +1135,7 @@ Int DecodeMacroblockDC(CWMImageStrCodec* pSC, CCodingContext* pContext, Int iMBX
 /*************************************************************************
     DecodeMacroblockHighpass
 *************************************************************************/
-Int DecodeMacroblockHighpass(CWMImageStrCodec* pSC, CCodingContext* pContext,
+Int JXRLIB_API(DecodeMacroblockHighpass)(CWMImageStrCodec* pSC, CCodingContext* pContext,
     Int iMBX, Int iMBY)
 {
     /** reset adaptive scan totals **/
@@ -1148,7 +1149,7 @@ Int DecodeMacroblockHighpass(CWMImageStrCodec* pSC, CCodingContext* pContext,
         }
     }
     if ((pSC->WMISCP.bfBitstreamFormat != SPATIAL) && (pSC->pTile[pSC->cTileColumn].cBitsHP > 0)) { // MB-based HP QP index
-        pSC->MBInfo.iQIndexHP = decodeQPIndex(pContext->m_pIOAC, pSC->pTile[pSC->cTileColumn].cBitsHP);
+        pSC->MBInfo.iQIndexHP = JXRLIB_API(decodeQPIndex)(pContext->m_pIOAC, pSC->pTile[pSC->cTileColumn].cBitsHP);
         if (pSC->MBInfo.iQIndexHP >= pSC->pTile[pSC->cTileColumn].cNumQPHP)
             goto ErrorExit;
     }
@@ -1157,14 +1158,14 @@ Int DecodeMacroblockHighpass(CWMImageStrCodec* pSC, CCodingContext* pContext,
 
 
     DecodeCBP(pSC, pContext);
-    predCBPDec(pSC, pContext);
+    JXRLIB_API(predCBPDec)(pSC, pContext);
 
     if (DecodeCoeffs(pSC, pContext, iMBX, iMBY,
         pContext->m_pIOAC, pContext->m_pIOFL) != ICERR_OK)
         goto ErrorExit;
 
     if (pSC->m_bResetContext) {
-        AdaptHighpassDec(pContext);
+        JXRLIB_API(AdaptHighpassDec)(pContext);
     }
 
     return ICERR_OK;
@@ -1175,7 +1176,7 @@ ErrorExit:
 /*************************************************************************
     Adapt
 *************************************************************************/
-Int AdaptLowpassDec(CCodingContext* pSC)
+Int JXRLIB_API(AdaptLowpassDec)(CCodingContext* pSC)
 {
     Int kk;
     for (kk = 0; kk < CONTEXTX + CTDC; kk++) {
@@ -1190,7 +1191,7 @@ ErrorExit:
 
 }
 
-Int AdaptHighpassDec(CCodingContext* pSC)
+Int JXRLIB_API(AdaptHighpassDec)(CCodingContext* pSC)
 {
     Int kk;
     if (ICERR_OK != AdaptDecFixed(pSC->m_pAdaptHuffCBPCY)) {

@@ -44,7 +44,7 @@ struct ExternalOutputStreamStructInterop
     /// Function pointer used to close the stream. This function is called only once, and up until this function is called,
     /// the write_function pointer must remain valid and operational. No assumptions should be made about when this
     /// function is called, so the implementation must be prepared to handle this function being called at any time
-    /// (but not concurrently with calls to the read_function).
+    /// (but not concurrently with calls to the write_function).
     /// 
     /// \param  opaque_handle1  The value of the opaque_handle1 field of the ExternalOutputStreamStructInterop.
     /// \param  opaque_handle2  The value of the opaque_handle2 field of the ExternalOutputStreamStructInterop.

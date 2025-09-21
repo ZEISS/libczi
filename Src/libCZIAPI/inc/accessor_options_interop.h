@@ -36,7 +36,26 @@ struct AccessorOptionsInterop
     /// without this optimization - i.e. there should be no reason to turn it off besides potential bugs.
     bool use_visibility_check_optimization;
 
-    /// Additional parameters for the accessor.
+    /// Additional parameters for the accessor in JSON format.
+    ///
+    /// This field allows passing extended configuration options that are not covered by the
+    /// standard structure members. The value should be a valid JSON string with an object
+    /// as the root element.
+    ///
+    /// Currently supported parameters:
+    /// - "mask_aware" (boolean): When true, enables mask-aware composition where subblock
+    ///   mask data (if available) is used during tile composition to selectively copy pixels.
+    ///   Only pixels where the corresponding mask bit is set will be rendered.
+    ///
+    /// Example JSON:
+    /// \code{.json}
+    /// {
+    ///     "mask_aware": true
+    /// }
+    /// \endcode
+    ///
+    /// If this field is nullptr, empty, or contains invalid JSON, default values are used
+    /// for all extended parameters. Unknown parameters are silently ignored.
     const char* additional_parameters;
 };
 

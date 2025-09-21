@@ -310,3 +310,4 @@ megalinter-reports/
 /Src/libCZI/Build/
 /Src/libCZIAPI/Build/
 /docs/build/
+/docs/source/_static/images/Thumbs.db

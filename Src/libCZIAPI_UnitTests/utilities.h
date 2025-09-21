@@ -12,7 +12,7 @@
 class Utilities
 {
 public:
-    static std::shared_ptr<libCZI::IBitmapData> CreateGray8BitmapAndFill(std::uint32_t width, std::uint32_t height, uint8_t value);
+    static std::shared_ptr<libCZI::IBitmapData> CreateGray8BitmapAndFill(std::uint32_t width, std::uint32_t height, std::uint8_t value);
     static libCZI::CDimBounds ConvertDimBoundsInterop(const DimBoundsInterop& dim_bounds_interop);
     static libCZI::CDimCoordinate ConvertCoordinateInterop(const CoordinateInterop& coordinate_interop);
 
@@ -20,7 +20,7 @@ public:
     {
         int32_t x;
         int32_t y;
-        uint8_t gray8_value;
+        std::uint8_t gray8_value;
     };
 
     struct MosaicInfo

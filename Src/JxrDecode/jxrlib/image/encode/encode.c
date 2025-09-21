@@ -26,6 +26,7 @@
 //
 //*@@@---@@@@******************************************************************
 
+#include "../../common/include/jxrlib_symbol_mangle.h"
 #include <stdlib.h>
 #include "encode.h"
 #include "../sys/strcodec.h"
@@ -37,7 +38,7 @@
     each tile, but for now we assume only one user specified value is
     used for the entire image
 *************************************************************************/
-Int AllocateCodingContextEnc(CWMImageStrCodec* pSC, Int iNumContexts, Int iTrimFlexBits)
+Int JXRLIB_API(AllocateCodingContextEnc)(CWMImageStrCodec* pSC, Int iNumContexts, Int iTrimFlexBits)
 {
     Int i, iCBPSize, k;
     static const Int aAlphabet[] = { 5,4,8,7,7,  12,6,6,12,6,6,7,7,  12,6,6,12,6,6,7,7 };
@@ -70,23 +71,23 @@ Int AllocateCodingContextEnc(CWMImageStrCodec* pSC, Int iNumContexts, Int iTrimF
         CCodingContext* pContext = &(pSC->m_pCodingContext[i]);
 
         /** allocate adaptive Huffman encoder **/
-        pContext->m_pAdaptHuffCBPCY = Allocate(iCBPSize, ENCODER);
+        pContext->m_pAdaptHuffCBPCY = JXRLIB_API(Allocate)(iCBPSize, ENCODER);
         if (pContext->m_pAdaptHuffCBPCY == NULL) {
             return ICERR_ERROR;
         }
-        pContext->m_pAdaptHuffCBPCY1 = Allocate(5, ENCODER);
+        pContext->m_pAdaptHuffCBPCY1 = JXRLIB_API(Allocate)(5, ENCODER);
         if (pContext->m_pAdaptHuffCBPCY1 == NULL) {
             return ICERR_ERROR;
         }
 
         for (k = 0; k < NUMVLCTABLES; k++) {
-            pContext->m_pAHexpt[k] = Allocate(aAlphabet[k], ENCODER);
+            pContext->m_pAHexpt[k] = JXRLIB_API(Allocate)(aAlphabet[k], ENCODER);
             if (pContext->m_pAHexpt[k] == NULL) {
                 return ICERR_ERROR;
             }
         }
 
-        ResetCodingContextEnc(pContext);
+        JXRLIB_API(ResetCodingContextEnc)(pContext);
         pContext->m_iTrimFlexBits = iTrimFlexBits;
     }
 
@@ -96,7 +97,7 @@ Int AllocateCodingContextEnc(CWMImageStrCodec* pSC, Int iNumContexts, Int iTrimF
 /*************************************************************************
     Context reset on encoder
 *************************************************************************/
-Void ResetCodingContextEnc(CCodingContext* pContext)
+Void JXRLIB_API(ResetCodingContextEnc)(CCodingContext* pContext)
 {
     Int k;
     /** set flags **/
@@ -106,29 +107,29 @@ Void ResetCodingContextEnc(CCodingContext* pContext)
         pContext->m_pAHexpt[k]->m_bInitialize = FALSE;
 
     // reset VLC tables
-    AdaptLowpassEnc(pContext);
-    AdaptHighpassEnc(pContext);
+    JXRLIB_API(AdaptLowpassEnc)(pContext);
+    JXRLIB_API(AdaptHighpassEnc)(pContext);
 
     // reset zigzag patterns, totals
-    InitZigzagScan(pContext);
+    JXRLIB_API(InitZigzagScan)(pContext);
     // reset bit reduction and cbp models
-    ResetCodingContext(pContext);
+    JXRLIB_API(ResetCodingContext)(pContext);
 }
 
 /*************************************************************************
     Context deletion
 *************************************************************************/
-Void FreeCodingContextEnc(CWMImageStrCodec* pSC)
+Void JXRLIB_API(FreeCodingContextEnc)(CWMImageStrCodec* pSC)
 {
     Int iContexts = (Int)(pSC->cNumCodingContext), i, k;
     if (iContexts > 0 && pSC->m_pCodingContext) {
 
         for (i = 0; i < iContexts; i++) {
             CCodingContext* pContext = &(pSC->m_pCodingContext[i]);
-            Clean(pContext->m_pAdaptHuffCBPCY);
-            Clean(pContext->m_pAdaptHuffCBPCY1);
+            JXRLIB_API(Clean)(pContext->m_pAdaptHuffCBPCY);
+            JXRLIB_API(Clean)(pContext->m_pAdaptHuffCBPCY1);
             for (k = 0; k < NUMVLCTABLES; k++)
-                Clean(pContext->m_pAHexpt[k]);
+                JXRLIB_API(Clean)(pContext->m_pAHexpt[k]);
         }
         free(pSC->m_pCodingContext);
     }

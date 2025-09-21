@@ -120,28 +120,32 @@ TEST(Utilities, HasSameDimensionsExpectFalse2)
 class BitmapLockTestMock : public IBitmapData
 {
 private:
-    int lckCnt = 0;
+    int lock_count_ = 0;
 public:
-    virtual PixelType		GetPixelType() const
+    PixelType		GetPixelType() const override
     {
         throw std::runtime_error("not implemented");
     }
-    virtual IntSize			GetSize() const
+
+    IntSize			GetSize() const override
     {
         throw std::runtime_error("not implemented");
     }
-    virtual BitmapLockInfo	Lock()
+
+    BitmapLockInfo	Lock() override
     {
-        this->lckCnt++;
-        return BitmapLockInfo();
+        this->lock_count_++;
+        return {};
     }
-    virtual void			Unlock()
+
+    void			Unlock() override
     {
-        this->lckCnt--;
+        this->lock_count_--;
     }
-    virtual int				GetLockCount() const
+
+    int				GetLockCount() const override
     {
-        return this->lckCnt;
+        return this->lock_count_;
     }
 };
 
@@ -171,8 +175,8 @@ TEST(Utilities, ScopedBitmapLocker2)
     // check that the scoped-bitmap-locker also works as expected when it is copied/moved
     {
         std::vector<ScopedBitmapLockerSP> vec;
-        vec.push_back(ScopedBitmapLockerSP{ bitmap });
-        vec.push_back(ScopedBitmapLockerSP{ bitmap });
+        vec.emplace_back(bitmap);
+        vec.emplace_back(bitmap);
         EXPECT_EQ(bitmap->GetLockCount(), 2) << "expecting a lock-count of '2'";
     }
 
@@ -186,12 +190,74 @@ TEST(Utilities, ScopedBitmapLocker3)
     // check that the scoped-bitmap-locker also works as expected when it is copied/moved
     {
         std::vector<ScopedBitmapLockerSP> vec;
-        vec.emplace_back(ScopedBitmapLockerSP{ bitmap });
-        vec.emplace_back(ScopedBitmapLockerSP{ bitmap });
+        vec.emplace_back(bitmap);
+        vec.emplace_back(bitmap);
         EXPECT_EQ(bitmap->GetLockCount(), 2) << "expecting a lock-count of '2'";
     }
 
     EXPECT_EQ(bitmap->GetLockCount(), 0) << "expecting a lock-count of zero";
+}
+
+TEST(Utilities, ScopedBitmapLocker4)
+{
+    const auto bitmap = std::make_shared<BitmapLockTestMock>();
+
+    // Test copy constructor directly
+    {
+        ScopedBitmapLockerSP locker1{ bitmap };
+        EXPECT_EQ(bitmap->GetLockCount(), 1) << "expecting a lock-count of '1' after initial construction";
+
+        // Test copy constructor
+        ScopedBitmapLockerSP locker2{ locker1 };
+        EXPECT_EQ(bitmap->GetLockCount(), 2) << "expecting a lock-count of '2' after copy construction";
+
+        // Test assignment operator
+        ScopedBitmapLockerSP locker3{ bitmap };
+        EXPECT_EQ(bitmap->GetLockCount(), 3) << "expecting a lock-count of '3' after creating locker3";
+    
+        locker3 = locker1;  // This should not change the lock count as locker3 was already locking the same bitmap
+        EXPECT_EQ(bitmap->GetLockCount(), 3) << "expecting a lock-count of '3' after assignment";
+    }
+
+    EXPECT_EQ(bitmap->GetLockCount(), 0) << "expecting a lock-count of zero after all lockers go out of scope";
+}
+
+TEST(Utilities, ScopedBitmapLocker5)
+{
+    const auto bitmap = std::make_shared<BitmapLockTestMock>();
+
+    // Test move constructor
+    {
+        ScopedBitmapLockerSP locker1{ bitmap };
+        EXPECT_EQ(bitmap->GetLockCount(), 1) << "expecting a lock-count of '1' after initial construction";
+
+        // Test move constructor - locker1 should be moved to locker2
+        ScopedBitmapLockerSP locker2{ std::move(locker1) };
+        EXPECT_EQ(bitmap->GetLockCount(), 1) << "expecting a lock-count of '1' after move construction (no additional lock)";
+
+        // After move, locker1 should be in a valid but unspecified state
+        // and locker2 should hold the lock
+    } // locker2 goes out of scope here, should unlock
+
+    EXPECT_EQ(bitmap->GetLockCount(), 0) << "expecting a lock-count of zero after moved-to locker goes out of scope";
+
+    // Test move assignment
+    {
+        ScopedBitmapLockerSP locker1{ bitmap };
+        ScopedBitmapLockerSP locker2{ bitmap };
+        EXPECT_EQ(bitmap->GetLockCount(), 2) << "expecting a lock-count of '2' after creating two lockers";
+
+        // Move assign locker1 to locker3
+        ScopedBitmapLockerSP locker3 = std::move(locker1);
+        EXPECT_EQ(bitmap->GetLockCount(), 2) << "expecting a lock-count of '2' after move assignment (locker2 + locker3)";
+
+        // Test move assignment to existing locker
+        locker2 = std::move(locker3);
+        EXPECT_EQ(bitmap->GetLockCount(), 1) << "expecting a lock-count of '1' after move assignment to existing locker";
+    }
+
+    EXPECT_EQ(bitmap->GetLockCount(), 0) << "expecting a lock-count of zero after all lockers go out of scope";
+
 }
 
 // test-fixture, cf. https://stackoverflow.com/questions/47354280/what-is-the-best-way-of-testing-private-methods-with-googletest

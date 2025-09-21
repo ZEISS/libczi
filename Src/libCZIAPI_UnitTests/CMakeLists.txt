@@ -16,7 +16,8 @@ ADD_EXECUTABLE(libCZIAPI_UnitTests
     "MemoryOutputStream.h" 
     "MemoryOutputStream.cpp" 
     "SimpleBitmap.h" 
-    "test_parameterhelpers.cpp")
+    "test_parameterhelpers.cpp"
+    "test_accessors.cpp")
 
 TARGET_LINK_LIBRARIES(libCZIAPI_UnitTests PRIVATE libCZIAPIStatic GTest::gtest GTest::gmock)
 

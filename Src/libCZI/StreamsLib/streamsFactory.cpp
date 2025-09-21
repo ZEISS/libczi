@@ -9,6 +9,7 @@
 #include <assert.h>
 #include "curlhttpinputstream.h"
 #include "windowsfileinputstream.h"
+#include "uwpfileinputstream.h"
 #include "simplefileinputstream.h"
 #include "preadfileinputstream.h"
 #include "azureblobinputstream.h"
@@ -67,6 +68,19 @@ static const struct
             }
         },
 #endif  // LIBCZI_WINDOWSAPI_AVAILABLE
+#if LIBCZI_WINDOWS_UWPAPI_AVAILABLE
+        {
+            { "uwp_file_inputstream", "stream implementation based on UWP-API", nullptr, nullptr },
+            [](const StreamsFactory::CreateStreamInfo& stream_info, const std::string& file_name) -> std::shared_ptr<libCZI::IStream>
+            {
+                return std::make_shared<UwpFileInputStream>(file_name);
+            },
+            [](const StreamsFactory::CreateStreamInfo& stream_info, const std::wstring& file_name) -> std::shared_ptr<libCZI::IStream>
+            {
+                return std::make_shared<UwpFileInputStream>(file_name.c_str());
+            }
+        },
+#endif  // LIBCZI_WINDOWS_UWPAPI_AVAILABLE
 #if LIBCZI_USE_PREADPWRITEBASED_STREAMIMPL
         {
             { "pread_file_inputstream", "stream implementation based on pread-API", nullptr, nullptr },

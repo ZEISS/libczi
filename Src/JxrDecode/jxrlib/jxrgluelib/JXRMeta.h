@@ -26,7 +26,7 @@
 //
 //*@@@---@@@@******************************************************************
 #pragma once
-
+#include "../common/include/jxrlib_symbol_mangle.h"
 #include "../image/sys/windowsmediaphoto.h"
 
 #ifndef UNREFERENCED_PARAMETER
@@ -185,31 +185,31 @@ typedef struct tagWmpDEMisc
 
 
 //================================================================
-EXTERN_C ERR GetUShort(
+EXTERN_C ERR JXRLIB_API(GetUShort)(
     struct tagWMPStream* pWS,
     size_t offPos,
     U16* puValue
 );
 
-EXTERN_C ERR PutUShort(
+EXTERN_C ERR JXRLIB_API(PutUShort)(
     struct tagWMPStream* pWS,
     size_t offPos,
     U16 uValue
 );
 
-EXTERN_C ERR GetULong(
+EXTERN_C ERR JXRLIB_API(GetULong)(
     struct tagWMPStream* pWS,
     size_t offPos,
     U32* puValue
 );
 
-EXTERN_C ERR PutULong(
+EXTERN_C ERR JXRLIB_API(PutULong)(
     struct tagWMPStream* pWS,
     size_t offPos,
     U32 uValue
 );
 
-EXTERN_C ERR WriteWmpDE(
+EXTERN_C ERR JXRLIB_API(WriteWmpDE)(
     struct tagWMPStream* pWS,
     size_t* pOffPos,
     const WmpDE* pDE,
@@ -218,7 +218,7 @@ EXTERN_C ERR WriteWmpDE(
 );
 
 
-EXTERN_C ERR ReadPropvar(struct tagWMPStream* pWS,
+EXTERN_C ERR JXRLIB_API(ReadPropvar)(struct tagWMPStream* pWS,
                             const U16 uType,
                             const U32 uCount,
                             const U32 uValue,
@@ -231,19 +231,19 @@ EXTERN_C ERR ReadPropvar(struct tagWMPStream* pWS,
 
 #define WMP_INTEL_ENDIAN    ('I')
 
-EXTERN_C ERR getbfcpy(U8* pbdest, const U8* pb, size_t cb, size_t ofs, U32 n);
-EXTERN_C ERR getbfw(const U8* pb, size_t cb, size_t ofs, U16* pw);
-EXTERN_C ERR getbfdw(const U8* pb, size_t cb, size_t ofs, U32* pdw);
-EXTERN_C ERR getbfwbig(const U8* pb, size_t cb, size_t ofs, U16* pw);
-EXTERN_C ERR getbfdwbig(const U8* pb, size_t cb, size_t ofs, U32* pdw);
-EXTERN_C ERR getbfwe(const U8* pb, size_t cb, size_t ofs, U16* pw, U8 endian);
-EXTERN_C ERR getbfdwe(const U8* pb, size_t cb, size_t ofs, U32* pdw, U8 endian);
-EXTERN_C ERR setbfcpy(U8* pb, size_t cb, size_t ofs, const U8* pbset, size_t cbset);
-EXTERN_C ERR setbfw(U8* pb, size_t cb, size_t ofs, U16 dw);
-EXTERN_C ERR setbfdw(U8* pb, size_t cb, size_t ofs, U32 dw);
-EXTERN_C ERR setbfwbig(U8* pb, size_t cb, size_t ofs, U16 dw);
-EXTERN_C ERR setbfdwbig(U8* pb, size_t cb, size_t ofs, U32 dw);
-EXTERN_C ERR BufferCalcIFDSize(const U8* pb, size_t cb, U32 uIFDOfs, U8 endian, U32* pcbifd);
-EXTERN_C ERR StreamCalcIFDSize(struct tagWMPStream* pWS, U32 uIFDOfs, U32* pcbifd);
-EXTERN_C ERR BufferCopyIFD(const U8* pbsrc, U32 cbsrc, U32 ofssrc, U8 endian, U8* pbdest, U32 cbdest, U32* pofsdest);
-EXTERN_C ERR StreamCopyIFD(struct tagWMPStream* pWS, U32 ofssrc, U8* pbdest, U32 cbdest, U32* pofsdest);
+EXTERN_C ERR JXRLIB_API(getbfcpy)(U8* pbdest, const U8* pb, size_t cb, size_t ofs, U32 n);
+EXTERN_C ERR JXRLIB_API(getbfw)(const U8* pb, size_t cb, size_t ofs, U16* pw);
+EXTERN_C ERR JXRLIB_API(getbfdw)(const U8* pb, size_t cb, size_t ofs, U32* pdw);
+EXTERN_C ERR JXRLIB_API(getbfwbig)(const U8* pb, size_t cb, size_t ofs, U16* pw);
+EXTERN_C ERR JXRLIB_API(getbfdwbig)(const U8* pb, size_t cb, size_t ofs, U32* pdw);
+EXTERN_C ERR JXRLIB_API(getbfwe)(const U8* pb, size_t cb, size_t ofs, U16* pw, U8 endian);
+EXTERN_C ERR JXRLIB_API(getbfdwe)(const U8* pb, size_t cb, size_t ofs, U32* pdw, U8 endian);
+EXTERN_C ERR JXRLIB_API(setbfcpy)(U8* pb, size_t cb, size_t ofs, const U8* pbset, size_t cbset);
+EXTERN_C ERR JXRLIB_API(setbfw)(U8* pb, size_t cb, size_t ofs, U16 dw);
+EXTERN_C ERR JXRLIB_API(setbfdw)(U8* pb, size_t cb, size_t ofs, U32 dw);
+EXTERN_C ERR JXRLIB_API(setbfwbig)(U8* pb, size_t cb, size_t ofs, U16 dw);
+EXTERN_C ERR JXRLIB_API(setbfdwbig)(U8* pb, size_t cb, size_t ofs, U32 dw);
+EXTERN_C ERR JXRLIB_API(BufferCalcIFDSize)(const U8* pb, size_t cb, U32 uIFDOfs, U8 endian, U32* pcbifd);
+EXTERN_C ERR JXRLIB_API(StreamCalcIFDSize)(struct tagWMPStream* pWS, U32 uIFDOfs, U32* pcbifd);
+EXTERN_C ERR JXRLIB_API(BufferCopyIFD)(const U8* pbsrc, U32 cbsrc, U32 ofssrc, U8 endian, U8* pbdest, U32 cbdest, U32* pofsdest);
+EXTERN_C ERR JXRLIB_API(StreamCopyIFD)(struct tagWMPStream* pWS, U32 ofssrc, U8* pbdest, U32 cbdest, U32* pofsdest);

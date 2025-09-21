@@ -13,6 +13,9 @@
 // whether the libCZI library is built with support for the Windows-API, i.e. whether it is being built for a Windows-environment
 #define LIBCZI_WINDOWSAPI_AVAILABLE @libCZI_WINDOWSAPIAVAILABLE@
 
+// whether the libCZI library is built with support for the Windows-UWP-API, i.e. whether it is being built for an UWP-environment
+#define LIBCZI_WINDOWS_UWPAPI_AVAILABLE @libCZI_WINDOWSAPI_UWP_AVAILABLE@
+
 // if the host system is a big-endian system, this is "1", otherwise 0
 #define LIBCZI_ISBIGENDIANHOST @libCZI_ISBIGENDIANHOST@
 
@@ -54,3 +57,12 @@
 #define LIBCZI_AZURESDK_BASED_STREAM_AVAILABLE  @libCZI_AzureStorage_available@
 
 #define LIBCZI_AZURESDK_VERSION_INFO "@libCZI_AzureStorage_SDK_Version_Info@"
+
+// whether the intrinsic "__builtin_bswap32" is available (in the header-file byteswap.h)
+#define LIBCZI_HAS_BUILTIN_BSWAP32 @libCZI_Has_builtin_bswap32@
+
+// whether the function "_byteswap_ulong" is available (in the header-file stdlib.h)
+#define LIBCZI_HAS_BYTESWAP_IN_STDLIB @libCZI_Has_byteswap_long_in_stdlib@
+
+// whether the function "bswap32" is available (in the header-file sys/endian.h)
+#define LIBCZI_HAS_BSWAP_LONG_IN_SYS_ENDIAN @libCZI_Has_bswap_long_in_sys_endian@

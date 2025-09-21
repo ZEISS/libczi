@@ -16,6 +16,7 @@ Documentation of LibCZI and adjacent projects.
    pages/building
    pages/building_documentation
    pages/image_document_concept
+   pages/valid_pixel_mask_concept
    pages/using_libCZI
    pages/accessors
    pages/multichannel_composition
