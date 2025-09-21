@@ -66,7 +66,7 @@ public:
         return false;
     }
 
-    bool TryGetSplineControlPoints(std::vector<libCZI::IDisplaySettings::SplineControlPoint>* ctrlPts) const override
+    bool TryGetSplineControlPoints(std::vector<libCZI::IDisplaySettings::SplineControlPoint>*) const override
     {
         throw std::runtime_error("not implemented");
     }

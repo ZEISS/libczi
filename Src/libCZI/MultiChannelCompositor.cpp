@@ -190,7 +190,7 @@ private:
     }
 
     template <typename tStore>
-    static void DoTinting(tStore store, libCZI::IBitmapData* dest, const BitmapLockInfo& lckDst,
+    static void DoTinting(tStore store, libCZI::IBitmapData*, const BitmapLockInfo& lckDst,
         libCZI::IBitmapData* src, const Compositors::ChannelInfo* chInfo)
     {
         ScopedBitmapLockerP lckSrc{ src };
@@ -670,7 +670,7 @@ private:
     };
 
     template <typename tStore>
-    static void DoTintingBlackWhitePt(tStore store, libCZI::IBitmapData* dest, const BitmapLockInfo& lckDst,
+    static void DoTintingBlackWhitePt(tStore store, libCZI::IBitmapData*, const BitmapLockInfo& lckDst,
         libCZI::IBitmapData* src, const Compositors::ChannelInfo* chInfo)
     {
         ScopedBitmapLockerP lckSrc{ src };
@@ -897,7 +897,7 @@ private:
     };
 
     template <typename tStore>
-    static void DoLut(tStore store, libCZI::IBitmapData* dest, const BitmapLockInfo& lckDst, libCZI::IBitmapData* src, const Compositors::ChannelInfo* chInfo)
+    static void DoLut(tStore store, libCZI::IBitmapData*, const BitmapLockInfo& lckDst, libCZI::IBitmapData* src, const Compositors::ChannelInfo* chInfo)
     {
         auto pxTypeSrc = src->GetPixelType();
         ScopedBitmapLockerP lckSrc{ src };

@@ -94,7 +94,7 @@ private:
 
         std::map<std::string, int> mapAttchmntName;
         reader->EnumerateAttachments(
-            [&](int index, const AttachmentInfo& info)->bool
+            [&](int, const AttachmentInfo& info)->bool
             {
                 ++mapAttchmntName[info.name];
                 return true;
@@ -228,19 +228,11 @@ private:
         options.GetLog()->WriteLineStdOut(xmlUtf8);
     }
 
-    static void PrintDisplaySettingsMetadata(ICZIReader* reader, ICziMetadata* md, const CCmdLineOptions& options)
+    static void PrintDisplaySettingsMetadata(ICZIReader*, ICziMetadata* md, const CCmdLineOptions& options)
     {
         options.GetLog()->WriteLineStdOut("Display-Settings");
         options.GetLog()->WriteLineStdOut("----------------");
         options.GetLog()->WriteLineStdOut("");
-
-        int startC = 0, endC = 0;
-
-        int sizeC;
-        if (reader->GetStatistics().dimBounds.TryGetInterval(DimensionIndex::C, &startC, &sizeC) == true)
-        {
-            endC = startC + sizeC;
-        }
 
         auto docInfo = md->GetDocumentInfo();
         auto dsplSettings = docInfo->GetDisplaySettings();
@@ -259,7 +251,7 @@ private:
             });
     }
 
-    static void PrintDisplaySettingsMetadataAsJson(ICZIReader* reader, ICziMetadata* md, const CCmdLineOptions& options)
+    static void PrintDisplaySettingsMetadataAsJson(ICZIReader*, ICziMetadata* md, const CCmdLineOptions& options)
     {
         options.GetLog()->WriteLineStdOut("Display-Settings in CZIcmd-JSON-Format");
         options.GetLog()->WriteLineStdOut("--------------------------------------");
@@ -1085,7 +1077,7 @@ private:
         return si;
     }
 
-    static bool IsSelection(int index, const SubBlockInfo& info, const SelectionInfo& selectionInfo)
+    static bool IsSelection(int index, const SubBlockInfo&, const SelectionInfo& selectionInfo)
     {
         bool rv = true;
         if (selectionInfo.indexValid == true)

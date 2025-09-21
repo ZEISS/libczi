@@ -746,7 +746,7 @@ bool libCZI::XmlDateTime::IsValid() const
 {
     MetadataUtils::WriteImageSizeInformation(builder, statistics.boundingBox.w, statistics.boundingBox.h);
     statistics.dimBounds.EnumValidDimensions(
-        [&](libCZI::DimensionIndex dim, int start, int size)->bool
+        [&](libCZI::DimensionIndex dim, int, int size)->bool
         {
             MetadataUtils::WriteDimensionSize(builder, dim, size);
             return true;

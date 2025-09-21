@@ -205,7 +205,7 @@ int CSingleChannelPyramidLevelTileAccessor::CalcPyramidLayerNo(const libCZI::Int
     return layerNo;
 }
 
-std::vector<CSingleChannelPyramidLevelTileAccessor::SbInfo> CSingleChannelPyramidLevelTileAccessor::GetSubBlocksSubset(const libCZI::IntRect& roi, const libCZI::IDimCoordinate* planeCoordinate, const PyramidLayerInfo& pyramidInfo, const libCZI::IIndexSet* sceneFilter, bool sortByM)
+std::vector<CSingleChannelPyramidLevelTileAccessor::SbInfo> CSingleChannelPyramidLevelTileAccessor::GetSubBlocksSubset(const libCZI::IntRect& roi, const libCZI::IDimCoordinate* planeCoordinate, const PyramidLayerInfo&, const libCZI::IIndexSet* sceneFilter, bool sortByM)
 {
     std::vector<CSingleChannelPyramidLevelTileAccessor::SbInfo> sblks;
     this->GetAllSubBlocks(roi, planeCoordinate, sceneFilter,

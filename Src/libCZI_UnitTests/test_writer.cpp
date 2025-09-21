@@ -247,7 +247,7 @@ static void _testWriteReadCompressedImageZStd0(uint32_t width, uint32_t height, 
 
         auto metadataBuilder = writer.GetPreparedMetadata(PrepareMetadataInfo());
         string xml = metadataBuilder->GetXml(true);
-        WriteMetadataInfo writerMdInfo = { 0 };
+        WriteMetadataInfo writerMdInfo;
         writerMdInfo.szMetadata = xml.c_str();
         writerMdInfo.szMetadataSize = xml.size();
 
@@ -374,7 +374,7 @@ static void _testWriteReadCompressedImageZStd1(uint32_t width, uint32_t height, 
 
         auto metadataBuilder = writer.GetPreparedMetadata(PrepareMetadataInfo());
         string xml = metadataBuilder->GetXml(true);
-        WriteMetadataInfo writerMdInfo = { 0 };
+        WriteMetadataInfo writerMdInfo;
         writerMdInfo.szMetadata = xml.c_str();
         writerMdInfo.szMetadataSize = xml.size();
 
@@ -627,7 +627,7 @@ TEST(CziWriter, WriteAndReadBitmapBgr24)
 
     auto metadataBuilder = cziWriter->GetPreparedMetadata(PrepareMetadataInfo());
     string xml = metadataBuilder->GetXml(true);
-    WriteMetadataInfo writerMdInfo = { 0 };
+    WriteMetadataInfo writerMdInfo;
     writerMdInfo.szMetadata = xml.c_str();
     writerMdInfo.szMetadataSize = xml.size();
 
@@ -725,7 +725,7 @@ TEST(CziWriter, Writer5)
 
     std::uint8_t data = 0;
     int cnt = 0;
-    addSbBlkInfo.getData = [&](int callCnt, size_t offset, const void*& ptr, size_t& size)->bool
+    addSbBlkInfo.getData = [&](int, size_t, const void*& ptr, size_t& size)->bool
         {
             ++data;
             ptr = &data;
@@ -796,7 +796,7 @@ TEST(CziWriter, Writer6)
 
     std::uint8_t data = 0;
     int cnt = 0;
-    addSbBlkInfo.getData = [&](int callCnt, size_t offset, const void*& ptr, size_t& size)->bool
+    addSbBlkInfo.getData = [&](int callCnt, size_t, const void*& ptr, size_t& size)->bool
         {
             if (callCnt > 500)
             {
@@ -1110,7 +1110,7 @@ TEST(CziWriter, Writer11)
     int subBlkCnt = 0;
     CSegmentWalker::Walk(
         inputStream.get(),
-        [&](int cnt, const std::string& id, std::int64_t allocatedSize, std::int64_t usedSize)->bool
+        [&](int cnt, const std::string& id, std::int64_t, std::int64_t)->bool
         {
             // we expect the CZI-fileheader-segment, then the subblockdirectory-segment, and then exactly 50 subblocks
             if (cnt == 0)
@@ -1211,7 +1211,7 @@ TEST(CziWriter, Writer12)
     int subBlkCnt = 0;
     CSegmentWalker::Walk(
         inputStream.get(),
-        [&](int cnt, const std::string& id, std::int64_t allocatedSize, std::int64_t usedSize)->bool
+        [&](int cnt, const std::string& id, std::int64_t, std::int64_t)->bool
         {
             // we expect the CZI-fileheader-segment, then the subblockdirectory-segment, and then exactly 50 subblocks
             if (cnt == 0)
@@ -1294,7 +1294,7 @@ TEST(CziWriter, Writer13)
 
     auto metadataBuilder = writer->GetPreparedMetadata(PrepareMetadataInfo());
     string xml = metadataBuilder->GetXml(true);
-    WriteMetadataInfo writerMdInfo = { 0 };
+    WriteMetadataInfo writerMdInfo;
     writerMdInfo.szMetadata = xml.c_str();
     writerMdInfo.szMetadataSize = xml.size();
 
@@ -1534,7 +1534,7 @@ TEST(CziWriter, WriterReturnFalseFromCallback)
     addSbBlkInfo.PixelType = PixelType::Gray8;
     addSbBlkInfo.sizeData = 1000;
     addSbBlkInfo.getData = std::function<bool(int callCnt, size_t offset, const void*& ptr, size_t & size)>(
-        [&](int callCnt, size_t offset, const void*& ptr, size_t& size)->bool
+        [&](int, size_t, const void*&, size_t&)->bool
         {
             return false;
         }
@@ -1602,7 +1602,7 @@ TEST(CziWriter, WriterReturnOneByteAndThenFalseFromCallback)
     addSbBlkInfo.PixelType = PixelType::Gray8;
     addSbBlkInfo.sizeData = 1000;
     addSbBlkInfo.getData = std::function<bool(int callCnt, size_t offset, const void*& ptr, size_t & size)>(
-        [&](int callCnt, size_t offset, const void*& ptr, size_t& size)->bool
+        [&](int callCnt, size_t, const void*& ptr, size_t& size)->bool
         {
             if (callCnt == 0)
             {
@@ -2271,7 +2271,7 @@ TEST(CziWriter, TryAddingDuplicateSubBlocksToCziWriterAndWhenCheckIsDisable)
 
     auto metadataBuilder = writer->GetPreparedMetadata(PrepareMetadataInfo());
     string xml = metadataBuilder->GetXml(true);
-    WriteMetadataInfo writerMdInfo = { 0 };
+    WriteMetadataInfo writerMdInfo;
     writerMdInfo.szMetadata = xml.c_str();
     writerMdInfo.szMetadataSize = xml.size();
     writer->SyncWriteMetadata(writerMdInfo);

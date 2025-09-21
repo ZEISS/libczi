@@ -19,12 +19,12 @@ using namespace std;
 class CSiteImpBase : public ISite
 {
 public:
-    bool IsEnabled(int logLevel) override
+    bool IsEnabled(int) override
     {
         return false;
     }
 
-    void Log(int level, const char* szMsg) override
+    void Log(int, const char*) override
     {
     }
 
@@ -33,12 +33,12 @@ public:
         return CStdBitmapData::Create(pixeltype, width, height, stride, extraRows, extraColumns);
     }
 
-    std::shared_ptr<IDecoder> GetDecoder(ImageDecoderType type, const char* arguments) override
+    std::shared_ptr<IDecoder> GetDecoder(ImageDecoderType, const char*) override
     {
         throw std::runtime_error("must not be called...");
     }
 
-    void TerminateProgram(TerminationReason reason, const char* message) override
+    void TerminateProgram(TerminationReason, const char*) override
     {
         abort();
     }
@@ -106,7 +106,7 @@ private:
     std::once_flag  zstd1DecoderInitialized;
     std::shared_ptr<IDecoder> zstd1decoder;
 public:
-    std::shared_ptr<IDecoder> GetDecoder(ImageDecoderType type, const char* arguments) override
+    std::shared_ptr<IDecoder> GetDecoder(ImageDecoderType type, const char*) override
     {
         switch (type)
         {

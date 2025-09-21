@@ -51,7 +51,7 @@ static void ConvertSegmentHeaderToHostByteOrder(CziSegmentHeader* p);
 
         ConvertSegmentHeaderToHostByteOrder(&hdr);
 
-        int strLen = 0;
+        size_t strLen = 0;
         for (; strLen < sizeof(hdr.Id); ++strLen)
         {
             if (hdr.Id[strLen] == 0)
@@ -84,7 +84,7 @@ static void ConvertSegmentHeaderToHostByteOrder(CziSegmentHeader* p);
     bool allReceived = false;
     CSegmentWalker::Walk(
         stream,
-        [&](int cnt, const std::string& id, std::int64_t allocatedSize, std::int64_t usedSize)->bool
+        [&](int cnt, const std::string& id, std::int64_t, std::int64_t)->bool
         {
             const CSegmentWalker::ExpectedSegment* p = expectedSegments;
     intptr_t n = cnt;

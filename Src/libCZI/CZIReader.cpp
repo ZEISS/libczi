@@ -349,11 +349,11 @@ std::shared_ptr<ISubBlock> CCZIReader::ReadSubBlock(const CCziSubBlockDirectory:
             Utils::Compare(&entry.coordinate, &subBlkData.coordinate) != 0 ||
             (Utils::IsValidMindex(entry.mIndex) != Utils::IsValidMindex(subBlkData.mIndex) || (Utils::IsValidMindex(subBlkData.mIndex) && entry.mIndex != subBlkData.mIndex)) ||
             entry.x != subBlkData.logicalRect.x || entry.y != subBlkData.logicalRect.y || entry.width != subBlkData.logicalRect.w || entry.height != subBlkData.logicalRect.h ||
-            entry.storedWidth != subBlkData.physicalSize.w || entry.storedHeight != subBlkData.physicalSize.h)
+            entry.storedWidth != static_cast<int>(subBlkData.physicalSize.w) || entry.storedHeight != static_cast<int>(subBlkData.physicalSize.h))
         {
             throw LibCZICZIParseException(
                 "CZIReader::ReadSubBlock: SubBlock-directory and sub-block information do not match.",
-                LibCZICZIParseException::ErrorCode::SubBlockDirectoryToSubBlockHeaderMismatch);
+                LibCZICZIParseException::ErrorType::SubBlockDirectoryToSubBlockHeaderMismatch);
         }
     }
 

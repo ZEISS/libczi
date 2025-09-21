@@ -78,7 +78,7 @@ public:
                     if (px != nullptr) { *px = 0; }
                     if (py != nullptr) { *py = 0; }
                 }
-                else if (index == splineControlPoints.size() + 1)
+                else if (index == static_cast<int>(splineControlPoints.size()) + 1)
                 {
                     if (px != nullptr) { *px = 1; }
                     if (py != nullptr) { *py = 1; }

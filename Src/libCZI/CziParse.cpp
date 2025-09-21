@@ -7,6 +7,7 @@
 #include "CziStructs.h"
 #include <cassert>
 #include <cstddef>
+#include <cstdint>
 #include "Site.h"
 
 using namespace std;
@@ -128,7 +129,7 @@ using namespace libCZI;
         CCZIParse::ThrowNotEnoughDataRead(offset + sizeof(subBlckDirSegment), subBlkDirSize, bytesRead);
     }
 
-    int currentOffset = 0;
+    uint64_t currentOffset = 0;
     CCZIParse::ParseThroughDirectoryEntries(
         subBlckDirSegment.data.EntryCount,
         [&](int numberOfBytes, void* ptr)->void
@@ -385,7 +386,7 @@ using namespace libCZI;
             std::throw_with_nested(LibCZIIOException("Error reading FileHeaderSegment", offset + lengthSubblockSegmentData + sizeof(SegmentHeader), subBlckSegment.data.MetadataSize));
         }
 
-        if (bytesRead != subBlckSegment.data.MetadataSize)
+        if (static_cast<int32_t>(bytesRead) != subBlckSegment.data.MetadataSize)
         {
             CCZIParse::ThrowNotEnoughDataRead(offset + lengthSubblockSegmentData + sizeof(SegmentHeader), subBlckSegment.data.MetadataSize, bytesRead);
         }
@@ -402,7 +403,7 @@ using namespace libCZI;
             std::throw_with_nested(LibCZIIOException("Error reading FileHeaderSegment", offset + lengthSubblockSegmentData + sizeof(SegmentHeader) + subBlckSegment.data.MetadataSize, subBlckSegment.data.DataSize));
         }
 
-        if (bytesRead != subBlckSegment.data.DataSize)
+        if (static_cast<int32_t>(bytesRead) != subBlckSegment.data.DataSize)
         {
             CCZIParse::ThrowNotEnoughDataRead(offset + lengthSubblockSegmentData + sizeof(SegmentHeader) + subBlckSegment.data.MetadataSize, subBlckSegment.data.DataSize, bytesRead);
         }
@@ -419,7 +420,7 @@ using namespace libCZI;
             std::throw_with_nested(LibCZIIOException("Error reading FileHeaderSegment", offset + lengthSubblockSegmentData + sizeof(SegmentHeader) + subBlckSegment.data.MetadataSize + subBlckSegment.data.DataSize, subBlckSegment.data.AttachmentSize));
         }
 
-        if (bytesRead != subBlckSegment.data.AttachmentSize)
+        if (static_cast<int32_t>(bytesRead) != subBlckSegment.data.AttachmentSize)
         {
             CCZIParse::ThrowNotEnoughDataRead(offset + lengthSubblockSegmentData + sizeof(SegmentHeader) + subBlckSegment.data.MetadataSize + subBlckSegment.data.DataSize, subBlckSegment.data.AttachmentSize, bytesRead);
         }
@@ -474,7 +475,7 @@ using namespace libCZI;
             std::throw_with_nested(LibCZIIOException("Error reading AttachmentSegment", offset + 256 + sizeof(SegmentHeader), attchmntSegment.data.DataSize));
         }
 
-        if (bytesRead != attchmntSegment.data.DataSize)
+        if (static_cast<int32_t>(bytesRead) != attchmntSegment.data.DataSize)
         {
             CCZIParse::ThrowNotEnoughDataRead(offset + 256 + sizeof(SegmentHeader), attchmntSegment.data.DataSize, bytesRead);
         }
@@ -516,7 +517,7 @@ using namespace libCZI;
     }
 }
 
-/*static*/void CCZIParse::AddEntryToSubBlockDirectory(const SubBlockDirectoryEntryDE* subBlkDirDE, const std::function<void(const CCziSubBlockDirectoryBase::SubBlkEntry&)>& addFunc)
+/*static*/void CCZIParse::AddEntryToSubBlockDirectory(const SubBlockDirectoryEntryDE*, const std::function<void(const CCziSubBlockDirectoryBase::SubBlkEntry&)>&)
 {
     // TODO
     throw std::logic_error("not (yet) implemented");
@@ -557,7 +558,7 @@ using namespace libCZI;
                     // In this case we can immediately throw an exception (i.e. this options requires that the size of M is 1 for all subblocks).
                     stringstream string_stream;
                     string_stream << "Size for dimension 'M' is expected to be 1, but found " << subBlkDirDV->DimensionEntries[i].Size << " (file-offset:" << subBlkDirDV->FilePosition << ").";
-                    throw LibCZICZIParseException(string_stream.str().c_str(), LibCZICZIParseException::ErrorCode::NonConformingSubBlockDimensionEntry);
+                    throw LibCZICZIParseException(string_stream.str().c_str(), LibCZICZIParseException::ErrorType::NonConformingSubBlockDimensionEntry);
                 }
                 else
                 {
@@ -584,7 +585,7 @@ using namespace libCZI;
                             << "Physical size for dimension '" << Utils::DimensionToChar(dim)
                             << "' is expected to be 1, but found " << physicalSize
                             << " (file-offset:" << subBlkDirDV->FilePosition << ").";
-                    throw LibCZICZIParseException(string_stream.str().c_str(), LibCZICZIParseException::ErrorCode::NonConformingSubBlockDimensionEntry);
+                    throw LibCZICZIParseException(string_stream.str().c_str(), LibCZICZIParseException::ErrorType::NonConformingSubBlockDimensionEntry);
                 }
             }
 
@@ -592,7 +593,7 @@ using namespace libCZI;
             {
                 stringstream string_stream;
                 string_stream << "Size for dimension '" << Utils::DimensionToChar(dim) << "' is expected to be 1, but found " << subBlkDirDV->DimensionEntries[i].Size << " (file-offset:" << subBlkDirDV->FilePosition << ").";
-                throw LibCZICZIParseException(string_stream.str().c_str(), LibCZICZIParseException::ErrorCode::NonConformingSubBlockDimensionEntry);
+                throw LibCZICZIParseException(string_stream.str().c_str(), LibCZICZIParseException::ErrorType::NonConformingSubBlockDimensionEntry);
             }
         }
     }
@@ -615,7 +616,7 @@ using namespace libCZI;
         }
 
         string_stream << " (file-offset:" << subBlkDirDV->FilePosition << ").";
-        throw LibCZICZIParseException(string_stream.str().c_str(), LibCZICZIParseException::ErrorCode::NonConformingSubBlockDimensionEntry);
+        throw LibCZICZIParseException(string_stream.str().c_str(), LibCZICZIParseException::ErrorType::NonConformingSubBlockDimensionEntry);
     }
 
     if (size_of_m_was_not_1 && options.GetDimensionMMustHaveSizeOneForPyramidSubblocks())
@@ -628,7 +629,7 @@ using namespace libCZI;
             // this is not a pyramid-subblock, so we throw the exception
             stringstream string_stream;
             string_stream << "Size for dimension 'M' for non-pyramid-subblock is expected to be 1, but found " << size_of_m_in_case_it_was_not_1 << " (file-offset:" << subBlkDirDV->FilePosition << ").";
-            throw LibCZICZIParseException(string_stream.str().c_str(), LibCZICZIParseException::ErrorCode::NonConformingSubBlockDimensionEntry);
+            throw LibCZICZIParseException(string_stream.str().c_str(), LibCZICZIParseException::ErrorType::NonConformingSubBlockDimensionEntry);
         }
     }
 
@@ -680,7 +681,7 @@ using namespace libCZI;
             std::throw_with_nested(LibCZIIOException("Error reading MetaDataSegment", offset + sizeof(metadataSegment), metadataSegment.data.XmlSize));
         }
 
-        if (bytesRead != metadataSegment.data.XmlSize)
+        if (static_cast<int32_t>(bytesRead) != metadataSegment.data.XmlSize)
         {
             CCZIParse::ThrowNotEnoughDataRead(offset + sizeof(metadataSegment), metadataSegment.data.XmlSize, bytesRead);
         }
@@ -697,7 +698,7 @@ using namespace libCZI;
             std::throw_with_nested(LibCZIIOException("Error reading MetaDataSegment", offset + sizeof(metadataSegment) + metadataSegment.data.XmlSize, metadataSegment.data.AttachmentSize));
         }
 
-        if (bytesRead != metadataSegment.data.AttachmentSize)
+        if (static_cast<int32_t>(bytesRead) != metadataSegment.data.AttachmentSize)
         {
             CCZIParse::ThrowNotEnoughDataRead(offset + sizeof(metadataSegment) + metadataSegment.data.XmlSize, metadataSegment.data.AttachmentSize, bytesRead);
         }
@@ -798,21 +799,21 @@ using namespace libCZI;
 {
     stringstream ss;
     ss << "Not enough data read at offset " << offset << " -> requested: " << bytesRequested << " bytes, actually got " << bytesActuallyRead << " bytes.";
-    throw LibCZICZIParseException(ss.str().c_str(), LibCZICZIParseException::ErrorCode::NotEnoughData);
+    throw LibCZICZIParseException(ss.str().c_str(), LibCZICZIParseException::ErrorType::NotEnoughData);
 }
 
 [[noreturn]] /*static*/void CCZIParse::ThrowIllegalData(std::uint64_t offset, const char* sz)
 {
     stringstream ss;
     ss << "Illegal data detected at offset " << offset << " -> " << sz;
-    throw LibCZICZIParseException(ss.str().c_str(), LibCZICZIParseException::ErrorCode::CorruptedData);
+    throw LibCZICZIParseException(ss.str().c_str(), LibCZICZIParseException::ErrorType::CorruptedData);
 }
 
 [[noreturn]] /*static*/void CCZIParse::ThrowIllegalData(const char* sz)
 {
     stringstream ss;
     ss << "Illegal data detected -> " << sz;
-    throw LibCZICZIParseException(ss.str().c_str(), LibCZICZIParseException::ErrorCode::CorruptedData);
+    throw LibCZICZIParseException(ss.str().c_str(), LibCZICZIParseException::ErrorType::CorruptedData);
 }
 
 /*static*/bool CCZIParse::CheckAttachmentSchemaType(const char* p, size_t cnt)

@@ -6,7 +6,7 @@
 #include "utilities.h"
 #include "inc_libCZI_Config.h"
 
-/*static*/void ConvertToHostByteOrder::Convert(SegmentHeader* p)
+/*static*/void ConvertToHostByteOrder::Convert(SegmentHeader*)
 {
 #if LIBCZI_ISBIGENDIANHOST
     Utilities::ConvertInt64ToHostByteOrder(&p->AllocatedSize);
@@ -14,7 +14,7 @@
 #endif
 }
 
-/*static*/void ConvertToHostByteOrder::Convert(FileHeaderSegmentData* p)
+/*static*/void ConvertToHostByteOrder::Convert(FileHeaderSegmentData*)
 {
 #if LIBCZI_ISBIGENDIANHOST
     Utilities::ConvertInt32ToHostByteOrder(&p->Major);
@@ -31,7 +31,7 @@
 #endif
 }
 
-/*static*/void ConvertToHostByteOrder::Convert(AttachmentEntryA1* p)
+/*static*/void ConvertToHostByteOrder::Convert(AttachmentEntryA1*)
 {
 #if LIBCZI_ISBIGENDIANHOST
     Utilities::ConvertInt64ToHostByteOrder(&p->FilePosition);
@@ -40,7 +40,7 @@
 #endif
 }
 
-/*static*/void ConvertToHostByteOrder::Convert(SubBlockDirectoryEntryDV* p)
+/*static*/void ConvertToHostByteOrder::Convert(SubBlockDirectoryEntryDV*)
 {
 #if LIBCZI_ISBIGENDIANHOST
     Utilities::ConvertInt32ToHostByteOrder(&p->PixelType);
@@ -51,7 +51,7 @@
 #endif
 }
 
-/*static*/void ConvertToHostByteOrder::Convert(DimensionEntryDV* p, int count)
+/*static*/void ConvertToHostByteOrder::Convert(DimensionEntryDV*, int)
 {
 #if LIBCZI_ISBIGENDIANHOST
     for (int i = 0; i < count; ++i)
@@ -64,7 +64,7 @@
 #endif
 }
 
-/*static*/void ConvertToHostByteOrder::Convert(SubBlockDirectoryEntryDE* p)
+/*static*/void ConvertToHostByteOrder::Convert(SubBlockDirectoryEntryDE*)
 {
 #if LIBCZI_ISBIGENDIANHOST
     Utilities::ConvertInt32ToHostByteOrder(&p->PixelType);
@@ -96,7 +96,7 @@
 #endif
 }
 
-/*static*/void ConvertToHostByteOrder::Convert(FileHeaderSegment* p)
+/*static*/void ConvertToHostByteOrder::Convert(FileHeaderSegment*)
 {
 #if LIBCZI_ISBIGENDIANHOST
     ConvertToHostByteOrder::Convert(&p->header);
@@ -104,7 +104,7 @@
 #endif
 }
 
-/*static*/void ConvertToHostByteOrder::Convert(AttachmentSegment* p)
+/*static*/void ConvertToHostByteOrder::Convert(AttachmentSegment*)
 {
 #if LIBCZI_ISBIGENDIANHOST
     ConvertToHostByteOrder::Convert(&p->header);
@@ -115,7 +115,7 @@
 #endif
 }
 
-/*static*/void ConvertToHostByteOrder::Convert(AttachmentDirectorySegment* p)
+/*static*/void ConvertToHostByteOrder::Convert(AttachmentDirectorySegment*)
 {
 #if LIBCZI_ISBIGENDIANHOST
     ConvertToHostByteOrder::Convert(&p->header);
@@ -123,7 +123,7 @@
 #endif
 }
 
-/*static*/void ConvertToHostByteOrder::Convert(MetadataSegment* p)
+/*static*/void ConvertToHostByteOrder::Convert(MetadataSegment*)
 {
 #if LIBCZI_ISBIGENDIANHOST
     ConvertToHostByteOrder::Convert(&p->header);
@@ -132,7 +132,7 @@
 #endif
 }
 
-/*static*/void ConvertToHostByteOrder::Convert(SubBlockDirectorySegment* p)
+/*static*/void ConvertToHostByteOrder::Convert(SubBlockDirectorySegment*)
 {
 #if LIBCZI_ISBIGENDIANHOST
     ConvertToHostByteOrder::Convert(&p->header);
@@ -140,7 +140,7 @@
 #endif
 }
 
-/*static*/void ConvertToHostByteOrder::Convert(SubBlockSegment* p)
+/*static*/void ConvertToHostByteOrder::Convert(SubBlockSegment*)
 {
 #if LIBCZI_ISBIGENDIANHOST
     ConvertToHostByteOrder::Convert(&p->header);
@@ -150,7 +150,7 @@
 #endif
 }
 
-/*static*/void ConvertToHostByteOrder::ConvertAndAllSubBlkEntries(SubBlockSegment* p)
+/*static*/void ConvertToHostByteOrder::ConvertAndAllSubBlkEntries(SubBlockSegment*)
 {
 #if LIBCZI_ISBIGENDIANHOST
     // we need to store the "EntryCount" before shuffling the properties
@@ -164,7 +164,7 @@
 #endif
 }
 
-/*static*/void ConvertToHostByteOrder::ConvertAndAllSubBlkDirEntries(SubBlockDirectorySegment* p)
+/*static*/void ConvertToHostByteOrder::ConvertAndAllSubBlkDirEntries(SubBlockDirectorySegment*)
 {
 #if LIBCZI_ISBIGENDIANHOST
     // we need to store the "EntryCount" before shuffling the properties

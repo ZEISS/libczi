@@ -4,6 +4,7 @@
 
 #include "SingleChannelAccessorBase.h"
 #include "BitmapOperations.h"
+#include "libCZI_Pixels.h"
 #include "utilities.h"
 
 using namespace std;
@@ -33,7 +34,7 @@ void CSingleChannelAccessorBase::CheckPlaneCoordinates(const libCZI::IDimCoordin
     // planeCoordinate must not contain S
     if (planeCoordinate->IsValid(DimensionIndex::S))
     {
-        throw LibCZIInvalidPlaneCoordinateException("S-dimension is illegal for a plane.", LibCZIInvalidPlaneCoordinateException::ErrorCode::InvalidDimension);
+        throw LibCZIInvalidPlaneCoordinateException("S-dimension is illegal for a plane.", LibCZIInvalidPlaneCoordinateException::ErrorType::InvalidDimension);
     }
 
     static constexpr DimensionIndex DimensionsToCheck[] =
@@ -56,7 +57,7 @@ void CSingleChannelAccessorBase::CheckPlaneCoordinates(const libCZI::IDimCoordin
                 {
                     stringstream ss;
                     ss << "Coordinate for dimension '" << Utils::DimensionToChar(d) << "' not given.";
-                    throw LibCZIInvalidPlaneCoordinateException(ss.str().c_str(), LibCZIInvalidPlaneCoordinateException::ErrorCode::MissingDimension);
+                    throw LibCZIInvalidPlaneCoordinateException(ss.str().c_str(), LibCZIInvalidPlaneCoordinateException::ErrorType::MissingDimension);
                 }
             }
             else
@@ -65,7 +66,7 @@ void CSingleChannelAccessorBase::CheckPlaneCoordinates(const libCZI::IDimCoordin
                 {
                     stringstream ss;
                     ss << "Coordinate for dimension '" << Utils::DimensionToChar(d) << "' is out-of-range.";
-                    throw LibCZIInvalidPlaneCoordinateException(ss.str().c_str(), LibCZIInvalidPlaneCoordinateException::ErrorCode::CoordinateOutOfRange);
+                    throw LibCZIInvalidPlaneCoordinateException(ss.str().c_str(), LibCZIInvalidPlaneCoordinateException::ErrorType::CoordinateOutOfRange);
                 }
             }
         }
@@ -76,7 +77,7 @@ void CSingleChannelAccessorBase::CheckPlaneCoordinates(const libCZI::IDimCoordin
             {
                 stringstream ss;
                 ss << "Coordinate for dimension '" << Utils::DimensionToChar(d) << "' is not expected.";
-                throw LibCZIInvalidPlaneCoordinateException(ss.str().c_str(), LibCZIInvalidPlaneCoordinateException::ErrorCode::SurplusDimension);
+                throw LibCZIInvalidPlaneCoordinateException(ss.str().c_str(), LibCZIInvalidPlaneCoordinateException::ErrorType::SurplusDimension);
             }
         }
     }
@@ -84,14 +85,20 @@ void CSingleChannelAccessorBase::CheckPlaneCoordinates(const libCZI::IDimCoordin
 
 std::vector<int> CSingleChannelAccessorBase::CheckForVisibility(const libCZI::IntRect& roi, int count, const std::function<int(int)>& get_subblock_index) const
 {
-    return CSingleChannelAccessorBase::CheckForVisibilityCore(
+   constexpr IntRect invalid_rect {.h = -1, .w = -1};
+   return CSingleChannelAccessorBase::CheckForVisibilityCore(
         roi,
         count,
         get_subblock_index,
-        [this](int subblock_index) -> IntRect
+        [&](int subblock_index) -> IntRect
             {
                 SubBlockInfo subblock_info;
-                bool b = this->sbBlkRepository->TryGetSubBlockInfo(subblock_index, &subblock_info);
+                bool b = this->sbBlkRepository->TryGetSubBlockInfo(
+                    subblock_index, &subblock_info);
+                if (!b)
+                {
+                    return invalid_rect;
+                }
                 return subblock_info.logicalRect;
             });
 }

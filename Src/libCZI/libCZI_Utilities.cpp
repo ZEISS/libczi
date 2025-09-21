@@ -626,7 +626,7 @@ std::vector<tOutput> InternalCreateLookUpTableFromGamma(int tableElementCnt, tFl
     CDimCoordinate coord;
     std::vector<DimensionIndex> dims;
     bounds.EnumValidDimensions(
-        [&](libCZI::DimensionIndex dim, int start, int size)->bool
+        [&](libCZI::DimensionIndex dim, int start, int)->bool
         {
             coord.Set(dim, start);
             dims.push_back(dim);
