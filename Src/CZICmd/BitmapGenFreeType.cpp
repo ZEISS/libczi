@@ -17,7 +17,7 @@
 
 /*static*/void CBitmapGenFreetype::Initialize()
 {
-    auto error = FT_Init_FreeType(&CBitmapGenFreetype::library);
+    FT_Init_FreeType(&CBitmapGenFreetype::library);
 }
 
 /*static*/void CBitmapGenFreetype::Shutdown()
@@ -35,16 +35,15 @@ CBitmapGenFreetype::CBitmapGenFreetype(const IBitmapGenParameters* params) : fac
         fontSize = params->GetFontHeight();
     }
 
-    FT_Error error;
     if (!filenameFont.empty())
     {
-        error = FT_New_Face(CBitmapGenFreetype::library,
+        FT_New_Face(CBitmapGenFreetype::library,
             filenameFont.c_str(),
             0, &this->face);
     }
     else
     {
-        error = FT_New_Memory_Face(CBitmapGenFreetype::library,
+        FT_New_Memory_Face(CBitmapGenFreetype::library,
             CBitmapGenFreetype::font_MonoMMM5,
             sizeof(CBitmapGenFreetype::font_MonoMMM5),
             0,
@@ -56,7 +55,7 @@ CBitmapGenFreetype::CBitmapGenFreetype(const IBitmapGenParameters* params) : fac
         fontSize = 36;
     }
 
-    error = FT_Set_Pixel_Sizes(this->face,   /* handle to face object */
+    FT_Set_Pixel_Sizes(this->face,   /* handle to face object */
         0,            /* pixel_width           */
         fontSize);   /* pixel_height          */
 }
@@ -113,9 +112,9 @@ void CBitmapGenFreetype::DrawString(int xPos, int yPos, const char* sz, const st
         }
 
         /* load glyph image into the slot (erase previous one) */
-        FT_Error error = FT_Load_Glyph(this->face, glyph_index, FT_LOAD_DEFAULT);
+        FT_Load_Glyph(this->face, glyph_index, FT_LOAD_DEFAULT);
 
-        error = FT_Render_Glyph(this->face->glyph, FT_RENDER_MODE_MONO);
+        FT_Render_Glyph(this->face->glyph, FT_RENDER_MODE_MONO);
 
         bm->CopyMonochromeBitmap(xPos, yPos, this->face->glyph->bitmap.buffer, this->face->glyph->bitmap.pitch, this->face->glyph->bitmap.width, this->face->glyph->bitmap.rows, color);
         xPos += this->face->glyph->advance.x >> 6;

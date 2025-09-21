@@ -23,6 +23,6 @@ public:
     explicit CSharedPtrAllocator(std::shared_ptr<const void> shp) :shp(std::move(shp))
     {}
 
-    void* Allocate(std::uint64_t size) { return const_cast<void*>(this->shp.get()); }
-    void Free(void* ptr) { this->shp.reset(); }
+    void* Allocate(std::uint64_t) { return const_cast<void*>(this->shp.get()); }
+    void Free(void*) { this->shp.reset(); }
 };

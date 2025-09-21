@@ -365,7 +365,7 @@ void CCziReaderWriter::ReadCziStructure()
     }
     catch (const LibCZICZIParseException& excp)
     {
-        if (excp.GetErrorCode() == LibCZICZIParseException::ErrorCode::NotEnoughData)
+        if (excp.GetErrorCode() == LibCZICZIParseException::ErrorType::NotEnoughData)
         {
             // this now means that the existing file did not contain a CZI-file-header, which let's us
             // treat this file as "new" (so, there is no information we re-use)     
@@ -477,7 +477,7 @@ void CCziReaderWriter::DetermineNextSubBlockOffset()
 {
     std::uint64_t lastSegmentPos = 0;
     this->sbBlkDirectory.EnumEntries(
-        [&](size_t index, const CCziSubBlockDirectoryBase::SubBlkEntry& sbBlkEntry)->bool
+        [&](size_t, const CCziSubBlockDirectoryBase::SubBlkEntry& sbBlkEntry)->bool
         {
             if (sbBlkEntry.FilePosition > lastSegmentPos)
             {
@@ -488,7 +488,7 @@ void CCziReaderWriter::DetermineNextSubBlockOffset()
         });
 
     this->attachmentDirectory.EnumEntries(
-        [&](size_t index, const CCziAttachmentsDirectoryBase::AttachmentEntry& attEntry)->bool
+        [&](size_t, const CCziAttachmentsDirectoryBase::AttachmentEntry& attEntry)->bool
         {
             if (static_cast<uint64_t>(attEntry.FilePosition) > lastSegmentPos)
             {

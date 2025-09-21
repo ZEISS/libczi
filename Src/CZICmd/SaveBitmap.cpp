@@ -180,7 +180,7 @@ private:
         }
     };
 public:
-    virtual void Save(const wchar_t* fileName, SaveDataFormat dataFormat, libCZI::IBitmapData* bitmap)
+    virtual void Save(const wchar_t* fileName, SaveDataFormat, libCZI::IBitmapData* bitmap)
     {
         switch (bitmap->GetPixelType())
         {

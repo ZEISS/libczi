@@ -35,19 +35,19 @@ public:
     {
         libCZI::AddSubBlockInfo addSbInfo(addSbBlkInfo);
         addSbInfo.sizeData = addSbBlkInfo.dataSize;
-        addSbInfo.getData = [&](int callCnt, size_t offset, const void*& ptr, size_t& size)->bool
+        addSbInfo.getData = [&](int callCnt, size_t, const void*& ptr, size_t& size)->bool
         {
             return SetIfCallCountZero(callCnt, addSbBlkInfo.ptrData, addSbBlkInfo.dataSize, ptr, size);
         };
 
         addSbInfo.sizeAttachment = addSbBlkInfo.sbBlkAttachmentSize;
-        addSbInfo.getAttachment = [&](int callCnt, size_t offset, const void*& ptr, size_t& size)->bool
+        addSbInfo.getAttachment = [&](int callCnt, size_t, const void*& ptr, size_t& size)->bool
         {
             return SetIfCallCountZero(callCnt, addSbBlkInfo.ptrSbBlkAttachment, addSbBlkInfo.sbBlkAttachmentSize, ptr, size);
         };
 
         addSbInfo.sizeMetadata = addSbBlkInfo.sbBlkMetadataSize;
-        addSbInfo.getMetaData = [&](int callCnt, size_t offset, const void*& ptr, size_t& size)->bool
+        addSbInfo.getMetaData = [&](int callCnt, size_t, const void*& ptr, size_t& size)->bool
         {
             return SetIfCallCountZero(callCnt, addSbBlkInfo.ptrSbBlkMetadata, addSbBlkInfo.sbBlkMetadataSize, ptr, size);
         };
@@ -63,7 +63,7 @@ public:
         size_t stride = addSbInfoLinewise.physicalWidth * CziUtils::GetBytesPerPel(addSbInfoLinewise.PixelType);
         addSbInfo.sizeData = addSbInfoLinewise.physicalHeight * stride;
         auto linesCnt = addSbInfoLinewise.physicalHeight;
-        addSbInfo.getData = [&](int callCnt, size_t offset, const void*& ptr, size_t& size)->bool
+        addSbInfo.getData = [&](int callCnt, size_t, const void*& ptr, size_t& size)->bool
         {
             if (callCnt < linesCnt)
             {
@@ -76,13 +76,13 @@ public:
         };
 
         addSbInfo.sizeAttachment = addSbInfoLinewise.sbBlkAttachmentSize;
-        addSbInfo.getAttachment = [&](int callCnt, size_t offset, const void*& ptr, size_t& size)->bool
+        addSbInfo.getAttachment = [&](int callCnt, size_t, const void*& ptr, size_t& size)->bool
         {
             return SetIfCallCountZero(callCnt, addSbInfoLinewise.ptrSbBlkAttachment, addSbInfoLinewise.sbBlkAttachmentSize, ptr, size);
         };
 
         addSbInfo.sizeMetadata = addSbInfoLinewise.sbBlkMetadataSize;
-        addSbInfo.getMetaData = [&](int callCnt, size_t offset, const void*& ptr, size_t& size)->bool
+        addSbInfo.getMetaData = [&](int callCnt, size_t, const void*& ptr, size_t& size)->bool
         {
             return SetIfCallCountZero(callCnt, addSbInfoLinewise.ptrSbBlkMetadata, addSbInfoLinewise.sbBlkMetadataSize, ptr, size);
         };
@@ -96,7 +96,7 @@ public:
         libCZI::AddSubBlockInfo addSbInfo(addSbBlkInfoStrideBitmap);
 
         addSbInfo.sizeData = static_cast<size_t>(addSbBlkInfoStrideBitmap.physicalHeight) * addSbBlkInfoStrideBitmap.strideBitmap;
-        addSbInfo.getData = [&](int callCnt, size_t offset, const void*& ptr, size_t& size)->bool
+        addSbInfo.getData = [&](int callCnt, size_t, const void*& ptr, size_t& size)->bool
         {
             if (callCnt < addSbBlkInfoStrideBitmap.physicalHeight)
             {
@@ -109,13 +109,13 @@ public:
         };
 
         addSbInfo.sizeAttachment = addSbBlkInfoStrideBitmap.sbBlkAttachmentSize;
-        addSbInfo.getAttachment = [&](int callCnt, size_t offset, const void*& ptr, size_t& size)->bool
+        addSbInfo.getAttachment = [&](int callCnt, size_t, const void*& ptr, size_t& size)->bool
         {
             return SetIfCallCountZero(callCnt, addSbBlkInfoStrideBitmap.ptrSbBlkAttachment, addSbBlkInfoStrideBitmap.sbBlkAttachmentSize, ptr, size);
         };
 
         addSbInfo.sizeMetadata = addSbBlkInfoStrideBitmap.sbBlkMetadataSize;
-        addSbInfo.getMetaData = [&](int callCnt, size_t offset, const void*& ptr, size_t& size)->bool
+        addSbInfo.getMetaData = [&](int callCnt, size_t, const void*& ptr, size_t& size)->bool
         {
             return SetIfCallCountZero(callCnt, addSbBlkInfoStrideBitmap.ptrSbBlkMetadata, addSbBlkInfoStrideBitmap.sbBlkMetadataSize, ptr, size);
         };

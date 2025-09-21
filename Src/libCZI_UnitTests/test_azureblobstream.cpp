@@ -173,7 +173,7 @@ TEST(AzureBlobStream, ReadSubBlockFromBlobUsingConnectionString)
     reader->Open(stream);
 
     reader->EnumerateSubBlocks(
-        [&](int index, const SubBlockInfo& subBlockInfo)
+        [&](int index, const SubBlockInfo&)
         {
             const auto subBlock = reader->ReadSubBlock(index);
             EXPECT_TRUE(subBlock);

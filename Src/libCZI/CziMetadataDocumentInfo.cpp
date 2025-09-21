@@ -4,6 +4,7 @@
 
 #include "CziMetadataDocumentInfo.h"
 
+#include <cstddef>
 #include <utility>
 #include "CziDimensionInfo.h"
 #include "CziDisplaySettings.h"
@@ -488,7 +489,7 @@ void CCziMetadataDocumentInfo::ParseDimensionInfo()
     auto np = this->GetNode(L"Metadata/Information/Image");
     if (!np.empty())
     {
-        for (int i = 0; i < sizeof(DimAndNodeNames) / sizeof(DimAndNodeNames[0]); ++i)
+        for (size_t i = 0; i < sizeof(DimAndNodeNames) / sizeof(DimAndNodeNames[0]); ++i)
         {
             auto nStart = GetNodeRelativeFromNode(np, DimAndNodeNames[i].start);
             auto nSize = GetNodeRelativeFromNode(np, DimAndNodeNames[i].size);

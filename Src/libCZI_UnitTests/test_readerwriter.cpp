@@ -324,7 +324,7 @@ TEST(CziReaderWriter, ReaderWriter2)
     addSbInfo.PixelType = sb0->GetSubBlockInfo().pixelType;
 
     addSbInfo.sizeData = sizeSbblkData * 4;
-    addSbInfo.getData = [&](int callCnt, size_t offset, const void*& ptr, size_t& size)->bool
+    addSbInfo.getData = [&](int callCnt, size_t, const void*& ptr, size_t& size)->bool
         {
             // repeat every byte four times
             auto byteNo = callCnt / 4;
@@ -348,7 +348,7 @@ TEST(CziReaderWriter, ReaderWriter2)
     bool allReceived = false;
     CSegmentWalker::Walk(
         inOutStream.get(),
-        [&](int cnt, const std::string& id, std::int64_t allocatedSize, std::int64_t usedSize)->bool
+        [&](int cnt, const std::string& id, std::int64_t, std::int64_t)->bool
         {
             // we expect "FILEHEADER", "SUBBLKDIR", "DELETED", 49 x "SUBBLK", "METADATA", "SUBBLK"
             if (cnt == 0)
@@ -466,7 +466,7 @@ TEST(CziReaderWriter, ReaderWriter3)
     bool allReceived = false;
     CSegmentWalker::Walk(
         inOutStream.get(),
-        [&](int cnt, const std::string& id, std::int64_t allocatedSize, std::int64_t usedSize)->bool
+        [&](int cnt, const std::string& id, std::int64_t, std::int64_t)->bool
         {
             // we expect "FILEHEADER", "SUBBLKDIR", 50 x "SUBBLK", "DELETED", "METADATA", "ATTACHMENTDIR", "ATTACHMENT"
             if (cnt == 0)
@@ -990,7 +990,7 @@ TEST(CziReaderWriter, ReaderWriter12)
     EXPECT_TRUE(CheckNotOperationalException([&]()->void {rw->ReadMetadataSegment(); })) << "incorrect behavior";
     EXPECT_TRUE(CheckNotOperationalException([&]()->void {rw->Close(); })) << "incorrect behavior";
 
-    EXPECT_TRUE(CheckNotOperationalException([&]()->void {rw->EnumerateSubBlocks([](int i, const SubBlockInfo& info)->bool {return true; }); })) << "incorrect behavior";
+    EXPECT_TRUE(CheckNotOperationalException([&]()->void {rw->EnumerateSubBlocks([](int, const SubBlockInfo&)->bool {return true; }); })) << "incorrect behavior";
     EXPECT_TRUE(CheckNotOperationalException([&]()->void {rw->GetStatistics(); })) << "incorrect behavior";
     EXPECT_TRUE(CheckNotOperationalException([&]()->void {rw->GetPyramidStatistics(); })) << "incorrect behavior";
 
@@ -1146,7 +1146,7 @@ TEST(CziReaderWriter, ReaderWriterEmpty2)
     MetadataUtils::WriteFillWithSubBlockStatistics(spMdBuilder.get(), rw->GetStatistics());
 
     string xml = spMdBuilder->GetXml(true);
-    WriteMetadataInfo writerMdInfo = { 0 };
+    WriteMetadataInfo writerMdInfo;
     writerMdInfo.szMetadata = xml.c_str();
     writerMdInfo.szMetadataSize = xml.size();
 
@@ -1206,7 +1206,7 @@ TEST(CziReaderWriter, ReaderWriterEmpty3)
     MetadataUtils::WriteFillWithSubBlockStatistics(spMdBuilder.get(), rw->GetStatistics());
 
     string xml = spMdBuilder->GetXml(true);
-    WriteMetadataInfo writerMdInfo = { 0 };
+    WriteMetadataInfo writerMdInfo;
     writerMdInfo.szMetadata = xml.c_str();
     writerMdInfo.szMetadataSize = xml.size();
 
@@ -1325,7 +1325,7 @@ TEST_P(SparePyramidTypeFixture, ReaderWriterCheckDeprecatedSparePyramidType)
     uint32_t call_count = 0;
     bool subblock_looks_as_expected = false;
     reader->EnumerateSubBlocks(
-        [&](int index, const SubBlockInfo& info)->bool
+        [&](int, const SubBlockInfo& info)->bool
         {
             // we expect to find only one subblock, and this has to have the expected
             //  "deprecated pyramid-type"
@@ -1399,7 +1399,7 @@ TEST(CziReaderWriter, TestEnumerateSubBlocks)
 
     vector<int> indices;
     reader_writer->EnumerateSubBlocks(
-        [&](int index, const SubBlockInfo& info)->bool
+        [&](int index, const SubBlockInfo&)->bool
         {
             indices.push_back(index);
             return true;
@@ -1427,7 +1427,7 @@ TEST(CziReaderWriter, TestEnumerateSubBlocks)
         nullptr,
         &query_rect,
         true,
-        [&](int index, const SubBlockInfo& info)->bool
+        [&](int index, const SubBlockInfo&)->bool
         {
             indices.push_back(index);
             return true;
@@ -1462,7 +1462,7 @@ TEST(CziReaderWriter, AttachmentEnumerateSubset)
     //  this should give the same result
     vector<int> indices_from_enumerate;
     reader_writer->EnumerateAttachments(
-        [&](int index, const AttachmentInfo& info)->bool
+        [&](int index, const AttachmentInfo&)->bool
         {
             indices_from_enumerate.push_back(index);
             return true;
@@ -1471,7 +1471,7 @@ TEST(CziReaderWriter, AttachmentEnumerateSubset)
     vector<int> indices_from_enumerate_subset;
     reader_writer->EnumerateSubset(
         nullptr, nullptr,
-        [&](int index, const AttachmentInfo& info)->bool
+        [&](int index, const AttachmentInfo&)->bool
         {
             indices_from_enumerate_subset.push_back(index);
             return true;
@@ -1485,7 +1485,7 @@ TEST(CziReaderWriter, AttachmentEnumerateSubset)
     indices_from_enumerate_subset.clear();
     reader_writer->EnumerateSubset(
         nullptr, "ATTACHMENT1",
-        [&](int index, const AttachmentInfo& info)->bool
+        [&](int index, const AttachmentInfo&)->bool
         {
             indices_from_enumerate_subset.push_back(index);
             return true;
@@ -1498,7 +1498,7 @@ TEST(CziReaderWriter, AttachmentEnumerateSubset)
     // Now use a condition which is not met by any attachment (so the result should be an empty vector).
     reader_writer->EnumerateSubset(
         nullptr, "XXXXXXXXXXX",
-        [&](int index, const AttachmentInfo& info)->bool
+        [&](int index, const AttachmentInfo&)->bool
         {
             indices_from_enumerate_subset.push_back(index);
             return true;

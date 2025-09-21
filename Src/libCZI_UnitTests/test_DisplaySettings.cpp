@@ -154,7 +154,7 @@ TEST(DisplaySettings, WriteDisplaySettingsToDocumentAndReadFromThereAndCompare)
 
     // then, get the XML-string containing the metadata, and put this into the CZI-file
     string xml = metadata_to_be_written->GetXml(true);
-    WriteMetadataInfo writerMdInfo = { 0 };
+    WriteMetadataInfo writerMdInfo;
     writerMdInfo.szMetadata = xml.c_str();
     writerMdInfo.szMetadataSize = xml.size();
     writer->SyncWriteMetadata(writerMdInfo);
@@ -268,7 +268,7 @@ TEST(DisplaySettings, WriteDisplaySettingsWithGradationCurveGammaAndSplineToDocu
 
     // then, get the XML-string containing the metadata, and put this into the CZI-file
     string xml = metadata_to_be_written->GetXml(true);
-    WriteMetadataInfo writerMdInfo = { 0 };
+    WriteMetadataInfo writerMdInfo;
     writerMdInfo.szMetadata = xml.c_str();
     writerMdInfo.szMetadataSize = xml.size();
     writer->SyncWriteMetadata(writerMdInfo);

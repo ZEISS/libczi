@@ -4,6 +4,7 @@
 
 #include "CziSubBlockDirectory.h"
 #include "CziUtils.h"
+#include <cstddef>
 
 using namespace libCZI;
 using namespace std;
@@ -279,7 +280,7 @@ const libCZI::PyramidStatistics& CSbBlkStatisticsUpdater::GetPyramidStatistics()
     };
 
     // check whether it is a factor of 2
-    for (int i = 0; i < sizeof(MinFacToPLI_Factor2) / sizeof(MinFacToPLI_Factor2[0]); ++i)
+    for (size_t i = 0; i < sizeof(MinFacToPLI_Factor2) / sizeof(MinFacToPLI_Factor2[0]); ++i)
     {
         if (MinFacToPLI_Factor2[i].IsInRange(minificationFactor))
         {
@@ -290,7 +291,7 @@ const libCZI::PyramidStatistics& CSbBlkStatisticsUpdater::GetPyramidStatistics()
     }
 
     // check whether it is a factor of 3
-    for (int i = 0; i < sizeof(MinFacToPLI_Factor3) / sizeof(MinFacToPLI_Factor3[0]); ++i)
+    for (size_t i = 0; i < sizeof(MinFacToPLI_Factor3) / sizeof(MinFacToPLI_Factor3[0]); ++i)
     {
         if (MinFacToPLI_Factor3[i].IsInRange(minificationFactor))
         {

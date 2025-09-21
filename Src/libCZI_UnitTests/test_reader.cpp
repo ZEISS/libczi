@@ -641,7 +641,7 @@ TEST(CziReader, ReaderException)
     public:
         CTestStreamImp(std::string exceptionText, std::error_code code) :exceptionText(std::move(exceptionText)), code(code) {}
 
-        void Read(std::uint64_t offset, void* pv, std::uint64_t size, std::uint64_t* ptrBytesRead) override
+        void Read(std::uint64_t, void*, std::uint64_t, std::uint64_t*) override
         {
             throw MyException(this->exceptionText, this->code);
         }
@@ -666,7 +666,6 @@ TEST(CziReader, ReaderException)
         {
             // according to standard, the content of the what()-test is implementation-specific,
             // so it is not suited for checking - but it seems that the code goes unaltered
-            const char* errorText = innerExcp.what();
             error_code errCode = innerExcp.code();
             if (errCode == ErrorCode)
             {
@@ -697,8 +696,6 @@ TEST(CziReader, ReaderException2)
         }
     };
 
-    static const char* ExceptionText = "Test-1";
-    static std::error_code ErrorCode = error_code(42, generic_category());
     auto stream = std::make_shared<CTestStreamImp>();
     auto spReader = libCZI::CreateCZIReader();
     bool exceptionCorrect = false;
@@ -709,7 +706,7 @@ TEST(CziReader, ReaderException2)
     catch (LibCZICZIParseException& excp)
     {
         auto errCode = excp.GetErrorCode();
-        if (errCode == LibCZICZIParseException::ErrorCode::CorruptedData)
+        if (errCode == LibCZICZIParseException::ErrorType::CorruptedData)
         {
             exceptionCorrect = true;
         }
@@ -842,7 +839,7 @@ TEST(CziReader, CheckThatExceptionIsThrownWhenEnabledIfSubBlockDirectoryAndSubbl
     }
     catch (const LibCZICZIParseException& exception)
     {
-        EXPECT_EQ(exception.GetErrorCode(), LibCZICZIParseException::ErrorCode::SubBlockDirectoryToSubBlockHeaderMismatch) << "not the correct errorcode";
+        EXPECT_EQ(exception.GetErrorCode(), LibCZICZIParseException::ErrorType::SubBlockDirectoryToSubBlockHeaderMismatch) << "not the correct errorcode";
     }
     catch (...)
     {

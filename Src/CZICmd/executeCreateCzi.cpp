@@ -53,7 +53,7 @@ private:
 
             // copy the key-value data into the sub-block-metadata
             auto sbBlkMd = Utils::CreateSubBlockMetadata(
-                [&](int no, std::tuple<std::string, std::string>& nodeNameAndValue)->bool
+                [&](int, std::tuple<std::string, std::string>& nodeNameAndValue)->bool
                 {
                     if (kvIter == kv.cend())
                     {
@@ -312,7 +312,7 @@ private:
 
     // the resulting metadata-information is written to the CZI here
     auto xml = mdBldr->GetXml(true);
-    WriteMetadataInfo writerMdInfo = { 0 };
+    WriteMetadataInfo writerMdInfo;
     writerMdInfo.szMetadata = xml.c_str();
     writerMdInfo.szMetadataSize = xml.size();
     writer->SyncWriteMetadata(writerMdInfo);
