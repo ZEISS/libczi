@@ -3,8 +3,6 @@
 // SPDX-License-Identifier: LGPL-3.0-or-later
 
 #include "include_gtest.h"
-#include <cstddef>
-#include <sys/_types/_ssize_t.h>
 #include "MockMetadataSegment.h"
 
 using namespace libCZI;

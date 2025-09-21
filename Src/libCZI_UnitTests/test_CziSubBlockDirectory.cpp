@@ -5,7 +5,6 @@
 #include "include_gtest.h"
 #include "testImage.h"
 #include "inc_libCZI.h"
-#include <cstddef>
 
 using namespace libCZI;
 
