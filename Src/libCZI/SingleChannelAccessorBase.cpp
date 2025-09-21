@@ -85,8 +85,8 @@ void CSingleChannelAccessorBase::CheckPlaneCoordinates(const libCZI::IDimCoordin
 
 std::vector<int> CSingleChannelAccessorBase::CheckForVisibility(const libCZI::IntRect& roi, int count, const std::function<int(int)>& get_subblock_index) const
 {
-   constexpr IntRect invalid_rect {.h = -1, .w = -1};
-   return CSingleChannelAccessorBase::CheckForVisibilityCore(
+    constexpr IntRect invalid_rect { .w = -1, .h = -1};
+    return CSingleChannelAccessorBase::CheckForVisibilityCore(
         roi,
         count,
         get_subblock_index,
