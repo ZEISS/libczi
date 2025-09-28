@@ -15,13 +15,13 @@
 #include "utilities.h"
 
 #if LIBCZI_HAS_BUILTIN_BSWAP32
- #include <byteswap.h>
+    #include <byteswap.h>
 #endif
 #if LIBCZI_HAS_BYTESWAP_IN_STDLIB
- #include <stdlib.h>
+    #include <stdlib.h>
 #endif
 #if LIBCZI_HAS_BSWAP_LONG_IN_SYS_ENDIAN
- #include <sys/endian.h>
+    #include <sys/endian.h>
 #endif
 
 using namespace std;
