@@ -100,6 +100,19 @@ if (NOT jxrdecode_Has_rotl_with_x86intrin)
 	set (jxrdecode_Has_rotl_with_x86intrin 0)
 endif()
 
+if (NOT jxrdecode_Has_rotl_with_intrin AND NOT jxrdecode_Has_rotl_with_x86intrin)
+	# Latest Clang and AppleClang seem to support the builtin function __builtin_rotateleft32()
+	check_cxx_source_compiles(
+		"#include <stdint.h>
+		static uint32_t test(uint32_t x) { return __builtin_rotateleft32(x, 7); }
+		int main(){ volatile uint32_t v = test(0x12345678u); (void)v; return 0; }"
+		jxrdecode_has_builtin_rotateleft32)
+	BoolToYesNo(jxrdecode_has_builtin_rotateleft32 jxrdecode_result_text)
+	message("jxrdecode_has_builtin_rotateleft32 = ${jxrdecode_result_text}.")
+else()
+	set (jxrdecode_has_builtin_rotateleft32 0)
+endif()
+
 configure_file (
   "${CMAKE_CURRENT_SOURCE_DIR}/JxrDecode_Config.h.in"
   "${CMAKE_CURRENT_BINARY_DIR}/JxrDecode_Config.h"

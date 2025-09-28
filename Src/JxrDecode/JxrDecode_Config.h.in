@@ -26,3 +26,6 @@
 
 // whether the "_rotl" function is available in the respective header file - here in <x86intrin.h>, which should be the case with GCC
 #define JXRDECODE_HAS_ROTL_WITH_X86INTRIN_H @jxrdecode_Has_rotl_with_x86intrin@
+
+// whether the compiler-intrinsic "__builtin_rotateleft32" is available (equivalent to _rotl, and no header needed)
+#define JXRDECODE_HAS_ROTATELEFT32_INTRINSIC @jxrdecode_has_builtin_rotateleft32@
