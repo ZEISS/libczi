@@ -14,6 +14,16 @@
 #include <libCZI_Utilities.h>
 #include "utilities.h"
 
+#if LIBCZI_HAS_BUILTIN_BSWAP32
+ #include <byteswap.h>
+#endif
+#if LIBCZI_HAS_BYTESWAP_IN_STDLIB
+ #include <stdlib.h>
+#endif
+#if LIBCZI_HAS_BSWAP_LONG_IN_SYS_ENDIAN
+ #include <sys/endian.h>
+#endif
+
 using namespace std;
 using namespace libCZI;
 
@@ -30,7 +40,7 @@ namespace
 #elif LIBCZI_HAS_BYTESWAP_IN_STDLIB
             return _byteswap_ulong(dw);
 #elif LIBCZI_HAS_BSWAP_LONG_IN_SYS_ENDIAN
-            return bswap_32(dw);
+            return bswap32(dw);
 #else
             return (((dw & 0xff000000u) >> 24) |
                     ((dw & 0x00ff0000u) >> 8) |
@@ -45,7 +55,7 @@ namespace
 #elif LIBCZI_HAS_BYTESWAP_IN_STDLIB
             return _byteswap_ushort(us);
 #elif LIBCZI_HAS_BSWAP_LONG_IN_SYS_ENDIAN
-            return bswap_16(us);
+            return bswap16(us);
 #else
             return (((us & 0xff00u) >> 8) |
                     ((us & 0x00ffu) << 8));
