@@ -960,7 +960,7 @@ Int JXRLIB_API(DecodeMacroblockLowpass)(CWMImageStrCodec* pSC, CCodingContext* p
 #if CAN_USE_ROTL
                     if (pCoeffs[k]) {
 #if JXRDECODE_HAS_ROTATELEFT32_INTRINSIC
-                    	Int r1 = __builtin_rotateleft32(pCoeffs[k], iModelBits);
+                        Int r1 = __builtin_rotateleft32(pCoeffs[k], iModelBits);
 #else
                         Int r1 = _rotl(pCoeffs[k], iModelBits);
 #endif
