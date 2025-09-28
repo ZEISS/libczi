@@ -109,7 +109,8 @@ if (NOT jxrdecode_Has_rotl_with_intrin AND NOT jxrdecode_Has_rotl_with_x86intrin
 		jxrdecode_has_builtin_rotateleft32)
 	BoolToYesNo(jxrdecode_has_builtin_rotateleft32 jxrdecode_result_text)
 	message("jxrdecode_has_builtin_rotateleft32 = ${jxrdecode_result_text}.")
-else()
+endif()
+if (NOT jxrdecode_has_builtin_rotateleft32)
 	set (jxrdecode_has_builtin_rotateleft32 0)
 endif()
 
