@@ -1328,7 +1328,7 @@ TEST(CziWriter, Writer13)
     EXPECT_TRUE(sbBlkInfo.GetCompressionMode() == CompressionMode::JpgXr) << "Incorrect result";
 
     auto bitmap = sbBlk->CreateBitmap();
-    EXPECT_TRUE(bitmap->GetWidth() == widthCompressedBitmap && bitmap->GetHeight() == heightCompressedBitmap) << "Incorrect result";
+    EXPECT_TRUE(bitmap->GetWidth() == static_cast<uint32_t>(widthCompressedBitmap) && bitmap->GetHeight() == static_cast<uint32_t>(heightCompressedBitmap)) << "Incorrect result";
     EXPECT_TRUE(bitmap->GetPixelType() == PixelType::Bgr24) << "Incorrect result";
 }
 

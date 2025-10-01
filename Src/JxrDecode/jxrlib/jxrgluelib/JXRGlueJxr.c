@@ -1087,7 +1087,7 @@ ERR JXRLIB_API(PKImageEncode_SetXMPMetadata_WMP)(PKImageEncode* pIE, const U8* p
         // hd and tiff don't put a trailing null, so we don't either
         cbTemp = cbXMPMetadata - (U32)(pszFormatEnd - pszFormatBegin) + sizeof(szHDPhotoFormat) - 1;
         assert(cbTemp <= cbBuffer);
-        FailIf(0 != STRCPY_SAFE(pszFormatBegin,
+        FailIf(0 != strcpy_s(pszFormatBegin,
             cbBuffer - (pszFormatBegin - pbTemp),
             szHDPhotoFormat),
             WMP_errBufferOverflow);

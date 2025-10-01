@@ -121,6 +121,7 @@ TEST(SubBlockAttachment, BasicTest)
     sub_block_metadata_accessor->EnumerateChunksInChunkContainer(
         [&chunks](int index, const ISubBlockAttachmentAccessor::ChunkInfo& info)
         {
+            (void)index;
             chunks.push_back(info);
             return true; // continue enumeration
         });
@@ -161,6 +162,7 @@ TEST(SubBlockAttachment, InvalidChunkContainer1Test)
         sub_block_metadata_accessor->EnumerateChunksInChunkContainer(
         [&chunks](int index, const ISubBlockAttachmentAccessor::ChunkInfo& info)
         {
+            (void)index;
             chunks.push_back(info);
             return true; // continue enumeration
         }),
