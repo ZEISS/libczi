@@ -54,12 +54,12 @@ public:
 
         if (options.IsInfoLevelEnabled(InfoLevel::DisplaySettings))
         {
-            PrintDisplaySettingsMetadata(spReader.get(), md.get(), options);
+            PrintDisplaySettingsMetadata(md.get(), options);
         }
 
         if (options.IsInfoLevelEnabled(InfoLevel::DisplaySettingsJson))
         {
-            PrintDisplaySettingsMetadataAsJson(spReader.get(), md.get(), options);
+            PrintDisplaySettingsMetadataAsJson(md.get(), options);
         }
 
         if (options.IsInfoLevelEnabled(InfoLevel::AllSubBlocks))
@@ -94,8 +94,10 @@ private:
 
         std::map<std::string, int> mapAttchmntName;
         reader->EnumerateAttachments(
-            [&](int, const AttachmentInfo& info)->bool
+            [&](int index, const AttachmentInfo& info)->bool
             {
+                (void)index;
+
                 ++mapAttchmntName[info.name];
                 return true;
             });
@@ -228,7 +230,7 @@ private:
         options.GetLog()->WriteLineStdOut(xmlUtf8);
     }
 
-    static void PrintDisplaySettingsMetadata(ICZIReader*, ICziMetadata* md, const CCmdLineOptions& options)
+    static void PrintDisplaySettingsMetadata(ICziMetadata* md, const CCmdLineOptions& options)
     {
         options.GetLog()->WriteLineStdOut("Display-Settings");
         options.GetLog()->WriteLineStdOut("----------------");
@@ -251,7 +253,7 @@ private:
             });
     }
 
-    static void PrintDisplaySettingsMetadataAsJson(ICZIReader*, ICziMetadata* md, const CCmdLineOptions& options)
+    static void PrintDisplaySettingsMetadataAsJson(ICziMetadata* md, const CCmdLineOptions& options)
     {
         options.GetLog()->WriteLineStdOut("Display-Settings in CZIcmd-JSON-Format");
         options.GetLog()->WriteLineStdOut("--------------------------------------");
@@ -1078,8 +1080,10 @@ private:
         return si;
     }
 
-    static bool IsSelection(int index, const SubBlockInfo&, const SelectionInfo& selectionInfo)
+    static bool IsSelection(int index, const SubBlockInfo& info, const SelectionInfo& selectionInfo)
     {
+        (void)info;
+
         bool rv = true;
         if (selectionInfo.indexValid == true)
         {

@@ -215,8 +215,10 @@ CBitmapGenNull::CBitmapGenNull()
 
 }
 
-/*virtual*/std::shared_ptr<libCZI::IBitmapData> CBitmapGenNull::Create(libCZI::PixelType pixeltype, std::uint32_t width, std::uint32_t height, const BitmapGenInfo&)
+/*virtual*/std::shared_ptr<libCZI::IBitmapData> CBitmapGenNull::Create(libCZI::PixelType pixeltype, std::uint32_t width, std::uint32_t height, const BitmapGenInfo& info)
 {
+    (void)info;
+
     auto bm = std::make_shared<CNullBitmapWrapper>(pixeltype, width, height);
     bm->Clear();
     return bm;

@@ -6,46 +6,23 @@
 
 #include "libCZI_Utilities.h"
 
-#if !defined(__GNUC__)
-#include <pshpack2.h>
-#define PACKED 
-#else
-#define PACKED __attribute__ ((__packed__))
-#endif
-
-/////////////////////////////////////////////////////////////////////////////////
-// Enumerations
-/////////////////////////////////////////////////////////////////////////////////
-
-//enum class PixelType : std::uint8_t
-//{
-//    Gray8 = 0,
-//    Gray16 = 1,
-//    Gray32Float = 2, Bgr24 = 3,
-//    Bgr48 = 4,
-//    Bgr96Float = 8,
-//    Bgra32 = 9,
-//    Gray64ComplexFloat = 10,
-//    Bgr192ComplexFloat = 11,
-//    Gray32 = 12,
-//    Gray64Float = 13,
-//};
+#pragma pack(push, 2)
 
 ////////////////////////////////////////////////////////////////////
 // STRUCTURES
 ////////////////////////////////////////////////////////////////////
 
 
-typedef struct PACKED DimensionEntry
+struct DimensionEntry
 {
     char Dimension[4];
     std::int32_t Start;
     std::int32_t Size;
     float StartCoordinate;
     std::int32_t StoredSize;
-} DIMENSIONENTRY;
+};
 
-typedef struct PACKED AttachmentInfo
+struct AttachmentInfo
 {
     std::int64_t AllocatedSize;
     std::int64_t DataSize;
@@ -55,26 +32,26 @@ typedef struct PACKED AttachmentInfo
     char Name[80];
     //HANDLE FileHandle;
     unsigned char spare[128];
-} ATTACHMENTINFO;
+};
 
-typedef struct PACKED MetadataInfo
+struct MetadataInfo
 {
     std::int64_t AllocatedSize;
     std::int32_t XmlSize;
     std::int32_t BinarySize;
-} METADATAINFO;
+};
 
-typedef struct PACKED AttachmentDirectoryInfo
+struct AttachmentDirectoryInfo
 {
     std::int32_t EntryCount;
     //HANDLE* attachmentHandles;
-} ATTACHMENTDIRECTORYINFO;
+};
 
 ////////////////////////////////////////////////////////////////////
 // COMMON
 ////////////////////////////////////////////////////////////////////
 
-struct PACKED SegmentHeader
+struct SegmentHeader
 {
     unsigned char Id[16];
     std::int64_t AllocatedSize;
@@ -114,7 +91,7 @@ const int MAXDIMENSIONS = 40;
 
 // FileHeader
 
-struct PACKED FileHeaderSegmentData
+struct FileHeaderSegmentData
 {
     std::int32_t Major;
     std::int32_t Minor;
@@ -132,7 +109,7 @@ struct PACKED FileHeaderSegmentData
 
 // SubBlockDirectory - Entry: DE fixed size 256 bytes
 
-struct PACKED SubBlockDirectoryEntryDE
+struct SubBlockDirectoryEntryDE
 {
     unsigned char SchemaType[2];
     std::int32_t PixelType;
@@ -168,11 +145,11 @@ struct PACKED SubBlockDirectoryEntryDE
 // SubBlockDirectory - Entry: DV variable length - mimimum of 256 bytes
 
 // same structure for Dimension entries as used in public API
-struct PACKED DimensionEntryDV : DIMENSIONENTRY
+struct DimensionEntryDV : DimensionEntry
 {
 };
 
-struct PACKED SubBlockDirectoryEntryDV
+struct SubBlockDirectoryEntryDV
 {
     unsigned char SchemaType[2];
     std::int32_t PixelType;
@@ -192,10 +169,10 @@ struct PACKED SubBlockDirectoryEntryDV
     std::int32_t DimensionCount;
 
     // max. allocation for ease of use (valid size = 32 + EntryCount * 20)
-    struct DimensionEntryDV DimensionEntries[MAXDIMENSIONS]; // offset 32
+    DimensionEntryDV DimensionEntries[MAXDIMENSIONS]; // offset 32
 };
 
-struct PACKED SubBlockDirectorySegmentData
+struct SubBlockDirectorySegmentData
 {
     std::int32_t EntryCount;
     unsigned char _spare[SIZE_SUBBLOCKDIRECTORY_DATA - 4];
@@ -205,7 +182,7 @@ struct PACKED SubBlockDirectorySegmentData
 ///////////////////////////////////////////////////////////////////////////////////
 // Attachment
 
-struct PACKED AttachmentEntryA1
+struct AttachmentEntryA1
 {
     unsigned char SchemaType[2];
     unsigned char _spare[10];
@@ -216,19 +193,19 @@ struct PACKED AttachmentEntryA1
     unsigned char Name[80];
 };
 
-struct PACKED AttachmentSegmentData
+struct AttachmentSegmentData
 {
     std::int64_t DataSize;
     unsigned char _spare[8];
     union
     {
         std::uint8_t reserved[SIZE_ATTACHMENTENTRY];
-        struct AttachmentEntryA1 entry;     // offset 16
+        AttachmentEntryA1 entry;     // offset 16
     };
     unsigned char _spare2[SIZE_ATTACHMENT_DATA - SIZE_ATTACHMENTENTRY - 16];
 };
 
-struct PACKED AttachmentDirectorySegmentData
+struct AttachmentDirectorySegmentData
 {
     std::int32_t EntryCount;
     unsigned char _spare[SIZE_ATTACHMENTDIRECTORY_DATA - 4];
@@ -239,12 +216,12 @@ struct PACKED AttachmentDirectorySegmentData
 ///////////////////////////////////////////////////////////////////////////////////
 // SubBlock
 
-struct PACKED SubBlockSegmentData
+struct SubBlockSegmentData
 {
     std::int32_t MetadataSize;
     std::int32_t AttachmentSize;
     std::int64_t DataSize;
-    union PACKED
+    union
     {
         unsigned char _spare[SIZE_SUBBLOCKDATA_MINIMUM - SIZE_SUBBLOCKDATA_FIXEDPART];  // offset 16
         unsigned char entrySchema[2];
@@ -256,7 +233,7 @@ struct PACKED SubBlockSegmentData
 ///////////////////////////////////////////////////////////////////////////////////
 // Metadata
 
-struct PACKED MetadataSegmentData
+struct MetadataSegmentData
 {
     std::int32_t XmlSize;
     std::int32_t AttachmentSize;
@@ -269,52 +246,48 @@ struct PACKED MetadataSegmentData
 ////////////////////////////////////////////////////////////////////
 
 // SubBlockDirectorySegment: size = [128 bytes fixed (or variable if DV)] + MetadataSize + AttachmentSize + DataSize
-struct PACKED SubBlockSegment
+struct SubBlockSegment
 {
-    struct SegmentHeader header;
-    struct SubBlockSegmentData data;
+    SegmentHeader header;
+    SubBlockSegmentData data;
 };
 
 // SubBlockDirectorySegment: size = 128(fixed) + EntryCount * [128 bytes fixed (or variable if DV)]
-struct PACKED SubBlockDirectorySegment
+struct SubBlockDirectorySegment
 {
-    struct SegmentHeader header;
-    struct SubBlockDirectorySegmentData data;
+    SegmentHeader header;
+    SubBlockDirectorySegmentData data;
 };
 
 // MetdataSegment: size = 128(fixed) + dataLength
-struct PACKED MetadataSegment
+struct MetadataSegment
 {
-    struct SegmentHeader header;
-    struct MetadataSegmentData data;
+    SegmentHeader header;
+    MetadataSegmentData data;
 };
 
 // AttachmentDirectorySegment: size = 256(fixed) + EntryCount * 128(fixed)
-struct PACKED AttachmentDirectorySegment
+struct AttachmentDirectorySegment
 {
-    struct SegmentHeader header;
-    struct AttachmentDirectorySegmentData data;
+    SegmentHeader header;
+    AttachmentDirectorySegmentData data;
 };
 
 // AttachmentSegment: size = 256(fixed)
-struct PACKED AttachmentSegment
+struct AttachmentSegment
 {
-    struct SegmentHeader header;
-    struct AttachmentSegmentData data;
+    SegmentHeader header;
+    AttachmentSegmentData data;
 };
 
 // FileHeaderSegment: size = 512(fixed)
-struct PACKED FileHeaderSegment
+struct FileHeaderSegment
 {
-    struct SegmentHeader header;
-    struct FileHeaderSegmentData data;
+    SegmentHeader header;
+    FileHeaderSegmentData data;
 };
 
-#if !defined(__GNUC__)
-#include <poppack.h>
-#else
-#define PACK
-#endif
+#pragma pack(pop)
 
 class ConvertToHostByteOrder
 {
