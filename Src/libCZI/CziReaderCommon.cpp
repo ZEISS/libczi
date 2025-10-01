@@ -21,30 +21,22 @@ using namespace libCZI;
     // Ok... for a first tentative, experimental and quick-n-dirty implementation, simply
     //      walk through all the subblocks. We surely want to have something more elaborated
     //      here.
-    repository->EnumerateSubBlocks([&](int index,
-                                       const SubBlockInfo &info) -> bool
-    {
-        if (info.logicalRect.h < 0 || info.logicalRect.w < 0) {
-            return false;
-        }
-
-        if (onlyLayer0 == false ||
-            (info.physicalSize.w ==
-             static_cast<std::atomic_uint32_t>(info.logicalRect.w) &&
-             info.physicalSize.h == static_cast<std::atomic_uint32_t>(info.logicalRect.h)))
+    repository->EnumerateSubBlocks(
+        [&](int index, const SubBlockInfo& info)->bool
         {
-            if (planeCoordinate == nullptr || CziUtils::CompareCoordinate(planeCoordinate, &info.coordinate) == true)
+            if (onlyLayer0 == false || (info.physicalSize.w == static_cast<uint32_t>(info.logicalRect.w) && info.physicalSize.h == static_cast<uint32_t>(info.logicalRect.h)))
             {
-                if (roi == nullptr || Utilities::DoIntersect(*roi, info.logicalRect))
+                if (planeCoordinate == nullptr || CziUtils::CompareCoordinate(planeCoordinate, &info.coordinate) == true)
                 {
-                    const bool b = funcEnum(index, info);
-                    return b;
+                    if (roi == nullptr || Utilities::DoIntersect(*roi, info.logicalRect))
+                    {
+                        return funcEnum(index, info);
+                    }
                 }
             }
-        }
 
-        return true;
-    });
+            return true;
+        });
 }
 
 /*static*/bool CziReaderCommon::TryGetSubBlockInfoOfArbitrarySubBlockInChannel(
@@ -58,8 +50,10 @@ using namespace libCZI;
     {
         // in this case -> just take the first subblock...
         repository->EnumerateSubBlocks(
-            [&](int, const SubBlockInfo& sbinfo)->bool
+            [&](int index, const SubBlockInfo& sbinfo)->bool
             {
+                (void)index;
+
                 info = sbinfo;
                 foundASubBlock = true;
                 return false;
@@ -68,8 +62,10 @@ using namespace libCZI;
     else
     {
         repository->EnumerateSubBlocks(
-            [&](int, const SubBlockInfo& sbinfo)->bool
+            [&](int index, const SubBlockInfo& sbinfo)->bool
             {
+                (void)index;
+
                 int c;
                 if (sbinfo.coordinate.TryGetPosition(DimensionIndex::C, &c) == true && c == channelIndex)
                 {

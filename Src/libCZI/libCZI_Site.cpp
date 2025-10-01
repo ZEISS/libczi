@@ -19,13 +19,17 @@ using namespace std;
 class CSiteImpBase : public ISite
 {
 public:
-    bool IsEnabled(int) override
+    bool IsEnabled(int logLevel) override
     {
+        (void)logLevel;
+
         return false;
     }
 
-    void Log(int, const char*) override
+    void Log(int logLevel, const char* szMsg) override
     {
+        (void)logLevel;
+        (void)szMsg;
     }
 
     std::shared_ptr<libCZI::IBitmapData> CreateBitmap(libCZI::PixelType pixeltype, std::uint32_t width, std::uint32_t height, std::uint32_t stride, std::uint32_t extraRows, std::uint32_t extraColumns) override
@@ -33,13 +37,19 @@ public:
         return CStdBitmapData::Create(pixeltype, width, height, stride, extraRows, extraColumns);
     }
 
-    std::shared_ptr<IDecoder> GetDecoder(ImageDecoderType, const char*) override
+    std::shared_ptr<IDecoder> GetDecoder(ImageDecoderType type, const char* arguments) override
     {
+        (void)type;
+        (void)arguments;
+
         throw std::runtime_error("must not be called...");
     }
 
-    void TerminateProgram(TerminationReason, const char*) override
+    void TerminateProgram(TerminationReason reason, const char* message) override
     {
+        (void)reason;
+        (void)message;
+
         abort();
     }
 };
@@ -57,6 +67,8 @@ private:
 public:
     std::shared_ptr<IDecoder> GetDecoder(ImageDecoderType type, const char* arguments) override
     {
+        (void)arguments;
+
         switch (type)
         {
         case ImageDecoderType::JPXR_JxrLib:
@@ -106,8 +118,10 @@ private:
     std::once_flag  zstd1DecoderInitialized;
     std::shared_ptr<IDecoder> zstd1decoder;
 public:
-    std::shared_ptr<IDecoder> GetDecoder(ImageDecoderType type, const char*) override
+    std::shared_ptr<IDecoder> GetDecoder(ImageDecoderType type, const char* arguments) override
     {
+        (void)arguments;
+
         switch (type)
         {
         case ImageDecoderType::JPXR_JxrLib:

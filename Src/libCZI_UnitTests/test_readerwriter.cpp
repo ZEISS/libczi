@@ -1146,7 +1146,7 @@ TEST(CziReaderWriter, ReaderWriterEmpty2)
     MetadataUtils::WriteFillWithSubBlockStatistics(spMdBuilder.get(), rw->GetStatistics());
 
     string xml = spMdBuilder->GetXml(true);
-    WriteMetadataInfo writerMdInfo;
+    WriteMetadataInfo writerMdInfo{};
     writerMdInfo.szMetadata = xml.c_str();
     writerMdInfo.szMetadataSize = xml.size();
 
@@ -1206,7 +1206,7 @@ TEST(CziReaderWriter, ReaderWriterEmpty3)
     MetadataUtils::WriteFillWithSubBlockStatistics(spMdBuilder.get(), rw->GetStatistics());
 
     string xml = spMdBuilder->GetXml(true);
-    WriteMetadataInfo writerMdInfo;
+    WriteMetadataInfo writerMdInfo{};
     writerMdInfo.szMetadata = xml.c_str();
     writerMdInfo.szMetadataSize = xml.size();
 

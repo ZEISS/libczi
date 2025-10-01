@@ -243,6 +243,10 @@ namespace
     template <>
     /*static*/uint32_t DecimateHelpers<0>::GetDword(int y, int height, const void* ptrSrc, int pitchSrc)
     {
+        (void)y;
+        (void)height;
+        (void)pitchSrc;
+
         return *static_cast<const uint32_t*>(ptrSrc);
     }
 

@@ -237,6 +237,7 @@ static void _testWriteReadCompressedImageZStd0(uint32_t width, uint32_t height, 
         writer.Create(stream, make_shared<CCziWriterInfo >(guid));
 
         AddSubBlockInfoMemPtr block;
+        block.Clear();
         _compressImageZStd0(img, params, block);
         block.coordinate = coordinate;
 
@@ -248,6 +249,7 @@ static void _testWriteReadCompressedImageZStd0(uint32_t width, uint32_t height, 
         auto metadataBuilder = writer.GetPreparedMetadata(PrepareMetadataInfo());
         string xml = metadataBuilder->GetXml(true);
         WriteMetadataInfo writerMdInfo;
+        writerMdInfo.Clear();
         writerMdInfo.szMetadata = xml.c_str();
         writerMdInfo.szMetadataSize = xml.size();
 
@@ -364,6 +366,7 @@ static void _testWriteReadCompressedImageZStd1(uint32_t width, uint32_t height, 
         writer.Create(stream, make_shared<CCziWriterInfo >(guid));
 
         AddSubBlockInfoMemPtr block;
+        block.Clear();
         _compressImageZStd1(img, params, block);
         block.coordinate = coordinate;
 
@@ -375,6 +378,7 @@ static void _testWriteReadCompressedImageZStd1(uint32_t width, uint32_t height, 
         auto metadataBuilder = writer.GetPreparedMetadata(PrepareMetadataInfo());
         string xml = metadataBuilder->GetXml(true);
         WriteMetadataInfo writerMdInfo;
+        writerMdInfo.Clear();
         writerMdInfo.szMetadata = xml.c_str();
         writerMdInfo.szMetadataSize = xml.size();
 
@@ -609,6 +613,7 @@ TEST(CziWriter, WriteAndReadBitmapBgr24)
     {
         ScopedBitmapLockerSP lockBm{ bitmap };
         AddSubBlockInfoStridedBitmap addInfo;
+        addInfo.Clear();
         addInfo.coordinate = coord;
         addInfo.mIndexValid = true;
         addInfo.mIndex = 0;
@@ -628,6 +633,7 @@ TEST(CziWriter, WriteAndReadBitmapBgr24)
     auto metadataBuilder = cziWriter->GetPreparedMetadata(PrepareMetadataInfo());
     string xml = metadataBuilder->GetXml(true);
     WriteMetadataInfo writerMdInfo;
+    writerMdInfo.Clear();
     writerMdInfo.szMetadata = xml.c_str();
     writerMdInfo.szMetadataSize = xml.size();
 
@@ -635,11 +641,11 @@ TEST(CziWriter, WriteAndReadBitmapBgr24)
 
     cziWriter->Close();
 
-    cziWriter.reset();		// not needed anymore
+    cziWriter.reset(); // not needed anymore
 
     size_t cziData_Size;
     auto cziData = outputStream->GetCopy(&cziData_Size);
-    outputStream.reset();	// not needed anymore
+    outputStream.reset(); // not needed anymore
 
     auto inputStream = CreateStreamFromMemory(cziData, cziData_Size);
 
@@ -1295,6 +1301,7 @@ TEST(CziWriter, Writer13)
     auto metadataBuilder = writer->GetPreparedMetadata(PrepareMetadataInfo());
     string xml = metadataBuilder->GetXml(true);
     WriteMetadataInfo writerMdInfo;
+    writerMdInfo.Clear();
     writerMdInfo.szMetadata = xml.c_str();
     writerMdInfo.szMetadataSize = xml.size();
 
@@ -2249,7 +2256,7 @@ TEST(CziWriter, TryAddingDuplicateSubBlocksToCziWriterAndWhenCheckIsDisable)
     auto bitmap = CreateTestBitmap(PixelType::Gray8, 64, 64);
 
     ScopedBitmapLockerSP lockBm{ bitmap };
-    AddSubBlockInfoStridedBitmap addSbBlkInfo;
+    AddSubBlockInfoStridedBitmap addSbBlkInfo{};
     addSbBlkInfo.Clear();
     addSbBlkInfo.coordinate = CDimCoordinate::Parse("C0T0Z1");
     addSbBlkInfo.mIndexValid = true;
@@ -2271,7 +2278,7 @@ TEST(CziWriter, TryAddingDuplicateSubBlocksToCziWriterAndWhenCheckIsDisable)
 
     auto metadataBuilder = writer->GetPreparedMetadata(PrepareMetadataInfo());
     string xml = metadataBuilder->GetXml(true);
-    WriteMetadataInfo writerMdInfo;
+    WriteMetadataInfo writerMdInfo{};
     writerMdInfo.szMetadata = xml.c_str();
     writerMdInfo.szMetadataSize = xml.size();
     writer->SyncWriteMetadata(writerMdInfo);

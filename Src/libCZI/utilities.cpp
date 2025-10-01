@@ -267,6 +267,7 @@ tString trimImpl(const tString& str, const tString& whitespace)
 
 /*static*/void Utilities::ConvertInt16ToHostByteOrder(std::int16_t* p)
 {
+    (void)p;
 #if LIBCZI_ISBIGENDIANHOST
 #if LIBCZI_HAVE_ENDIAN_H
 #if LIBCZI_SIGBUS_ON_UNALIGNEDINTEGERS
@@ -296,6 +297,7 @@ tString trimImpl(const tString& str, const tString& whitespace)
 
 /*static*/void Utilities::ConvertInt32ToHostByteOrder(std::int32_t* p)
 {
+    (void)p;
 #if LIBCZI_ISBIGENDIANHOST
 #if LIBCZI_HAVE_ENDIAN_H
 #if LIBCZI_SIGBUS_ON_UNALIGNEDINTEGERS
@@ -326,6 +328,7 @@ tString trimImpl(const tString& str, const tString& whitespace)
 
 /*static*/void Utilities::ConvertInt64ToHostByteOrder(std::int64_t* p)
 {
+    (void)p;
 #if LIBCZI_ISBIGENDIANHOST
 #if LIBCZI_HAVE_ENDIAN_H
 #if LIBCZI_SIGBUS_ON_UNALIGNEDINTEGERS
@@ -363,6 +366,7 @@ tString trimImpl(const tString& str, const tString& whitespace)
 
 /*static*/void Utilities::ConvertGuidToHostByteOrder(libCZI::GUID* p)
 {
+    (void)p;
 #if LIBCZI_ISBIGENDIANHOST
     Utilities::ConvertInt32ToHostByteOrder((int32_t*)&(p->Data1));
     Utilities::ConvertInt16ToHostByteOrder((int16_t*)&(p->Data2));

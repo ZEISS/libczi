@@ -222,6 +222,8 @@ static bool DeterminePixelType(const WICPixelFormatGUID& wicPxlFmt, GUID* destPi
 
 /*virtual*/std::shared_ptr<libCZI::IBitmapData> CWicJpgxrDecoder::Decode(const void* ptrData, size_t size, const libCZI::PixelType* pixelType, const uint32_t* width, const uint32_t* height, const char* additional_arguments)
 {
+    (void)additional_arguments;
+
     if (GetSite()->IsEnabled(LOGLEVEL_CHATTYINFORMATION))
     {
         stringstream ss; ss << "Begin WIC-JpgXR-Decode with " << size << " bytes";
