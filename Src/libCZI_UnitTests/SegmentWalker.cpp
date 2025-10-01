@@ -5,25 +5,16 @@
 #include "include_gtest.h"
 #include "SegmentWalker.h"
 
-#if !defined(__GNUC__)
-#include <pshpack2.h>
-#define PACKED 
-#else
-#define PACKED __attribute__ ((__packed__))
-#endif
+#pragma pack(push, 2)
 
-struct PACKED CziSegmentHeader
+struct CziSegmentHeader
 {
     unsigned char Id[16];
     std::int64_t AllocatedSize;
     std::int64_t UsedSize;
 };
 
-#if !defined(__GNUC__)
-#include <poppack.h>
-#else
-#define PACK
-#endif
+#pragma pack(pop)
 
 static bool is_big_endian();
 static void ConvertSegmentHeaderToHostByteOrder(CziSegmentHeader* p);
