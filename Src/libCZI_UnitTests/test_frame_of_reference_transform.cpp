@@ -111,10 +111,11 @@ TEST(FrameOfReferenceTransform, UseCziWhichIsNotZeroAlignedAndCallCheckTransform
     MosaicInfo mosaic_info;
     mosaic_info.tile_width = 1;
     mosaic_info.tile_height = 1;
-    mosaic_info.tiles.push_back({ -1, -1, 10 });
-    mosaic_info.tiles.push_back({ 0, -1, 20 });
-    mosaic_info.tiles.push_back({ -1, 0, 30 });
-    mosaic_info.tiles.push_back({ 0, 0, 40 });
+    mosaic_info.tiles.reserve(4);
+    mosaic_info.tiles.push_back({-1, -1, 10});
+    mosaic_info.tiles.push_back({ 0, -1, 20});
+    mosaic_info.tiles.push_back({-1,  0, 30});
+    mosaic_info.tiles.push_back({ 0,  0, 40});
     auto czi_document_as_blob = CreateMosaicCzi(mosaic_info);
     auto reader = libCZI::CreateCZIReader();
     auto mem_input_stream = make_shared<CMemInputOutputStream>(get<0>(czi_document_as_blob).get(), get<1>(czi_document_as_blob));
@@ -148,10 +149,11 @@ TEST(FrameOfReferenceTransform, UseCziWhichIsNotZeroAlignedAndCallCheckTransform
     MosaicInfo mosaic_info;
     mosaic_info.tile_width = 1;
     mosaic_info.tile_height = 1;
-    mosaic_info.tiles.push_back({ -1, -1, 10 });
-    mosaic_info.tiles.push_back({ 0, -1, 20 });
-    mosaic_info.tiles.push_back({ -1, 0, 30 });
-    mosaic_info.tiles.push_back({ 0, 0, 40 });
+    mosaic_info.tiles.reserve(4);
+    mosaic_info.tiles.push_back({-1, -1, 10});
+    mosaic_info.tiles.push_back({ 0, -1, 20});
+    mosaic_info.tiles.push_back({-1,  0, 30});
+    mosaic_info.tiles.push_back({ 0,  0, 40});
     auto czi_document_as_blob = CreateMosaicCzi(mosaic_info);
     auto reader = libCZI::CreateCZIReader();
     auto mem_input_stream = make_shared<CMemInputOutputStream>(get<0>(czi_document_as_blob).get(), get<1>(czi_document_as_blob));
@@ -185,11 +187,11 @@ TEST(FrameOfReferenceTransform, SetDefaultFrameOfReferenceToPixelCoordinateSyste
     MosaicInfo mosaic_info;
     mosaic_info.tile_width = 1;
     mosaic_info.tile_height = 1;
-    mosaic_info.tiles.push_back({ -1, -1, 10 });
-    mosaic_info.tiles.push_back({ 0, -1, 20 });
-    mosaic_info.tiles.push_back({ -1, 0, 30 });
-    mosaic_info.tiles.push_back({ 0, 0, 40 });
-
+    mosaic_info.tiles.reserve(4);
+    mosaic_info.tiles.push_back({-1, -1, 10});
+    mosaic_info.tiles.push_back({ 0, -1, 20});
+    mosaic_info.tiles.push_back({-1,  0, 30});
+    mosaic_info.tiles.push_back({ 0,  0, 40});
     auto czi_document_as_blob = CreateMosaicCzi(mosaic_info);
     auto reader = libCZI::CreateCZIReader();
     auto mem_input_stream = make_shared<CMemInputOutputStream>(get<0>(czi_document_as_blob).get(), get<1>(czi_document_as_blob));
@@ -218,11 +220,11 @@ TEST(FrameOfReferenceTransform, SetDefaultFrameOfReferenceToRawSubblockCoordinat
     MosaicInfo mosaic_info;
     mosaic_info.tile_width = 1;
     mosaic_info.tile_height = 1;
-    mosaic_info.tiles.push_back({ -1, -1, 10 });
-    mosaic_info.tiles.push_back({ 0, -1, 20 });
-    mosaic_info.tiles.push_back({ -1, 0, 30 });
-    mosaic_info.tiles.push_back({ 0, 0, 40 });
-
+    mosaic_info.tiles.reserve(4);
+    mosaic_info.tiles.push_back({-1, -1, 10});
+    mosaic_info.tiles.push_back({ 0, -1, 20});
+    mosaic_info.tiles.push_back({-1,  0, 30});
+    mosaic_info.tiles.push_back({ 0,  0, 40});
     auto czi_document_as_blob = CreateMosaicCzi(mosaic_info);
     auto reader = libCZI::CreateCZIReader();
     auto mem_input_stream = make_shared<CMemInputOutputStream>(get<0>(czi_document_as_blob).get(), get<1>(czi_document_as_blob));
@@ -251,11 +253,11 @@ TEST(FrameOfReferenceTransform, GetTileCompositeAndCheckResult)
     MosaicInfo mosaic_info;
     mosaic_info.tile_width = 1;
     mosaic_info.tile_height = 1;
-    mosaic_info.tiles.push_back({ -1, -1, 10 });
-    mosaic_info.tiles.push_back({ 0, -1, 20 });
-    mosaic_info.tiles.push_back({ -1, 0, 30 });
-    mosaic_info.tiles.push_back({ 0, 0, 40 });
-
+    mosaic_info.tiles.reserve(4);
+    mosaic_info.tiles.push_back({-1, -1, 10});
+    mosaic_info.tiles.push_back({ 0, -1, 20});
+    mosaic_info.tiles.push_back({-1,  0, 30});
+    mosaic_info.tiles.push_back({ 0,  0, 40});
     auto czi_document_as_blob = CreateMosaicCzi(mosaic_info);
     auto reader = libCZI::CreateCZIReader();
     auto mem_input_stream = make_shared<CMemInputOutputStream>(get<0>(czi_document_as_blob).get(), get<1>(czi_document_as_blob));
@@ -291,11 +293,11 @@ TEST(FrameOfReferenceTransform, UseReaderWriterAndCallAndCheckTransformPoint)
     MosaicInfo mosaic_info;
     mosaic_info.tile_width = 1;
     mosaic_info.tile_height = 1;
-    mosaic_info.tiles.push_back({ -1, -1, 10 });
-    mosaic_info.tiles.push_back({ 0, -1, 20 });
-    mosaic_info.tiles.push_back({ -1, 0, 30 });
-    mosaic_info.tiles.push_back({ 0, 0, 40 });
-
+    mosaic_info.tiles.reserve(4);
+    mosaic_info.tiles.push_back({-1, -1, 10});
+    mosaic_info.tiles.push_back({ 0, -1, 20});
+    mosaic_info.tiles.push_back({-1,  0, 30});
+    mosaic_info.tiles.push_back({ 0,  0, 40});
     auto czi_document_as_blob = CreateMosaicCzi(mosaic_info);
 
     const auto in_out_stream = make_shared<CMemInputOutputStream>(get<0>(czi_document_as_blob).get(), get<1>(czi_document_as_blob));

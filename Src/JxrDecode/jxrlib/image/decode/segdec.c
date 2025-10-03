@@ -47,6 +47,8 @@
 #elif JXRDECODE_HAS_ROTL_WITH_X86INTRIN_H
  #include <x86intrin.h>
  #define CAN_USE_ROTL 1
+#elif JXRDECODE_HAS_ROTATELEFT32_INTRINSIC
+ #define CAN_USE_ROTL 1
 #else
  #define CAN_USE_ROTL 0
 #endif
@@ -87,7 +89,7 @@ static U32 _FORCEINLINE _load4(void* pv)
     #elif JXRDECODE_HAS_BYTESWAP_IN_STDLIB
         return _byteswap_ulong(v);
     #elif JXRDECODE_HAS_BSWAP_LONG_IN_SYS_ENDIAN
-        return bswap_32(v);
+        return bswap32(v);
     #else
         return (((v & 0xff000000u) >> 24) |
                 ((v & 0x00ff0000u) >> 8) |
@@ -957,7 +959,11 @@ Int JXRLIB_API(DecodeMacroblockLowpass)(CWMImageStrCodec* pSC, CCodingContext* p
                 for (k = 1; k < 16; k++) {
 #if CAN_USE_ROTL
                     if (pCoeffs[k]) {
+#if JXRDECODE_HAS_ROTATELEFT32_INTRINSIC
+                        Int r1 = __builtin_rotateleft32(pCoeffs[k], iModelBits);
+#else
                         Int r1 = _rotl(pCoeffs[k], iModelBits);
+#endif
                         pCoeffs[k] = (r1 ^ getBits(pIO, iModelBits)) - (r1 & iMask);
                     }
 #else // CAN_USE_ROTL
@@ -972,9 +978,6 @@ Int JXRLIB_API(DecodeMacroblockLowpass)(CWMImageStrCodec* pSC, CCodingContext* p
                     }
 #endif // CAN_USE_ROTL
                     else {
-                        //pCoeffs[k] = getBits (pIO, iModelBits);
-                        //if (pCoeffs[k] && _getBool16 (pIO))
-                        //    pCoeffs[k] = -pCoeffs[k];
                         Int r1 = _peekBit16(pIO, iModelBits + 1);
                         pCoeffs[k] = ((r1 >> 1) ^ (-(r1 & 1))) + (r1 & 1);
                         _flushBit16(pIO, iModelBits + (pCoeffs[k] != 0));

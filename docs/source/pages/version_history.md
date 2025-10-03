@@ -49,3 +49,4 @@ Version history
  0.66.6             | [149](https://github.com/ZEISS/libczi/pull/149)      | prepare for vcpkg features
  0.66.7             | [151](https://github.com/ZEISS/libczi/pull/151)      | fix for missing tiles with scaling compositor in rare circumstances
  0.67.0             | [153](https://github.com/ZEISS/libczi/pull/153)	   | add mask support
+ 0.67.1             | [157](https://github.com/ZEISS/libczi/pull/157)	   | fix compilation issue on macOS
