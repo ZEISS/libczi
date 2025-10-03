@@ -1521,8 +1521,10 @@ TEST(CziReaderWriter, AttachmentEnumerateSubset)
     // Now use a condition which is not met by any attachment (so the result should be an empty vector).
     reader_writer->EnumerateSubset(
         nullptr, "XXXXXXXXXXX",
-        [&](int index, const AttachmentInfo&)->bool
+        [&](int index, const AttachmentInfo& attachment_info)->bool
         {
+            (void)attachment_info;
+
             indices_from_enumerate_subset.push_back(index);
             return true;
         });
