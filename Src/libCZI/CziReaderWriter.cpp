@@ -490,8 +490,10 @@ void CCziReaderWriter::DetermineNextSubBlockOffset()
         });
 
     this->attachmentDirectory.EnumEntries(
-        [&](size_t, const CCziAttachmentsDirectoryBase::AttachmentEntry& attEntry)->bool
+        [&](size_t index, const CCziAttachmentsDirectoryBase::AttachmentEntry& attEntry)->bool
         {
+            (void)index;
+
             if (static_cast<uint64_t>(attEntry.FilePosition) > lastSegmentPos)
             {
                 lastSegmentPos = attEntry.FilePosition;
