@@ -636,7 +636,7 @@ void CCziReaderWriter::WriteToOutputStream(std::uint64_t offset, const void* pv,
 {
     stringstream ss;
     ss << "Not enough data written at offset " << offset << " -> bytes to write: " << bytesToWrite << " bytes, actually written " << bytesActuallyWritten << " bytes.";
-    throw LibCZIWriteException(ss.str().c_str(), LibCZIWriteException::ErrorCode::NotEnoughDataWritten);
+    throw LibCZIWriteException(ss.str().c_str(), LibCZIWriteException::ErrorType::NotEnoughDataWritten);
 }
 
 /*virtual*/void CCziReaderWriter::EnumerateSubBlocks(const std::function<bool(int index, const libCZI::SubBlockInfo& info)>& funcEnum)

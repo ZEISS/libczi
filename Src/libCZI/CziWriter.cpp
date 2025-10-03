@@ -530,7 +530,7 @@ void libCZI::ICziWriter::SyncAddSubBlock(const AddSubBlockInfoStridedBitmap& add
             {
                 stringstream ss;
                 ss << "Got an invalid result when requesting data for '" << nameOfPartToWrite << "'";
-                throw LibCZIWriteException(ss.str().c_str(), LibCZIWriteException::ErrorCode::GetDataCallError);
+                throw LibCZIWriteException(ss.str().c_str(), LibCZIWriteException::ErrorType::GetDataCallError);
             }
 
             auto sizeOfDataToWrite = (std::min)(size - offset, sizeData);
@@ -968,7 +968,7 @@ CCziWriter::~CCziWriter()
     bool b = this->sbBlkDirectory.TryAddSubBlock(entry);
     if (b == false)
     {
-        throw LibCZIWriteException("Could not add subblock because it already exists", LibCZIWriteException::ErrorCode::AddCoordinateAlreadyExisting);
+        throw LibCZIWriteException("Could not add subblock because it already exists", LibCZIWriteException::ErrorType::AddCoordinateAlreadyExisting);
     }
 
     this->WriteSubBlock(addSbBlkInfo);
@@ -986,7 +986,7 @@ CCziWriter::~CCziWriter()
     bool b = this->attachmentDirectory.TryAddAttachment(entry);
     if (b == false)
     {
-        throw LibCZIWriteException("Could not add attachment because it already exists", LibCZIWriteException::ErrorCode::AddAttachmentAlreadyExisting);
+        throw LibCZIWriteException("Could not add attachment because it already exists", LibCZIWriteException::ErrorType::AddAttachmentAlreadyExisting);
     }
 
     this->WriteAttachment(addAttachmentInfo);
@@ -1111,7 +1111,7 @@ void CCziWriter::WriteToOutputStream(std::uint64_t offset, const void* pv, std::
 {
     stringstream ss;
     ss << "Not enough data written at offset " << offset << " -> bytes to write: " << bytesToWrite << " bytes, actually written " << bytesActuallyWritten << " bytes.";
-    throw LibCZIWriteException(ss.str().c_str(), LibCZIWriteException::ErrorCode::NotEnoughDataWritten);
+    throw LibCZIWriteException(ss.str().c_str(), LibCZIWriteException::ErrorType::NotEnoughDataWritten);
 }
 
 void CCziWriter::WriteFileHeader(const FileHeaderData& fhd)
@@ -1304,11 +1304,11 @@ void CCziWriter::ThrowIfCoordinateIsOutOfBounds(const libCZI::AddSubBlockInfo& a
     case SbBlkCoordinateCheckResult::Ok:
         return;
     case SbBlkCoordinateCheckResult::OutOfBounds:
-        throw LibCZIWriteException("coordinate out-of-bounds", LibCZIWriteException::ErrorCode::SubBlockCoordinateOutOfBounds);
+        throw LibCZIWriteException("coordinate out-of-bounds", LibCZIWriteException::ErrorType::SubBlockCoordinateOutOfBounds);
     case SbBlkCoordinateCheckResult::InsufficientCoordinate:
-        throw LibCZIWriteException("coordinate insufficient", LibCZIWriteException::ErrorCode::SubBlockCoordinateInsufficient);
+        throw LibCZIWriteException("coordinate insufficient", LibCZIWriteException::ErrorType::SubBlockCoordinateInsufficient);
     case SbBlkCoordinateCheckResult::UnexpectedCoordinate:
-        throw LibCZIWriteException("unexpected dimension", LibCZIWriteException::ErrorCode::AddCoordinateContainsUnexpectedDimension);
+        throw LibCZIWriteException("unexpected dimension", LibCZIWriteException::ErrorType::AddCoordinateContainsUnexpectedDimension);
     }
 }
 
