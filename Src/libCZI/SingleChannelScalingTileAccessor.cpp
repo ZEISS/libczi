@@ -222,10 +222,10 @@ std::vector<int> CSingleChannelScalingTileAccessor::CreateSortByZoom(const std::
                 }
 
                 if (zoom1 > zoom2 ||
-                         static_cast<uint32_t>(sb1.logicalRect.w) != sb1.physicalSize.w ||  // if the logical rect is not the same as the physical size, then the subblock is not on layer-0
-                         static_cast<uint32_t>(sb1.logicalRect.h) != sb1.physicalSize.h ||  // and we want to apply the "sorting by M-index" only for layer-0
-                         static_cast<uint32_t>(sb2.logicalRect.w) != sb2.physicalSize.w ||
-                         static_cast<uint32_t>(sb2.logicalRect.h) != sb2.physicalSize.h)
+                    static_cast<uint32_t>(sb1.logicalRect.w) != sb1.physicalSize.w ||  // if the logical rect is not the same as the physical size, then the subblock is not on layer-0
+                    static_cast<uint32_t>(sb1.logicalRect.h) != sb1.physicalSize.h ||  // and we want to apply the "sorting by M-index" only for layer-0
+                    static_cast<uint32_t>(sb2.logicalRect.w) != sb2.physicalSize.w ||
+                    static_cast<uint32_t>(sb2.logicalRect.h) != sb2.physicalSize.h)
                 {
                     return false;
                 }
