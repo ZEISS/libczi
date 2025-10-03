@@ -1225,8 +1225,11 @@ TEST(CziWriter, Writer12)
     int subBlkCnt = 0;
     CSegmentWalker::Walk(
         inputStream.get(),
-        [&](int cnt, const std::string& id, std::int64_t, std::int64_t)->bool
+        [&](int cnt, const std::string& id, std::int64_t allocatedSize, std::int64_t usedSize)->bool
         {
+            (void)allocatedSize;
+            (void)usedSize;
+
             // we expect the CZI-fileheader-segment, then the subblockdirectory-segment, and then exactly 50 subblocks
             if (cnt == 0)
             {
@@ -1549,8 +1552,13 @@ TEST(CziWriter, WriterReturnFalseFromCallback)
     addSbBlkInfo.PixelType = PixelType::Gray8;
     addSbBlkInfo.sizeData = 1000;
     addSbBlkInfo.getData = std::function<bool(int callCnt, size_t offset, const void*& ptr, size_t & size)>(
-        [&](int, size_t, const void*&, size_t&)->bool
+        [&](int callCnt, size_t offset, const void*& ptr, size_t& size)->bool
         {
+            (void)callCnt;
+            (void)offset;
+            (void)ptr;
+            (void)size;
+
             return false;
         }
     );
