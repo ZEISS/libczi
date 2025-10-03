@@ -75,37 +75,40 @@ static void ConvertSegmentHeaderToHostByteOrder(CziSegmentHeader* p);
     bool allReceived = false;
     CSegmentWalker::Walk(
         stream,
-        [&](int cnt, const std::string& id, std::int64_t, std::int64_t)->bool
+        [&](int cnt, const std::string& id, std::int64_t allocatedSize, std::int64_t usedSize)->bool
         {
+            (void)allocatedSize;
+            (void)usedSize;
+
             const CSegmentWalker::ExpectedSegment* p = expectedSegments;
-    intptr_t n = cnt;
-    for (; n > 0; )
-    {
-        n -= p->cnt;
-        if (n >= 0)
-        {
-            ++p;
-        }
+            intptr_t n = cnt;
+            for (; n > 0; )
+            {
+                n -= p->cnt;
+                if (n >= 0)
+                {
+                    ++p;
+                }
 
-        if (p >= expectedSegments + countExpectedSegments)
-        {
-            tooManySegments = true;
-            return false;
-        }
-    }
+                if (p >= expectedSegments + countExpectedSegments)
+                {
+                    tooManySegments = true;
+                    return false;
+                }
+            }
 
-    if (id != p->segmentId)
-    {
-        wrongId = true;
-        return false;
-    }
+            if (id != p->segmentId)
+            {
+                wrongId = true;
+                return false;
+            }
 
-    if (cnt + 1 == totalCnt)
-    {
-        allReceived = true;
-    }
+            if (cnt + 1 == totalCnt)
+            {
+                allReceived = true;
+            }
 
-    return true;
+            return true;
         });
 
     return !tooManySegments && !wrongId && allReceived;

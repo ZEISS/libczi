@@ -6891,8 +6891,11 @@ MockMetadataSegment::MockMetadataSegment(Type type/*= Type::Data1*/)
     }
 }
 
-/*virtual*/ std::shared_ptr<const void> MockMetadataSegment::GetRawData(MemBlkType, size_t*)
+/*virtual*/ std::shared_ptr<const void> MockMetadataSegment::GetRawData(MemBlkType type, size_t* ptrSize)
 {
+    (void)type;
+    (void)ptrSize;
+
     throw  std::logic_error("Function not implemented.");
 }
 
