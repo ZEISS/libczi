@@ -40,7 +40,6 @@ extern "C" {
 #define PK_SDK_VERSION 0x0101
 
 #define sizeof2(array) (sizeof(array)/sizeof(*(array)))
-#define STRCPY_SAFE(pszDest, cbDest, pszSrc)    (strncpy((pszDest), (pszSrc), (cbDest)) == (pszDest) ? 0 : 1)
 
 //================================================================
     typedef struct tagPKRect

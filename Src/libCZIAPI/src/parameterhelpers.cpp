@@ -1026,6 +1026,8 @@ std::string ParameterHelpers::trim(const std::string& str, const std::string& wh
                 case libCZI::PixelType::Gray64Float:
                     pixel_type_string = "Gray64Float";
                     break;
+                default:
+                    break;
                 }
 
                 if (pixel_type_string != nullptr)
