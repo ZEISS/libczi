@@ -13,7 +13,7 @@ struct AzureUriAndExpectedResultFixture : public testing::TestWithParam<tuple<ws
 
 TEST_P(AzureUriAndExpectedResultFixture, TokenizeAzureUriScheme_ValidCases)
 {
-    const auto parameters = GetParam();
+    const auto& parameters = GetParam();
     const auto tokens = Utilities::TokenizeAzureUriString(get<0>(parameters));
     EXPECT_EQ(tokens, get<1>(parameters));
 }
@@ -37,7 +37,7 @@ struct IllFormedAzureUriAndExpectedErrorFixture : public testing::TestWithParam<
 
 TEST_P(IllFormedAzureUriAndExpectedErrorFixture, TokenizeAzureUriScheme_InvalidCases)
 {
-    const auto parameter = GetParam();
+    const auto& parameter = GetParam();
     EXPECT_THROW(Utilities::TokenizeAzureUriString(parameter), std::invalid_argument);
 }
 
