@@ -996,8 +996,10 @@ TEST(MetadataBuilder, WriteDisplaySettingsAndCheckNameAndId)
         metadata_builder.get(), 
         DisplaySettingsPOD::CreateIDisplaySettingSp(display_settings).get(), 
         1,
-        [](int, MetadataUtils::CoerceAdditionalInfoForChannelDisplaySettings& coerce_info)->void
+        [](int channelNo, MetadataUtils::CoerceAdditionalInfoForChannelDisplaySettings& coerce_info)->void
         {
+            (void)channelNo;
+
             coerce_info.idAttribute = kChannelId;
             coerce_info.writeIdAttribute = true;
             coerce_info.nameAttribute = kChannelName;
