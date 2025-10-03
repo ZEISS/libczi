@@ -639,9 +639,10 @@ TEST(CziReader, ReaderException)
         std::string exceptionText;
         std::error_code code;
     public:
-        CTestStreamImp(std::string exceptionText, std::error_code code) :exceptionText(std::move(exceptionText)), code(code) {}
+        CTestStreamImp(std::string exceptionText, std::error_code code) :exceptionText(std::move(exceptionText)), code(code)
+        {}
 
-        void Read(std::uint64_t offset, void* pv, std::uint64_t size, std::uint64_t* ptrBytesRead)  override
+        void Read(std::uint64_t offset, void* pv, std::uint64_t size, std::uint64_t* ptrBytesRead) override
         {
             (void)offset;
             (void)pv;
