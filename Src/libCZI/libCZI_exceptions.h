@@ -118,7 +118,8 @@ namespace libCZI
         /// \param offset   The offset (into the stream) at which the I/O-error occurred.
         /// \param size     The size of data we have attempted to read (when the I/O-error occurred).
         LibCZIIOException(const char* szErrMsg, std::uint64_t offset, std::uint64_t size)
-            : LibCZIException(szErrMsg), offset(offset), size(size) {}
+            : LibCZIException(szErrMsg), offset(offset), size(size)
+        {}
 
         /// Gets the offset (in bytes) into the stream at which
         /// the I/O-error occurred.
@@ -138,7 +139,7 @@ namespace libCZI
     struct LibCZICZIParseException : public LibCZIException
     {
         /// Values that represent different error conditions.
-        enum class ErrorType
+        enum class ErrorCode
         {
             NotEnoughData,                              ///< An enum constant representing that not the expected amount of data could be read.
             CorruptedData,                              ///< An enum constant representing that the data was detected to be bogus.
@@ -151,16 +152,16 @@ namespace libCZI
         /// to signal that there was a parsing error.
         /// \param szErrMsg Message describing the error.
         /// \param code     The error code.
-        LibCZICZIParseException(const char* szErrMsg, ErrorType code)
-            : LibCZIException(szErrMsg), errorType(code)
+        LibCZICZIParseException(const char* szErrMsg, ErrorCode code)
+            : LibCZIException(szErrMsg), errorCode(code)
         {
         }
 
         /// Gets error code.
         /// \return The error code.
-        ErrorType GetErrorCode() const { return this->errorType; }
+        ErrorCode GetErrorCode() const { return this->errorCode; }
     private:
-        ErrorType errorType;
+        ErrorCode errorCode;
     };
 
     /// Exception is thrown in order to signal that the segments Metdata, SubblockDirectory or
@@ -181,7 +182,7 @@ namespace libCZI
     struct LibCZIInvalidPlaneCoordinateException : public LibCZIException
     {
         /// Values that represent different error conditions.
-        enum class ErrorType
+        enum class ErrorCode
         {
             SurplusDimension,    ///< An enum constant representing a dimension was specified which is not found in the document.
             MissingDimension,    ///< An enum constant representing that the plane-coordinate did not contain a coordinate which is required to specify a plane.
@@ -193,17 +194,12 @@ namespace libCZI
         /// to signal that a plane-coordinate was determined to be invalid.
         /// \param szErrMsg Message describing the error.
         /// \param code     The error code.
-        LibCZIInvalidPlaneCoordinateException(const char* szErrMsg, ErrorType code)
-            : LibCZIException(szErrMsg), errorType(code)
+        LibCZIInvalidPlaneCoordinateException(const char* szErrMsg, ErrorCode code)
+            : LibCZIException(szErrMsg), errorCode(code)
         {
         }
-
-        /// Gets error code.
-        /// \return The error code.
-        ErrorType GetErrorType() const { return this->errorType; }
-
     private:
-        ErrorType errorType;
+        ErrorCode errorCode;
     };
 
     /// Exception for signaling errors when using the CziWriter-object.
@@ -337,4 +333,3 @@ namespace libCZI
         }
     };
 }
-

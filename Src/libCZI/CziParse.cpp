@@ -558,7 +558,7 @@ using namespace libCZI;
                     // In this case we can immediately throw an exception (i.e. this options requires that the size of M is 1 for all subblocks).
                     stringstream string_stream;
                     string_stream << "Size for dimension 'M' is expected to be 1, but found " << subBlkDirDV->DimensionEntries[i].Size << " (file-offset:" << subBlkDirDV->FilePosition << ").";
-                    throw LibCZICZIParseException(string_stream.str().c_str(), LibCZICZIParseException::ErrorType::NonConformingSubBlockDimensionEntry);
+                    throw LibCZICZIParseException(string_stream.str().c_str(), LibCZICZIParseException::ErrorCode::NonConformingSubBlockDimensionEntry);
                 }
                 else
                 {
@@ -585,7 +585,7 @@ using namespace libCZI;
                             << "Physical size for dimension '" << Utils::DimensionToChar(dim)
                             << "' is expected to be 1, but found " << physicalSize
                             << " (file-offset:" << subBlkDirDV->FilePosition << ").";
-                    throw LibCZICZIParseException(string_stream.str().c_str(), LibCZICZIParseException::ErrorType::NonConformingSubBlockDimensionEntry);
+                    throw LibCZICZIParseException(string_stream.str().c_str(), LibCZICZIParseException::ErrorCode::NonConformingSubBlockDimensionEntry);
                 }
             }
 
@@ -593,7 +593,7 @@ using namespace libCZI;
             {
                 stringstream string_stream;
                 string_stream << "Size for dimension '" << Utils::DimensionToChar(dim) << "' is expected to be 1, but found " << subBlkDirDV->DimensionEntries[i].Size << " (file-offset:" << subBlkDirDV->FilePosition << ").";
-                throw LibCZICZIParseException(string_stream.str().c_str(), LibCZICZIParseException::ErrorType::NonConformingSubBlockDimensionEntry);
+                throw LibCZICZIParseException(string_stream.str().c_str(), LibCZICZIParseException::ErrorCode::NonConformingSubBlockDimensionEntry);
             }
         }
     }
@@ -616,7 +616,7 @@ using namespace libCZI;
         }
 
         string_stream << " (file-offset:" << subBlkDirDV->FilePosition << ").";
-        throw LibCZICZIParseException(string_stream.str().c_str(), LibCZICZIParseException::ErrorType::NonConformingSubBlockDimensionEntry);
+        throw LibCZICZIParseException(string_stream.str().c_str(), LibCZICZIParseException::ErrorCode::NonConformingSubBlockDimensionEntry);
     }
 
     if (size_of_m_was_not_1 && options.GetDimensionMMustHaveSizeOneForPyramidSubblocks())
@@ -629,7 +629,7 @@ using namespace libCZI;
             // this is not a pyramid-subblock, so we throw the exception
             stringstream string_stream;
             string_stream << "Size for dimension 'M' for non-pyramid-subblock is expected to be 1, but found " << size_of_m_in_case_it_was_not_1 << " (file-offset:" << subBlkDirDV->FilePosition << ").";
-            throw LibCZICZIParseException(string_stream.str().c_str(), LibCZICZIParseException::ErrorType::NonConformingSubBlockDimensionEntry);
+            throw LibCZICZIParseException(string_stream.str().c_str(), LibCZICZIParseException::ErrorCode::NonConformingSubBlockDimensionEntry);
         }
     }
 
@@ -799,21 +799,21 @@ using namespace libCZI;
 {
     stringstream ss;
     ss << "Not enough data read at offset " << offset << " -> requested: " << bytesRequested << " bytes, actually got " << bytesActuallyRead << " bytes.";
-    throw LibCZICZIParseException(ss.str().c_str(), LibCZICZIParseException::ErrorType::NotEnoughData);
+    throw LibCZICZIParseException(ss.str().c_str(), LibCZICZIParseException::ErrorCode::NotEnoughData);
 }
 
 [[noreturn]] /*static*/void CCZIParse::ThrowIllegalData(std::uint64_t offset, const char* sz)
 {
     stringstream ss;
     ss << "Illegal data detected at offset " << offset << " -> " << sz;
-    throw LibCZICZIParseException(ss.str().c_str(), LibCZICZIParseException::ErrorType::CorruptedData);
+    throw LibCZICZIParseException(ss.str().c_str(), LibCZICZIParseException::ErrorCode::CorruptedData);
 }
 
 [[noreturn]] /*static*/void CCZIParse::ThrowIllegalData(const char* sz)
 {
     stringstream ss;
     ss << "Illegal data detected -> " << sz;
-    throw LibCZICZIParseException(ss.str().c_str(), LibCZICZIParseException::ErrorType::CorruptedData);
+    throw LibCZICZIParseException(ss.str().c_str(), LibCZICZIParseException::ErrorCode::CorruptedData);
 }
 
 /*static*/bool CCZIParse::CheckAttachmentSchemaType(const char* p, size_t cnt)

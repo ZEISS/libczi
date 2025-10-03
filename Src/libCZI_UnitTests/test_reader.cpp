@@ -706,7 +706,7 @@ TEST(CziReader, ReaderException2)
     catch (LibCZICZIParseException& excp)
     {
         auto errCode = excp.GetErrorCode();
-        if (errCode == LibCZICZIParseException::ErrorType::CorruptedData)
+        if (errCode == LibCZICZIParseException::ErrorCode::CorruptedData)
         {
             exceptionCorrect = true;
         }
@@ -839,7 +839,7 @@ TEST(CziReader, CheckThatExceptionIsThrownWhenEnabledIfSubBlockDirectoryAndSubbl
     }
     catch (const LibCZICZIParseException& exception)
     {
-        EXPECT_EQ(exception.GetErrorCode(), LibCZICZIParseException::ErrorType::SubBlockDirectoryToSubBlockHeaderMismatch) << "not the correct errorcode";
+        EXPECT_EQ(exception.GetErrorCode(), LibCZICZIParseException::ErrorCode::SubBlockDirectoryToSubBlockHeaderMismatch) << "not the correct errorcode";
     }
     catch (...)
     {

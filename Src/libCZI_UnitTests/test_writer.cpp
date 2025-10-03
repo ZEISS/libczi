@@ -555,7 +555,7 @@ TEST(CziWriter, Writer2)
     }
     catch (LibCZIWriteException& e)
     {
-        if (e.GetErrorType() == LibCZIWriteException::ErrorType::AddCoordinateAlreadyExisting)
+        if (e.GetErrorType() == LibCZIWriteException::ErrorCode::AddCoordinateAlreadyExisting)
         {
             expectedExceptionCaught = true;
         }
@@ -591,7 +591,7 @@ TEST(CziWriter, Writer3)
     }
     catch (LibCZIWriteException& e)
     {
-        if (e.GetErrorType() == LibCZIWriteException::ErrorType::AddAttachmentAlreadyExisting)
+        if (e.GetErrorType() == LibCZIWriteException::ErrorCode::AddAttachmentAlreadyExisting)
         {
             expectedExceptionCaught = true;
         }
@@ -894,7 +894,7 @@ TEST(CziWriter, Writer7)
     }
     catch (LibCZIWriteException& excp)
     {
-        if (excp.GetErrorType() == LibCZIWriteException::ErrorType::SubBlockCoordinateOutOfBounds)
+        if (excp.GetErrorType() == LibCZIWriteException::ErrorCode::SubBlockCoordinateOutOfBounds)
         {
             expectedExceptionCaught = true;
         }
@@ -944,7 +944,7 @@ TEST(CziWriter, Writer8)
     }
     catch (LibCZIWriteException& excp)
     {
-        if (excp.GetErrorType() == LibCZIWriteException::ErrorType::SubBlockCoordinateInsufficient)
+        if (excp.GetErrorType() == LibCZIWriteException::ErrorCode::SubBlockCoordinateInsufficient)
         {
             expectedExceptionCaught = true;
         }
@@ -996,7 +996,7 @@ TEST(CziWriter, Writer9)
     }
     catch (LibCZIWriteException& excp)
     {
-        if (excp.GetErrorType() == LibCZIWriteException::ErrorType::SubBlockCoordinateOutOfBounds)
+        if (excp.GetErrorType() == LibCZIWriteException::ErrorCode::SubBlockCoordinateOutOfBounds)
         {
             expectedExceptionCaught = true;
         }
@@ -1048,7 +1048,7 @@ TEST(CziWriter, Writer10)
     }
     catch (LibCZIWriteException& excp)
     {
-        if (excp.GetErrorType() == LibCZIWriteException::ErrorType::AddCoordinateContainsUnexpectedDimension)
+        if (excp.GetErrorType() == LibCZIWriteException::ErrorCode::AddCoordinateContainsUnexpectedDimension)
         {
             expectedExceptionCaught = true;
         }

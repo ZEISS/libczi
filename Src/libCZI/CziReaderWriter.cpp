@@ -365,7 +365,7 @@ void CCziReaderWriter::ReadCziStructure()
     }
     catch (const LibCZICZIParseException& excp)
     {
-        if (excp.GetErrorCode() == LibCZICZIParseException::ErrorType::NotEnoughData)
+        if (excp.GetErrorCode() == LibCZICZIParseException::ErrorCode::NotEnoughData)
         {
             // this now means that the existing file did not contain a CZI-file-header, which let's us
             // treat this file as "new" (so, there is no information we re-use)     
@@ -636,7 +636,7 @@ void CCziReaderWriter::WriteToOutputStream(std::uint64_t offset, const void* pv,
 {
     stringstream ss;
     ss << "Not enough data written at offset " << offset << " -> bytes to write: " << bytesToWrite << " bytes, actually written " << bytesActuallyWritten << " bytes.";
-    throw LibCZIWriteException(ss.str().c_str(), LibCZIWriteException::ErrorType::NotEnoughDataWritten);
+    throw LibCZIWriteException(ss.str().c_str(), LibCZIWriteException::ErrorCode::NotEnoughDataWritten);
 }
 
 /*virtual*/void CCziReaderWriter::EnumerateSubBlocks(const std::function<bool(int index, const libCZI::SubBlockInfo& info)>& funcEnum)

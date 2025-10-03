@@ -359,7 +359,7 @@ std::shared_ptr<ISubBlock> CCZIReader::ReadSubBlock(const CCziSubBlockDirectory:
         {
             throw LibCZICZIParseException(
                 "CZIReader::ReadSubBlock: SubBlock-directory and sub-block information do not match.",
-                LibCZICZIParseException::ErrorType::SubBlockDirectoryToSubBlockHeaderMismatch);
+                LibCZICZIParseException::ErrorCode::SubBlockDirectoryToSubBlockHeaderMismatch);
         }
     }
 

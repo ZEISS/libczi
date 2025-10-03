@@ -34,7 +34,7 @@ void CSingleChannelAccessorBase::CheckPlaneCoordinates(const libCZI::IDimCoordin
     // planeCoordinate must not contain S
     if (planeCoordinate->IsValid(DimensionIndex::S))
     {
-        throw LibCZIInvalidPlaneCoordinateException("S-dimension is illegal for a plane.", LibCZIInvalidPlaneCoordinateException::ErrorType::InvalidDimension);
+        throw LibCZIInvalidPlaneCoordinateException("S-dimension is illegal for a plane.", LibCZIInvalidPlaneCoordinateException::ErrorCode::InvalidDimension);
     }
 
     static constexpr DimensionIndex DimensionsToCheck[] =
@@ -57,7 +57,7 @@ void CSingleChannelAccessorBase::CheckPlaneCoordinates(const libCZI::IDimCoordin
                 {
                     stringstream ss;
                     ss << "Coordinate for dimension '" << Utils::DimensionToChar(d) << "' not given.";
-                    throw LibCZIInvalidPlaneCoordinateException(ss.str().c_str(), LibCZIInvalidPlaneCoordinateException::ErrorType::MissingDimension);
+                    throw LibCZIInvalidPlaneCoordinateException(ss.str().c_str(), LibCZIInvalidPlaneCoordinateException::ErrorCode::MissingDimension);
                 }
             }
             else
@@ -66,7 +66,7 @@ void CSingleChannelAccessorBase::CheckPlaneCoordinates(const libCZI::IDimCoordin
                 {
                     stringstream ss;
                     ss << "Coordinate for dimension '" << Utils::DimensionToChar(d) << "' is out-of-range.";
-                    throw LibCZIInvalidPlaneCoordinateException(ss.str().c_str(), LibCZIInvalidPlaneCoordinateException::ErrorType::CoordinateOutOfRange);
+                    throw LibCZIInvalidPlaneCoordinateException(ss.str().c_str(), LibCZIInvalidPlaneCoordinateException::ErrorCode::CoordinateOutOfRange);
                 }
             }
         }
@@ -77,7 +77,7 @@ void CSingleChannelAccessorBase::CheckPlaneCoordinates(const libCZI::IDimCoordin
             {
                 stringstream ss;
                 ss << "Coordinate for dimension '" << Utils::DimensionToChar(d) << "' is not expected.";
-                throw LibCZIInvalidPlaneCoordinateException(ss.str().c_str(), LibCZIInvalidPlaneCoordinateException::ErrorType::SurplusDimension);
+                throw LibCZIInvalidPlaneCoordinateException(ss.str().c_str(), LibCZIInvalidPlaneCoordinateException::ErrorCode::SurplusDimension);
             }
         }
     }
