@@ -1048,7 +1048,7 @@ TEST(CZIAPI_ParameterHelpers, Check_FormatDimensionCInfoAsJson_Scenario1)
     dimension_channel_info_2->SetIlluminationType(libCZI::DimensionChannelIlluminationType::Oblique);
     dimension_channel_info_2->SetContrastMethod(libCZI::DimensionChannelContrastMethod::HoffmanModulation);
     spectrum_characteristics_illumination.type = libCZI::SpectrumCharacteristics::InformationType::Ranges;
-    spectrum_characteristics_illumination.ranges.push_back(libCZI::RangeOrSingleValue<double>{ true, 1.0 });
+    spectrum_characteristics_illumination.ranges.push_back(libCZI::RangeOrSingleValue<double>{ true, 1.0, 0 });
     spectrum_characteristics_illumination.ranges.push_back(libCZI::RangeOrSingleValue<double>{ false, 2.2, 6.2 });
     spectrum_characteristics_illumination.ranges.push_back(libCZI::RangeOrSingleValue<double>{ true, 8, 0});
     dimension_channel_info_2->SetIlluminationWavelength(spectrum_characteristics_illumination);
@@ -1071,7 +1071,7 @@ TEST(CZIAPI_ParameterHelpers, Check_FormatDimensionCInfoAsJson_Scenario1)
     dimension_channel_info_2->SetPockelCellSetting(2);
     dimension_channel_info_2->SetColor(libCZI::Rgb8Color{ 4,5,7 });
 
-    dimension_channel_info_2->SetExposureTime(libCZI::RangeOrSingleValue<std::uint64_t>{true, 11});
+    dimension_channel_info_2->SetExposureTime(libCZI::RangeOrSingleValue<std::uint64_t>{true, 11, 0});
     dimension_channel_info_2->SetDepthOfFocus(7.4);
     dimension_channel_info_2->SetSectionThickness(3.1);
     dimension_channel_info_2->SetReflector(L"reflector");
