@@ -4,6 +4,7 @@
 
 #include "SingleChannelAccessorBase.h"
 #include "BitmapOperations.h"
+#include "libCZI_Pixels.h"
 #include "utilities.h"
 
 using namespace std;
@@ -91,7 +92,14 @@ std::vector<int> CSingleChannelAccessorBase::CheckForVisibility(const libCZI::In
         [this](int subblock_index) -> IntRect
             {
                 SubBlockInfo subblock_info;
-                bool b = this->sbBlkRepository->TryGetSubBlockInfo(subblock_index, &subblock_info);
+                const bool result = this->sbBlkRepository->TryGetSubBlockInfo(subblock_index, &subblock_info);
+                if (!result)
+                {
+                    stringstream ss;
+                    ss << "SubBlockInfo not found in repository for subblock index " << subblock_index << ".";
+                    throw LibCZIAccessorException(ss.str().c_str(), LibCZIAccessorException::ErrorType::InternalInconsistency);
+                }
+
                 return subblock_info.logicalRect;
             });
 }

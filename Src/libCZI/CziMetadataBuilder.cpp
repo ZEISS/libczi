@@ -748,6 +748,8 @@ bool libCZI::XmlDateTime::IsValid() const
     statistics.dimBounds.EnumValidDimensions(
         [&](libCZI::DimensionIndex dim, int start, int size)->bool
         {
+            (void)start;
+
             MetadataUtils::WriteDimensionSize(builder, dim, size);
             return true;
         });

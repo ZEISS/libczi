@@ -399,9 +399,9 @@ TEST(Pixels, SetPixelValueAndGetPixelValue)
     std::mt19937 gen(rd());
     std::uniform_int_distribution<> dis(0, 1);
 
-    for (int y = 0; y < bitonal_bitmap->GetHeight(); ++y)
+    for (uint32_t y = 0; y < bitonal_bitmap->GetHeight(); ++y)
     {
-        for (int x = 0; x < bitonal_bitmap->GetWidth(); ++x)
+        for (uint32_t x = 0; x < bitonal_bitmap->GetWidth(); ++x)
         {
             const bool value = dis(gen) == 1;
             BitonalBitmapOperations::SetPixelValue(bitonal_bitmap, x, y, value);

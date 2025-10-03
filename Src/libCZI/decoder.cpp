@@ -39,6 +39,8 @@ static libCZI::PixelType PixelTypeFromJxrPixelFormat(JxrDecode::PixelFormat pixe
 
 std::shared_ptr<libCZI::IBitmapData> CJxrLibDecoder::Decode(const void* ptrData, size_t size, const libCZI::PixelType* pixelType, const uint32_t* width, const uint32_t* height, const char* additional_arguments)
 {
+    (void)additional_arguments;
+
     std::shared_ptr<IBitmapData> bitmap;
     bool bitmap_is_locked = false;
 

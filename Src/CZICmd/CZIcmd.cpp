@@ -40,6 +40,8 @@ public:
 
     void Log(int level, const char* szMsg) override
     {
+        (void)level;
+
         this->options.GetLog()->WriteLineStdOut(szMsg);
     }
 
@@ -65,6 +67,8 @@ public:
 int main(int argc, char** _argv)
 {
 #if CZICMD_WINDOWSAPI_AVAILABLE
+    (void)argc;
+    (void)_argv;
     CoInitialize(NULL);
     CommandlineArgsWindowsHelper args_helper;
 #else

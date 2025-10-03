@@ -131,7 +131,7 @@ private:
         explicit CGetTintedGray16(Rgb8Color tintingColor) : CGetTintedBase(tintingColor) {}
         bgr8 operator()(const uint8_t* p) const
         {
-            float f = *((const uint16_t*)p);
+            float f = *reinterpret_cast<const uint16_t*>(p);
             f /= (256 * 256 - 1);
             return bgr8{ toByte(f * this->tintingColor.b),toByte(f * this->tintingColor.g),toByte(f * this->tintingColor.r) };
         }
@@ -193,6 +193,8 @@ private:
     static void DoTinting(tStore store, libCZI::IBitmapData* dest, const BitmapLockInfo& lckDst,
         libCZI::IBitmapData* src, const Compositors::ChannelInfo* chInfo)
     {
+        (void)dest;
+
         ScopedBitmapLockerP lckSrc{ src };
         if (chInfo->enableTinting)
         {
@@ -201,31 +203,31 @@ private:
             case PixelType::Gray8:
             {
                 CGetTintedGray8 t{ chInfo->tinting.color };
-                CopyTinting<tStore>(store, t, src->GetWidth(), src->GetHeight(), (uint8_t*)lckDst.ptrDataRoi, lckDst.stride, (const uint8_t*)lckSrc.ptrDataRoi, lckSrc.stride);
+                CopyTinting<tStore>(store, t, src->GetWidth(), src->GetHeight(), static_cast<uint8_t*>(lckDst.ptrDataRoi), lckDst.stride, static_cast<const uint8_t*>(lckSrc.ptrDataRoi), lckSrc.stride);
             }
             break;
             case PixelType::Gray16:
             {
                 CGetTintedGray16 t{ chInfo->tinting.color };
-                CopyTinting<tStore>(store, t, src->GetWidth(), src->GetHeight(), (uint8_t*)lckDst.ptrDataRoi, lckDst.stride, (const uint8_t*)lckSrc.ptrDataRoi, lckSrc.stride);
+                CopyTinting<tStore>(store, t, src->GetWidth(), src->GetHeight(), static_cast<uint8_t*>(lckDst.ptrDataRoi), lckDst.stride, static_cast<const uint8_t*>(lckSrc.ptrDataRoi), lckSrc.stride);
             }
             break;
             case PixelType::Bgr24:
             {
                 CGetTintedBgr24 t{ chInfo->tinting.color };
-                CopyTinting<tStore>(store, t, src->GetWidth(), src->GetHeight(), (uint8_t*)lckDst.ptrDataRoi, lckDst.stride, (const uint8_t*)lckSrc.ptrDataRoi, lckSrc.stride);
+                CopyTinting<tStore>(store, t, src->GetWidth(), src->GetHeight(), static_cast<uint8_t*>(lckDst.ptrDataRoi), lckDst.stride, static_cast<const uint8_t*>(lckSrc.ptrDataRoi), lckSrc.stride);
             }
             break;
             case PixelType::Bgra32:
             {
                 CGetTintedBgra32 t{ chInfo->tinting.color };
-                CopyTinting<tStore>(store, t, src->GetWidth(), src->GetHeight(), (uint8_t*)lckDst.ptrDataRoi, lckDst.stride, (const uint8_t*)lckSrc.ptrDataRoi, lckSrc.stride);
+                CopyTinting<tStore>(store, t, src->GetWidth(), src->GetHeight(), static_cast<uint8_t*>(lckDst.ptrDataRoi), lckDst.stride, static_cast<const uint8_t*>(lckSrc.ptrDataRoi), lckSrc.stride);
             }
             break;
             case PixelType::Bgr48:
             {
                 CGetTintedBgr48 t{ chInfo->tinting.color };
-                CopyTinting<tStore>(store, t, src->GetWidth(), src->GetHeight(), (uint8_t*)lckDst.ptrDataRoi, lckDst.stride, (const uint8_t*)lckSrc.ptrDataRoi, lckSrc.stride);
+                CopyTinting<tStore>(store, t, src->GetWidth(), src->GetHeight(), static_cast<uint8_t*>(lckDst.ptrDataRoi), lckDst.stride, static_cast<const uint8_t*>(lckSrc.ptrDataRoi), lckSrc.stride);
             }
             break;
             default:
@@ -239,31 +241,31 @@ private:
             case PixelType::Gray8:
             {
                 CGetGray8 t;
-                CopyTinting<tStore>(store, t, src->GetWidth(), src->GetHeight(), (uint8_t*)lckDst.ptrDataRoi, lckDst.stride, (const uint8_t*)lckSrc.ptrDataRoi, lckSrc.stride);
+                CopyTinting<tStore>(store, t, src->GetWidth(), src->GetHeight(), static_cast<uint8_t*>(lckDst.ptrDataRoi), lckDst.stride, static_cast<const uint8_t*>(lckSrc.ptrDataRoi), lckSrc.stride);
             }
             break;
             case PixelType::Gray16:
             {
                 CGetGray16 t;
-                CopyTinting<tStore>(store, t, src->GetWidth(), src->GetHeight(), (uint8_t*)lckDst.ptrDataRoi, lckDst.stride, (const uint8_t*)lckSrc.ptrDataRoi, lckSrc.stride);
+                CopyTinting<tStore>(store, t, src->GetWidth(), src->GetHeight(), static_cast<uint8_t*>(lckDst.ptrDataRoi), lckDst.stride, static_cast<const uint8_t*>(lckSrc.ptrDataRoi), lckSrc.stride);
             }
             break;
             case PixelType::Bgr24:
             {
                 CGetBgr24 t;
-                CopyTinting<tStore>(store, t, src->GetWidth(), src->GetHeight(), (uint8_t*)lckDst.ptrDataRoi, lckDst.stride, (const uint8_t*)lckSrc.ptrDataRoi, lckSrc.stride);
+                CopyTinting<tStore>(store, t, src->GetWidth(), src->GetHeight(), static_cast<uint8_t*>(lckDst.ptrDataRoi), lckDst.stride, static_cast<const uint8_t*>(lckSrc.ptrDataRoi), lckSrc.stride);
             }
             break;
             case PixelType::Bgra32:
             {
                 CGetBgra32 t;
-                CopyTinting<tStore>(store, t, src->GetWidth(), src->GetHeight(), (uint8_t*)lckDst.ptrDataRoi, lckDst.stride, (const uint8_t*)lckSrc.ptrDataRoi, lckSrc.stride);
+                CopyTinting<tStore>(store, t, src->GetWidth(), src->GetHeight(), static_cast<uint8_t*>(lckDst.ptrDataRoi), lckDst.stride, static_cast<const uint8_t*>(lckSrc.ptrDataRoi), lckSrc.stride);
             }
             break;
             case PixelType::Bgr48:
             {
                 CGetBgr48 t;
-                CopyTinting<tStore>(store, t, src->GetWidth(), src->GetHeight(), (uint8_t*)lckDst.ptrDataRoi, lckDst.stride, (const uint8_t*)lckSrc.ptrDataRoi, lckSrc.stride);
+                CopyTinting<tStore>(store, t, src->GetWidth(), src->GetHeight(), static_cast<uint8_t*>(lckDst.ptrDataRoi), lckDst.stride, static_cast<const uint8_t*>(lckSrc.ptrDataRoi), lckSrc.stride);
             }
             break;
             default:
@@ -485,7 +487,7 @@ private:
         CGetBlackWhitePtGray8(float blackPt, float whitePt) : CGetBlackWhitePtBase(blackPt, whitePt) {}
         bgr8 operator()(const uint8_t* p) const
         {
-            uint8_t pv = this->GetPixelValue(p);
+            const uint8_t pv = this->GetPixelValue(p);
             return bgr8{ pv,pv,pv };
         }
 
@@ -498,8 +500,8 @@ private:
                 return retPixelValue;
             }
 
-            float f = (pv - this->blackPt) / float(this->whitePt - this->blackPt);
-            retPixelValue = (uint8_t)(f * 255 + .5);
+            const float f = (pv - this->blackPt) / static_cast<float>(this->whitePt - this->blackPt);
+            retPixelValue = static_cast<uint8_t>(f * 255 + .5);
             return retPixelValue;
         }
 
@@ -559,28 +561,28 @@ private:
 
         uint8_t GetPixelValue(const uint8_t* p) const
         {
-            uint16_t pv = *((const uint16_t*)p);
+            uint16_t pv = *reinterpret_cast<const uint16_t*>(p);
             uint8_t retPixelValue;
             if (this->CheckBlackWhite(pv, retPixelValue))
             {
                 return retPixelValue;
             }
 
-            float f = (pv - this->blackPt) / float(this->whitePt - this->blackPt);
-            retPixelValue = (uint8_t)(f * 255 + .5);
+            const float f = (pv - this->blackPt) / static_cast<float>(this->whitePt - this->blackPt);
+            retPixelValue = static_cast<uint8_t>(f * 255 + .5);
             return retPixelValue;
         }
 
         float GetPixelValueFloat(const uint8_t* p) const
         {
-            uint16_t pv = *((const uint16_t*)p);
+            uint16_t pv = *reinterpret_cast<const uint16_t*>(p);
             float f;
             if (this->CheckBlackWhiteFloat(pv, f))
             {
                 return f;
             }
 
-            f = (pv - this->blackPt) / float(this->whitePt - this->blackPt);
+            f = (pv - this->blackPt) / static_cast<float>(this->whitePt - this->blackPt);
             return f;
         }
 
@@ -605,7 +607,7 @@ private:
 
         bgr8 operator()(const uint8_t* p) const
         {
-            float f = this->GetPixelValueFloat(p);
+            const float f = this->GetPixelValueFloat(p);
             return bgr8{ toByte(f * this->tintingColor.b),toByte(f * this->tintingColor.g),toByte(f * this->tintingColor.r) };
         }
     };
@@ -618,10 +620,10 @@ private:
         CGetBlackWhitePtBgr24(float blackPt, float whitePt) :getBlkWhtGray8(blackPt, whitePt) {}
         bgr8 operator()(const uint8_t* p) const
         {
-            uint8_t b = this->getBlkWhtGray8.GetPixelValue(p);
-            uint8_t g = this->getBlkWhtGray8.GetPixelValue(p + 1);
-            uint8_t r = this->getBlkWhtGray8.GetPixelValue(p + 2);
-            return bgr8{ b,g,r };
+            const uint8_t b = this->getBlkWhtGray8.GetPixelValue(p);
+            const uint8_t g = this->getBlkWhtGray8.GetPixelValue(p + 1);
+            const uint8_t r = this->getBlkWhtGray8.GetPixelValue(p + 2);
+            return bgr8{ b, g, r };
         }
     };
 
@@ -633,9 +635,9 @@ private:
 
         bgr8 operator()(const uint8_t* p) const
         {
-            uint8_t pv = (uint8_t)((((int)(*p)) + *(p + 1) + *(p + 2) + 1) / 3);
-            float f = this->getBlkWhtGray8.GetPixelValueFloat(pv);
-            return bgr8{ toByte(f * this->tintingColor.b),toByte(f * this->tintingColor.g),toByte(f * this->tintingColor.r) };
+            uint8_t pv = static_cast<uint8_t>((static_cast<int>(*p) + *(p + 1) + *(p + 2) + 1) / 3);
+            const float f = this->getBlkWhtGray8.GetPixelValueFloat(pv);
+            return bgr8{ toByte(f * this->tintingColor.b), toByte(f * this->tintingColor.g), toByte(f * this->tintingColor.r) };
         }
     };
 
@@ -647,9 +649,9 @@ private:
         CGetBlackWhitePtBgr48(float blackPt, float whitePt) : getBlkWhtGray16(blackPt, whitePt) {}
         bgr8 operator()(const uint8_t* p) const
         {
-            uint8_t b = this->getBlkWhtGray16.GetPixelValue(p);
-            uint8_t g = this->getBlkWhtGray16.GetPixelValue(p + 2);
-            uint8_t r = this->getBlkWhtGray16.GetPixelValue(p + 4);
+            const uint8_t b = this->getBlkWhtGray16.GetPixelValue(p);
+            const uint8_t g = this->getBlkWhtGray16.GetPixelValue(p + 2);
+            const uint8_t r = this->getBlkWhtGray16.GetPixelValue(p + 4);
             return bgr8{ b,g,r };
         }
     };
@@ -662,10 +664,10 @@ private:
 
         bgr8 operator()(const uint8_t* p) const
         {
-            const uint16_t* pus = (const uint16_t*)p;
-            uint16_t pv = (uint16_t)((((int)(*pus)) + *(pus + 1) + *(pus + 2) + 1) / 3);
-            float f = this->getBlkWhtGray16.GetPixelValueFloat(pv);
-            return bgr8{ toByte(f * this->tintingColor.b),toByte(f * this->tintingColor.g),toByte(f * this->tintingColor.r) };
+            const uint16_t* pus = reinterpret_cast<const uint16_t*>(p);
+            uint16_t pv = static_cast<uint16_t>((static_cast<int>(*pus) + *(pus + 1) + *(pus + 2) + 1) / 3);
+            const float f = this->getBlkWhtGray16.GetPixelValueFloat(pv);
+            return bgr8{ toByte(f * this->tintingColor.b), toByte(f * this->tintingColor.g), toByte(f * this->tintingColor.r) };
         }
     };
 
@@ -673,6 +675,8 @@ private:
     static void DoTintingBlackWhitePt(tStore store, libCZI::IBitmapData* dest, const BitmapLockInfo& lckDst,
         libCZI::IBitmapData* src, const Compositors::ChannelInfo* chInfo)
     {
+        (void)dest;
+
         ScopedBitmapLockerP lckSrc{ src };
         if (chInfo->enableTinting)
         {
@@ -899,6 +903,8 @@ private:
     template <typename tStore>
     static void DoLut(tStore store, libCZI::IBitmapData* dest, const BitmapLockInfo& lckDst, libCZI::IBitmapData* src, const Compositors::ChannelInfo* chInfo)
     {
+        (void)dest;
+
         auto pxTypeSrc = src->GetPixelType();
         ScopedBitmapLockerP lckSrc{ src };
         if (chInfo->enableTinting == false)
@@ -908,25 +914,25 @@ private:
             case PixelType::Gray8:
             {
                 CGetGray8Lut l(chInfo->ptrLookUpTable);
-                CopyTinting<tStore>(store, l, src->GetWidth(), src->GetHeight(), (uint8_t*)lckDst.ptrDataRoi, lckDst.stride, (const uint8_t*)lckSrc.ptrDataRoi, lckSrc.stride);
+                CopyTinting<tStore>(store, l, src->GetWidth(), src->GetHeight(), static_cast<uint8_t*>(lckDst.ptrDataRoi), lckDst.stride, static_cast<const uint8_t*>(lckSrc.ptrDataRoi), lckSrc.stride);
             }
             break;
             case PixelType::Gray16:
             {
                 CGetGray16Lut l(chInfo->ptrLookUpTable);
-                CopyTinting<tStore>(store, l, src->GetWidth(), src->GetHeight(), (uint8_t*)lckDst.ptrDataRoi, lckDst.stride, (const uint8_t*)lckSrc.ptrDataRoi, lckSrc.stride);
+                CopyTinting<tStore>(store, l, src->GetWidth(), src->GetHeight(), static_cast<uint8_t*>(lckDst.ptrDataRoi), lckDst.stride, static_cast<const uint8_t*>(lckSrc.ptrDataRoi), lckSrc.stride);
             }
             break;
             case PixelType::Bgr24:
             {
                 CGetBgr24Lut l(chInfo->ptrLookUpTable);
-                CopyTinting<tStore>(store, l, src->GetWidth(), src->GetHeight(), (uint8_t*)lckDst.ptrDataRoi, lckDst.stride, (const uint8_t*)lckSrc.ptrDataRoi, lckSrc.stride);
+                CopyTinting<tStore>(store, l, src->GetWidth(), src->GetHeight(), static_cast<uint8_t*>(lckDst.ptrDataRoi), lckDst.stride, static_cast<const uint8_t*>(lckSrc.ptrDataRoi), lckSrc.stride);
             }
             break;
             case PixelType::Bgr48:
             {
                 CGetBgr48Lut l(chInfo->ptrLookUpTable);
-                CopyTinting<tStore>(store, l, src->GetWidth(), src->GetHeight(), (uint8_t*)lckDst.ptrDataRoi, lckDst.stride, (const uint8_t*)lckSrc.ptrDataRoi, lckSrc.stride);
+                CopyTinting<tStore>(store, l, src->GetWidth(), src->GetHeight(), static_cast<uint8_t*>(lckDst.ptrDataRoi), lckDst.stride, static_cast<const uint8_t*>(lckSrc.ptrDataRoi), lckSrc.stride);
             }
             break;
             default:
@@ -940,25 +946,25 @@ private:
             case PixelType::Gray8:
             {
                 CGetGray8LutTinted l(chInfo->ptrLookUpTable, chInfo->tinting.color);
-                CopyTinting<tStore>(store, l, src->GetWidth(), src->GetHeight(), (uint8_t*)lckDst.ptrDataRoi, lckDst.stride, (const uint8_t*)lckSrc.ptrDataRoi, lckSrc.stride);
+                CopyTinting<tStore>(store, l, src->GetWidth(), src->GetHeight(), static_cast<uint8_t*>(lckDst.ptrDataRoi), lckDst.stride, (const uint8_t*)lckSrc.ptrDataRoi, lckSrc.stride);
             }
             break;
             case PixelType::Gray16:
             {
                 CGetGray16LutTinted l(chInfo->ptrLookUpTable, chInfo->tinting.color);
-                CopyTinting<tStore>(store, l, src->GetWidth(), src->GetHeight(), (uint8_t*)lckDst.ptrDataRoi, lckDst.stride, (const uint8_t*)lckSrc.ptrDataRoi, lckSrc.stride);
+                CopyTinting<tStore>(store, l, src->GetWidth(), src->GetHeight(), static_cast<uint8_t*>(lckDst.ptrDataRoi), lckDst.stride, static_cast<const uint8_t*>(lckSrc.ptrDataRoi), lckSrc.stride);
             }
             break;
             case PixelType::Bgr24:
             {
                 CGetBgr24LutTinted l(chInfo->ptrLookUpTable, chInfo->tinting.color);
-                CopyTinting<tStore>(store, l, src->GetWidth(), src->GetHeight(), (uint8_t*)lckDst.ptrDataRoi, lckDst.stride, (const uint8_t*)lckSrc.ptrDataRoi, lckSrc.stride);
+                CopyTinting<tStore>(store, l, src->GetWidth(), src->GetHeight(), static_cast<uint8_t*>(lckDst.ptrDataRoi), lckDst.stride, static_cast<const uint8_t*>(lckSrc.ptrDataRoi), lckSrc.stride);
             }
             break;
             case PixelType::Bgr48:
             {
                 CGetBgr48LutTinted l(chInfo->ptrLookUpTable, chInfo->tinting.color);
-                CopyTinting<tStore>(store, l, src->GetWidth(), src->GetHeight(), (uint8_t*)lckDst.ptrDataRoi, lckDst.stride, (const uint8_t*)lckSrc.ptrDataRoi, lckSrc.stride);
+                CopyTinting<tStore>(store, l, src->GetWidth(), src->GetHeight(), static_cast<uint8_t*>(lckDst.ptrDataRoi), lckDst.stride, static_cast<const uint8_t*>(lckSrc.ptrDataRoi), lckSrc.stride);
             }
             break;
             default:

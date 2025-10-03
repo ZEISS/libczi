@@ -13,7 +13,7 @@ struct AzureUriAndExpectedResultFixture : public testing::TestWithParam<tuple<ws
 
 TEST_P(AzureUriAndExpectedResultFixture, TokenizeAzureUriScheme_ValidCases)
 {
-    const auto parameters = GetParam();
+    const auto& parameters = GetParam();
     const auto tokens = Utilities::TokenizeAzureUriString(get<0>(parameters));
     EXPECT_EQ(tokens, get<1>(parameters));
 }
@@ -37,7 +37,7 @@ struct IllFormedAzureUriAndExpectedErrorFixture : public testing::TestWithParam<
 
 TEST_P(IllFormedAzureUriAndExpectedErrorFixture, TokenizeAzureUriScheme_InvalidCases)
 {
-    const auto parameter = GetParam();
+    const auto& parameter = GetParam();
     EXPECT_THROW(Utilities::TokenizeAzureUriString(parameter), std::invalid_argument);
 }
 
@@ -94,12 +94,22 @@ static string EscapeForUri(const char* str)
     return result;
 }
 
-static const char* GetAzureBlobStoreConnectionString()
+static std::string GetAzureBlobStoreConnectionString()
 {
     // We use the environment variable 'AZURE_BLOB_STORE_CONNECTION_STRING' to communicate a connection string.
 
-    const char* azure_blob_store_connection_string = std::getenv("AZURE_BLOB_STORE_CONNECTION_STRING");
-    return azure_blob_store_connection_string;
+#if defined(_MSC_VER)
+#pragma warning(push)
+#pragma warning(disable: 4996) // Disable MSVC warning C4996: 'getenv' is deprecated in favor of getenv_s (which is Windows-specific and not portable)
+#endif
+
+    const char* env_value = std::getenv("AZURE_BLOB_STORE_CONNECTION_STRING");
+    
+#if defined(_MSC_VER)
+#pragma warning(pop)
+#endif
+
+    return env_value ? std::string(env_value) : std::string();
     
     //return R"(DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://localhost:10000/devstoreaccount1;)";
 }
@@ -111,8 +121,8 @@ TEST(AzureBlobStream, GetStatisticsFromBlobUsingConnectionString)
         GTEST_SKIP() << "The stream-class 'azure_blob_inputstream' is not available/configured, therefore skipping this test.";
     }
 
-    const char* azure_blob_store_connection_string = GetAzureBlobStoreConnectionString();
-    if (!azure_blob_store_connection_string)
+    string azure_blob_store_connection_string = GetAzureBlobStoreConnectionString();
+    if (azure_blob_store_connection_string.empty())
     {
         GTEST_SKIP() << "The environment variable 'AZURE_BLOB_STORE_CONNECTION_STRING' is not set, skipping this test therefore.";
     }
@@ -122,7 +132,7 @@ TEST(AzureBlobStream, GetStatisticsFromBlobUsingConnectionString)
     create_info.property_bag = { {StreamsFactory::StreamProperties::kAzureBlob_AuthenticationMode, StreamsFactory::Property("ConnectionString")} };
 
     stringstream string_stream_uri;
-    string_stream_uri << "containername=testcontainer;blobname=testblob;connectionstring=" << EscapeForUri(azure_blob_store_connection_string);
+    string_stream_uri << "containername=testcontainer;blobname=testblob;connectionstring=" << EscapeForUri(azure_blob_store_connection_string.c_str());
 
     const auto stream = StreamsFactory::CreateStream(create_info, string_stream_uri.str());
     ASSERT_TRUE(stream);
@@ -153,8 +163,8 @@ TEST(AzureBlobStream, ReadSubBlockFromBlobUsingConnectionString)
         GTEST_SKIP() << "The stream-class 'azure_blob_inputstream' is not available/configured, skipping this test therefore.";
     }
 
-    const char* azure_blob_store_connection_string = GetAzureBlobStoreConnectionString();
-    if (!azure_blob_store_connection_string)
+    string azure_blob_store_connection_string = GetAzureBlobStoreConnectionString();
+    if (azure_blob_store_connection_string.empty())
     {
         GTEST_SKIP() << "The environment variable 'AZURE_BLOB_STORE_CONNECTION_STRING' is not set, skipping this test therefore.";
     }
@@ -164,7 +174,7 @@ TEST(AzureBlobStream, ReadSubBlockFromBlobUsingConnectionString)
     create_info.property_bag = { {StreamsFactory::StreamProperties::kAzureBlob_AuthenticationMode, StreamsFactory::Property("ConnectionString")} };
 
     stringstream string_stream_uri;
-    string_stream_uri << "containername=testcontainer;blobname=testblob;connectionstring=" << EscapeForUri(azure_blob_store_connection_string);
+    string_stream_uri << "containername=testcontainer;blobname=testblob;connectionstring=" << EscapeForUri(azure_blob_store_connection_string.c_str());
 
     const auto stream = StreamsFactory::CreateStream(create_info, string_stream_uri.str());
     ASSERT_TRUE(stream);
@@ -173,7 +183,7 @@ TEST(AzureBlobStream, ReadSubBlockFromBlobUsingConnectionString)
     reader->Open(stream);
 
     reader->EnumerateSubBlocks(
-        [&](int index, const SubBlockInfo& subBlockInfo)
+        [&](int index, const SubBlockInfo&)
         {
             const auto subBlock = reader->ReadSubBlock(index);
             EXPECT_TRUE(subBlock);

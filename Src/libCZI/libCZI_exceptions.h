@@ -28,8 +28,9 @@ namespace libCZI
         /// Values that represent error types.
         enum class ErrorType
         {
-            CouldntDeterminePixelType,  ///< The pixeltype could not be determined.
-            Unspecified                 ///< Unspecified error.
+            CouldntDeterminePixelType,   ///< The pixeltype could not be determined.
+            InternalInconsistency,       ///< An internal inconsistency was detected.
+            Unspecified                  ///< Unspecified error.
         };
     private:
         ErrorType errorType;
@@ -118,7 +119,8 @@ namespace libCZI
         /// \param offset   The offset (into the stream) at which the I/O-error occurred.
         /// \param size     The size of data we have attempted to read (when the I/O-error occurred).
         LibCZIIOException(const char* szErrMsg, std::uint64_t offset, std::uint64_t size)
-            : LibCZIException(szErrMsg), offset(offset), size(size) {}
+            : LibCZIException(szErrMsg), offset(offset), size(size)
+        {}
 
         /// Gets the offset (in bytes) into the stream at which
         /// the I/O-error occurred.
@@ -332,4 +334,3 @@ namespace libCZI
         }
     };
 }
-

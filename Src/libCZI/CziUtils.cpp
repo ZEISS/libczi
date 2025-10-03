@@ -2,6 +2,7 @@
 //
 // SPDX-License-Identifier: LGPL-3.0-or-later
 
+#include <cstddef>
 #include <limits>
 #include "CziUtils.h"
 
@@ -163,7 +164,7 @@ using namespace libCZI;
     static const DimensionIndex dims[] = { DimensionIndex::Z,DimensionIndex::C,DimensionIndex::T,DimensionIndex::R,DimensionIndex::S,
                                             DimensionIndex::I,DimensionIndex::H,DimensionIndex::V,DimensionIndex::B };
 
-    for (int i = 0; i < sizeof(dims) / sizeof(dims[0]); ++i)
+    for (size_t i = 0; i < sizeof(dims) / sizeof(dims[0]); ++i)
     {
         if (func(dims[i]) == false)
         {

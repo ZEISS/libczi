@@ -27,6 +27,7 @@ TEST(CZIAPI_Reader, ConstructExternalInputStreamAndOpenCZIAndCheck)
     external_input_stream_struct.opaque_handle2 = reinterpret_cast<uintptr_t>(&input_stream_release_call_count);
     external_input_stream_struct.read_function = [](uintptr_t opaque_handle1, uintptr_t opaque_handle2, uint64_t offset, void* pv, uint64_t size, uint64_t* ptrBytesRead, ExternalStreamErrorInfoInterop* error_info) -> int32_t
         {
+            (void)opaque_handle2;
             auto memory_input_stream_handler = reinterpret_cast<MemoryInputStream*>(opaque_handle1);
             return memory_input_stream_handler->Read(offset, pv, size, ptrBytesRead, error_info);
         };
@@ -80,6 +81,7 @@ TEST(CZIAPI_Reader, ConstructCziAndOpenCziAndCheckContent)
     external_input_stream_struct.opaque_handle2 = reinterpret_cast<uintptr_t>(&input_stream_release_call_count);
     external_input_stream_struct.read_function = [](uintptr_t opaque_handle1, uintptr_t opaque_handle2, uint64_t offset, void* pv, uint64_t size, uint64_t* ptrBytesRead, ExternalStreamErrorInfoInterop* error_info) -> int32_t
         {
+            (void)opaque_handle2;
             auto memory_input_stream_handler = reinterpret_cast<MemoryInputStream*>(opaque_handle1);
             return memory_input_stream_handler->Read(offset, pv, size, ptrBytesRead, error_info);
         };
@@ -167,6 +169,7 @@ TEST(CZIAPI_Reader, ConstructMultiSceneCziAndOpenCziAndCheckContent)
     external_input_stream_struct.opaque_handle2 = reinterpret_cast<uintptr_t>(&input_stream_release_call_count);
     external_input_stream_struct.read_function = [](uintptr_t opaque_handle1, uintptr_t opaque_handle2, uint64_t offset, void* pv, uint64_t size, uint64_t* ptrBytesRead, ExternalStreamErrorInfoInterop* error_info) -> int32_t
         {
+            (void)opaque_handle2;
             auto memory_input_stream_handler = reinterpret_cast<MemoryInputStream*>(opaque_handle1);
             return memory_input_stream_handler->Read(offset, pv, size, ptrBytesRead, error_info);
         };
@@ -254,6 +257,7 @@ TEST(CZIAPI_Reader, ConstructExternalInputStreamAndTryGetSubBlockInfoForIndex)
     external_input_stream_struct.opaque_handle2 = reinterpret_cast<uintptr_t>(&input_stream_release_call_count);
     external_input_stream_struct.read_function = [](uintptr_t opaque_handle1, uintptr_t opaque_handle2, uint64_t offset, void* pv, uint64_t size, uint64_t* ptrBytesRead, ExternalStreamErrorInfoInterop* error_info) -> int32_t
         {
+            (void)opaque_handle2;
             auto memory_input_stream_handler = reinterpret_cast<MemoryInputStream*>(opaque_handle1);
             return memory_input_stream_handler->Read(offset, pv, size, ptrBytesRead, error_info);
         };

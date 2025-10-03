@@ -6778,7 +6778,7 @@ static string GetTestData()
     // the size of static strings seems to be limited (with various compilers), so the easiest workaround was to
     // have a lot of short strings and put them together here...
     string str;
-    for (int i = 0; i < sizeof(testMetadata) / sizeof(testMetadata[0]); ++i)
+    for (size_t i = 0; i < sizeof(testMetadata) / sizeof(testMetadata[0]); ++i)
     {
         str += testMetadata[i];
     }
@@ -6791,7 +6791,7 @@ static string GetTest2Data()
     // the size of static strings seems to be limited (with various compilers), so the easiest workaround was to
     // have a lot of short strings and put them together here...
     string str;
-    for (int i = 0; i < sizeof(test2Metadata) / sizeof(test2Metadata[0]); ++i)
+    for (size_t i = 0; i < sizeof(test2Metadata) / sizeof(test2Metadata[0]); ++i)
     {
         str += test2Metadata[i];
     }
@@ -6804,7 +6804,7 @@ static string GetTest3Data()
     // the size of static strings seems to be limited (with various compilers), so the easiest workaround was to
     // have a lot of short strings and put them together here...
     string str;
-    for (int i = 0; i < sizeof(test3Metadata) / sizeof(test3Metadata[0]); ++i)
+    for (size_t i = 0; i < sizeof(test3Metadata) / sizeof(test3Metadata[0]); ++i)
     {
         str += test3Metadata[i];
     }
@@ -6817,7 +6817,7 @@ static string GetTest4Data()
     // the size of static strings seems to be limited (with various compilers), so the easiest workaround was to
     // have a lot of short strings and put them together here...
     string str;
-    for (int i = 0; i < sizeof(test4Metadata) / sizeof(test4Metadata[0]); ++i)
+    for (size_t i = 0; i < sizeof(test4Metadata) / sizeof(test4Metadata[0]); ++i)
     {
         str += test4Metadata[i];
     }
@@ -6830,7 +6830,7 @@ static string GetTest5Data()
     // the size of static strings seems to be limited (with various compilers), so the easiest workaround was to
     // have a lot of short strings and put them together here...
     string str;
-    for (int i = 0; i < sizeof(test5Metadata) / sizeof(test5Metadata[0]); ++i)
+    for (size_t i = 0; i < sizeof(test5Metadata) / sizeof(test5Metadata[0]); ++i)
     {
         str += test5Metadata[i];
     }
@@ -6843,7 +6843,7 @@ static string GetTest6Data()
     // the size of static strings seems to be limited (with various compilers), so the easiest workaround was to
     // have a lot of short strings and put them together here...
     string str;
-    for (int i = 0; i < sizeof(test6Metadata) / sizeof(test6Metadata[0]); ++i)
+    for (size_t i = 0; i < sizeof(test6Metadata) / sizeof(test6Metadata[0]); ++i)
     {
         str += test6Metadata[i];
     }
@@ -6855,7 +6855,7 @@ static string GetTestDataInvalid()
 {
     // here we leave out the last line, resulting in invalid XML
     string str;
-    for (int i = 0; i < sizeof(testMetadata) / sizeof(testMetadata[0]) - 1; ++i)
+    for (size_t i = 0; i < sizeof(testMetadata) / sizeof(testMetadata[0]) - 1; ++i)
     {
         str += testMetadata[i];
     }
@@ -6893,6 +6893,9 @@ MockMetadataSegment::MockMetadataSegment(Type type/*= Type::Data1*/)
 
 /*virtual*/ std::shared_ptr<const void> MockMetadataSegment::GetRawData(MemBlkType type, size_t* ptrSize)
 {
+    (void)type;
+    (void)ptrSize;
+
     throw  std::logic_error("Function not implemented.");
 }
 

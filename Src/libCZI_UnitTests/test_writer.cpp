@@ -237,6 +237,7 @@ static void _testWriteReadCompressedImageZStd0(uint32_t width, uint32_t height, 
         writer.Create(stream, make_shared<CCziWriterInfo >(guid));
 
         AddSubBlockInfoMemPtr block;
+        block.Clear();
         _compressImageZStd0(img, params, block);
         block.coordinate = coordinate;
 
@@ -247,7 +248,8 @@ static void _testWriteReadCompressedImageZStd0(uint32_t width, uint32_t height, 
 
         auto metadataBuilder = writer.GetPreparedMetadata(PrepareMetadataInfo());
         string xml = metadataBuilder->GetXml(true);
-        WriteMetadataInfo writerMdInfo = { 0 };
+        WriteMetadataInfo writerMdInfo;
+        writerMdInfo.Clear();
         writerMdInfo.szMetadata = xml.c_str();
         writerMdInfo.szMetadataSize = xml.size();
 
@@ -364,6 +366,7 @@ static void _testWriteReadCompressedImageZStd1(uint32_t width, uint32_t height, 
         writer.Create(stream, make_shared<CCziWriterInfo >(guid));
 
         AddSubBlockInfoMemPtr block;
+        block.Clear();
         _compressImageZStd1(img, params, block);
         block.coordinate = coordinate;
 
@@ -374,7 +377,8 @@ static void _testWriteReadCompressedImageZStd1(uint32_t width, uint32_t height, 
 
         auto metadataBuilder = writer.GetPreparedMetadata(PrepareMetadataInfo());
         string xml = metadataBuilder->GetXml(true);
-        WriteMetadataInfo writerMdInfo = { 0 };
+        WriteMetadataInfo writerMdInfo;
+        writerMdInfo.Clear();
         writerMdInfo.szMetadata = xml.c_str();
         writerMdInfo.szMetadataSize = xml.size();
 
@@ -609,6 +613,7 @@ TEST(CziWriter, WriteAndReadBitmapBgr24)
     {
         ScopedBitmapLockerSP lockBm{ bitmap };
         AddSubBlockInfoStridedBitmap addInfo;
+        addInfo.Clear();
         addInfo.coordinate = coord;
         addInfo.mIndexValid = true;
         addInfo.mIndex = 0;
@@ -627,7 +632,8 @@ TEST(CziWriter, WriteAndReadBitmapBgr24)
 
     auto metadataBuilder = cziWriter->GetPreparedMetadata(PrepareMetadataInfo());
     string xml = metadataBuilder->GetXml(true);
-    WriteMetadataInfo writerMdInfo = { 0 };
+    WriteMetadataInfo writerMdInfo;
+    writerMdInfo.Clear();
     writerMdInfo.szMetadata = xml.c_str();
     writerMdInfo.szMetadataSize = xml.size();
 
@@ -635,11 +641,11 @@ TEST(CziWriter, WriteAndReadBitmapBgr24)
 
     cziWriter->Close();
 
-    cziWriter.reset();		// not needed anymore
+    cziWriter.reset(); // not needed anymore
 
     size_t cziData_Size;
     auto cziData = outputStream->GetCopy(&cziData_Size);
-    outputStream.reset();	// not needed anymore
+    outputStream.reset(); // not needed anymore
 
     auto inputStream = CreateStreamFromMemory(cziData, cziData_Size);
 
@@ -727,6 +733,9 @@ TEST(CziWriter, Writer5)
     int cnt = 0;
     addSbBlkInfo.getData = [&](int callCnt, size_t offset, const void*& ptr, size_t& size)->bool
         {
+            (void)callCnt;
+            (void)offset;
+
             ++data;
             ptr = &data;
             size = 1;
@@ -798,6 +807,8 @@ TEST(CziWriter, Writer6)
     int cnt = 0;
     addSbBlkInfo.getData = [&](int callCnt, size_t offset, const void*& ptr, size_t& size)->bool
         {
+            (void)offset;
+
             if (callCnt > 500)
             {
                 return false;
@@ -1112,6 +1123,9 @@ TEST(CziWriter, Writer11)
         inputStream.get(),
         [&](int cnt, const std::string& id, std::int64_t allocatedSize, std::int64_t usedSize)->bool
         {
+            (void)allocatedSize;
+            (void)usedSize;
+
             // we expect the CZI-fileheader-segment, then the subblockdirectory-segment, and then exactly 50 subblocks
             if (cnt == 0)
             {
@@ -1213,6 +1227,9 @@ TEST(CziWriter, Writer12)
         inputStream.get(),
         [&](int cnt, const std::string& id, std::int64_t allocatedSize, std::int64_t usedSize)->bool
         {
+            (void)allocatedSize;
+            (void)usedSize;
+
             // we expect the CZI-fileheader-segment, then the subblockdirectory-segment, and then exactly 50 subblocks
             if (cnt == 0)
             {
@@ -1294,7 +1311,8 @@ TEST(CziWriter, Writer13)
 
     auto metadataBuilder = writer->GetPreparedMetadata(PrepareMetadataInfo());
     string xml = metadataBuilder->GetXml(true);
-    WriteMetadataInfo writerMdInfo = { 0 };
+    WriteMetadataInfo writerMdInfo;
+    writerMdInfo.Clear();
     writerMdInfo.szMetadata = xml.c_str();
     writerMdInfo.szMetadataSize = xml.size();
 
@@ -1321,7 +1339,7 @@ TEST(CziWriter, Writer13)
     EXPECT_TRUE(sbBlkInfo.GetCompressionMode() == CompressionMode::JpgXr) << "Incorrect result";
 
     auto bitmap = sbBlk->CreateBitmap();
-    EXPECT_TRUE(bitmap->GetWidth() == widthCompressedBitmap && bitmap->GetHeight() == heightCompressedBitmap) << "Incorrect result";
+    EXPECT_TRUE(bitmap->GetWidth() == static_cast<uint32_t>(widthCompressedBitmap) && bitmap->GetHeight() == static_cast<uint32_t>(heightCompressedBitmap)) << "Incorrect result";
     EXPECT_TRUE(bitmap->GetPixelType() == PixelType::Bgr24) << "Incorrect result";
 }
 
@@ -1536,6 +1554,11 @@ TEST(CziWriter, WriterReturnFalseFromCallback)
     addSbBlkInfo.getData = std::function<bool(int callCnt, size_t offset, const void*& ptr, size_t & size)>(
         [&](int callCnt, size_t offset, const void*& ptr, size_t& size)->bool
         {
+            (void)callCnt;
+            (void)offset;
+            (void)ptr;
+            (void)size;
+
             return false;
         }
     );
@@ -1604,6 +1627,8 @@ TEST(CziWriter, WriterReturnOneByteAndThenFalseFromCallback)
     addSbBlkInfo.getData = std::function<bool(int callCnt, size_t offset, const void*& ptr, size_t & size)>(
         [&](int callCnt, size_t offset, const void*& ptr, size_t& size)->bool
         {
+            (void)offset;
+
             if (callCnt == 0)
             {
                 ptr = &oneByteOfData;
@@ -2231,7 +2256,7 @@ TEST(CziWriter, TryAddingDuplicateSubBlocksToCziWriterAndExpectError)
     addSbBlkInfo.strideBitmap = lockBm.stride;
     writer->SyncAddSubBlock(addSbBlkInfo);
 
-    // now add it a second time - and expect an excpetion
+    // now add it a second time - and expect an exception
     EXPECT_THROW(writer->SyncAddSubBlock(addSbBlkInfo), LibCZIException);
 }
 
@@ -2271,7 +2296,8 @@ TEST(CziWriter, TryAddingDuplicateSubBlocksToCziWriterAndWhenCheckIsDisable)
 
     auto metadataBuilder = writer->GetPreparedMetadata(PrepareMetadataInfo());
     string xml = metadataBuilder->GetXml(true);
-    WriteMetadataInfo writerMdInfo = { 0 };
+    WriteMetadataInfo writerMdInfo;
+    writerMdInfo.Clear();
     writerMdInfo.szMetadata = xml.c_str();
     writerMdInfo.szMetadataSize = xml.size();
     writer->SyncWriteMetadata(writerMdInfo);

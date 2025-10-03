@@ -295,7 +295,7 @@ TEST(MetadataBuilder, MetadataUtils3)
     MetadataUtils::WriteDimInfoT_List(mdBldr.get(), &dt,
         [&](int i)->double
         {
-            if (i < sizeof(offsets) / sizeof(offsets[0]))
+            if (static_cast<size_t>(i) < sizeof(offsets) / sizeof(offsets[0]))
             {
                 return offsets[i];
             }
@@ -998,6 +998,8 @@ TEST(MetadataBuilder, WriteDisplaySettingsAndCheckNameAndId)
         1,
         [](int channelNo, MetadataUtils::CoerceAdditionalInfoForChannelDisplaySettings& coerce_info)->void
         {
+            (void)channelNo;
+
             coerce_info.idAttribute = kChannelId;
             coerce_info.writeIdAttribute = true;
             coerce_info.nameAttribute = kChannelName;

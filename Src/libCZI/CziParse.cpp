@@ -7,6 +7,7 @@
 #include "CziStructs.h"
 #include <cassert>
 #include <cstddef>
+#include <cstdint>
 #include "Site.h"
 
 using namespace std;
@@ -128,7 +129,7 @@ using namespace libCZI;
         CCZIParse::ThrowNotEnoughDataRead(offset + sizeof(subBlckDirSegment), subBlkDirSize, bytesRead);
     }
 
-    int currentOffset = 0;
+    uint64_t currentOffset = 0;
     CCZIParse::ParseThroughDirectoryEntries(
         subBlckDirSegment.data.EntryCount,
         [&](int numberOfBytes, void* ptr)->void
@@ -385,7 +386,7 @@ using namespace libCZI;
             std::throw_with_nested(LibCZIIOException("Error reading FileHeaderSegment", offset + lengthSubblockSegmentData + sizeof(SegmentHeader), subBlckSegment.data.MetadataSize));
         }
 
-        if (bytesRead != subBlckSegment.data.MetadataSize)
+        if (static_cast<int32_t>(bytesRead) != subBlckSegment.data.MetadataSize)
         {
             CCZIParse::ThrowNotEnoughDataRead(offset + lengthSubblockSegmentData + sizeof(SegmentHeader), subBlckSegment.data.MetadataSize, bytesRead);
         }
@@ -402,7 +403,7 @@ using namespace libCZI;
             std::throw_with_nested(LibCZIIOException("Error reading FileHeaderSegment", offset + lengthSubblockSegmentData + sizeof(SegmentHeader) + subBlckSegment.data.MetadataSize, subBlckSegment.data.DataSize));
         }
 
-        if (bytesRead != subBlckSegment.data.DataSize)
+        if (static_cast<int32_t>(bytesRead) != subBlckSegment.data.DataSize)
         {
             CCZIParse::ThrowNotEnoughDataRead(offset + lengthSubblockSegmentData + sizeof(SegmentHeader) + subBlckSegment.data.MetadataSize, subBlckSegment.data.DataSize, bytesRead);
         }
@@ -419,7 +420,7 @@ using namespace libCZI;
             std::throw_with_nested(LibCZIIOException("Error reading FileHeaderSegment", offset + lengthSubblockSegmentData + sizeof(SegmentHeader) + subBlckSegment.data.MetadataSize + subBlckSegment.data.DataSize, subBlckSegment.data.AttachmentSize));
         }
 
-        if (bytesRead != subBlckSegment.data.AttachmentSize)
+        if (static_cast<int32_t>(bytesRead) != subBlckSegment.data.AttachmentSize)
         {
             CCZIParse::ThrowNotEnoughDataRead(offset + lengthSubblockSegmentData + sizeof(SegmentHeader) + subBlckSegment.data.MetadataSize + subBlckSegment.data.DataSize, subBlckSegment.data.AttachmentSize, bytesRead);
         }
@@ -474,7 +475,7 @@ using namespace libCZI;
             std::throw_with_nested(LibCZIIOException("Error reading AttachmentSegment", offset + 256 + sizeof(SegmentHeader), attchmntSegment.data.DataSize));
         }
 
-        if (bytesRead != attchmntSegment.data.DataSize)
+        if (static_cast<int32_t>(bytesRead) != attchmntSegment.data.DataSize)
         {
             CCZIParse::ThrowNotEnoughDataRead(offset + 256 + sizeof(SegmentHeader), attchmntSegment.data.DataSize, bytesRead);
         }
@@ -518,6 +519,9 @@ using namespace libCZI;
 
 /*static*/void CCZIParse::AddEntryToSubBlockDirectory(const SubBlockDirectoryEntryDE* subBlkDirDE, const std::function<void(const CCziSubBlockDirectoryBase::SubBlkEntry&)>& addFunc)
 {
+    (void)subBlkDirDE;
+    (void)addFunc;
+
     // TODO
     throw std::logic_error("not (yet) implemented");
 }
@@ -680,7 +684,7 @@ using namespace libCZI;
             std::throw_with_nested(LibCZIIOException("Error reading MetaDataSegment", offset + sizeof(metadataSegment), metadataSegment.data.XmlSize));
         }
 
-        if (bytesRead != metadataSegment.data.XmlSize)
+        if (static_cast<int32_t>(bytesRead) != metadataSegment.data.XmlSize)
         {
             CCZIParse::ThrowNotEnoughDataRead(offset + sizeof(metadataSegment), metadataSegment.data.XmlSize, bytesRead);
         }
@@ -697,7 +701,7 @@ using namespace libCZI;
             std::throw_with_nested(LibCZIIOException("Error reading MetaDataSegment", offset + sizeof(metadataSegment) + metadataSegment.data.XmlSize, metadataSegment.data.AttachmentSize));
         }
 
-        if (bytesRead != metadataSegment.data.AttachmentSize)
+        if (static_cast<int32_t>(bytesRead) != metadataSegment.data.AttachmentSize)
         {
             CCZIParse::ThrowNotEnoughDataRead(offset + sizeof(metadataSegment) + metadataSegment.data.XmlSize, metadataSegment.data.AttachmentSize, bytesRead);
         }

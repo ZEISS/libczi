@@ -45,6 +45,8 @@ public:
 
     virtual void Save(const wchar_t* fileName, SaveDataFormat dataFormat, libCZI::IBitmapData* bitmap)
     {
+        (void)dataFormat;
+
         static const struct
         {
             libCZI::PixelType   pixelType;
@@ -182,6 +184,8 @@ private:
 public:
     virtual void Save(const wchar_t* fileName, SaveDataFormat dataFormat, libCZI::IBitmapData* bitmap)
     {
+        (void)dataFormat;
+
         switch (bitmap->GetPixelType())
         {
         case libCZI::PixelType::Bgr24:

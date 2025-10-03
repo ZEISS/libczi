@@ -639,10 +639,15 @@ TEST(CziReader, ReaderException)
         std::string exceptionText;
         std::error_code code;
     public:
-        CTestStreamImp(std::string exceptionText, std::error_code code) :exceptionText(std::move(exceptionText)), code(code) {}
+        CTestStreamImp(std::string exceptionText, std::error_code code) :exceptionText(std::move(exceptionText)), code(code)
+        {}
 
         void Read(std::uint64_t offset, void* pv, std::uint64_t size, std::uint64_t* ptrBytesRead) override
         {
+            (void)offset;
+            (void)pv;
+            (void)size;
+            (void)ptrBytesRead;
             throw MyException(this->exceptionText, this->code);
         }
     };
@@ -666,7 +671,6 @@ TEST(CziReader, ReaderException)
         {
             // according to standard, the content of the what()-test is implementation-specific,
             // so it is not suited for checking - but it seems that the code goes unaltered
-            const char* errorText = innerExcp.what();
             error_code errCode = innerExcp.code();
             if (errCode == ErrorCode)
             {
@@ -697,8 +701,6 @@ TEST(CziReader, ReaderException2)
         }
     };
 
-    static const char* ExceptionText = "Test-1";
-    static std::error_code ErrorCode = error_code(42, generic_category());
     auto stream = std::make_shared<CTestStreamImp>();
     auto spReader = libCZI::CreateCZIReader();
     bool exceptionCorrect = false;

@@ -1052,7 +1052,6 @@ ERR JXRLIB_API(PKImageEncode_SetXMPMetadata_WMP)(PKImageEncode* pIE, const U8* p
     char* pbTemp = 0;
     U32 cbTemp;
     char* pszFormatBegin;
-    // const char* pszXMPMetadata = (const char*)pbXMPMetadata;
     size_t cbBuffer;
 
     // Fail if the caller called us after we've already written the header out
@@ -1087,10 +1086,13 @@ ERR JXRLIB_API(PKImageEncode_SetXMPMetadata_WMP)(PKImageEncode* pIE, const U8* p
         // hd and tiff don't put a trailing null, so we don't either
         cbTemp = cbXMPMetadata - (U32)(pszFormatEnd - pszFormatBegin) + sizeof(szHDPhotoFormat) - 1;
         assert(cbTemp <= cbBuffer);
-        FailIf(0 != STRCPY_SAFE(pszFormatBegin,
-            cbBuffer - (pszFormatBegin - pbTemp),
-            szHDPhotoFormat),
-            WMP_errBufferOverflow);
+        {
+            size_t destSize = cbBuffer - (pszFormatBegin - pbTemp);
+            size_t srcLen = sizeof(szHDPhotoFormat) - 1;
+            FailIf(srcLen >= destSize, WMP_errBufferOverflow);
+            memcpy(pszFormatBegin, szHDPhotoFormat, srcLen);
+            pszFormatBegin[srcLen] = '\0';
+        }
         memcpy(pszFormatBegin + sizeof(szHDPhotoFormat) - 1, pbXMPMetadata + (pszFormatEnd - pbTemp),
             cbXMPMetadata - (pszFormatEnd - pbTemp));
     }

@@ -26,6 +26,8 @@ namespace
         external_stream.opaque_handle1 = reinterpret_cast<std::uintptr_t>(memory_output_stream.get());
         external_stream.write_function = [](std::uintptr_t opaque_handle1, std::uintptr_t opaque_handle2, std::uint64_t offset, const void* pv, std::uint64_t size, std::uint64_t* out_bytes_written, ExternalStreamErrorInfoInterop* error_info) -> std::int32_t
             {
+                (void)opaque_handle2;
+                (void)error_info;
                 auto memStream = reinterpret_cast<MemoryOutputStream*>(opaque_handle1);
                 if (memStream == nullptr)
                 {
@@ -37,6 +39,8 @@ namespace
             };
         external_stream.close_function = [](std::uintptr_t opaque_handle1, std::uintptr_t opaque_handle2) -> void
             {
+                (void)opaque_handle1;
+                (void)opaque_handle2;
             };
 
         libCZI_CreateOutputStreamFromExternal(&external_stream, &output_stream);
@@ -115,6 +119,7 @@ TEST(CZIAPI_Accessors, SingleChannelScalingTileAccessorScenario1)
     external_input_stream_struct.opaque_handle2 = reinterpret_cast<uintptr_t>(&input_stream_release_call_count);
     external_input_stream_struct.read_function = [](uintptr_t opaque_handle1, uintptr_t opaque_handle2, uint64_t offset, void* pv, uint64_t size, uint64_t* ptrBytesRead, ExternalStreamErrorInfoInterop* error_info) -> int32_t
         {
+            (void)opaque_handle2;
             auto memory_input_stream_handler = reinterpret_cast<MemoryInputStream*>(opaque_handle1);
             return memory_input_stream_handler->Read(offset, pv, size, ptrBytesRead, error_info);
         };

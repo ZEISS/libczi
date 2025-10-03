@@ -55,6 +55,8 @@ private:
             auto sbBlkMd = Utils::CreateSubBlockMetadata(
                 [&](int no, std::tuple<std::string, std::string>& nodeNameAndValue)->bool
                 {
+                    (void)no;
+
                     if (kvIter == kv.cend())
                     {
                         return false;
@@ -312,19 +314,11 @@ private:
 
     // the resulting metadata-information is written to the CZI here
     auto xml = mdBldr->GetXml(true);
-    WriteMetadataInfo writerMdInfo = { 0 };
+    WriteMetadataInfo writerMdInfo;
+    writerMdInfo.Clear();
     writerMdInfo.szMetadata = xml.c_str();
     writerMdInfo.szMetadataSize = xml.size();
     writer->SyncWriteMetadata(writerMdInfo);
-
-    // TEST
-    ////AddAttachmentInfo attchmntInfo;
-    ////attchmntInfo.ptrData = attachmentData;
-    ////attchmntInfo.dataSize = sizeof(attachmentData);
-    ////attchmntInfo.SetName("Thumbnail");
-    ////attchmntInfo.SetContentFileType("JPG");
-    ////attchmntInfo.contentGuid = { 0xB13BC88F,0x37A5,0x444,{ 0x94,0x93 , 0x28,0xC0,0x7C,0x3B,0xCE,0x85 } };
-    ////writer->SyncAddAttachment(attchmntInfo);
 
     // this finishes the write-operation, the subblock-directory-segment is written out to disk and the CZI
     //  is finalized.

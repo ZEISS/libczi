@@ -154,7 +154,8 @@ TEST(DisplaySettings, WriteDisplaySettingsToDocumentAndReadFromThereAndCompare)
 
     // then, get the XML-string containing the metadata, and put this into the CZI-file
     string xml = metadata_to_be_written->GetXml(true);
-    WriteMetadataInfo writerMdInfo = { 0 };
+    WriteMetadataInfo writerMdInfo;
+    writerMdInfo.Clear();
     writerMdInfo.szMetadata = xml.c_str();
     writerMdInfo.szMetadataSize = xml.size();
     writer->SyncWriteMetadata(writerMdInfo);
@@ -268,7 +269,8 @@ TEST(DisplaySettings, WriteDisplaySettingsWithGradationCurveGammaAndSplineToDocu
 
     // then, get the XML-string containing the metadata, and put this into the CZI-file
     string xml = metadata_to_be_written->GetXml(true);
-    WriteMetadataInfo writerMdInfo = { 0 };
+    WriteMetadataInfo writerMdInfo;
+    writerMdInfo.Clear();
     writerMdInfo.szMetadata = xml.c_str();
     writerMdInfo.szMetadataSize = xml.size();
     writer->SyncWriteMetadata(writerMdInfo);
@@ -301,9 +303,9 @@ TEST(DisplaySettings, WriteDisplaySettingsWithGradationCurveGammaAndSplineToDocu
     EXPECT_NEAR(black_point_from_document, 0.3f, 1e-8f);
     EXPECT_NEAR(white_point_from_document, 0.8f, 1e-8f);
     EXPECT_TRUE(channel_display_settings_from_document->GetGradationCurveMode() == IDisplaySettings::GradationCurveMode::Gamma);
-    float gamma__from_document;
-    EXPECT_TRUE(channel_display_settings_from_document->TryGetGamma(&gamma__from_document));
-    EXPECT_NEAR(gamma__from_document, 0.83f, 1e-8f);
+    float gamma_from_document;
+    EXPECT_TRUE(channel_display_settings_from_document->TryGetGamma(&gamma_from_document));
+    EXPECT_NEAR(gamma_from_document, 0.83f, 1e-8f);
 
     channel_display_settings_from_document = display_settings_from_document->GetChannelDisplaySettings(1);
     ASSERT_TRUE(channel_display_settings_from_document);

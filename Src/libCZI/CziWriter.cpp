@@ -31,18 +31,21 @@ void libCZI::ICziWriter::SyncAddSubBlock(const libCZI::AddSubBlockInfoMemPtr& ad
     addSbInfo.sizeData = addSbBlkInfo.dataSize;
     addSbInfo.getData = [&](int callCnt, size_t offset, const void*& ptr, size_t& size)->bool
         {
+            (void)offset;
             return SetIfCallCountZero(callCnt, addSbBlkInfo.ptrData, addSbBlkInfo.dataSize, ptr, size);
         };
 
     addSbInfo.sizeAttachment = addSbBlkInfo.sbBlkAttachmentSize;
     addSbInfo.getAttachment = [&](int callCnt, size_t offset, const void*& ptr, size_t& size)->bool
         {
+            (void)offset;
             return SetIfCallCountZero(callCnt, addSbBlkInfo.ptrSbBlkAttachment, addSbBlkInfo.sbBlkAttachmentSize, ptr, size);
         };
 
     addSbInfo.sizeMetadata = addSbBlkInfo.sbBlkMetadataSize;
     addSbInfo.getMetaData = [&](int callCnt, size_t offset, const void*& ptr, size_t& size)->bool
         {
+            (void)offset;
             return SetIfCallCountZero(callCnt, addSbBlkInfo.ptrSbBlkMetadata, addSbBlkInfo.sbBlkMetadataSize, ptr, size);
         };
 
@@ -58,6 +61,7 @@ void libCZI::ICziWriter::SyncAddSubBlock(const libCZI::AddSubBlockInfoLinewiseBi
     auto linesCnt = addSbInfoLinewise.physicalHeight;
     addSbInfo.getData = [&](int callCnt, size_t offset, const void*& ptr, size_t& size)->bool
         {
+            (void)offset;
             if (callCnt < linesCnt)
             {
                 ptr = addSbInfoLinewise.getBitmapLine(callCnt);
@@ -71,12 +75,14 @@ void libCZI::ICziWriter::SyncAddSubBlock(const libCZI::AddSubBlockInfoLinewiseBi
     addSbInfo.sizeAttachment = addSbInfoLinewise.sbBlkAttachmentSize;
     addSbInfo.getAttachment = [&](int callCnt, size_t offset, const void*& ptr, size_t& size)->bool
         {
+            (void)offset;
             return SetIfCallCountZero(callCnt, addSbInfoLinewise.ptrSbBlkAttachment, addSbInfoLinewise.sbBlkAttachmentSize, ptr, size);
         };
 
     addSbInfo.sizeMetadata = addSbInfoLinewise.sbBlkMetadataSize;
     addSbInfo.getMetaData = [&](int callCnt, size_t offset, const void*& ptr, size_t& size)->bool
         {
+            (void)offset;
             return SetIfCallCountZero(callCnt, addSbInfoLinewise.ptrSbBlkMetadata, addSbInfoLinewise.sbBlkMetadataSize, ptr, size);
         };
 
@@ -90,6 +96,7 @@ void libCZI::ICziWriter::SyncAddSubBlock(const AddSubBlockInfoStridedBitmap& add
     addSbInfo.sizeData = addSbBlkInfoStrideBitmap.physicalHeight * (addSbBlkInfoStrideBitmap.physicalWidth * static_cast<size_t>(CziUtils::GetBytesPerPel(addSbBlkInfoStrideBitmap.PixelType)));
     addSbInfo.getData = [&](int callCnt, size_t offset, const void*& ptr, size_t& size)->bool
         {
+            (void)offset;
             if (callCnt < addSbBlkInfoStrideBitmap.physicalHeight)
             {
                 ptr = static_cast<const char*>(addSbBlkInfoStrideBitmap.ptrBitmap) + callCnt * static_cast<size_t>(addSbBlkInfoStrideBitmap.strideBitmap);
@@ -103,12 +110,14 @@ void libCZI::ICziWriter::SyncAddSubBlock(const AddSubBlockInfoStridedBitmap& add
     addSbInfo.sizeAttachment = addSbBlkInfoStrideBitmap.sbBlkAttachmentSize;
     addSbInfo.getAttachment = [&](int callCnt, size_t offset, const void*& ptr, size_t& size)->bool
         {
+            (void)offset;
             return SetIfCallCountZero(callCnt, addSbBlkInfoStrideBitmap.ptrSbBlkAttachment, addSbBlkInfoStrideBitmap.sbBlkAttachmentSize, ptr, size);
         };
 
     addSbInfo.sizeMetadata = addSbBlkInfoStrideBitmap.sbBlkMetadataSize;
     addSbInfo.getMetaData = [&](int callCnt, size_t offset, const void*& ptr, size_t& size)->bool
         {
+            (void)offset;
             return SetIfCallCountZero(callCnt, addSbBlkInfoStrideBitmap.ptrSbBlkMetadata, addSbBlkInfoStrideBitmap.sbBlkMetadataSize, ptr, size);
         };
 
@@ -127,7 +136,7 @@ void libCZI::ICziWriter::SyncAddSubBlock(const AddSubBlockInfoStridedBitmap& add
     if (sbBlkSegmentSize <= sizeof(SubBlockSegment))
     {
         // the size of "SubBlockSegment" is big enough to hold the data-structure (this should always be the case)
-        SubBlockSegment sbBlkSegment = { 0 };
+        SubBlockSegment sbBlkSegment{};
         CWriterUtils::FillSubBlockSegment(info, addSbBlkInfo, &sbBlkSegment);
         if (info.useSpecifiedAllocatedSize == true)
         {
@@ -181,7 +190,7 @@ void libCZI::ICziWriter::SyncAddSubBlock(const AddSubBlockInfoStridedBitmap& add
 
 /*static*/std::uint64_t CWriterUtils::WriteAttachment(const WriteInfo& info, const libCZI::AddAttachmentInfo& addAttchmntInfo)
 {
-    AttachmentSegment attchmntSegment = { 0 };
+    AttachmentSegment attchmntSegment{};
     memcpy(attchmntSegment.header.Id, CCZIParse::ATTACHMENTBLKMAGIC, 16);
     attchmntSegment.header.UsedSize = sizeof(AttachmentSegmentData) + addAttchmntInfo.dataSize;
     if (!info.useSpecifiedAllocatedSize)
@@ -555,7 +564,7 @@ void libCZI::ICziWriter::SyncAddSubBlock(const AddSubBlockInfoStridedBitmap& add
 {
     size_t payloadTotalLength = metadataInfo.szMetadataSize + metadataInfo.attachmentSize;
 
-    MetadataSegment ms;
+    MetadataSegment ms{};
     memcpy(ms.header.Id, CCZIParse::METADATASEGMENTMAGIC, 16);
     ms.header.UsedSize = sizeof(MetadataSegmentData) + payloadTotalLength;
     ms.header.AllocatedSize = CWriterUtils::AlignSegmentSize(ms.header.UsedSize);
@@ -620,6 +629,7 @@ void libCZI::ICziWriter::SyncAddSubBlock(const AddSubBlockInfoStridedBitmap& add
     info.enumEntriesFunc(
         [&totalSizeSubBlockDirectoryEntryDV](size_t index, const CCziSubBlockDirectoryBase::SubBlkEntry& entry)->void
         {
+            (void)index;
             totalSizeSubBlockDirectoryEntryDV += CalcSizeOfSubBlockDirectoryEntryDV(entry);
         });
 
@@ -638,6 +648,7 @@ void libCZI::ICziWriter::SyncAddSubBlock(const AddSubBlockInfoStridedBitmap& add
     info.enumEntriesFunc(
         [&upSbBlkDirSegment, ptr, &offset](size_t index, const CCziSubBlockDirectoryBase::SubBlkEntry& entry)->void
         {
+            (void)index;
             offset += CWriterUtils::FillSubBlockDirectoryEntryDV(reinterpret_cast<SubBlockDirectoryEntryDV*>(ptr + offset), entry);
             ++upSbBlkDirSegment->data.EntryCount;
         });
@@ -686,7 +697,7 @@ void libCZI::ICziWriter::SyncAddSubBlock(const AddSubBlockInfoStridedBitmap& add
 
 /*static*/std::tuple<std::uint64_t, std::uint64_t> CWriterUtils::WriteAttachmentDirectory(const AttachmentDirWriteInfo& info)
 {
-    AttachmentDirectorySegment attchmntDirSegment = { 0 };
+    AttachmentDirectorySegment attchmntDirSegment{};
     const auto attchmntCnt = info.entryCnt;// this->attachmentDirectory.GetAttachmentCount();
     const size_t sizeAttchmntEntries = attchmntCnt * sizeof(AttachmentEntryA1);
 
@@ -737,6 +748,8 @@ void libCZI::ICziWriter::SyncAddSubBlock(const AddSubBlockInfoStridedBitmap& add
     info.enumEntriesFunc(
         [&](size_t index, const CCziAttachmentsDirectoryBase::AttachmentEntry& entry)->bool
         {
+            (void)index;
+
             AttachmentEntryA1* p = upAttchmntData.get() + index_count;
             p->SchemaType[0] = 'A';
             p->SchemaType[1] = '1';
@@ -1360,7 +1373,7 @@ void CCziWriter::ReserveMetadataSegment(size_t s)
         s = 10 * 1024;
     }
 
-    MetadataSegment ms = { 0 };
+    MetadataSegment ms{};
     memcpy(ms.header.Id, CCZIParse::DELETEDSEGMENTMAGIC, 16);
     ms.header.UsedSize = sizeof(MetadataSegmentData) + s;
     ms.header.AllocatedSize = CWriterUtils::AlignSegmentSize(ms.header.UsedSize);
@@ -1410,7 +1423,7 @@ void CCziWriter::ReserveSubBlockDirectory(size_t s)
         }
     }
 
-    SubBlockDirectorySegment sds = { 0 };
+    SubBlockDirectorySegment sds{};
 
     memcpy(sds.header.Id, CCZIParse::DELETEDSEGMENTMAGIC, 16);
     sds.header.UsedSize = sizeof(SubBlockDirectorySegmentData) + s * (32 + sizeof(DimensionEntryDV) * MAXDIMENSIONS);
@@ -1434,7 +1447,7 @@ void CCziWriter::ReserveAttachmentDirectory(size_t s)
         s = 10;
     }
 
-    AttachmentDirectorySegment ads = { 0 };
+    AttachmentDirectorySegment ads{};
 
     memcpy(ads.header.Id, CCZIParse::DELETEDSEGMENTMAGIC, 16);
     ads.header.UsedSize = sizeof(AttachmentDirectorySegmentData) + s * sizeof(AttachmentEntryA1);

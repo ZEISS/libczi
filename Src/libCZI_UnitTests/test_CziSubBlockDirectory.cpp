@@ -206,7 +206,7 @@ TEST(CziSubBlockDirectory, CziSubBlockDirectory1)
     };
 
     CCziSubBlockDirectory subBlkDir;
-    for (int i = 0; i < sizeof(data) / sizeof(data[0]); ++i)
+    for (size_t i = 0; i < sizeof(data) / sizeof(data[0]); ++i)
     {
         auto entry = SubBlkEntryFromSubBlockEntryData(data + i);
         subBlkDir.AddSubBlock(entry);

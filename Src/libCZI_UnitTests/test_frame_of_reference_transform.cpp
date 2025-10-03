@@ -81,7 +81,7 @@ namespace
         return make_tuple(czi_document_data, czi_document_size);
     }
 
-    bool Check2x2Gray8Bitmap(IBitmapData* bitmap, const array<uint8_t,4>& expected)
+    bool Check2x2Gray8Bitmap(IBitmapData* bitmap, const array<uint8_t, 4>& expected)
     {
         if (bitmap->GetWidth() != 2 || bitmap->GetHeight() != 2 || bitmap->GetPixelType() != PixelType::Gray8)
         {

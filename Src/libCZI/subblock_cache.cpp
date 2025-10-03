@@ -14,7 +14,7 @@ std::shared_ptr<ISubBlockCache> libCZI::CreateSubBlockCache()
 
 ISubBlockCacheStatistics::Statistics SubBlockCache::GetStatistics(std::uint8_t mask) const
 {
-    Statistics result{ 0 };
+    Statistics result{};
     if (mask == ISubBlockCacheStatistics::kMemoryUsage)
     {
         result.validityMask = ISubBlockCacheStatistics::kMemoryUsage;

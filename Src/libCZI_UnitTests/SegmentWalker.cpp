@@ -5,25 +5,16 @@
 #include "include_gtest.h"
 #include "SegmentWalker.h"
 
-#if !defined(__GNUC__)
-#include <pshpack2.h>
-#define PACKED 
-#else
-#define PACKED __attribute__ ((__packed__))
-#endif
+#pragma pack(push, 2)
 
-struct PACKED CziSegmentHeader
+struct CziSegmentHeader
 {
     unsigned char Id[16];
     std::int64_t AllocatedSize;
     std::int64_t UsedSize;
 };
 
-#if !defined(__GNUC__)
-#include <poppack.h>
-#else
-#define PACK
-#endif
+#pragma pack(pop)
 
 static bool is_big_endian();
 static void ConvertSegmentHeaderToHostByteOrder(CziSegmentHeader* p);
@@ -51,7 +42,7 @@ static void ConvertSegmentHeaderToHostByteOrder(CziSegmentHeader* p);
 
         ConvertSegmentHeaderToHostByteOrder(&hdr);
 
-        int strLen = 0;
+        size_t strLen = 0;
         for (; strLen < sizeof(hdr.Id); ++strLen)
         {
             if (hdr.Id[strLen] == 0)
@@ -86,35 +77,38 @@ static void ConvertSegmentHeaderToHostByteOrder(CziSegmentHeader* p);
         stream,
         [&](int cnt, const std::string& id, std::int64_t allocatedSize, std::int64_t usedSize)->bool
         {
+            (void)allocatedSize;
+            (void)usedSize;
+
             const CSegmentWalker::ExpectedSegment* p = expectedSegments;
-    intptr_t n = cnt;
-    for (; n > 0; )
-    {
-        n -= p->cnt;
-        if (n >= 0)
-        {
-            ++p;
-        }
+            intptr_t n = cnt;
+            for (; n > 0; )
+            {
+                n -= p->cnt;
+                if (n >= 0)
+                {
+                    ++p;
+                }
 
-        if (p >= expectedSegments + countExpectedSegments)
-        {
-            tooManySegments = true;
-            return false;
-        }
-    }
+                if (p >= expectedSegments + countExpectedSegments)
+                {
+                    tooManySegments = true;
+                    return false;
+                }
+            }
 
-    if (id != p->segmentId)
-    {
-        wrongId = true;
-        return false;
-    }
+            if (id != p->segmentId)
+            {
+                wrongId = true;
+                return false;
+            }
 
-    if (cnt + 1 == totalCnt)
-    {
-        allReceived = true;
-    }
+            if (cnt + 1 == totalCnt)
+            {
+                allReceived = true;
+            }
 
-    return true;
+            return true;
         });
 
     return !tooManySegments && !wrongId && allReceived;

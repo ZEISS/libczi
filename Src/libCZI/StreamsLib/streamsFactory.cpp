@@ -40,6 +40,7 @@ static const struct
             { "curl_http_inputstream", "curl-based http/https stream", CurlHttpInputStream::GetBuildInformation, CurlHttpInputStream::GetClassProperty },
             [](const StreamsFactory::CreateStreamInfo& stream_info, const std::string& file_name) -> std::shared_ptr<libCZI::IStream>
             {
+                (void)stream_info;
                 return std::make_shared<CurlHttpInputStream>(file_name, stream_info.property_bag);
             },
             nullptr
@@ -50,6 +51,7 @@ static const struct
             { "azure_blob_inputstream", "Azure-SDK-based stream", AzureBlobInputStream::GetBuildInformation, nullptr },
             [](const StreamsFactory::CreateStreamInfo& stream_info, const std::string& file_name) -> std::shared_ptr<libCZI::IStream>
             {
+                (void)stream_info;
                 return std::make_shared<AzureBlobInputStream>(file_name, stream_info.property_bag);
             },
             nullptr
@@ -60,10 +62,12 @@ static const struct
             { "windows_file_inputstream", "stream implementation based on Windows-API", nullptr, nullptr },
             [](const StreamsFactory::CreateStreamInfo& stream_info, const std::string& file_name) -> std::shared_ptr<libCZI::IStream>
             {
+                (void)stream_info;
                 return std::make_shared<WindowsFileInputStream>(file_name);
             },
             [](const StreamsFactory::CreateStreamInfo& stream_info, const std::wstring& file_name) -> std::shared_ptr<libCZI::IStream>
             {
+                (void)stream_info;
                 return std::make_shared<WindowsFileInputStream>(file_name.c_str());
             }
         },
@@ -73,10 +77,12 @@ static const struct
             { "uwp_file_inputstream", "stream implementation based on UWP-API", nullptr, nullptr },
             [](const StreamsFactory::CreateStreamInfo& stream_info, const std::string& file_name) -> std::shared_ptr<libCZI::IStream>
             {
+                (void)stream_info;
                 return std::make_shared<UwpFileInputStream>(file_name);
             },
             [](const StreamsFactory::CreateStreamInfo& stream_info, const std::wstring& file_name) -> std::shared_ptr<libCZI::IStream>
             {
+                (void)stream_info;
                 return std::make_shared<UwpFileInputStream>(file_name.c_str());
             }
         },
@@ -86,6 +92,7 @@ static const struct
             { "pread_file_inputstream", "stream implementation based on pread-API", nullptr, nullptr },
             [](const StreamsFactory::CreateStreamInfo& stream_info, const std::string& file_name) -> std::shared_ptr<libCZI::IStream>
             {
+                (void)stream_info;
                 return std::make_shared<PreadFileInputStream>(file_name);
             },
             nullptr
@@ -95,10 +102,12 @@ static const struct
             { "c_runtime_file_inputstream", "stream implementation based on C-runtime library", nullptr, nullptr },
             [](const StreamsFactory::CreateStreamInfo& stream_info, const std::string& file_name) -> std::shared_ptr<libCZI::IStream>
             {
+                (void)stream_info;
                 return std::make_shared<SimpleFileInputStream>(file_name);
             },
             [](const StreamsFactory::CreateStreamInfo& stream_info, const std::wstring& file_name) -> std::shared_ptr<libCZI::IStream>
             {
+                (void)stream_info;
                 return std::make_shared<SimpleFileInputStream>(file_name.c_str());
             }
         },

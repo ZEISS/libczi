@@ -2015,6 +2015,8 @@ void CCmdLineOptions::PrintHelpBitmapGenerator()
     BitmapGenFactory::EnumBitmapGenerator(
         [&](int no, std::tuple<std::string, std::string, bool> name_explanation_isdefault) -> bool
         {
+            (void)no;
+
             maxLengthClassName = (std::max)(get<0>(name_explanation_isdefault).length(), maxLengthClassName);
             return true;
         });

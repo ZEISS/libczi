@@ -6,6 +6,7 @@
 
 #include "CziUtils.h"
 #include "utilities.h"
+#include <atomic>
 
 using namespace std;
 using namespace libCZI;
@@ -23,14 +24,13 @@ using namespace libCZI;
     repository->EnumerateSubBlocks(
         [&](int index, const SubBlockInfo& info)->bool
         {
-            if (onlyLayer0 == false || (info.physicalSize.w == info.logicalRect.w && info.physicalSize.h == info.logicalRect.h))
+            if (onlyLayer0 == false || (info.physicalSize.w == static_cast<uint32_t>(info.logicalRect.w) && info.physicalSize.h == static_cast<uint32_t>(info.logicalRect.h)))
             {
                 if (planeCoordinate == nullptr || CziUtils::CompareCoordinate(planeCoordinate, &info.coordinate) == true)
                 {
                     if (roi == nullptr || Utilities::DoIntersect(*roi, info.logicalRect))
                     {
-                        const bool b = funcEnum(index, info);
-                        return b;
+                        return funcEnum(index, info);
                     }
                 }
             }
@@ -52,6 +52,8 @@ using namespace libCZI;
         repository->EnumerateSubBlocks(
             [&](int index, const SubBlockInfo& sbinfo)->bool
             {
+                (void)index;
+
                 info = sbinfo;
                 foundASubBlock = true;
                 return false;
@@ -62,6 +64,8 @@ using namespace libCZI;
         repository->EnumerateSubBlocks(
             [&](int index, const SubBlockInfo& sbinfo)->bool
             {
+                (void)index;
+
                 int c;
                 if (sbinfo.coordinate.TryGetPosition(DimensionIndex::C, &c) == true && c == channelIndex)
                 {
