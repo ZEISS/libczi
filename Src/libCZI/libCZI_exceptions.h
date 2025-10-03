@@ -28,8 +28,9 @@ namespace libCZI
         /// Values that represent error types.
         enum class ErrorType
         {
-            CouldntDeterminePixelType,  ///< The pixeltype could not be determined.
-            Unspecified                 ///< Unspecified error.
+            CouldntDeterminePixelType,   ///< The pixeltype could not be determined.
+            InternalInconsistency,       ///< An internal inconsistency was detected.
+            Unspecified                  ///< Unspecified error.
         };
     private:
         ErrorType errorType;

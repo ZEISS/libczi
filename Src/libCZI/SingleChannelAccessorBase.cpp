@@ -85,20 +85,21 @@ void CSingleChannelAccessorBase::CheckPlaneCoordinates(const libCZI::IDimCoordin
 
 std::vector<int> CSingleChannelAccessorBase::CheckForVisibility(const libCZI::IntRect& roi, int count, const std::function<int(int)>& get_subblock_index) const
 {
-    constexpr IntRect invalid_rect { .x = 0, .y = 0, .w = -1, .h = -1};
     return CSingleChannelAccessorBase::CheckForVisibilityCore(
         roi,
         count,
         get_subblock_index,
-        [&](int subblock_index) -> IntRect
+        [this](int subblock_index) -> IntRect
             {
                 SubBlockInfo subblock_info;
-                bool b = this->sbBlkRepository->TryGetSubBlockInfo(
-                    subblock_index, &subblock_info);
-                if (!b)
+                const bool result = this->sbBlkRepository->TryGetSubBlockInfo(subblock_index, &subblock_info);
+                if (!result)
                 {
-                    return invalid_rect;
+                    stringstream ss;
+                    ss << "SubBlockInfo not found in repository for subblock index " << subblock_index << ".";
+                    throw LibCZIAccessorException(ss.str().c_str(), LibCZIAccessorException::ErrorType::InternalInconsistency);
                 }
+
                 return subblock_info.logicalRect;
             });
 }
