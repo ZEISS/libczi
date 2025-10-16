@@ -27,5 +27,5 @@ namespace libCZI
             std::shared_ptr<const void> GetRawData(MemBlkType type, size_t* ptrSize) override;
         };
 
-    }
-}
+    }  // namespace detail
+} // namespace libCZI

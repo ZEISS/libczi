@@ -12,6 +12,7 @@
  */
 
 using namespace libCZI;
+using namespace libCZI::detail;
 using namespace std;
 
 static void _testImageCompressDecompressZStd0Basic(uint32_t imgWidth, uint32_t imgHeight, PixelType pixelType);

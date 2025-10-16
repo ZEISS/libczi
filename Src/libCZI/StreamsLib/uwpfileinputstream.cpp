@@ -9,6 +9,8 @@
 #include <iomanip>
 #include "../utilities.h"
 
+using namespace libCZI::detail;
+
 UwpFileInputStream::UwpFileInputStream(const std::string& filename)
     : UwpFileInputStream(Utilities::convertUtf8ToWchar_t(filename.c_str()).c_str())
 {

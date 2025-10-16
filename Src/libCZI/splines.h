@@ -8,12 +8,20 @@
 #include <vector>
 #include "libCZI_Metadata.h"
 
-class CSplines
+namespace libCZI
 {
-public:
-    typedef libCZI::IDisplaySettings::CubicSplineCoefficients Coefficients;
+    namespace detail
+    {
 
-    static std::vector<Coefficients> GetSplineCoefficients(int pointsCnt, const std::function<void(int index, double* x, double* y)>& getPoint);
+        class CSplines
+        {
+        public:
+            typedef libCZI::IDisplaySettings::CubicSplineCoefficients Coefficients;
 
-    static double CalculateSplineValue(double xPosition, const Coefficients& coeffs);
-};
+            static std::vector<Coefficients> GetSplineCoefficients(int pointsCnt, const std::function<void(int index, double* x, double* y)>& getPoint);
+
+            static double CalculateSplineValue(double xPosition, const Coefficients& coeffs);
+        };
+
+    }   // namespace detail
+}   // namespace libCZI

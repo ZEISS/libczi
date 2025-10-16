@@ -30,5 +30,5 @@ namespace libCZI
             std::shared_ptr<const void> GetRawData(size_t* ptrSize) override;
         };
 
-    }
-}
+    }  // namespace detail
+} 

@@ -7,6 +7,7 @@
 #include "CziUtils.h"
 
 using namespace libCZI;
+using namespace libCZI::detail;
 
 /*static*/libCZI::PixelType CziUtils::PixelTypeFromInt(int i)
 {

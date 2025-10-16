@@ -5,4 +5,12 @@
 #pragma once
 #include "libCZI_Site.h"
 
-libCZI::ISite* GetSite();
+namespace libCZI
+{
+    namespace detail
+    {
+
+        libCZI::ISite* GetSite();
+
+    }  // namespace detail
+} // namespace libCZI

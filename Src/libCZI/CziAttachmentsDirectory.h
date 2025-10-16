@@ -93,5 +93,5 @@ namespace libCZI
             bool TryAddAttachment(const AttachmentEntry& entry, int* key);
         };
 
-    }
-}
+    } // namespace detail
+}  // namespace libCZI

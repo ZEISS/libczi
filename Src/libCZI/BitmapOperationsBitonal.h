@@ -10,8 +10,10 @@
 #include "libCZI_Pixels.h"
 #include "BitmapOperations.h"
 
-namespace libCZI {
-    namespace detail {
+namespace libCZI
+{
+    namespace detail
+    {
 
         /// Here we gather operations that are specific to bitonal bitmaps.
         class BitmapOperationsBitonal
@@ -191,5 +193,5 @@ namespace libCZI {
 
         };
 
-    }
-}
+    } // namespace detail
+} // namespace libCZI

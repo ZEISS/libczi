@@ -224,5 +224,5 @@ namespace libCZI
             static bool CheckAttachmentSchemaType(const char* p, size_t cnt);
         };
 
-    }
-}
+    } // namespace detail
+} // namespace libCZI

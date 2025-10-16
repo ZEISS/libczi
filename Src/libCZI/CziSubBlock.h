@@ -31,5 +31,5 @@ namespace libCZI
             std::shared_ptr<libCZI::IBitmapData> CreateBitmap(const libCZI::CreateBitmapOptions* options) override;
         };
 
-    }
-}
+    } // namespace detail
+} // namespace libCZI

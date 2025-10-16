@@ -38,5 +38,5 @@ namespace libCZI
             static libCZI::SubBlockInfo ConvertToSubBlockInfo(const CCziSubBlockDirectory::SubBlkEntry& entry);
         };
 
-    }
-}
+    } // namespace detail
+} // namespace libCZI

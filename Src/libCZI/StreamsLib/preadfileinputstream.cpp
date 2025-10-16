@@ -4,6 +4,8 @@
 
 #include "preadfileinputstream.h"
 
+#include "BitmapOperations.h"
+
 #if LIBCZI_USE_PREADPWRITEBASED_STREAMIMPL
 
 #include <fcntl.h>
@@ -13,6 +15,7 @@
 #include "../utilities.h"
 
 using namespace libCZI;
+using namespace libCZI::detail;
 
 PreadFileInputStream::PreadFileInputStream(const std::string& filename)
 {

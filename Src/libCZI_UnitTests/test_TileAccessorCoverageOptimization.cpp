@@ -13,6 +13,7 @@
 #include "utils.h"
 
 using namespace libCZI;
+using namespace libCZI::detail;
 using namespace std;
 
 /// This is a shim for the ISubBlockRepository interface, which keeps track of the subblocks that were read.

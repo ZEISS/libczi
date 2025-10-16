@@ -48,5 +48,5 @@ namespace libCZI
             static bool CompareForLruValue(const std::pair<int, CacheEntry>& a, const std::pair<int, CacheEntry>& b);
         };
 
-    }
-}
+    } // namespace detail
+} // namespace libCZI

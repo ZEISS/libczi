@@ -8,32 +8,41 @@
 #include <memory>
 #include <utility>
 
-class CHeapAllocator
+namespace libCZI
 {
-public:
-    void* Allocate(std::uint64_t size);
-    void  Free(void* ptr);
-};
-
-class CSharedPtrAllocator
-{
-private:
-    std::shared_ptr<const void> shp;
-public:
-    explicit CSharedPtrAllocator(std::shared_ptr<const void> shp) :shp(std::move(shp))
-    {}
-
-    void* Allocate(std::uint64_t size)
+    namespace detail
     {
-        (void)size;
 
-        return const_cast<void*>(this->shp.get());
-    }
+        class CHeapAllocator
+        {
+        public:
+            void* Allocate(std::uint64_t size);
+            void  Free(void* ptr);
+        };
 
-    void Free(void* ptr)
-    {
-        (void)ptr;
+        class CSharedPtrAllocator
+        {
+        private:
+            std::shared_ptr<const void> shp;
+        public:
+            explicit CSharedPtrAllocator(std::shared_ptr<const void> shp) :shp(std::move(shp))
+            {
+            }
 
-        this->shp.reset();
-    }
-};
+            void* Allocate(std::uint64_t size)
+            {
+                (void)size;
+
+                return const_cast<void*>(this->shp.get());
+            }
+
+            void Free(void* ptr)
+            {
+                (void)ptr;
+
+                this->shp.reset();
+            }
+        };
+
+    }   // namespace detail
+}   // namespace libCZI

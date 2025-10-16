@@ -354,5 +354,5 @@ namespace libCZI
             WrittenSegmentInfo  attachmentDirectorySegment;
         };
 
-    }
-}
+    }  // namespace detail
+} // namespace libCZI

@@ -15,8 +15,11 @@
 #include "Site.h"
 #endif
 
-namespace libCZI {
-    namespace detail {
+namespace libCZI
+{
+    namespace detail
+    {
+
         template  <typename tAllocator = CHeapAllocator>
         class CBitmapData : public libCZI::IBitmapData
         {

@@ -8,6 +8,8 @@
 #include <stdexcept>
 #include "libCZI_Config.h"
 
+using namespace libCZI::detail;
+
 constexpr int ALLOC_ALIGNMENT = 32;
 
 void* CHeapAllocator::Allocate(std::uint64_t size)

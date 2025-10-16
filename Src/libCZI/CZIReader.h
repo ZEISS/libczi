@@ -68,5 +68,5 @@ namespace libCZI
             void SetOperationalState(bool operational);
         };
 
-    }
-}
+    } // namespace detail
+} // namespace libCZI

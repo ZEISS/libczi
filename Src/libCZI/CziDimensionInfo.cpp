@@ -4,6 +4,8 @@
 
 #include "CziDimensionInfo.h"
 
+using namespace libCZI::detail;
+
 /*virtual*/ libCZI::DimensionIndex CCziDimensionInfo::GetDimension() const
 {
     return this->dimAndStartSize_.dimension;

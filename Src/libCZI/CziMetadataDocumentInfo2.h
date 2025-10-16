@@ -710,5 +710,5 @@ namespace libCZI
             static std::vector<int> ParseInt32XmlArray(const std::wstring& str);
         };
 
-    }
-}
+    } // namespace libCZI
+} // namespace detail

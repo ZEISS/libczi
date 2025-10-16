@@ -96,7 +96,8 @@ namespace libCZI {
 
             static void ThrowUnsupportedConversion(libCZI::PixelType srcPixelType, libCZI::PixelType dstPixelType);
         };
-    }
-}
+
+    } // namespace detail
+} // namespace libCZI
 
 #include "BitmapOperations.hpp"

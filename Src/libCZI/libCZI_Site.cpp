@@ -10,6 +10,7 @@
 #include <cstdlib>
 #include "bitmapData.h"
 #include "decoder_wic.h"
+#include "Site.h"
 
 using namespace libCZI;
 using namespace libCZI::detail;
@@ -172,7 +173,7 @@ static CSiteImpJxrLib theJxrLibSite;
 static std::once_flag gSite_init;
 static ISite* g_site = nullptr;
 
-libCZI::ISite* GetSite()
+libCZI::ISite* libCZI::detail::GetSite()
 {
     std::call_once(gSite_init,
         []()

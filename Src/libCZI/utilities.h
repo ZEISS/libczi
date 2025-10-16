@@ -303,5 +303,5 @@ namespace libCZI
             static int SplitUpIntoNonOverlapping(const libCZI::IntRect& rectangle_a, const libCZI::IntRect& rectangle_b, std::array<libCZI::IntRect, 4>& result);
         };
 
-    }
-}
+    }   // namespace detail
+}   // namespace libCZI

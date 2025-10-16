@@ -6,6 +6,7 @@
 #include "inc_libCZI.h"
 
 using namespace libCZI;
+using namespace libCZI::detail;
 
 static bool CompareWithMargin(const std::uint8_t* p1, const std::uint8_t* p2, size_t elemCnt, int maxAllowedDifference)
 {

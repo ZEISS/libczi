@@ -596,5 +596,5 @@ namespace libCZI
                 ThrowUnsupportedConversion(srcPixelType, dstPixelType);
             }
         }
-    }
-}
+    } // namespace detail
+} // namespace libCZI
