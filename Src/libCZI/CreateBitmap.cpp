@@ -11,6 +11,7 @@
 #include "decoder_zstd.h"
 
 using namespace libCZI;
+using namespace libCZI::detail;
 
 static std::shared_ptr<libCZI::IBitmapData> CreateBitmapFromSubBlock_JpgXr(ISubBlock* subBlk, bool handle_jxr_bitmap_mismatch)
 {

@@ -16,6 +16,7 @@
 #endif
 
 using namespace std;
+using namespace libCZI::detail;
 
 //----------------------------------------------------------------------------
 

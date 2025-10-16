@@ -19,6 +19,7 @@
 #include <string>
 
 using namespace std;
+using namespace libCZI::detail;
 
 namespace
 {

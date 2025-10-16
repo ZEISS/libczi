@@ -7,6 +7,7 @@
 
 using namespace libCZI::pugi;
 using namespace libCZI;
+using namespace libCZI::detail;
 using namespace std;
 
 CCziMetadata::CCziMetadata(libCZI::IMetadataSegment* pMdSeg)

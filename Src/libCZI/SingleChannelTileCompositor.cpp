@@ -8,6 +8,7 @@
 #include "BitmapOperationsBitonal.h"
 
 using namespace libCZI;
+using namespace libCZI::detail;
 
 /*static*/void CSingleChannelTileCompositor::Compose(libCZI::IBitmapData* dest, libCZI::IBitmapData* source, int x, int y, bool drawTileBorder)
 {

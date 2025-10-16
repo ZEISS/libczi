@@ -6,6 +6,8 @@
 #include <algorithm>
 #include <cstring>
 
+using namespace libCZI::detail;
+
 /*static*/bool CCziAttachmentsDirectoryBase::CompareForEquality_Id(const AttachmentEntry& a, const AttachmentEntry& b)
 {
     if (a.ContentGuid != b.ContentGuid)

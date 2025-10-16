@@ -13,6 +13,7 @@
 #include "../libCZI/CZIReader.h"
 
 using namespace libCZI;
+using namespace libCZI::detail;
 using namespace std;
 
 //! .

@@ -17,6 +17,7 @@
 #include "SubblockAttachmentAccessor.h"
 
 using namespace libCZI;
+using namespace libCZI::detail;
 using namespace std;
 
 void libCZI::GetLibCZIVersion(int* pMajor, int* pMinor/*nullptr*/, int* pPatch/*nullptr*/, int* pTweak/*nullptr*/)

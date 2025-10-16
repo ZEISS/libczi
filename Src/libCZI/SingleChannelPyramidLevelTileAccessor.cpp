@@ -8,6 +8,7 @@
 #include "Site.h"
 
 using namespace libCZI;
+using namespace libCZI::detail;
 using namespace std;
 
 CSingleChannelPyramidLevelTileAccessor::CSingleChannelPyramidLevelTileAccessor(const std::shared_ptr<ISubBlockRepository>& sbBlkRepository)

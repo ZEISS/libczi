@@ -9,6 +9,7 @@
 #include "bitmapData.h"
 
 using namespace libCZI;
+using namespace libCZI::detail;
 using namespace std;
 
 static const libCZI::GUID kGuidValidPixelMask{ 0xCBE3EA67, 0x5BFC, 0x492B, { 0xA1, 0x6A, 0xEC, 0xE3, 0x78, 0x03, 0x14, 0x48 } };

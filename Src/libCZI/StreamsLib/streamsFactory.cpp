@@ -16,6 +16,7 @@
 #include "../utilities.h"
 
 using namespace libCZI;
+using namespace libCZI::detail;
 
 /*static*/const char* StreamsFactory::kStreamClassInfoProperty_CurlHttp_CaInfo = "CurlHttp_CaInfo";
 /*static*/const char* StreamsFactory::kStreamClassInfoProperty_CurlHttp_CaPath = "CurlHttp_CaPath";

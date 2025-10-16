@@ -10,6 +10,7 @@
 #include "bitmapData.h"
 
 using namespace libCZI;
+using namespace libCZI::detail;
 using namespace std;
 
 CSingleChannelTileAccessor::CSingleChannelTileAccessor(const std::shared_ptr<ISubBlockRepository>& sbBlkRepository)

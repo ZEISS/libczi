@@ -7,6 +7,7 @@
 
 using namespace libCZI::pugi;
 using namespace libCZI;
+using namespace libCZI::detail;
 using namespace std;
 
 SubblockMetadata::SubblockMetadata(const char* xml, size_t xml_size)

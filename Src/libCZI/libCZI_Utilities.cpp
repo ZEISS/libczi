@@ -16,6 +16,7 @@
 #include <regex>
 
 using namespace libCZI;
+using namespace libCZI::detail;
 using namespace std;
 
 namespace

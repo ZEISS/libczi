@@ -13,6 +13,7 @@
 #include "../libCZI/decoder.h"
 
 using namespace libCZI;
+using namespace libCZI::detail;
 using namespace std;
 
 TEST(JxrlibCodec, DecodeBgr24)

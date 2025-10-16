@@ -11,6 +11,7 @@
 #include "inc_libCZI_Config.h"
 
 using namespace libCZI;
+using namespace libCZI::detail;
 using namespace std;
 
 /*static*/int CBitmapOperations::CalcMd5Sum(libCZI::IBitmapData* bm, std::uint8_t* ptrHash, int hashSize)

@@ -19,6 +19,7 @@
 #endif
 
 using namespace std;
+using namespace libCZI::detail;
 
 /*static*/std::uint8_t Utilities::HexCharToInt(char c)
 {

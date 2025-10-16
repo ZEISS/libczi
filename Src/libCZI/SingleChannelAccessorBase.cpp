@@ -9,6 +9,7 @@
 
 using namespace std;
 using namespace libCZI;
+using namespace libCZI::detail;
 
 bool CSingleChannelAccessorBase::TryGetPixelType(const libCZI::IDimCoordinate* planeCoordinate, libCZI::PixelType& pixeltype)
 {

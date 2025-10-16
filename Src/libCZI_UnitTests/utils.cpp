@@ -9,6 +9,7 @@
 
 using namespace std;
 using namespace libCZI;
+using namespace libCZI::detail;
 
 class CMemBitmapWrapper : public libCZI::IBitmapData
 {

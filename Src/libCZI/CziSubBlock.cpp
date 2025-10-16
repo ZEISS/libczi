@@ -6,6 +6,7 @@
 #include "CziUtils.h"
 
 using namespace libCZI;
+using namespace libCZI::detail;
 
 CCziSubBlock::CCziSubBlock(const libCZI::SubBlockInfo& info, const CCZIParse::SubBlockData& data, const std::function<void(void*)>& deleter)
     :

@@ -12,6 +12,7 @@
 #include "CziMetadataDocumentInfo2.h"
 
 using namespace libCZI;
+using namespace libCZI::detail;
 using namespace std;
 
 CCziMetadataDocumentInfo::CCziMetadataDocumentInfo(std::shared_ptr<CCziMetadata> md)

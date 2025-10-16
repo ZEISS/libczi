@@ -56,7 +56,7 @@ void CCziDimensionZInfo::SetIntervalDefinition(const double& start, const double
 
 void CCziDimensionZInfo::SetListDefinition(std::vector<double>&& list)
 {
-    this->data = list;
+    this->data = std::move(list);
     this->type = DefType::List;
 }
 
@@ -223,7 +223,7 @@ void CCziDimensionTInfo::SetIntervalDefinition(const double& start, const double
 
 void CCziDimensionTInfo::SetListDefinition(std::vector<double>&& list)
 {
-    this->offsets = list;
+    this->offsets = std::move(list);
     this->type = DefType::List;
 }
 

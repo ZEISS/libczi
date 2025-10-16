@@ -23,7 +23,7 @@ private:
 
     libCZI::pugi::xml_parse_result   parseResult;
     libCZI::pugi::xml_document doc;
-    std::unique_ptr<XmlNodeWrapperReadonly<CCziMetadata, XmlNodeWrapperThrowExcp> > wrapper;
+    std::unique_ptr<libCZI::detail::XmlNodeWrapperReadonly<CCziMetadata, XmlNodeWrapperThrowExcp> > wrapper;
 public:
     explicit CCziMetadata(libCZI::IMetadataSegment* pMdSeg);
 
