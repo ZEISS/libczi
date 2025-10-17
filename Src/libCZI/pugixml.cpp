@@ -160,8 +160,8 @@ using std::memset;
 #	define PUGI_IMPL_FN_NO_INLINE inline
 #else
 #	if defined(_MSC_VER) && _MSC_VER < 1300 // MSVC6 seems to have an amusing bug with anonymous namespaces inside namespaces
-#		define PUGI_IMPL_NS_BEGIN namespace libCZI { namespace pugi { namespace impl {
-#		define PUGI_IMPL_NS_END } } }
+#		define PUGI_IMPL_NS_BEGIN namespace libCZI { namespace detail { namespace pugi { namespace impl {
+#		define PUGI_IMPL_NS_END } } } }
 #	else
 #		define PUGI_IMPL_NS_BEGIN namespace libCZI { namespace detail { namespace pugi { namespace impl { namespace {
 #		define PUGI_IMPL_NS_END } } } } }
@@ -172,7 +172,7 @@ using std::memset;
 
 // uintptr_t
 #if (defined(_MSC_VER) && _MSC_VER < 1600) || (defined(__BORLANDC__) && __BORLANDC__ < 0x561)
-namespace pugi
+namespace libCZI { namespace detail { namespace pugi {
 {
 #	ifndef _UINTPTR_T_DEFINED
     typedef size_t uintptr_t;
@@ -181,7 +181,7 @@ namespace pugi
     typedef unsigned __int8 uint8_t;
     typedef unsigned __int16 uint16_t;
     typedef unsigned __int32 uint32_t;
-}
+}}}
 #else
 #	include <stdint.h>
 #endif

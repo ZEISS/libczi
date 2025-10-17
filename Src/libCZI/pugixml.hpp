@@ -1485,9 +1485,9 @@ namespace std
 namespace std
 {
     // Workarounds for (non-standard) iterator category detection
-    std::bidirectional_iterator_tag PUGIXML_FUNCTION __iterator_category(const libCZI::pugi::xml_node_iterator&);
-    std::bidirectional_iterator_tag PUGIXML_FUNCTION __iterator_category(const libCZI::pugi::xml_attribute_iterator&);
-    std::bidirectional_iterator_tag PUGIXML_FUNCTION __iterator_category(const libCZI::pugi::xml_named_node_iterator&);
+    std::bidirectional_iterator_tag PUGIXML_FUNCTION __iterator_category(const libCZI::detail::pugi::xml_node_iterator&);
+    std::bidirectional_iterator_tag PUGIXML_FUNCTION __iterator_category(const libCZI::detail::pugi::xml_attribute_iterator&);
+    std::bidirectional_iterator_tag PUGIXML_FUNCTION __iterator_category(const libCZI::detail::pugi::xml_named_node_iterator&);
 }
 #endif
 
