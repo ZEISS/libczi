@@ -19,7 +19,7 @@ namespace libCZI
     {
 
         template <libCZI::PixelType tSrcDstPixelType>
-        inline void libCZI::detail::CBitmapOperations::CopySamePixelType(const void* srcPtr, int srcStride, void* dstPtr, int dstStride, int width, int height, bool drawTileBorder)
+        void CBitmapOperations::CopySamePixelType(const void* srcPtr, int srcStride, void* dstPtr, int dstStride, int width, int height, bool drawTileBorder)
         {
             constexpr auto kBytesPerPel = CziUtils::BytesPerPel<tSrcDstPixelType>();
             const int bytes_to_copy = width * kBytesPerPel;
@@ -50,7 +50,7 @@ namespace libCZI
         }
 
         template <libCZI::PixelType tSrcPixelType, libCZI::PixelType tDstPixelType, typename tPixelConverter>
-        inline void libCZI::detail::CBitmapOperations::Copy(const tPixelConverter& conv, const void* srcPtr, int srcStride, void* dstPtr, int dstStride, int width, int height, bool drawTileBorder)
+        void CBitmapOperations::Copy(const tPixelConverter& conv, const void* srcPtr, int srcStride, void* dstPtr, int dstStride, int width, int height, bool drawTileBorder)
         {
             (void)drawTileBorder;
 
@@ -413,7 +413,7 @@ namespace libCZI
         //------------------------------------------------------------------------------------------------------------
 
         template <libCZI::PixelType tSrcPixelType, libCZI::PixelType tDstPixelType, typename tPixelConverter, typename tFlt>
-        inline void CBitmapOperations::InternalNNScale2(const tPixelConverter& conv, const NNResizeInfo2<tFlt>& resizeInfo)
+        void CBitmapOperations::InternalNNScale2(const tPixelConverter& conv, const NNResizeInfo2<tFlt>& resizeInfo)
         {
             constexpr uint8_t bytesPerPelSrc = CziUtils::BytesPerPel<tSrcPixelType>();
             constexpr uint8_t bytesPerPelDest = CziUtils::BytesPerPel<tDstPixelType>();
@@ -474,7 +474,7 @@ namespace libCZI
         }
 
         template <typename tFlt>
-        inline void CBitmapOperations::NNScale2(libCZI::PixelType srcPixelType, libCZI::PixelType dstPixelType, const NNResizeInfo2<tFlt>& resizeInfo)
+        void CBitmapOperations::NNScale2(libCZI::PixelType srcPixelType, libCZI::PixelType dstPixelType, const NNResizeInfo2<tFlt>& resizeInfo)
         {
             switch (srcPixelType)
             {
