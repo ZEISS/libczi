@@ -5,7 +5,7 @@
 #include "SubblockMetadata.h"
 #include <sstream>
 
-using namespace libCZI::pugi;
+using namespace libCZI::detail::pugi;
 using namespace libCZI;
 using namespace libCZI::detail;
 using namespace std;
@@ -72,7 +72,7 @@ bool SubblockMetadata::IsXmlValid() const
 
 std::string SubblockMetadata::GetXml() const
 {
-    static libCZI::pugi::char_t Indent[] = PUGIXML_TEXT(" ");
+    static libCZI::detail::pugi::char_t Indent[] = PUGIXML_TEXT(" ");
 
     this->ThrowIfXmlInvalid();
 

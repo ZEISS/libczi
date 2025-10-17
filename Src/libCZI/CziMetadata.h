@@ -26,14 +26,14 @@ namespace libCZI
                 }
             };
 
-            libCZI::pugi::xml_parse_result   parseResult;
-            libCZI::pugi::xml_document doc;
+            libCZI::detail::pugi::xml_parse_result   parseResult;
+            libCZI::detail::pugi::xml_document doc;
             std::unique_ptr<libCZI::detail::XmlNodeWrapperReadonly<CCziMetadata, XmlNodeWrapperThrowExcp> > wrapper;
         public:
             explicit CCziMetadata(libCZI::IMetadataSegment* pMdSeg);
 
         public:
-            const libCZI::pugi::xml_document& GetXmlDoc() const;
+            const libCZI::detail::pugi::xml_document& GetXmlDoc() const;
 
         public: // interface ICziMetadata
             bool IsXmlValid() const override;

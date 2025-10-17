@@ -37,8 +37,8 @@ namespace libCZI
             void ParseDimensionInfo();
 
         private:
-            libCZI::pugi::xml_node GetNode(const wchar_t* path) const;
-            static libCZI::pugi::xml_node GetNodeRelativeFromNode(libCZI::pugi::xml_node node, const wchar_t* path);
+            libCZI::detail::pugi::xml_node GetNode(const wchar_t* path) const;
+            static libCZI::detail::pugi::xml_node GetNodeRelativeFromNode(libCZI::detail::pugi::xml_node node, const wchar_t* path);
         };
 
     } // namespace detail

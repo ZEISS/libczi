@@ -136,6 +136,8 @@
 
 namespace libCZI
 {
+namespace detail
+{
 namespace pugi
 {
     // Character type used for all internal storage and operations; depends on PUGIXML_WCHAR_MODE
@@ -147,9 +149,12 @@ namespace pugi
 #endif
 }
 }
+}
 
 // The PugiXML namespace
 namespace libCZI
+{
+namespace detail
 {
 namespace pugi
 {
@@ -1463,14 +1468,16 @@ namespace pugi
     deallocation_function PUGIXML_FUNCTION get_memory_deallocation_function();
 }
 }
+}
+
 
 #if !defined(PUGIXML_NO_STL) && (defined(_MSC_VER) || defined(__ICC))
 namespace std
 {
     // Workarounds for (non-standard) iterator category detection for older versions (MSVC7/IC8 and earlier)
-    std::bidirectional_iterator_tag PUGIXML_FUNCTION _Iter_cat(const libCZI::pugi::xml_node_iterator&);
-    std::bidirectional_iterator_tag PUGIXML_FUNCTION _Iter_cat(const libCZI::pugi::xml_attribute_iterator&);
-    std::bidirectional_iterator_tag PUGIXML_FUNCTION _Iter_cat(const libCZI::pugi::xml_named_node_iterator&);
+    std::bidirectional_iterator_tag PUGIXML_FUNCTION _Iter_cat(const libCZI::detail::pugi::xml_node_iterator&);
+    std::bidirectional_iterator_tag PUGIXML_FUNCTION _Iter_cat(const libCZI::detail::pugi::xml_attribute_iterator&);
+    std::bidirectional_iterator_tag PUGIXML_FUNCTION _Iter_cat(const libCZI::detail::pugi::xml_named_node_iterator&);
 }
 #endif
 

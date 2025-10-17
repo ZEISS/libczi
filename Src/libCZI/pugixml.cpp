@@ -154,8 +154,8 @@ using std::memset;
 
 // We put implementation details into an anonymous namespace in source mode, but have to keep it in non-anonymous namespace in header-only mode to prevent binary bloat.
 #ifdef PUGIXML_HEADER_ONLY
-#	define PUGI_IMPL_NS_BEGIN namespace libCZI { namespace pugi { namespace impl {
-#	define PUGI_IMPL_NS_END } } }
+#	define PUGI_IMPL_NS_BEGIN namespace libCZI { namespace detail { namespace pugi { namespace impl {
+#	define PUGI_IMPL_NS_END } } } }
 #	define PUGI_IMPL_FN inline
 #	define PUGI_IMPL_FN_NO_INLINE inline
 #else
@@ -163,8 +163,8 @@ using std::memset;
 #		define PUGI_IMPL_NS_BEGIN namespace libCZI { namespace pugi { namespace impl {
 #		define PUGI_IMPL_NS_END } } }
 #	else
-#		define PUGI_IMPL_NS_BEGIN namespace libCZI { namespace pugi { namespace impl { namespace {
-#		define PUGI_IMPL_NS_END } } } }
+#		define PUGI_IMPL_NS_BEGIN namespace libCZI { namespace detail { namespace pugi { namespace impl { namespace {
+#		define PUGI_IMPL_NS_END } } } } }
 #	endif
 #	define PUGI_IMPL_FN
 #	define PUGI_IMPL_FN_NO_INLINE PUGI_IMPL_NO_INLINE
@@ -1097,7 +1097,7 @@ namespace pugi
     };
 }
 #else
-namespace libCZI { namespace pugi 
+namespace libCZI { namespace detail { namespace pugi 
 {
     struct xml_attribute_struct
     {
@@ -1136,6 +1136,7 @@ namespace libCZI { namespace pugi
 
         xml_attribute_struct* first_attribute;
     };
+}
 }
 }
 #endif
@@ -5098,7 +5099,7 @@ struct name_null_sentry
 };
 PUGI_IMPL_NS_END
 
-namespace libCZI { namespace pugi 
+namespace libCZI { namespace detail { namespace pugi 
 {
     PUGI_IMPL_FN xml_writer_file::xml_writer_file(void* file_) : file(file_)
     {
@@ -7494,23 +7495,23 @@ namespace libCZI { namespace pugi
     {
         return impl::xml_memory::deallocate;
     }
-}}
+}}}
 
 #if !defined(PUGIXML_NO_STL) && (defined(_MSC_VER) || defined(__ICC))
 namespace std
 {
     // Workarounds for (non-standard) iterator category detection for older versions (MSVC7/IC8 and earlier)
-    PUGI_IMPL_FN std::bidirectional_iterator_tag _Iter_cat(const libCZI::pugi::xml_node_iterator&)
+    PUGI_IMPL_FN std::bidirectional_iterator_tag _Iter_cat(const libCZI::detail::pugi::xml_node_iterator&)
     {
         return std::bidirectional_iterator_tag();
     }
 
-    PUGI_IMPL_FN std::bidirectional_iterator_tag _Iter_cat(const libCZI::pugi::xml_attribute_iterator&)
+    PUGI_IMPL_FN std::bidirectional_iterator_tag _Iter_cat(const libCZI::detail::pugi::xml_attribute_iterator&)
     {
         return std::bidirectional_iterator_tag();
     }
 
-    PUGI_IMPL_FN std::bidirectional_iterator_tag _Iter_cat(const libCZI::pugi::xml_named_node_iterator&)
+    PUGI_IMPL_FN std::bidirectional_iterator_tag _Iter_cat(const libCZI::detail::pugi::xml_named_node_iterator&)
     {
         return std::bidirectional_iterator_tag();
     }
@@ -7521,17 +7522,17 @@ namespace std
 namespace std
 {
     // Workarounds for (non-standard) iterator category detection
-    PUGI_IMPL_FN std::bidirectional_iterator_tag __iterator_category(const libCZI::pugi::xml_node_iterator&)
+    PUGI_IMPL_FN std::bidirectional_iterator_tag __iterator_category(const libCZI::detail::pugi::xml_node_iterator&)
     {
         return std::bidirectional_iterator_tag();
     }
 
-    PUGI_IMPL_FN std::bidirectional_iterator_tag __iterator_category(const libCZI::pugi::xml_attribute_iterator&)
+    PUGI_IMPL_FN std::bidirectional_iterator_tag __iterator_category(const libCZI::detail::pugi::xml_attribute_iterator&)
     {
         return std::bidirectional_iterator_tag();
     }
 
-    PUGI_IMPL_FN std::bidirectional_iterator_tag __iterator_category(const libCZI::pugi::xml_named_node_iterator&)
+    PUGI_IMPL_FN std::bidirectional_iterator_tag __iterator_category(const libCZI::detail::pugi::xml_named_node_iterator&)
     {
         return std::bidirectional_iterator_tag();
     }
@@ -12308,7 +12309,7 @@ PUGI_IMPL_FN impl::xpath_ast_node* evaluate_node_set_prepare(xpath_query_impl* i
 }
 PUGI_IMPL_NS_END
 
-namespace libCZI { namespace pugi
+namespace libCZI { namespace detail { namespace pugi
 {
 #ifndef PUGIXML_NO_EXCEPTIONS
     PUGI_IMPL_FN xpath_exception::xpath_exception(const xpath_parse_result& result_) : _result(result_)
@@ -13089,7 +13090,7 @@ namespace libCZI { namespace pugi
     {
         return query.evaluate_node(*this);
     }
-}}
+}}}
 
 #endif
 

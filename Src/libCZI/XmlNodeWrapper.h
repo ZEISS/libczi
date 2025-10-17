@@ -35,7 +35,7 @@ namespace libCZI
             /// \param          str     The path.
             ///
             /// \returns    The child element identified by the path.
-            static libCZI::pugi::xml_node GetChildElementNodeWithAttributes(libCZI::pugi::xml_node& node, const std::wstring& str)
+            static libCZI::detail::pugi::xml_node GetChildElementNodeWithAttributes(libCZI::detail::pugi::xml_node& node, const std::wstring& str)
             {
                 // this matches one or more characters that are not square brackets, followed by an optional group that starts with a '[', 
                 // followed by zero or more of any characters that are not square brackets, and ends with a ']'
@@ -101,7 +101,7 @@ namespace libCZI
                 return attribMap;
             }
         private:
-            static libCZI::pugi::xml_node GetChildElementWithSpecifier(libCZI::pugi::xml_node& node, const std::wstring& nodeName, const std::wstring& specifier)
+            static libCZI::detail::pugi::xml_node GetChildElementWithSpecifier(libCZI::detail::pugi::xml_node& node, const std::wstring& nodeName, const std::wstring& specifier)
             {
                 // if the specifier contains only digits, then it is an index - otherwise it is (or has to be) a list of key-value pairs giving attributes
                 const std::wregex regex_contains_only_a_number(L"^\\s*\\d+\\s*$");
@@ -138,7 +138,7 @@ namespace libCZI
             /// \param          node_name   Name of the child node to search for.
             /// \param          index       Zero-based index of the child node (with the specified name) to search for.
             /// \returns    The child node with the specified index if it exists; nullptr otherwise.
-            static libCZI::pugi::xml_node GetChildElementNodeWithIndex(const libCZI::pugi::xml_node& node, const std::wstring& node_name, std::uint32_t index)
+            static libCZI::detail::pugi::xml_node GetChildElementNodeWithIndex(const libCZI::detail::pugi::xml_node& node, const std::wstring& node_name, std::uint32_t index)
             {
                 auto child_node = node.child(node_name.c_str());
                 if (!child_node)
@@ -161,16 +161,16 @@ namespace libCZI
                 }
             }
 
-            static libCZI::pugi::xml_node GetChildElementNodeWithAttributes(libCZI::pugi::xml_node& node, const std::wstring& str, const std::map<std::wstring, std::wstring>& attribs)
+            static libCZI::detail::pugi::xml_node GetChildElementNodeWithAttributes(libCZI::detail::pugi::xml_node& node, const std::wstring& str, const std::map<std::wstring, std::wstring>& attribs)
             {
                 struct find_element_node_and_attributes
                 {
                     const wchar_t* nodeName;
                     const std::map<std::wstring, std::wstring>& attribs;
 
-                    bool operator()(libCZI::pugi::xml_node node) const
+                    bool operator()(libCZI::detail::pugi::xml_node node) const
                     {
-                        if (node.type() != libCZI::pugi::xml_node_type::node_element)
+                        if (node.type() != libCZI::detail::pugi::xml_node_type::node_element)
                         {
                             return false;
                         }
@@ -182,7 +182,7 @@ namespace libCZI
 
                         for (auto it = this->attribs.cbegin(); it != this->attribs.cend(); ++it)
                         {
-                            auto attribute = node.find_attribute([&](const libCZI::pugi::xml_attribute& a)
+                            auto attribute = node.find_attribute([&](const libCZI::detail::pugi::xml_attribute& a)
                                 {
                                     return wcscmp(a.name(), it->first.c_str()) == 0;
                                 });
@@ -211,15 +211,15 @@ namespace libCZI
                 return c;
             }
 
-            static libCZI::pugi::xml_node GetChildElementNode(libCZI::pugi::xml_node& node, const wchar_t* sz)
+            static libCZI::detail::pugi::xml_node GetChildElementNode(libCZI::detail::pugi::xml_node& node, const wchar_t* sz)
             {
                 struct find_element_node
                 {
                     const wchar_t* nodeName;
 
-                    bool operator()(libCZI::pugi::xml_node node) const
+                    bool operator()(libCZI::detail::pugi::xml_node node) const
                     {
-                        if (node.type() != libCZI::pugi::xml_node_type::node_element)
+                        if (node.type() != libCZI::detail::pugi::xml_node_type::node_element)
                         {
                             return false;
                         }
@@ -252,11 +252,11 @@ namespace libCZI
         class XmlNodeWrapperReadonly : public libCZI::IXmlNodeRead
         {
         private:
-            libCZI::pugi::xml_node node;
+            libCZI::detail::pugi::xml_node node;
             std::shared_ptr<t> parentRef;
         public:
-            XmlNodeWrapperReadonly(std::shared_ptr<t> parentRef, libCZI::pugi::xml_node_struct* node_struct) :node(node_struct), parentRef(std::move(parentRef)) {}
-            explicit XmlNodeWrapperReadonly(libCZI::pugi::xml_node_struct* node_struct) :node(node_struct) {}
+            XmlNodeWrapperReadonly(std::shared_ptr<t> parentRef, libCZI::detail::pugi::xml_node_struct* node_struct) :node(node_struct), parentRef(std::move(parentRef)) {}
+            explicit XmlNodeWrapperReadonly(libCZI::detail::pugi::xml_node_struct* node_struct) :node(node_struct) {}
         public: // interface IXmlNodeRead
             std::wstring Name() const override
             {
@@ -265,7 +265,7 @@ namespace libCZI
 
             bool TryGetAttribute(const wchar_t* attributeName, std::wstring* attribValue) const override
             {
-                auto attrib = this->node.find_attribute([&](const libCZI::pugi::xml_attribute& a)
+                auto attrib = this->node.find_attribute([&](const libCZI::detail::pugi::xml_attribute& a)
                     {
                         return wcscmp(a.name(), attributeName) == 0;
                     });
@@ -285,7 +285,7 @@ namespace libCZI
 
             void EnumAttributes(const std::function<bool(const std::wstring& attribName, const std::wstring& attribValue)>& enumFunc) const override
             {
-                for (libCZI::pugi::xml_attribute_iterator ait = this->node.attributes_begin(); ait != this->node.attributes_end(); ++ait)
+                for (libCZI::detail::pugi::xml_attribute_iterator ait = this->node.attributes_begin(); ait != this->node.attributes_end(); ++ait)
                 {
                     if (!enumFunc(std::wstring(ait->name()), std::wstring(ait->value())))
                     {
@@ -296,7 +296,7 @@ namespace libCZI
 
             bool TryGetValue(std::wstring* value) const override
             {
-                if (this->node.first_child().type() == libCZI::pugi::xml_node_type::node_pcdata)
+                if (this->node.first_child().type() == libCZI::detail::pugi::xml_node_type::node_pcdata)
                 {
                     if (value != nullptr)
                     {
@@ -367,9 +367,9 @@ namespace libCZI
 
             void EnumChildren(const std::function<bool(std::shared_ptr<IXmlNodeRead>)>& enumChildren, std::shared_ptr<t> parentRef)
             {
-                for (libCZI::pugi::xml_node childNode = this->node.first_child(); childNode; childNode = childNode.next_sibling())
+                for (libCZI::detail::pugi::xml_node childNode = this->node.first_child(); childNode; childNode = childNode.next_sibling())
                 {
-                    if (childNode.type() == libCZI::pugi::xml_node_type::node_element)
+                    if (childNode.type() == libCZI::detail::pugi::xml_node_type::node_element)
                     {
                         const bool b = enumChildren(std::make_shared<XmlNodeWrapperReadonly>(parentRef, childNode.internal_object()));
                         if (!b)

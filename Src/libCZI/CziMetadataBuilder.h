@@ -21,8 +21,8 @@ namespace libCZI
         class CCZiMetadataBuilder : public libCZI::ICziMetadataBuilder, public std::enable_shared_from_this<CCZiMetadataBuilder>
         {
         private:
-            libCZI::pugi::xml_document metadataDoc;
-            libCZI::pugi::xml_node rootNode;
+            libCZI::detail::pugi::xml_document metadataDoc;
+            libCZI::detail::pugi::xml_node rootNode;
         public:
             CCZiMetadataBuilder() = delete;
             explicit CCZiMetadataBuilder(const wchar_t* rootNodeName);
@@ -37,14 +37,14 @@ namespace libCZI
         class CNodeWrapper : public libCZI::IXmlNodeRw
         {
         private:
-            libCZI::pugi::xml_node node;
+            libCZI::detail::pugi::xml_node node;
             std::shared_ptr<CCZiMetadataBuilder> builderRef;
             struct MetadataBuilderXmlNodeWrapperThrowExcp
             {
                 static void ThrowInvalidPath();
             };
         public:
-            CNodeWrapper(std::shared_ptr<CCZiMetadataBuilder> builderRef, libCZI::pugi::xml_node_struct* node_struct) :
+            CNodeWrapper(std::shared_ptr<CCZiMetadataBuilder> builderRef, libCZI::detail::pugi::xml_node_struct* node_struct) :
                 node(node_struct), builderRef(std::move(builderRef))
             {
             }
@@ -79,15 +79,15 @@ namespace libCZI
             bool RemoveChild(const char* name) override;
             bool RemoveAttribute(const char* name) override;
         private:
-            libCZI::pugi::xml_node GetChildNodePathMustExist(const char* path);
+            libCZI::detail::pugi::xml_node GetChildNodePathMustExist(const char* path);
             std::shared_ptr<IXmlNodeRw> GetOrCreateChildNodeInternal(const char* path);
-            libCZI::pugi::xml_node GetOrCreateChildElementNode(const wchar_t* sz);
-            static libCZI::pugi::xml_node GetOrCreateChildElementNode(libCZI::pugi::xml_node& node, const wchar_t* sz);
-            static libCZI::pugi::xml_node GetOrCreateChildElementNodeWithAttributes(libCZI::pugi::xml_node& node, const std::wstring& str);
-            static libCZI::pugi::xml_node GetOrCreateChildElementNodeWithAttributes(libCZI::pugi::xml_node& node, const std::wstring& str, const std::map<std::wstring, std::wstring>& attribs);
+            libCZI::detail::pugi::xml_node GetOrCreateChildElementNode(const wchar_t* sz);
+            static libCZI::detail::pugi::xml_node GetOrCreateChildElementNode(libCZI::detail::pugi::xml_node& node, const wchar_t* sz);
+            static libCZI::detail::pugi::xml_node GetOrCreateChildElementNodeWithAttributes(libCZI::detail::pugi::xml_node& node, const std::wstring& str);
+            static libCZI::detail::pugi::xml_node GetOrCreateChildElementNodeWithAttributes(libCZI::detail::pugi::xml_node& node, const std::wstring& str, const std::map<std::wstring, std::wstring>& attribs);
 
             void ThrowIfCannotSetValue();
-            libCZI::pugi::xml_node GetOrCreatePcDataChild();
+            libCZI::detail::pugi::xml_node GetOrCreatePcDataChild();
 
             template <typename t> void SetValueT(t v)
             {

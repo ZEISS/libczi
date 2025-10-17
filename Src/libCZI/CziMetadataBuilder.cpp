@@ -11,7 +11,7 @@
 #include "CziUtils.h"
 #include "XmlNodeWrapper.h"
 
-using namespace libCZI::pugi;
+using namespace libCZI::detail::pugi;
 using namespace libCZI;
 using namespace libCZI::detail;
 using namespace std;

@@ -31,8 +31,8 @@ namespace libCZI
                 }
             };
 
-            libCZI::pugi::xml_parse_result parse_result_;
-            libCZI::pugi::xml_document doc_;
+            libCZI::detail::pugi::xml_parse_result parse_result_;
+            libCZI::detail::pugi::xml_document doc_;
             std::unique_ptr<libCZI::detail::XmlNodeWrapperReadonly<SubblockMetadata, XmlNodeWrapperThrowExcp>> wrapper_;
         public:
             SubblockMetadata(const char* xml, size_t xml_size);
