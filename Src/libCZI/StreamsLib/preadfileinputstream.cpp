@@ -4,8 +4,6 @@
 
 #include "preadfileinputstream.h"
 
-#include "BitmapOperations.h"
-
 #if LIBCZI_USE_PREADPWRITEBASED_STREAMIMPL
 
 #include <fcntl.h>
