@@ -8,6 +8,7 @@
 #include <algorithm>
 #include <sstream>
 #include <stdexcept>
+#include <iostream>
 
 #include "inc_libCZI_Config.h"
 #include "BitmapOperations.h"
@@ -176,10 +177,14 @@ namespace
         if (bitsRemaining > 0)
         {
             // we continue to operate DWORD-wise, we are just careful...
-            uint32_t dw = /*EndianessConv::BswapDWORD*/(DecimateHelpers<RegionSize>::GetDwordPartial(y, height, ptrSrc + static_cast<size_t>(numberOfDwords) * 4, bitsRemaining, strideSrc));
+            uint32_t dw = EndianessConv::BswapDWORD(DecimateHelpers<RegionSize>::GetDwordPartial(y, height, ptrSrc + static_cast<size_t>(numberOfDwords) * 4, bitsRemaining, strideSrc));
+
+            cout << "dw = " << std::hex << dw << std::dec << endl;
 
             // then filter the DWORD as usually
             uint16_t dest = FilterDword(dw, byteBefore, 0xff);
+
+            cout << "dest = " << std::hex << dest << std::dec << endl;
 
             if (bitsRemaining <= 16)
             {
