@@ -665,8 +665,10 @@ TEST(MaskAwareComposition, SingleChannelTileAccessorScalingGray16WithMaskScenari
     for (size_t y = 0; y < composition->GetHeight(); ++y)
     {
         const uint16_t* composition_line = reinterpret_cast<const uint16_t*>(static_cast<const uint8_t*>(locker_composition.ptrDataRoi) + y * locker_composition.stride);
-        int r = memcmp(composition_line, expected_result + y * 3, 3 * sizeof(uint16_t));
-        ASSERT_EQ(r, 0);
+        for (size_t x = 0; x < composition->GetWidth(); ++x)
+        {
+            ASSERT_EQ(composition_line[x], expected_result[y * 3 + x]);
+        }
     }
 }
 
