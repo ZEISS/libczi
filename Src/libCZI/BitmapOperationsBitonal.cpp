@@ -8,7 +8,6 @@
 #include <algorithm>
 #include <sstream>
 #include <stdexcept>
-#include <iostream>
 
 #include "inc_libCZI_Config.h"
 #include "BitmapOperations.h"
@@ -202,7 +201,7 @@ namespace
                                         DecimateHelpers<RegionSize>::GetDwordPartial(y, height, ptrSrc + static_cast<size_t>(numberOfDwords) * 4, bitsRemaining, strideSrc)));
 
             // then filter the DWORD as usually
-            uint16_t dest = EndianessConv::ConvertToHostByteOrderWord(FilterDword(dw, byteBefore, 0xff));
+            const uint16_t dest = EndianessConv::ConvertToHostByteOrderWord(FilterDword(dw, byteBefore, 0xff));
 
             if (bitsRemaining <= 16)
             {
