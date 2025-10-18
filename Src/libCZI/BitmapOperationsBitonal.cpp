@@ -197,15 +197,12 @@ namespace
         if (bitsRemaining > 0)
         {
             // we continue to operate DWORD-wise, we are just careful...
-            uint32_t dw =  EndianessConv::ConvertToHostByteOrderDword(
-                EndianessConv::BswapDWORD(DecimateHelpers<RegionSize>::GetDwordPartial(y, height, ptrSrc + static_cast<size_t>(numberOfDwords) * 4, bitsRemaining, strideSrc)));
-
-//            cout << "dw = " << std::hex << dw << std::dec << endl;
+            const uint32_t dw =  EndianessConv::ConvertToHostByteOrderDword(
+                                    EndianessConv::BswapDWORD(
+                                        DecimateHelpers<RegionSize>::GetDwordPartial(y, height, ptrSrc + static_cast<size_t>(numberOfDwords) * 4, bitsRemaining, strideSrc)));
 
             // then filter the DWORD as usually
             uint16_t dest = EndianessConv::ConvertToHostByteOrderWord(FilterDword(dw, byteBefore, 0xff));
-            //Utilities::ConvertUint16ToHostByteOrder(&dest);
-            //cout << "dest = " << std::hex << dest << std::dec << endl;
 
             if (bitsRemaining <= 16)
             {
