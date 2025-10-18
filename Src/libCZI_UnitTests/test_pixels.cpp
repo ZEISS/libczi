@@ -279,25 +279,25 @@ TEST(Pixels, BitonalFillScenario5)
 
     // Assert
     constexpr char expected_result[] =
-        "......................................................................" 
-        "......................................................................" 
-        "......................................................................" 
-        "......................................................................" 
-        "......................................................................" 
-        "**********************************************************************" 
-        "**********************************************************************" 
-        "**********************************************************************" 
-        "**********************************************************************" 
-        "**********************************************************************" 
-        "......................................................................" 
-        "......................................................................" 
-        "......................................................................" 
-        "......................................................................" 
-        "......................................................................" 
-        "......................................................................" 
-        "......................................................................" 
-        "......................................................................" 
-        "......................................................................" 
+        "......................................................................"
+        "......................................................................"
+        "......................................................................"
+        "......................................................................"
+        "......................................................................"
+        "**********************************************************************"
+        "**********************************************************************"
+        "**********************************************************************"
+        "**********************************************************************"
+        "**********************************************************************"
+        "......................................................................"
+        "......................................................................"
+        "......................................................................"
+        "......................................................................"
+        "......................................................................"
+        "......................................................................"
+        "......................................................................"
+        "......................................................................"
+        "......................................................................"
         "......................................................................";
     EXPECT_EQ(BitonalBitmapToString(bm.get()), expected_result);
 }
@@ -305,7 +305,7 @@ TEST(Pixels, BitonalFillScenario5)
 TEST(Pixels, BitonalDecimateScenario1)
 {
     // arrange
-    auto source = CStdBitonalBitmapData::Create(6,6);
+    auto source = CStdBitonalBitmapData::Create(6, 6);
 
     {
         ScopedBitonalBitmapLockerSP source_locker{ source };
@@ -332,7 +332,7 @@ TEST(Pixels, BitonalDecimateScenario1)
 TEST(Pixels, BitonalDecimateScenario2)
 {
     // arrange
-    auto source = CStdBitonalBitmapData::Create(6,6);
+    auto source = CStdBitonalBitmapData::Create(6, 6);
 
     {
         ScopedBitonalBitmapLockerSP source_locker{ source };
@@ -356,6 +356,72 @@ TEST(Pixels, BitonalDecimateScenario2)
     EXPECT_EQ(BitonalBitmapToString(decimated.get()), expected_result);
 }
 
+TEST(Pixels, BitonalDecimateScenario3)
+{
+    // arrange
+    auto source = CStdBitonalBitmapData::Create(16, 6);
+
+    {
+        ScopedBitonalBitmapLockerSP source_locker{ source };
+        uint8_t* row_ptr = static_cast<uint8_t*>(source_locker.ptrData);
+        row_ptr[0] = row_ptr[1] = 0b11110100;
+        row_ptr += source_locker.stride;
+        row_ptr[0] = row_ptr[1] = 0b11110000;
+        row_ptr += source_locker.stride;
+        row_ptr[0] = row_ptr[1] = 0b01101000;
+        row_ptr += source_locker.stride;
+        row_ptr[0] = row_ptr[1] = 0b10000000;
+        row_ptr += source_locker.stride;
+        row_ptr[0] = row_ptr[1] = 0b11000010;
+        row_ptr += source_locker.stride;
+        row_ptr[0] = row_ptr[1] = 0b11000001;
+    }
+
+    // act
+    auto decimated = BitonalBitmapOperations::Decimate(1, source.get());
+
+    // assert
+    constexpr char expected_result[] =
+        "**...*.."
+        "........"
+        "........";
+
+    EXPECT_EQ(BitonalBitmapToString(decimated.get()), expected_result);
+}
+
+TEST(Pixels, BitonalDecimateScenario4)
+{
+    // arrange
+    auto source = CStdBitonalBitmapData::Create(18, 6);
+
+    {
+        ScopedBitonalBitmapLockerSP source_locker{ source };
+        uint8_t* row_ptr = static_cast<uint8_t*>(source_locker.ptrData);
+        row_ptr[0] = row_ptr[1] = 0b11110100; row_ptr[2] = 0b11111111;
+        row_ptr += source_locker.stride;
+        row_ptr[0] = row_ptr[1] = 0b11110000; row_ptr[2] = 0b11111111;
+        row_ptr += source_locker.stride;
+        row_ptr[0] = row_ptr[1] = 0b01101000; row_ptr[2] = 0b11111111;
+        row_ptr += source_locker.stride;
+        row_ptr[0] = row_ptr[1] = 0b10000000; row_ptr[2] = 0b11111111;
+        row_ptr += source_locker.stride;
+        row_ptr[0] = row_ptr[1] = 0b11000010; row_ptr[2] = 0b11111111;
+        row_ptr += source_locker.stride;
+        row_ptr[0] = row_ptr[1] = 0b11000001; row_ptr[2] = 0b11111111;
+    }
+
+    // act
+    auto decimated = BitonalBitmapOperations::Decimate(1, source.get());
+
+    // assert
+    constexpr char expected_result[] =
+        "**...*..."
+        "........."
+        ".........";
+
+    EXPECT_EQ(BitonalBitmapToString(decimated.get()), expected_result);
+}
+
 TEST(Pixels, CallSetPixelValueWithInvalidArgumentsAndExpectException1)
 {
     BitonalBitmapLockInfo lockInfo;
@@ -371,7 +437,7 @@ TEST(Pixels, CallSetPixelValueWithInvalidArgumentsAndExpectException1)
     lockInfo.size = 100;
     EXPECT_ANY_THROW(BitonalBitmapOperations::SetPixelValue(lockInfo, extent, 10, 0, true));
 
-    lockInfo.stride = 10;        
+    lockInfo.stride = 10;
     lockInfo.size = 9;      // this size it too small (should be at least 10)
     EXPECT_ANY_THROW(BitonalBitmapOperations::SetPixelValue(lockInfo, extent, 10, 0, true));
 
