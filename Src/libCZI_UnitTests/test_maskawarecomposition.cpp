@@ -145,9 +145,11 @@ namespace
             writer->SyncAddSubBlock(addSbBlkInfo);
         }
 
-        uint16_t fill_value_hostbyte_order = 256;
-        Utilities::ConvertUint16ToHostByteOrder(&fill_value_hostbyte_order);
-        bitmap = CreateGray16BitmapAndFill(4, 4, fill_value_hostbyte_order);
+        // libCZI is converting a bitmap (from CZI-file) into host-byte-order, so we need to
+        // convert the fill-value into host-byte-order here as well.
+        uint16_t fill_value_host_byte_order = 256;
+        Utilities::ConvertUint16ToHostByteOrder(&fill_value_host_byte_order);
+        bitmap = CreateGray16BitmapAndFill(4, 4, fill_value_host_byte_order);
 
         static const uint8_t sub_block_attachment[] =
         {
