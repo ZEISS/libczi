@@ -667,7 +667,7 @@ TEST(MaskAwareComposition, SingleChannelTileAccessorScalingGray16WithMaskScenari
         const uint16_t* composition_line = reinterpret_cast<const uint16_t*>(static_cast<const uint8_t*>(locker_composition.ptrDataRoi) + y * locker_composition.stride);
         for (size_t x = 0; x < composition->GetWidth(); ++x)
         {
-            ASSERT_EQ(composition_line[x], expected_result[y * 3 + x]);
+            ASSERT_EQ(composition_line[x], expected_result[y * 3 + x]) << "Mismatch at (" << x << ", " << y << ")";
         }
     }
 }
