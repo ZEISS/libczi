@@ -9,6 +9,7 @@
 #include <sstream>
 #include <stdexcept>
 #include <iostream>
+#include <iomanip>
 
 #include "inc_libCZI_Config.h"
 #include "BitmapOperations.h"
