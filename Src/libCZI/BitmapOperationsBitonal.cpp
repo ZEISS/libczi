@@ -212,7 +212,7 @@ namespace
 
             if (bitsRemaining <= 16)
             {
-                *reinterpret_cast<uint8_t*>(reinterpret_cast<uintptr_t>(ptrDest) + 2 * static_cast<size_t>(numberOfDwords)) = static_cast<uint8_t>(EndianessConv::BswapUSHORT(dest));
+                *reinterpret_cast<uint8_t*>(reinterpret_cast<uintptr_t>(ptrDest) + 2 * static_cast<size_t>(numberOfDwords)) = static_cast<uint8_t>(dest>>8);//static_cast<uint8_t>(EndianessConv::BswapUSHORT(dest));
             }
             else
             {
