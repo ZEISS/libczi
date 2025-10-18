@@ -144,6 +144,7 @@ namespace libCZI
             static bool IsGuidNull(const libCZI::GUID& g);
 
             static void ConvertInt16ToHostByteOrder(std::int16_t* p);
+            static void ConvertUint16ToHostByteOrder(std::uint16_t* p)  { ConvertInt16ToHostByteOrder(reinterpret_cast<int16_t*>(p)); }
             static void ConvertInt32ToHostByteOrder(std::int32_t* p);
             static void ConvertUint32ToHostByteOrder(std::uint32_t* p) { ConvertInt32ToHostByteOrder(reinterpret_cast<int32_t*>(p)); }
             static void ConvertInt64ToHostByteOrder(std::int64_t* p);
