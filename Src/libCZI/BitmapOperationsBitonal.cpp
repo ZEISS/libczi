@@ -31,37 +31,47 @@ using namespace libCZI::detail;
 
 namespace
 {
+    std::uint32_t bswapDword(std::uint32_t dw)
+    {
+#if LIBCZI_HAS_BUILTIN_BSWAP32
+        return __builtin_bswap32(dw);
+#elif LIBCZI_HAS_BYTESWAP_IN_STDLIB
+        return _byteswap_ulong(dw);
+#elif LIBCZI_HAS_BSWAP_LONG_IN_SYS_ENDIAN
+        return bswap32(dw);
+#else
+        return (((dw & 0xff000000u) >> 24) |
+                ((dw & 0x00ff0000u) >> 8) |
+                ((dw & 0x0000ff00u) << 8) |
+                ((dw & 0x000000ffu) << 24));
+#endif
+    }
+
+    std::uint16_t bswapWord(std::uint16_t us)
+    {
+#if LIBCZI_HAS_BUILTIN_BSWAP32
+        return __builtin_bswap16(us);
+#elif LIBCZI_HAS_BYTESWAP_IN_STDLIB
+        return _byteswap_ushort(us);
+#elif LIBCZI_HAS_BSWAP_LONG_IN_SYS_ENDIAN
+        return bswap16(us);
+#else
+        return (((us & 0xff00u) >> 8) |
+                ((us & 0x00ffu) << 8));
+#endif
+    }
+
     // use this on a little-endian machine (Intel, ARM, ...)
     class CLittleEndianConverter
     {
     public:
         static std::uint32_t BswapDWORD(std::uint32_t dw)
         {
-#if LIBCZI_HAS_BUILTIN_BSWAP32
-            return __builtin_bswap32(dw);
-#elif LIBCZI_HAS_BYTESWAP_IN_STDLIB
-            return _byteswap_ulong(dw);
-#elif LIBCZI_HAS_BSWAP_LONG_IN_SYS_ENDIAN
-            return bswap32(dw);
-#else
-            return (((dw & 0xff000000u) >> 24) |
-                    ((dw & 0x00ff0000u) >> 8) |
-                    ((dw & 0x0000ff00u) << 8) |
-                    ((dw & 0x000000ffu) << 24));
-#endif
+            return bswapDword(dw);
         }
         static std::uint16_t BswapUSHORT(std::uint16_t us)
         {
-#if LIBCZI_HAS_BUILTIN_BSWAP32
-            return __builtin_bswap16(us);
-#elif LIBCZI_HAS_BYTESWAP_IN_STDLIB
-            return _byteswap_ushort(us);
-#elif LIBCZI_HAS_BSWAP_LONG_IN_SYS_ENDIAN
-            return bswap16(us);
-#else
-            return (((us & 0xff00u) >> 8) |
-                    ((us & 0x00ffu) << 8));
-#endif
+            return bswapWord(us);
         }
         static std::uint32_t ConvertToHostByteOrderDword(std::uint32_t dw) { return dw; }
         static std::uint16_t ConvertToHostByteOrderWord(std::uint16_t us) { return us; }
@@ -75,31 +85,11 @@ namespace
         static std::uint16_t BswapUSHORT(std::uint16_t us) { return us; }
         static std::uint32_t ConvertToHostByteOrderDword(std::uint32_t dw)
         {
-#if LIBCZI_HAS_BUILTIN_BSWAP32
-            return __builtin_bswap32(dw);
-#elif LIBCZI_HAS_BYTESWAP_IN_STDLIB
-            return _byteswap_ulong(dw);
-#elif LIBCZI_HAS_BSWAP_LONG_IN_SYS_ENDIAN
-            return bswap32(dw);
-#else
-            return (((dw & 0xff000000u) >> 24) |
-                    ((dw & 0x00ff0000u) >> 8) |
-                    ((dw & 0x0000ff00u) << 8) |
-                    ((dw & 0x000000ffu) << 24));
-#endif
+            return bswapDword(dw);
         }
         static std::uint16_t ConvertToHostByteOrderWord(std::uint16_t us)
         {
-#if LIBCZI_HAS_BUILTIN_BSWAP32
-            return __builtin_bswap16(us);
-#elif LIBCZI_HAS_BYTESWAP_IN_STDLIB
-            return _byteswap_ushort(us);
-#elif LIBCZI_HAS_BSWAP_LONG_IN_SYS_ENDIAN
-            return bswap16(us);
-#else
-            return (((us & 0xff00u) >> 8) |
-                    ((us & 0x00ffu) << 8));
-#endif
+            return bswapWord(us);
         }
     };
 
