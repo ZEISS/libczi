@@ -309,12 +309,12 @@ TEST(Pixels, BitonalDecimateScenario1)
 
     {
         ScopedBitonalBitmapLockerSP source_locker{ source };
-        static_cast<uint8_t*>(source_locker.ptrData)[0] = 0b11110100;
-        static_cast<uint8_t*>(source_locker.ptrData)[1] = 0b11110000;
-        static_cast<uint8_t*>(source_locker.ptrData)[2] = 0b01101000;
-        static_cast<uint8_t*>(source_locker.ptrData)[3] = 0b10000000;
-        static_cast<uint8_t*>(source_locker.ptrData)[4] = 0b11000010;
-        static_cast<uint8_t*>(source_locker.ptrData)[5] = 0b11000001;
+        static_cast<uint8_t*>(source_locker.ptrData)[0 * source_locker.stride] = 0b11110100;
+        static_cast<uint8_t*>(source_locker.ptrData)[1 * source_locker.stride] = 0b11110000;
+        static_cast<uint8_t*>(source_locker.ptrData)[2 * source_locker.stride] = 0b01101000;
+        static_cast<uint8_t*>(source_locker.ptrData)[3 * source_locker.stride] = 0b10000000;
+        static_cast<uint8_t*>(source_locker.ptrData)[4 * source_locker.stride] = 0b11000010;
+        static_cast<uint8_t*>(source_locker.ptrData)[5 * source_locker.stride] = 0b11000001;
     }
 
     // act
@@ -336,12 +336,12 @@ TEST(Pixels, BitonalDecimateScenario2)
 
     {
         ScopedBitonalBitmapLockerSP source_locker{ source };
-        static_cast<uint8_t*>(source_locker.ptrData)[0] = 0b11110100;
-        static_cast<uint8_t*>(source_locker.ptrData)[1] = 0b11110000;
-        static_cast<uint8_t*>(source_locker.ptrData)[2] = 0b01101000;
-        static_cast<uint8_t*>(source_locker.ptrData)[3] = 0b10000000;
-        static_cast<uint8_t*>(source_locker.ptrData)[4] = 0b11000010;
-        static_cast<uint8_t*>(source_locker.ptrData)[5] = 0b11000001;
+        static_cast<uint8_t*>(source_locker.ptrData)[0 * source_locker.stride] = 0b11110100;
+        static_cast<uint8_t*>(source_locker.ptrData)[1 * source_locker.stride] = 0b11110000;
+        static_cast<uint8_t*>(source_locker.ptrData)[2 * source_locker.stride] = 0b01101000;
+        static_cast<uint8_t*>(source_locker.ptrData)[3 * source_locker.stride] = 0b10000000;
+        static_cast<uint8_t*>(source_locker.ptrData)[4 * source_locker.stride] = 0b11000010;
+        static_cast<uint8_t*>(source_locker.ptrData)[5 * source_locker.stride] = 0b11000001;
     }
 
     // act
@@ -397,17 +397,23 @@ TEST(Pixels, BitonalDecimateScenario4)
     {
         ScopedBitonalBitmapLockerSP source_locker{ source };
         uint8_t* row_ptr = static_cast<uint8_t*>(source_locker.ptrData);
-        row_ptr[0] = row_ptr[1] = 0b11110100; row_ptr[2] = 0b11111111;
+        row_ptr[0] = row_ptr[1] = 0b11110100;
+        row_ptr[2] = 0b11111111;
         row_ptr += source_locker.stride;
-        row_ptr[0] = row_ptr[1] = 0b11110000; row_ptr[2] = 0b11111111;
+        row_ptr[0] = row_ptr[1] = 0b11110000;
+        row_ptr[2] = 0b11111111;
         row_ptr += source_locker.stride;
-        row_ptr[0] = row_ptr[1] = 0b01101000; row_ptr[2] = 0b11111111;
+        row_ptr[0] = row_ptr[1] = 0b01101000;
+        row_ptr[2] = 0b11111111;
         row_ptr += source_locker.stride;
-        row_ptr[0] = row_ptr[1] = 0b10000000; row_ptr[2] = 0b11111111;
+        row_ptr[0] = row_ptr[1] = 0b10000000;
+        row_ptr[2] = 0b11111111;
         row_ptr += source_locker.stride;
-        row_ptr[0] = row_ptr[1] = 0b11000010; row_ptr[2] = 0b11111111;
+        row_ptr[0] = row_ptr[1] = 0b11000010;
+        row_ptr[2] = 0b11111111;
         row_ptr += source_locker.stride;
-        row_ptr[0] = row_ptr[1] = 0b11000001; row_ptr[2] = 0b11111111;
+        row_ptr[0] = row_ptr[1] = 0b11000001;
+        row_ptr[2] = 0b11111111;
     }
 
     // act
