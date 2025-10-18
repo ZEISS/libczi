@@ -200,7 +200,7 @@ namespace
         {
             // we continue to operate DWORD-wise, we are just careful...
             const uint32_t dw =  /*EndianessConv::ConvertToHostByteOrderDword*/(
-                                    EndianessConv::BswapDWORD(
+                                    /*EndianessConv::BswapDWORD*/bswapDword(
                                         DecimateHelpers<RegionSize>::GetDwordPartial(y, height, ptrSrc + static_cast<size_t>(numberOfDwords) * 4, bitsRemaining, strideSrc)));
 
             cout << "dw: " << std::hex << std::setfill('0') << std::setw(8) << dw << std::dec << endl;
