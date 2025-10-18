@@ -5,6 +5,7 @@
 #include "include_gtest.h"
 #include "inc_libCZI.h"
 #include "../libCZI/bitmapData.h"
+#include "../libCZI/utilities.h"
 #include "MemOutputStream.h"
 #include "utils.h"
 
@@ -144,7 +145,9 @@ namespace
             writer->SyncAddSubBlock(addSbBlkInfo);
         }
 
-        bitmap = CreateGray16BitmapAndFill(4, 4, 256);
+        uint16_t fill_value_hostbyte_order = 256;
+        Utilities::ConvertUint16ToHostByteOrder(&fill_value_hostbyte_order);
+        bitmap = CreateGray16BitmapAndFill(4, 4, fill_value_hostbyte_order);
 
         static const uint8_t sub_block_attachment[] =
         {
