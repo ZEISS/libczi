@@ -326,8 +326,6 @@ TEST(Pixels, BitonalDecimateScenario1)
         "..."
         "...";
 
-    cout << BitonalBitmapToString(decimated.get());
-
     EXPECT_EQ(BitonalBitmapToString(decimated.get()), expected_result);
 }
 
