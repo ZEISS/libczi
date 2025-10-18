@@ -8,8 +8,6 @@
 #include <algorithm>
 #include <sstream>
 #include <stdexcept>
-#include <iostream>
-#include <iomanip>
 
 #include "inc_libCZI_Config.h"
 #include "BitmapOperations.h"
@@ -32,7 +30,7 @@ using namespace libCZI::detail;
 
 namespace
 {
-    std::uint32_t bswapDword(std::uint32_t dw)
+    std::uint32_t bswap_dword(std::uint32_t dw)
     {
 #if LIBCZI_HAS_BUILTIN_BSWAP32
         return __builtin_bswap32(dw);
@@ -48,7 +46,7 @@ namespace
 #endif
     }
 
-    std::uint16_t bswapWord(std::uint16_t us)
+    std::uint16_t bswap_word(std::uint16_t us)
     {
 #if LIBCZI_HAS_BUILTIN_BSWAP32
         return __builtin_bswap16(us);
@@ -67,16 +65,13 @@ namespace
     {
     public:
         static std::uint32_t BswapDWORD(std::uint32_t dw)
-        //static std::uint32_t Convert(std::uint32_t dw)
         {
-            return bswapDword(dw);
+            return bswap_dword(dw);
         }
         static std::uint16_t BswapUSHORT(std::uint16_t us)
         {
-            return bswapWord(us);
+            return bswap_word(us);
         }
-        static std::uint32_t ConvertToHostByteOrderDword(std::uint32_t dw) { return dw; }
-        static std::uint16_t ConvertToHostByteOrderWord(std::uint16_t us) { return us; }
     };
 
     // use this on a big-endian machine
@@ -85,14 +80,6 @@ namespace
     public:
         static std::uint32_t BswapDWORD(std::uint32_t dw) { return dw; }
         static std::uint16_t BswapUSHORT(std::uint16_t us) { return us; }
-        static std::uint32_t ConvertToHostByteOrderDword(std::uint32_t dw)
-        {
-            return bswapDword(dw);
-        }
-        static std::uint16_t ConvertToHostByteOrderWord(std::uint16_t us)
-        {
-            return bswapWord(us);
-        }
     };
 
     typedef
@@ -184,7 +171,7 @@ namespace
     {
         uint8_t byteBefore = 0xff;
 
-        int numberOfDwords = widthSrc / 32;
+        const int numberOfDwords = widthSrc / 32;
 
         for (int x = 0; x < numberOfDwords; ++x)
         {
@@ -195,24 +182,18 @@ namespace
             *reinterpret_cast<uint16_t*>(reinterpret_cast<uintptr_t>(ptrDest) + 2 * static_cast<size_t>(x)) = EndianessConv::BswapUSHORT(dest);
         }
 
-        int bitsRemaining = widthSrc - numberOfDwords * 32;
+        const int bitsRemaining = widthSrc - numberOfDwords * 32;
         if (bitsRemaining > 0)
         {
             // we continue to operate DWORD-wise, we are just careful...
-            const uint32_t dw =  /*EndianessConv::ConvertToHostByteOrderDword*/(
-                                    /*EndianessConv::BswapDWORD*/bswapDword(
-                                        DecimateHelpers<RegionSize>::GetDwordPartial(y, height, ptrSrc + static_cast<size_t>(numberOfDwords) * 4, bitsRemaining, strideSrc)));
-
-            cout << "dw: " << std::hex << std::setfill('0') << std::setw(8) << dw << std::dec << endl;
+            const uint32_t dw =  bswap_dword(DecimateHelpers<RegionSize>::GetDwordPartial(y, height, ptrSrc + static_cast<size_t>(numberOfDwords) * 4, bitsRemaining, strideSrc));
 
             // then filter the DWORD as usually
-            const uint16_t dest = /*EndianessConv::ConvertToHostByteOrderWord*/(FilterDword(dw, byteBefore, 0xff));
-
-            cout << "dest: " << std::hex << std::setfill('0') << std::setw(4) << dest << std::dec << endl;
+            const uint16_t dest = FilterDword(dw, byteBefore, 0xff);
 
             if (bitsRemaining <= 16)
             {
-                *reinterpret_cast<uint8_t*>(reinterpret_cast<uintptr_t>(ptrDest) + 2 * static_cast<size_t>(numberOfDwords)) = static_cast<uint8_t>(dest>>8);//static_cast<uint8_t>(EndianessConv::BswapUSHORT(dest));
+                *reinterpret_cast<uint8_t*>(reinterpret_cast<uintptr_t>(ptrDest) + 2 * static_cast<size_t>(numberOfDwords)) = static_cast<uint8_t>(dest >> 8);
             }
             else
             {
