@@ -176,7 +176,7 @@ namespace
         if (bitsRemaining > 0)
         {
             // we continue to operate DWORD-wise, we are just careful...
-            uint32_t dw = EndianessConv::BswapDWORD(DecimateHelpers<RegionSize>::GetDwordPartial(y, height, ptrSrc + static_cast<size_t>(numberOfDwords) * 4, bitsRemaining, strideSrc));
+            uint32_t dw = /*EndianessConv::BswapDWORD*/(DecimateHelpers<RegionSize>::GetDwordPartial(y, height, ptrSrc + static_cast<size_t>(numberOfDwords) * 4, bitsRemaining, strideSrc));
 
             // then filter the DWORD as usually
             uint16_t dest = FilterDword(dw, byteBefore, 0xff);
