@@ -382,8 +382,11 @@ TEST(MaskAwareComposition, SingleChannelScalingTileAccessorWithMaskGray16Scenari
     for (size_t y = 0; y < composition->GetHeight(); ++y)
     {
         const uint16_t* composition_line = (const uint16_t*)(static_cast<const uint8_t*>(locker_composition.ptrDataRoi) + y * locker_composition.stride);
-        int r = memcmp(composition_line, expected_result + y * 6, 6 * sizeof(uint16_t));
-        ASSERT_EQ(r, 0);
+        for (size_t x = 0; x < composition->GetWidth(); ++x)
+        {
+            // For better debugging output, check each pixel individually
+            ASSERT_EQ(composition_line[x], expected_result[y * 6 + x]) << " at position (" << x << "," << y << ")";
+        }
     }
 }
 
