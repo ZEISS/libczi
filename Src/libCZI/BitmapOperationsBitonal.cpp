@@ -184,6 +184,8 @@ namespace
 
             // then filter the DWORD as usually
             uint16_t dest = FilterDword(dw, byteBefore, 0xff);
+            Utilities::ConvertUint32ToHostByteOrder(&dest);
+
 
             cout << "dest = " << std::hex << dest << std::dec << endl;
 
