@@ -290,6 +290,7 @@ using namespace std;
 
 /*static*/void CBitmapOperations::Fill_Gray16(int w, int h, void* ptr, int stride, std::uint16_t val)
 {
+    Utilities::ConvertUint16ToHostByteOrder(&val);
     for (int y = 0; y < h; ++y)
     {
         std::uint16_t* p = reinterpret_cast<std::uint16_t*>(static_cast<char*>(ptr) + (y * static_cast<ptrdiff_t>(stride)));
@@ -331,6 +332,9 @@ void CBitmapOperations::Fill_Bgra32(int w, int h, void* ptr, int stride, std::ui
 
 /*static*/void CBitmapOperations::Fill_Bgr48(int w, int h, void* ptr, int stride, std::uint16_t b, std::uint16_t g, std::uint16_t r)
 {
+    Utilities::ConvertUint16ToHostByteOrder(&b);
+    Utilities::ConvertUint16ToHostByteOrder(&g);
+    Utilities::ConvertUint16ToHostByteOrder(&r);
     for (int y = 0; y < h; ++y)
     {
         std::uint16_t* p = reinterpret_cast<std::uint16_t*>(static_cast<char*>(ptr) + (y * static_cast<ptrdiff_t>(stride)));
