@@ -10,6 +10,7 @@
 
 using namespace std;
 using namespace libCZI;
+using namespace libCZI::detail;
 
 /*static*/void CziReaderCommon::EnumSubset(
     libCZI::ISubBlockRepository* repository,

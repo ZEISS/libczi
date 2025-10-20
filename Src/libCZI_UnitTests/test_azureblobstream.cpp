@@ -7,6 +7,7 @@
 #include "../libCZI/utilities.h"
 
 using namespace libCZI;
+using namespace libCZI::detail;
 using namespace std;
 
 struct AzureUriAndExpectedResultFixture : public testing::TestWithParam<tuple<wstring, map<wstring, wstring>>> { };

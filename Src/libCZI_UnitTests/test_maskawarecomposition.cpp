@@ -5,10 +5,12 @@
 #include "include_gtest.h"
 #include "inc_libCZI.h"
 #include "../libCZI/bitmapData.h"
+#include "../libCZI/utilities.h"
 #include "MemOutputStream.h"
 #include "utils.h"
 
 using namespace libCZI;
+using namespace libCZI::detail;
 using namespace std;
 
 namespace
@@ -143,7 +145,11 @@ namespace
             writer->SyncAddSubBlock(addSbBlkInfo);
         }
 
-        bitmap = CreateGray16BitmapAndFill(4, 4, 256);
+        // libCZI is converting a bitmap (from CZI-file) into host-byte-order, so we need to
+        // convert the fill-value into host-byte-order here as well.
+        uint16_t fill_value_host_byte_order = 256;
+        Utilities::ConvertUint16ToHostByteOrder(&fill_value_host_byte_order);
+        bitmap = CreateGray16BitmapAndFill(4, 4, fill_value_host_byte_order);
 
         static const uint8_t sub_block_attachment[] =
         {
@@ -381,8 +387,11 @@ TEST(MaskAwareComposition, SingleChannelScalingTileAccessorWithMaskGray16Scenari
     for (size_t y = 0; y < composition->GetHeight(); ++y)
     {
         const uint16_t* composition_line = (const uint16_t*)(static_cast<const uint8_t*>(locker_composition.ptrDataRoi) + y * locker_composition.stride);
-        int r = memcmp(composition_line, expected_result + y * 6, 6 * sizeof(uint16_t));
-        ASSERT_EQ(r, 0);
+        for (size_t x = 0; x < composition->GetWidth(); ++x)
+        {
+            // For better debugging output, check each pixel individually
+            ASSERT_EQ(composition_line[x], expected_result[y * 6 + x]) << " at position (" << x << "," << y << ")";
+        }
     }
 }
 
@@ -664,8 +673,10 @@ TEST(MaskAwareComposition, SingleChannelTileAccessorScalingGray16WithMaskScenari
     for (size_t y = 0; y < composition->GetHeight(); ++y)
     {
         const uint16_t* composition_line = reinterpret_cast<const uint16_t*>(static_cast<const uint8_t*>(locker_composition.ptrDataRoi) + y * locker_composition.stride);
-        int r = memcmp(composition_line, expected_result + y * 3, 3 * sizeof(uint16_t));
-        ASSERT_EQ(r, 0);
+        for (size_t x = 0; x < composition->GetWidth(); ++x)
+        {
+            ASSERT_EQ(composition_line[x], expected_result[y * 3 + x]) << "Mismatch at (" << x << ", " << y << ")";
+        }
     }
 }
 

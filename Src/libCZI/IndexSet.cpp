@@ -7,6 +7,7 @@
 
 using namespace std;
 using namespace libCZI;
+using namespace libCZI::detail;
 
 CIndexSet::CIndexSet(const std::wstring& str)
 {

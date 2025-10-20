@@ -12,6 +12,7 @@
 
 using namespace std;
 using namespace libCZI;
+using namespace libCZI::detail;
 
 /*static*/const std::uint8_t CCZIParse::FILEHDRMAGIC[16] = { 'Z','I','S','R','A','W','F','I','L','E','\0','\0','\0','\0','\0','\0' };
 /*static*/const std::uint8_t CCZIParse::SUBBLKDIRMAGIC[16] = { 'Z','I','S','R','A','W','D','I','R','E','C','T','O','R','Y','\0' };

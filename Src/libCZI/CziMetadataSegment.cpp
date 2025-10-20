@@ -6,6 +6,7 @@
 #include "CziUtils.h"
 
 using namespace libCZI;
+using namespace libCZI::detail;
 
 CCziMetadataSegment::CCziMetadataSegment(const CCZIParse::MetadataSegmentData& data, const std::function<void(void*)>& deleter)
     : spXmlData(std::shared_ptr<const void>(data.ptrXmlData, deleter)),

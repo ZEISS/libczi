@@ -6,6 +6,7 @@
 #include "inc_libCZI.h"
 
 using namespace libCZI;
+using namespace libCZI::detail;
 
 TEST(Splines, Splines1)
 {

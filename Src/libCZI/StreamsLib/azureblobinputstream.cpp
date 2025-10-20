@@ -14,6 +14,7 @@
 #include "../utilities.h"
 
 using namespace std;
+using namespace libCZI::detail;
 
 /*static*/const wchar_t* AzureBlobInputStream::kUriKey_ContainerName = L"containername";
 /*static*/const wchar_t* AzureBlobInputStream::kUriKey_BlobName = L"blobname";

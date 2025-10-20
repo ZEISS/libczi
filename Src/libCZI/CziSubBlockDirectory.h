@@ -11,193 +11,202 @@
 #include <set>
 #include "libCZI.h"
 
-class CCziSubBlockDirectoryBase
+namespace libCZI
 {
-public:
-    struct SubBlkEntry
+    namespace detail
     {
-        libCZI::CDimCoordinate coordinate;
-        int mIndex;
-        int x;
-        int y;
-        int width;
-        int height;
-        int storedWidth;
-        int storedHeight;
-        int PixelType;
-        std::uint64_t FilePosition;
-        int Compression;
-        std::uint8_t pyramid_type_from_spare;   ///< The field "pyramid-type" (from spare-bytes of the subblock-directory-entry)
 
-        bool IsMIndexValid() const
+        class CCziSubBlockDirectoryBase
         {
-            return this->mIndex != (std::numeric_limits<int>::min)() ? true : false;
-        }
+        public:
+            struct SubBlkEntry
+            {
+                libCZI::CDimCoordinate coordinate;
+                int mIndex;
+                int x;
+                int y;
+                int width;
+                int height;
+                int storedWidth;
+                int storedHeight;
+                int PixelType;
+                std::uint64_t FilePosition;
+                int Compression;
+                std::uint8_t pyramid_type_from_spare;   ///< The field "pyramid-type" (from spare-bytes of the subblock-directory-entry)
 
-        bool IsStoredSizeEqualLogicalSize() const
+                bool IsMIndexValid() const
+                {
+                    return this->mIndex != (std::numeric_limits<int>::min)() ? true : false;
+                }
+
+                bool IsStoredSizeEqualLogicalSize() const
+                {
+                    return this->width == this->storedWidth && this->height == this->storedHeight;
+                }
+
+                void Invalidate()
+                {
+                    this->mIndex = this->x = this->y = this->width = this->height = this->storedWidth = this->storedHeight = (std::numeric_limits<int>::min)();
+                    this->pyramid_type_from_spare = 0;
+                }
+            };
+
+            struct SubBlkEntryEx : SubBlkEntry
+            {
+                std::uint64_t allocatedSize;
+            };
+
+            static bool CompareForEquality_Coordinate(const SubBlkEntry& a, const SubBlkEntry& b);
+        };
+
+        class CSbBlkStatisticsUpdater
         {
-            return this->width == this->storedWidth && this->height == this->storedHeight;
-        }
+        private:
+            libCZI::SubBlockStatistics statistics;
+            libCZI::PyramidStatistics pyramidStatistics;
+            bool pyramidStatisticsDirty;
+        public:
+            CSbBlkStatisticsUpdater();
+            void UpdateStatistics(const CCziSubBlockDirectoryBase::SubBlkEntry& entry);
+            void Consolidate();
 
-        void Invalidate()
+            const libCZI::SubBlockStatistics& GetStatistics() const;
+            const libCZI::PyramidStatistics& GetPyramidStatistics();
+
+            void Clear();
+        private:
+            void SortPyramidStatistics();
+            static void UpdateBoundingBox(libCZI::IntRect& rect, const CCziSubBlockDirectoryBase::SubBlkEntry& entry);
+            static bool TryToDeterminePyramidLayerInfo(const CCziSubBlockDirectoryBase::SubBlkEntry& entry, std::uint8_t* ptrMinificationFactor, std::uint8_t* ptrPyramidLayerNo);
+            static void UpdatePyramidLayerStatistics(std::vector<libCZI::PyramidStatistics::PyramidLayerStatistics>& vec, const libCZI::PyramidStatistics::PyramidLayerInfo& pli);
+        };
+
+
+        class CCziSubBlockDirectory : public CCziSubBlockDirectoryBase
         {
-            this->mIndex = this->x = this->y = this->width = this->height = this->storedWidth = this->storedHeight = (std::numeric_limits<int>::min)();
-            this->pyramid_type_from_spare = 0;
-        }
-    };
+        private:
+            std::vector<SubBlkEntry> subBlks;
+            mutable CSbBlkStatisticsUpdater sblkStatistics;
+            enum class State
+            {
+                AddingAllowed,
+                AddingFinished
+            };
+            State state;
+        public:
+            CCziSubBlockDirectory();
 
-    struct SubBlkEntryEx : SubBlkEntry
-    {
-        std::uint64_t allocatedSize;
-    };
+            const libCZI::SubBlockStatistics& GetStatistics() const;
+            const libCZI::PyramidStatistics& GetPyramidStatistics() const;
 
-    static bool CompareForEquality_Coordinate(const SubBlkEntry& a, const SubBlkEntry& b);
-};
+            void AddSubBlock(const SubBlkEntry& entry);
+            void AddingFinished();
 
-class CSbBlkStatisticsUpdater
-{
-private:
-    libCZI::SubBlockStatistics statistics;
-    libCZI::PyramidStatistics pyramidStatistics;
-    bool pyramidStatisticsDirty;
-public:
-    CSbBlkStatisticsUpdater();
-    void UpdateStatistics(const CCziSubBlockDirectoryBase::SubBlkEntry& entry);
-    void Consolidate();
+            void EnumSubBlocks(const std::function<bool(int index, const SubBlkEntry&)>& func);
+            bool TryGetSubBlock(int index, SubBlkEntry& entry) const;
+        };
 
-    const libCZI::SubBlockStatistics& GetStatistics() const;
-    const libCZI::PyramidStatistics& GetPyramidStatistics();
+        class PixelTypeForChannelIndexStatistic
+        {
+        protected:
+            bool pixeltypeNoValidChannelIdxValid;
+            int pixelTypeNoValidChannel;
+            std::map<int, int> pixelTypePerChannelIndex;
+        public:
+            PixelTypeForChannelIndexStatistic() :pixeltypeNoValidChannelIdxValid(false)
+            {
+            }
 
-    void Clear();
-private:
-    void SortPyramidStatistics();
-    static void UpdateBoundingBox(libCZI::IntRect& rect, const CCziSubBlockDirectoryBase::SubBlkEntry& entry);
-    static bool TryToDeterminePyramidLayerInfo(const CCziSubBlockDirectoryBase::SubBlkEntry& entry, std::uint8_t* ptrMinificationFactor, std::uint8_t* ptrPyramidLayerNo);
-    static void UpdatePyramidLayerStatistics(std::vector<libCZI::PyramidStatistics::PyramidLayerStatistics>& vec, const libCZI::PyramidStatistics::PyramidLayerInfo& pli);
-};
+            /// Attempts to get the pixeltype for "sub-blocks without a channel index".
+            ///
+            /// \param [in,out] pixelType If non-null, will receive the pixeltype (if successful).
+            /// \return True if it succeeds, false if it fails.
+            bool TryGetPixelTypeForNoChannelIndex(int* pixelType) const;
 
+            /// Gets a map where key is the channel-index and value is the pixel-type that was determinded.
+            ///
+            /// \return A map where key is the channel-index and value is the pixel-type that was determinded.
+            const std::map<int, int>& GetChannelIndexPixelTypeMap() const { return this->pixelTypePerChannelIndex; }
+        };
 
-class CCziSubBlockDirectory : public CCziSubBlockDirectoryBase
-{
-private:
-    std::vector<SubBlkEntry> subBlks;
-    mutable CSbBlkStatisticsUpdater sblkStatistics;
-    enum class State
-    {
-        AddingAllowed,
-        AddingFinished
-    };
-    State state;
-public:
-    CCziSubBlockDirectory();
+        class CWriterCziSubBlockDirectory : public CCziSubBlockDirectoryBase
+        {
+        private:
+            class PixelTypeForChannelIndexStatisticCreate : public PixelTypeForChannelIndexStatistic
+            {
+            public:
+                void AddSbBlk(const SubBlkEntry& entry);
+            };
+        private:
+            mutable CSbBlkStatisticsUpdater sblkStatistics;
+            std::map<int, int> mapChannelIdxPixelType;
+            PixelTypeForChannelIndexStatisticCreate pixelTypeForChannel;
+        public:
+            CWriterCziSubBlockDirectory() = delete;
+            CWriterCziSubBlockDirectory(bool allow_duplicate_subblocks);
+            bool TryAddSubBlock(const SubBlkEntry& entry);
 
-    const libCZI::SubBlockStatistics& GetStatistics() const;
-    const libCZI::PyramidStatistics& GetPyramidStatistics() const;
+            bool EnumEntries(const std::function<bool(size_t index, const SubBlkEntry&)>& func) const;
 
-    void AddSubBlock(const SubBlkEntry& entry);
-    void AddingFinished();
+            const libCZI::SubBlockStatistics& GetStatistics() const;
+            const libCZI::PyramidStatistics& GetPyramidStatistics() const;
+            const PixelTypeForChannelIndexStatistic& GetPixelTypeForChannel() const;
+        private:
+            /// Implementation of a "less-comparison" for SubBlkEntry objects, which can
+            /// be parametrized.
+            struct SubBlkEntryCompare
+            {
+                SubBlkEntryCompare(bool include_file_position) : include_file_position_(include_file_position) {}
+                bool include_file_position_{ false };
+                bool operator() (const SubBlkEntry& a, const SubBlkEntry& b) const;
+            };
 
-    void EnumSubBlocks(const std::function<bool(int index, const SubBlkEntry&)>& func);
-    bool TryGetSubBlock(int index, SubBlkEntry& entry) const;
-};
+            /// This object is used to implement the "less-comparison" for the set.
+            SubBlkEntryCompare subBlkEntryComparison;
 
-class PixelTypeForChannelIndexStatistic
-{
-protected:
-    bool pixeltypeNoValidChannelIdxValid;
-    int pixelTypeNoValidChannel;
-    std::map<int, int> pixelTypePerChannelIndex;
-public:
-    PixelTypeForChannelIndexStatistic() :pixeltypeNoValidChannelIdxValid(false)
-    {}
+            std::set<SubBlkEntry, SubBlkEntryCompare> subBlks;
+        };
 
-    /// Attempts to get the pixeltype for "sub-blocks without a channel index".
-    ///
-    /// \param [in,out] pixelType If non-null, will receive the pixeltype (if successful).
-    /// \return True if it succeeds, false if it fails.
-    bool TryGetPixelTypeForNoChannelIndex(int* pixelType) const;
+        class CReaderWriterCziSubBlockDirectory : public CCziSubBlockDirectoryBase
+        {
+        private:
+            mutable CSbBlkStatisticsUpdater sblkStatistics;
 
-    /// Gets a map where key is the channel-index and value is the pixel-type that was determinded.
-    ///
-    /// \return A map where key is the channel-index and value is the pixel-type that was determinded.
-    const std::map<int, int>& GetChannelIndexPixelTypeMap() const { return this->pixelTypePerChannelIndex; }
-};
+            /// Indicates that the "SubBlock-Statistics" is current and up-to-date. Attention: this only means that "GetStatistics()" is valid,
+            /// "GetPyramidStatistics" might be not current.
+            bool sbBlkStatisticsCurrent;
 
-class CWriterCziSubBlockDirectory : public CCziSubBlockDirectoryBase
-{
-private:
-    class PixelTypeForChannelIndexStatisticCreate : public PixelTypeForChannelIndexStatistic
-    {
-    public:
-        void AddSbBlk(const SubBlkEntry& entry);
-    };
-private:
-    mutable CSbBlkStatisticsUpdater sblkStatistics;
-    std::map<int, int> mapChannelIdxPixelType;
-    PixelTypeForChannelIndexStatisticCreate pixelTypeForChannel;
-public:
-    CWriterCziSubBlockDirectory() = delete;
-    CWriterCziSubBlockDirectory(bool allow_duplicate_subblocks);
-    bool TryAddSubBlock(const SubBlkEntry& entry);
+            /// Indicates that the "SubBlock-Statistics" is current and up-to-date AND that it is "consolidated", ie. that also
+            /// "GetPyramidStatistics" is valid and up-to-date.
+            bool sbBlkStatisticsConsolidated;
 
-    bool EnumEntries(const std::function<bool(size_t index, const SubBlkEntry&)>& func) const;
+            int nextSbBlkIndex;
+            std::map<int, SubBlkEntry> subBlks;
 
-    const libCZI::SubBlockStatistics& GetStatistics() const;
-    const libCZI::PyramidStatistics& GetPyramidStatistics() const;
-    const PixelTypeForChannelIndexStatistic& GetPixelTypeForChannel() const;
-private:
-    /// Implementation of a "less-comparison" for SubBlkEntry objects, which can
-    /// be parametrized.
-    struct SubBlkEntryCompare
-    {
-        SubBlkEntryCompare(bool include_file_position) : include_file_position_(include_file_position) {}
-        bool include_file_position_{ false };
-        bool operator() (const SubBlkEntry& a, const SubBlkEntry& b) const;
-    };
+            bool isModified;
+        public:
+            CReaderWriterCziSubBlockDirectory() :sbBlkStatisticsCurrent(true), sbBlkStatisticsConsolidated(false), nextSbBlkIndex(0), isModified(false) {}
 
-    /// This object is used to implement the "less-comparison" for the set.
-    SubBlkEntryCompare subBlkEntryComparison;
+            bool IsModified()const { return this->isModified; }
+            void SetModified(bool modified) { this->isModified = modified; }
 
-    std::set<SubBlkEntry, SubBlkEntryCompare> subBlks;
-};
+            void AddSubBlock(const SubBlkEntry& entry, int* key = nullptr);
 
-class CReaderWriterCziSubBlockDirectory : public CCziSubBlockDirectoryBase
-{
-private:
-    mutable CSbBlkStatisticsUpdater sblkStatistics;
+            bool TryGetSubBlock(int key, SubBlkEntry* entry) const;
 
-    /// Indicates that the "SubBlock-Statistics" is current and up-to-date. Attention: this only means that "GetStatistics()" is valid,
-    /// "GetPyramidStatistics" might be not current.
-    bool sbBlkStatisticsCurrent;
+            bool TryModifySubBlock(int key, const SubBlkEntry& entry);
+            bool TryRemoveSubBlock(int key, SubBlkEntry* entry = nullptr);
+            bool TryAddSubBlock(const SubBlkEntry& entry, int* key);
 
-    /// Indicates that the "SubBlock-Statistics" is current and up-to-date AND that it is "consolidated", ie. that also
-    /// "GetPyramidStatistics" is valid and up-to-date.
-    bool sbBlkStatisticsConsolidated;
+            bool EnumEntries(const std::function<bool(int index, const SubBlkEntry&)>& func) const;
 
-    int nextSbBlkIndex;
-    std::map<int, SubBlkEntry> subBlks;
+            const libCZI::SubBlockStatistics& GetStatistics();
+            const libCZI::PyramidStatistics& GetPyramidStatistics();
 
-    bool isModified;
-public:
-    CReaderWriterCziSubBlockDirectory() :sbBlkStatisticsCurrent(true), sbBlkStatisticsConsolidated(false), nextSbBlkIndex(0), isModified(false) {}
+        private:
+            void RecreateSubBlockStatistics();
+            void EnsureSbBlkStatisticsConsolidated();
+        };
 
-    bool IsModified()const { return this->isModified; }
-    void SetModified(bool modified) { this->isModified = modified; }
-
-    void AddSubBlock(const SubBlkEntry& entry, int* key = nullptr);
-
-    bool TryGetSubBlock(int key, SubBlkEntry* entry) const;
-
-    bool TryModifySubBlock(int key, const SubBlkEntry& entry);
-    bool TryRemoveSubBlock(int key, SubBlkEntry* entry = nullptr);
-    bool TryAddSubBlock(const SubBlkEntry& entry, int* key);
-
-    bool EnumEntries(const std::function<bool(int index, const SubBlkEntry&)>& func) const;
-
-    const libCZI::SubBlockStatistics& GetStatistics();
-    const libCZI::PyramidStatistics& GetPyramidStatistics();
-
-private:
-    void RecreateSubBlockStatistics();
-    void EnsureSbBlkStatisticsConsolidated();
-};
+    } // namespace detail
+} // namespace libCZI

@@ -51,3 +51,4 @@ Version history
  0.67.0             | [153](https://github.com/ZEISS/libczi/pull/153)      | add mask support
  0.67.1             | [157](https://github.com/ZEISS/libczi/pull/157)      | fix compilation issue on macOS
  0.67.2             | [155](https://github.com/ZEISS/libczi/pull/155)      | code cleanup
+ 0.67.3             | [158](https://github.com/ZEISS/libczi/pull/158)      | have all internal code in its own namespace `libCZI::detail`, update vendored pugixml to version 1.15, fix issue with big-endian-machines

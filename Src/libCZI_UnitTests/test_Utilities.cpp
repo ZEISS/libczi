@@ -8,6 +8,7 @@
 #include "../libCZI/utilities.h"
 
 using namespace libCZI;
+using namespace libCZI::detail;
 using namespace std;
 
 TEST(Utilities, CompareCoordinates1)
@@ -266,7 +267,7 @@ class CCZIParseTest : public ::testing::Test
 public:
     static libCZI::DimensionIndex DimensionCharToDimensionIndex(const char* ptr, size_t size)
     {
-        return CCZIParse::DimensionCharToDimensionIndex(ptr, size);
+        return libCZI::detail::CCZIParse::DimensionCharToDimensionIndex(ptr, size);
     }
 };
 

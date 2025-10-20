@@ -6,6 +6,8 @@
 #include "utilities.h"
 #include "inc_libCZI_Config.h"
 
+using namespace libCZI::detail;
+
 /*static*/void ConvertToHostByteOrder::Convert(SegmentHeader* p)
 {
     (void)p;

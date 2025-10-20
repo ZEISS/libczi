@@ -7,6 +7,7 @@
 #include <cstring>
 
 using namespace std;
+using namespace libCZI::detail;
 
 CMd5Sum::CMd5Sum()
 {

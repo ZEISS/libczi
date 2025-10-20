@@ -9,6 +9,7 @@
 #include <mutex>
 
 using namespace std;
+using namespace libCZI::detail;
 
 #if defined(_WIN32)
 

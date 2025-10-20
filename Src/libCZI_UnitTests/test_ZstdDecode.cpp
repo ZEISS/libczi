@@ -8,6 +8,7 @@
 #include "../libCZI/decoder_zstd.h"
 
 using namespace libCZI;
+using namespace libCZI::detail;
 using namespace std;
 
 TEST(ZstdDecode, Decode1)

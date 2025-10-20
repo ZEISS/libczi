@@ -8,6 +8,7 @@
 #include "utilities.h"
 
 using namespace std;
+using namespace libCZI::detail;
 
 #if LIBCZI_HAS_AVXINTRINSICS
 

@@ -11,6 +11,7 @@
 #include "utilities.h"
 
 using namespace libCZI;
+using namespace libCZI::detail;
 using namespace std;
 
 static bool SetIfCallCountZero(int callCnt, const void* ptr, size_t size, const void*& dstPtr, size_t& dstSize)

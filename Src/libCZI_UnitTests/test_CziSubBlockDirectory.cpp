@@ -7,6 +7,7 @@
 #include "inc_libCZI.h"
 
 using namespace libCZI;
+using namespace libCZI::detail;
 
 struct SubBlockEntryData
 {

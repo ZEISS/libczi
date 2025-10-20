@@ -13,6 +13,7 @@
 #include "../utilities.h"
 
 using namespace libCZI;
+using namespace libCZI::detail;
 
 PreadFileInputStream::PreadFileInputStream(const std::string& filename)
 {

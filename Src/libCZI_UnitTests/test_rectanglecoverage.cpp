@@ -8,6 +8,7 @@
 #include <random>
 
 using namespace libCZI;
+using namespace libCZI::detail;
 using namespace std;
 
 /// A simplistic reference implementation of a rectangle coverage calculator. We calculate

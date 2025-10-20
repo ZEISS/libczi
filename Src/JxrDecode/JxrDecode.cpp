@@ -11,6 +11,7 @@
 #include "jxrlib/image/sys/windowsmediaphoto.h"
 
 using namespace std;
+using namespace libCZI::detail;
 
 static void ApplyQuality(float quality, JxrDecode::PixelFormat pixel_format, std::uint32_t width, PKImageEncode* pEncoder);
 

@@ -11,47 +11,55 @@
 #include "libCZI.h"
 #include "SingleChannelAccessorBase.h"
 
-class CSingleChannelPyramidLevelTileAccessor : public CSingleChannelAccessorBase, public libCZI::ISingleChannelPyramidLayerTileAccessor
+namespace libCZI
 {
-private:
-    struct SbInfo
+    namespace detail
     {
-        libCZI::IntRect			logicalRect;
-        libCZI::IntSize			physicalSize;
-        int						mIndex;
-        int						index;
-    };
 
-    struct SbByLayer
-    {
-        std::vector<int> indices;
-    };
+        class CSingleChannelPyramidLevelTileAccessor : public CSingleChannelAccessorBase, public libCZI::ISingleChannelPyramidLayerTileAccessor
+        {
+        private:
+            struct SbInfo
+            {
+                libCZI::IntRect			logicalRect;
+                libCZI::IntSize			physicalSize;
+                int						mIndex;
+                int						index;
+            };
 
-public:
-    explicit CSingleChannelPyramidLevelTileAccessor(const std::shared_ptr<libCZI::ISubBlockRepository>& sbBlkRepository);
+            struct SbByLayer
+            {
+                std::vector<int> indices;
+            };
 
-public:	// interface ISingleChannelTileAccessor
-    std::shared_ptr<libCZI::IBitmapData> Get(const libCZI::IntRectAndFrameOfReference& roi, const libCZI::IDimCoordinate* planeCoordinate, const PyramidLayerInfo& pyramidInfo, const Options* pOptions) override;
+        public:
+            explicit CSingleChannelPyramidLevelTileAccessor(const std::shared_ptr<libCZI::ISubBlockRepository>& sbBlkRepository);
 
-    std::shared_ptr<libCZI::IBitmapData> Get(libCZI::PixelType pixeltype, const libCZI::IntRectAndFrameOfReference& roi, const libCZI::IDimCoordinate* planeCoordinate, const PyramidLayerInfo& pyramidInfo, const libCZI::ISingleChannelPyramidLayerTileAccessor::Options* pOptions) override;
+        public:	// interface ISingleChannelTileAccessor
+            std::shared_ptr<libCZI::IBitmapData> Get(const libCZI::IntRectAndFrameOfReference& roi, const libCZI::IDimCoordinate* planeCoordinate, const PyramidLayerInfo& pyramidInfo, const Options* pOptions) override;
 
-    void Get(libCZI::IBitmapData* pDest, const libCZI::IntPointAndFrameOfReference& position, const libCZI::IDimCoordinate* planeCoordinate, const PyramidLayerInfo& pyramidInfo, const Options* pOptions) override;
-private:
-    libCZI::IntRect CalcDestinationRectFromSourceRect(const libCZI::IntRect& roi, const PyramidLayerInfo& pyramidInfo);
+            std::shared_ptr<libCZI::IBitmapData> Get(libCZI::PixelType pixeltype, const libCZI::IntRectAndFrameOfReference& roi, const libCZI::IDimCoordinate* planeCoordinate, const PyramidLayerInfo& pyramidInfo, const libCZI::ISingleChannelPyramidLayerTileAccessor::Options* pOptions) override;
 
-    libCZI::IntRect NormalizePyramidRect(int x, int y, int w, int h, const PyramidLayerInfo& pyramidInfo);
+            void Get(libCZI::IBitmapData* pDest, const libCZI::IntPointAndFrameOfReference& position, const libCZI::IDimCoordinate* planeCoordinate, const PyramidLayerInfo& pyramidInfo, const Options* pOptions) override;
+        private:
+            libCZI::IntRect CalcDestinationRectFromSourceRect(const libCZI::IntRect& roi, const PyramidLayerInfo& pyramidInfo);
 
-    static int CalcSizeOfPixelOnLayer0(const PyramidLayerInfo& pyramidInfo);
+            libCZI::IntRect NormalizePyramidRect(int x, int y, int w, int h, const PyramidLayerInfo& pyramidInfo);
 
-    std::map<int, SbByLayer> CalcByLayer(const std::vector<SbInfo>& sbinfo, int minificationFactor);
+            static int CalcSizeOfPixelOnLayer0(const PyramidLayerInfo& pyramidInfo);
 
-    std::vector<SbInfo> GetSubBlocksSubset(const libCZI::IntRect& roi, const libCZI::IDimCoordinate* planeCoordinate, const PyramidLayerInfo& pyramidInfo, const libCZI::IIndexSet* sceneFilter, bool sortByM);
+            std::map<int, SbByLayer> CalcByLayer(const std::vector<SbInfo>& sbinfo, int minificationFactor);
 
-    void GetAllSubBlocks(const libCZI::IntRect& roi, const libCZI::IDimCoordinate* planeCoordinate, const libCZI::IIndexSet* sceneFilter, const std::function<void(const SbInfo& info)>& appender) const;
+            std::vector<SbInfo> GetSubBlocksSubset(const libCZI::IntRect& roi, const libCZI::IDimCoordinate* planeCoordinate, const PyramidLayerInfo& pyramidInfo, const libCZI::IIndexSet* sceneFilter, bool sortByM);
 
-    int CalcPyramidLayerNo(const libCZI::IntRect& logicalRect, const libCZI::IntSize& physicalSize, int minificationFactor);
+            void GetAllSubBlocks(const libCZI::IntRect& roi, const libCZI::IDimCoordinate* planeCoordinate, const libCZI::IIndexSet* sceneFilter, const std::function<void(const SbInfo& info)>& appender) const;
 
-    void ComposeTiles(libCZI::IBitmapData* bm, int xPos, int yPos, int sizeOfPixel, int bitmapCnt, const Options& options, const std::function<SbInfo(int)>& getSbInfo);
+            int CalcPyramidLayerNo(const libCZI::IntRect& logicalRect, const libCZI::IntSize& physicalSize, int minificationFactor);
 
-    void InternalGet(libCZI::IBitmapData* pDest, int xPos, int yPos, int sizeOfPixelOnLayer0, const libCZI::IDimCoordinate* planeCoordinate, const PyramidLayerInfo& pyramidInfo, const Options& options);
-};
+            void ComposeTiles(libCZI::IBitmapData* bm, int xPos, int yPos, int sizeOfPixel, int bitmapCnt, const Options& options, const std::function<SbInfo(int)>& getSbInfo);
+
+            void InternalGet(libCZI::IBitmapData* pDest, int xPos, int yPos, int sizeOfPixelOnLayer0, const libCZI::IDimCoordinate* planeCoordinate, const PyramidLayerInfo& pyramidInfo, const Options& options);
+        };
+
+    } // namespace detail
+} // namespace libCZI

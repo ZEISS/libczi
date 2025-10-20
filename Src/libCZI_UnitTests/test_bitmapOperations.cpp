@@ -8,6 +8,7 @@
 #include "utils.h"
 
 using namespace libCZI;
+using namespace libCZI::detail;
 
 static std::shared_ptr<IBitmapData> CreateTestImage()
 {

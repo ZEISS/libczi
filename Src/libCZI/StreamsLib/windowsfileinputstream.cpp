@@ -9,6 +9,8 @@
 #include <iomanip>
 #include "../utilities.h"
 
+using namespace libCZI::detail;
+
 WindowsFileInputStream::WindowsFileInputStream(const std::string& filename)
     : WindowsFileInputStream(Utilities::convertUtf8ToWchar_t(filename.c_str()).c_str())
 {

@@ -7,6 +7,7 @@
 #include <cstddef>
 
 using namespace libCZI;
+using namespace libCZI::detail;
 using namespace std;
 
 /*static*/bool CCziSubBlockDirectoryBase::CompareForEquality_Coordinate(const SubBlkEntry& a, const SubBlkEntry& b)

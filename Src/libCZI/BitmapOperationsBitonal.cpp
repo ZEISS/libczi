@@ -26,40 +26,51 @@
 
 using namespace std;
 using namespace libCZI;
+using namespace libCZI::detail;
 
 namespace
 {
+    std::uint32_t bswap_dword(std::uint32_t dw)
+    {
+#if LIBCZI_HAS_BUILTIN_BSWAP32
+        return __builtin_bswap32(dw);
+#elif LIBCZI_HAS_BYTESWAP_IN_STDLIB
+        return _byteswap_ulong(dw);
+#elif LIBCZI_HAS_BSWAP_LONG_IN_SYS_ENDIAN
+        return bswap32(dw);
+#else
+        return (((dw & 0xff000000u) >> 24) |
+                ((dw & 0x00ff0000u) >> 8) |
+                ((dw & 0x0000ff00u) << 8) |
+                ((dw & 0x000000ffu) << 24));
+#endif
+    }
+
+    std::uint16_t bswap_word(std::uint16_t us)
+    {
+#if LIBCZI_HAS_BUILTIN_BSWAP32
+        return __builtin_bswap16(us);
+#elif LIBCZI_HAS_BYTESWAP_IN_STDLIB
+        return _byteswap_ushort(us);
+#elif LIBCZI_HAS_BSWAP_LONG_IN_SYS_ENDIAN
+        return bswap16(us);
+#else
+        return (((us & 0xff00u) >> 8) |
+                ((us & 0x00ffu) << 8));
+#endif
+    }
+
     // use this on a little-endian machine (Intel, ARM, ...)
     class CLittleEndianConverter
     {
     public:
         static std::uint32_t BswapDWORD(std::uint32_t dw)
         {
-#if LIBCZI_HAS_BUILTIN_BSWAP32
-            return __builtin_bswap32(dw);
-#elif LIBCZI_HAS_BYTESWAP_IN_STDLIB
-            return _byteswap_ulong(dw);
-#elif LIBCZI_HAS_BSWAP_LONG_IN_SYS_ENDIAN
-            return bswap32(dw);
-#else
-            return (((dw & 0xff000000u) >> 24) |
-                    ((dw & 0x00ff0000u) >> 8) |
-                    ((dw & 0x0000ff00u) << 8) |
-                    ((dw & 0x000000ffu) << 24));
-#endif
+            return bswap_dword(dw);
         }
         static std::uint16_t BswapUSHORT(std::uint16_t us)
         {
-#if LIBCZI_HAS_BUILTIN_BSWAP32
-            return __builtin_bswap16(us);
-#elif LIBCZI_HAS_BYTESWAP_IN_STDLIB
-            return _byteswap_ushort(us);
-#elif LIBCZI_HAS_BSWAP_LONG_IN_SYS_ENDIAN
-            return bswap16(us);
-#else
-            return (((us & 0xff00u) >> 8) |
-                    ((us & 0x00ffu) << 8));
-#endif
+            return bswap_word(us);
         }
     };
 
@@ -160,29 +171,29 @@ namespace
     {
         uint8_t byteBefore = 0xff;
 
-        int numberOfDwords = widthSrc / 32;
+        const int numberOfDwords = widthSrc / 32;
 
         for (int x = 0; x < numberOfDwords; ++x)
         {
             uint8_t byteAfter = GetByteAfter(ptrSrc, (x * 4) + 4, widthSrc);
-            uint32_t dw = EndianessConv::BswapDWORD(DecimateHelpers<RegionSize>::GetDword(y, height, ptrSrc + static_cast<size_t>(x) * 4, strideSrc)); ///< The double-word
+            uint32_t dw = EndianessConv::BswapDWORD(DecimateHelpers<RegionSize>::GetDword(y, height, ptrSrc + static_cast<size_t>(x) * 4, strideSrc));
             uint16_t dest = FilterDword(dw, byteBefore, byteAfter);
             byteBefore = static_cast<uint8_t>(dw);
             *reinterpret_cast<uint16_t*>(reinterpret_cast<uintptr_t>(ptrDest) + 2 * static_cast<size_t>(x)) = EndianessConv::BswapUSHORT(dest);
         }
 
-        int bitsRemaining = widthSrc - numberOfDwords * 32;
+        const int bitsRemaining = widthSrc - numberOfDwords * 32;
         if (bitsRemaining > 0)
         {
             // we continue to operate DWORD-wise, we are just careful...
-            uint32_t dw = EndianessConv::BswapDWORD(DecimateHelpers<RegionSize>::GetDwordPartial(y, height, ptrSrc + static_cast<size_t>(numberOfDwords) * 4, bitsRemaining, strideSrc));
+            const uint32_t dw =  bswap_dword(DecimateHelpers<RegionSize>::GetDwordPartial(y, height, ptrSrc + static_cast<size_t>(numberOfDwords) * 4, bitsRemaining, strideSrc));
 
-            // the filter the DWORD as usually
-            uint16_t dest = FilterDword(dw, byteBefore, 0xff);
+            // then filter the DWORD as usually
+            const uint16_t dest = FilterDword(dw, byteBefore, 0xff);
 
             if (bitsRemaining <= 16)
             {
-                *reinterpret_cast<uint8_t*>(reinterpret_cast<uintptr_t>(ptrDest) + 2 * static_cast<size_t>(numberOfDwords)) = static_cast<uint8_t>(EndianessConv::BswapUSHORT(dest));
+                *reinterpret_cast<uint8_t*>(reinterpret_cast<uintptr_t>(ptrDest) + 2 * static_cast<size_t>(numberOfDwords)) = static_cast<uint8_t>(dest >> 8);
             }
             else
             {

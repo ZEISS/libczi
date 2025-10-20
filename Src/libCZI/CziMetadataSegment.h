@@ -8,16 +8,24 @@
 #include "libCZI.h"
 #include "CziParse.h"
 
-class CCziMetadataSegment : public  libCZI::IMetadataSegment
+namespace libCZI
 {
-private:
-    std::shared_ptr<const void> spXmlData, spAttachment;
-    std::uint64_t   xmlDataSize;
-    std::uint32_t   attachmentSize;
-public:
-    CCziMetadataSegment(const CCZIParse::MetadataSegmentData& data, const std::function<void(void*)>& deleter);
+    namespace detail
+    {
 
-    // interface ISubBlock
-    void DangerousGetRawData(MemBlkType type, const void*& ptr, size_t& size) const override;
-    std::shared_ptr<const void> GetRawData(MemBlkType type, size_t* ptrSize) override;
-};
+        class CCziMetadataSegment : public  libCZI::IMetadataSegment
+        {
+        private:
+            std::shared_ptr<const void> spXmlData, spAttachment;
+            std::uint64_t   xmlDataSize;
+            std::uint32_t   attachmentSize;
+        public:
+            CCziMetadataSegment(const CCZIParse::MetadataSegmentData& data, const std::function<void(void*)>& deleter);
+
+            // interface ISubBlock
+            void DangerousGetRawData(MemBlkType type, const void*& ptr, size_t& size) const override;
+            std::shared_ptr<const void> GetRawData(MemBlkType type, size_t* ptrSize) override;
+        };
+
+    }  // namespace detail
+} // namespace libCZI

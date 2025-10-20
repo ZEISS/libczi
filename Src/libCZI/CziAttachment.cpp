@@ -7,6 +7,7 @@
 #include "CziUtils.h"
 
 using namespace libCZI;
+using namespace libCZI::detail;
 
 CCziAttachment::CCziAttachment(libCZI::AttachmentInfo info, const CCZIParse::AttachmentData& data, std::function<void(void*)> deleter)
     :

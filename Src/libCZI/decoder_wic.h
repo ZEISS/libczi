@@ -15,19 +15,27 @@
 struct IWICBitmapDecoder;
 struct IWICImagingFactory;
 
-class CWicJpgxrDecoder : public libCZI::IDecoder
+namespace libCZI
 {
-private:
-    IWICImagingFactory* pFactory;
-public:
-    static std::shared_ptr<CWicJpgxrDecoder> Create();
+    namespace detail
+    {
 
-    CWicJpgxrDecoder() = delete;
-    explicit CWicJpgxrDecoder(IWICImagingFactory* pFactory);
-    virtual ~CWicJpgxrDecoder();
+        class CWicJpgxrDecoder : public libCZI::IDecoder
+        {
+        private:
+            IWICImagingFactory* pFactory;
+        public:
+            static std::shared_ptr<CWicJpgxrDecoder> Create();
 
-public:
-    std::shared_ptr<libCZI::IBitmapData> Decode(const void* ptrData, size_t size, const libCZI::PixelType* pixelType, const std::uint32_t* height, const std::uint32_t* width, const char* additional_arguments) override;
-};
+            CWicJpgxrDecoder() = delete;
+            explicit CWicJpgxrDecoder(IWICImagingFactory* pFactory);
+            virtual ~CWicJpgxrDecoder();
+
+        public:
+            std::shared_ptr<libCZI::IBitmapData> Decode(const void* ptrData, size_t size, const libCZI::PixelType* pixelType, const std::uint32_t* height, const std::uint32_t* width, const char* additional_arguments) override;
+        };
+
+    }  // namespace detail
+} // namespace libCZI
 
 #endif

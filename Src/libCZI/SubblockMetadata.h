@@ -15,47 +15,55 @@
 #include <functional>
 #include <tuple>
 
-class SubblockMetadata : public libCZI::ISubBlockMetadata, public std::enable_shared_from_this<SubblockMetadata>
+namespace libCZI
 {
-private:
-    struct XmlNodeWrapperThrowExcp
+    namespace detail
     {
-        [[noreturn]] static void ThrowInvalidPath()
+
+        class SubblockMetadata : public libCZI::ISubBlockMetadata, public std::enable_shared_from_this<SubblockMetadata>
         {
-            throw libCZI::LibCZIMetadataException("invalid path", libCZI::LibCZIMetadataException::ErrorType::InvalidPath);
-        }
-    };
+        private:
+            struct XmlNodeWrapperThrowExcp
+            {
+                [[noreturn]] static void ThrowInvalidPath()
+                {
+                    throw libCZI::LibCZIMetadataException("invalid path", libCZI::LibCZIMetadataException::ErrorType::InvalidPath);
+                }
+            };
 
-    libCZI::pugi::xml_parse_result parse_result_;
-    libCZI::pugi::xml_document doc_;
-    std::unique_ptr<XmlNodeWrapperReadonly<SubblockMetadata, XmlNodeWrapperThrowExcp>> wrapper_;
-public:
-    SubblockMetadata(const char* xml, size_t xml_size);
-    SubblockMetadata() = delete;
-    SubblockMetadata(const SubblockMetadata&) = delete;
-    SubblockMetadata(SubblockMetadata&&) = delete;
-    SubblockMetadata& operator=(const SubblockMetadata&) = delete;
-    SubblockMetadata& operator=(SubblockMetadata&&) = delete;
-    ~SubblockMetadata() override = default;
+            libCZI::detail::pugi::xml_parse_result parse_result_;
+            libCZI::detail::pugi::xml_document doc_;
+            std::unique_ptr<libCZI::detail::XmlNodeWrapperReadonly<SubblockMetadata, XmlNodeWrapperThrowExcp>> wrapper_;
+        public:
+            SubblockMetadata(const char* xml, size_t xml_size);
+            SubblockMetadata() = delete;
+            SubblockMetadata(const SubblockMetadata&) = delete;
+            SubblockMetadata(SubblockMetadata&&) = delete;
+            SubblockMetadata& operator=(const SubblockMetadata&) = delete;
+            SubblockMetadata& operator=(SubblockMetadata&&) = delete;
+            ~SubblockMetadata() override = default;
 
-public:
-    // interface IXmlNodeRead
-    bool TryGetAttribute(const wchar_t* attributeName, std::wstring* attribValue) const override;
-    void EnumAttributes(const std::function<bool(const std::wstring& attribName, const std::wstring& attribValue)>& enumFunc) const override;
-    bool TryGetValue(std::wstring* value) const override;
-    std::shared_ptr<libCZI::IXmlNodeRead> GetChildNodeReadonly(const char* path) override;
-    std::wstring Name() const override;
-    void EnumChildren(const std::function<bool(std::shared_ptr<libCZI::IXmlNodeRead>)>& enumChildren) override;
+        public:
+            // interface IXmlNodeRead
+            bool TryGetAttribute(const wchar_t* attributeName, std::wstring* attribValue) const override;
+            void EnumAttributes(const std::function<bool(const std::wstring& attribName, const std::wstring& attribValue)>& enumFunc) const override;
+            bool TryGetValue(std::wstring* value) const override;
+            std::shared_ptr<libCZI::IXmlNodeRead> GetChildNodeReadonly(const char* path) override;
+            std::wstring Name() const override;
+            void EnumChildren(const std::function<bool(std::shared_ptr<libCZI::IXmlNodeRead>)>& enumChildren) override;
 
-    // interface ISubBlockMetadataMetadataView
-    bool TryGetAttachmentDataFormat(std::wstring* data_format) override;
-    bool TryGetTagAsDouble(const std::wstring& tag_name, double* value) override;
-    bool TryGetTagAsString(const std::wstring& tag_name, std::wstring* value) override;
-    bool TryGetStagePositionFromTags(std::tuple<double, double>* stage_position) override;
+            // interface ISubBlockMetadataMetadataView
+            bool TryGetAttachmentDataFormat(std::wstring* data_format) override;
+            bool TryGetTagAsDouble(const std::wstring& tag_name, double* value) override;
+            bool TryGetTagAsString(const std::wstring& tag_name, std::wstring* value) override;
+            bool TryGetStagePositionFromTags(std::tuple<double, double>* stage_position) override;
 
-    bool IsXmlValid() const override;
-    std::string GetXml() const override;
+            bool IsXmlValid() const override;
+            std::string GetXml() const override;
 
-private:
-    void ThrowIfXmlInvalid() const;
-};
+        private:
+            void ThrowIfXmlInvalid() const;
+        };
+
+    }   // namespace detail
+}   // namespace libCZI

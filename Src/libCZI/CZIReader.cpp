@@ -14,6 +14,7 @@
 
 using namespace std;
 using namespace libCZI;
+using namespace libCZI::detail;
 
 static CCZIParse::SubblockDirectoryParseOptions GetParseOptionsFromOpenOptions(const ICZIReader::OpenOptions& options)
 {

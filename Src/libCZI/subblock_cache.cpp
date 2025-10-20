@@ -5,6 +5,7 @@
 #include "subblock_cache.h"
 
 using namespace libCZI;
+using namespace libCZI::detail;
 using namespace std;
 
 std::shared_ptr<ISubBlockCache> libCZI::CreateSubBlockCache()
