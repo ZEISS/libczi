@@ -6,9 +6,9 @@
 #include <cmath>
 #include <Eigen/Eigen>
 
-using namespace std;
 using namespace Eigen;
 using namespace libCZI::detail;
+using namespace std;
 
 /*static*/std::vector<CSplines::Coefficients> CSplines::GetSplineCoefficients(int pointsCnt, const std::function<void(int index, double* x, double* y)>& getPoint)
 {

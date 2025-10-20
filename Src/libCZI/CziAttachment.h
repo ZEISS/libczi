@@ -31,4 +31,4 @@ namespace libCZI
         };
 
     }  // namespace detail
-} 
+}  // namespace libCZI

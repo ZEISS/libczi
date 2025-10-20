@@ -7,9 +7,9 @@
 
 #include <random>
 
-using namespace std;
 using namespace libCZI;
 using namespace libCZI::detail;
+using namespace std;
 
 class CMemBitmapWrapper : public libCZI::IBitmapData
 {

@@ -5,9 +5,9 @@
 #include "SubblockMetadata.h"
 #include <sstream>
 
-using namespace libCZI::detail::pugi;
 using namespace libCZI;
 using namespace libCZI::detail;
+using namespace libCZI::detail::pugi;
 using namespace std;
 
 SubblockMetadata::SubblockMetadata(const char* xml, size_t xml_size)
