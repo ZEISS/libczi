@@ -696,6 +696,7 @@ TEST(CziWriter, WriteAndReadBitmapBgr24)
         "     <Channels>\n"
         "      <Channel Id=\"Channel:0\">\n"
         "       <PixelType>Bgr24</PixelType>\n"
+        "       <ComponentBitCount>8</ComponentBitCount>\n"
         "      </Channel>\n"
         "     </Channels>\n"
         "    </Dimensions>\n"
