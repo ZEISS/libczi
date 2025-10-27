@@ -2316,3 +2316,127 @@ TEST(CziWriter, TryAddingDuplicateSubBlocksToCziWriterAndWhenCheckIsDisable)
     auto statistics = reader->GetStatistics();
     EXPECT_EQ(statistics.subBlockCount, 2);
 }
+
+TEST(CziWriter, CheckPreparedMetadataContainsComponentBitCount)
+{
+    // This test verifies that the prepared metadata includes ComponentBitCount for each channel.
+    auto writer = CreateCZIWriter();
+    auto outStream = make_shared<CMemOutputStream>(0);
+    
+    auto spWriterInfo = make_shared<CCziWriterInfo>(GUID{ 0x1234567, 0x89ab, 0xcdef, { 1, 2, 3, 4, 5, 6, 7, 8 } });
+    writer->Create(outStream, spWriterInfo);
+
+    // Add a simple Gray8 subblock
+    auto bitmap = CreateGray8BitmapAndFill(4, 4, 42);
+    AddSubBlockInfoStridedBitmap addInfo;
+    addInfo.Clear();
+    addInfo.coordinate.Set(DimensionIndex::C, 0);
+    addInfo.mIndexValid = true;
+    addInfo.mIndex = 0;
+    addInfo.x = 0;
+    addInfo.y = 0;
+    addInfo.logicalWidth = bitmap->GetWidth();
+    addInfo.logicalHeight = bitmap->GetHeight();
+    addInfo.physicalWidth = bitmap->GetWidth();
+    addInfo.physicalHeight = bitmap->GetHeight();
+    addInfo.PixelType = PixelType::Gray8;
+    ScopedBitmapLockerSP lockBm{ bitmap };
+    addInfo.ptrBitmap = lockBm.ptrDataRoi;
+    addInfo.strideBitmap = lockBm.stride;
+    writer->SyncAddSubBlock(addInfo);
+
+    // Get prepared metadata and check it contains ComponentBitCount
+    PrepareMetadataInfo prepareInfo;
+    auto metadataBuilder = writer->GetPreparedMetadata(prepareInfo);
+    string xml = metadataBuilder->GetXml(true);
+
+    // Verify ComponentBitCount is present in the XML
+    EXPECT_NE(xml.find("<ComponentBitCount>"), string::npos) 
+        << "ComponentBitCount should be present in prepared metadata";
+    
+    // For Gray8, ComponentBitCount should be 8
+    EXPECT_NE(xml.find("<ComponentBitCount>8</ComponentBitCount>"), string::npos)
+        << "ComponentBitCount should be 8 for Gray8 pixel type";
+
+    writer->Close();
+}
+
+TEST(CziWriter, CheckPreparedMetadataContainsComponentBitCountForGray16)
+{
+    // This test verifies that ComponentBitCount is correctly set for Gray16 pixel type
+    auto writer = CreateCZIWriter();
+    auto outStream = make_shared<CMemOutputStream>(0);
+    
+    auto spWriterInfo = make_shared<CCziWriterInfo>(GUID{ 0x1234567, 0x89ab, 0xcdef, { 1, 2, 3, 4, 5, 6, 7, 8 } });
+    writer->Create(outStream, spWriterInfo);
+
+    // Add a simple Gray16 subblock
+    auto bitmap = CreateGray16BitmapAndFill(4, 4, 1000);
+    AddSubBlockInfoStridedBitmap addInfo;
+    addInfo.Clear();
+    addInfo.coordinate.Set(DimensionIndex::C, 0);
+    addInfo.mIndexValid = true;
+    addInfo.mIndex = 0;
+    addInfo.x = 0;
+    addInfo.y = 0;
+    addInfo.logicalWidth = bitmap->GetWidth();
+    addInfo.logicalHeight = bitmap->GetHeight();
+    addInfo.physicalWidth = bitmap->GetWidth();
+    addInfo.physicalHeight = bitmap->GetHeight();
+    addInfo.PixelType = PixelType::Gray16;
+    ScopedBitmapLockerSP lockBm{ bitmap };
+    addInfo.ptrBitmap = lockBm.ptrDataRoi;
+    addInfo.strideBitmap = lockBm.stride;
+    writer->SyncAddSubBlock(addInfo);
+
+    // Get prepared metadata and check it contains ComponentBitCount
+    PrepareMetadataInfo prepareInfo;
+    auto metadataBuilder = writer->GetPreparedMetadata(prepareInfo);
+    string xml = metadataBuilder->GetXml(true);
+
+    // For Gray16, ComponentBitCount should be 16
+    EXPECT_NE(xml.find("<ComponentBitCount>16</ComponentBitCount>"), string::npos)
+        << "ComponentBitCount should be 16 for Gray16 pixel type";
+
+    writer->Close();
+}
+
+TEST(CziWriter, CheckPreparedMetadataContainsComponentBitCountForBgr24)
+{
+    // This test verifies that ComponentBitCount is correctly set for Bgr24 pixel type
+    auto writer = CreateCZIWriter();
+    auto outStream = make_shared<CMemOutputStream>(0);
+    
+    auto spWriterInfo = make_shared<CCziWriterInfo>(GUID{ 0x1234567, 0x89ab, 0xcdef, { 1, 2, 3, 4, 5, 6, 7, 8 } });
+    writer->Create(outStream, spWriterInfo);
+
+    // Add a simple Bgr24 subblock
+    auto bitmap = CreateBgr24BitmapAndFill(4, 4, 100, 150, 200);
+    AddSubBlockInfoStridedBitmap addInfo;
+    addInfo.Clear();
+    addInfo.coordinate.Set(DimensionIndex::C, 0);
+    addInfo.mIndexValid = true;
+    addInfo.mIndex = 0;
+    addInfo.x = 0;
+    addInfo.y = 0;
+    addInfo.logicalWidth = bitmap->GetWidth();
+    addInfo.logicalHeight = bitmap->GetHeight();
+    addInfo.physicalWidth = bitmap->GetWidth();
+    addInfo.physicalHeight = bitmap->GetHeight();
+    addInfo.PixelType = PixelType::Bgr24;
+    ScopedBitmapLockerSP lockBm{ bitmap };
+    addInfo.ptrBitmap = lockBm.ptrDataRoi;
+    addInfo.strideBitmap = lockBm.stride;
+    writer->SyncAddSubBlock(addInfo);
+
+    // Get prepared metadata and check it contains ComponentBitCount
+    PrepareMetadataInfo prepareInfo;
+    auto metadataBuilder = writer->GetPreparedMetadata(prepareInfo);
+    string xml = metadataBuilder->GetXml(true);
+
+    // For Bgr24 (8 bits per component), ComponentBitCount should be 8
+    EXPECT_NE(xml.find("<ComponentBitCount>8</ComponentBitCount>"), string::npos)
+        << "ComponentBitCount should be 8 for Bgr24 pixel type (8 bits per component)";
+
+    writer->Close();
+}
