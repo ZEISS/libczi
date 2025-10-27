@@ -2411,7 +2411,7 @@ TEST(CziWriter, CheckPreparedMetadataContainsComponentBitCountForBgr24)
     writer->Create(outStream, spWriterInfo);
 
     // Add a simple Bgr24 subblock
-    auto bitmap = CreateBgr24BitmapAndFill(4, 4, 100, 150, 200);
+    auto bitmap = CreateTestBitmap(PixelType::Bgr24, 4, 4);
     AddSubBlockInfoStridedBitmap addInfo;
     addInfo.Clear();
     addInfo.coordinate.Set(DimensionIndex::C, 0);
