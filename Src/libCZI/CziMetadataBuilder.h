@@ -117,6 +117,7 @@ namespace libCZI
 
         private:
             static void FillImagePixelType(libCZI::ICziMetadataBuilder* builder, libCZI::PixelType pxlType);
+            static bool TryGetComponentBitCountFromPixelType(libCZI::PixelType pxlType, int& componentBitCount);
         };
 
     } // namespace detail
