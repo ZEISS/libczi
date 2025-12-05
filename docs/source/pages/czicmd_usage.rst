@@ -85,9 +85,9 @@ The synopsis of the program is:
                         for reading the source CZI-file. The data is given in
                         JSON-notation.
 
-      -o,--output OUTPUTFILE
-                        specifies the output-filename. A suffix will be appended to
-                        the name given here depending on the type of the file.
+  -o,--output OUTPUTFILE
+                    Specifies the output-filename. A suffix will be appended to
+                    the name given here depending on the type of the file.
 
       -p,--plane-coordinate PLANE-COORDINATE
                         Uniquely select a 2D-plane from the document. It is given in
@@ -116,11 +116,11 @@ The synopsis of the program is:
       -t,--drawtileboundaries
                         Draw a one-pixel black line around each tile.
 
-      -j,--jpgxrcodec DECODERNAME
-                        Choose which decoder implementation is used. Specifying
-                        "WIC" will request the Windows-provided decoder - which is
-                        only available on Windows.By default the internal
-                        JPG-XR-decoder is used.
+  -j,--jpgxrcodec DECODERNAME
+                    Choose which decoder implementation is used. Specifying
+                    "WIC" will request the Windows-provided decoder - which is
+                    only available on Windows. By default the internal
+                    JPG-XR-decoder is used.
 
       -v,--verbosity VERBOSITYLEVEL
                         Set the verbosity of this program. The argument is a comma-
@@ -128,21 +128,21 @@ The synopsis of the program is:
                         'All', 'Errors', 'Warnings', 'Infos', 'Errors1',
                         'Warnings1', 'Infos1', 'Errors2', 'Warnings2', 'Infos2'.
 
-      -b,--background BACKGROUND
-                        Specify the background color. BACKGROUND is either a single
-                        float or three floats, separated by a comma or semicolon. In
-                        case of a single float, it gives a grayscale value, in case
-                        of three floats it gives a RGB - value.The floats are given
-                        normalized to a range from 0 to 1.
+  -b,--background BACKGROUND
+                    Specify the background color. BACKGROUND is either a single
+                    float or three floats, separated by a comma or semicolon. In
+                    case of a single float, it gives a grayscale value, in case
+                    of three floats it gives a RGB - value. The floats are given
+                    normalized to a range from 0 to 1.
 
-      -y,--pyramidinfo PYRAMIDINFO
-                        For the command 'SingleChannelPyramidTileAccessor' the
-                        argument PYRAMIDINFO specifies the pyramid layer. It
-                        consists of two integers(separated by a comma, semicolon or
-                        pipe-symbol), where the first specifies the
-                        minification-factor (between pyramid-layers) and the second
-                        the pyramid-layer (starting with 0 for the layer with the
-                        highest resolution).
+  -y,--pyramidinfo PYRAMIDINFO
+                    For the command 'SingleChannelPyramidTileAccessor' the
+                    argument PYRAMIDINFO specifies the pyramid layer. It
+                    consists of two integers (separated by a comma, semicolon or
+                    pipe-symbol), where the first specifies the
+                    minification-factor (between pyramid-layers) and the second
+                    the pyramid-layer (starting with 0 for the layer with the
+                    highest resolution).
 
       -z,--zoom ZOOM    The zoom-factor (which is used for the commands
                         'SingleChannelScalingTileAccessor' and
@@ -207,26 +207,26 @@ The synopsis of the program is:
                         "cfc4a2fe-f968-4ef8-b685-e73d1b77271a" or
                         "{cfc4a2fe-f968-4ef8-b685-e73d1b77271a}"
 
-      --bitmapgenerator BITMAPGENERATORCLASSNAME
-                        Only used for 'CreateCZI': specifies the bitmap-generator to
-                        use. Possibly values are "gdi", "freetype", "null" or
-                        "default". Run with argument '--version' to get a list of
-                        available bitmap-generators.
+  --bitmapgenerator BITMAPGENERATORCLASSNAME
+                    Only used for 'CreateCZI': specifies the bitmap-generator to
+                    use. Possible values are "gdi", "freetype", "null" or
+                    "default". Run with argument '--version' to get a list of
+                    available bitmap-generators.
 
       --createczisbblkmetadata KEY_VALUE_SUBBLOCKMETADATA
                         Only used for 'CreateCZI': a key-value list in JSON-notation
                         which will be written as subblock-metadata. For example:
                         {"StageXPosition":-8906.346,"StageYPosition":-648.51}
 
-      --compressionopts COMPRESSIONDESCRIPTION
-                        Only used for 'CreateCZI': a string in a defined format
-                        which states the compression-method and (compression-method
-                        specific) parameters.The format is "compression_method:
-                        key=value; ...". It starts with the name of the
-                        compression-method, followed by a colon, then followed by a
-                        list of key-value pairs which are separated by a semicolon.
-                        Examples: "zstd0:ExplicitLevel=3",
-                        "zstd1:ExplicitLevel=2;PreProcess=HiLoByteUnpack".
+  --compressionopts COMPRESSIONDESCRIPTION
+                    Only used for 'CreateCZI': a string in a defined format
+                    which states the compression-method and (compression-method
+                    specific) parameters. The format is "compression_method:
+                    key=value; ...". It starts with the name of the
+                    compression-method, followed by a colon, then followed by a
+                    list of key-value pairs which are separated by a semicolon.
+                    Examples: "zstd0:ExplicitLevel=3",
+                    "zstd1:ExplicitLevel=2;PreProcess=HiLoByteUnpack".
 
       --generatorpixeltype PIXELTYPE
                         Only used for 'CreateCZI': a string defining the pixeltype

@@ -639,7 +639,7 @@ CCmdLineOptions::ParseResult CCmdLineOptions::Parse(int argc, char** argv)
         "Specifies the property-bag used for creating the stream used for reading the source CZI-file. The data is given in JSON-notation.")
         ->option_text("PROPBAG");
     cli_app.add_option("-o,--output", argument_output_filename,
-        "specifies the output-filename. A suffix will be appended to the name given here depending on the type of the file.")
+        "Specifies the output-filename. A suffix will be appended to the name given here depending on the type of the file.")
         ->option_text("OUTPUTFILE");
     // editorconfig-checker-disable
     cli_app.add_option("-p,--plane-coordinate", argument_plane_coordinate,
@@ -665,7 +665,7 @@ CCmdLineOptions::ParseResult CCmdLineOptions::Parse(int argc, char** argv)
     cli_app.add_flag("-t,--drawtileboundaries", argument_drawtileboundaries, "Draw a one-pixel black line around each tile.");
     cli_app.add_option("-j,--jpgxrcodec", argument_jpgxrcodec,
         "Choose which decoder implementation is used. Specifying \"WIC\" will request the Windows-provided decoder - which "
-        "is only available on Windows.By default the internal JPG-XR-decoder is used.")
+        "is only available on Windows. By default the internal JPG-XR-decoder is used.")
         ->option_text("DECODERNAME")
         ->check(jpgxr_codec_validator);
     cli_app.add_option("-v,--verbosity", argument_verbosity,
@@ -676,13 +676,13 @@ CCmdLineOptions::ParseResult CCmdLineOptions::Parse(int argc, char** argv)
         ->check(verbosity_validator);
     cli_app.add_option("-b,--background", argument_backgroundcolor,
         "Specify the background color. BACKGROUND is either a single float or three floats, separated by a comma or semicolon. In case of "
-        "a single float, it gives a grayscale value, in case of three floats it gives a RGB - value.The floats are given normalized to a range "
+        "a single float, it gives a grayscale value, in case of three floats it gives a RGB - value. The floats are given normalized to a range "
         "from 0 to 1.")
         ->option_text("BACKGROUND")
         ->check(background_color_validator);
     cli_app.add_option("-y,--pyramidinfo", argument_pyramidinfo,
         "For the command 'SingleChannelPyramidTileAccessor' the argument PYRAMIDINFO specifies the pyramid layer. It consists of two "
-        "integers(separated by a comma, semicolon or pipe-symbol), where the first specifies the minification-factor (between pyramid-layers) and "
+        "integers (separated by a comma, semicolon or pipe-symbol), where the first specifies the minification-factor (between pyramid-layers) and "
         "the second the pyramid-layer (starting with 0 for the layer with the highest resolution).")
         ->option_text("PYRAMIDINFO")
         ->check(pyramidinfo_validator);
@@ -742,7 +742,7 @@ CCmdLineOptions::ParseResult CCmdLineOptions::Parse(int argc, char** argv)
         ->option_text("CZI-File-GUID")
         ->check(guidofczi_validator);
     cli_app.add_option("--bitmapgenerator", argument_bitmapgenerator,
-        "Only used for 'CreateCZI': specifies the bitmap-generator to use. Possibly values are \"gdi\", \"freetype\", \"null\" or \"default\". "
+        "Only used for 'CreateCZI': specifies the bitmap-generator to use. Possible values are \"gdi\", \"freetype\", \"null\" or \"default\". "
         "Run with argument '--version' to get a list of available bitmap-generators.")
         ->option_text("BITMAPGENERATORCLASSNAME")
         ->check(bitmapgenerator_validator);
@@ -753,7 +753,7 @@ CCmdLineOptions::ParseResult CCmdLineOptions::Parse(int argc, char** argv)
         ->check(createsubblockmetadata_validator);
     cli_app.add_option("--compressionopts", argument_compressionoptions,
         "Only used for 'CreateCZI': a string in a defined format which states the compression-method and (compression-method specific) "
-        "parameters.The format is \"compression_method: key=value; ...\". It starts with the name of the compression-method, followed by a colon, "
+        "parameters. The format is \"compression_method: key=value; ...\". It starts with the name of the compression-method, followed by a colon, "
         "then followed by a list of key-value pairs which are separated by a semicolon. Examples: \"zstd0:ExplicitLevel=3\", \"zstd1:ExplicitLevel=2;PreProcess=HiLoByteUnpack\".")
         ->option_text("COMPRESSIONDESCRIPTION")
         ->check(compressionoptions_validator);
