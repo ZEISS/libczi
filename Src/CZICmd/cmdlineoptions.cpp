@@ -651,7 +651,7 @@ CCmdLineOptions::ParseResult CCmdLineOptions::Parse(int argc, char** argv)
     // editorconfig-checker-disable
     cli_app.add_option("-r,--rect", argument_rect,
         R"(Select a paraxial rectangular region as the region-of-interest. The coordinates may be given either absolute or relative. If using relative
-            coordinates, they are relative to what is determined as the upper-left point in the document.\nRelative coordinates are specified with
+            coordinates, they are relative to what is determined as the upper-left point in the document. \nRelative coordinates are specified with
             the syntax 'rel([x],[y],[width],[height])', absolute coordinates are specified 'abs([x],[y],[width],[height])'.
             \nExamples: rel(0, 0, 1024, 1024), rel(-100, -100, 500, 500), abs(-230, 100, 800, 800).)")
         ->option_text("ROI")
