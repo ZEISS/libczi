@@ -138,7 +138,7 @@ jobs:
           # now use the CZIcmd executable to create a test CZI file
           "$czicmd" --command CreateCZI --createbounds "C0:2T0:2" --generatorpixeltype Gray8 --compressionopts "zstd1:ExplicitLevel=2;PreProcess=HiLoByteUnpack" --createsubblocksize "1024x1024" -o test --bitmapgenerator default
           # start Azurite in the background (we start only the blob-service, as we only need this for the tests)
-          azurite-blob --inMemoryPersistence --silent &
+          azurite-blob --inMemoryPersistence --silent --skipApiVersionCheck &
           # create a blob container "testcontainer"
           az storage container create --name testcontainer  --connection-string "$AZURE_BLOB_STORE_CONNECTION_STRING"
           # upload the test CZI file to the container

@@ -6,7 +6,7 @@ include(utilities)
 include(CheckCSourceCompiles)
 
 if (LIBCZI_BUILD_PREFER_EXTERNALPACKAGE_EIGEN3)
- find_package (Eigen3 3.3 REQUIRED NO_MODULE)
+ find_package (Eigen3 REQUIRED NO_MODULE)
 else()
  include(ExternalEIGEN3)
 endif()
