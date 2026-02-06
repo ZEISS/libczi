@@ -540,6 +540,14 @@ CCZiMetadataBuilder::CCZiMetadataBuilder(const wchar_t* rootNodeName, const std:
                 pixelTypeNode->SetValue(pixelTypeString.c_str());
             }
 
+            // Add ComponentBitCount information inferred from the pixel type
+            int componentBitCount;
+            if (CMetadataPrepareHelper::TryGetComponentBitCountFromPixelType(pxlType, componentBitCount))
+            {
+                auto componentBitCountNode = channelNode->AppendChildNode("ComponentBitCount");
+                componentBitCountNode->SetValueI32(componentBitCount);
+            }
+
             if (pxlType != PixelType::Invalid && pxlTypeForImagePixelType == PixelType::Invalid)
             {
                 pxlTypeForImagePixelType = pxlType;
@@ -598,6 +606,50 @@ CCZiMetadataBuilder::CCZiMetadataBuilder(const wchar_t* rootNodeName, const std:
     }
 
     return true;
+}
+
+/*static*/bool CMetadataPrepareHelper::TryGetComponentBitCountFromPixelType(libCZI::PixelType pxlType, int& componentBitCount)
+{
+    // ComponentBitCount represents the actual number of significant bits per component.
+    // For most pixel types, this is the full bit depth. However, Gray16 often uses 14 or 16 bits, but for now leave as default.
+    switch (pxlType)
+    {
+    case PixelType::Gray8:
+        componentBitCount = 8;
+        return true;
+    case PixelType::Gray16:
+        componentBitCount = 16;
+        return true;
+    case PixelType::Gray32Float:
+        componentBitCount = 32;
+        return true;
+    case PixelType::Bgr24:
+        componentBitCount = 8;
+        return true;
+    case PixelType::Bgr48:
+        componentBitCount = 16;
+        return true;
+    case PixelType::Bgr96Float:
+        componentBitCount = 32;
+        return true;
+    case PixelType::Bgra32:
+        componentBitCount = 8;
+        return true;
+    case PixelType::Gray32:
+        componentBitCount = 32;
+        return true;
+    case PixelType::Gray64Float:
+        componentBitCount = 64;
+        return true;
+    case PixelType::Gray64ComplexFloat:
+        componentBitCount = 32; // Complex float uses 32 bits per real/imaginary component
+        return true;
+    case PixelType::Bgr192ComplexFloat:
+        componentBitCount = 32; // Complex float uses 32 bits per component
+        return true;
+    default:
+        return false;
+    }
 }
 
 //**************************************************************************************************
