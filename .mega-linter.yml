@@ -10,6 +10,7 @@ DISABLE:
   - SPELL # Comment to enable checks of spelling mistakes
 DISABLE_ERRORS_LINTERS:
   - MARKDOWN_MARKDOWN_LINK_CHECK # Make non-blocking due to network timeouts etc.
+  - REPOSITORY_GRYPE             # Make non-blocking due to database age issues in CI
 DISABLE_LINTERS:
   - REPOSITORY_TRIVY  # this linter seems currently broken, so we disable it here for now
 C_CPPLINT_ARGUMENTS: --verbose=2
