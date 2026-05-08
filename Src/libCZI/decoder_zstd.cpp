@@ -292,6 +292,10 @@ namespace
 
             auto bitmap = CStdBitmapData::Create(pixel_type, width, height);
             auto bitmap_lock_info = libCZI::ScopedBitmapLockerSP(bitmap);
+
+            // note: we divide the stride by 2 because that's the number of bytes per pel for a 16-bit pel, 
+            // and this gives the correct size also for Bgr48 (which we simply treat as a sequence of 16-bit
+            // pels for the purpose of the hi-lo-byte packing)
             LoHiBytePackUnpack::LoHiBytePackStrided(temporary_buffer.get(), zstd_frame_content_size, stride / 2, height, bitmap_lock_info.stride, bitmap_lock_info.ptrDataRoi);
             return bitmap;
         }
