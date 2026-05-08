@@ -15,11 +15,20 @@ using namespace libCZI;
 using namespace libCZI::detail;
 using namespace std;
 
+class ZStd1DecodeParametersFixture : public testing::TestWithParam<const char*>
+{
+protected:
+    const char* GetDecodeParameters() const
+    {
+        return GetParam();
+    }
+};
+
 static void _testImageCompressDecompressZStd0Basic(uint32_t imgWidth, uint32_t imgHeight, PixelType pixelType);
 static void _testImageCompressDecompressZStd0Param(uint32_t imgWidth, uint32_t imgHeight, PixelType pixelType, const ICompressParameters* parameters);
 
 static void _testImageCompressDecompressZStd1Basic(uint32_t imgWidth, uint32_t imgHeight, PixelType pixelType);
-static void _testImageCompressDecompressZStd1Param(uint32_t imgWidth, uint32_t imgHeight, PixelType pixelType, const ICompressParameters* parameters);
+static void _testImageCompressDecompressZStd1Param(uint32_t imgWidth, uint32_t imgHeight, PixelType pixelType, const ICompressParameters* parameters, const char* decode_parameters);
 
 //!< ZStd0 Compress and decompress image, pass null pointer as a compression parameter
 static void _testImageCompressDecompressZStd0Basic(uint32_t imgWidth, uint32_t imgHeight, PixelType pixelType)
@@ -30,7 +39,7 @@ static void _testImageCompressDecompressZStd0Basic(uint32_t imgWidth, uint32_t i
 //!< ZStd1 Compress and decompress image, pass null pointer as a compression parameter
 static void _testImageCompressDecompressZStd1Basic(uint32_t imgWidth, uint32_t imgHeight, PixelType pixelType)
 {
-    _testImageCompressDecompressZStd1Param(imgWidth, imgHeight, pixelType, nullptr);
+    _testImageCompressDecompressZStd1Param(imgWidth, imgHeight, pixelType, nullptr, nullptr);
 }
 
 //!< ZStd0 Compress and decompress image, pass a compression parameter.
@@ -74,7 +83,7 @@ static void _testImageCompressDecompressZStd0Param(uint32_t imgWidth, uint32_t i
 //! The function creates bitmap image with random pixels, which type is defined by 'pixelType' parameter.
 //! At the moment only Gray8, Gray16, Brg24 and Brg48 are supported.
 //! After decompression, the image buffer must have same data.
-static void _testImageCompressDecompressZStd1Param(uint32_t imgWidth, uint32_t imgHeight, PixelType pixelType, const ICompressParameters* parameters)
+static void _testImageCompressDecompressZStd1Param(uint32_t imgWidth, uint32_t imgHeight, PixelType pixelType, const ICompressParameters* parameters, const char* decode_parameters)
 {
     const size_t maxSize = ZstdCompress::CalculateMaxCompressedSizeZStd1(imgWidth, imgHeight, pixelType);
     std::unique_ptr<uint8_t[]> buffer = unique_ptr<uint8_t[]>(new uint8_t[maxSize]);
@@ -95,7 +104,7 @@ static void _testImageCompressDecompressZStd1Param(uint32_t imgWidth, uint32_t i
     EXPECT_TRUE(maxSize >= imgSize) << "Unexpected compress image size";
 
     std::shared_ptr<CZstd1Decoder> dec = CZstd1Decoder::Create();
-    std::shared_ptr<libCZI::IBitmapData> decImg = dec->Decode(buffer.get(), imgSize, pixelType, img->GetWidth(), img->GetHeight());
+    std::shared_ptr<libCZI::IBitmapData> decImg = dec->Decode(buffer.get(), imgSize, pixelType, img->GetWidth(), img->GetHeight(), decode_parameters);
 
     EXPECT_TRUE(decImg != nullptr) << "Failed to create decoded image";
     EXPECT_TRUE(decImg->GetHeight() == imgHeight) << "The decoded image has wrong height";
@@ -117,12 +126,12 @@ TEST(ZStdCompress, CompressZStd0Gray8Basic)
 
 //! Test ZStd1 compression and decompression for pixel type Gray8 
 //! and use default compression parameters.
-TEST(ZStdCompress, CompressZStd1Gray8Basic)
+TEST_P(ZStd1DecodeParametersFixture, CompressZStd1Gray8Basic)
 {
     constexpr PixelType pixelType = PixelType::Gray8;
 
-    _testImageCompressDecompressZStd1Basic(64, 64, pixelType);
-    _testImageCompressDecompressZStd1Basic(61, 61, pixelType);
+    _testImageCompressDecompressZStd1Param(64, 64, pixelType, nullptr, GetDecodeParameters());
+    _testImageCompressDecompressZStd1Param(61, 61, pixelType, nullptr, GetDecodeParameters());
 }
 
 //! Test ZStd0 compression and decompression for pixel type Gray16 
@@ -137,12 +146,12 @@ TEST(ZStdCompress, CompressZStd0Gray16Basic)
 
 //! Test ZStd1 compression and decompression for pixel type Gray16 
 //! and use default compression parameters.
-TEST(ZStdCompress, CompressZStd1Gray16Basic)
+TEST_P(ZStd1DecodeParametersFixture, CompressZStd1Gray16Basic)
 {
     constexpr PixelType pixelType = PixelType::Gray16;
 
-    _testImageCompressDecompressZStd1Basic(64, 64, pixelType);
-    _testImageCompressDecompressZStd1Basic(61, 61, pixelType);
+    _testImageCompressDecompressZStd1Param(64, 64, pixelType, nullptr, GetDecodeParameters());
+    _testImageCompressDecompressZStd1Param(61, 61, pixelType, nullptr, GetDecodeParameters());
 }
 
 //! Test ZStd0 compression and decompression for pixel type Brg24 
@@ -157,12 +166,12 @@ TEST(ZStdCompress, CompressZStd0Brg24Basic)
 
 //! Test ZStd1 compression and decompression for pixel type Brg24 
 //! and use default compression parameters.
-TEST(ZStdCompress, CompressZStd1Brg24Basic)
+TEST_P(ZStd1DecodeParametersFixture, CompressZStd1Brg24Basic)
 {
     constexpr PixelType pixelType = PixelType::Bgr24;
 
-    _testImageCompressDecompressZStd1Basic(64, 64, pixelType);
-    _testImageCompressDecompressZStd1Basic(61, 61, pixelType);
+    _testImageCompressDecompressZStd1Param(64, 64, pixelType, nullptr, GetDecodeParameters());
+    _testImageCompressDecompressZStd1Param(61, 61, pixelType, nullptr, GetDecodeParameters());
 }
 
 //! Test ZStd0 compression and decompression for pixel type Brg48 
@@ -177,12 +186,12 @@ TEST(ZStdCompress, CompressZStd0Brg48Basic)
 
 //! Test ZStd1 compression and decompression for pixel type Brg48 
 //! and use default compression parameters.
-TEST(ZStdCompress, CompressZStd1Brg48Basic)
+TEST_P(ZStd1DecodeParametersFixture, CompressZStd1Brg48Basic)
 {
     constexpr PixelType pixelType = PixelType::Bgr48;
 
-    _testImageCompressDecompressZStd1Basic(64, 64, pixelType);
-    _testImageCompressDecompressZStd1Basic(61, 61, pixelType);
+    _testImageCompressDecompressZStd1Param(64, 64, pixelType, nullptr, GetDecodeParameters());
+    _testImageCompressDecompressZStd1Param(61, 61, pixelType, nullptr, GetDecodeParameters());
 }
 
 //! Test ZStd0 compression and decompression for pixel type Gray8 
@@ -202,7 +211,7 @@ TEST(ZStdCompress, CompressZStd0Gray8Level2)
 
 //! Test ZStd1 compression and decompression for pixel type Gray8 
 //! and use compression parameter "zstd1:ExplicitLevel=2"
-TEST(ZStdCompress, CompressZStd1Gray8Level2)
+TEST_P(ZStd1DecodeParametersFixture, CompressZStd1Gray8Level2)
 {
     constexpr PixelType pixelType = PixelType::Gray8;
     constexpr int32_t keyLevel = static_cast<int>(libCZI::CompressionParameterKey::ZSTD_RAWCOMPRESSIONLEVEL);
@@ -211,8 +220,8 @@ TEST(ZStdCompress, CompressZStd1Gray8Level2)
     libCZI::CompressParametersOnMap params;
     params.map[keyLevel] = CompressParameter(valLevel);
 
-    _testImageCompressDecompressZStd1Param(64, 64, pixelType, &params);
-    _testImageCompressDecompressZStd1Param(61, 61, pixelType, &params);
+    _testImageCompressDecompressZStd1Param(64, 64, pixelType, &params, GetDecodeParameters());
+    _testImageCompressDecompressZStd1Param(61, 61, pixelType, &params, GetDecodeParameters());
 }
 
 //! Test ZStd0 compression and decompression for pixel type Gray16
@@ -232,7 +241,7 @@ TEST(ZStdCompress, CompressZStd0Gray16Level2)
 
 //! Test ZStd1 compression and decompression for pixel type Gray16
 //! and use compression parameter "zstd1:ExplicitLevel=2"
-TEST(ZStdCompress, CompressZStd1Gray16Level2)
+TEST_P(ZStd1DecodeParametersFixture, CompressZStd1Gray16Level2)
 {
     constexpr PixelType pixelType = PixelType::Gray16;
     constexpr int32_t keyLevel = static_cast<int>(libCZI::CompressionParameterKey::ZSTD_RAWCOMPRESSIONLEVEL);
@@ -241,8 +250,8 @@ TEST(ZStdCompress, CompressZStd1Gray16Level2)
     libCZI::CompressParametersOnMap params;
     params.map[keyLevel] = CompressParameter(valLevel);
 
-    _testImageCompressDecompressZStd1Param(64, 64, pixelType, &params);
-    _testImageCompressDecompressZStd1Param(61, 61, pixelType, &params);
+    _testImageCompressDecompressZStd1Param(64, 64, pixelType, &params, GetDecodeParameters());
+    _testImageCompressDecompressZStd1Param(61, 61, pixelType, &params, GetDecodeParameters());
 }
 
 //! Test ZStd0 compression and decompression for pixel type Brg24 
@@ -262,7 +271,7 @@ TEST(ZStdCompress, CompressZStd0Brg24Level2)
 
 //! Test ZStd1 compression and decompression for pixel type Brg24 
 //! and use compression parameter "zstd1:ExplicitLevel=2"
-TEST(ZStdCompress, CompressZStd1Brg24Level2)
+TEST_P(ZStd1DecodeParametersFixture, CompressZStd1Brg24Level2)
 {
     constexpr PixelType pixelType = PixelType::Bgr24;
     constexpr int32_t keyLevel = static_cast<int>(libCZI::CompressionParameterKey::ZSTD_RAWCOMPRESSIONLEVEL);
@@ -271,8 +280,8 @@ TEST(ZStdCompress, CompressZStd1Brg24Level2)
     libCZI::CompressParametersOnMap params;
     params.map[keyLevel] = CompressParameter(valLevel);
 
-    _testImageCompressDecompressZStd1Param(64, 64, pixelType, &params);
-    _testImageCompressDecompressZStd1Param(61, 61, pixelType, &params);
+    _testImageCompressDecompressZStd1Param(64, 64, pixelType, &params, GetDecodeParameters());
+    _testImageCompressDecompressZStd1Param(61, 61, pixelType, &params, GetDecodeParameters());
 }
 
 //! Test ZStd0 compression and decompression for pixel type Brg48
@@ -292,7 +301,7 @@ TEST(ZStdCompress, CompressZStd0Brg48Level2)
 
 //! Test ZStd1 compression and decompression for pixel type Brg48
 //! and use compression parameter "zstd1:ExplicitLevel=2"
-TEST(ZStdCompress, CompressZStd1Brg48Level2)
+TEST_P(ZStd1DecodeParametersFixture, CompressZStd1Brg48Level2)
 {
     constexpr PixelType pixelType = PixelType::Bgr48;
     constexpr int32_t keyLevel = static_cast<int>(libCZI::CompressionParameterKey::ZSTD_RAWCOMPRESSIONLEVEL);
@@ -301,8 +310,8 @@ TEST(ZStdCompress, CompressZStd1Brg48Level2)
     libCZI::CompressParametersOnMap params;
     params.map[keyLevel] = CompressParameter(valLevel);
 
-    _testImageCompressDecompressZStd1Param(64, 64, pixelType, &params);
-    _testImageCompressDecompressZStd1Param(61, 61, pixelType, &params);
+    _testImageCompressDecompressZStd1Param(64, 64, pixelType, &params, GetDecodeParameters());
+    _testImageCompressDecompressZStd1Param(61, 61, pixelType, &params, GetDecodeParameters());
 }
 
 //! Test ZStd0 compression and decompression for pixel type Gray8
@@ -327,7 +336,7 @@ TEST(ZStdCompress, CompressZStd0Gray8Level2LowByte)
 //! Test ZStd1 compression and decompression for pixel type Gray8
 //! and use compression parameter "zstd1:ExplicitLevel=2;PreProcess=HiLoByteUnpack"
 //! The Low-high byte packing is ignored for the Gray8.
-TEST(ZStdCompress, CompressZStd1Gray8Level2LowByte)
+TEST_P(ZStd1DecodeParametersFixture, CompressZStd1Gray8Level2LowByte)
 {
     constexpr PixelType pixelType = PixelType::Gray8;
     constexpr int32_t keyLevel = static_cast<int32_t>(libCZI::CompressionParameterKey::ZSTD_RAWCOMPRESSIONLEVEL);
@@ -339,8 +348,8 @@ TEST(ZStdCompress, CompressZStd1Gray8Level2LowByte)
     params.map[keyLevel] = CompressParameter(valLevel);
     params.map[keyLowPack] = CompressParameter(valLowPack);
 
-    _testImageCompressDecompressZStd1Param(64, 64, pixelType, &params);
-    _testImageCompressDecompressZStd1Param(61, 61, pixelType, &params);
+    _testImageCompressDecompressZStd1Param(64, 64, pixelType, &params, GetDecodeParameters());
+    _testImageCompressDecompressZStd1Param(61, 61, pixelType, &params, GetDecodeParameters());
 }
 
 //! Test ZStd0 compression and decompression for pixel type Gray16
@@ -364,7 +373,7 @@ TEST(ZStdCompress, CompressZStd0Gray16Level2LowByte)
 
 //! Test ZStd1 compression and decompression for pixel type Gray16
 //! and use compression parameter "zstd1:ExplicitLevel=2;PreProcess=HiLoByteUnpack"
-TEST(ZStdCompress, CompressZStd1Gray16Level2LowByte)
+TEST_P(ZStd1DecodeParametersFixture, CompressZStd1Gray16Level2LowByte)
 {
     constexpr PixelType pixelType = PixelType::Gray16;
     constexpr int32_t keyLevel = static_cast<int32_t>(libCZI::CompressionParameterKey::ZSTD_RAWCOMPRESSIONLEVEL);
@@ -376,8 +385,8 @@ TEST(ZStdCompress, CompressZStd1Gray16Level2LowByte)
     params.map[keyLevel] = CompressParameter(valLevel);
     params.map[keyLowPack] = CompressParameter(valLowPack);
 
-    _testImageCompressDecompressZStd1Param(64, 64, pixelType, &params);
-    _testImageCompressDecompressZStd1Param(61, 61, pixelType, &params);
+    _testImageCompressDecompressZStd1Param(64, 64, pixelType, &params, GetDecodeParameters());
+    _testImageCompressDecompressZStd1Param(61, 61, pixelType, &params, GetDecodeParameters());
 }
 
 //! Test ZStd0 compression and decompression for pixel type Bgr24
@@ -402,7 +411,7 @@ TEST(ZStdCompress, CompressZStd0Brg24Level2LowByte)
 //! Test ZStd1 compression and decompression for pixel type Bgr24
 //! and use compression parameter "zstd1:ExplicitLevel=2;PreProcess=HiLoByteUnpack"
 //! The Low-high byte packing is ignored for the Bgr24.
-TEST(ZStdCompress, CompressZStd1Brg24Level2LowByte)
+TEST_P(ZStd1DecodeParametersFixture, CompressZStd1Brg24Level2LowByte)
 {
     constexpr PixelType pixelType = PixelType::Bgr24;
     constexpr int32_t keyLevel = static_cast<int32_t>(libCZI::CompressionParameterKey::ZSTD_RAWCOMPRESSIONLEVEL);
@@ -414,8 +423,8 @@ TEST(ZStdCompress, CompressZStd1Brg24Level2LowByte)
     params.map[keyLevel] = CompressParameter(valLevel);
     params.map[keyLowPack] = CompressParameter(valLowPack);
 
-    _testImageCompressDecompressZStd1Param(64, 64, pixelType, &params);
-    _testImageCompressDecompressZStd1Param(61, 61, pixelType, &params);
+    _testImageCompressDecompressZStd1Param(64, 64, pixelType, &params, GetDecodeParameters());
+    _testImageCompressDecompressZStd1Param(61, 61, pixelType, &params, GetDecodeParameters());
 }
 
 //! Test ZStd0 compression and decompression for pixel type Bgr48
@@ -439,7 +448,7 @@ TEST(ZStdCompress, CompressZStd0Brg48Level2LowByte)
 
 //! Test ZStd1 compression and decompression for pixel type Bgr48
 //! and use compression parameter "zstd1:ExplicitLevel=2;PreProcess=HiLoByteUnpack"
-TEST(ZStdCompress, CompressZStd1Brg48Level2LowByte)
+TEST_P(ZStd1DecodeParametersFixture, CompressZStd1Brg48Level2LowByte)
 {
     constexpr PixelType pixelType = PixelType::Bgr48;
     constexpr int32_t keyLevel = static_cast<int32_t>(libCZI::CompressionParameterKey::ZSTD_RAWCOMPRESSIONLEVEL);
@@ -451,6 +460,16 @@ TEST(ZStdCompress, CompressZStd1Brg48Level2LowByte)
     params.map[keyLevel] = CompressParameter(valLevel);
     params.map[keyLowPack] = CompressParameter(valLowPack);
 
-    _testImageCompressDecompressZStd1Param(64, 64, pixelType, &params);
-    _testImageCompressDecompressZStd1Param(61, 61, pixelType, &params);
+    _testImageCompressDecompressZStd1Param(64, 64, pixelType, &params, GetDecodeParameters());
+    _testImageCompressDecompressZStd1Param(61, 61, pixelType, &params, GetDecodeParameters());
 }
+
+// run the tests with and without decode parameter "handle_data_size_mismatch", which is used to
+// handle the data size mismatch between compressed data and expected data size in decoder, and 
+// it should not affect the decompression result.
+INSTANTIATE_TEST_SUITE_P(
+    DecodeParameters,
+    ZStd1DecodeParametersFixture,
+    testing::Values(
+        nullptr,
+        "handle_data_size_mismatch"));
