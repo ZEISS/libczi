@@ -292,7 +292,7 @@ namespace
 
             auto bitmap = CStdBitmapData::Create(pixel_type, width, height);
             auto bitmap_lock_info = libCZI::ScopedBitmapLockerSP(bitmap);
-            LoHiBytePackUnpack::LoHiBytePackStrided(temporary_buffer.get(), zstd_frame_content_size, stride / bytes_per_pel, height, bitmap_lock_info.stride, bitmap_lock_info.ptrDataRoi);
+            LoHiBytePackUnpack::LoHiBytePackStrided(temporary_buffer.get(), zstd_frame_content_size, stride / 2, height, bitmap_lock_info.stride, bitmap_lock_info.ptrDataRoi);
             return bitmap;
         }
         else if (zstd_frame_content_size < expectedSize)
@@ -307,7 +307,7 @@ namespace
 
             auto bitmap = CStdBitmapData::Create(pixel_type, width, height, stride);
             auto bitmap_lock_info = libCZI::ScopedBitmapLockerSP(bitmap);
-            LoHiBytePackUnpack::LoHiBytePackStrided(temporary_buffer.get(), zstd_frame_content_size, decompressed_size / bytes_per_pel, 1, zstd_frame_content_size, bitmap_lock_info.ptrDataRoi);
+            LoHiBytePackUnpack::LoHiBytePackStrided(temporary_buffer.get(), zstd_frame_content_size, decompressed_size / 2, 1, zstd_frame_content_size, bitmap_lock_info.ptrDataRoi);
             memset(static_cast<uint8_t*>(bitmap_lock_info.ptrDataRoi) + decompressed_size, 0, expectedSize - decompressed_size);
             return bitmap;
         }
@@ -331,7 +331,7 @@ namespace
                 throw runtime_error("Failed to allocate temporary buffer for Zstd-decompression.");
             }
 
-            LoHiBytePackUnpack::LoHiBytePackStrided(temporary_buffer.get(), zstd_frame_content_size, decompressed_size / bytes_per_pel, 1, zstd_frame_content_size, temporary_buffer_for_packed.get());
+            LoHiBytePackUnpack::LoHiBytePackStrided(temporary_buffer.get(), zstd_frame_content_size, decompressed_size / 2, 1, zstd_frame_content_size, temporary_buffer_for_packed.get());
 
             // now we can release the first temporary buffer
             temporary_buffer.reset();
