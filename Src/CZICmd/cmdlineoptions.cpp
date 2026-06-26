@@ -537,7 +537,9 @@ CCmdLineOptions::ParseResult CCmdLineOptions::Parse(int argc, char** argv)
         { "ScalingChannelComposite",            Command::ScalingChannelComposite },
         { "ExtractAttachment",                  Command::ExtractAttachment},
         { "CreateCZI",                          Command::CreateCZI },
+        { "ReEncodeCZI",                        Command::ReEncodeCZI },
         { "PlaneScan",                          Command::PlaneScan },
+        { "CompareImages",                      Command::CompareImages },
     };
 
     const static PlaneCoordinateValidator plane_coordinate_validator;
@@ -565,6 +567,7 @@ CCmdLineOptions::ParseResult CCmdLineOptions::Parse(int argc, char** argv)
     Command argument_command;
     string argument_source_filename;
     string argument_output_filename;
+    string argument_compare_filename;
     string argument_plane_coordinate;
     string argument_rect;
     string argument_display_settings;
@@ -600,7 +603,7 @@ CCmdLineOptions::ParseResult CCmdLineOptions::Parse(int argc, char** argv)
     // editorconfig-checker-disable
     cli_app.add_option("-c,--command", argument_command,
         R"(COMMAND can be one of 'PrintInformation', 'ExtractSubBlock', 'SingleChannelTileAccessor', 'ChannelComposite',
-           'SingleChannelPyramidTileAccessor', 'SingleChannelScalingTileAccessor', 'ScalingChannelComposite', 'ExtractAttachment' and 'CreateCZI'.
+           'SingleChannelPyramidTileAccessor', 'SingleChannelScalingTileAccessor', 'ScalingChannelComposite', 'ExtractAttachment', 'CreateCZI', 'ReEncodeCZI' and 'CompareImages'.
            \N'PrintInformation' will print information about the CZI-file to the console. The argument 'info-level' can be used
            to specify which information is to be printed.
            \N'ExtractSubBlock' will write the bitmap contained in the specified sub-block to the OUTPUTFILE.
@@ -616,7 +619,9 @@ CCmdLineOptions::ParseResult CCmdLineOptions::Parse(int argc, char** argv)
            \N'ScalingChannelComposite' operates like the previous command, but in addition gets all channels and creates a multi-channel-composite from them
            using display-settings.
            \N'ExtractAttachment' allows to extract (and save to a file) the contents of attachments.)
-           \N'CreateCZI' is used to demonstrate the CZI-creation capabilities of libCZI.)
+           \N'CreateCZI' is used to demonstrate the CZI-creation capabilities of libCZI (synthetic tiles; use --createbounds; -s is not used for pixels).
+           \N'ReEncodeCZI' reads the CZI given with -s and writes a new CZI to -o with the same metadata, attachments, subblock layout, and per-subblock metadata/attachments; only the pixel payload is re-encoded per --compressionopts (e.g. jxl:, zstd1:, uncompressed:).)
+           \N'CompareImages' reads two CZIs (-s and --compare), pairs subblocks by tile layout (dimension coordinate, logical rect, physical size, pixel type, M-index), decodes each pair, and reports RMSD over all scalar samples. Directory index order may differ between files.)
            \N'PlaneScan' does the following: over a ROI given with the --rect option a rectangle of size given with 
            the --tilesize-for-plane-scan option is moved, and the image content of this rectangle is written out to
            files. The operation takes place on a plane which is given with the --plane-coordinate option. The filenames of the
@@ -639,6 +644,9 @@ CCmdLineOptions::ParseResult CCmdLineOptions::Parse(int argc, char** argv)
     cli_app.add_option("-o,--output", argument_output_filename,
         "Specifies the output-filename. A suffix will be appended to the name given here depending on the type of the file.")
         ->option_text("OUTPUTFILE");
+    cli_app.add_option("--compare", argument_compare_filename,
+        "Second CZI file for 'CompareImages' (decoded pixels are compared to -s in subblock order). Uses the same stream class and property bag as -s when set.")
+        ->option_text("COMPAREFILE");
     // editorconfig-checker-disable
     cli_app.add_option("-p,--plane-coordinate", argument_plane_coordinate,
         R"(Uniquely select a 2D-plane from the document. It is given in the form [DimChar][number], where 'DimChar' specifies a dimension and 
@@ -713,7 +721,8 @@ CCmdLineOptions::ParseResult CCmdLineOptions::Parse(int argc, char** argv)
         ->option_text("CHANNELCOMPOSITIONFORMAT")
         ->check(channelcompositionformat_validator);
     cli_app.add_option("--createbounds", arguments_createbounds,
-        "Only used for 'CreateCZI': specify the range of coordinates used to create a CZI. Format is e.g. 'T0:3Z0:3C0:2'.")
+        "Required for 'CreateCZI': dimension ranges for which synthetic tiles are written. Format is e.g. 'T0:3Z0:3C0:2' "
+        "(dimension letter, start index, colon, count). CreateCZI does not copy image data from -s.")
         ->option_text("BOUNDS")
         ->check(createbounds_validator);
     cli_app.add_option("--createsubblocksize", arguments_createsubblocksize,
@@ -750,9 +759,10 @@ CCmdLineOptions::ParseResult CCmdLineOptions::Parse(int argc, char** argv)
         ->option_text("KEY_VALUE_SUBBLOCKMETADATA")
         ->check(createsubblockmetadata_validator);
     cli_app.add_option("--compressionopts", argument_compressionoptions,
-        "Only used for 'CreateCZI': a string in a defined format which states the compression-method and (compression-method specific) "
+        "Used for 'CreateCZI' and 'ReEncodeCZI': a string in a defined format which states the compression-method and (compression-method specific) "
         "parameters. The format is \"compression_method: key=value; ...\". It starts with the name of the compression-method, followed by a colon, "
-        "then followed by a list of key-value pairs which are separated by a semicolon. Examples: \"zstd0:ExplicitLevel=3\", \"zstd1:ExplicitLevel=2;PreProcess=HiLoByteUnpack\".")
+        "then followed by a list of key-value pairs which are separated by a semicolon. Examples: \"zstd0:ExplicitLevel=3\", \"zstd1:ExplicitLevel=2;PreProcess=HiLoByteUnpack\", "
+        "\"jxl:\" or \"jxl:Effort=7;Modular=true;DecodingSpeed=0;Responsive=0\" for JPEG XL (requires LIBCZI_BUILD_WITH_LIBJXL), \"uncompressed:\" for raw pixels on ReEncodeCZI.")
         ->option_text("COMPRESSIONDESCRIPTION")
         ->check(compressionoptions_validator);
     cli_app.add_option("--generatorpixeltype", argument_generatorpixeltype,
@@ -832,6 +842,11 @@ CCmdLineOptions::ParseResult CCmdLineOptions::Parse(int argc, char** argv)
         if (!argument_output_filename.empty())
         {
             this->SetOutputFilename(convertUtf8ToWide(argument_output_filename));
+        }
+
+        if (!argument_compare_filename.empty())
+        {
+            this->compareCziFilename = convertUtf8ToWide(argument_compare_filename);
         }
 
         if (!argument_plane_coordinate.empty())
@@ -1021,7 +1036,7 @@ bool CCmdLineOptions::CheckArgumentConsistency() const
         return false;
     }
 
-    if (cmd != Command::PrintInformation)
+    if (cmd != Command::PrintInformation && cmd != Command::CompareImages)
     {
         auto str = this->MakeOutputFilename(nullptr, nullptr);
         if (str.empty())
@@ -1030,6 +1045,13 @@ bool CCmdLineOptions::CheckArgumentConsistency() const
             this->GetLog()->WriteLineStdErr(ss.str());
             return false;
         }
+    }
+
+    if (cmd == Command::CompareImages && this->compareCziFilename.empty())
+    {
+        ss << ERRORPREFIX << "CompareImages requires --compare <second CZI file>";
+        this->GetLog()->WriteLineStdErr(ss.str());
+        return false;
     }
 
     switch (cmd)
@@ -1082,6 +1104,22 @@ bool CCmdLineOptions::CheckArgumentConsistency() const
         break;
     }
 
+    if (cmd == Command::CreateCZI && this->createBounds.IsEmpty())
+    {
+        ss << ERRORPREFIX << "CreateCZI requires --createbounds (for example: --createbounds \"C0:1\" or \"C0:1T0:3\"). "
+              "If bounds are empty, no subblocks are written. The source file (-s) is not read for CreateCZI; "
+              "tiles are generated only by the bitmap generator for the coordinate ranges you specify.";
+        this->GetLog()->WriteLineStdErr(ss.str());
+        return false;
+    }
+
+    if (cmd == Command::ReEncodeCZI && this->compressionMode == libCZI::CompressionMode::Invalid)
+    {
+        ss << ERRORPREFIX << "ReEncodeCZI requires --compressionopts (for example: \"jxl:\", \"jxl:Effort=5\", \"zstd1:ExplicitLevel=3\", or \"uncompressed:\").";
+        this->GetLog()->WriteLineStdErr(ss.str());
+        return false;
+    }
+
     // TODO: there is probably more to be checked
 
     return true;
@@ -1090,6 +1128,7 @@ bool CCmdLineOptions::CheckArgumentConsistency() const
 void CCmdLineOptions::Clear()
 {
     this->command = Command::Invalid;
+    this->compareCziFilename.clear();
     this->useDisplaySettingsFromDocument = true;
     this->calcHashOfResult = false;
     this->drawTileBoundaries = false;

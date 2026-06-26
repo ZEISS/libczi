@@ -29,7 +29,8 @@ namespace
             libCZI::CompressionMode::Jpg,
             libCZI::CompressionMode::JpgXr,
             libCZI::CompressionMode::Zstd0,
-            libCZI::CompressionMode::Zstd1
+            libCZI::CompressionMode::Zstd1,
+            libCZI::CompressionMode::Jxl
         };
 
         for (const auto& compressionMode : AvailableCompressionModes)
@@ -43,6 +44,31 @@ namespace
 
                 return true;
             }
+        }
+
+        return false;
+    }
+
+    bool tryParseBoolish(const string& value, bool* out)
+    {
+        if (Utilities::icasecmp(value, "true") || value == "1" || Utilities::icasecmp(value, "yes"))
+        {
+            if (out != nullptr)
+            {
+                *out = true;
+            }
+
+            return true;
+        }
+
+        if (Utilities::icasecmp(value, "false") || value == "0" || Utilities::icasecmp(value, "no"))
+        {
+            if (out != nullptr)
+            {
+                *out = false;
+            }
+
+            return true;
         }
 
         return false;
@@ -98,6 +124,94 @@ namespace
                         }
                     }
                 }
+                else if (Utilities::icasecmp(key, Utils::KEY_JXL_EFFORT))
+                {
+                    size_t indexParsingStopped;
+                    try
+                    {
+                        const int i = stoi(value, &indexParsingStopped);
+                        if (value[indexParsingStopped] != '\0')
+                        {
+                            return false;
+                        }
+
+                        if (map != nullptr)
+                        {
+                            (*map)[static_cast<int>(libCZI::CompressionParameterKey::JXL_EFFORT)] = libCZI::CompressParameter(static_cast<std::int32_t>(i));
+                        }
+                    }
+                    catch (invalid_argument&)
+                    {
+                        return false;
+                    }
+                    catch (out_of_range&)
+                    {
+                        return false;
+                    }
+                }
+                else if (Utilities::icasecmp(key, Utils::KEY_JXL_MODULAR))
+                {
+                    bool b;
+                    if (!tryParseBoolish(value, &b))
+                    {
+                        return false;
+                    }
+
+                    if (map != nullptr)
+                    {
+                        (*map)[static_cast<int>(libCZI::CompressionParameterKey::JXL_MODULAR)] = libCZI::CompressParameter(b);
+                    }
+                }
+                else if (Utilities::icasecmp(key, Utils::KEY_JXL_DECODING_SPEED))
+                {
+                    size_t indexParsingStopped;
+                    try
+                    {
+                        const int i = stoi(value, &indexParsingStopped);
+                        if (value[indexParsingStopped] != '\0')
+                        {
+                            return false;
+                        }
+
+                        if (map != nullptr)
+                        {
+                            (*map)[static_cast<int>(libCZI::CompressionParameterKey::JXL_DECODING_SPEED)] = libCZI::CompressParameter(static_cast<std::int32_t>(i));
+                        }
+                    }
+                    catch (invalid_argument&)
+                    {
+                        return false;
+                    }
+                    catch (out_of_range&)
+                    {
+                        return false;
+                    }
+                }
+                else if (Utilities::icasecmp(key, Utils::KEY_JXL_RESPONSIVE))
+                {
+                    size_t indexParsingStopped;
+                    try
+                    {
+                        const int i = stoi(value, &indexParsingStopped);
+                        if (value[indexParsingStopped] != '\0')
+                        {
+                            return false;
+                        }
+
+                        if (map != nullptr)
+                        {
+                            (*map)[static_cast<int>(libCZI::CompressionParameterKey::JXL_RESPONSIVE)] = libCZI::CompressParameter(static_cast<std::int32_t>(i));
+                        }
+                    }
+                    catch (invalid_argument&)
+                    {
+                        return false;
+                    }
+                    catch (out_of_range&)
+                    {
+                        return false;
+                    }
+                }
             }
         }
 
@@ -108,6 +222,10 @@ namespace
 const char* const Utils::KEY_COMPRESS_EXPLICIT_LEVEL = "ExplicitLevel";
 const char* const Utils::KEY_COMPRESS_PRE_PROCESS = "PreProcess";
 const char* const Utils::VALUE_COMPRESS_HILO_BYTE_UNPACK = "HiLoByteUnpack";
+const char* const Utils::KEY_JXL_EFFORT = "Effort";
+const char* const Utils::KEY_JXL_MODULAR = "Modular";
+const char* const Utils::KEY_JXL_DECODING_SPEED = "DecodingSpeed";
+const char* const Utils::KEY_JXL_RESPONSIVE = "Responsive";
 
 /*static*/char Utils::DimensionToChar(libCZI::DimensionIndex dim)
 {
@@ -468,6 +586,8 @@ std::vector<tOutput> InternalCreateLookUpTableFromGamma(int tableElementCnt, tFl
         return "zstd0";
     case CompressionMode::Zstd1:
         return "zstd1";
+    case CompressionMode::Jxl:
+        return "jxl";
     case CompressionMode::Invalid:
         return "invalid";
     }

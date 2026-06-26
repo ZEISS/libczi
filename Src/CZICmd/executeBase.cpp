@@ -11,15 +11,20 @@ using namespace libCZI;
 
 std::shared_ptr<ICZIReader> CExecuteBase::CreateAndOpenCziReader(const CCmdLineOptions& options)
 {
+    return CreateAndOpenCziReaderForPath(options.GetCZIFilename().c_str(), options);
+}
+
+std::shared_ptr<ICZIReader> CExecuteBase::CreateAndOpenCziReaderForPath(const wchar_t* path, const CCmdLineOptions& options)
+{
     shared_ptr<IStream> stream;
     if (options.GetInputStreamClassName().empty())
     {
-        stream = CExecuteBase::CreateStandardFileBasedStreamObject(options.GetCZIFilename().c_str());
+        stream = CExecuteBase::CreateStandardFileBasedStreamObject(path);
     }
     else
     {
         stream = CExecuteBase::CreateInputStreamObject(
-                                options.GetCZIFilename().c_str(),
+                                path,
                                 options.GetInputStreamClassName(),
                                 &options.GetInputStreamPropertyBag());
     }

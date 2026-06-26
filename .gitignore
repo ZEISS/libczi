@@ -299,7 +299,7 @@ __pycache__/
 # exclude "cmake-build-directory"
 /cmake-build-*/
 
-/build
+/build*
 /Src/Build/VS
 /out/Src/Build/Doxygen/
 /out/

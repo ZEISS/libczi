@@ -16,6 +16,7 @@ class CExecuteBase
 {
 protected:
     static std::shared_ptr<libCZI::ICZIReader> CreateAndOpenCziReader(const CCmdLineOptions& options);
+    static std::shared_ptr<libCZI::ICZIReader> CreateAndOpenCziReaderForPath(const wchar_t* path, const CCmdLineOptions& options);
     static std::shared_ptr<libCZI::IStream> CreateStandardFileBasedStreamObject(const wchar_t* fileName);
     static std::shared_ptr<libCZI::IStream> CreateInputStreamObject(const wchar_t* uri, const std::string& class_name, const std::map<int, libCZI::StreamsFactory::Property>* property_bag);
     static libCZI::IntRect GetRoiFromOptions(const CCmdLineOptions& options, const libCZI::SubBlockStatistics& subBlockStatistics);

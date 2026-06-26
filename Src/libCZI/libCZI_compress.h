@@ -9,6 +9,7 @@
 #include <functional>
 #include <map>
 #include <type_traits>
+#include "inc_libCZI_Config.h"
 #include "libCZI.h"
 
 namespace libCZI
@@ -30,6 +31,20 @@ namespace libCZI
         /// gives the best quality (i.e. loss-less compression). This parameter is used with the "jxrlib" compression scheme only.
         /// If value is out-of-range, it will be clipped.
         JXRLIB_QUALITY = 3,
+
+        /// JPEG XL encoder effort (type: int32, clipped to 1..9). Used with \c CompressionMode::Jxl only.
+        /// Parsed from \c jxl:Effort=N in \c --compressionopts. Default when omitted is 7.
+        JXL_EFFORT = 4,
+
+        /// Use modular mode for the frame (type: boolean). Used with \c CompressionMode::Jxl only.
+        /// Parsed from \c jxl:Modular=true|false. Default when omitted is true (recommended with lossless).
+        JXL_MODULAR = 5,
+
+        /// \c JXL_ENC_FRAME_SETTING_DECODING_SPEED (type: int32, clipped to 0..4). Optional; when omitted the encoder default applies.
+        JXL_DECODING_SPEED = 6,
+
+        /// \c JXL_ENC_FRAME_SETTING_RESPONSIVE (type: int32, clipped to 0..2). Optional; when omitted the encoder default applies.
+        JXL_RESPONSIVE = 7,
     };
 
     /// Simple variant type used for the compression-parameters-property-bag.
@@ -550,6 +565,25 @@ namespace libCZI
             const void* ptrData,
             const ICompressParameters* parameters);
     };
+
+#if LIBCZI_HAVE_LIBJXL
+    /// JPEG XL lossless compression (raw CZI id 7, provisional). Requires \c LIBCZI_BUILD_WITH_LIBJXL.
+    class LIBCZI_API JxlLibCompress
+    {
+    public:
+        /// Compress the bitmap to a single-frame JPEG XL codestream suitable for a CZI subblock.
+        ///
+        /// \param  parameters  Optional \c ICompressParameters (see \c CompressionParameterKey values \c JXL_*).
+        ///                     Unrecognized keys are ignored; omitted keys use encoder defaults described on those keys.
+        static std::shared_ptr<IMemoryBlock> Compress(
+            libCZI::PixelType pixel_type,
+            std::uint32_t width,
+            std::uint32_t height,
+            std::uint32_t stride,
+            const void* ptrData,
+            const ICompressParameters* parameters);
+    };
+#endif
 
     /// Simplistic implementation of the compression-parameters property bag. Note that for high-performance scenarios
     /// it might be a good idea to re-use instances of this, or have a custom implementation without heap-allocation

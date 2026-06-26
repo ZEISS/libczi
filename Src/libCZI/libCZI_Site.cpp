@@ -6,6 +6,9 @@
 #include "inc_libCZI_Config.h"
 #include "decoder.h"
 #include "decoder_zstd.h"
+#if LIBCZI_HAVE_LIBJXL
+#include "decoder_jxl.h"
+#endif
 #include <mutex>
 #include <cstdlib>
 #include "bitmapData.h"
@@ -66,6 +69,10 @@ private:
     std::shared_ptr<IDecoder> zstd0decoder;
     std::once_flag  zstd1DecoderInitialized;
     std::shared_ptr<IDecoder> zstd1decoder;
+#if LIBCZI_HAVE_LIBJXL
+    std::once_flag jxlDecoderInitialized;
+    std::shared_ptr<IDecoder> jxldecoder;
+#endif
 public:
     std::shared_ptr<IDecoder> GetDecoder(ImageDecoderType type, const char* arguments) override
     {
@@ -83,6 +90,18 @@ public:
 
             return this->jpgXrdecoder;
         }
+#if LIBCZI_HAVE_LIBJXL
+        case ImageDecoderType::JXL:
+        {
+            std::call_once(jxlDecoderInitialized,
+                [this]()
+                {
+                    this->jxldecoder = CJxlDecoder::Create();
+                });
+
+            return this->jxldecoder;
+        }
+#endif
         case ImageDecoderType::ZStd0:
         {
             std::call_once(zstd0DecoderInitialized,
@@ -119,6 +138,10 @@ private:
     std::shared_ptr<IDecoder> zstd0decoder;
     std::once_flag  zstd1DecoderInitialized;
     std::shared_ptr<IDecoder> zstd1decoder;
+#if LIBCZI_HAVE_LIBJXL
+    std::once_flag jxlDecoderInitialized;
+    std::shared_ptr<IDecoder> jxldecoder;
+#endif
 public:
     std::shared_ptr<IDecoder> GetDecoder(ImageDecoderType type, const char* arguments) override
     {
@@ -136,6 +159,18 @@ public:
 
             return this->jpgXrdecoder;
         }
+#if LIBCZI_HAVE_LIBJXL
+        case ImageDecoderType::JXL:
+        {
+            std::call_once(jxlDecoderInitialized,
+                [this]()
+                {
+                    this->jxldecoder = CJxlDecoder::Create();
+                });
+
+            return this->jxldecoder;
+        }
+#endif
         case ImageDecoderType::ZStd0:
         {
             std::call_once(zstd0DecoderInitialized,

@@ -353,6 +353,39 @@ TEST(Utilities, ParseCompressionOptionEmptyPropertyBagCheckForCorrectCompression
     EXPECT_EQ(compressionOptions.first, CompressionMode::Zstd1);
 }
 
+TEST(Utilities, ParseCompressionOptionJxl)
+{
+    const auto compressionOptions = Utils::ParseCompressionOptions("jxl:");
+    EXPECT_EQ(compressionOptions.first, CompressionMode::Jxl);
+}
+
+TEST(Utilities, ParseCompressionOptionJxlWithFrameSettings)
+{
+    const auto compressionOptions = Utils::ParseCompressionOptions("jxl:Effort=3;Modular=false;DecodingSpeed=2;Responsive=1");
+    EXPECT_EQ(compressionOptions.first, CompressionMode::Jxl);
+    ASSERT_NE(compressionOptions.second, nullptr);
+    CompressParameter c;
+    ASSERT_TRUE(compressionOptions.second->TryGetProperty(CompressionParameterKey::JXL_EFFORT, &c));
+    EXPECT_EQ(c.GetType(), CompressParameter::Type::Int32);
+    EXPECT_EQ(c.GetInt32(), 3);
+    ASSERT_TRUE(compressionOptions.second->TryGetProperty(CompressionParameterKey::JXL_MODULAR, &c));
+    EXPECT_EQ(c.GetType(), CompressParameter::Type::Boolean);
+    EXPECT_FALSE(c.GetBoolean());
+    ASSERT_TRUE(compressionOptions.second->TryGetProperty(CompressionParameterKey::JXL_DECODING_SPEED, &c));
+    EXPECT_EQ(c.GetInt32(), 2);
+    ASSERT_TRUE(compressionOptions.second->TryGetProperty(CompressionParameterKey::JXL_RESPONSIVE, &c));
+    EXPECT_EQ(c.GetInt32(), 1);
+}
+
+TEST(Utilities, ParseCompressionOptionJxlEffortStoredRawValueClampedAtEncode)
+{
+    const auto compressionOptions = Utils::ParseCompressionOptions("jxl:Effort=12");
+    EXPECT_EQ(compressionOptions.first, CompressionMode::Jxl);
+    CompressParameter c;
+    ASSERT_TRUE(compressionOptions.second->TryGetProperty(CompressionParameterKey::JXL_EFFORT, &c));
+    EXPECT_EQ(c.GetInt32(), 12);
+}
+
 TEST(Utilities, CallGetLibCZIVersionAndCheckResultForPlausibility)
 {
     int major, minor, patch, tweak;

@@ -66,3 +66,6 @@
 
 // whether the function "bswap32" is available (in the header-file sys/endian.h)
 #define LIBCZI_HAS_BSWAP_LONG_IN_SYS_ENDIAN @libCZI_Has_bswap_long_in_sys_endian@
+
+// whether libjxl is available for JPEG XL (provisional CZI compression id 7) encode/decode
+#define LIBCZI_HAVE_LIBJXL @libCZI_have_libjxl@

@@ -6,7 +6,9 @@
 #include "execute.h"
 #include "executeBase.h"
 #include "executeCreateCzi.h"
+#include "executeReEncodeCzi.h"
 #include "executePlaneScan.h"
+#include "executeCompareImages.h"
 #include "inc_libCZI.h"
 #include "SaveBitmap.h"
 #include "utils.h"
@@ -1141,8 +1143,14 @@ bool execute(const CCmdLineOptions& options)
         case Command::CreateCZI:
             success = executeCreateCzi(options);
             break;
+        case Command::ReEncodeCZI:
+            success = executeReEncodeCzi(options);
+            break;
         case Command::PlaneScan:
             success = executePlaneScan(options);
+            break;
+        case Command::CompareImages:
+            success = executeCompareImages(options);
             break;
         default:
             break;

@@ -32,9 +32,13 @@ enum class Command
 
     CreateCZI,
 
+    ReEncodeCZI,
+
     ReadWriteCZI,
 
     PlaneScan,
+
+    CompareImages,
 };
 
 enum class InfoLevel : std::uint32_t
@@ -143,6 +147,7 @@ private:
 
     Command command;
     std::wstring cziFilename;
+    std::wstring compareCziFilename;
     std::string source_stream_class;
     std::map<int, libCZI::StreamsFactory::Property> property_bag_for_stream_class;
     libCZI::CDimCoordinate planeCoordinate;
@@ -224,6 +229,7 @@ public:
     std::shared_ptr<ILog> GetLog() const { return this->log; }
     Command GetCommand() const { return this->command; }
     const std::wstring& GetCZIFilename() const { return this->cziFilename; }
+    const std::wstring& GetCompareCziFilename() const { return this->compareCziFilename; }
     const std::string& GetInputStreamClassName() const { return this->source_stream_class; }
     const std::map<int, libCZI::StreamsFactory::Property>& GetInputStreamPropertyBag() const { return this->property_bag_for_stream_class; }
     const libCZI::CDimCoordinate& GetPlaneCoordinate() const { return this->planeCoordinate; }

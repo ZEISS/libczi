@@ -9,6 +9,9 @@
 #include "inc_libCZI_Config.h"
 #include "CziSubBlock.h"
 #include "decoder_zstd.h"
+#if LIBCZI_HAVE_LIBJXL
+#include "decoder_jxl.h"
+#endif
 
 using namespace libCZI;
 using namespace libCZI::detail;
@@ -245,6 +248,18 @@ namespace
     }
 }
 
+#if LIBCZI_HAVE_LIBJXL
+static std::shared_ptr<libCZI::IBitmapData> CreateBitmapFromSubBlock_Jxl(ISubBlock* subBlk)
+{
+    auto dec = GetSite()->GetDecoder(ImageDecoderType::JXL, nullptr);
+    const void* ptr;
+    size_t size;
+    subBlk->DangerousGetRawData(ISubBlock::MemBlkType::Data, ptr, size);
+    const SubBlockInfo& sub_block_info = subBlk->GetSubBlockInfo();
+    return dec->Decode(ptr, size, sub_block_info.pixelType, sub_block_info.physicalSize.w, sub_block_info.physicalSize.h);
+}
+#endif
+
 std::shared_ptr<libCZI::IBitmapData> libCZI::CreateBitmapFromSubBlock(ISubBlock* subBlk, const CreateBitmapOptions* options)
 {
     switch (subBlk->GetSubBlockInfo().GetCompressionMode())
@@ -257,6 +272,10 @@ std::shared_ptr<libCZI::IBitmapData> libCZI::CreateBitmapFromSubBlock(ISubBlock*
         return CreateBitmapFromSubBlock_ZStd1(subBlk, options != nullptr ? options->handle_zstd_data_size_mismatch : true);
     case CompressionMode::UnCompressed:
         return CreateBitmapFromSubBlock_Uncompressed(subBlk, options != nullptr ? options->handle_uncompressed_data_size_mismatch : true);
+#if LIBCZI_HAVE_LIBJXL
+    case CompressionMode::Jxl:
+        return CreateBitmapFromSubBlock_Jxl(subBlk);
+#endif
     default:    // silence warnings
         throw std::logic_error("The method or operation is not implemented.");
     }

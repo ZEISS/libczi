@@ -150,6 +150,40 @@ private:
                 addInfo.SetCompressionMode(CompressionMode::Zstd0);
                 writer->SyncAddSubBlock(addInfo);
             }
+            else if (options.GetCompressionMode() == CompressionMode::Jxl)
+            {
+#if LIBCZI_HAVE_LIBJXL
+                auto memblk = JxlLibCompress::Compress(
+                    bm->GetPixelType(),
+                    bm->GetWidth(),
+                    bm->GetHeight(),
+                    locker.stride,
+                    locker.ptrDataRoi,
+                    options.GetCompressionParameters().get());
+
+                AddSubBlockInfoMemPtr addInfo;
+                addInfo.Clear();
+                addInfo.coordinate = coord;
+                addInfo.mIndexValid = true;
+                addInfo.mIndex = m;
+                addInfo.x = x;
+                addInfo.y = y;
+                addInfo.logicalWidth = bm->GetWidth();
+                addInfo.logicalHeight = bm->GetHeight();
+                addInfo.physicalWidth = bm->GetWidth();
+                addInfo.physicalHeight = bm->GetHeight();
+                addInfo.PixelType = bm->GetPixelType();
+                addInfo.ptrData = memblk->GetPtr();
+                addInfo.dataSize = memblk->GetSizeOfData();
+                addInfo.ptrSbBlkMetadata = sbBlkMetadata;
+                addInfo.sbBlkMetadataSize = sbBlkMetadataSize;
+                addInfo.SetCompressionMode(CompressionMode::Jxl);
+                writer->SyncAddSubBlock(addInfo);
+#else
+                throw runtime_error(
+                    "CreateCZI with JPEG XL requires libCZI built with LIBCZI_BUILD_WITH_LIBJXL=ON and libjxl.");
+#endif
+            }
         }
     }
 }

@@ -19,7 +19,9 @@ namespace libCZI
 
         ZStd0,          ///< Identifies a decoder capable of decoding a zstd compressed image (type "zstd0").
 
-        ZStd1           ///< Identifies a decoder capable of decoding a zstd compressed image (type "zstd1").
+        ZStd1,          ///< Identifies a decoder capable of decoding a zstd compressed image (type "zstd1").
+
+        JXL             ///< Identifies a decoder capable of decoding a JPEG XL compressed image (provisional CZI id 7).
     };
 
     class IBitmapData;

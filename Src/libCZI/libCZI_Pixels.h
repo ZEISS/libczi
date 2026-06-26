@@ -167,7 +167,8 @@ namespace libCZI
         Jpg = 1,            ///< The data is JPG-compressed.
         JpgXr = 4,          ///< The data is JPG-XR-compressed.
         Zstd0 = 5,          ///< The data is compressed with zstd.
-        Zstd1 = 6           ///< The data contains a header, followed by a zstd-compressed block. 
+        Zstd1 = 6,          ///< The data contains a header, followed by a zstd-compressed block.
+        Jxl = 7             ///< JPEG XL lossless (raw CZI compression id 7, provisional / experimental). Requires libjxl at build time.
     };
 
     /// This enum is used in the context of a subblock to describe which "type of pyramid" is represented by the subblock.

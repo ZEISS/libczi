@@ -80,6 +80,7 @@ using namespace libCZI::detail;
     case 4: return CompressionMode::JpgXr;
     case 5: return CompressionMode::Zstd0;
     case 6: return CompressionMode::Zstd1;
+    case 7: return CompressionMode::Jxl;
     default: return CompressionMode::Invalid;
     }
 }
@@ -98,6 +99,8 @@ using namespace libCZI::detail;
         return 5;
     case CompressionMode::Zstd1:
         return 6;
+    case CompressionMode::Jxl:
+        return 7;
     default:
         return (std::numeric_limits<int32_t>::min)();
     }

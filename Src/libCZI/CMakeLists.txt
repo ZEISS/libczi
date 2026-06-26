@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: LGPL-3.0-or-later
 
 include(FetchContent)
+include(FindPkgConfig)
 include(CheckIncludeFiles)
 include(CheckSymbolExists)
 include(CMakePackageConfigHelpers)
@@ -132,6 +133,11 @@ set(LIBCZISRCFILES
             BitmapOperationsBitonal.h
             BitmapOperationsBitonal.cpp
 )
+
+set(LIBCZI_JXL_SOURCES "")
+if (LIBCZI_BUILD_WITH_LIBJXL)
+  list(APPEND LIBCZI_JXL_SOURCES jxlCompress.cpp decoder_jxl.cpp decoder_jxl.h)
+endif()
 
 # prepare the configuration-file "libCZI_Config.h"
 if (IS_BIG_ENDIAN)
@@ -317,6 +323,36 @@ else()
   set(libCZI_WINDOWSAPI_UWP_AVAILABLE 0)
 endif()
 
+set(libCZI_have_libjxl 0)
+set(LIBCZI_LIBJXL_LINK "")
+if (LIBCZI_BUILD_WITH_LIBJXL)
+  set(_libczi_libjxl_resolved FALSE)
+  find_package(libjxl CONFIG QUIET)
+  if (libjxl_FOUND)
+    if (TARGET libjxl::jxl)
+      set(LIBCZI_LIBJXL_LINK libjxl::jxl)
+      set(_libczi_libjxl_resolved TRUE)
+    elseif (TARGET libjxl::jxl_enc AND TARGET libjxl::jxl_dec)
+      set(LIBCZI_LIBJXL_LINK libjxl::jxl_enc libjxl::jxl_dec)
+      set(_libczi_libjxl_resolved TRUE)
+    endif()
+  endif()
+  if (NOT _libczi_libjxl_resolved)
+    find_package(PkgConfig QUIET)
+    if (PkgConfig_FOUND)
+      pkg_check_modules(libczi_libjxl IMPORTED_TARGET libjxl)
+      if (libczi_libjxl_FOUND)
+        set(LIBCZI_LIBJXL_LINK PkgConfig::libczi_libjxl)
+        set(_libczi_libjxl_resolved TRUE)
+      endif()
+    endif()
+  endif()
+  if (NOT _libczi_libjxl_resolved)
+    message(FATAL_ERROR "LIBCZI_BUILD_WITH_LIBJXL is ON but libjxl was not found. Install libjxl (e.g. libjxl-dev) or provide CMake package 'libjxl'.")
+  endif()
+  set(libCZI_have_libjxl 1)
+endif()
+
 configure_file (
   "${CMAKE_CURRENT_SOURCE_DIR}/libCZI_Config.h.in"
   "${CMAKE_CURRENT_BINARY_DIR}/libCZI_Config.h"
@@ -332,13 +368,14 @@ set(libCZIPublicHeaders "ImportExport.h" "libCZI.h" "libCZI_Compositor.h" "libCZ
 #define the shared libCZI - library
 #
 if (LIBCZI_BUILD_DYNLIB)
-  add_library(libCZI SHARED ${LIBCZISRCFILES} $<TARGET_OBJECTS:JxrDecodeStatic>)
+  add_library(libCZI SHARED ${LIBCZISRCFILES} ${LIBCZI_JXL_SOURCES} $<TARGET_OBJECTS:JxrDecodeStatic>)
  
   set_target_properties(libCZI PROPERTIES CXX_STANDARD 14 CXX_STANDARD_REQUIRED YES) # https://crascit.com/2015/03/28/enabling-cxx11-in-cmake/
   SET_TARGET_PROPERTIES (libCZI PROPERTIES DEFINE_SYMBOL  "LIBCZI_EXPORTS" )
   set_target_properties(libCZI PROPERTIES VERSION ${PROJECT_VERSION} SOVERSION 1)
   # add the binary tree to the search path for include files so that we will find libCZI_Config.h
-  target_include_directories(libCZI PRIVATE  "${CMAKE_CURRENT_BINARY_DIR}")
+  target_include_directories(libCZI PRIVATE "${CMAKE_CURRENT_BINARY_DIR}")
+  target_include_directories(libCZI PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>")
   target_include_directories(libCZI PRIVATE  ${EIGEN3_INCLUDE_DIR})
   target_link_libraries(libCZI PRIVATE  ${ADDITIONAL_LIBS_REQUIRED_FOR_ATOMIC})
   set_target_properties(libCZI PROPERTIES DEBUG_POSTFIX "d")
@@ -353,6 +390,9 @@ if (LIBCZI_BUILD_DYNLIB)
   endif()
   if (LIBCZI_BUILD_AZURESDK_BASED_STREAM)
     target_link_libraries(libCZI PRIVATE Azure::azure-identity Azure::azure-storage-blobs)
+  endif()
+  if (LIBCZI_BUILD_WITH_LIBJXL)
+    target_link_libraries(libCZI PRIVATE ${LIBCZI_LIBJXL_LINK})
   endif()
   if (LIBCZI_BUILD_PREFER_EXTERNALPACKAGE_EIGEN3)
    target_link_libraries(libCZI PRIVATE Eigen3::Eigen)
@@ -375,12 +415,13 @@ endif(LIBCZI_BUILD_DYNLIB)
 #define the static libCZI - library
 #
 # Notes: -we use JxrDecode as an "object-library" in order have it "embedded" into libCZI.a
-add_library(libCZIStatic STATIC ${LIBCZISRCFILES} $<TARGET_OBJECTS:JxrDecodeStatic>)
+add_library(libCZIStatic STATIC ${LIBCZISRCFILES} ${LIBCZI_JXL_SOURCES} $<TARGET_OBJECTS:JxrDecodeStatic>)
 set_target_properties(libCZIStatic PROPERTIES CXX_STANDARD 14)
 target_compile_definitions(libCZIStatic PRIVATE _LIBCZISTATICLIB)
 set_target_properties(libCZIStatic PROPERTIES VERSION ${PROJECT_VERSION})
 # add the binary tree to the search path for include files so that we will find libCZI_Config.h
-target_include_directories(libCZIStatic PRIVATE  "${CMAKE_CURRENT_BINARY_DIR}")
+target_include_directories(libCZIStatic PRIVATE "${CMAKE_CURRENT_BINARY_DIR}")
+target_include_directories(libCZIStatic PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>")
 target_include_directories(libCZIStatic PRIVATE  ${EIGEN3_INCLUDE_DIR})
 target_link_libraries(libCZIStatic PRIVATE  ${ADDITIONAL_LIBS_REQUIRED_FOR_ATOMIC})
 set_target_properties(libCZIStatic PROPERTIES DEBUG_POSTFIX "d")
@@ -396,6 +437,10 @@ if (LIBCZI_BUILD_CURL_BASED_STREAM)
 endif()
 if (LIBCZI_BUILD_AZURESDK_BASED_STREAM)
   target_link_libraries(libCZIStatic PRIVATE Azure::azure-identity Azure::azure-storage-blobs)
+endif()
+if (LIBCZI_BUILD_WITH_LIBJXL)
+  # PUBLIC so static consumers (e.g. CZIcmd) resolve JPEG XL symbols at link time.
+  target_link_libraries(libCZIStatic PUBLIC ${LIBCZI_LIBJXL_LINK})
 endif()
 
 if (LIBCZI_BUILD_PREFER_EXTERNALPACKAGE_EIGEN3)

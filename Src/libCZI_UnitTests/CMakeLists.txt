@@ -2,6 +2,11 @@
 #
 # SPDX-License-Identifier: LGPL-3.0-or-later
 
+set(LIBCZI_UNITTESTS_JXL_SOURCES "")
+if (LIBCZI_BUILD_WITH_LIBJXL)
+  list(APPEND LIBCZI_UNITTESTS_JXL_SOURCES test_jxl.cpp)
+endif()
+
 ADD_EXECUTABLE(libCZI_UnitTests 
 										inc_libCZI.h
 										include_gtest.h
@@ -50,9 +55,11 @@ ADD_EXECUTABLE(libCZI_UnitTests
 										test_subblockmetadata.cpp 
 										test_subblockattachment.cpp
 										test_maskawarecomposition.cpp 
-										test_pixels.cpp)
+										test_pixels.cpp
+										${LIBCZI_UNITTESTS_JXL_SOURCES})
 
 TARGET_LINK_LIBRARIES(libCZI_UnitTests PRIVATE libCZIStatic GTest::gtest GTest::gmock)
+target_include_directories(libCZI_UnitTests PRIVATE "${CMAKE_BINARY_DIR}/Src/libCZI")
 set_target_properties(libCZI_UnitTests PROPERTIES CXX_STANDARD 14)
 
 target_compile_definitions(libCZI_UnitTests PRIVATE _LIBCZISTATICLIB)

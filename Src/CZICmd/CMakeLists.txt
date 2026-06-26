@@ -50,6 +50,8 @@ set (CZICMDSRCFILES
          BitmapGenFreeType.h    
          cmdlineoptions.h    
          executeCreateCzi.cpp     
+         executeReEncodeCzi.cpp
+         executeReEncodeCzi.h
          IBitmapGen.h         
          SaveBitmap.h    
          utils.h
@@ -67,6 +69,8 @@ set (CZICMDSRCFILES
          CZIcmd.cpp          
          executePlaneScan.h
          executePlaneScan.cpp
+         executeCompareImages.h
+         executeCompareImages.cpp
          executeBase.h
          executeBase.cpp
          CZIcmd.manifest    # the manifest is needed to allow long paths on windows, see https://docs.microsoft.com/en-us/windows/win32/fileio/maximum-file-path-limitation?tabs=cmd

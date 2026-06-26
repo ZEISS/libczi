@@ -369,6 +369,12 @@ namespace libCZI
         //!             - Pixel type Gray48: Used       --> "zstd1:ExplicitLevel=2;PreProcess=HiLoByteUnpack"
         static const char* const VALUE_COMPRESS_HILO_BYTE_UNPACK /*= "HiLoByteUnpack"*/;
 
+        //! JPEG XL frame settings (used with \c jxl:... only). Example: \c "jxl:Effort=5;Modular=true;DecodingSpeed=0;Responsive=0"
+        static const char* const KEY_JXL_EFFORT /*= "Effort"*/;
+        static const char* const KEY_JXL_MODULAR /*= "Modular"*/;
+        static const char* const KEY_JXL_DECODING_SPEED /*= "DecodingSpeed"*/;
+        static const char* const KEY_JXL_RESPONSIVE /*= "Responsive"*/;
+
         //! Define a type for compression options. It is a pair where one parameter is compression mode
         //! and the others are compression parameters.
         using CompressionOption = std::pair<libCZI::CompressionMode, std::shared_ptr<libCZI::ICompressParameters>>;
@@ -378,7 +384,7 @@ namespace libCZI
         //! The format of the string representation is: "<compression_method>: key=value; ...". 
         //! It starts with the name of the compression-method, followed by a colon,
         //! then followed by a list of key-value pairs which are separated by a semicolon.
-        //! Examples: "zstd0:ExplicitLevel=3", "zstd1:ExplicitLevel=2;PreProcess=HiLoByteUnpack"
+        //! Examples: "zstd0:ExplicitLevel=3", "zstd1:ExplicitLevel=2;PreProcess=HiLoByteUnpack", "jxl:Effort=7;Modular=true"
         //! If parsing fails an excpetion of type "Logic_error" is thrown.
         static CompressionOption ParseCompressionOptions(const std::string& options);
 

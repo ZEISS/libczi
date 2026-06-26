@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: LGPL-3.0-or-later
 
 #include "StreamImpl.h"
+#include <algorithm>
 #include <cerrno>
 #include <sstream>
 #include <codecvt>
@@ -17,6 +18,82 @@
 
 using namespace std;
 using namespace libCZI::detail;
+
+namespace
+{
+    // Single write syscalls can return short counts (signals, quotas, some FS layers).
+    // Chunk to stay under common kernel limits (e.g. Linux MAX_RW_COUNT) and loop until complete.
+    constexpr std::uint64_t kStreamWriteChunkMax = 16ULL * 1024 * 1024;
+
+    void WriteAllPwrite(int fd, std::uint64_t offset, const void* pv, std::uint64_t size, std::uint64_t* ptrBytesWritten)
+    {
+        const auto* bytes = static_cast<const std::uint8_t*>(pv);
+        std::uint64_t done = 0;
+        while (done < size)
+        {
+            const std::uint64_t remain = size - done;
+            const size_t chunk = static_cast<size_t>((std::min)(remain, kStreamWriteChunkMax));
+            const ssize_t w = pwrite(fd, bytes + done, chunk, static_cast<off_t>(offset + done));
+            if (w < 0)
+            {
+                const auto err = errno;
+                ostringstream ss;
+                ss << "pwrite failed (errno=" << err << " -> " << strerror(err) << ")";
+                throw runtime_error(ss.str());
+            }
+
+            if (w == 0)
+            {
+                throw runtime_error("pwrite returned 0 bytes (unexpected short write / progress stalled).");
+            }
+
+            done += static_cast<std::uint64_t>(w);
+        }
+
+        if (ptrBytesWritten != nullptr)
+        {
+            *ptrBytesWritten = done;
+        }
+    }
+
+    void WriteAllFwrite(FILE* fp, std::uint64_t offset, const void* pv, std::uint64_t size, std::uint64_t* ptrBytesWritten)
+    {
+        const auto* bytes = static_cast<const std::uint8_t*>(pv);
+        std::uint64_t done = 0;
+        while (done < size)
+        {
+#if defined(_WIN32)
+            if (_fseeki64(fp, offset + done, SEEK_SET) != 0)
+#else
+            if (fseeko(fp, offset + done, SEEK_SET) != 0)
+#endif
+            {
+                const auto err = errno;
+                ostringstream ss;
+                ss << "Seek to file-position " << (offset + done) << " failed, errno=" << err << ".";
+                throw runtime_error(ss.str());
+            }
+
+            const std::uint64_t remain = size - done;
+            const size_t chunk = static_cast<size_t>((std::min)(remain, kStreamWriteChunkMax));
+            const size_t w = fwrite(bytes + done, 1, chunk, fp);
+            if (w != chunk)
+            {
+                const auto err = errno;
+                ostringstream ss;
+                ss << "fwrite failed at offset " << (offset + done) << " (wrote " << w << " of " << chunk << " bytes, errno=" << err << ").";
+                throw runtime_error(ss.str());
+            }
+
+            done += w;
+        }
+
+        if (ptrBytesWritten != nullptr)
+        {
+            *ptrBytesWritten = done;
+        }
+    }
+}
 
 //----------------------------------------------------------------------------
 
@@ -55,19 +132,7 @@ COutputStreamImplPwrite::~COutputStreamImplPwrite()
 
 /*virtual*/void COutputStreamImplPwrite::Write(std::uint64_t offset, const void* pv, std::uint64_t size, std::uint64_t* ptrBytesWritten)
 {
-    ssize_t bytesWritten = pwrite(this->fileDescriptor, pv, size, offset);
-    if (bytesWritten < 0)
-    {
-        auto err = errno;
-        std::stringstream ss;
-        ss << "Error reading from file (errno=" << err << " -> " << strerror(err) << ")";
-        throw std::runtime_error(ss.str());
-    }
-
-    if (ptrBytesWritten != nullptr)
-    {
-        *ptrBytesWritten = bytesWritten;
-    }
+    WriteAllPwrite(this->fileDescriptor, offset, pv, size, ptrBytesWritten);
 }
 #endif
 
@@ -231,25 +296,7 @@ CSimpleOutputStreamStreams::~CSimpleOutputStreamStreams()
 
 void CSimpleOutputStreamStreams::Write(std::uint64_t offset, const void* pv, std::uint64_t size, std::uint64_t* ptrBytesWritten)
 {
-#if defined(_WIN32)
-    int r = _fseeki64(this->fp, offset, SEEK_SET);
-#else
-    int r = fseeko(this->fp, offset, SEEK_SET);
-#endif
-
-    if (r != 0)
-    {
-        const auto err = errno;
-        ostringstream ss;
-        ss << "Seek to file-position " << offset << " failed, errno=<<" << err << ".";
-        throw std::runtime_error(ss.str());
-    }
-
-    const std::uint64_t bytesRead = fwrite(pv, 1, (size_t)size, this->fp);
-    if (ptrBytesWritten != nullptr)
-    {
-        *ptrBytesWritten = bytesRead;
-    }
+    WriteAllFwrite(this->fp, offset, pv, size, ptrBytesWritten);
 }
 
 //-----------------------------------------------------------------------------
@@ -299,19 +346,7 @@ CInputOutputStreamImplPreadPwrite::~CInputOutputStreamImplPreadPwrite()
 
 /*virtual*/void CInputOutputStreamImplPreadPwrite::Write(std::uint64_t offset, const void* pv, std::uint64_t size, std::uint64_t* ptrBytesWritten)
 {
-    ssize_t bytesWritten = pwrite(this->fileDescriptor, pv, size, offset);
-    if (bytesWritten < 0)
-    {
-        auto err = errno;
-        ostringstream ss;
-        ss << "Error reading from file (errno=" << err << " -> " << strerror(err) << ")";
-        throw std::runtime_error(ss.str());
-    }
-
-    if (ptrBytesWritten != nullptr)
-    {
-        *ptrBytesWritten = bytesWritten;
-    }
+    WriteAllPwrite(this->fileDescriptor, offset, pv, size, ptrBytesWritten);
 }
 #endif
 
@@ -433,25 +468,7 @@ CSimpleInputOutputStreamImpl::~CSimpleInputOutputStreamImpl()
 
 void CSimpleInputOutputStreamImpl::Write(std::uint64_t offset, const void* pv, std::uint64_t size, std::uint64_t* ptrBytesWritten)
 {
-#if defined(_WIN32)
-    int r = _fseeki64(this->fp, offset, SEEK_SET);
-#else
-    int r = fseeko(this->fp, offset, SEEK_SET);
-#endif
-
-    if (r != 0)
-    {
-        const auto err = errno;
-        ostringstream ss;
-        ss << "Seek to file-position " << offset << " failed, errno=<<" << err << ".";
-        throw std::runtime_error(ss.str());
-    }
-
-    const std::uint64_t bytesRead = fwrite(pv, 1, (size_t)size, this->fp);
-    if (ptrBytesWritten != nullptr)
-    {
-        *ptrBytesWritten = bytesRead;
-    }
+    WriteAllFwrite(this->fp, offset, pv, size, ptrBytesWritten);
 }
 
 /*virtual*/void CSimpleInputOutputStreamImpl::Read(std::uint64_t offset, void* pv, std::uint64_t size, std::uint64_t* ptrBytesRead)
