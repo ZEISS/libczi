@@ -1109,6 +1109,61 @@ namespace
 
         return true;
     }
+
+    bool ChunkedCompressWithLz4AndLoHiBytePacking(const ChunkedCompressionOptionsLz4& options, const void* source_data, size_t size_source_data, vector<uint32_t>& compressed_sizes)
+    {
+        const uint32_t number_of_chunks = static_cast<uint32_t>((size_source_data + options.chunkSize - 1) / options.chunkSize);
+        const size_t max_chunk_size = min(static_cast<size_t>(options.chunkSize), size_source_data);
+
+        auto deleter = [&](void* ptr) -> void { if (ptr != nullptr) { options.freeTempBuffer(ptr); } };
+        void* temp_buffer = options.allocateTempBuffer(max_chunk_size);
+        if (temp_buffer == nullptr)
+        {
+            // allocation failed
+            stringstream ss;
+            ss << "Allocation of temporary buffer (of " << max_chunk_size << " bytes) failed.";
+            throw runtime_error(ss.str());
+        }
+
+        compressed_sizes.clear();
+        compressed_sizes.reserve(number_of_chunks);
+
+        unique_ptr<void, decltype(deleter)> up_temp_buffer(nullptr, deleter);
+        up_temp_buffer.reset(temp_buffer);
+
+        size_t offset_in_source = 0;
+        size_t offset_in_destination = 0;
+        for (uint32_t n = 0; n < number_of_chunks; ++n)
+        {
+            const uint32_t size_of_chunk = min(
+                    static_cast<uint32_t>(options.chunkSize),
+                    static_cast<uint32_t>(size_source_data - static_cast<size_t>(n) * options.chunkSize));
+
+                LoHiBytePackUnpack::LoHiByteUnpackStrided(
+                        static_cast<const uint8_t*>(source_data) + offset_in_source,
+                        size_of_chunk / 2,
+                        size_of_chunk,
+                        1,
+                        up_temp_buffer.get());
+
+                const int r = LZ4_compress_default(
+                            static_cast<const char*>(up_temp_buffer.get()),
+                            static_cast<char*>(options.destination) + offset_in_destination,
+                            size_of_chunk,
+                            static_cast<int>(options.sizeDestination - offset_in_destination));
+            if (r <= 0)
+            {
+                return false;
+            }
+
+            compressed_sizes.emplace_back(static_cast<uint32_t>(r));
+
+            offset_in_source += size_of_chunk;
+            offset_in_destination += r;
+        }
+
+        return true;
+    }
 #endif
 
     bool ChunkedCompressWithZstd(const ChunkedCompressionOptionsZstd& options, const void* source_data, size_t size_source_data, vector<uint32_t>& compressed_sizes)
@@ -1128,6 +1183,64 @@ namespace
                                     static_cast<uint8_t*>(options.destination) + offset_in_destination,
                                     options.sizeDestination - offset_in_destination,
                                     static_cast<const uint8_t*>(source_data) + offset_in_source,
+                                    size_of_chunk,
+                                    options.zstdCompressionLevel);
+            if (ZSTD_isError(r))
+            {
+                return false;
+            }
+
+            // TODO(JBL): check that r does not exceed numeric_limits<uint32_t>::max() before the cast in the 
+            // next statement (and handle this case appropriately, e.g. by throwing an exception), since the compressed chunk size must be representable in 4 bytes for our header format
+
+            compressed_sizes.emplace_back(static_cast<uint32_t>(r));
+
+            offset_in_source += size_of_chunk;
+            offset_in_destination += r;
+        }
+
+        return true;
+    }
+
+    bool ChunkedCompressWithZstdAndHiLoBytePacking(const ChunkedCompressionOptionsZstd& options, const void* source_data, size_t size_source_data, vector<uint32_t>& compressed_sizes)
+    {
+        const uint32_t number_of_chunks = static_cast<uint32_t>((size_source_data + options.chunkSize - 1) / options.chunkSize);
+
+        const size_t max_chunk_size = min(static_cast<size_t>(options.chunkSize), size_source_data);
+
+        auto deleter = [&](void* ptr) -> void { if (ptr != nullptr) { options.freeTempBuffer(ptr); } };
+        void* temp_buffer = options.allocateTempBuffer(max_chunk_size);
+        if (temp_buffer == nullptr)
+        {
+            // allocation failed
+            stringstream ss;
+            ss << "Allocation of temporary buffer (of " << max_chunk_size << " bytes) failed.";
+            throw runtime_error(ss.str());
+        }
+
+        unique_ptr<void, decltype(deleter)> up_temp_buffer(nullptr, deleter);
+        up_temp_buffer.reset(temp_buffer);
+
+        compressed_sizes.clear();
+        compressed_sizes.reserve(number_of_chunks);
+
+        size_t offset_in_source = 0;
+        size_t offset_in_destination = 0;
+        for (uint32_t n = 0; n < number_of_chunks; ++n)
+        {
+            uint32_t size_of_chunk = min(options.chunkSize, static_cast<uint32_t>(size_source_data - static_cast<size_t>(n) * options.chunkSize));
+
+            LoHiBytePackUnpack::LoHiByteUnpackStrided(
+                    static_cast<const uint8_t*>(source_data) + offset_in_source,
+                    size_of_chunk/2,
+                    size_of_chunk,
+                    1,
+                    up_temp_buffer.get());
+
+            const size_t r = ZSTD_compress(
+                                    static_cast<uint8_t*>(options.destination) + offset_in_destination,
+                                    options.sizeDestination - offset_in_destination,
+                                    up_temp_buffer.get(),
                                     size_of_chunk,
                                     options.zstdCompressionLevel);
             if (ZSTD_isError(r))
@@ -1194,35 +1307,24 @@ namespace
 
             upTemp.reset(tempBuffer);
 
-            if (options.do_lo_hi_byte_unpacking)
-            {
-                // TODO(JBL) : check requirements (line_size must be divisible by 2, etc.) for hi-lo byte unpacking, and throw if the requirements are not met
-                LoHiBytePackUnpack::LoHiByteUnpackStrided(
-                    options.source,
-                    line_size / 2,
-                    options.sourceStride,
-                    options.sourceHeight,
-                    upTemp.get());
-            }
-            else
-            {
-                // copy the source data to the temporary buffer with the minimal stride (i.e. the line size), since this is required for compression, and also since this will ensure that the data is laid out in memory in a way that is optimal for compression (i.e. without "gaps" at the end of each line that would be present if the stride is larger than the line size)
-                CBitmapOperations::Copy(
-                    options.sourcePixeltype,
-                    options.source,
-                    options.sourceStride,
-                    options.sourcePixeltype,
-                    upTemp.get(),
-                    line_size,
-                    options.sourceWidth,
-                    options.sourceHeight,
-                    false);
-            }
+            // copy the source data to the temporary buffer with the minimal stride (i.e. the line size), since this is required for compression, and also since this will ensure that the data is laid out in memory in a way that is optimal for compression (i.e. without "gaps" at the end of each line that would be present if the stride is larger than the line size)
+            CBitmapOperations::Copy(
+                options.sourcePixeltype,
+                options.source,
+                options.sourceStride,
+                options.sourcePixeltype,
+                upTemp.get(),
+                line_size,
+                options.sourceWidth,
+                options.sourceHeight,
+                false);
 
             source_data_for_compression = upTemp.get();
         }
 
-        const bool success = ChunkedCompressWithZstd(options, source_data_for_compression, source_data_size, compressed_sizes);
+        const bool success = options.do_lo_hi_byte_unpacking ? 
+                                        ChunkedCompressWithZstdAndHiLoBytePacking(options, source_data_for_compression, source_data_size, compressed_sizes) :
+                                        ChunkedCompressWithZstd(options, source_data_for_compression, source_data_size, compressed_sizes);
         if (!success)
         {
             return false;
@@ -1337,19 +1439,7 @@ namespace
 
             upTemp.reset(tempBuffer);
 
-            if (options.do_lo_hi_byte_unpacking)
-            {
-                // TODO(JBL) : check requirements (line_size must be divisible by 2, etc.) for hi-lo byte unpacking, and throw if the requirements are not met
-                LoHiBytePackUnpack::LoHiByteUnpackStrided(
-                    options.source,
-                    line_size / 2,
-                    options.sourceStride,
-                    options.sourceHeight,
-                    upTemp.get());
-            }
-            else
-            {
-                CBitmapOperations::Copy(
+            CBitmapOperations::Copy(
                     options.sourcePixeltype,
                     options.source,
                     options.sourceStride,
@@ -1359,12 +1449,13 @@ namespace
                     options.sourceWidth,
                     options.sourceHeight,
                     false);
-            }
 
             source_data_for_compression = upTemp.get();
         }
 
-        const bool success = ChunkedCompressWithLz4(options, source_data_for_compression, source_data_size, compressed_sizes);
+        const bool success = options.do_lo_hi_byte_unpacking ? 
+                                    ChunkedCompressWithLz4AndLoHiBytePacking(options, source_data_for_compression, source_data_size, compressed_sizes) : 
+                                    ChunkedCompressWithLz4(options, source_data_for_compression, source_data_size, compressed_sizes);
         if (!success)
         {
             return false;
