@@ -1139,14 +1139,23 @@ namespace
                     static_cast<uint32_t>(options.chunkSize),
                     static_cast<uint32_t>(size_source_data - static_cast<size_t>(n) * options.chunkSize));
 
-                LoHiBytePackUnpack::LoHiByteUnpackStrided(
-                        static_cast<const uint8_t*>(source_data) + offset_in_source,
-                        size_of_chunk / 2,
-                        size_of_chunk,
-                        1,
-                        up_temp_buffer.get());
+            /*LoHiBytePackUnpack::LoHiByteUnpackStrided(
+                    static_cast<const uint8_t*>(source_data) + offset_in_source,
+                    size_of_chunk / 2,
+                    size_of_chunk,
+                    1,
+                    up_temp_buffer.get());*/
+            LoHiBytePackUnpack::LoHiByteUnpackByteSized(
+                    static_cast<const uint8_t*>(source_data) + offset_in_source,
+                    size_of_chunk,
+                    up_temp_buffer.get());
 
-                const int r = LZ4_compress_default(
+            /*const int r = LZ4_compress_default(
+                static_cast<const char*>(source_data) + offset_in_source,
+                static_cast<char*>(options.destination) + offset_in_destination,
+                size_of_chunk,
+                static_cast<int>(options.sizeDestination - offset_in_destination));*/
+            const int r = LZ4_compress_default(
                             static_cast<const char*>(up_temp_buffer.get()),
                             static_cast<char*>(options.destination) + offset_in_destination,
                             size_of_chunk,
@@ -1230,11 +1239,15 @@ namespace
         {
             uint32_t size_of_chunk = min(options.chunkSize, static_cast<uint32_t>(size_source_data - static_cast<size_t>(n) * options.chunkSize));
 
-            LoHiBytePackUnpack::LoHiByteUnpackStrided(
+            /*LoHiBytePackUnpack::LoHiByteUnpackStrided(
                     static_cast<const uint8_t*>(source_data) + offset_in_source,
                     size_of_chunk/2,
                     size_of_chunk,
                     1,
+                    up_temp_buffer.get());*/
+            LoHiBytePackUnpack::LoHiByteUnpackByteSized(
+                    static_cast<const uint8_t*>(source_data) + offset_in_source,
+                    size_of_chunk,
                     up_temp_buffer.get());
 
             const size_t r = ZSTD_compress(
@@ -1243,6 +1256,13 @@ namespace
                                     up_temp_buffer.get(),
                                     size_of_chunk,
                                     options.zstdCompressionLevel);
+
+            /*const size_t r = ZSTD_compress(
+                                    static_cast<uint8_t*>(options.destination) + offset_in_destination,
+                                    options.sizeDestination - offset_in_destination,
+                                    static_cast<const uint8_t*>(source_data) + offset_in_source,
+                                    size_of_chunk,
+                                    options.zstdCompressionLevel);*/
             if (ZSTD_isError(r))
             {
                 return false;
@@ -1318,6 +1338,32 @@ namespace
                 options.sourceWidth,
                 options.sourceHeight,
                 false);
+
+
+ /*           if (options.do_lo_hi_byte_unpacking)
+            {
+                // TODO(JBL) : check requirements (line_size must be divisible by 2, etc.) for hi-lo byte unpacking, and throw if the requirements are not met
+                LoHiBytePackUnpack::LoHiByteUnpackStrided(
+                    options.source,
+                    line_size / 2,
+                    options.sourceStride,
+                    options.sourceHeight,
+                    upTemp.get());
+            }
+            else
+            {
+                // copy the source data to the temporary buffer with the minimal stride (i.e. the line size), since this is required for compression, and also since this will ensure that the data is laid out in memory in a way that is optimal for compression (i.e. without "gaps" at the end of each line that would be present if the stride is larger than the line size)
+                CBitmapOperations::Copy(
+                    options.sourcePixeltype,
+                    options.source,
+                    options.sourceStride,
+                    options.sourcePixeltype,
+                    upTemp.get(),
+                    line_size,
+                    options.sourceWidth,
+                    options.sourceHeight,
+                    false);
+            }*/
 
             source_data_for_compression = upTemp.get();
         }
@@ -1439,6 +1485,29 @@ namespace
 
             upTemp.reset(tempBuffer);
 
+            //if (options.do_lo_hi_byte_unpacking)
+            //{
+            //    // TODO(JBL) : check requirements (line_size must be divisible by 2, etc.) for hi-lo byte unpacking, and throw if the requirements are not met
+            //    LoHiBytePackUnpack::LoHiByteUnpackStrided(
+            //        options.source,
+            //        line_size / 2,
+            //        options.sourceStride,
+            //        options.sourceHeight,
+            //        upTemp.get());
+            //}
+            //else
+            //{
+            //    CBitmapOperations::Copy(
+            //        options.sourcePixeltype,
+            //        options.source,
+            //        options.sourceStride,
+            //        options.sourcePixeltype,
+            //        upTemp.get(),
+            //        line_size,
+            //        options.sourceWidth,
+            //        options.sourceHeight,
+            //        false);
+            //}
             CBitmapOperations::Copy(
                     options.sourcePixeltype,
                     options.source,

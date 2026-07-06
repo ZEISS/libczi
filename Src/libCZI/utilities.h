@@ -169,11 +169,86 @@ namespace libCZI
             static bool ContainsToken(const char* input, const char* token);
         };
 
+        /// Utility class for converting between packed 16-bit pixel data and the LoHiByte encoding.
+        ///
+        /// In the LoHiByte encoding all low bytes of a sequence of 16-bit words are stored
+        /// contiguously, followed by all high bytes. This byte-plane separation improves compression
+        /// ratios by grouping bytes with similar statistical properties together.
+        ///
+        /// The class provides two complementary operations:
+        /// - **Unpack** (LoHiByte-encoded → packed 16-bit): reconstructs a normal strided bitmap from
+        ///   a LoHiByte-encoded source; used during decoding.
+        /// - **Pack** (packed 16-bit → LoHiByte-encoded): converts a normal strided bitmap into the
+        ///   LoHiByte layout; used during encoding before compression.
+        ///
+        /// Both directions are available in a strided (full-image) form and in a flat byte-sized
+        /// (partial / chunked) form that tolerates odd-sized or incomplete source buffers.
         class LoHiBytePackUnpack
         {
         public:
+            /// Unpack LoHiByte-encoded data from a strided 2D source buffer into a flat destination
+            /// buffer. The source is a strided bitmap of packed 16-bit pixels: \p lineCount rows of
+            /// \p wordCount pixels each, with \p stride bytes between the start of consecutive rows.
+            /// The destination receives the result in LoHiByte layout: the first
+            /// wordCount * lineCount bytes hold the low bytes of all pixels in row-major order,
+            /// immediately followed by the corresponding high bytes.
+            /// This function validates its arguments and throws std::invalid_argument if either pointer
+            /// is null or if \p stride is less than wordCount * 2.
+            /// For the flat (non-strided) variant see LoHiByteUnpackByteSized.
+            ///
+            /// \param  ptrSrc      Pointer to the strided source bitmap of packed 16-bit pixels.
+            /// \param  wordCount   Number of 16-bit pixels per row.
+            /// \param  stride      Row stride of the source bitmap in bytes; must be >= wordCount * 2.
+            /// \param  lineCount   Number of rows.
+            /// \param  ptrDst      Pointer to the destination buffer; must be at least
+            ///                     wordCount * lineCount * 2 bytes in size.
             static void LoHiByteUnpackStrided(const void* ptrSrc, std::uint32_t wordCount, std::uint32_t stride, std::uint32_t lineCount, void* ptrDst);
+
+            /// Pack LoHiByte-encoded data from a flat source buffer into a strided 2D destination buffer of
+            /// 16-bit pixels. The source buffer is laid out in two contiguous halves: the first \p sizeSrc / 2
+            /// bytes hold the low bytes of all pixels in row-major order, and the second half holds the
+            /// corresponding high bytes. The destination is written as a strided bitmap where each row is
+            /// \p stride bytes wide and contains \p width packed 16-bit pixel values.
+            /// This function validates all arguments and throws std::invalid_argument if \p sizeSrc is less
+            /// than width * height * 2, or if \p stride is less than width * 2.
+            /// For a variant that accepts partial or odd-sized source buffers without argument validation,
+            /// see LoHiBytePackStridedByteSized.
+            ///
+            /// \param  ptrSrc  Pointer to the LoHiByte-encoded source buffer.
+            /// \param  sizeSrc Size of the source buffer in bytes; must be >= width * height * 2.
+            /// \param  width   Width of the destination bitmap in pixels.
+            /// \param  height  Height of the destination bitmap in pixels.
+            /// \param  stride  Row stride of the destination bitmap in bytes; must be >= width * 2.
+            /// \param  dest    Pointer to the destination buffer that receives the packed 16-bit pixel data.
             static void LoHiBytePackStrided(const void* ptrSrc, size_t sizeSrc, std::uint32_t width, std::uint32_t height, std::uint32_t stride, void* dest);
+
+            /// Unpack LoHiByte-encoded data from a flat (non-strided) byte buffer into the destination buffer.
+            /// The LoHiByte encoding stores all low bytes of 16-bit words contiguously, followed by all high bytes.
+            /// This function is the flat-buffer variant of LoHiByteUnpackStrided, treating the source as a
+            /// single contiguous block of \p src_size bytes. If \p src_size is odd, the last byte is copied
+            /// verbatim to the destination.
+            ///
+            /// \param  src_ptr     Pointer to the source buffer containing the LoHiByte-encoded data.
+            /// \param  src_size    Size of the source buffer in bytes.
+            /// \param  ptrDst      Pointer to the destination buffer; must be at least \p src_size bytes in size.
+            static void LoHiByteUnpackByteSized(const void* src_ptr, std::uint32_t src_size, void* ptrDst);
+
+            /// Size-tolerant variant of LoHiBytePackStrided that accepts a source buffer whose byte count
+            /// need not be a multiple of 2 nor cover a whole number of complete rows.
+            /// the largest even-byte-count prefix of the source via LoHiBytePackStrided; if \p sizeSrc is odd,
+            /// the remaining lone low byte is placed at its correct position in the strided destination.
+            /// Unlike LoHiBytePackStrided, this function does not validate arguments and does not throw;
+            /// the caller is responsible for ensuring that \p dest is large enough to hold the output.
+            /// Use this variant when the source data represents a partial or potentially odd-sized chunk
+            /// (e.g. the last chunk in a chunked-compression pipeline).
+            ///
+            /// \param  ptrSrc  Pointer to the LoHiByte-encoded source buffer.
+            /// \param  sizeSrc Size of the source buffer in bytes; may be any value, including odd.
+            /// \param  width   Width of the destination bitmap in pixels.
+            /// \param  height  Height of the destination bitmap in pixels.
+            /// \param  stride  Row stride of the destination bitmap in bytes.
+            /// \param  dest    Pointer to the destination buffer that receives the packed 16-bit pixel data.
+            static void LoHiBytePackStridedByteSized(const void* ptrSrc, size_t sizeSrc, std::uint32_t width, std::uint32_t height, std::uint32_t stride, void* dest);
         protected:
             static void LoHiByteUnpackStrided_C(const void* ptrSrc, std::uint32_t wordCount, std::uint32_t stride, std::uint32_t lineCount, void* ptrDst);
             static void LoHiBytePackStrided_C(const void* ptrSrc, size_t sizeSrc, std::uint32_t width, std::uint32_t height, std::uint32_t stride, void* dest);

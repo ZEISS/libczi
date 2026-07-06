@@ -126,7 +126,7 @@ tString trimImpl(const tString& str, const tString& whitespace)
     }
 
     const int size_needed = MultiByteToWideChar(CP_UTF8, 0, sz, -1, nullptr, 0);
-    if (size_needed <= 0) 
+    if (size_needed <= 0)
     {
         throw runtime_error("MultiByteToWideChar failed: " + std::to_string(GetLastError()));
     }
@@ -134,7 +134,7 @@ tString trimImpl(const tString& str, const tString& whitespace)
     wstring wide_string;
     wide_string.resize(size_needed - 1); // Exclude the null terminator
 
-    if (MultiByteToWideChar(CP_UTF8, 0, sz, -1, &wide_string[0], size_needed) == 0) 
+    if (MultiByteToWideChar(CP_UTF8, 0, sz, -1, &wide_string[0], size_needed) == 0)
     {
         throw runtime_error("MultiByteToWideChar conversion failed: " + std::to_string(GetLastError()));
     }
@@ -157,7 +157,7 @@ tString trimImpl(const tString& str, const tString& whitespace)
 
     // Calculate the required buffer size
     const int size_needed = WideCharToMultiByte(CP_UTF8, 0, szw, -1, nullptr, 0, nullptr, nullptr);
-    if (size_needed <= 0) 
+    if (size_needed <= 0)
     {
         throw runtime_error("WideCharToMultiByte failed: " + std::to_string(GetLastError()));
     }
@@ -166,7 +166,7 @@ tString trimImpl(const tString& str, const tString& whitespace)
     string utf8_str;
     utf8_str.resize(size_needed - 1); // Exclude the null terminator
 
-    if (WideCharToMultiByte(CP_UTF8, 0, szw, -1, &utf8_str[0], size_needed, nullptr, nullptr) == 0) 
+    if (WideCharToMultiByte(CP_UTF8, 0, szw, -1, &utf8_str[0], size_needed, nullptr, nullptr) == 0)
     {
         throw runtime_error("WideCharToMultiByte conversion failed: " + std::to_string(GetLastError()));
     }
@@ -610,6 +610,52 @@ bool Utilities::ContainsToken(const char* input, const char* token)
 }
 
 //-----------------------------------------------------------------------------
+
+/*static*/void LoHiBytePackUnpack::LoHiByteUnpackByteSized(const void* src_ptr, uint32_t src_size, void* ptrDst)
+{
+    uint32_t word_count = src_size / 2;
+    if (word_count > 0)
+    {
+        LoHiBytePackUnpack::LoHiByteUnpackStrided(
+            src_ptr, 
+            word_count, 
+            word_count * 2, 
+            1, 
+            ptrDst);
+    }
+
+    if (src_size % 2 != 0)
+    {
+        // copy the last byte to the destination, if the source size is odd
+        uint8_t* pDst = static_cast<uint8_t*>(ptrDst);
+        pDst[src_size - 1] = static_cast<const uint8_t*>(src_ptr)[src_size - 1];
+    }
+}
+
+/*static*/void LoHiBytePackUnpack::LoHiBytePackStridedByteSized(const void* ptrSrc, size_t sizeSrc, std::uint32_t width, std::uint32_t height, std::uint32_t stride, void* dest)
+{
+    size_t size_words = (sizeSrc / 2) * 2; // Round down to the nearest even number
+    if (size_words > 0)
+    {
+        LoHiBytePackUnpack::LoHiBytePackStrided(
+            ptrSrc,
+            size_words,
+            width,
+            height,
+            stride,
+            dest);
+    }
+
+    if (sizeSrc % 2 != 0)
+    {
+        // copy the last (lone lo) byte to its correct position in the strided destination
+        const size_t word_count = size_words / 2;
+        const uint32_t x = static_cast<uint32_t>(word_count % width);
+        const uint32_t y = static_cast<uint32_t>(word_count / width);
+        static_cast<uint8_t*>(dest)[static_cast<size_t>(y) * stride + static_cast<size_t>(x) * 2 -1] =
+            static_cast<const uint8_t*>(ptrSrc)[sizeSrc - 1];
+    }
+}
 
 /*static*/void LoHiBytePackUnpack::CheckLoHiByteUnpackArgumentsAndThrow(std::uint32_t width, std::uint32_t stride, const void* source, void* dest)
 {
