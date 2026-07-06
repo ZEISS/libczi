@@ -136,11 +136,82 @@ option(LIBCZI_BUILD_PREFER_EXTERNALPACKAGE_ZSTD "Prefer a ZSTD-package present o
 #  copy of RapidJSON during the CMake-run. This option is only relevant if building CZICmd.
 option(LIBCZI_BUILD_PREFER_EXTERNALPACKAGE_RAPIDJSON "Prefer an RapidJSON-package present on the system" ON)
 
+# Experimental functionality policy.
+#
+# This cache variable intentionally is not declared with option(), because it has
+# three states:
+#
+#   AUTO - Do not force experimental features globally. Each experimental feature
+#          keeps its own default. This is the default and preserves the normal,
+#          conservative build behavior.
+#
+#   ON   - Enable all experimental features by default.
+#
+#   OFF  - Disable all experimental features by default.
+#
+# Individual experimental feature options remain available and may still be set
+# explicitly by the user. If both this policy variable and an individual feature
+# option are specified, the individual feature option wins. This allows package
+# managers and advanced users to enable the global policy while still opting out
+# of one specific experimental feature if needed.
+#
+# Example:
+#   -DLIBCZI_BUILD_ENABLE_EXPERIMENTAL_FUNCTIONALITY=ON
+#
+# Example with explicit override:
+#   -DLIBCZI_BUILD_ENABLE_EXPERIMENTAL_FUNCTIONALITY=ON
+#   -DLIBCZI_BUILD_EXPERIMENTAL_CHUNKED_COMPRESSION=OFF
+set(LIBCZI_BUILD_ENABLE_EXPERIMENTAL_FUNCTIONALITY "AUTO" CACHE STRING
+    "Experimental functionality policy: AUTO, ON, or OFF.")
+set_property(CACHE LIBCZI_BUILD_ENABLE_EXPERIMENTAL_FUNCTIONALITY PROPERTY STRINGS AUTO ON OFF)
+string(TOUPPER "${LIBCZI_BUILD_ENABLE_EXPERIMENTAL_FUNCTIONALITY}" _libczi_experimental_functionality_policy)
+
+if (NOT _libczi_experimental_functionality_policy STREQUAL "AUTO" AND
+    NOT _libczi_experimental_functionality_policy STREQUAL "ON" AND
+    NOT _libczi_experimental_functionality_policy STREQUAL "OFF")
+    message(FATAL_ERROR
+        "LIBCZI_BUILD_ENABLE_EXPERIMENTAL_FUNCTIONALITY must be one of: AUTO, ON, OFF.")
+endif()
+
+# Default for experimental chunked compression.
+#
+# The default is derived from LIBCZI_BUILD_ENABLE_EXPERIMENTAL_FUNCTIONALITY:
+#
+#   AUTO -> OFF
+#   ON   -> ON
+#   OFF  -> OFF
+#
+# The value is used only as the default for option(). If the user already
+# supplied LIBCZI_BUILD_EXPERIMENTAL_CHUNKED_COMPRESSION in the CMake cache or
+# via -D, that explicit value is preserved by option().
+set(_libczi_default_experimental_chunked_compression OFF)
+
+if (_libczi_experimental_functionality_policy STREQUAL "ON")
+    set(_libczi_default_experimental_chunked_compression ON)
+elseif (_libczi_experimental_functionality_policy STREQUAL "OFF")
+    set(_libczi_default_experimental_chunked_compression OFF)
+endif()
+
+option(LIBCZI_BUILD_EXPERIMENTAL_CHUNKED_COMPRESSION "Enable experimental chunked compression support in the build." ${_libczi_default_experimental_chunked_compression})
+
 # Enables optional LZ4 codec support for chunked compression.
 # When OFF, LZ4 code is excluded and no LZ4 dependency is required.
 # When ON, LZ4 is either found as an external package or fetched during configuration,
 # depending on LIBCZI_BUILD_PREFER_EXTERNALPACKAGE_LZ4.
 option(LIBCZI_BUILD_ENABLE_LZ4 "Enable LZ4 compression support in the build." OFF)
+
+# LZ4 support is meaningful only for the experimental chunked-compression feature.
+# Keep this as a hard configuration error so accidental dependency enablement is
+# visible immediately, especially for package-manager builds.
+if (LIBCZI_BUILD_ENABLE_LZ4 AND NOT LIBCZI_BUILD_EXPERIMENTAL_CHUNKED_COMPRESSION)
+    message(FATAL_ERROR
+        "LIBCZI_BUILD_ENABLE_LZ4 is ON, but "
+        "LIBCZI_BUILD_EXPERIMENTAL_CHUNKED_COMPRESSION is OFF. "
+        "LZ4 support is only valid when experimental chunked compression is enabled. "
+        "If you did not specify LIBCZI_BUILD_ENABLE_LZ4, this is probably a stale "
+        "CMake cache entry; delete the CMake cache or set "
+        "-DLIBCZI_BUILD_ENABLE_LZ4=OFF.")
+endif()
 
 # Controls how the LZ4 dependency is resolved when LIBCZI_BUILD_ENABLE_LZ4 is ON.
 # When ON, CMake requires an externally provided lz4 package via find_package(lz4 CONFIG REQUIRED).

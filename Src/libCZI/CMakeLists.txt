@@ -356,6 +356,15 @@ else()
   set(libCZI_WINDOWSAPI_UWP_AVAILABLE 0)
 endif()
 
+# Export the experimental chunked-compression availability into libCZI_Config.h.
+# Public headers use this macro to expose or hide experimental API declarations
+# consistently with the way the library was built.
+if (LIBCZI_BUILD_EXPERIMENTAL_CHUNKED_COMPRESSION)
+  set(libCZI_Experimental_Chunked_Compression_Available 1)
+else()
+  set(libCZI_Experimental_Chunked_Compression_Available 0)
+endif()
+
 configure_file (
   "${CMAKE_CURRENT_SOURCE_DIR}/libCZI_Config.h.in"
   "${CMAKE_CURRENT_BINARY_DIR}/libCZI_Config.h"
