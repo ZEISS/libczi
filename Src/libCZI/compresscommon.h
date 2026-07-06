@@ -5,6 +5,7 @@
 #pragma once
 
 #include <cstdint>
+#include <cstddef>
 #include <functional>
 
 #include "libCZI_Pixels.h"
