@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include "libCZI_Config.h"
+
 #include <sstream>
 #include <memory>
 #include <string>

@@ -5,6 +5,7 @@
 #include "include_gtest.h"
 #include "inc_libCZI.h"
 
+#if LIBCZI_EXPERIMENTAL_CHUNKED_COMPRESSION_AVAILABLE
 #include <array>
 #include <memory>
 #include <random>
@@ -487,4 +488,4 @@ INSTANTIATE_TEST_SUITE_P(
     {
         return CodecToParamName(info.param.codec) + "_chunkSize" + std::to_string(info.param.maxChunkSize);
     });
-
+#endif

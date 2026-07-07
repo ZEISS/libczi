@@ -474,6 +474,7 @@ INSTANTIATE_TEST_SUITE_P(
         nullptr,
         "handle_data_size_mismatch"));
 
+#if LIBCZI_EXPERIMENTAL_CHUNKED_COMPRESSION_AVAILABLE
 TEST(ZStdCompress, WalkCompressionHeaderScenario1)
 {
     static uint8_t headerData[] =
@@ -499,7 +500,9 @@ TEST(ZStdCompress, WalkCompressionHeaderScenario1)
     EXPECT_TRUE(b) << "WalkCompressionHeader failed";
     EXPECT_EQ(bytes_consumed, sizeof(headerData)) << "Unexpected number of bytes consumed in WalkCompressionHeader";
 }
+#endif
 
+#if LIBCZI_EXPERIMENTAL_CHUNKED_COMPRESSION_AVAILABLE
 TEST(ZStdCompress, WalkCompressionHeaderScenario2)
 {
     static uint8_t header_data_no_terminator[] =
@@ -524,7 +527,9 @@ TEST(ZStdCompress, WalkCompressionHeaderScenario2)
         nullptr),
         exception) << "WalkCompressionHeader should have thrown due to missing terminator";
 }
+#endif
 
+#if LIBCZI_EXPERIMENTAL_CHUNKED_COMPRESSION_AVAILABLE
 TEST(ZStdCompress, WalkCompressionHeaderScenario3)
 {
     static uint8_t headerData[] =
@@ -564,7 +569,9 @@ TEST(ZStdCompress, WalkCompressionHeaderScenario3)
     EXPECT_TRUE(b) << "WalkCompressionHeader failed";
     EXPECT_EQ(bytes_consumed, sizeof(headerData)) << "Unexpected number of bytes consumed in WalkCompressionHeader";
 }
+#endif
 
+#if LIBCZI_EXPERIMENTAL_CHUNKED_COMPRESSION_AVAILABLE
 TEST(ZStdCompress, GetCompressionHeaderSizeScenario1)
 {
     static uint8_t headerData[] =
@@ -581,7 +588,9 @@ TEST(ZStdCompress, GetCompressionHeaderSizeScenario1)
     size_t header_size = ChunkedCompressionHeaderHelper::GetCompressionHeaderSize(headerData, sizeof(headerData));
     EXPECT_EQ(header_size, sizeof(headerData)) << "Unexpected compression header size";
 }
+#endif
 
+#if LIBCZI_EXPERIMENTAL_CHUNKED_COMPRESSION_AVAILABLE
 TEST(ZStdCompress, GetCompressionHeaderSizeScenario2)
 {
     static uint8_t headerData[] =
@@ -598,7 +607,9 @@ TEST(ZStdCompress, GetCompressionHeaderSizeScenario2)
         ChunkedCompressionHeaderHelper::GetCompressionHeaderSize(headerData, sizeof(headerData)),
         exception) << "GetCompressionHeaderSize should have thrown due to missing terminator";
 }
+#endif
 
+#if LIBCZI_EXPERIMENTAL_CHUNKED_COMPRESSION_AVAILABLE
 TEST(ZStdCompress, GetCompressionHeaderSizeScenario3)
 {
     static uint8_t headerData[] =
@@ -612,7 +623,9 @@ TEST(ZStdCompress, GetCompressionHeaderSizeScenario3)
         ChunkedCompressionHeaderHelper::GetCompressionHeaderSize(headerData, sizeof(headerData)),
         exception) << "GetCompressionHeaderSize should have thrown due to incomplete header chunk data";
 }
+#endif
 
+#if LIBCZI_EXPERIMENTAL_CHUNKED_COMPRESSION_AVAILABLE
 TEST(ZStdCompress, ParseCompressionHeaderScenario1)
 {
     static uint8_t headerData[] =
@@ -640,7 +653,9 @@ TEST(ZStdCompress, ParseCompressionHeaderScenario1)
     // since the header does not contain a chunk with id = 0x02, the codec should be set to ZStd by default
     EXPECT_EQ(header_info.codec, ChunkedCompressionHeaderHelper::Codec::ZStd);
 }
+#endif
 
+#if LIBCZI_EXPERIMENTAL_CHUNKED_COMPRESSION_AVAILABLE
 TEST(ZStdCompress, ParseCompressionHeaderScenario2)
 {
     static uint8_t headerData[] =
@@ -668,7 +683,9 @@ TEST(ZStdCompress, ParseCompressionHeaderScenario2)
     // since the header does not contain a chunk with id = 0x02, the codec should be set to ZStd by default
     EXPECT_EQ(header_info.codec, ChunkedCompressionHeaderHelper::Codec::ZStd);
 }
+#endif
 
+#if LIBCZI_EXPERIMENTAL_CHUNKED_COMPRESSION_AVAILABLE
 TEST(ZStdCompress, ParseCompressionHeaderScenario3)
 {
     static uint8_t headerData[] =
@@ -696,7 +713,9 @@ TEST(ZStdCompress, ParseCompressionHeaderScenario3)
     // since the header does not contain a chunk with id = 0x02, the codec should be set to ZStd by default
     EXPECT_EQ(header_info.codec, ChunkedCompressionHeaderHelper::Codec::ZStd);
 }
+#endif
 
+#if LIBCZI_EXPERIMENTAL_CHUNKED_COMPRESSION_AVAILABLE
 TEST(ZStdCompress, ParseCompressionHeaderScenario4)
 {
     static uint8_t headerData[] =
@@ -714,7 +733,9 @@ TEST(ZStdCompress, ParseCompressionHeaderScenario4)
         ChunkedCompressionHeaderHelper::ParseCompressionHeader(headerData, sizeof(headerData)),
         exception) << "ParseCompressionHeader should have thrown due to mismatch in number of compressed and decompressed chunk sizes";
 }
+#endif
 
+#if LIBCZI_EXPERIMENTAL_CHUNKED_COMPRESSION_AVAILABLE
 TEST(ZStdCompress, ParseCompressionHeaderScenario5)
 {
     static uint8_t headerData[] =
@@ -745,7 +766,9 @@ TEST(ZStdCompress, ParseCompressionHeaderScenario5)
     EXPECT_EQ(header_info.codec, ChunkedCompressionHeaderHelper::Codec::Lz4);
     EXPECT_EQ(header_info.hiLoBytePackingApplied, false);
 }
+#endif
 
+#if LIBCZI_EXPERIMENTAL_CHUNKED_COMPRESSION_AVAILABLE
 TEST(ZStdCompress, CreateCompressionHeaderScenario1)
 {
     ChunkedCompressionHeaderHelper::HeaderInfoForCreation header_info_for_creation;
@@ -773,7 +796,9 @@ TEST(ZStdCompress, CreateCompressionHeaderScenario1)
     EXPECT_EQ(header_info.codec, ChunkedCompressionHeaderHelper::Codec::ZStd);
     EXPECT_EQ(header_info.hiLoBytePackingApplied, false);
 }
+#endif
 
+#if LIBCZI_EXPERIMENTAL_CHUNKED_COMPRESSION_AVAILABLE
 TEST(ZStdCompress, CreateCompressionHeaderScenario2)
 {
     ChunkedCompressionHeaderHelper::HeaderInfoForCreation header_info_for_creation;
@@ -801,3 +826,4 @@ TEST(ZStdCompress, CreateCompressionHeaderScenario2)
     EXPECT_EQ(header_info.codec, ChunkedCompressionHeaderHelper::Codec::ZStd);
     EXPECT_EQ(header_info.hiLoBytePackingApplied, true);
 }
+#endif

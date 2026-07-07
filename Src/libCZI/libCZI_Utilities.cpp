@@ -78,10 +78,12 @@ namespace
                         {
                             (*map)[static_cast<int>(libCZI::CompressionParameterKey::ZSTD_RAWCOMPRESSIONLEVEL)] = libCZI::CompressParameter(i);
                         }
+#if LIBCZI_EXPERIMENTAL_CHUNKED_COMPRESSION_AVAILABLE
                         else if (compression_mode == CompressionMode::ChunkedExtensible)
                         {
                             (*map)[static_cast<int>(libCZI::CompressionParameterKey::CHUNKEDCOMPRESSION_RAWCOMPRESSIONLEVEL_ZSTD)] = libCZI::CompressParameter(i);
                         }
+#endif
                     }
                 }
                 else if (Utilities::icasecmp(key, Utils::KEY_COMPRESS_PRE_PROCESS))
@@ -94,13 +96,16 @@ namespace
                             {
                                 (*map)[static_cast<int>(libCZI::CompressionParameterKey::ZSTD_PREPROCESS_DOLOHIBYTEPACKING)] = libCZI::CompressParameter(true);
                             }
+#if LIBCZI_EXPERIMENTAL_CHUNKED_COMPRESSION_AVAILABLE
                             else if (compression_mode == CompressionMode::ChunkedExtensible)
                             {
                                 (*map)[static_cast<int>(libCZI::CompressionParameterKey::CHUNKEDCOMPRESSION_DOLOHIBYTEUNPACKING)] = libCZI::CompressParameter(true);
                             }
+#endif
                         }
                     }
                 }
+#if LIBCZI_EXPERIMENTAL_CHUNKED_COMPRESSION_AVAILABLE
                 else if (Utilities::icasecmp(key, Utils::KEY_COMPRESS_CHUNKED_MAXCHUNKSIZE))
                 {
                     uint32_t i;
@@ -132,6 +137,7 @@ namespace
                         }
                     }
                 }
+#endif
             }
         }
 
@@ -142,8 +148,10 @@ namespace
 const char* const Utils::KEY_COMPRESS_EXPLICIT_LEVEL = "ExplicitLevel";
 const char* const Utils::KEY_COMPRESS_PRE_PROCESS = "PreProcess";
 const char* const Utils::VALUE_COMPRESS_HILO_BYTE_UNPACK = "HiLoByteUnpack";
+#if LIBCZI_EXPERIMENTAL_CHUNKED_COMPRESSION_AVAILABLE
 const char* const Utils::KEY_COMPRESS_CHUNKED_MAXCHUNKSIZE = "ChunkedMaxChunkSize";
 const char* const Utils::KEY_COMPRESS_CHUNKED_CODEC = "ChunkedCodec";
+#endif
 
 
 /*static*/char Utils::DimensionToChar(libCZI::DimensionIndex dim)

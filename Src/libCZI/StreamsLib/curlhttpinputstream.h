@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: LGPL-3.0-or-later
 
 #pragma once
-#include <libCZI_Config.h>
+#include "libCZI_Config_Internal.h"
 
 #if LIBCZI_CURL_BASED_STREAM_AVAILABLE
 

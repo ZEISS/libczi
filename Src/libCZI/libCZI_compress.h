@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include "libCZI_Config.h"
+
 #include <memory>
 #include <cstdint>
 #include <functional>
@@ -31,6 +33,7 @@ namespace libCZI
         /// If value is out-of-range, it will be clipped.
         JXRLIB_QUALITY = 3,
 
+#if LIBCZI_EXPERIMENTAL_CHUNKED_COMPRESSION_AVAILABLE
         /// The maximum chunk size (in bytes) to be used for chunked compression (type: uint32).
         /// This parameter is used with the "chunked" compression scheme only.
         CHUNKEDCOMPRESSION_MAXCHUNKSIZE = 4,
@@ -46,6 +49,7 @@ namespace libCZI
         /// Whether to do the "lo-hi-byte-unpacking" preprocessing (type: boolean)
         /// for chunked compression.
         CHUNKEDCOMPRESSION_DOLOHIBYTEUNPACKING = 7,
+#endif
     };
 
     /// Simple variant type used for the compression-parameters-property-bag.
@@ -567,6 +571,7 @@ namespace libCZI
             const ICompressParameters* parameters);
     };
 
+#if LIBCZI_EXPERIMENTAL_CHUNKED_COMPRESSION_AVAILABLE
     /// The functions found here deal with chunked-compression (the compression-part in particular).
     /// Those functions are rather low-level, and the common theme is - given a source bitmap, create a blob
     /// (containing the compressed bitmap data) which is suitable to be placed in a subblock's data.
@@ -697,6 +702,7 @@ namespace libCZI
             const void* source,
             const ICompressParameters* parameters);
     };
+#endif
 
     /// Simplistic implementation of the compression-parameters property bag. Note that for high-performance scenarios
     /// it might be a good idea to re-use instances of this, or have a custom implementation without heap-allocation
@@ -729,6 +735,7 @@ namespace libCZI
         }
     };
 
+#if LIBCZI_EXPERIMENTAL_CHUNKED_COMPRESSION_AVAILABLE
     /// Here we gather utilities for working with chunked-compression headers. The concept of the chunked-compression scheme
     /// is to have a header which describes the structure of the compressed data in terms of "chunks", and then the compressed
     /// data is organized in a sequence of chunks, where each chunk contains compressed data for a part of the uncompressed data.
@@ -916,4 +923,5 @@ namespace libCZI
             Codec codec,
             bool hiLoBytePacking);
     };
+#endif
 }

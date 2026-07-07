@@ -6,7 +6,7 @@
 #include <limits>
 #include <cstdlib>
 #include <stdexcept>
-#include "libCZI_Config.h"
+#include "libCZI_Config_Internal.h"
 
 using namespace libCZI::detail;
 

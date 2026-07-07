@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: LGPL-3.0-or-later
 
 #include "utilities.h"
-#include "inc_libCZI_Config.h"
+#include "libCZI_Config_Internal.h"
 #include <locale>
 #include <codecvt>
 #include <sstream>

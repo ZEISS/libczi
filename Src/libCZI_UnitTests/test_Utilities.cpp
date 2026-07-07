@@ -353,6 +353,7 @@ TEST(Utilities, ParseCompressionOptionEmptyPropertyBagCheckForCorrectCompression
     EXPECT_EQ(compressionOptions.first, CompressionMode::Zstd1);
 }
 
+#if LIBCZI_EXPERIMENTAL_CHUNKED_COMPRESSION_AVAILABLE
 TEST(Utilities, ParseCompressionOptionForChunkedCheckThatCorrectPropertiesAreUsed)
 {
     // check that for chunked compression, the correct properties are used (i.e. the ones with "CHUNKEDCOMPRESSION_" prefix)
@@ -364,7 +365,9 @@ TEST(Utilities, ParseCompressionOptionForChunkedCheckThatCorrectPropertiesAreUse
     ASSERT_TRUE(compressionOptions.second->TryGetProperty(CompressionParameterKey::CHUNKEDCOMPRESSION_DOLOHIBYTEUNPACKING, &value));
     EXPECT_TRUE(value.GetBoolean());
 }
+#endif
 
+#if LIBCZI_EXPERIMENTAL_CHUNKED_COMPRESSION_AVAILABLE
 TEST(Utilities, ParseCompressionOptionForChunkedCheckThatSpecificOptionsAreParsedCorrectly1)
 {
     auto compressionOptions = Utils::ParseCompressionOptions("chunked:ChunkedMaxChunkSize=65536;ChunkedCodec=zstd");
@@ -375,7 +378,9 @@ TEST(Utilities, ParseCompressionOptionForChunkedCheckThatSpecificOptionsAreParse
     ASSERT_TRUE(compressionOptions.second->TryGetProperty(CompressionParameterKey::CHUNKEDCOMPRESSION_CODEC, &value));
     EXPECT_EQ(value.GetInt32(), static_cast<int32_t>(ChunkedCompressionHeaderHelper::Codec::ZStd));
 }
+#endif
 
+#if LIBCZI_EXPERIMENTAL_CHUNKED_COMPRESSION_AVAILABLE
 TEST(Utilities, ParseCompressionOptionForChunkedCheckThatSpecificOptionsAreParsedCorrectly2)
 {
     auto compressionOptions = Utils::ParseCompressionOptions("chunked:ChunkedMaxChunkSize=1234567;ChunkedCodec=lz4");
@@ -386,7 +391,9 @@ TEST(Utilities, ParseCompressionOptionForChunkedCheckThatSpecificOptionsAreParse
     ASSERT_TRUE(compressionOptions.second->TryGetProperty(CompressionParameterKey::CHUNKEDCOMPRESSION_CODEC, &value));
     EXPECT_EQ(value.GetInt32(), static_cast<int32_t>(ChunkedCompressionHeaderHelper::Codec::Lz4));
 }
+#endif
 
+#if LIBCZI_EXPERIMENTAL_CHUNKED_COMPRESSION_AVAILABLE
 TEST(Utilities, ParseCompressionOptionForChunkedCheckThatInvalidParametersAreIgnored1)
 {
     const auto compressionOptions = Utils::ParseCompressionOptions("chunked:ChunkedMaxChunkSize=1234567;ChunkedCodec=xyz");
@@ -396,6 +403,7 @@ TEST(Utilities, ParseCompressionOptionForChunkedCheckThatInvalidParametersAreIgn
     EXPECT_EQ(value.GetUInt32(), 1234567);
     ASSERT_FALSE(compressionOptions.second->TryGetProperty(CompressionParameterKey::CHUNKEDCOMPRESSION_CODEC, &value));
 }
+#endif
 
 TEST(Utilities, CallGetLibCZIVersionAndCheckResultForPlausibility)
 {

@@ -75,7 +75,6 @@ set(LIBCZISRCFILES
             decoder_zstd.h
             FileHeaderSegmentData.h
             ImportExport.h
-            inc_libCZI_Config.h
             IndexSet.h
             libCZI.h
             libCZI_Compositor.h
@@ -370,11 +369,17 @@ configure_file (
   "${CMAKE_CURRENT_BINARY_DIR}/libCZI_Config.h"
   ESCAPE_QUOTES @ONLY)
 
+configure_file (
+  "${CMAKE_CURRENT_SOURCE_DIR}/libCZI_Config_Internal.h.in"
+  "${CMAKE_CURRENT_BINARY_DIR}/libCZI_Config_Internal.h"
+  ESCAPE_QUOTES @ONLY)
+
 
 #  Define headers for this library. PUBLIC headers are used for compiling the library, and will be added to consumers' build paths.
 set(libCZIPublicHeaders "ImportExport.h" "libCZI.h" "libCZI_Compositor.h" "libCZI_DimCoordinate.h" "libCZI_exceptions.h"
                "libCZI_Helpers.h" "libCZI_Metadata.h" "libCZI_Metadata2.h" "libCZI_Pixels.h" "libCZI_ReadWrite.h"
-               "libCZI_Site.h" "libCZI_Utilities.h" "libCZI_Write.h" "libCZI_compress.h" "libCZI_StreamsLib.h" "libCZI_SubBlock.h")
+               "libCZI_Site.h" "libCZI_Utilities.h" "libCZI_Write.h" "libCZI_compress.h" "libCZI_StreamsLib.h" "libCZI_SubBlock.h"
+               "${CMAKE_CURRENT_BINARY_DIR}/libCZI_Config.h")
 
 #
 #define the shared libCZI - library
@@ -386,8 +391,6 @@ if (LIBCZI_BUILD_DYNLIB)
   SET_TARGET_PROPERTIES (libCZI PROPERTIES DEFINE_SYMBOL  "LIBCZI_EXPORTS" )
   set_target_properties(libCZI PROPERTIES VERSION ${PROJECT_VERSION} SOVERSION 1)
   # add the binary tree to the search path for include files so that we will find libCZI_Config.h
-  target_include_directories(libCZI PRIVATE  "${CMAKE_CURRENT_BINARY_DIR}")
-  target_include_directories(libCZI PRIVATE  ${EIGEN3_INCLUDE_DIR})
   target_link_libraries(libCZI PRIVATE  ${ADDITIONAL_LIBS_REQUIRED_FOR_ATOMIC})
   set_target_properties(libCZI PROPERTIES DEBUG_POSTFIX "d")
   if (LIBCZI_BUILD_PREFER_EXTERNALPACKAGE_ZSTD)
@@ -419,10 +422,13 @@ if (LIBCZI_BUILD_DYNLIB)
   if(LIBCZI_HAVE_WIN32_API)
     target_link_libraries(libCZI PRIVATE ole32 Windowscodecs)
   endif()
-  target_include_directories(libCZI
-      PUBLIC
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
-        $<INSTALL_INTERFACE:include>)
+    target_include_directories(libCZI
+        PUBLIC
+            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+            $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>      # add the binary tree to the search path for include files so that we will find libCZI_Config.h
+            $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
+        PRIVATE
+            ${EIGEN3_INCLUDE_DIR})
 endif(LIBCZI_BUILD_DYNLIB)
 
 #
@@ -434,8 +440,6 @@ set_target_properties(libCZIStatic PROPERTIES CXX_STANDARD 14)
 target_compile_definitions(libCZIStatic PRIVATE _LIBCZISTATICLIB)
 set_target_properties(libCZIStatic PROPERTIES VERSION ${PROJECT_VERSION})
 # add the binary tree to the search path for include files so that we will find libCZI_Config.h
-target_include_directories(libCZIStatic PRIVATE  "${CMAKE_CURRENT_BINARY_DIR}")
-target_include_directories(libCZIStatic PRIVATE  ${EIGEN3_INCLUDE_DIR})
 target_link_libraries(libCZIStatic PRIVATE  ${ADDITIONAL_LIBS_REQUIRED_FOR_ATOMIC})
 set_target_properties(libCZIStatic PROPERTIES DEBUG_POSTFIX "d")
 if (LIBCZI_BUILD_PREFER_EXTERNALPACKAGE_ZSTD)
@@ -476,9 +480,12 @@ target_compile_definitions(libCZIStatic PUBLIC _LIBCZISTATICLIB)    # make sure 
 
 # Static library include directories
 target_include_directories(libCZIStatic
-  PUBLIC
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
-    $<INSTALL_INTERFACE:include>)
+    PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
+        $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
+    PRIVATE
+        ${EIGEN3_INCLUDE_DIR})
 
 if(LIBCZI_ENABLE_INSTALL)
 
@@ -506,7 +513,7 @@ if(LIBCZI_ENABLE_INSTALL)
                 CONFIGURATIONS Release RelWithDebInfo MinSizeRel)
     endif()
 
-    # Manual install of public headers to include/libCZI (simulate structure without moving files)
+    # Manual install of public headers and generated public configuration heade
     install(FILES ${libCZIPublicHeaders}
         DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/libCZI)
 

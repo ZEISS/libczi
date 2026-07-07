@@ -8,7 +8,7 @@
 #include "utilities.h"
 #include "libCZI.h"
 #include "Site.h"
-#include "inc_libCZI_Config.h"
+#include "libCZI_Config_Internal.h"
 
 using namespace libCZI;
 using namespace libCZI::detail;

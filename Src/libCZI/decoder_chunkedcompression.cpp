@@ -2,7 +2,8 @@
 //
 // SPDX-License-Identifier: LGPL-3.0-or-later
 
-#include "inc_libCZI_Config.h"
+#include "libCZI_Config_Internal.h"
+#if LIBCZI_EXPERIMENTAL_CHUNKED_COMPRESSION_AVAILABLE
 #include "decoder_chunkedcompression.h"
 
 #include "libCZI_compress.h"
@@ -377,3 +378,4 @@ std::shared_ptr<libCZI::IBitmapData> CChunkedCompressionDecoder::Decode(const vo
         return bitmap;
     }
 }
+#endif

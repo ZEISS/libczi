@@ -2,8 +2,10 @@
 //
 // SPDX-License-Identifier: LGPL-3.0-or-later
 
-#include "inc_libCZI_Config.h"
+#include "libCZI_Config_Internal.h"
 #include "libCZI_compress.h"
+
+#if LIBCZI_EXPERIMENTAL_CHUNKED_COMPRESSION_AVAILABLE
 #include <cstring>
 #include <stdexcept>
 #include <limits>
@@ -1886,3 +1888,4 @@ size_t ChunkedCompressionHeaderHelper::CalculateMaxCompressedSizeChunked(
     const auto sizes = CalculateMaxChunkedCompressionSize(sourceWidth, sourceHeight, sourcePixeltype, maxChunkSize, codec, hiLoBytePacking);
     return sizes.maxHeaderSize + sizes.maxCompressedSize;
 }
+#endif

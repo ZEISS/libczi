@@ -2,9 +2,9 @@
 //
 // SPDX-License-Identifier: LGPL-3.0-or-later
 
+#include "libCZI_Config_Internal.h"
 #include <stdexcept>
 #include <cstdint>
-#include "inc_libCZI_Config.h"
 #include "utilities.h"
 
 using namespace std;

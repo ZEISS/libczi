@@ -611,6 +611,7 @@ namespace
         return make_tuple(data, size_data);
     }
 
+#if LIBCZI_EXPERIMENTAL_CHUNKED_COMPRESSION_AVAILABLE
     tuple<shared_ptr<void>, size_t> CreateCziDocumentContainingOneSubblockChunkedCompressedWhichIsTooSmallWithHiLoBytePack()
     {
         // this creates a one-subblock CZI file, with a ChunkedExtensible-compressed subblock of characteristics "4x4, Gray16";
@@ -673,7 +674,9 @@ namespace
         const auto data = outStream->GetCopy(&size_data);
         return make_tuple(data, size_data);
     }
+#endif
 
+#if LIBCZI_EXPERIMENTAL_CHUNKED_COMPRESSION_AVAILABLE
     tuple<shared_ptr<void>, size_t> CreateCziDocumentContainingOneSubblockChunkedCompressedWhichIsTooLargeWithHiLoBytePack()
     {
         // this creates a one-subblock CZI file, with a ChunkedExtensible-compressed subblock of characteristics "4x4, Gray16";
@@ -733,6 +736,7 @@ namespace
         const auto data = outStream->GetCopy(&size_data);
         return make_tuple(data, size_data);
     }
+#endif
 }
 
 TEST(CziReader, ReaderException)
@@ -1732,6 +1736,7 @@ TEST(CziReader, CreateBitmapFromSubBlockDataZstd0TooSmallEnableResolutionAndChec
     }
 }
 
+#if LIBCZI_EXPERIMENTAL_CHUNKED_COMPRESSION_AVAILABLE
 TEST(CziReader, ReadSubBlockWithChunkedCompressionWithHiLoBytePackTooLargeEnableResolutionAndCheckResolutionProtocol)
 {
     // arrange
@@ -1763,7 +1768,9 @@ TEST(CziReader, ReadSubBlockWithChunkedCompressionWithHiLoBytePackTooLargeEnable
         }
     }
 }
+#endif
 
+#if LIBCZI_EXPERIMENTAL_CHUNKED_COMPRESSION_AVAILABLE
 TEST(CziReader, ReadSubBlockWithChunkedCompressionWithHiLoBytePackTooSmallEnableResolutionAndCheckResolutionProtocol)
 {
     // arrange
@@ -1804,7 +1811,9 @@ TEST(CziReader, ReadSubBlockWithChunkedCompressionWithHiLoBytePackTooSmallEnable
         }
     }
 }
+#endif
 
+#if LIBCZI_EXPERIMENTAL_CHUNKED_COMPRESSION_AVAILABLE
 TEST(CziReader, ReadSubBlockWithChunkedCompressionWithHiLoBytePackTooLargeDisableResolutionAndCheckException)
 {
     // arrange
@@ -1822,7 +1831,9 @@ TEST(CziReader, ReadSubBlockWithChunkedCompressionWithHiLoBytePackTooLargeDisabl
     options.handle_chunked_compression_data_size_mismatch = false;
     EXPECT_THROW(sub_block->CreateBitmap(&options), exception);
 }
+#endif
 
+#if LIBCZI_EXPERIMENTAL_CHUNKED_COMPRESSION_AVAILABLE
 TEST(CziReader, ReadSubBlockWithChunkedCompressionWithHiLoBytePackTooSmallDisableResolutionAndCheckException)
 {
     // arrange
@@ -1840,3 +1851,4 @@ TEST(CziReader, ReadSubBlockWithChunkedCompressionWithHiLoBytePackTooSmallDisabl
     options.handle_chunked_compression_data_size_mismatch = false;
     EXPECT_THROW(sub_block->CreateBitmap(&options), exception);
 }
+#endif

@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: LGPL-3.0-or-later
 
 #include "../libCZI_StreamsLib.h"
-#include <libCZI_Config.h>
+#include "libCZI_Config_Internal.h"
 #include <memory>
 #include <mutex>
 #include <assert.h>
