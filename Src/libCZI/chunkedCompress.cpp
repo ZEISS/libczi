@@ -1340,9 +1340,8 @@ namespace
                 options.sourceWidth,
                 options.sourceHeight,
                 false);
-
-
- /*         if (options.do_lo_hi_byte_unpacking)
+            
+/*          if (options.do_lo_hi_byte_unpacking)
             {
                 // TODO(JBL) : check requirements (line_size must be divisible by 2, etc.) for hi-lo byte unpacking, and throw if the requirements are not met
                 LoHiBytePackUnpack::LoHiByteUnpackStrided(
