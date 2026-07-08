@@ -113,9 +113,20 @@ std::shared_ptr<libCZI::IBitmapData> CChunkedCompressionDecoder::Decode(const vo
     // now - if this size matches the expected size (given by width, height and pixel type), then we can proceed with the decompression, otherwise we
     //  use the "resolution protocol"
 
-    // calculate the expected size of the uncompressed data
-    size_t stride = *width * static_cast<size_t>(Utils::GetBytesPerPixel(*pixelType));
-    size_t expected_size = *height * stride;
+    // calculate the expected size of the uncompressed data (with overflow checks)
+    const size_t bytes_per_pixel = static_cast<size_t>(Utils::GetBytesPerPixel(*pixelType));
+    if (static_cast<size_t>(*width) > (numeric_limits<size_t>::max)() / bytes_per_pixel)
+    {
+        throw runtime_error("Invalid bitmap width/pixel type: size overflow.");
+    }
+
+    size_t stride = static_cast<size_t>(*width) * bytes_per_pixel;
+    if (static_cast<size_t>(*height) > (numeric_limits<size_t>::max)() / stride)
+    {
+        throw runtime_error("Invalid bitmap height/stride: size overflow.");
+    }
+
+    size_t expected_size = static_cast<size_t>(*height) * stride;
     if (expected_size == total_size_of_decompressed_data)
     {
         // ok, so the reported sizes add up to exactly what is expected
@@ -345,7 +356,12 @@ std::shared_ptr<libCZI::IBitmapData> CChunkedCompressionDecoder::Decode(const vo
         throw runtime_error("Invalid stride calculated from width and pixel type.");
     }
 
-    const size_t expected_size = decode_information.height * stride;
+    if (static_cast<size_t>(decode_information.height) > (numeric_limits<size_t>::max)() / stride)
+    {
+        throw runtime_error("Invalid bitmap height/stride: size overflow.");
+    }
+
+    const size_t expected_size = static_cast<size_t>(decode_information.height) * stride;
     const uint64_t source_offset = get<0>(decode_information.chunk_header_info);  // chunk-data starts after the chunk-header, so we start reading from there
 
     auto bitmap = CStdBitmapData::Create(decode_information.pixelType, decode_information.width, decode_information.height, static_cast<uint32_t>(stride));

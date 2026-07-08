@@ -1173,11 +1173,14 @@ namespace
                     size_of_chunk,
                     up_temp_buffer.get());
 
+            const int dest_capacity = static_cast<int>(
+                 min(options.sizeDestination - offset_in_destination,
+                static_cast<size_t>((numeric_limits<int>::max)())));
             const int r = LZ4_compress_default(
                             static_cast<const char*>(up_temp_buffer.get()),
                             static_cast<char*>(options.destination) + offset_in_destination,
-                            size_of_chunk,
-                            static_cast<int>(options.sizeDestination - offset_in_destination));
+                             static_cast<int>(size_of_chunk),
+                             dest_capacity);
             if (r <= 0)
             {
                 return false;
