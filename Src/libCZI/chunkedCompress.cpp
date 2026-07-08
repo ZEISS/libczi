@@ -23,9 +23,7 @@
 #include <common/zstd_errors.h>
 #endif
 
-#if (LIBCZI_LZ4_AVAILABLE)
 #include <lz4.h>
-#endif
 
 using namespace libCZI;
 using namespace libCZI::detail;
@@ -1031,7 +1029,6 @@ namespace
 
             return total;
         }
-#if (LIBCZI_LZ4_AVAILABLE)
         case ChunkedCompressionHeaderHelper::Codec::Lz4:
         {
             size_t total = full_chunk_count * static_cast<size_t>(LZ4_compressBound(static_cast<int>(max_chunk_size)));
@@ -1042,7 +1039,6 @@ namespace
 
             return total;
         }
-#endif
         default:
             throw invalid_argument("Invalid codec specified for calculating maximum size for chunked compression.");
         }
@@ -1077,7 +1073,6 @@ namespace
         return CalculateMaxChunkedCompressionSize(source_data_size, maxChunkSize, codec, hiLoBytePacking);
     }
 
-#if (LIBCZI_LZ4_AVAILABLE)
     bool ChunkedCompressWithLz4(const ChunkedCompressionOptionsLz4& options, const void* source_data, size_t size_source_data, vector<uint32_t>& compressed_sizes)
     {
         const uint32_t number_of_chunks = static_cast<uint32_t>((size_source_data + options.chunkSize - 1) / options.chunkSize);
@@ -1141,22 +1136,11 @@ namespace
                     static_cast<uint32_t>(options.chunkSize),
                     static_cast<uint32_t>(size_source_data - static_cast<size_t>(n) * options.chunkSize));
 
-            /*LoHiBytePackUnpack::LoHiByteUnpackStrided(
-                    static_cast<const uint8_t*>(source_data) + offset_in_source,
-                    size_of_chunk / 2,
-                    size_of_chunk,
-                    1,
-                    up_temp_buffer.get());*/
             LoHiBytePackUnpack::LoHiByteUnpackByteSized(
                     static_cast<const uint8_t*>(source_data) + offset_in_source,
                     size_of_chunk,
                     up_temp_buffer.get());
 
-            /*const int r = LZ4_compress_default(
-                static_cast<const char*>(source_data) + offset_in_source,
-                static_cast<char*>(options.destination) + offset_in_destination,
-                size_of_chunk,
-                static_cast<int>(options.sizeDestination - offset_in_destination));*/
             const int r = LZ4_compress_default(
                             static_cast<const char*>(up_temp_buffer.get()),
                             static_cast<char*>(options.destination) + offset_in_destination,
@@ -1175,7 +1159,6 @@ namespace
 
         return true;
     }
-#endif
 
     bool ChunkedCompressWithZstd(const ChunkedCompressionOptionsZstd& options, const void* source_data, size_t size_source_data, vector<uint32_t>& compressed_sizes)
     {
@@ -1421,7 +1404,6 @@ namespace
         }
     }
 
-#if (LIBCZI_LZ4_AVAILABLE)
     bool ChunkedCompressToDestinationBufferLz4(const ChunkedCompressionOptionsLz4& options, vector<uint32_t>& compressed_sizes, size_t* total_size_of_compressed_data)
     {
         const size_t bytesPerPel = Utils::GetBytesPerPixel(options.sourcePixeltype);
@@ -1481,9 +1463,7 @@ namespace
 
         return true;
     }
-#endif
 
-#if (LIBCZI_LZ4_AVAILABLE)
     size_t ChunkedCompressLz4AndPrependHeader(const ChunkedCompressionOptionsLz4& options)
     {
         vector<uint32_t> compressed_sizes;
@@ -1520,7 +1500,6 @@ namespace
 
         return actual_header_size + total_compressed_chunks_size;
     }
-#endif
 
     // This function determines the maximum chunk size to use for chunked compression, based on the given parameters. If 
     // the parameters do not specify a valid chunk size, a default of 64kb is used.
@@ -1645,7 +1624,6 @@ bool ChunkedCompress::Compress(
         sizeDestination = size_compressed;
         return true;
     }
-#if (LIBCZI_LZ4_AVAILABLE)
     case ChunkedCompressionHeaderHelper::Codec::Lz4:
     {
         ChunkedCompressionOptionsLz4 options_lz4;
@@ -1671,7 +1649,6 @@ bool ChunkedCompress::Compress(
         sizeDestination = size_compressed;
         return true;
     }
-#endif
     default:
         throw invalid_argument("Invalid compression method specified in the parameters for ChunkedCompress::Compress.");
     }
@@ -1770,7 +1747,6 @@ std::shared_ptr<IMemoryBlock> ChunkedCompress::CompressToMemoryBlock(
 
         return mem_blk;
     }
-#if (LIBCZI_LZ4_AVAILABLE)
     else if (compression_method == ChunkedCompressionHeaderHelper::Codec::Lz4)
     {
         ChunkedCompressionOptionsLz4 options_lz4;
@@ -1812,7 +1788,6 @@ std::shared_ptr<IMemoryBlock> ChunkedCompress::CompressToMemoryBlock(
 
         return mem_blk;
     }
-#endif
     else
     {
         throw invalid_argument("Unsupported compression method.");

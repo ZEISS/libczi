@@ -194,29 +194,11 @@ endif()
 
 option(LIBCZI_BUILD_EXPERIMENTAL_CHUNKED_COMPRESSION "Enable experimental chunked compression support in the build." ${_libczi_default_experimental_chunked_compression})
 
-# Enables optional LZ4 codec support for chunked compression.
-# When OFF, LZ4 code is excluded and no LZ4 dependency is required.
-# When ON, LZ4 is either found as an external package or fetched during configuration,
-# depending on LIBCZI_BUILD_PREFER_EXTERNALPACKAGE_LZ4.
-option(LIBCZI_BUILD_ENABLE_LZ4 "Enable LZ4 compression support in the build." OFF)
-
-# LZ4 support is meaningful only for the experimental chunked-compression feature.
-# Keep this as a hard configuration error so accidental dependency enablement is
-# visible immediately, especially for package-manager builds.
-if (LIBCZI_BUILD_ENABLE_LZ4 AND NOT LIBCZI_BUILD_EXPERIMENTAL_CHUNKED_COMPRESSION)
-    message(FATAL_ERROR
-        "LIBCZI_BUILD_ENABLE_LZ4 is ON, but "
-        "LIBCZI_BUILD_EXPERIMENTAL_CHUNKED_COMPRESSION is OFF. "
-        "LZ4 support is only valid when experimental chunked compression is enabled. "
-        "If you did not specify LIBCZI_BUILD_ENABLE_LZ4, this is probably a stale "
-        "CMake cache entry; delete the CMake cache or set "
-        "-DLIBCZI_BUILD_ENABLE_LZ4=OFF.")
-endif()
-
-# Controls how the LZ4 dependency is resolved when LIBCZI_BUILD_ENABLE_LZ4 is ON.
-# When ON, CMake requires an externally provided lz4 package via find_package(lz4 CONFIG REQUIRED).
-# When OFF, CMake fetches and builds a private copy of LZ4 using FetchContent.
-# This option has no effect when LIBCZI_BUILD_ENABLE_LZ4 is OFF.
+# Controls how the mandatory LZ4 dependency is resolved when experimental
+# chunked compression is enabled. When ON, CMake requires an externally
+# provided lz4 package via find_package(lz4 CONFIG REQUIRED). When OFF,
+# CMake fetches and builds a private copy of LZ4 using FetchContent.
+# This option has no effect when LIBCZI_BUILD_EXPERIMENTAL_CHUNKED_COMPRESSION is OFF.
 option(LIBCZI_BUILD_PREFER_EXTERNALPACKAGE_LZ4 "Prefer an LZ4-package present on the system" OFF)
 
 
