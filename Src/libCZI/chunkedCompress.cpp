@@ -1331,31 +1331,6 @@ namespace
                 options.sourceWidth,
                 options.sourceHeight,
                 false);
-            
-/*          if (options.do_lo_hi_byte_unpacking)
-            {
-                // TODO(JBL) : check requirements (line_size must be divisible by 2, etc.) for hi-lo byte unpacking, and throw if the requirements are not met
-                LoHiBytePackUnpack::LoHiByteUnpackStrided(
-                    options.source,
-                    line_size / 2,
-                    options.sourceStride,
-                    options.sourceHeight,
-                    upTemp.get());
-            }
-            else
-            {
-                // copy the source data to the temporary buffer with the minimal stride (i.e. the line size), since this is required for compression, and also since this will ensure that the data is laid out in memory in a way that is optimal for compression (i.e. without "gaps" at the end of each line that would be present if the stride is larger than the line size)
-                CBitmapOperations::Copy(
-                    options.sourcePixeltype,
-                    options.source,
-                    options.sourceStride,
-                    options.sourcePixeltype,
-                    upTemp.get(),
-                    line_size,
-                    options.sourceWidth,
-                    options.sourceHeight,
-                    false);
-            }*/
 
             source_data_for_compression = upTemp.get();
         }
@@ -1477,29 +1452,6 @@ namespace
 
             upTemp.reset(tempBuffer);
 
-            //if (options.do_lo_hi_byte_unpacking)
-            //{
-            //    // TODO(JBL) : check requirements (line_size must be divisible by 2, etc.) for hi-lo byte unpacking, and throw if the requirements are not met
-            //    LoHiBytePackUnpack::LoHiByteUnpackStrided(
-            //        options.source,
-            //        line_size / 2,
-            //        options.sourceStride,
-            //        options.sourceHeight,
-            //        upTemp.get());
-            //}
-            //else
-            //{
-            //    CBitmapOperations::Copy(
-            //        options.sourcePixeltype,
-            //        options.source,
-            //        options.sourceStride,
-            //        options.sourcePixeltype,
-            //        upTemp.get(),
-            //        line_size,
-            //        options.sourceWidth,
-            //        options.sourceHeight,
-            //        false);
-            //}
             CBitmapOperations::Copy(
                     options.sourcePixeltype,
                     options.source,
