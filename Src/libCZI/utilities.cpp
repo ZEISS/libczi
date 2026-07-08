@@ -613,6 +613,11 @@ bool Utilities::ContainsToken(const char* input, const char* token)
 
 /*static*/void LoHiBytePackUnpack::LoHiByteUnpackByteSized(const void* src_ptr, uint32_t src_size, void* ptrDst)
 {
+    if (src_size > 0 && (src_ptr == nullptr || ptrDst == nullptr))
+    {
+        throw invalid_argument("src_ptr and ptrDst must not be null when src_size is greater than zero.");
+    }
+
     uint32_t word_count = src_size / 2;
     if (word_count > 0)
     {
