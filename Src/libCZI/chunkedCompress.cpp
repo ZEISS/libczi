@@ -1075,6 +1075,15 @@ namespace
 
     bool ChunkedCompressWithLz4(const ChunkedCompressionOptionsLz4& options, const void* source_data, size_t size_source_data, vector<uint32_t>& compressed_sizes)
     {
+        // LZ4's API represents all sizes as signed int.  The tightest safe limit is
+        // LZ4_MAX_INPUT_SIZE (0x7E000000), not INT_MAX: for any srcSize <= LZ4_MAX_INPUT_SIZE
+        // LZ4_compressBound(srcSize) is guaranteed to fit in a signed int, whereas
+        // LZ4_compressBound(INT_MAX) overflows int.
+        if (options.chunkSize > static_cast<uint32_t>(LZ4_MAX_INPUT_SIZE))
+        {
+            throw invalid_argument("chunkSize exceeds LZ4_MAX_INPUT_SIZE; the LZ4 API cannot handle chunks that large.");
+        }
+
         const uint32_t number_of_chunks = static_cast<uint32_t>((size_source_data + options.chunkSize - 1) / options.chunkSize);
 
         compressed_sizes.clear();
@@ -1084,15 +1093,26 @@ namespace
         size_t offset_in_destination = 0;
         for (uint32_t n = 0; n < number_of_chunks; ++n)
         {
+            // options.chunkSize was verified above to be <= LZ4_MAX_INPUT_SIZE <= INT_MAX,
+            // so the min() result is also within that range and the cast to int is safe.
             const int size_of_chunk = static_cast<int>(min(
                 static_cast<size_t>(options.chunkSize),
                 size_source_data - static_cast<size_t>(n) * options.chunkSize));
+
+            // The remaining destination capacity is a size_t and may exceed INT_MAX on
+            // 64-bit platforms.  Clamp to INT_MAX before casting: because chunkSize is
+            // bounded by LZ4_MAX_INPUT_SIZE, the compressed output of one chunk is at most
+            // LZ4_compressBound(LZ4_MAX_INPUT_SIZE) = 2,122,219,150 < INT_MAX, so the
+            // clamp never causes LZ4 to see less space than it actually needs.
+            const int dest_capacity = static_cast<int>(
+                min(options.sizeDestination - offset_in_destination,
+                static_cast<size_t>((numeric_limits<int>::max)())));
 
             const int r = LZ4_compress_default(
                 static_cast<const char*>(source_data) + offset_in_source,
                 static_cast<char*>(options.destination) + offset_in_destination,
                 size_of_chunk,
-                static_cast<int>(options.sizeDestination - offset_in_destination));
+                dest_capacity);
             if (r <= 0)
             {
                 return false;
@@ -1318,9 +1338,9 @@ namespace
             source_data_for_compression = upTemp.get();
         }
 
-        const bool success = options.do_lo_hi_byte_unpacking ? 
-                                        ChunkedCompressWithZstdAndHiLoBytePacking(options, source_data_for_compression, source_data_size, compressed_sizes) :
-                                        ChunkedCompressWithZstd(options, source_data_for_compression, source_data_size, compressed_sizes);
+        const bool success = options.do_lo_hi_byte_unpacking ?
+            ChunkedCompressWithZstdAndHiLoBytePacking(options, source_data_for_compression, source_data_size, compressed_sizes) :
+            ChunkedCompressWithZstd(options, source_data_for_compression, source_data_size, compressed_sizes);
         if (!success)
         {
             return false;
@@ -1448,9 +1468,9 @@ namespace
             source_data_for_compression = upTemp.get();
         }
 
-        const bool success = options.do_lo_hi_byte_unpacking ? 
-                                    ChunkedCompressWithLz4AndLoHiBytePacking(options, source_data_for_compression, source_data_size, compressed_sizes) : 
-                                    ChunkedCompressWithLz4(options, source_data_for_compression, source_data_size, compressed_sizes);
+        const bool success = options.do_lo_hi_byte_unpacking ?
+            ChunkedCompressWithLz4AndLoHiBytePacking(options, source_data_for_compression, source_data_size, compressed_sizes) :
+            ChunkedCompressWithLz4(options, source_data_for_compression, source_data_size, compressed_sizes);
         if (!success)
         {
             return false;
