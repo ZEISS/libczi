@@ -391,7 +391,7 @@ std::shared_ptr<libCZI::IBitmapData> CChunkedCompressionDecoder::Decode(const vo
         unique_ptr<void, decltype(&free)> temporary_buffer(malloc(total_size_of_decompressed_data), free);
         if (temporary_buffer == nullptr)
         {
-            throw runtime_error("Failed to allocate temporary buffer for Zstd-decompression.");
+            throw runtime_error("Failed to allocate temporary buffer for chunked decompression.");
         }
 
         if (get<1>(decode_information.chunk_header_info).hiLoBytePackingApplied)

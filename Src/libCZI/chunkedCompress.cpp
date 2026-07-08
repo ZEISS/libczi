@@ -1065,7 +1065,20 @@ namespace
         ChunkedCompressionHeaderHelper::HeaderInfoForMaxSizeDetermination header_info_for_max_size_determination;
         header_info_for_max_size_determination.codec = codec;
         header_info_for_max_size_determination.hiLoBytePackingApplied = hiLoBytePacking;
-        header_info_for_max_size_determination.number_of_chunks = static_cast<uint32_t>((size + maxChunkSize - 1) / maxChunkSize);
+
+        if (maxChunkSize == 0)
+        {
+            throw invalid_argument("maxChunkSize must be greater than 0.");
+        }
+
+        const size_t max_chunk_size = static_cast<size_t>(maxChunkSize);
+        const size_t number_of_chunks_sz = (size / max_chunk_size) + ((size % max_chunk_size) ? 1 : 0);
+        if (number_of_chunks_sz > (std::numeric_limits<uint32_t>::max)())
+        {
+            throw invalid_argument("Number of chunks exceeds 32-bit limit required by the chunked-compression header.");
+        }
+
+        header_info_for_max_size_determination.number_of_chunks = static_cast<uint32_t>(number_of_chunks_sz);
         result.maxHeaderSize = ChunkedCompressionHeaderHelper::DetermineMaxSizeForCompressionHeader(header_info_for_max_size_determination);
 
         result.maxCompressedSize = CalculateMaxSizeForChunkedCompression(codec, size, maxChunkSize);
@@ -1080,8 +1093,24 @@ namespace
                                                                         ChunkedCompressionHeaderHelper::Codec codec,
                                                                         bool hiLoBytePacking)
     {
-        const size_t line_size = sourceWidth * static_cast<size_t>(Utils::GetBytesPerPixel(sourcePixeltype));
-        const size_t source_data_size = sourceHeight * line_size;
+        const size_t bytes_per_pixel = static_cast<size_t>(Utils::GetBytesPerPixel(sourcePixeltype));
+        if (bytes_per_pixel == 0)
+        {
+            throw invalid_argument("Invalid pixel type.");
+        }
+
+        if (static_cast<size_t>(sourceWidth) > (std::numeric_limits<size_t>::max)() / bytes_per_pixel)
+        {
+            throw invalid_argument("sourceWidth/bytesPerPixel overflow.");
+        }
+
+        const size_t line_size = static_cast<size_t>(sourceWidth) * bytes_per_pixel;
+        if (static_cast<size_t>(sourceHeight) > (std::numeric_limits<size_t>::max)() / line_size)
+        {
+            throw invalid_argument("sourceHeight/line_size overflow.");
+        }
+
+        const size_t source_data_size = static_cast<size_t>(sourceHeight) * line_size;
         return CalculateMaxChunkedCompressionSize(source_data_size, maxChunkSize, codec, hiLoBytePacking);
     }
 
