@@ -1201,8 +1201,10 @@ namespace
                 return false;
             }
 
-            // TODO(JBL): check that r does not exceed numeric_limits<uint32_t>::max() before the cast in the 
-            // next statement (and handle this case appropriately, e.g. by throwing an exception), since the compressed chunk size must be representable in 4 bytes for our header format
+            if (r > (numeric_limits<uint32_t>::max)())
+            {
+                throw runtime_error("Compressed chunk size exceeds 32-bit limit required by chunked-compression header.");
+            }
 
             compressed_sizes.emplace_back(static_cast<uint32_t>(r));
 
@@ -1241,12 +1243,6 @@ namespace
         {
             uint32_t size_of_chunk = min(options.chunkSize, static_cast<uint32_t>(size_source_data - static_cast<size_t>(n) * options.chunkSize));
 
-            /*LoHiBytePackUnpack::LoHiByteUnpackStrided(
-                    static_cast<const uint8_t*>(source_data) + offset_in_source,
-                    size_of_chunk/2,
-                    size_of_chunk,
-                    1,
-                    up_temp_buffer.get());*/
             LoHiBytePackUnpack::LoHiByteUnpackByteSized(
                     static_cast<const uint8_t*>(source_data) + offset_in_source,
                     size_of_chunk,
@@ -1258,20 +1254,15 @@ namespace
                                     up_temp_buffer.get(),
                                     size_of_chunk,
                                     options.zstdCompressionLevel);
-
-            /*const size_t r = ZSTD_compress(
-                                    static_cast<uint8_t*>(options.destination) + offset_in_destination,
-                                    options.sizeDestination - offset_in_destination,
-                                    static_cast<const uint8_t*>(source_data) + offset_in_source,
-                                    size_of_chunk,
-                                    options.zstdCompressionLevel);*/
             if (ZSTD_isError(r))
             {
                 return false;
             }
 
-            // TODO(JBL): check that r does not exceed numeric_limits<uint32_t>::max() before the cast in the 
-            // next statement (and handle this case appropriately, e.g. by throwing an exception), since the compressed chunk size must be representable in 4 bytes for our header format
+            if (r > (numeric_limits<uint32_t>::max)())
+            {
+                throw runtime_error("Compressed chunk size exceeds 32-bit limit required by chunked-compression header.");
+            }
 
             compressed_sizes.emplace_back(static_cast<uint32_t>(r));
 
