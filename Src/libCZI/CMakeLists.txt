@@ -510,7 +510,7 @@ if(LIBCZI_ENABLE_INSTALL)
                 CONFIGURATIONS Release RelWithDebInfo MinSizeRel)
     endif()
 
-    # Manual install of public headers and generated public configuration heade
+    # Manual install of public headers and generated public configuration header
     install(FILES ${libCZIPublicHeaders}
         DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/libCZI)
 
