@@ -1141,6 +1141,12 @@ namespace
 
     bool ChunkedCompressWithLz4AndLoHiBytePacking(const ChunkedCompressionOptionsLz4& options, const void* source_data, size_t size_source_data, vector<uint32_t>& compressed_sizes)
     {
+        // LZ4 APIs take `int` sizes and require srcSize <= LZ4_MAX_INPUT_SIZE.
+        if (options.chunkSize > static_cast<uint32_t>(LZ4_MAX_INPUT_SIZE))
+        {
+            throw invalid_argument("chunkSize exceeds LZ4_MAX_INPUT_SIZE; the LZ4 API cannot handle chunks that large.");
+        }
+
         const uint32_t number_of_chunks = static_cast<uint32_t>((size_source_data + options.chunkSize - 1) / options.chunkSize);
         const size_t max_chunk_size = min(static_cast<size_t>(options.chunkSize), size_source_data);
 
