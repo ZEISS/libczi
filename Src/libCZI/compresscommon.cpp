@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: LGPL-3.0-or-later
 
 #include "compresscommon.h"
+#include <limits>
 #include <stdexcept>
 #include <sstream>
 
@@ -24,11 +25,18 @@ void libCZI::detail::CompressionUtilities::CheckSourceBitmapArgumentsAndThrow(st
     }
 
     // note: GetBytesPerPixel will throw (an invalid_argument-exception) in case of an invalid enum value
-    if (source_stride < source_width * Utils::GetBytesPerPixel(source_pixeltype))
+    const size_t bytes_per_pixel = Utils::GetBytesPerPixel(source_pixeltype);
+    if (static_cast<size_t>(source_width) > numeric_limits<size_t>::max() / bytes_per_pixel)
+    {
+        throw invalid_argument("width is too large for the given pixel type.");
+    }
+
+    const size_t min_stride = static_cast<size_t>(source_width) * bytes_per_pixel;
+    if (min_stride > numeric_limits<uint32_t>::max() || static_cast<size_t>(source_stride) < min_stride)
     {
         stringstream ss;
         ss << "stride is illegal, for width=" << source_width << " and pixeltype=" << Utils::PixelTypeToInformalString(source_pixeltype) << " the minimum stride is "
-            << source_width * Utils::GetBytesPerPixel(source_pixeltype) << " whereas " << source_stride << " was specified.";
+            << min_stride << " whereas " << source_stride << " was specified.";
         throw invalid_argument(ss.str());
     }
 
