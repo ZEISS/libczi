@@ -10,6 +10,7 @@
 #include "utilities.h"
 
 #include <cstring>
+#include <limits>
 #include <numeric>
 #include <stdexcept>
 #include <utility>
@@ -32,17 +33,38 @@ namespace
 {
     bool CheckIfCompressedChunkSizesAreValid(const std::tuple<size_t, ChunkedCompressionHeaderHelper::HeaderInfo>& size_and_header_info, size_t size_of_data)
     {
-        size_t total_compressed_size = accumulate(
-            get<1>(size_and_header_info).chunks.begin(),
-            get<1>(size_and_header_info).chunks.end(),
-            size_t{ 0 },
-            [](size_t sum, const auto& chunkInfo)
-            {
-                return sum + chunkInfo.compressedSize;
-            });
+        const size_t header_size = get<0>(size_and_header_info);
 
-        // ok, so now "size of chunk-header" and "total compressed size" must add up to the total size of the data
-        return get<0>(size_and_header_info) + total_compressed_size <= size_of_data;
+        // The header alone must not exceed the total data size.
+        if (header_size > size_of_data)
+        {
+            return false;
+        }
+
+        // Accumulate the compressed chunk sizes directly against the remaining budget.
+        // This avoids a two-step approach (accumulate-then-add) where either addition
+        // could silently wrap on malformed input with many / large chunks:
+        //   - sum of compressedSizes could overflow size_t
+        //   - header_size + that sum could then also overflow size_t
+        // Both wraps would make the subsequent "<= size_of_data" check pass erroneously,
+        // allowing out-of-bounds reads when the chunks are later iterated.
+        //
+        // Loop invariant: running_total <= size_of_data, so (size_of_data - running_total)
+        // never underflows and the addition running_total += ... never overflows.
+        size_t running_total = header_size;
+        for (const auto& chunk : get<1>(size_and_header_info).chunks)
+        {
+            // compressedSize is uint32_t; widening to size_t is safe on all platforms.
+            if (static_cast<size_t>(chunk.compressedSize) > size_of_data - running_total)
+            {
+                return false;
+            }
+
+            running_total += chunk.compressedSize;
+        }
+
+        // running_total == header_size + sum(compressedSizes) and is guaranteed <= size_of_data.
+        return true;
     }
 }
 
