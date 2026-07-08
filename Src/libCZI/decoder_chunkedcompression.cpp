@@ -85,14 +85,22 @@ std::shared_ptr<libCZI::IBitmapData> CChunkedCompressionDecoder::Decode(const vo
 
     auto size_and_header_info = ChunkedCompressionHeaderHelper::ParseCompressionHeader(ptrData, size);
     const auto& chunks = get<1>(size_and_header_info).chunks;
-    size_t total_size_of_decompressed_data = accumulate(
-        chunks.begin(),
-        chunks.end(),
-        size_t{ 0 },
-        [](size_t sum, const auto& chunk)
+
+    // Sum all per-chunk uncompressed sizes.  uncompressedSize is uint32_t, so each
+    // individual value widens safely to size_t.  However, the accumulated total can
+    // still overflow size_t when a malformed header contains many / large chunks.
+    // An overflowing sum would silently corrupt the size comparison, the error
+    // message, and the downstream decode path, so we detect and reject it here.
+    size_t total_size_of_decompressed_data = 0;
+    for (const auto& chunk : chunks)
+    {
+        if (static_cast<size_t>(chunk.uncompressedSize) > (numeric_limits<size_t>::max)() - total_size_of_decompressed_data)
         {
-            return sum + chunk.uncompressedSize;
-        });
+            throw runtime_error("Overflow computing total decompressed size: chunked-compression header is malformed.");
+        }
+
+        total_size_of_decompressed_data += chunk.uncompressedSize;
+    }
 
     if (get<1>(size_and_header_info).hiLoBytePackingApplied == true &&
         Utilities::ContainsToken(additional_arguments, CChunkedCompressionDecoder::kOption_IgnorePreprocessingInstruction))
