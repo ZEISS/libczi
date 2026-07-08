@@ -14,7 +14,6 @@ namespace libCZI
 {
     namespace detail
     {
-
         class CCziMetadata : public libCZI::ICziMetadata, public std::enable_shared_from_this<CCziMetadata>
         {
         private:
