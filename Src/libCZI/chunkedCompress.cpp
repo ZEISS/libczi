@@ -1031,6 +1031,18 @@ namespace
         }
         case ChunkedCompressionHeaderHelper::Codec::Lz4:
         {
+            // LZ4_compressBound() takes a signed int.  Guard that max_chunk_size fits
+            // within LZ4_MAX_INPUT_SIZE — not merely INT_MAX — because
+            // LZ4_compressBound(INT_MAX) overflows int, whereas
+            // LZ4_compressBound(LZ4_MAX_INPUT_SIZE) = 2,122,219,150 < INT_MAX.
+            if (max_chunk_size > static_cast<uint32_t>(LZ4_MAX_INPUT_SIZE))
+            {
+                throw invalid_argument("max_chunk_size exceeds LZ4_MAX_INPUT_SIZE; cannot calculate LZ4 compressed-size bound.");
+            }
+
+            // last_chunk_size = source_data_size % max_chunk_size, so it is strictly less
+            // than max_chunk_size and therefore also within LZ4_MAX_INPUT_SIZE.  Both
+            // casts to int are safe after the guard above.
             size_t total = full_chunk_count * static_cast<size_t>(LZ4_compressBound(static_cast<int>(max_chunk_size)));
             if (last_chunk_size > 0)
             {
