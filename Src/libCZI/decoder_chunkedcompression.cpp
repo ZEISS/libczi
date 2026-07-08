@@ -145,7 +145,6 @@ std::shared_ptr<libCZI::IBitmapData> CChunkedCompressionDecoder::Decode(const vo
     DecodeInformation decode_information{ *pixelType, *width, *height, ptrData, size, std::move(size_and_header_info) };
     return CChunkedCompressionDecoder::DecodeSizeMatchesHandleSizeMismatch(decode_information, total_size_of_decompressed_data);
 
-    //throw runtime_error("Not yet implemented: The size of the decompressed data does not match the expected size calculated from width, height and pixel type. The resolution protocol is not yet implemented.");
 }
 
 /*static*/std::shared_ptr<libCZI::IBitmapData> CChunkedCompressionDecoder::DecodeSizeMatchesExactly(const DecodeInformation& decode_information)
