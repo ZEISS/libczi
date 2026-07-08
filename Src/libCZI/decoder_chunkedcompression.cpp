@@ -292,23 +292,14 @@ std::shared_ptr<libCZI::IBitmapData> CChunkedCompressionDecoder::Decode(const vo
             throw runtime_error("Decompressed chunk size does not match the uncompressed size declared in the chunked-compression header.");
         }
 
-        // Each chunk is a self-contained hi-lo packed flat buffer (no row-stride concerns).
-        // The encoder produces the hi-lo layout per-chunk, so we unpack it the same way:
-        // treat the whole chunk as a single row of (decompressed_size / 2) 16-bit pixels.
-        /*LoHiBytePackUnpack::LoHiBytePackStrided(
-            staging_buffer.data(),
-            decompressed_size,
-            static_cast<uint32_t>(decompressed_size / 2),
-            1,
-            static_cast<uint32_t>(decompressed_size),
-            static_cast<uint8_t*>(destination) + destination_offset);*/
+        // Each chunk is a self-contained LoHiByte-packed flat buffer without row-stride concerns.
+        // Chunk sizes are byte-based and may be odd, so use the byte-sized flat-buffer helper
+        // instead of the strided bitmap-row variant.
+        uint8_t* chunk_destination = static_cast<uint8_t*>(destination) + destination_offset;
         LoHiBytePackUnpack::LoHiBytePackStridedByteSized(
             staging_buffer.data(),
-            decompressed_size,
-            static_cast<uint32_t>(decompressed_size / 2),
-            1,
-            static_cast<uint32_t>(decompressed_size),
-            static_cast<uint8_t*>(destination) + destination_offset);
+            chunk_destination,
+            decompressed_size);
 
         destination_offset += chunk.uncompressedSize;
         source_offset += chunk.compressedSize;

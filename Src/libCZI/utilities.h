@@ -233,22 +233,29 @@ namespace libCZI
             /// \param  ptrDst      Pointer to the destination buffer; must be at least \p src_size bytes in size.
             static void LoHiByteUnpackByteSized(const void* src_ptr, std::uint32_t src_size, void* ptrDst);
 
-            /// Size-tolerant variant of LoHiBytePackStrided that accepts a source buffer whose byte count
-            /// need not be a multiple of 2 nor cover a whole number of complete rows.
-            /// the largest even-byte-count prefix of the source via LoHiBytePackStrided; if \p sizeSrc is odd,
-            /// the remaining lone low byte is placed at its correct position in the strided destination.
-            /// Unlike LoHiBytePackStrided, this function does not validate arguments and does not throw;
-            /// the caller is responsible for ensuring that \p dest is large enough to hold the output.
-            /// Use this variant when the source data represents a partial or potentially odd-sized chunk
-            /// (e.g. the last chunk in a chunked-compression pipeline).
+            /// Pack LoHiByte-encoded data from a flat byte buffer into a flat destination buffer.
             ///
-            /// \param  ptrSrc  Pointer to the LoHiByte-encoded source buffer.
-            /// \param  sizeSrc Size of the source buffer in bytes; may be any value, including odd.
-            /// \param  width   Width of the destination bitmap in pixels.
-            /// \param  height  Height of the destination bitmap in pixels.
-            /// \param  stride  Row stride of the destination bitmap in bytes.
-            /// \param  dest    Pointer to the destination buffer that receives the packed 16-bit pixel data.
-            static void LoHiBytePackStridedByteSized(const void* ptrSrc, size_t sizeSrc, std::uint32_t width, std::uint32_t height, std::uint32_t stride, void* dest);
+            /// The LoHiByte encoding stores the low bytes of 16-bit words first, followed by the
+            /// corresponding high bytes. This helper treats the input as one contiguous, non-strided
+            /// chunk and writes the unpacked/interleaved byte representation to \p destination.
+            ///
+            /// The function is byte-size tolerant:
+            /// - if \p size is zero, it returns without writing anything;
+            /// - the largest even-byte prefix is processed as complete 16-bit words;
+            /// - if \p size is odd, the final lone byte is copied verbatim to the last destination byte.
+            ///
+            /// This is intended for chunked-compression paths where an individual chunk may contain an
+            /// odd number of bytes and does not necessarily represent a complete bitmap row.
+            ///
+            /// \param  src          Pointer to the LoHiByte-encoded source buffer. Must be valid when
+            ///                      \p size is greater than zero.
+            /// \param  destination  Pointer to the destination buffer. Must be valid when \p size is
+            ///                      greater than zero and must provide at least \p size bytes.
+            /// \param  size         Number of bytes to read from \p src and write to \p destination.
+            ///
+            /// \throws std::invalid_argument if the even-byte portion is too large to be processed by
+            ///         the underlying strided implementation.
+            static void LoHiBytePackStridedByteSized(const void* src, void* destination, size_t size);
         protected:
             static void LoHiByteUnpackStrided_C(const void* ptrSrc, std::uint32_t wordCount, std::uint32_t stride, std::uint32_t lineCount, void* ptrDst);
             static void LoHiBytePackStrided_C(const void* ptrSrc, size_t sizeSrc, std::uint32_t width, std::uint32_t height, std::uint32_t stride, void* dest);

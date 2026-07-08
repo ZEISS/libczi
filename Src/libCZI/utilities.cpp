@@ -617,10 +617,10 @@ bool Utilities::ContainsToken(const char* input, const char* token)
     if (word_count > 0)
     {
         LoHiBytePackUnpack::LoHiByteUnpackStrided(
-            src_ptr, 
-            word_count, 
-            word_count * 2, 
-            1, 
+            src_ptr,
+            word_count,
+            word_count * 2,
+            1,
             ptrDst);
     }
 
@@ -632,28 +632,34 @@ bool Utilities::ContainsToken(const char* input, const char* token)
     }
 }
 
-/*static*/void LoHiBytePackUnpack::LoHiBytePackStridedByteSized(const void* ptrSrc, size_t sizeSrc, std::uint32_t width, std::uint32_t height, std::uint32_t stride, void* dest)
+/*static*/void LoHiBytePackUnpack::LoHiBytePackStridedByteSized(const void* src, void* destination, size_t size)
 {
-    size_t size_words = (sizeSrc / 2) * 2; // Round down to the nearest even number
-    if (size_words > 0)
+    if (size == 0)
     {
-        LoHiBytePackUnpack::LoHiBytePackStrided(
-            ptrSrc,
-            size_words,
-            width,
-            height,
-            stride,
-            dest);
+        return;
     }
 
-    if (sizeSrc % 2 != 0)
+    const size_t even_size = (size / 2) * 2; // Round down to the nearest even number
+    if (even_size > (std::numeric_limits<uint32_t>::max)())
     {
-        // copy the last (lone lo) byte to its correct position in the strided destination
-        const size_t word_count = size_words / 2;
-        const uint32_t x = static_cast<uint32_t>(word_count % width);
-        const uint32_t y = static_cast<uint32_t>(word_count / width);
-        static_cast<uint8_t*>(dest)[static_cast<size_t>(y) * stride + static_cast<size_t>(x) * 2 -1] =
-            static_cast<const uint8_t*>(ptrSrc)[sizeSrc - 1];
+        throw invalid_argument("Size is too large to be processed.");
+    }
+
+    if (even_size > 0)
+    {
+        LoHiBytePackUnpack::LoHiBytePackStrided(
+            src,
+            static_cast<uint32_t>(even_size),
+            static_cast<uint32_t>(even_size / 2),
+            1,
+            static_cast<uint32_t>(even_size),
+            destination);
+    }
+
+    if (size != even_size)
+    {
+        // Preserve the final lone byte that has no matching high byte in the flat destination.
+        static_cast<uint8_t*>(destination)[size - 1] = static_cast<const uint8_t*>(src)[size - 1];
     }
 }
 
