@@ -639,6 +639,11 @@ bool Utilities::ContainsToken(const char* input, const char* token)
         return;
     }
 
+    if (src == nullptr || destination == nullptr)
+    {
+        throw invalid_argument("src and destination must not be null when size is greater than zero.");
+    }
+
     const size_t even_size = (size / 2) * 2; // Round down to the nearest even number
     if (even_size > (std::numeric_limits<uint32_t>::max)())
     {
