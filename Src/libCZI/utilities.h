@@ -186,9 +186,9 @@ namespace libCZI
         class LoHiBytePackUnpack
         {
         public:
-            /// Unpack LoHiByte-encoded data from a strided 2D source buffer into a flat destination
-            /// buffer. The source is a strided bitmap of packed 16-bit pixels: \p lineCount rows of
-            /// \p wordCount pixels each, with \p stride bytes between the start of consecutive rows.
+            /// Unpack packed 16-bit pixel data from a strided 2D source bitmap into a flat destination
+            /// buffer in LoHiByte layout. The source is a strided bitmap of packed 16-bit pixels:
+            /// \p lineCount rows of \p wordCount pixels each, with \p stride bytes between the start of consecutive rows.
             /// The destination receives the result in LoHiByte layout: the first
             /// wordCount * lineCount bytes hold the low bytes of all pixels in row-major order,
             /// immediately followed by the corresponding high bytes.
