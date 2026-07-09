@@ -221,13 +221,14 @@ namespace libCZI
             /// \param  dest    Pointer to the destination buffer that receives the packed 16-bit pixel data.
             static void LoHiBytePackStrided(const void* ptrSrc, size_t sizeSrc, std::uint32_t width, std::uint32_t height, std::uint32_t stride, void* dest);
 
-            /// Unpack LoHiByte-encoded data from a flat (non-strided) byte buffer into the destination buffer.
-            /// The LoHiByte encoding stores all low bytes of 16-bit words contiguously, followed by all high bytes.
-            /// This function is the flat-buffer variant of LoHiByteUnpackStrided, treating the source as a
-            /// single contiguous block of \p src_size bytes. If \p src_size is odd, the last byte is copied
-            /// verbatim to the destination.
+            /// Unpack packed 16-bit word data from a flat (non-strided) byte buffer into LoHiByte layout.
+            /// 
+            /// This is the flat-buffer variant of LoHiByteUnpackStrided, treating the source as one
+            /// contiguous block of packed 16-bit words (little-endian byte order within each word).
+            /// The destination receives the LoHiByte representation: all low bytes first, followed by
+            /// all high bytes. If \p src_size is odd, the last byte is copied verbatim.
             ///
-            /// \param  src_ptr     Pointer to the source buffer containing the LoHiByte-encoded data.
+            /// \param  src_ptr     Pointer to the source buffer containing packed 16-bit word bytes.
             /// \param  src_size    Size of the source buffer in bytes.
             /// \param  ptrDst      Pointer to the destination buffer; must be at least \p src_size bytes in size.
             static void LoHiByteUnpackByteSized(const void* src_ptr, std::uint32_t src_size, void* ptrDst);
