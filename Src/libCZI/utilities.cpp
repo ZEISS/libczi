@@ -525,8 +525,7 @@ bool Utilities::TryParseInt32(const char* number, std::int32_t* pResult)
 
     char* end = nullptr;
     errno = 0;
-    const long long liValue = strtoll(number, &end, 10);
-
+    const long long liValue = std::strtoll(number, &end, 10);
     if (end == number || *end != '\0' || errno == ERANGE)
     {
         return false;
@@ -555,8 +554,7 @@ bool Utilities::TryParseUInt32(const char* number, std::uint32_t* pResult)
 
     char* end = nullptr;
     errno = 0;
-    const unsigned long long ullValue = strtoull(number, &end, 10);
-
+    const unsigned long long ullValue = std::strtoull(number, &end, 10);
     if (end == number || *end != '\0' || errno == ERANGE)
     {
         return false;

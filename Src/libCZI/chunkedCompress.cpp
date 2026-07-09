@@ -513,6 +513,11 @@ size_t libCZI::ChunkedCompressionHeaderHelper::CreateCompressionHeader(void* des
         throw invalid_argument("destination must not be null");
     }
 
+    if (headerInfo.chunkSizes.empty())
+    {
+        throw invalid_argument("chunkSizes must not be empty.");
+    }
+
     uint8_t* p = static_cast<uint8_t*>(destination);
     size_t offset = 0;
 
