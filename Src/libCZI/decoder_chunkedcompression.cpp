@@ -83,6 +83,11 @@ std::shared_ptr<libCZI::IBitmapData> CChunkedCompressionDecoder::Decode(const vo
         throw invalid_argument("pixeltype, width and height must be specified.");
     }
 
+    if (*width == 0 || *height == 0)
+    {
+        throw invalid_argument("width and height must be greater than zero");
+    }
+
     auto size_and_header_info = ChunkedCompressionHeaderHelper::ParseCompressionHeader(ptrData, size);
     const auto& chunks = get<1>(size_and_header_info).chunks;
 
