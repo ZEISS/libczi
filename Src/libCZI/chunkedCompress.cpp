@@ -1125,7 +1125,13 @@ namespace
             throw invalid_argument("chunkSize exceeds LZ4_MAX_INPUT_SIZE; the LZ4 API cannot handle chunks that large.");
         }
 
-        const uint32_t number_of_chunks = static_cast<uint32_t>((size_source_data + options.chunkSize - 1) / options.chunkSize);
+        const size_t number_of_chunks_sz = (size_source_data / options.chunkSize) + ((size_source_data % options.chunkSize) ? 1 : 0);
+        if (number_of_chunks_sz > (numeric_limits<uint32_t>::max)())
+        {
+            throw invalid_argument("Number of chunks exceeds 32-bit limit required by chunked-compression header.");
+        }
+
+        const uint32_t number_of_chunks = static_cast<uint32_t>(number_of_chunks_sz);
 
         compressed_sizes.clear();
         compressed_sizes.reserve(number_of_chunks);
@@ -1176,7 +1182,13 @@ namespace
             throw invalid_argument("chunkSize exceeds LZ4_MAX_INPUT_SIZE; the LZ4 API cannot handle chunks that large.");
         }
 
-        const uint32_t number_of_chunks = static_cast<uint32_t>((size_source_data + options.chunkSize - 1) / options.chunkSize);
+        const size_t number_of_chunks_sz = (size_source_data / options.chunkSize) + ((size_source_data % options.chunkSize) ? 1 : 0);
+        if (number_of_chunks_sz > (numeric_limits<uint32_t>::max)())
+        {
+            throw invalid_argument("Number of chunks exceeds 32-bit limit required by chunked-compression header.");
+        }
+
+        const uint32_t number_of_chunks = static_cast<uint32_t>(number_of_chunks_sz);
         const size_t max_chunk_size = min(static_cast<size_t>(options.chunkSize), size_source_data);
 
         auto deleter = [&](void* ptr) -> void { if (ptr != nullptr) { options.freeTempBuffer(ptr); } };
@@ -1232,7 +1244,13 @@ namespace
 
     bool ChunkedCompressWithZstd(const ChunkedCompressionOptionsZstd& options, const void* source_data, size_t size_source_data, vector<uint32_t>& compressed_sizes)
     {
-        const uint32_t number_of_chunks = static_cast<uint32_t>((size_source_data + options.chunkSize - 1) / options.chunkSize);
+        const size_t number_of_chunks_sz = (size_source_data / options.chunkSize) + ((size_source_data % options.chunkSize) ? 1 : 0);
+        if (number_of_chunks_sz > (numeric_limits<uint32_t>::max)())
+        {
+            throw invalid_argument("Number of chunks exceeds 32-bit limit required by chunked-compression header.");
+        }
+
+        const uint32_t number_of_chunks = static_cast<uint32_t>(number_of_chunks_sz);
 
         compressed_sizes.clear();
         compressed_sizes.reserve(number_of_chunks);
@@ -1270,7 +1288,13 @@ namespace
 
     bool ChunkedCompressWithZstdAndHiLoBytePacking(const ChunkedCompressionOptionsZstd& options, const void* source_data, size_t size_source_data, vector<uint32_t>& compressed_sizes)
     {
-        const uint32_t number_of_chunks = static_cast<uint32_t>((size_source_data + options.chunkSize - 1) / options.chunkSize);
+        const size_t number_of_chunks_sz = (size_source_data / options.chunkSize) + ((size_source_data % options.chunkSize) ? 1 : 0);
+        if (number_of_chunks_sz > (numeric_limits<uint32_t>::max)())
+        {
+            throw invalid_argument("Number of chunks exceeds 32-bit limit required by chunked-compression header.");
+        }
+
+        const uint32_t number_of_chunks = static_cast<uint32_t>(number_of_chunks_sz);
 
         const size_t max_chunk_size = min(static_cast<size_t>(options.chunkSize), size_source_data);
 
@@ -1328,24 +1352,50 @@ namespace
 
     std::tuple<std::uint32_t, std::uint32_t> CalculateUncompressedChunkSizesForHeader(const ChunkedCompressionOptionsZstd& options)
     {
-        const size_t line_size = options.sourceWidth * static_cast<size_t>(Utils::GetBytesPerPixel(options.sourcePixeltype));
-        const size_t source_data_size = options.sourceHeight * line_size;
+        const size_t bytes_per_pixel = static_cast<size_t>(Utils::GetBytesPerPixel(options.sourcePixeltype));
+        if (bytes_per_pixel == 0 ||
+            static_cast<size_t>(options.sourceWidth) > (numeric_limits<size_t>::max)() / bytes_per_pixel)
+        {
+            throw invalid_argument("Invalid width/pixel type combination for chunked compression.");
+        }
+
+        const size_t line_size = static_cast<size_t>(options.sourceWidth) * bytes_per_pixel;
+        if (static_cast<size_t>(options.sourceHeight) > (numeric_limits<size_t>::max)() / line_size)
+        {
+            throw invalid_argument("Invalid height/stride combination for chunked compression.");
+        }
+
+        const size_t source_data_size = static_cast<size_t>(options.sourceHeight) * line_size;
+        if (source_data_size > (numeric_limits<uint32_t>::max)())
+        {
+            throw invalid_argument("Uncompressed chunk size exceeds 32-bit limit required by chunked-compression header.");
+        }
+
         if (options.chunkSize >= source_data_size)
         {
             return make_tuple(static_cast<uint32_t>(source_data_size), 0);
         }
-        else
-        {
-            const uint32_t last_chunk_size = static_cast<uint32_t>(source_data_size % options.chunkSize);
-            return make_tuple(static_cast<uint32_t>(options.chunkSize), last_chunk_size);
-        }
+
+        const uint32_t last_chunk_size = static_cast<uint32_t>(source_data_size % options.chunkSize);
+        return make_tuple(options.chunkSize, last_chunk_size);
     }
 
     bool ChunkedCompressToDestinationBuffer(const ChunkedCompressionOptionsZstd& options, vector<uint32_t>& compressed_sizes, size_t* total_size_of_compressed_data)
     {
-        const size_t bytesPerPel = Utils::GetBytesPerPixel(options.sourcePixeltype);
-        const size_t line_size = options.sourceWidth * bytesPerPel;
-        const size_t source_data_size = options.sourceHeight * line_size;
+        const size_t bytesPerPel = static_cast<size_t>(Utils::GetBytesPerPixel(options.sourcePixeltype));
+        if (bytesPerPel == 0 ||
+            static_cast<size_t>(options.sourceWidth) > (numeric_limits<size_t>::max)() / bytesPerPel)
+        {
+            throw invalid_argument("Invalid width/pixel type combination for chunked compression.");
+        }
+
+        const size_t line_size = static_cast<size_t>(options.sourceWidth) * bytesPerPel;
+        if (static_cast<size_t>(options.sourceHeight) > (numeric_limits<size_t>::max)() / line_size)
+        {
+            throw invalid_argument("Invalid height/stride combination for chunked compression.");
+        }
+
+        const size_t source_data_size = static_cast<size_t>(options.sourceHeight) * line_size;
 
         const void* source_data_for_compression;
 
@@ -1461,24 +1511,50 @@ namespace
 
     std::tuple<std::uint32_t, std::uint32_t> CalculateUncompressedChunkSizesForLz4Header(const ChunkedCompressionOptionsLz4& options)
     {
-        const size_t line_size = options.sourceWidth * static_cast<size_t>(Utils::GetBytesPerPixel(options.sourcePixeltype));
-        const size_t source_data_size = options.sourceHeight * line_size;
+        const size_t bytes_per_pixel = static_cast<size_t>(Utils::GetBytesPerPixel(options.sourcePixeltype));
+        if (bytes_per_pixel == 0 ||
+            static_cast<size_t>(options.sourceWidth) > (numeric_limits<size_t>::max)() / bytes_per_pixel)
+        {
+            throw invalid_argument("Invalid width/pixel type combination for chunked compression.");
+        }
+
+        const size_t line_size = static_cast<size_t>(options.sourceWidth) * bytes_per_pixel;
+        if (static_cast<size_t>(options.sourceHeight) > (numeric_limits<size_t>::max)() / line_size)
+        {
+            throw invalid_argument("Invalid height/stride combination for chunked compression.");
+        }
+
+        const size_t source_data_size = static_cast<size_t>(options.sourceHeight) * line_size;
+        if (source_data_size > (numeric_limits<uint32_t>::max)())
+        {
+            throw invalid_argument("Uncompressed chunk size exceeds 32-bit limit required by chunked-compression header.");
+        }
+
         if (options.chunkSize >= source_data_size)
         {
             return make_tuple(static_cast<uint32_t>(source_data_size), 0);
         }
-        else
-        {
-            const uint32_t last_chunk_size = static_cast<uint32_t>(source_data_size % options.chunkSize);
-            return make_tuple(static_cast<uint32_t>(options.chunkSize), last_chunk_size);
-        }
+
+        const uint32_t last_chunk_size = static_cast<uint32_t>(source_data_size % options.chunkSize);
+        return make_tuple(options.chunkSize, last_chunk_size);
     }
 
     bool ChunkedCompressToDestinationBufferLz4(const ChunkedCompressionOptionsLz4& options, vector<uint32_t>& compressed_sizes, size_t* total_size_of_compressed_data)
     {
-        const size_t bytesPerPel = Utils::GetBytesPerPixel(options.sourcePixeltype);
-        const size_t line_size = options.sourceWidth * bytesPerPel;
-        const size_t source_data_size = options.sourceHeight * line_size;
+        const size_t bytesPerPel = static_cast<size_t>(Utils::GetBytesPerPixel(options.sourcePixeltype));
+        if (bytesPerPel == 0 ||
+            static_cast<size_t>(options.sourceWidth) > (numeric_limits<size_t>::max)() / bytesPerPel)
+        {
+            throw invalid_argument("Invalid width/pixel type combination for chunked compression.");
+        }
+
+        const size_t line_size = static_cast<size_t>(options.sourceWidth) * bytesPerPel;
+        if (static_cast<size_t>(options.sourceHeight) > (numeric_limits<size_t>::max)() / line_size)
+        {
+            throw invalid_argument("Invalid height/stride combination for chunked compression.");
+        }
+
+        const size_t source_data_size = static_cast<size_t>(options.sourceHeight) * line_size;
 
         const void* source_data_for_compression;
 
