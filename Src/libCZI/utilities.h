@@ -175,11 +175,11 @@ namespace libCZI
         /// contiguously, followed by all high bytes. This byte-plane separation improves compression
         /// ratios by grouping bytes with similar statistical properties together.
         ///
-            /// The class provides two complementary operations:
-            /// - **Unpack** (packed 16-bit → LoHiByte-encoded): converts a normal strided bitmap into the
-            ///   LoHiByte layout; used during encoding before compression.
-            /// - **Pack** (LoHiByte-encoded → packed 16-bit): reconstructs a normal strided bitmap from
-            ///   a LoHiByte-encoded source; used during decoding.
+        /// The class provides two complementary operations:
+        /// - **Unpack** (packed 16-bit → LoHiByte-encoded): converts a normal strided bitmap into the
+        ///   LoHiByte layout; used during encoding before compression.
+        /// - **Pack** (LoHiByte-encoded → packed 16-bit): reconstructs a normal strided bitmap from
+        ///   a LoHiByte-encoded source; used during decoding.
         /// Both directions are available in a strided (full-image) form and in a flat byte-sized
         /// (partial / chunked) form that tolerates odd-sized or incomplete source buffers.
         class LoHiBytePackUnpack
