@@ -141,8 +141,8 @@ namespace libCZI
         /// If false, an exception is thrown  (in case of a discrepancy).
         bool handle_zstd_data_size_mismatch{ true };
 
-        /// In case of chunked-compression compressed pixel data, apply the resolution protocol for chunked-compression-compressed data.
-        /// If false, an exception is thrown  (in case of a discrepancy).
+        /// In case of chunked-compression pixel data, apply the resolution protocol for chunked-compression data.
+        /// If false, an exception is thrown (in case of a discrepancy).
         bool handle_chunked_compression_data_size_mismatch{ true };
     };
 
