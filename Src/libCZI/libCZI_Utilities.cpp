@@ -30,7 +30,9 @@ namespace
             libCZI::CompressionMode::JpgXr,
             libCZI::CompressionMode::Zstd0,
             libCZI::CompressionMode::Zstd1,
+#if LIBCZI_EXPERIMENTAL_CHUNKED_COMPRESSION_AVAILABLE
             libCZI::CompressionMode::ChunkedExtensible,
+#endif
         };
 
         for (const auto& compressionMode : AvailableCompressionModes)
