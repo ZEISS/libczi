@@ -170,7 +170,11 @@ namespace libCZI
         JpgXr = 4,              ///< The data is JPG-XR-compressed.
         Zstd0 = 5,              ///< The data is compressed with zstd.
         Zstd1 = 6,              ///< The data contains a header, followed by a zstd-compressed block.
-        ChunkedExtensible = 7,  ///< The data is compressed with a chunked extensible compression scheme. This is an EXPERIMENTAL feature.
+
+        /// The data is compressed with a chunked extensible compression scheme.
+        /// This is an EXPERIMENTAL feature. Support for it in libCZI is subject
+        /// to a build where experimental features are enabled.
+        ChunkedExtensible = 7,
     };
 
     /// This enum is used in the context of a subblock to describe which "type of pyramid" is represented by the subblock.
