@@ -17,7 +17,7 @@
 #include <zstd.h>
 
 #include "BitmapOperations.h"
-#if (ZSTD_VERSION_MAJOR >= 1 && ZSTD_VERSION_MINOR >= 5) 
+#if (ZSTD_VERSION_MAJOR > 1 || (ZSTD_VERSION_MAJOR == 1 && ZSTD_VERSION_MINOR >= 5))
 #include <zstd_errors.h>
 #else
 #include <common/zstd_errors.h>
