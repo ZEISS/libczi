@@ -10,11 +10,11 @@
 #include "utilities.h"
 
 #include <cstring>
+#include <cstdlib>
 #include <limits>
 #include <numeric>
 #include <stdexcept>
 #include <utility>
-
 #include "bitmapData.h"
 #include <zstd.h>
 #if (ZSTD_VERSION_MAJOR >= 1 && ZSTD_VERSION_MINOR >= 5) 

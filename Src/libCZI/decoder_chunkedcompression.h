@@ -8,6 +8,7 @@
 
 #if LIBCZI_EXPERIMENTAL_CHUNKED_COMPRESSION_AVAILABLE
 #include <memory>
+#include <tuple>
 
 #include "libCZI_compress.h"
 #include "libCZI_Pixels.h"
