@@ -877,8 +877,11 @@ std::tuple<size_t, ChunkedCompressionHeaderHelper::HeaderInfo> ChunkedCompressio
 
                 break;
             default:
-                // Unknown header chunk ids are ignored for forward compatibility.
-                break;
+                // If we encounter an unknown chunk ID, we throw an exception. This is a safeguard against unexpected or malformed headers.
+                // TODO(JBL): Consider whether we want to allow unknown chunk IDs to be ignored instead of throwing an exception. This would 
+                // allow for forward compatibility with future header formats. For the time being, we leave it at this and align with the
+                // documentation that says "If an unknown chunk ID is encountered, the function should throw an exception."
+                throw invalid_argument("Invalid header chunk ID in compression header.");
             }
 
             return true;  // continue walking through the header
