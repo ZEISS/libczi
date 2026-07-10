@@ -547,7 +547,17 @@ bool Utilities::TryParseInt32(const char* number, std::int32_t* pResult)
 
 bool Utilities::TryParseUInt32(const char* number, std::uint32_t* pResult)
 {
-    if (number == nullptr || *number == '\0' || *number == '-')
+    if (number == nullptr)
+    {
+        return false;
+    }
+
+    while (std::isspace(static_cast<unsigned char>(*number)))
+    {
+        ++number;
+    }
+
+    if (*number == '\0' || *number == '-')
     {
         return false;
     }
