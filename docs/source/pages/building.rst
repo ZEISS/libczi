@@ -102,6 +102,33 @@ The CMake-file defines the following options for customizing the build:
 |                                  | languages.  Default is **OFF**   |
 +----------------------------------+----------------------------------+
 
+Experimental functionality
+--------------------------
+
+Experimental functionality is disabled by default unless explicitly enabled.
+The global option ``LIBCZI_BUILD_ENABLE_EXPERIMENTAL_FUNCTIONALITY`` accepts the
+values ``AUTO``, ``ON`` and ``OFF``. ``AUTO`` is the default and keeps the
+conservative build behavior.
+
+Individual experimental features can also be controlled directly. The
+experimental chunked-compression feature is enabled with:
+
+.. code:: bash
+
+    cmake .. -DLIBCZI_BUILD_EXPERIMENTAL_CHUNKED_COMPRESSION=ON
+
+When this feature is enabled, the public configuration header defines
+``LIBCZI_EXPERIMENTAL_CHUNKED_COMPRESSION_AVAILABLE`` to ``1``. The feature may
+also be enabled through the global experimental policy:
+
+.. code:: bash
+
+    cmake .. -DLIBCZI_BUILD_ENABLE_EXPERIMENTAL_FUNCTIONALITY=ON
+
+If both the global policy and the feature-specific option are supplied, the
+feature-specific option takes precedence. For more details about the feature and
+its file format, see :doc:`chunked_compression`.
+
 If building CZICmd is desired, then running CMake with this command line will enable building CZICmd:
 
 .. code:: bash
