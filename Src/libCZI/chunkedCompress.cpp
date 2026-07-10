@@ -937,7 +937,7 @@ namespace
             this->sizeOfData = initialSize;
         }
 
-        void* GetPtr() override { return (uint8_t*)this->ptr + this->offset; }
+        void* GetPtr() override { return static_cast<uint8_t*>(this->ptr) + this->offset; }
         size_t GetSizeOfData() const override { return this->sizeOfData - this->offset; }
 
         void SetOffset(size_t offset)
@@ -953,12 +953,19 @@ namespace
         void ReduceSize(size_t reducedSize)
         {
             //assert(reducedSize <= this->sizeOfData);
+            if (reducedSize > this->sizeOfData)
+            {
+                throw invalid_argument("Reduced size cannot be greater than the current size of the data.");
+            }
+
             void* new_ptr = realloc(this->ptr, reducedSize);
             if (new_ptr != nullptr)
             {
                 this->ptr = new_ptr;
-                this->sizeOfData = reducedSize;
             }
+
+            // Even if realloc fails, the original allocation is still at least reducedSize bytes.
+            this->sizeOfData = reducedSize;
         }
 
         ~MemoryBlockWithOffset() override
