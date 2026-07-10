@@ -75,7 +75,6 @@ set(LIBCZISRCFILES
             decoder_zstd.h
             FileHeaderSegmentData.h
             ImportExport.h
-            inc_libCZI_Config.h
             IndexSet.h
             libCZI.h
             libCZI_Compositor.h
@@ -131,6 +130,11 @@ set(LIBCZISRCFILES
             SubblockAttachmentAccessor.cpp
             BitmapOperationsBitonal.h
             BitmapOperationsBitonal.cpp
+            chunkedCompress.cpp
+            decoder_chunkedcompression.h
+            decoder_chunkedcompression.cpp
+            compresscommon.h
+            compresscommon.cpp
 )
 
 # prepare the configuration-file "libCZI_Config.h"
@@ -305,6 +309,37 @@ else()
   add_subdirectory(${zstd_SOURCE_DIR}/build/cmake ${zstd_BINARY_DIR})
 endif()
 
+if (LIBCZI_BUILD_EXPERIMENTAL_CHUNKED_COMPRESSION)
+    if (LIBCZI_BUILD_PREFER_EXTERNALPACKAGE_LZ4)
+      find_package(lz4 CONFIG REQUIRED)
+      if (TARGET LZ4::lz4_static)
+        set(LIBCZI_LZ4_LINK_TARGET "LZ4::lz4_static")
+      elseif (TARGET LZ4::lz4_shared)
+        set(LIBCZI_LZ4_LINK_TARGET "LZ4::lz4_shared")
+      else()
+        message(FATAL_ERROR "No suitable lz4 target found")
+      endif()
+    else()
+      FetchContent_Declare(
+        lz4
+        GIT_REPOSITORY https://github.com/lz4/lz4.git
+        GIT_TAG "v1.10.0"
+        SOURCE_SUBDIR "build/cmake"
+        PATCH_COMMAND # raises cmake_minimum_required to VERSION 3.10 (silences CMake 4.x deprecation warning)
+          "${CMAKE_COMMAND}"
+          -DFILE=<SOURCE_DIR>/build/cmake/CMakeLists.txt
+          -P "${CMAKE_CURRENT_SOURCE_DIR}/../../cmake/patch_cmake_minimum_version.cmake"
+      )
+
+      message(STATUS "Fetching lz4...")
+      set(LZ4_BUILD_CLI           OFF CACHE BOOL "" FORCE)
+      set(LZ4_BUILD_LEGACY_LZ4C   OFF CACHE BOOL "" FORCE)
+
+      FetchContent_MakeAvailable(lz4)
+      set(LIBCZI_LZ4_LINK_TARGET "lz4_static")
+    endif()
+endif()
+
 if (LIBCZI_HAVE_WIN32_API)
   set(libCZI_WINDOWSAPIAVAILABLE 1)
 else()
@@ -317,16 +352,31 @@ else()
   set(libCZI_WINDOWSAPI_UWP_AVAILABLE 0)
 endif()
 
+# Export the experimental chunked-compression availability into libCZI_Config.h.
+# Public headers use this macro to expose or hide experimental API declarations
+# consistently with the way the library was built.
+if (LIBCZI_BUILD_EXPERIMENTAL_CHUNKED_COMPRESSION)
+  set(libCZI_Experimental_Chunked_Compression_Available 1)
+else()
+  set(libCZI_Experimental_Chunked_Compression_Available 0)
+endif()
+
 configure_file (
   "${CMAKE_CURRENT_SOURCE_DIR}/libCZI_Config.h.in"
   "${CMAKE_CURRENT_BINARY_DIR}/libCZI_Config.h"
+  ESCAPE_QUOTES @ONLY)
+
+configure_file (
+  "${CMAKE_CURRENT_SOURCE_DIR}/libCZI_Config_Internal.h.in"
+  "${CMAKE_CURRENT_BINARY_DIR}/libCZI_Config_Internal.h"
   ESCAPE_QUOTES @ONLY)
 
 
 #  Define headers for this library. PUBLIC headers are used for compiling the library, and will be added to consumers' build paths.
 set(libCZIPublicHeaders "ImportExport.h" "libCZI.h" "libCZI_Compositor.h" "libCZI_DimCoordinate.h" "libCZI_exceptions.h"
                "libCZI_Helpers.h" "libCZI_Metadata.h" "libCZI_Metadata2.h" "libCZI_Pixels.h" "libCZI_ReadWrite.h"
-               "libCZI_Site.h" "libCZI_Utilities.h" "libCZI_Write.h" "libCZI_compress.h" "libCZI_StreamsLib.h" "libCZI_SubBlock.h")
+               "libCZI_Site.h" "libCZI_Utilities.h" "libCZI_Write.h" "libCZI_compress.h" "libCZI_StreamsLib.h" "libCZI_SubBlock.h"
+               "${CMAKE_CURRENT_BINARY_DIR}/libCZI_Config.h")
 
 #
 #define the shared libCZI - library
@@ -338,8 +388,6 @@ if (LIBCZI_BUILD_DYNLIB)
   SET_TARGET_PROPERTIES (libCZI PROPERTIES DEFINE_SYMBOL  "LIBCZI_EXPORTS" )
   set_target_properties(libCZI PROPERTIES VERSION ${PROJECT_VERSION} SOVERSION 1)
   # add the binary tree to the search path for include files so that we will find libCZI_Config.h
-  target_include_directories(libCZI PRIVATE  "${CMAKE_CURRENT_BINARY_DIR}")
-  target_include_directories(libCZI PRIVATE  ${EIGEN3_INCLUDE_DIR})
   target_link_libraries(libCZI PRIVATE  ${ADDITIONAL_LIBS_REQUIRED_FOR_ATOMIC})
   set_target_properties(libCZI PROPERTIES DEBUG_POSTFIX "d")
   if (LIBCZI_BUILD_PREFER_EXTERNALPACKAGE_ZSTD)
@@ -347,6 +395,12 @@ if (LIBCZI_BUILD_DYNLIB)
   else()
    target_link_libraries(libCZI PRIVATE libzstd_static)
    target_include_directories(libCZI PRIVATE ${zstd_SOURCE_DIR}/lib)
+  endif()
+  if (LIBCZI_BUILD_EXPERIMENTAL_CHUNKED_COMPRESSION)
+    target_link_libraries(libCZI PRIVATE ${LIBCZI_LZ4_LINK_TARGET})
+    if (NOT LIBCZI_BUILD_PREFER_EXTERNALPACKAGE_LZ4)
+      target_include_directories(libCZI PRIVATE ${lz4_SOURCE_DIR}/lib)
+    endif()
   endif()
   if (LIBCZI_BUILD_CURL_BASED_STREAM)
     target_link_libraries(libCZI PRIVATE CURL::libcurl)
@@ -365,10 +419,13 @@ if (LIBCZI_BUILD_DYNLIB)
   if(LIBCZI_HAVE_WIN32_API)
     target_link_libraries(libCZI PRIVATE ole32 Windowscodecs)
   endif()
-  target_include_directories(libCZI
-      PUBLIC
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
-        $<INSTALL_INTERFACE:include>)
+    target_include_directories(libCZI
+        PUBLIC
+            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+            $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>      # add the binary tree to the search path for include files so that we will find libCZI_Config.h
+            $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
+        PRIVATE
+            ${EIGEN3_INCLUDE_DIR})
 endif(LIBCZI_BUILD_DYNLIB)
 
 #
@@ -380,15 +437,21 @@ set_target_properties(libCZIStatic PROPERTIES CXX_STANDARD 14)
 target_compile_definitions(libCZIStatic PRIVATE _LIBCZISTATICLIB)
 set_target_properties(libCZIStatic PROPERTIES VERSION ${PROJECT_VERSION})
 # add the binary tree to the search path for include files so that we will find libCZI_Config.h
-target_include_directories(libCZIStatic PRIVATE  "${CMAKE_CURRENT_BINARY_DIR}")
-target_include_directories(libCZIStatic PRIVATE  ${EIGEN3_INCLUDE_DIR})
 target_link_libraries(libCZIStatic PRIVATE  ${ADDITIONAL_LIBS_REQUIRED_FOR_ATOMIC})
 set_target_properties(libCZIStatic PROPERTIES DEBUG_POSTFIX "d")
 if (LIBCZI_BUILD_PREFER_EXTERNALPACKAGE_ZSTD)
-   target_link_libraries(libCZIStatic PUBLIC ${LIBCZI_ZSTD_LINK_TARGET})
+  target_link_libraries(libCZIStatic PUBLIC ${LIBCZI_ZSTD_LINK_TARGET})
 else()
-   target_link_libraries(libCZIStatic PRIVATE libzstd_static)
-   target_include_directories(libCZIStatic PRIVATE ${zstd_SOURCE_DIR}/lib)
+  target_link_libraries(libCZIStatic PRIVATE libzstd_static)
+  target_include_directories(libCZIStatic PRIVATE ${zstd_SOURCE_DIR}/lib)
+endif()
+if (LIBCZI_BUILD_EXPERIMENTAL_CHUNKED_COMPRESSION)
+  if (LIBCZI_BUILD_PREFER_EXTERNALPACKAGE_LZ4)
+    target_link_libraries(libCZIStatic PUBLIC ${LIBCZI_LZ4_LINK_TARGET})
+  else()
+    target_link_libraries(libCZIStatic PUBLIC ${LIBCZI_LZ4_LINK_TARGET})
+    target_include_directories(libCZIStatic PRIVATE ${lz4_SOURCE_DIR}/lib)
+  endif()
 endif()
 
 if (LIBCZI_BUILD_CURL_BASED_STREAM)
@@ -414,9 +477,12 @@ target_compile_definitions(libCZIStatic PUBLIC _LIBCZISTATICLIB)    # make sure 
 
 # Static library include directories
 target_include_directories(libCZIStatic
-  PUBLIC
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
-    $<INSTALL_INTERFACE:include>)
+    PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
+        $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
+    PRIVATE
+        ${EIGEN3_INCLUDE_DIR})
 
 if(LIBCZI_ENABLE_INSTALL)
 
@@ -444,7 +510,7 @@ if(LIBCZI_ENABLE_INSTALL)
                 CONFIGURATIONS Release RelWithDebInfo MinSizeRel)
     endif()
 
-    # Manual install of public headers to include/libCZI (simulate structure without moving files)
+    # Manual install of public headers and generated public configuration header
     install(FILES ${libCZIPublicHeaders}
         DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/libCZI)
 

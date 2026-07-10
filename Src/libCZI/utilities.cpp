@@ -3,12 +3,16 @@
 // SPDX-License-Identifier: LGPL-3.0-or-later
 
 #include "utilities.h"
-#include "inc_libCZI_Config.h"
+#include "libCZI_Config_Internal.h"
 #include <locale>
 #include <codecvt>
 #include <sstream>
 #include <cstring>
 #include <array>
+#include <cerrno>
+#include <cctype>
+#include <cstdlib>
+#include <limits>
 #if LIBCZI_WINDOWSAPI_AVAILABLE || LIBCZI_WINDOWS_UWPAPI_AVAILABLE
 #include <Windows.h>
 #else
@@ -20,6 +24,27 @@
 
 using namespace std;
 using namespace libCZI::detail;
+
+namespace
+{
+    bool IsTokenMatch(const char* start, const char* token, size_t token_len)
+    {
+        // Match string content
+        if (std::strncmp(start, token, token_len) != 0)
+        {
+            return false;
+        }
+
+        // Must be followed by ;, space, or null
+        const char after = start[token_len];
+        if (after != '\0' && after != ';' && !std::isspace(static_cast<unsigned char>(after)))
+        {
+            return false;
+        }
+
+        return true;
+    }
+}
 
 /*static*/std::uint8_t Utilities::HexCharToInt(char c)
 {
@@ -101,7 +126,7 @@ tString trimImpl(const tString& str, const tString& whitespace)
     }
 
     const int size_needed = MultiByteToWideChar(CP_UTF8, 0, sz, -1, nullptr, 0);
-    if (size_needed <= 0) 
+    if (size_needed <= 0)
     {
         throw runtime_error("MultiByteToWideChar failed: " + std::to_string(GetLastError()));
     }
@@ -109,7 +134,7 @@ tString trimImpl(const tString& str, const tString& whitespace)
     wstring wide_string;
     wide_string.resize(size_needed - 1); // Exclude the null terminator
 
-    if (MultiByteToWideChar(CP_UTF8, 0, sz, -1, &wide_string[0], size_needed) == 0) 
+    if (MultiByteToWideChar(CP_UTF8, 0, sz, -1, &wide_string[0], size_needed) == 0)
     {
         throw runtime_error("MultiByteToWideChar conversion failed: " + std::to_string(GetLastError()));
     }
@@ -132,7 +157,7 @@ tString trimImpl(const tString& str, const tString& whitespace)
 
     // Calculate the required buffer size
     const int size_needed = WideCharToMultiByte(CP_UTF8, 0, szw, -1, nullptr, 0, nullptr, nullptr);
-    if (size_needed <= 0) 
+    if (size_needed <= 0)
     {
         throw runtime_error("WideCharToMultiByte failed: " + std::to_string(GetLastError()));
     }
@@ -141,7 +166,7 @@ tString trimImpl(const tString& str, const tString& whitespace)
     string utf8_str;
     utf8_str.resize(size_needed - 1); // Exclude the null terminator
 
-    if (WideCharToMultiByte(CP_UTF8, 0, szw, -1, &utf8_str[0], size_needed, nullptr, nullptr) == 0) 
+    if (WideCharToMultiByte(CP_UTF8, 0, szw, -1, &utf8_str[0], size_needed, nullptr, nullptr) == 0)
     {
         throw runtime_error("WideCharToMultiByte conversion failed: " + std::to_string(GetLastError()));
     }
@@ -491,7 +516,170 @@ tString trimImpl(const tString& str, const tString& whitespace)
     return tokens;
 }
 
+bool Utilities::TryParseInt32(const char* number, std::int32_t* pResult)
+{
+    if (number == nullptr || *number == '\0')
+    {
+        return false;
+    }
+
+    char* end = nullptr;
+    errno = 0;
+    const long long liValue = std::strtoll(number, &end, 10);
+    if (end == number || *end != '\0' || errno == ERANGE)
+    {
+        return false;
+    }
+
+    if (liValue > (std::numeric_limits<std::int32_t>::max)() ||
+        liValue < (std::numeric_limits<std::int32_t>::min)())
+    {
+        return false;
+    }
+
+    if (pResult != nullptr)
+    {
+        *pResult = static_cast<std::int32_t>(liValue);
+    }
+
+    return true;
+}
+
+bool Utilities::TryParseUInt32(const char* number, std::uint32_t* pResult)
+{
+    if (number == nullptr)
+    {
+        return false;
+    }
+
+    while (std::isspace(static_cast<unsigned char>(*number)))
+    {
+        ++number;
+    }
+
+    if (*number == '\0' || *number == '-')
+    {
+        return false;
+    }
+
+    char* end = nullptr;
+    errno = 0;
+    const unsigned long long ullValue = std::strtoull(number, &end, 10);
+    if (end == number || *end != '\0' || errno == ERANGE)
+    {
+        return false;
+    }
+
+    if (ullValue > (std::numeric_limits<std::uint32_t>::max)())
+    {
+        return false;
+    }
+
+    if (pResult != nullptr)
+    {
+        *pResult = static_cast<std::uint32_t>(ullValue);
+    }
+
+    return true;
+}
+
+bool Utilities::ContainsToken(const char* input, const char* token)
+{
+    if (!input || !token || *token == '\0')
+    {
+        return false;
+    }
+
+    const size_t token_len = std::strlen(token);
+    const char* current = input;
+
+    while ((current = std::strstr(current, token)))
+    {
+        // Check that we're at token boundary: either start or preceded by ; or whitespace
+        if (current != input)
+        {
+            const char before = *(current - 1);
+            if (before != ';' && !std::isspace(static_cast<unsigned char>(before)))
+            {
+                ++current;
+                continue;
+            }
+        }
+
+        if (IsTokenMatch(current, token, token_len))
+        {
+            return true;
+        }
+
+        ++current;
+    }
+
+    return false;
+}
+
 //-----------------------------------------------------------------------------
+
+/*static*/void LoHiBytePackUnpack::LoHiByteUnpackByteSized(const void* src_ptr, uint32_t src_size, void* ptrDst)
+{
+    if (src_size > 0 && (src_ptr == nullptr || ptrDst == nullptr))
+    {
+        throw invalid_argument("src_ptr and ptrDst must not be null when src_size is greater than zero.");
+    }
+
+    uint32_t word_count = src_size / 2;
+    if (word_count > 0)
+    {
+        LoHiBytePackUnpack::LoHiByteUnpackStrided(
+            src_ptr,
+            word_count,
+            word_count * 2,
+            1,
+            ptrDst);
+    }
+
+    if (src_size % 2 != 0)
+    {
+        // copy the last byte to the destination, if the source size is odd
+        uint8_t* pDst = static_cast<uint8_t*>(ptrDst);
+        pDst[src_size - 1] = static_cast<const uint8_t*>(src_ptr)[src_size - 1];
+    }
+}
+
+/*static*/void LoHiBytePackUnpack::LoHiBytePackStridedByteSized(const void* src, void* destination, size_t size)
+{
+    if (size == 0)
+    {
+        return;
+    }
+
+    if (src == nullptr || destination == nullptr)
+    {
+        throw invalid_argument("src and destination must not be null when size is greater than zero.");
+    }
+
+    const size_t even_size = (size / 2) * 2; // Round down to the nearest even number
+    if (even_size > (std::numeric_limits<uint32_t>::max)())
+    {
+        throw invalid_argument("Size is too large to be processed.");
+    }
+
+    if (even_size > 0)
+    {
+        LoHiBytePackUnpack::LoHiBytePackStrided(
+            src,
+            static_cast<uint32_t>(even_size),
+            static_cast<uint32_t>(even_size / 2),
+            1,
+            static_cast<uint32_t>(even_size),
+            destination);
+    }
+
+    if (size != even_size)
+    {
+        // Preserve the final lone byte that has no matching high byte in the flat destination.
+        static_cast<uint8_t*>(destination)[size - 1] = static_cast<const uint8_t*>(src)[size - 1];
+    }
+}
 
 /*static*/void LoHiBytePackUnpack::CheckLoHiByteUnpackArgumentsAndThrow(std::uint32_t width, std::uint32_t stride, const void* source, void* dest)
 {

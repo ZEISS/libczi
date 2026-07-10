@@ -3,12 +3,13 @@
 // SPDX-License-Identifier: LGPL-3.0-or-later
 
 #include "libCZI.h"
-#include "inc_libCZI_Config.h"
+#include "libCZI_Config_Internal.h"
 #include "decoder.h"
 #include "decoder_zstd.h"
 #include <mutex>
 #include <cstdlib>
 #include "bitmapData.h"
+#include "decoder_chunkedcompression.h"
 #include "decoder_wic.h"
 #include "Site.h"
 
@@ -66,6 +67,10 @@ private:
     std::shared_ptr<IDecoder> zstd0decoder;
     std::once_flag  zstd1DecoderInitialized;
     std::shared_ptr<IDecoder> zstd1decoder;
+#if LIBCZI_EXPERIMENTAL_CHUNKED_COMPRESSION_AVAILABLE
+    std::once_flag  chunkedCompressionDecoderInitialized;
+    std::shared_ptr<IDecoder> chunkedCompressiondecoder;
+#endif
 public:
     std::shared_ptr<IDecoder> GetDecoder(ImageDecoderType type, const char* arguments) override
     {
@@ -103,6 +108,18 @@ public:
 
             return this->zstd1decoder;
         }
+#if LIBCZI_EXPERIMENTAL_CHUNKED_COMPRESSION_AVAILABLE
+        case ImageDecoderType::ChunkedCompression:
+        {
+            std::call_once(chunkedCompressionDecoderInitialized,
+                [this]()
+                {
+                    this->chunkedCompressiondecoder = CChunkedCompressionDecoder::Create();
+                });
+
+            return this->chunkedCompressiondecoder;
+        }
+#endif
         }
 
         return shared_ptr<IDecoder>();
@@ -119,6 +136,10 @@ private:
     std::shared_ptr<IDecoder> zstd0decoder;
     std::once_flag  zstd1DecoderInitialized;
     std::shared_ptr<IDecoder> zstd1decoder;
+#if LIBCZI_EXPERIMENTAL_CHUNKED_COMPRESSION_AVAILABLE
+    std::once_flag  chunkedCompressionDecoderInitialized;
+    std::shared_ptr<IDecoder> chunkedCompressiondecoder;
+#endif
 public:
     std::shared_ptr<IDecoder> GetDecoder(ImageDecoderType type, const char* arguments) override
     {
@@ -156,6 +177,18 @@ public:
 
             return this->zstd1decoder;
         }
+#if LIBCZI_EXPERIMENTAL_CHUNKED_COMPRESSION_AVAILABLE
+        case ImageDecoderType::ChunkedCompression:
+        {
+            std::call_once(chunkedCompressionDecoderInitialized,
+                [this]()
+                {
+                this->chunkedCompressiondecoder = CChunkedCompressionDecoder::Create();
+                });
+
+            return this->chunkedCompressiondecoder;
+        }
+#endif
         }
 
         return shared_ptr<IDecoder>();

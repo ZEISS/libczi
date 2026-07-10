@@ -13,8 +13,9 @@
 #include "CziReaderWriter.h"
 #include "CziMetadataBuilder.h"
 #include "SubblockMetadata.h"
-#include "inc_libCZI_Config.h"
 #include "SubblockAttachmentAccessor.h"
+
+#include "libCZI_Config_Internal.h"
 
 using namespace libCZI;
 using namespace libCZI::detail;

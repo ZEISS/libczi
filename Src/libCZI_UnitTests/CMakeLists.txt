@@ -50,7 +50,8 @@ ADD_EXECUTABLE(libCZI_UnitTests
 										test_subblockmetadata.cpp 
 										test_subblockattachment.cpp
 										test_maskawarecomposition.cpp 
-										test_pixels.cpp)
+										test_pixels.cpp 
+										test_chunkedcompression.cpp)
 
 TARGET_LINK_LIBRARIES(libCZI_UnitTests PRIVATE libCZIStatic GTest::gtest GTest::gmock)
 set_target_properties(libCZI_UnitTests PROPERTIES CXX_STANDARD 14)

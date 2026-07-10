@@ -20,65 +20,6 @@ using namespace libCZI::detail;
 
 namespace
 {
-    bool IsTokenMatch(const char* start, const char* token, size_t token_len)
-    {
-        // Match string content
-        if (std::strncmp(start, token, token_len) != 0)
-        {
-            return false;
-        }
-
-        // Must be followed by ;, space, or null
-        const char after = start[token_len];
-        if (after != '\0' && after != ';' && !std::isspace(static_cast<unsigned char>(after)))
-        {
-            return false;
-        }
-
-        return true;
-    }
-
-    /// Parse the options string and check if it contains the specified token. The syntax for the
-    /// options string is a semicolon-separated list of items.
-    ///
-    /// \param  input   The options string to parse. If nullptr, the function returns false.
-    /// \param  token   The string to search for. If nullptr or empty, the function returns false.
-    ///
-    /// \returns    True if the specified string is found; false otherwise.
-    bool ContainsToken(const char* input, const char* token)
-    {
-        if (!input || !token || *token == '\0')
-        {
-            return false;
-        }
-
-        const size_t token_len = std::strlen(token);
-        const char* current = input;
-
-        while ((current = std::strstr(current, token)))
-        {
-            // Check that we're at token boundary: either start or preceded by ; or whitespace
-            if (current != input) 
-            {
-                const char before = *(current - 1);
-                if (before != ';' && !std::isspace(static_cast<unsigned char>(before)))
-                {
-                    ++current;
-                    continue;
-                }
-            }
-
-            if (IsTokenMatch(current, token, token_len))
-            {
-                return true;
-            }
-
-            ++current;
-        }
-
-        return false;
-    }
-
     uint64_t GetZstdContentSizeOrThrow(const void* ptr_data, size_t size)
     {
         const auto zstd_frame_content_size = ZSTD_getFrameContentSize(ptr_data, size);
@@ -415,7 +356,7 @@ namespace
         throw invalid_argument("pixeltype, width and height must be specified.");
     }
 
-    const bool handle_data_size_mismatch = ContainsToken(additional_arguments, kOption_handle_data_size_mismatch);
+    const bool handle_data_size_mismatch = Utilities::ContainsToken(additional_arguments, kOption_handle_data_size_mismatch);
     return handle_data_size_mismatch ?
         DecodeAndHandleSizeMismatch(ptrData, size, *pixelType, *width, *height) :
         DecodeRequireCorrectSize(ptrData, size, *pixelType, *width, *height);
@@ -459,7 +400,7 @@ namespace
         throw runtime_error(ss.str());
     }
 
-    const bool handle_data_size_mismatch = ContainsToken(additional_arguments, kOption_handle_data_size_mismatch);
+    const bool handle_data_size_mismatch = Utilities::ContainsToken(additional_arguments, kOption_handle_data_size_mismatch);
 
     if (handle_data_size_mismatch)
     {

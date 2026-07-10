@@ -3,10 +3,12 @@
 // SPDX-License-Identifier: LGPL-3.0-or-later
 
 #include "libCZI.h"
+#include "utilities.h"
 #include <climits>
 #include <regex>
 
 using namespace libCZI;
+using namespace libCZI::detail;
 using namespace std;
 
 class CIntParseCoordinateBoundsString
@@ -64,13 +66,13 @@ public:
 
                 int startIdx, sizeIdx;
                 auto startIdxMatch = it->operator[](2);
-                if (!TryParseInt(startIdxMatch.str().c_str(), &startIdx))
+                if (!Utilities::TryParseInt32(startIdxMatch.str().c_str(), &startIdx))
                 {
                     throw LibCZIStringParseException("Invalid start-index", -1, LibCZIStringParseException::ErrorType::InvalidSyntax);
                 }
 
                 auto sizeIdxMatch = it->operator[](3);
-                if (!TryParseInt(sizeIdxMatch.str().c_str(), &sizeIdx) || sizeIdx == 0)
+                if (!Utilities::TryParseInt32(sizeIdxMatch.str().c_str(), &sizeIdx) || sizeIdx == 0)
                 {
                     throw LibCZIStringParseException("Invalid end-index", -1, LibCZIStringParseException::ErrorType::InvalidSyntax);
                 }
@@ -226,26 +228,9 @@ private:
             return false;
         }
 
-        if (!TryParseInt(number, &value))
+        if (!Utilities::TryParseInt32(number, &value))
         {
             return false;
-        }
-
-        return true;
-    }
-
-    static bool TryParseInt(const char* number, int* value)
-    {
-        long long liValue = strtoll(number, nullptr, 10);
-
-        if (liValue > (std::numeric_limits<int>::max)() || liValue < (std::numeric_limits<int>::min)())
-        {
-            return false;
-        }
-
-        if (value != nullptr)
-        {
-            *value = static_cast<int>(liValue);
         }
 
         return true;

@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.15)
 cmake_policy(SET CMP0091 NEW) # enable new "MSVC runtime library selection" (https://cmake.org/cmake/help/latest/variable/CMAKE_MSVC_RUNTIME_LIBRARY.html)
 
 project(libCZI 
-      VERSION 0.68.0
+      VERSION 0.69.0
       HOMEPAGE_URL "https://github.com/ZEISS/libczi"
       DESCRIPTION "libCZI is an Open Source Cross-Platform C++ library to read and write CZI")
 
@@ -135,6 +135,72 @@ option(LIBCZI_BUILD_PREFER_EXTERNALPACKAGE_ZSTD "Prefer a ZSTD-package present o
 # When this option is ON, we try to use an existing RapidJSON-library. Otherwise, we download a private
 #  copy of RapidJSON during the CMake-run. This option is only relevant if building CZICmd.
 option(LIBCZI_BUILD_PREFER_EXTERNALPACKAGE_RAPIDJSON "Prefer an RapidJSON-package present on the system" ON)
+
+# Experimental functionality policy.
+#
+# This cache variable intentionally is not declared with option(), because it has
+# three states:
+#
+#   AUTO - Do not force experimental features globally. Each experimental feature
+#          keeps its own default. This is the default and preserves the normal,
+#          conservative build behavior.
+#
+#   ON   - Enable all experimental features by default.
+#
+#   OFF  - Disable all experimental features by default.
+#
+# Individual experimental feature options remain available and may still be set
+# explicitly by the user. If both this policy variable and an individual feature
+# option are specified, the individual feature option wins. This allows package
+# managers and advanced users to enable the global policy while still opting out
+# of one specific experimental feature if needed.
+#
+# Example:
+#   -DLIBCZI_BUILD_ENABLE_EXPERIMENTAL_FUNCTIONALITY=ON
+#
+# Example with explicit override:
+#   -DLIBCZI_BUILD_ENABLE_EXPERIMENTAL_FUNCTIONALITY=ON
+#   -DLIBCZI_BUILD_EXPERIMENTAL_CHUNKED_COMPRESSION=OFF
+set(LIBCZI_BUILD_ENABLE_EXPERIMENTAL_FUNCTIONALITY "AUTO" CACHE STRING
+    "Experimental functionality policy: AUTO, ON, or OFF.")
+set_property(CACHE LIBCZI_BUILD_ENABLE_EXPERIMENTAL_FUNCTIONALITY PROPERTY STRINGS AUTO ON OFF)
+string(TOUPPER "${LIBCZI_BUILD_ENABLE_EXPERIMENTAL_FUNCTIONALITY}" _libczi_experimental_functionality_policy)
+
+if (NOT _libczi_experimental_functionality_policy STREQUAL "AUTO" AND
+    NOT _libczi_experimental_functionality_policy STREQUAL "ON" AND
+    NOT _libczi_experimental_functionality_policy STREQUAL "OFF")
+    message(FATAL_ERROR
+        "LIBCZI_BUILD_ENABLE_EXPERIMENTAL_FUNCTIONALITY must be one of: AUTO, ON, OFF.")
+endif()
+
+# Default for experimental chunked compression.
+#
+# The default is derived from LIBCZI_BUILD_ENABLE_EXPERIMENTAL_FUNCTIONALITY:
+#
+#   AUTO -> OFF
+#   ON   -> ON
+#   OFF  -> OFF
+#
+# The value is used only as the default for option(). If the user already
+# supplied LIBCZI_BUILD_EXPERIMENTAL_CHUNKED_COMPRESSION in the CMake cache or
+# via -D, that explicit value is preserved by option().
+set(_libczi_default_experimental_chunked_compression OFF)
+
+if (_libczi_experimental_functionality_policy STREQUAL "ON")
+    set(_libczi_default_experimental_chunked_compression ON)
+elseif (_libczi_experimental_functionality_policy STREQUAL "OFF")
+    set(_libczi_default_experimental_chunked_compression OFF)
+endif()
+
+option(LIBCZI_BUILD_EXPERIMENTAL_CHUNKED_COMPRESSION "Enable experimental chunked compression support in the build." ${_libczi_default_experimental_chunked_compression})
+
+# Controls how the mandatory LZ4 dependency is resolved when experimental
+# chunked compression is enabled. When ON, CMake requires an externally
+# provided lz4 package via find_package(lz4 CONFIG REQUIRED). When OFF,
+# CMake fetches and builds a private copy of LZ4 using FetchContent.
+# This option has no effect when LIBCZI_BUILD_EXPERIMENTAL_CHUNKED_COMPRESSION is OFF.
+option(LIBCZI_BUILD_PREFER_EXTERNALPACKAGE_LZ4 "Prefer an LZ4-package present on the system" OFF)
+
 
 
 if (LIBCZI_BUILD_UNITTESTS)

@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include "libCZI_Config.h"
+
 #include "ImportExport.h"
 #include <cstdint>
 #include <memory>
@@ -162,12 +164,17 @@ namespace libCZI
     /// An enum specifying the compression method.
     enum class CompressionMode : std::uint8_t
     {
-        Invalid = 0xff,     ///< Invalid compression type.
-        UnCompressed = 0,   ///< The data is uncompressed.
-        Jpg = 1,            ///< The data is JPG-compressed.
-        JpgXr = 4,          ///< The data is JPG-XR-compressed.
-        Zstd0 = 5,          ///< The data is compressed with zstd.
-        Zstd1 = 6           ///< The data contains a header, followed by a zstd-compressed block. 
+        Invalid = 0xff,         ///< Invalid compression type.
+        UnCompressed = 0,       ///< The data is uncompressed.
+        Jpg = 1,                ///< The data is JPG-compressed.
+        JpgXr = 4,              ///< The data is JPG-XR-compressed.
+        Zstd0 = 5,              ///< The data is compressed with zstd.
+        Zstd1 = 6,              ///< The data contains a header, followed by a zstd-compressed block.
+
+        /// The data is compressed with a chunked extensible compression scheme.
+        /// This is an EXPERIMENTAL feature. Support for it in libCZI is subject
+        /// to a build where experimental features are enabled.
+        ChunkedExtensible = 7,
     };
 
     /// This enum is used in the context of a subblock to describe which "type of pyramid" is represented by the subblock.

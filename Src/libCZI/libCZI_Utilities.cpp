@@ -21,7 +21,7 @@ using namespace std;
 
 namespace
 {
-    bool _tryParseCompressionMode(const std::string& s, libCZI::CompressionMode* m)
+    bool tryParseCompressionMode(const std::string& s, libCZI::CompressionMode* m)
     {
         static constexpr libCZI::CompressionMode AvailableCompressionModes[] =
         {
@@ -29,7 +29,10 @@ namespace
             libCZI::CompressionMode::Jpg,
             libCZI::CompressionMode::JpgXr,
             libCZI::CompressionMode::Zstd0,
-            libCZI::CompressionMode::Zstd1
+            libCZI::CompressionMode::Zstd1,
+#if LIBCZI_EXPERIMENTAL_CHUNKED_COMPRESSION_AVAILABLE
+            libCZI::CompressionMode::ChunkedExtensible,
+#endif
         };
 
         for (const auto& compressionMode : AvailableCompressionModes)
@@ -48,7 +51,7 @@ namespace
         return false;
     }
 
-    bool _tryParseCompressionOptions(const std::string& s, std::map<int, libCZI::CompressParameter>* map)
+    bool tryParseCompressionOptions(CompressionMode compression_mode, const std::string& s, std::map<int, libCZI::CompressParameter>* map)
     {
         const std::regex compressionOptionsRegex(R"(^\s*([a-zA-Z0-9]*)\s*=\s*([a-zA-Z0-9.+-]*)\s*$)");
         istringstream stringStream(s);
@@ -64,28 +67,25 @@ namespace
                 // strategy is (currently): anything we do not understand we ignore
                 if (Utilities::icasecmp(key, Utils::KEY_COMPRESS_EXPLICIT_LEVEL))
                 {
-                    size_t indexParsingStopped;
-                    try
+                    int32_t i;
+                    const bool success = Utilities::TryParseInt32(value.c_str(), &i);
+                    if (!success)
                     {
-                        int i = stoi(value, &indexParsingStopped);
-                        if (value[indexParsingStopped] != '\0')
-                        {
-                            // this means that parsing stopped before we reached the end of the string
-                            return false;
-                        }
+                        return false;
+                    }
 
-                        if (map != nullptr)
+                    if (map != nullptr)
+                    {
+                        if (compression_mode == CompressionMode::Zstd0 || compression_mode == CompressionMode::Zstd1)
                         {
                             (*map)[static_cast<int>(libCZI::CompressionParameterKey::ZSTD_RAWCOMPRESSIONLEVEL)] = libCZI::CompressParameter(i);
                         }
-                    }
-                    catch (invalid_argument&)
-                    {
-                        return false;
-                    }
-                    catch (out_of_range&)
-                    {
-                        return false;
+#if LIBCZI_EXPERIMENTAL_CHUNKED_COMPRESSION_AVAILABLE
+                        else if (compression_mode == CompressionMode::ChunkedExtensible)
+                        {
+                            (*map)[static_cast<int>(libCZI::CompressionParameterKey::CHUNKEDCOMPRESSION_RAWCOMPRESSIONLEVEL_ZSTD)] = libCZI::CompressParameter(i);
+                        }
+#endif
                     }
                 }
                 else if (Utilities::icasecmp(key, Utils::KEY_COMPRESS_PRE_PROCESS))
@@ -94,10 +94,52 @@ namespace
                     {
                         if (map != nullptr)
                         {
-                            (*map)[static_cast<int>(libCZI::CompressionParameterKey::ZSTD_PREPROCESS_DOLOHIBYTEPACKING)] = libCZI::CompressParameter(true);
+                            if (compression_mode == CompressionMode::Zstd1)
+                            {
+                                (*map)[static_cast<int>(libCZI::CompressionParameterKey::ZSTD_PREPROCESS_DOLOHIBYTEPACKING)] = libCZI::CompressParameter(true);
+                            }
+#if LIBCZI_EXPERIMENTAL_CHUNKED_COMPRESSION_AVAILABLE
+                            else if (compression_mode == CompressionMode::ChunkedExtensible)
+                            {
+                                (*map)[static_cast<int>(libCZI::CompressionParameterKey::CHUNKEDCOMPRESSION_DOLOHIBYTEUNPACKING)] = libCZI::CompressParameter(true);
+                            }
+#endif
                         }
                     }
                 }
+#if LIBCZI_EXPERIMENTAL_CHUNKED_COMPRESSION_AVAILABLE
+                else if (Utilities::icasecmp(key, Utils::KEY_COMPRESS_CHUNKED_MAXCHUNKSIZE))
+                {
+                    uint32_t i;
+                    const bool success = Utilities::TryParseUInt32(value.c_str(), &i);
+                    if (!success)
+                    {
+                        return false;
+                    }
+
+                    if (map != nullptr)
+                    {
+                        (*map)[static_cast<int>(libCZI::CompressionParameterKey::CHUNKEDCOMPRESSION_MAXCHUNKSIZE)] = libCZI::CompressParameter(i);
+                    }
+                }
+                else if (Utilities::icasecmp(key, Utils::KEY_COMPRESS_CHUNKED_CODEC))
+                {
+                    if (Utilities::icasecmp(value, "zstd"))
+                    {
+                        if (map != nullptr)
+                        {
+                            (*map)[static_cast<int>(libCZI::CompressionParameterKey::CHUNKEDCOMPRESSION_CODEC)] = libCZI::CompressParameter(static_cast<int32_t>(ChunkedCompressionHeaderHelper::Codec::ZStd));
+                        }
+                    }
+                    else if (Utilities::icasecmp(value, "lz4"))
+                    {
+                        if (map != nullptr)
+                        {
+                            (*map)[static_cast<int>(libCZI::CompressionParameterKey::CHUNKEDCOMPRESSION_CODEC)] = libCZI::CompressParameter(static_cast<int32_t>(ChunkedCompressionHeaderHelper::Codec::Lz4));
+                        }
+                    }
+                }
+#endif
             }
         }
 
@@ -108,6 +150,11 @@ namespace
 const char* const Utils::KEY_COMPRESS_EXPLICIT_LEVEL = "ExplicitLevel";
 const char* const Utils::KEY_COMPRESS_PRE_PROCESS = "PreProcess";
 const char* const Utils::VALUE_COMPRESS_HILO_BYTE_UNPACK = "HiLoByteUnpack";
+#if LIBCZI_EXPERIMENTAL_CHUNKED_COMPRESSION_AVAILABLE
+const char* const Utils::KEY_COMPRESS_CHUNKED_MAXCHUNKSIZE = "ChunkedMaxChunkSize";
+const char* const Utils::KEY_COMPRESS_CHUNKED_CODEC = "ChunkedCodec";
+#endif
+
 
 /*static*/char Utils::DimensionToChar(libCZI::DimensionIndex dim)
 {
@@ -468,6 +515,8 @@ std::vector<tOutput> InternalCreateLookUpTableFromGamma(int tableElementCnt, tFl
         return "zstd0";
     case CompressionMode::Zstd1:
         return "zstd1";
+    case CompressionMode::ChunkedExtensible:
+        return "chunked";
     case CompressionMode::Invalid:
         return "invalid";
     }
@@ -710,7 +759,7 @@ Utils::CompressionOption Utils::ParseCompressionOptions(const std::string& optio
             const string& parameters = pieces_match[2].str();
 
             libCZI::CompressionMode compressionMode;
-            if (!_tryParseCompressionMode(compressionMethod, &compressionMode))
+            if (!tryParseCompressionMode(compressionMethod, &compressionMode))
             {
                 stringstream ss;
                 ss << "Error parsing the compression-options - unknown method \"" << compressionMethod << "\"";
@@ -718,7 +767,7 @@ Utils::CompressionOption Utils::ParseCompressionOptions(const std::string& optio
             }
 
             auto compressParametersOnMap = make_shared<libCZI::CompressParametersOnMap>();
-            if (!_tryParseCompressionOptions(parameters, &compressParametersOnMap->map))
+            if (!tryParseCompressionOptions(compressionMode, parameters, &compressParametersOnMap->map))
             {
                 stringstream ss;
                 ss << "Error parsing the compression-options - parameters could not be parsed (\"" << parameters << "\")";

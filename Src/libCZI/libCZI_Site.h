@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include "libCZI_Config.h"
+
 #include <sstream>
 #include <memory>
 #include <string>
@@ -15,11 +17,13 @@ namespace libCZI
     /// created by `ISite::GetDecoder`.
     enum class ImageDecoderType
     {
-        JPXR_JxrLib,    ///< Identifies a decoder capable of decoding a JPG-XR compressed image.
+        JPXR_JxrLib,        ///< Identifies a decoder capable of decoding a JPG-XR compressed image.
 
-        ZStd0,          ///< Identifies a decoder capable of decoding a zstd compressed image (type "zstd0").
+        ZStd0,              ///< Identifies a decoder capable of decoding a zstd compressed image (type "zstd0").
 
-        ZStd1           ///< Identifies a decoder capable of decoding a zstd compressed image (type "zstd1").
+        ZStd1,              ///< Identifies a decoder capable of decoding a zstd compressed image (type "zstd1").
+
+        ChunkedCompression, ///< Identifies a decoder capable of decoding an image compressed with the chunked-compression scheme.
     };
 
     class IBitmapData;

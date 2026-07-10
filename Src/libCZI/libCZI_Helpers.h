@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include "libCZI_Config.h"
+
 #include <vector>
 #include <memory>
 #include "libCZI.h"

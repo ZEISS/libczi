@@ -13,6 +13,7 @@
 #include "BitmapOperations.h"
 #include "libCZI_compress.h"
 #include "utilities.h"
+#include "compresscommon.h"
 
 using namespace libCZI;
 using namespace libCZI::detail;
@@ -90,61 +91,6 @@ static bool CompressZstd(const void* source, size_t sizeSource, void* destinatio
     return CompressZstd(source, sizeSource, destination, sizeDestination, zstdCompressionLevel);
 }
 
-static void CheckSourceBitmapArgumentsAndThrow(std::uint32_t sourceWidth, std::uint32_t sourceHeight, std::uint32_t sourceStride, libCZI::PixelType sourcePixeltype, const void* source)
-{
-    if (sourceWidth == 0)
-    {
-        throw invalid_argument("width must be greater than zero");
-    }
-
-    if (sourceHeight == 0)
-    {
-        throw invalid_argument("height must be greater than zero");
-    }
-
-    // note: GetBytesPerPixel will throw (an invalid_argument-exception) in case of an invalid enum value
-    if (sourceStride < sourceWidth * Utils::GetBytesPerPixel(sourcePixeltype))
-    {
-        stringstream ss;
-        ss << "stride is illegal, for width=" << sourceWidth << " and pixeltype=" << Utils::PixelTypeToInformalString(sourcePixeltype) << " the minimum stride is "
-            << sourceWidth * Utils::GetBytesPerPixel(sourcePixeltype) << " whereas " << sourceStride << " was specified.";
-        throw invalid_argument(ss.str());
-    }
-
-    if (source == nullptr)
-    {
-        throw invalid_argument("source must not be null");
-    }
-}
-
-static void CheckDestinationArgumentsAndThrow(const void* destination, size_t sizeDestination, size_t minSizeOfDestination)
-{
-    if (destination == nullptr)
-    {
-        throw invalid_argument("destination must not be null.");
-    }
-
-    if (sizeDestination < minSizeOfDestination)
-    {
-        stringstream ss;
-        ss << "sizeDestination must be greater than or equal to " << minSizeOfDestination << ", whereas " << sizeDestination << " was specified.";
-        throw invalid_argument(ss.str());
-    }
-}
-
-static void CheckTempBufferAllocArgumentsAndThrow(const std::function<void* (size_t)>& allocateTempBuffer, const std::function<void(void*)>& freeTempBuffer)
-{
-    if (!allocateTempBuffer)
-    {
-        throw invalid_argument("A function for allocating temp memory must be given.");
-    }
-
-    if (!freeTempBuffer)
-    {
-        throw invalid_argument("A function for freeing temp memory must be given.");
-    }
-}
-
 size_t libCZI::ZstdCompress::CalculateMaxCompressedSizeZStd0(std::uint32_t sourceWidth, std::uint32_t sourceHeight, libCZI::PixelType sourcePixeltype)
 {
     const size_t sizeSource = static_cast<size_t>(sourceWidth) * Utils::GetBytesPerPixel(sourcePixeltype) * sourceHeight;
@@ -175,9 +121,9 @@ bool libCZI::ZstdCompress::CompressZStd0(
     size_t& sizeDestination,
     const ICompressParameters* parameters)
 {
-    CheckSourceBitmapArgumentsAndThrow(sourceWidth, sourceHeight, sourceStride, sourcePixeltype, source);
-    CheckDestinationArgumentsAndThrow(destination, sizeDestination, 1);
-    CheckTempBufferAllocArgumentsAndThrow(allocateTempBuffer, freeTempBuffer);
+    CompressionUtilities::CheckSourceBitmapArgumentsAndThrow(sourceWidth, sourceHeight, sourceStride, sourcePixeltype, source);
+    CompressionUtilities::CheckDestinationArgumentsAndThrow(destination, sizeDestination, 1);
+    CompressionUtilities::CheckTempBufferAllocArgumentsAndThrow(allocateTempBuffer, freeTempBuffer);
 
     // that's the size of the input bitmap with "minimal stride" (-> stride = width * bytes_per_pel)
     const size_t requiredSizeSource = static_cast<size_t>(sourceWidth) * Utils::GetBytesPerPixel(sourcePixeltype) * sourceHeight;
@@ -207,8 +153,8 @@ bool libCZI::ZstdCompress::CompressZStd0(
 
 std::shared_ptr<IMemoryBlock> libCZI::ZstdCompress::CompressZStd0Alloc(std::uint32_t sourceWidth, std::uint32_t sourceHeight, std::uint32_t sourceStride, libCZI::PixelType sourcePixeltype, const void* source, const std::function<void* (size_t)>& allocateTempBuffer, const std::function<void(void*)>& freeTempBuffer, const ICompressParameters* parameters)
 {
-    CheckSourceBitmapArgumentsAndThrow(sourceWidth, sourceHeight, sourceStride, sourcePixeltype, source);
-    CheckTempBufferAllocArgumentsAndThrow(allocateTempBuffer, freeTempBuffer);
+    CompressionUtilities::CheckSourceBitmapArgumentsAndThrow(sourceWidth, sourceHeight, sourceStride, sourcePixeltype, source);
+    CompressionUtilities::CheckTempBufferAllocArgumentsAndThrow(allocateTempBuffer, freeTempBuffer);
 
     // allocate a memory-block which is "large enough under all circumstances"
     const size_t size = ZstdCompress::CalculateMaxCompressedSizeZStd0(sourceWidth, sourceHeight, sourcePixeltype);
@@ -237,9 +183,9 @@ std::shared_ptr<IMemoryBlock> libCZI::ZstdCompress::CompressZStd0Alloc(std::uint
 
 bool libCZI::ZstdCompress::CompressZStd1(std::uint32_t sourceWidth, std::uint32_t sourceHeight, std::uint32_t sourceStride, libCZI::PixelType sourcePixeltype, const void* source, const std::function<void* (size_t)>& allocateTempBuffer, const std::function<void(void*)>& freeTempBuffer, void* destination, size_t& sizeDestination, const ICompressParameters* parameters)
 {
-    CheckSourceBitmapArgumentsAndThrow(sourceWidth, sourceHeight, sourceStride, sourcePixeltype, source);
-    CheckDestinationArgumentsAndThrow(destination, sizeDestination, 3 + 1);
-    CheckTempBufferAllocArgumentsAndThrow(allocateTempBuffer, freeTempBuffer);
+    CompressionUtilities::CheckSourceBitmapArgumentsAndThrow(sourceWidth, sourceHeight, sourceStride, sourcePixeltype, source);
+    CompressionUtilities::CheckDestinationArgumentsAndThrow(destination, sizeDestination, 3 + 1);
+    CompressionUtilities::CheckTempBufferAllocArgumentsAndThrow(allocateTempBuffer, freeTempBuffer);
 
     bool doLoHiBytePacking = false;
     if (parameters != nullptr &&
@@ -359,8 +305,8 @@ bool libCZI::ZstdCompress::CompressZStd1(std::uint32_t sourceWidth, std::uint32_
 
 std::shared_ptr<IMemoryBlock> libCZI::ZstdCompress::CompressZStd1Alloc(std::uint32_t sourceWidth, std::uint32_t sourceHeight, std::uint32_t sourceStride, libCZI::PixelType sourcePixeltype, const void* source, const std::function<void* (size_t)>& allocateTempBuffer, const std::function<void(void*)>& freeTempBuffer, const ICompressParameters* parameters)
 {
-    CheckSourceBitmapArgumentsAndThrow(sourceWidth, sourceHeight, sourceStride, sourcePixeltype, source);
-    CheckTempBufferAllocArgumentsAndThrow(allocateTempBuffer, freeTempBuffer);
+    CompressionUtilities::CheckSourceBitmapArgumentsAndThrow(sourceWidth, sourceHeight, sourceStride, sourcePixeltype, source);
+    CompressionUtilities::CheckTempBufferAllocArgumentsAndThrow(allocateTempBuffer, freeTempBuffer);
 
     // allocate a memory-block which is "large enough under all circumstances"
     const size_t size = ZstdCompress::CalculateMaxCompressedSizeZStd1(sourceWidth, sourceHeight, sourcePixeltype);

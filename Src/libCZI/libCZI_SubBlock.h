@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include "libCZI_Config.h"
+
 #include <tuple>
 #include "libCZI_Metadata.h"
 #include "libCZI_Utilities.h"

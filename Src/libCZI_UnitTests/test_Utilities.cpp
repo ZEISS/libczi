@@ -215,7 +215,7 @@ TEST(Utilities, ScopedBitmapLocker4)
         // Test assignment operator
         ScopedBitmapLockerSP locker3{ bitmap };
         EXPECT_EQ(bitmap->GetLockCount(), 3) << "expecting a lock-count of '3' after creating locker3";
-    
+
         locker3 = locker1;  // This should not change the lock count as locker3 was already locking the same bitmap
         EXPECT_EQ(bitmap->GetLockCount(), 3) << "expecting a lock-count of '3' after assignment";
     }
@@ -258,7 +258,71 @@ TEST(Utilities, ScopedBitmapLocker5)
     }
 
     EXPECT_EQ(bitmap->GetLockCount(), 0) << "expecting a lock-count of zero after all lockers go out of scope";
+}
 
+TEST(Utilities, LoHiBytePackStridedByteSizedCopiesOddTrailingByteInFlatBuffer)
+{
+    // Regression test for odd-sized LoHiByte chunks in the flat-buffer helper.
+    //
+    // The first two bytes form one complete 16-bit word in LoHiByte layout:
+    // low byte first, then high byte. They are processed by the regular
+    // LoHiByte packing path for the largest even-byte prefix.
+    //
+    // The third byte is a trailing lone byte. Since there is no matching high
+    // byte for it, the byte-sized helper must preserve it by copying it to the
+    // same final byte position in the destination.
+    const uint8_t source[] = { 0x11, 0x22, 0x33 };
+    uint8_t destination[] = { 0xee, 0xee, 0xee };
+
+    LoHiBytePackUnpack::LoHiBytePackStridedByteSized(source, destination, sizeof(source));
+
+    EXPECT_EQ(destination[0], 0x11);
+    EXPECT_EQ(destination[1], 0x22);
+    EXPECT_EQ(destination[2], 0x33);
+}
+
+TEST(Utilities, LoHiBytePackStridedByteSizedCopiesSingleLoneByte)
+{
+    // Regression test for a one-byte LoHiByte chunk.
+    //
+    // With only one byte, there are no complete 16-bit words to pass to the
+    // regular LoHiByte packing path. The byte-sized helper must still preserve
+    // the lone byte by copying it to the destination.
+    const uint8_t source[] = { 0x44 };
+    uint8_t destination[] = { 0xee };
+
+    LoHiBytePackUnpack::LoHiBytePackStridedByteSized(source, destination, sizeof(source));
+
+    EXPECT_EQ(destination[0], 0x44);
+}
+
+TEST(Utilities, LoHiBytePackStridedByteSizedPacksEvenPrefixAndCopiesOddTrailingByte)
+{
+    // Regression test for an odd-sized LoHiByte chunk with more than one
+    // complete 16-bit word.
+    //
+    // For the even-byte prefix, the source is in LoHiByte layout:
+    //   source[0], source[1] are low bytes
+    //   source[2], source[3] are high bytes
+    //
+    // The packed destination therefore becomes:
+    //   destination[0] = source[0]
+    //   destination[1] = source[2]
+    //   destination[2] = source[1]
+    //   destination[3] = source[3]
+    //
+    // The fifth byte has no matching high byte and must be copied unchanged to
+    // the final destination position.
+    const uint8_t source[] = { 0x11, 0x22, 0x33, 0x44, 0x55 };
+    uint8_t destination[] = { 0xee, 0xee, 0xee, 0xee, 0xee };
+
+    LoHiBytePackUnpack::LoHiBytePackStridedByteSized(source, destination, sizeof(source));
+
+    EXPECT_EQ(destination[0], 0x11);
+    EXPECT_EQ(destination[1], 0x33);
+    EXPECT_EQ(destination[2], 0x22);
+    EXPECT_EQ(destination[3], 0x44);
+    EXPECT_EQ(destination[4], 0x55);
 }
 
 // test-fixture, cf. https://stackoverflow.com/questions/47354280/what-is-the-best-way-of-testing-private-methods-with-googletest
@@ -352,6 +416,58 @@ TEST(Utilities, ParseCompressionOptionEmptyPropertyBagCheckForCorrectCompression
     compressionOptions = Utils::ParseCompressionOptions("zstd1:");
     EXPECT_EQ(compressionOptions.first, CompressionMode::Zstd1);
 }
+
+#if LIBCZI_EXPERIMENTAL_CHUNKED_COMPRESSION_AVAILABLE
+TEST(Utilities, ParseCompressionOptionForChunkedCheckThatCorrectPropertiesAreUsed)
+{
+    // check that for chunked compression, the correct properties are used (i.e. the ones with "CHUNKEDCOMPRESSION_" prefix)
+    auto compressionOptions = Utils::ParseCompressionOptions("chunked:ExplicitLevel=3;PreProcess=HiLoByteUnpack");
+    EXPECT_EQ(compressionOptions.first, CompressionMode::ChunkedExtensible);
+    CompressParameter value;
+    ASSERT_TRUE(compressionOptions.second->TryGetProperty(CompressionParameterKey::CHUNKEDCOMPRESSION_RAWCOMPRESSIONLEVEL_ZSTD, &value));
+    EXPECT_EQ(value.GetInt32(), 3);
+    ASSERT_TRUE(compressionOptions.second->TryGetProperty(CompressionParameterKey::CHUNKEDCOMPRESSION_DOLOHIBYTEUNPACKING, &value));
+    EXPECT_TRUE(value.GetBoolean());
+}
+#endif
+
+#if LIBCZI_EXPERIMENTAL_CHUNKED_COMPRESSION_AVAILABLE
+TEST(Utilities, ParseCompressionOptionForChunkedCheckThatSpecificOptionsAreParsedCorrectly1)
+{
+    auto compressionOptions = Utils::ParseCompressionOptions("chunked:ChunkedMaxChunkSize=65536;ChunkedCodec=zstd");
+    EXPECT_EQ(compressionOptions.first, CompressionMode::ChunkedExtensible);
+    CompressParameter value;
+    ASSERT_TRUE(compressionOptions.second->TryGetProperty(CompressionParameterKey::CHUNKEDCOMPRESSION_MAXCHUNKSIZE, &value));
+    EXPECT_EQ(value.GetUInt32(), 65536);
+    ASSERT_TRUE(compressionOptions.second->TryGetProperty(CompressionParameterKey::CHUNKEDCOMPRESSION_CODEC, &value));
+    EXPECT_EQ(value.GetInt32(), static_cast<int32_t>(ChunkedCompressionHeaderHelper::Codec::ZStd));
+}
+#endif
+
+#if LIBCZI_EXPERIMENTAL_CHUNKED_COMPRESSION_AVAILABLE
+TEST(Utilities, ParseCompressionOptionForChunkedCheckThatSpecificOptionsAreParsedCorrectly2)
+{
+    auto compressionOptions = Utils::ParseCompressionOptions("chunked:ChunkedMaxChunkSize=1234567;ChunkedCodec=lz4");
+    EXPECT_EQ(compressionOptions.first, CompressionMode::ChunkedExtensible);
+    CompressParameter value;
+    ASSERT_TRUE(compressionOptions.second->TryGetProperty(CompressionParameterKey::CHUNKEDCOMPRESSION_MAXCHUNKSIZE, &value));
+    EXPECT_EQ(value.GetUInt32(), 1234567);
+    ASSERT_TRUE(compressionOptions.second->TryGetProperty(CompressionParameterKey::CHUNKEDCOMPRESSION_CODEC, &value));
+    EXPECT_EQ(value.GetInt32(), static_cast<int32_t>(ChunkedCompressionHeaderHelper::Codec::Lz4));
+}
+#endif
+
+#if LIBCZI_EXPERIMENTAL_CHUNKED_COMPRESSION_AVAILABLE
+TEST(Utilities, ParseCompressionOptionForChunkedCheckThatInvalidParametersAreIgnored1)
+{
+    const auto compressionOptions = Utils::ParseCompressionOptions("chunked:ChunkedMaxChunkSize=1234567;ChunkedCodec=xyz");
+    EXPECT_EQ(compressionOptions.first, CompressionMode::ChunkedExtensible);
+    CompressParameter value;
+    ASSERT_TRUE(compressionOptions.second->TryGetProperty(CompressionParameterKey::CHUNKEDCOMPRESSION_MAXCHUNKSIZE, &value));
+    EXPECT_EQ(value.GetUInt32(), 1234567);
+    ASSERT_FALSE(compressionOptions.second->TryGetProperty(CompressionParameterKey::CHUNKEDCOMPRESSION_CODEC, &value));
+}
+#endif
 
 TEST(Utilities, CallGetLibCZIVersionAndCheckResultForPlausibility)
 {

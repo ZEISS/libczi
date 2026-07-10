@@ -4,15 +4,15 @@
 
 #include "BitmapOperationsBitonal.h"
 
+#include "libCZI_Config_Internal.h"
+#include "BitmapOperations.h"
+#include "libCZI_Utilities.h"
+#include "utilities.h"
+
 #include <cstdint>
 #include <algorithm>
 #include <sstream>
 #include <stdexcept>
-
-#include "inc_libCZI_Config.h"
-#include "BitmapOperations.h"
-#include <libCZI_Utilities.h>
-#include "utilities.h"
 
 #if LIBCZI_HAS_BUILTIN_BSWAP32
     #include <byteswap.h>

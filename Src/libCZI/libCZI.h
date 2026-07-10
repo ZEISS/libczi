@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include "libCZI_Config.h"
+
 #include <functional>
 #include <memory>
 #include <map>
@@ -138,6 +140,10 @@ namespace libCZI
         /// In case of zstd compressed pixel data, apply the resolution protocol for zstd-compressed data.
         /// If false, an exception is thrown  (in case of a discrepancy).
         bool handle_zstd_data_size_mismatch{ true };
+
+        /// In case of chunked-compression pixel data, apply the resolution protocol for chunked-compression data.
+        /// If false, an exception is thrown (in case of a discrepancy).
+        bool handle_chunked_compression_data_size_mismatch{ true };
     };
 
     /// Creates bitmap from sub block.
@@ -598,7 +604,7 @@ namespace libCZI
     struct AttachmentStatistics
     {
         /// The total number of attachments.
-        int attachmentsCount;
+        int attachmentsCount{ 0 };
     };
 
     /// Interface for sub-block repository. This interface is used to access the sub-blocks in a CZI-file.

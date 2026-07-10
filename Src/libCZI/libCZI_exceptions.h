@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include "libCZI_Config.h"
+
 #include <exception>
 #include <stdexcept>
 #include <cstdint>

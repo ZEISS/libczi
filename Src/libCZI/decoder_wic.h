@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <libCZI_Config.h>
+#include "libCZI_Config_Internal.h"
 
 #if LIBCZI_WINDOWSAPI_AVAILABLE
 
@@ -32,7 +32,7 @@ namespace libCZI
             virtual ~CWicJpgxrDecoder();
 
         public:
-            std::shared_ptr<libCZI::IBitmapData> Decode(const void* ptrData, size_t size, const libCZI::PixelType* pixelType, const std::uint32_t* height, const std::uint32_t* width, const char* additional_arguments) override;
+            std::shared_ptr<libCZI::IBitmapData> Decode(const void* ptrData, size_t size, const libCZI::PixelType* pixelType, const std::uint32_t* width, const std::uint32_t* height, const char* additional_arguments) override;
         };
 
     }  // namespace detail

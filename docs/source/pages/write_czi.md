@@ -90,3 +90,26 @@ void SyncAddSubBlock(const AddSubBlockInfoStridedBitmap& addSbBlkInfoStrideBitma
 ```
 
 They provide a simplified way if dealing with bitmap-data when it is given as e. g. a bitmap consecutive in memory but with a specific stride (which may not be equal to the minimal stride required in storage in CZI).
+
+### compression
+
+Subblock pixel data can be stored uncompressed or with one of the compression
+modes supported by libCZI. Compression options can be passed through the
+compression option parser, using informal mode names such as `zstd0`, `zstd1`,
+or, in builds that enable the experimental feature, `chunked`.
+
+The experimental chunked-compression mode stores a subblock as a small header
+followed by independently compressed data chunks. It is intended for workflows
+that benefit from chunk-level concurrency or hardware-accelerated codecs. For
+example:
+
+```text
+chunked:ChunkedCodec=zstd;ChunkedMaxChunkSize=65536
+chunked:ChunkedCodec=lz4;ChunkedMaxChunkSize=65536
+```
+
+Chunked compression is only available when libCZI is built with
+`LIBCZI_BUILD_EXPERIMENTAL_CHUNKED_COMPRESSION=ON`, or when the global
+experimental policy enables it. See [Experimental chunked
+compression](chunked_compression.md) for the build switches, API availability
+macro, and binary format specification.
