@@ -67,8 +67,10 @@ private:
     std::shared_ptr<IDecoder> zstd0decoder;
     std::once_flag  zstd1DecoderInitialized;
     std::shared_ptr<IDecoder> zstd1decoder;
+#if LIBCZI_EXPERIMENTAL_CHUNKED_COMPRESSION_AVAILABLE
     std::once_flag  chunkedCompressionDecoderInitialized;
     std::shared_ptr<IDecoder> chunkedCompressiondecoder;
+#endif
 public:
     std::shared_ptr<IDecoder> GetDecoder(ImageDecoderType type, const char* arguments) override
     {
@@ -134,8 +136,10 @@ private:
     std::shared_ptr<IDecoder> zstd0decoder;
     std::once_flag  zstd1DecoderInitialized;
     std::shared_ptr<IDecoder> zstd1decoder;
+#if LIBCZI_EXPERIMENTAL_CHUNKED_COMPRESSION_AVAILABLE
     std::once_flag  chunkedCompressionDecoderInitialized;
     std::shared_ptr<IDecoder> chunkedCompressiondecoder;
+#endif
 public:
     std::shared_ptr<IDecoder> GetDecoder(ImageDecoderType type, const char* arguments) override
     {
