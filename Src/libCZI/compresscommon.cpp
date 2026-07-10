@@ -32,6 +32,11 @@ void libCZI::detail::CompressionUtilities::CheckSourceBitmapArgumentsAndThrow(st
     }
 
     const size_t min_stride = static_cast<size_t>(source_width) * bytes_per_pixel;
+    if (static_cast<size_t>(source_height) > numeric_limits<size_t>::max() / min_stride)
+    {
+        throw invalid_argument("height is too large for the given width/pixel type.");
+    }
+
     if (min_stride > numeric_limits<uint32_t>::max() || static_cast<size_t>(source_stride) < min_stride)
     {
         stringstream ss;
