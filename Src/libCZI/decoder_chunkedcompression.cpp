@@ -215,7 +215,7 @@ std::shared_ptr<libCZI::IBitmapData> CChunkedCompressionDecoder::Decode(const vo
 
             if (ZSTD_isError(decompressed_size))
             {
-                throw runtime_error("ZStd decompression of chunk failed.");
+                throw runtime_error(std::string("ZStd decompression of chunk failed: ") + ZSTD_getErrorName(decompressed_size));
             }
 
             break;
@@ -295,7 +295,7 @@ std::shared_ptr<libCZI::IBitmapData> CChunkedCompressionDecoder::Decode(const vo
 
             if (ZSTD_isError(decompressed_size))
             {
-                throw runtime_error("ZStd decompression of chunk failed.");
+                throw runtime_error(std::string("ZStd decompression of chunk failed: ") + ZSTD_getErrorName(decompressed_size));
             }
 
             break;

@@ -877,7 +877,8 @@ std::tuple<size_t, ChunkedCompressionHeaderHelper::HeaderInfo> ChunkedCompressio
 
                 break;
             default:
-                throw invalid_argument("Invalid header chunk ID in compression header.");
+                // Unknown header chunk ids are ignored for forward compatibility.
+                break;
             }
 
             return true;  // continue walking through the header
