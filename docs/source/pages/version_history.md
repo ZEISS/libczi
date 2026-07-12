@@ -57,3 +57,4 @@ Version history
  0.67.6             | [169](https://github.com/ZEISS/libczi/pull/169)      | fix CI/CD build
  0.68.0             | [171](https://github.com/ZEISS/libczi/pull/171)      | add bitmap creation from compressed subblock data and attachment statistics APIs; improve test integration and CI workflow
  0.69.0             | [172](https://github.com/ZEISS/libczi/pull/172)      | add EXPERIMENTAL chunked-compression
+ 0.69.1             | [174](https://github.com/ZEISS/libczi/pull/174)      | fix CMake package export for external LZ4 and document vcpkg overlay ports

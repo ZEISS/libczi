@@ -14,6 +14,12 @@
 # Flags baked in at install time:
 set(LIBCZI_BUILD_AZURESDK_BASED_STREAM @LIBCZI_BUILD_AZURESDK_BASED_STREAM@)
 set(LIBCZI_BUILD_CURL_BASED_STREAM     @LIBCZI_BUILD_CURL_BASED_STREAM@)
+# Keep the experimental chunked-compression and LZ4 dependency state available
+# to consumers of the installed CMake package. When libCZI exports a target that
+# links to an external LZ4 target, downstream find_package(libCZI) must also load
+# the lz4 package before libCZITargets.cmake is included.
+set(LIBCZI_BUILD_EXPERIMENTAL_CHUNKED_COMPRESSION @LIBCZI_BUILD_EXPERIMENTAL_CHUNKED_COMPRESSION@)
+set(LIBCZI_BUILD_PREFER_EXTERNALPACKAGE_LZ4 @LIBCZI_BUILD_PREFER_EXTERNALPACKAGE_LZ4@)
 
 include(CMakeFindDependencyMacro)
 
@@ -21,6 +27,10 @@ include(CMakeFindDependencyMacro)
 # These must also be declared in vcpkg.json dependencies to work properly across all platforms.
 find_dependency(zstd CONFIG REQUIRED)
 find_dependency(Eigen3 CONFIG REQUIRED)
+
+if(LIBCZI_BUILD_EXPERIMENTAL_CHUNKED_COMPRESSION AND LIBCZI_BUILD_PREFER_EXTERNALPACKAGE_LZ4)
+  find_dependency(lz4 CONFIG REQUIRED)
+endif()
 
 if(LIBCZI_BUILD_AZURESDK_BASED_STREAM)
   find_dependency(azure-core-cpp CONFIG)
