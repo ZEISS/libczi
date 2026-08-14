@@ -7,10 +7,24 @@
 #include "BitmapOperations.h"
 #include "BitmapOperationsBitonal.h"
 #include "Site.h"
+#include <future>
 
 using namespace libCZI;
 using namespace libCZI::detail;
 using namespace std;
+
+namespace
+{
+    class SingleIndexSet final : public libCZI::IIndexSet
+    {
+    public:
+        explicit SingleIndexSet(int index) : index_(index) {}
+        bool IsContained(int index) const override { return index == this->index_; }
+
+    private:
+        int index_;
+    };
+}
 
 CSingleChannelScalingTileAccessor::CSingleChannelScalingTileAccessor(const std::shared_ptr<ISubBlockRepository>& sbBlkRepository)
     : CSingleChannelAccessorBase(sbBlkRepository)
@@ -82,14 +96,27 @@ CSingleChannelScalingTileAccessor::CSingleChannelScalingTileAccessor(const std::
     return IntSize{ static_cast<uint32_t>(roi.w * zoom),static_cast<uint32_t>(roi.h * zoom) };
 }
 
-void CSingleChannelScalingTileAccessor::ScaleBlt(libCZI::IBitmapData* bmDest, float zoom, const libCZI::IntRect& roi, const SbInfo& sbInfo, const libCZI::ISingleChannelScalingTileAccessor::Options& options)
+void CSingleChannelScalingTileAccessor::ScaleBlt(
+    libCZI::IBitmapData* bmDest,
+    float zoom,
+    const libCZI::IntRect& roi,
+    const SbInfo& sbInfo,
+    const libCZI::ISingleChannelScalingTileAccessor::Options& options,
+    const SubBlockData* prefetchedData)
 {
-    auto subblock_bitmap_data = CSingleChannelAccessorBase::GetSubBlockDataIncludingMaskForSubBlockIndex(
-                                                                            this->sbBlkRepository,
-                                                                            options.subBlockCache,
-                                                                            sbInfo.index,
-                                                                            options.onlyUseSubBlockCacheForCompressedData,
-                                                                            options.maskAware);
+    SubBlockData loadedData;
+    if (prefetchedData == nullptr)
+    {
+        loadedData = CSingleChannelAccessorBase::GetSubBlockDataIncludingMaskForSubBlockIndex(
+            this->sbBlkRepository,
+            options.subBlockCache,
+            sbInfo.index,
+            options.onlyUseSubBlockCacheForCompressedData,
+            options.maskAware);
+        prefetchedData = &loadedData;
+    }
+
+    const auto& subblock_bitmap_data = *prefetchedData;
     if (GetSite()->IsEnabled(LOGLEVEL_CHATTYINFORMATION))
     {
         stringstream ss;
@@ -100,15 +127,16 @@ void CSingleChannelScalingTileAccessor::ScaleBlt(libCZI::IBitmapData* bmDest, fl
     const auto& source = subblock_bitmap_data.bitmap;
     const auto& source_mask = subblock_bitmap_data.mask;
 
-    // In order not to run into trouble with floating point precision, if the scale is exactly 1, we refrain from using the scaling operation
-    //  and do instead a simple copy operation. This should ensure a pixel-accurate result if zoom is exactly 1.
-    if (zoom == 1)
+    // If the chosen pyramid subblock already has the requested scale, composition is a
+    // clipped copy rather than a per-pixel nearest-neighbor operation.
+    const float sourceZoom = sbInfo.GetZoom();
+    if (std::abs(sourceZoom - zoom) <= (std::max)(1e-6f, zoom * 1e-5f))
     {
         ScopedBitmapLockerSP srcLck{ source };
         ScopedBitmapLockerP dstLck{ bmDest };
         BitmapOperationsBitonal::CopyWithOffsetAndMaskInfo info;
-        info.xOffset = sbInfo.logicalRect.x - roi.x;
-        info.yOffset = sbInfo.logicalRect.y - roi.y;
+        info.xOffset = static_cast<int>(std::lround((sbInfo.logicalRect.x - roi.x) * zoom));
+        info.yOffset = static_cast<int>(std::lround((sbInfo.logicalRect.y - roi.y) * zoom));
         info.srcPixelType = source->GetPixelType();
         info.srcPtr = srcLck.ptrDataRoi;
         info.srcStride = srcLck.stride;
@@ -251,10 +279,14 @@ std::vector<int> CSingleChannelScalingTileAccessor::CreateSortByZoom(const std::
     return byZoom;
 }
 
-std::vector<CSingleChannelScalingTileAccessor::SbInfo> CSingleChannelScalingTileAccessor::GetSubSet(const libCZI::IntRect& roi, const libCZI::IDimCoordinate* planeCoordinate, const std::vector<int>* allowedScenes)
+std::vector<CSingleChannelScalingTileAccessor::SbInfo> CSingleChannelScalingTileAccessor::GetSubSet(
+    const libCZI::IntRect& roi,
+    const libCZI::IDimCoordinate* planeCoordinate,
+    const std::vector<int>* allowedScenes,
+    const libCZI::IIndexSet* sceneFilter)
 {
     std::vector<SbInfo> sblks;
-    this->sbBlkRepository->EnumSubset(planeCoordinate, &roi, false,
+    const auto callback =
         [&](int idx, const SubBlockInfo& info)->bool
         {
             if (allowedScenes != nullptr)
@@ -278,7 +310,17 @@ std::vector<CSingleChannelScalingTileAccessor::SbInfo> CSingleChannelScalingTile
             sbinfo.index = idx;
             sblks.push_back(sbinfo);
             return true;
-        });
+        };
+
+    auto optimizedRepository = dynamic_cast<ISubBlockRepositorySubsetEx*>(this->sbBlkRepository.get());
+    if (optimizedRepository != nullptr)
+    {
+        optimizedRepository->EnumSubsetEx(planeCoordinate, &roi, false, sceneFilter, callback);
+    }
+    else
+    {
+        this->sbBlkRepository->EnumSubset(planeCoordinate, &roi, false, callback);
+    }
 
     return sblks;
 }
@@ -287,7 +329,12 @@ void CSingleChannelScalingTileAccessor::InternalGet(libCZI::IBitmapData* bmDest,
 {
     this->CheckPlaneCoordinates(planeCoordinate);
     Clear(bmDest, options.backGroundColor);
-    std::vector<int> scenesInvolved = this->DetermineInvolvedScenes(roi, options.sceneFilter.get());
+    const auto explicitSceneFilter = options.sceneIndex != (std::numeric_limits<int>::min)() ?
+        std::make_unique<SingleIndexSet>(options.sceneIndex) : nullptr;
+    const auto effectiveSceneFilter = explicitSceneFilter ?
+        static_cast<const IIndexSet*>(explicitSceneFilter.get()) : options.sceneFilter.get();
+    std::vector<int> scenesInvolved = this->DetermineInvolvedScenes(
+        roi, effectiveSceneFilter, options.sceneIndex);
 
     if (GetSite()->IsEnabled(LOGLEVEL_CHATTYINFORMATION))
     {
@@ -323,12 +370,14 @@ void CSingleChannelScalingTileAccessor::InternalGet(libCZI::IBitmapData* bmDest,
     {
         // we only have to deal with a single scene (or: the document does not include a scene-dimension at all), in this
         //  case we do not have group by scene and save some cycles
-        auto sbSetsortedByZoom = this->GetSubSetFilteredBySceneSortedByZoom(roi, planeCoordinate, scenesInvolved, options.sortByM);
+        auto sbSetsortedByZoom = this->GetSubSetFilteredBySceneSortedByZoom(
+            roi, planeCoordinate, scenesInvolved, effectiveSceneFilter, options.sortByM);
         this->Paint(bmDest, roi, sbSetsortedByZoom, zoom, options);
     }
     else
     {
-        const auto sbSetSortedByZoomPerScene = this->GetSubSetSortedByZoomPerScene(scenesInvolved, roi, planeCoordinate, options.sortByM);
+        const auto sbSetSortedByZoomPerScene = this->GetSubSetSortedByZoomPerScene(
+            scenesInvolved, roi, planeCoordinate, effectiveSceneFilter, options.sortByM);
         for (const auto& it : sbSetSortedByZoomPerScene)
         {
             this->Paint(bmDest, roi, get<1>(it), zoom, options);
@@ -368,20 +417,12 @@ void CSingleChannelScalingTileAccessor::Paint(libCZI::IBitmapData* bmDest, const
         }
     }
 
+    std::vector<const SbInfo*> visibleSubBlocks;
     if (!options.useVisibilityCheckOptimization)
     {
         for (auto it = start_iterator; it != end_iterator; ++it)
         {
-            const SbInfo& sbInfo = sbSetSortedByZoom.subBlocks.at(*it);
-
-            if (GetSite()->IsEnabled(LOGLEVEL_CHATTYINFORMATION))
-            {
-                stringstream ss;
-                ss << " Drawing subblock: idx=" << sbInfo.index << " Log.: " << sbInfo.logicalRect << " Phys.Size: " << sbInfo.physicalSize;
-                GetSite()->Log(LOGLEVEL_CHATTYINFORMATION, ss);
-            }
-
-            this->ScaleBlt(bmDest, zoom, roi, sbInfo, options);
+            visibleSubBlocks.push_back(&sbSetSortedByZoom.subBlocks.at(*it));
         }
     }
     else
@@ -401,15 +442,42 @@ void CSingleChannelScalingTileAccessor::Paint(libCZI::IBitmapData* bmDest, const
         {
             // dereference the iterator (advanced by the index from out loop variable), this gives us an index into the
             // subBlocks-vector
-            const SbInfo& sbInfo = sbSetSortedByZoom.subBlocks.at(*(start_iterator + i));
-            if (GetSite()->IsEnabled(LOGLEVEL_CHATTYINFORMATION))
-            {
-                stringstream ss;
-                ss << " Drawing subblock: idx=" << sbInfo.index << " Log.: " << sbInfo.logicalRect << " Phys.Size: " << sbInfo.physicalSize;
-                GetSite()->Log(LOGLEVEL_CHATTYINFORMATION, ss);
-            }
+            visibleSubBlocks.push_back(&sbSetSortedByZoom.subBlocks.at(*(start_iterator + i)));
+        }
+    }
 
-            this->ScaleBlt(bmDest, zoom, roi, sbInfo, options);
+    const std::size_t concurrency = (std::max)(
+        std::size_t{1}, static_cast<std::size_t>(options.maxConcurrentSubBlockReads));
+    for (std::size_t offset = 0; offset < visibleSubBlocks.size(); offset += concurrency)
+    {
+        const auto batchSize = (std::min)(concurrency, visibleSubBlocks.size() - offset);
+        if (batchSize == 1)
+        {
+            this->ScaleBlt(bmDest, zoom, roi, *visibleSubBlocks[offset], options);
+            continue;
+        }
+
+        std::vector<std::future<SubBlockData>> reads;
+        reads.reserve(batchSize);
+        for (std::size_t index = 0; index < batchSize; ++index)
+        {
+            const int subBlockIndex = visibleSubBlocks[offset + index]->index;
+            reads.emplace_back(std::async(std::launch::async, [this, &options, subBlockIndex]
+                {
+                    return CSingleChannelAccessorBase::GetSubBlockDataIncludingMaskForSubBlockIndex(
+                        this->sbBlkRepository,
+                        options.subBlockCache,
+                        subBlockIndex,
+                        options.onlyUseSubBlockCacheForCompressedData,
+                        options.maskAware);
+                }));
+        }
+
+        for (std::size_t index = 0; index < batchSize; ++index)
+        {
+            const auto data = reads[index].get();
+            this->ScaleBlt(
+                bmDest, zoom, roi, *visibleSubBlocks[offset + index], options, &data);
         }
     }
 }
@@ -422,8 +490,22 @@ void CSingleChannelScalingTileAccessor::Paint(libCZI::IBitmapData* bmDest, const
 ///                         scenes are considered "allowed".
 ///
 /// \returns   A vector with the scene indices that the specified ROI intersects with.
-std::vector<int> CSingleChannelScalingTileAccessor::DetermineInvolvedScenes(const libCZI::IntRect& roi, const libCZI::IIndexSet* pSceneIndexSet)
+std::vector<int> CSingleChannelScalingTileAccessor::DetermineInvolvedScenes(
+    const libCZI::IntRect& roi,
+    const libCZI::IIndexSet* pSceneIndexSet,
+    int explicitSceneIndex)
 {
+    if (explicitSceneIndex != (std::numeric_limits<int>::min)())
+    {
+        auto optimizedRepository = dynamic_cast<ISubBlockRepositorySubsetEx*>(this->sbBlkRepository.get());
+        IntRect sceneBoundingBox;
+        if (optimizedRepository != nullptr &&
+            optimizedRepository->TryGetSceneBoundingBox(explicitSceneIndex, sceneBoundingBox))
+        {
+            return sceneBoundingBox.IntersectsWith(roi) ? std::vector<int>{explicitSceneIndex} : std::vector<int>{};
+        }
+    }
+
     SubBlockStatistics statistics = this->sbBlkRepository->GetStatistics();
     if (statistics.sceneBoundingBoxes.empty())
     {
@@ -458,15 +540,25 @@ std::vector<int> CSingleChannelScalingTileAccessor::DetermineInvolvedScenes(cons
 ///
 /// \returns    The subset of subblocks filtered by the specified conditions, sorted by their
 ///             zoom.
-CSingleChannelScalingTileAccessor::SubSetSortedByZoom CSingleChannelScalingTileAccessor::GetSubSetFilteredBySceneSortedByZoom(const libCZI::IntRect& roi, const libCZI::IDimCoordinate* planeCoordinate, const std::vector<int>& allowedScenes, bool sortByM)
+CSingleChannelScalingTileAccessor::SubSetSortedByZoom CSingleChannelScalingTileAccessor::GetSubSetFilteredBySceneSortedByZoom(
+    const libCZI::IntRect& roi,
+    const libCZI::IDimCoordinate* planeCoordinate,
+    const std::vector<int>& allowedScenes,
+    const libCZI::IIndexSet* sceneFilter,
+    bool sortByM)
 {
     SubSetSortedByZoom result;
-    result.subBlocks = this->GetSubSet(roi, planeCoordinate, &allowedScenes);
+    result.subBlocks = this->GetSubSet(roi, planeCoordinate, &allowedScenes, sceneFilter);
     result.sortedByZoom = CSingleChannelScalingTileAccessor::CreateSortByZoom(result.subBlocks, sortByM);
     return result;
 }
 
-std::vector<std::tuple<int, CSingleChannelScalingTileAccessor::SubSetSortedByZoom>> CSingleChannelScalingTileAccessor::GetSubSetSortedByZoomPerScene(const vector<int>& scenes, const libCZI::IntRect& roi, const libCZI::IDimCoordinate* planeCoordinate, bool sortByM)
+std::vector<std::tuple<int, CSingleChannelScalingTileAccessor::SubSetSortedByZoom>> CSingleChannelScalingTileAccessor::GetSubSetSortedByZoomPerScene(
+    const vector<int>& scenes,
+    const libCZI::IntRect& roi,
+    const libCZI::IDimCoordinate* planeCoordinate,
+    const libCZI::IIndexSet* sceneFilter,
+    bool sortByM)
 {
     std::vector<std::tuple<int, CSingleChannelScalingTileAccessor::SubSetSortedByZoom>> result;
     CDimCoordinate coord(planeCoordinate);
@@ -478,7 +570,7 @@ std::vector<std::tuple<int, CSingleChannelScalingTileAccessor::SubSetSortedByZoo
         // TODO: we need to look into what is supposed to happen if the user passed in a scene-index
         //       I guess the natural thing would be to consider only the specified scene
         coord.Set(DimensionIndex::S, sceneIdx);
-        sbset.subBlocks = this->GetSubSet(roi, &coord, nullptr);
+        sbset.subBlocks = this->GetSubSet(roi, &coord, nullptr, sceneFilter);
         sbset.sortedByZoom = CSingleChannelScalingTileAccessor::CreateSortByZoom(sbset.subBlocks, sortByM);
         result.emplace_back(sceneIdx, sbset);
     }

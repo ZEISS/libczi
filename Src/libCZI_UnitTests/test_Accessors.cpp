@@ -298,6 +298,7 @@ TEST_P(ZOrderAndResultGray8Fixture, CreateDocumentAndUseSingleChannelScalingTile
     const CDimCoordinate plane_coordinate{ {DimensionIndex::C, 0} };
     ISingleChannelScalingTileAccessor::Options options;
     options.Clear();
+    options.maxConcurrentSubBlockReads = 3;
 
     // act
     const auto composite_bitmap = accessor->Get(PixelType::Gray8, IntRect{ 0,0,4,1 }, &plane_coordinate, 1.f, &options);

@@ -196,8 +196,48 @@ CCZIReader::CCZIReader() :
 
 /*virtual*/void CCZIReader::EnumSubset(const IDimCoordinate* planeCoordinate, const IntRect* roi, bool onlyLayer0, const std::function<bool(int index, const SubBlockInfo& info)>& funcEnum)
 {
+    this->EnumSubsetEx(planeCoordinate, roi, onlyLayer0, nullptr, funcEnum);
+}
+
+void CCZIReader::EnumSubsetEx(
+    const IDimCoordinate* planeCoordinate,
+    const IntRect* roi,
+    bool onlyLayer0,
+    const IIndexSet* sceneFilter,
+    const std::function<bool(int index, const SubBlockInfo& info)>& funcEnum)
+{
     this->ThrowIfNotOperational();
-    CziReaderCommon::EnumSubset(this, planeCoordinate, roi, onlyLayer0, funcEnum);
+    if (this->subBlkDir.TryEnumSubset(
+        planeCoordinate, roi, onlyLayer0, sceneFilter,
+        [&](int index, const CCziSubBlockDirectory::SubBlkEntry& entry)
+        {
+            return funcEnum(index, CziReaderCommon::ConvertToSubBlockInfo(entry));
+        }))
+    {
+        return;
+    }
+
+    CziReaderCommon::EnumSubset(
+        this, planeCoordinate, roi, onlyLayer0,
+        [&](int index, const SubBlockInfo& info)
+        {
+            if (sceneFilter != nullptr)
+            {
+                int scene = 0;
+                if (info.coordinate.TryGetPosition(DimensionIndex::S, &scene) &&
+                    !sceneFilter->IsContained(scene))
+                {
+                    return true;
+                }
+            }
+
+            return funcEnum(index, info);
+        });
+}
+
+bool CCZIReader::TryGetSceneBoundingBox(int sceneIndex, IntRect& boundingBox) const
+{
+    return this->subBlkDir.TryGetSceneBoundingBox(sceneIndex, boundingBox);
 }
 
 /*virtual*/std::shared_ptr<ISubBlock> CCZIReader::ReadSubBlock(int index)
@@ -215,7 +255,14 @@ CCZIReader::CCZIReader() :
 /*virtual*/bool CCZIReader::TryGetSubBlockInfoOfArbitrarySubBlockInChannel(int channelIndex, SubBlockInfo& info)
 {
     this->ThrowIfNotOperational();
-    return CziReaderCommon::TryGetSubBlockInfoOfArbitrarySubBlockInChannel(this, channelIndex, info);
+    CCziSubBlockDirectory::SubBlkEntry entry;
+    if (!this->subBlkDir.TryGetSubBlockOfArbitrarySubBlockInChannel(channelIndex, entry))
+    {
+        return false;
+    }
+
+    info = CziReaderCommon::ConvertToSubBlockInfo(entry);
+    return true;
 }
 
 /*virtual*/bool CCZIReader::TryGetSubBlockInfo(int index, SubBlockInfo* info) const

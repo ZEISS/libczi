@@ -6,6 +6,11 @@
 #include "inc_libCZI.h"
 #include "utils.h"
 
+#include <atomic>
+#include <future>
+#include <thread>
+#include <vector>
+
 using namespace libCZI;
 using namespace std;
 
@@ -155,4 +160,43 @@ TEST(SubBlockCache, PruneCacheCase3)
     EXPECT_TRUE(!cache_item_from_cache.IsValid());
     cache_item_from_cache = cache->Get(2);
     EXPECT_TRUE(cache_item_from_cache.IsValid());
+}
+
+TEST(SubBlockCache, ConcurrentMissesAreLoadedOnce)
+{
+    const auto cache = CreateSubBlockCache();
+    const auto bitmap = CreateTestBitmap(PixelType::Gray8, 16, 16);
+    atomic<int> loader_count{ 0 };
+    promise<void> release_loader;
+    const shared_future<void> release = release_loader.get_future().share();
+    vector<ISubBlockCacheOperation::CacheItem> results(8);
+    vector<thread> threads;
+
+    for (size_t i = 0; i < results.size(); ++i)
+    {
+        threads.emplace_back([&, i]() {
+            results[i] = cache->GetOrCreate(7, [&]() {
+                ++loader_count;
+                release.wait();
+                return ISubBlockCacheOperation::CacheItem{ bitmap };
+            });
+        });
+    }
+
+    while (loader_count.load() == 0)
+    {
+        this_thread::yield();
+    }
+    release_loader.set_value();
+    for (auto& thread : threads)
+    {
+        thread.join();
+    }
+
+    EXPECT_EQ(loader_count.load(), 1);
+    for (const auto& result : results)
+    {
+        EXPECT_TRUE(result.IsValid());
+        EXPECT_EQ(result.bitmap.get(), bitmap.get());
+    }
 }
