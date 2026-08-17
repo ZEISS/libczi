@@ -333,8 +333,10 @@ void CSingleChannelScalingTileAccessor::InternalGet(libCZI::IBitmapData* bmDest,
         std::make_unique<SingleIndexSet>(options.sceneIndex) : nullptr;
     const auto effectiveSceneFilter = explicitSceneFilter ?
         static_cast<const IIndexSet*>(explicitSceneFilter.get()) : options.sceneFilter.get();
-    std::vector<int> scenesInvolved = this->DetermineInvolvedScenes(
-        roi, effectiveSceneFilter, options.sceneIndex);
+    std::vector<int> scenesInvolved = options.sceneIndex != (std::numeric_limits<int>::min)() ?
+        std::vector<int>{ options.sceneIndex } :
+        this->DetermineInvolvedScenes(
+            roi, effectiveSceneFilter, options.sceneIndex);
 
     if (GetSite()->IsEnabled(LOGLEVEL_CHATTYINFORMATION))
     {
