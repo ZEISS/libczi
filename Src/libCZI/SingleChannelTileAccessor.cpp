@@ -41,6 +41,7 @@ CSingleChannelTileAccessor::CSingleChannelTileAccessor(const std::shared_ptr<ISu
     // pixel-type conversions retain the existing general compositor path.
     int matchingIndex = -1;
     int matchingCount = 0;
+    bool hasOtherSubblock = false;
     this->sbBlkRepository->EnumSubset(
         planeCoordinate, &roi_raw_sub_block_cs, true,
         [&](int index, const SubBlockInfo& info)->bool
@@ -55,19 +56,33 @@ CSingleChannelTileAccessor::CSingleChannelTileAccessor(const std::shared_ptr<ISu
                 }
             }
 
-            if (info.logicalRect.x == roi_raw_sub_block_cs.x &&
+            const bool isExactLayerZeroTile =
+                info.logicalRect.x == roi_raw_sub_block_cs.x &&
                 info.logicalRect.y == roi_raw_sub_block_cs.y &&
                 info.logicalRect.w == roi_raw_sub_block_cs.w &&
-                info.logicalRect.h == roi_raw_sub_block_cs.h)
+                info.logicalRect.h == roi_raw_sub_block_cs.h &&
+                // A minified pyramid subblock has the same logical rectangle
+                // but fewer stored pixels.  It must go through the compositor
+                // so the returned bitmap retains the requested ROI dimensions.
+                info.physicalSize.w == static_cast<std::uint32_t>(roi_raw_sub_block_cs.w) &&
+                info.physicalSize.h == static_cast<std::uint32_t>(roi_raw_sub_block_cs.h);
+            if (isExactLayerZeroTile)
             {
                 matchingIndex = index;
                 ++matchingCount;
             }
+            else
+            {
+                // A partially overlapping tile, another pyramid level, or a
+                // different stored representation requires compositing.
+                hasOtherSubblock = true;
+            }
 
-            return matchingCount < 2;
+            return matchingCount < 2 && !hasOtherSubblock;
         });
 
-    if (matchingCount == 1 && !(pOptions != nullptr && (pOptions->maskAware || pOptions->drawTileBorder)))
+    if (matchingCount == 1 && !hasOtherSubblock &&
+        !(pOptions != nullptr && (pOptions->maskAware || pOptions->drawTileBorder)))
     {
         const auto subblockData = CSingleChannelAccessorBase::GetSubBlockDataIncludingMaskForSubBlockIndex(
             this->sbBlkRepository,
