@@ -186,7 +186,10 @@ namespace libCZI
     LIBCZI_API std::shared_ptr<IStream> CreateStreamFromFile(const wchar_t* szFilename);
 
     /// Creates a stream-object on a memory-block.
-    /// \param ptr  Shared pointer to a memory-block.
+    /// The stream retains shared ownership of the memory-block; its contents must remain unchanged
+    /// while used for reading. A zero-sized block creates an empty stream and may have a null pointer.
+    /// Reads follow the IStream::Read contract, including reads at or beyond the end of the block.
+    /// \param ptr  Shared pointer to a memory-block, non-null when dataSize is nonzero.
     /// \param dataSize Size of the memory-block.
     /// \return         The new stream object.
     LIBCZI_API std::shared_ptr<IStream> CreateStreamFromMemory(std::shared_ptr<const void> ptr, size_t dataSize);
@@ -253,26 +256,38 @@ namespace libCZI
     /// \returns	The newly created sub-block-attachment-accessor object.
     LIBCZI_API std::shared_ptr<ISubBlockAttachmentAccessor> CreateSubBlockAttachmentAccessor(const std::shared_ptr<libCZI::ISubBlock>& sub_block, const std::shared_ptr<ISubBlockMetadata>& sub_block_metadata);
 
-    /// Interface used for accessing the data-stream.  
+    /// Interface used for accessing the data-stream.
+    /// The underlying contents and length are assumed to remain unchanged while used for reading.
+    /// Repeated successful reads with the same offset and size must return identical data and byte counts.
     /// Implementations of this interface are expected to be thread-safe - it should be possible to
-    /// call the Read-method from multiple threads simultaneously.
+    /// call the Read-method from multiple threads simultaneously with independent destination buffers
+    /// and byte-count storage. Snapshot isolation and detection of external changes are not required;
+    /// behavior when the underlying data changes is outside this contract.
     /// In libCZI-usage, exceptions thrown by Read-method are wrapped into a libCZI::LibCZIIOException-exception,
     /// where the exception thrown by the Read-method is stored as the inner exception.
     class IStream
     {
     public:
-        /// Reads the specified amount of data from the stream at the specified position. This method
-        /// is expected to throw an exception for any kind of I/O-related error. It must not throw
-        /// an exception if reading past the end of a file - instead, it must return the number of
-        /// bytes actually read accordingly.
-        /// For the special case of size==0, the behavior should be as follows: the method should
-        /// operate as for a size>0, but it should not read any data. The method should return 0 in
-        /// ptrBytesRead.
+        /// Reads the specified amount of data at the zero-based byte offset. For valid, supported
+        /// requests, reads the requested number of bytes unless the end of the stream prevents it.
+        /// Actual I/O errors must throw; transport-level short reads must not be exposed as successful
+        /// completion when more requested data is available.
+        /// A read crossing the end returns the available bytes. A read at or beyond the end, including
+        /// an empty stream, returns normally with zero bytes. EOF does not prevent later reads at other
+        /// offsets. On success, only the bytes actually read are written; the rest of the buffer is unchanged.
+        /// If size is zero, no data is read, the buffer is unchanged, and zero is reported when requested.
+        /// Argument and backend-limit validation may still fail; a zero-length read is not a reliable
+        /// existence or connectivity check.
+        /// Backends may support a narrower range of offsets and sizes than uint64_t. Unsupported requests
+        /// may throw and must not silently wrap. On an exception the buffer may be partially modified and
+        /// the byte count is unspecified; no rollback or common exception type is guaranteed.
         ///
         /// \param offset                The offset to start reading from.
-        /// \param [out] pv              The caller-provided buffer for the data. Must be non-null.
+        /// \param [out] pv              Caller-provided writable storage for at least size bytes. Must be non-null,
+        ///                              even if size is zero. Detection of invalid pointers is not guaranteed.
         /// \param size                  The size of the buffer.
-        /// \param [out] ptrBytesRead    If non-null, the variable pointed to will receive the number of bytes actually read.
+        /// \param [out] ptrBytesRead    If non-null, receives the number of bytes actually read on success.
+        ///                              If null, the same read is performed without reporting its byte count.
         virtual void Read(std::uint64_t offset, void* pv, std::uint64_t size, std::uint64_t* ptrBytesRead) = 0;
 
         virtual ~IStream() = default;
@@ -297,6 +312,9 @@ namespace libCZI
     };
 
     /// Interface for a read-write-stream. 
+    /// Read follows the IStream contract. Stable-source and idempotent-read assumptions apply between
+    /// writes; writes may intentionally change subsequent read results. The IStream thread-safety
+    /// requirement does not guarantee concurrent reads and writes.
     class IInputOutputStream : public IStream, public IOutputStream
     {
     };

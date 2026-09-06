@@ -7,6 +7,37 @@
 
 using namespace libCZI;
 
+TEST(StreamImplementations, EmptyMemoryStreamWithNullStorage)
+{
+    auto stream = CreateStreamFromMemory(std::shared_ptr<const void>{}, 0);
+    for (uint64_t offset : { uint64_t{ 0 }, (std::numeric_limits<uint64_t>::max)() })
+    {
+        uint8_t buffer = 0xa5;
+        uint64_t count = 99;
+        ASSERT_NO_THROW(stream->Read(offset, &buffer, 1, &count));
+        EXPECT_EQ(count, 0);
+        EXPECT_EQ(buffer, 0xa5);
+        ASSERT_NO_THROW(stream->Read(offset, &buffer, 0, nullptr));
+        EXPECT_EQ(buffer, 0xa5);
+        EXPECT_THROW(stream->Read(offset, nullptr, 0, &count), std::invalid_argument);
+    }
+}
+
+TEST(StreamImplementations, EmptyMemoryStreamIsNotAValidCzi)
+{
+    auto stream = CreateStreamFromMemory(std::shared_ptr<const void>{}, 0);
+    auto reader = CreateCZIReader();
+    try
+    {
+        reader->Open(stream);
+        FAIL() << "An empty CZI must be rejected";
+    }
+    catch (const LibCZICZIParseException& error)
+    {
+        EXPECT_EQ(error.GetErrorCode(), LibCZICZIParseException::ErrorCode::NotEnoughData);
+    }
+}
+
 TEST(StreamImplementations, StreamInMemory1)
 {
     std::uint8_t* buffer = (std::uint8_t*)malloc(10);

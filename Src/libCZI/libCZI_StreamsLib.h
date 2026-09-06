@@ -22,9 +22,11 @@ namespace libCZI
     /// libCZI is operating on abstractions (IStream for an input stream, IOutputStream for an output stream and IInputOutputStream
     /// for and input-output-stream) for accessing the CZI-data. In this class factory we gather implementations provided by libCZI
     /// and provide functionality to enumerate available classes.
-    /// At this point, we can find two variants here - for operating on a file in a file-system and for operating on an http- or
-    /// https-stream.
+    /// Implementations include files in a file-system, HTTP/HTTPS streams, and Azure Blob Storage streams.
     /// The http-stream class is based on cURL (https://curl.se/libcurl/), and it needs to be configured in when building libCZI.
+    /// Azure Blob Storage support likewise requires its optional build configuration.
+    /// The read contract for stream implementations is specified by IStream::Read; supported offset and
+    /// request-size limits may differ between backends.
     class LIBCZI_API StreamsFactory
     {
     public:
