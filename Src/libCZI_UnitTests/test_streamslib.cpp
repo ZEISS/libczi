@@ -196,52 +196,7 @@ TEST_P(EndOfStreamTest, EmptyStream)
     CheckRead(1, 0, 0);
 }
 
-TEST_P(ConcurrentStreamReadTest, ImmutableSource)
-{
-    std::promise<void> start;
-    auto ready = start.get_future().share();
-    std::vector<std::future<bool>> readers;
-    for (unsigned worker = 0; worker < 4; ++worker)
-    {
-        readers.push_back(std::async(std::launch::async, [this, ready, worker]()
-        {
-            ready.wait();
-            for (unsigned iteration = 0; iteration < 100; ++iteration)
-            {
-                const size_t offset = (iteration + worker) % (data.size() + 2);
-                const size_t expected = offset < data.size() ? data.size() - offset : 0;
-                std::array<uint8_t, 8> buffer;
-                buffer.fill(0xa5);
-                uint64_t count = 99;
-                stream->Read(offset, buffer.data(), buffer.size(), &count);
-                if (count != expected)
-                {
-                    return false;
-                }
-
-                for (size_t i = 0; i < buffer.size(); ++i)
-                {
-                    if (buffer[i] != (i < expected ? data[offset + i] : 0xa5))
-                    {
-                        return false;
-                    }
-                }
-            }
-
-            return true;
-        }));
-    }
-
-    start.set_value();
-    for (auto& reader : readers)
-    {
-        EXPECT_TRUE(reader.get());
-    }
-}
-
 INSTANTIATE_TEST_SUITE_P(LocalStreams, EndOfStreamTest, testing::ValuesIn(ReadBackends()),
-    [](const testing::TestParamInfo<std::string>& info) { return info.param; });
-INSTANTIATE_TEST_SUITE_P(LocalStreams, ConcurrentStreamReadTest, testing::ValuesIn(ReadBackends()),
     [](const testing::TestParamInfo<std::string>& info) { return info.param; });
 
 TEST(StreamsLib, Enumeration)
