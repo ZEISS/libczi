@@ -4,6 +4,8 @@
 
 #include "CziSubBlockDirectory.h"
 #include "CziUtils.h"
+#include <algorithm>
+#include <cmath>
 #include <cstddef>
 
 using namespace libCZI;
@@ -387,6 +389,83 @@ void CCziSubBlockDirectory::AddingFinished()
 {
     this->state = State::AddingFinished;
     this->sblkStatistics.Consolidate();
+    this->BuildSubsetIndex();
+}
+
+void CCziSubBlockDirectory::BuildSubsetIndex()
+{
+    this->indexedPlaneDimensions.clear();
+    this->subsetIndex.clear();
+    this->firstSubBlockByChannel.clear();
+    this->firstSubBlockWithoutChannel = -1;
+
+    const auto& statistics = this->sblkStatistics.GetStatistics();
+    for (auto value = static_cast<int>(DimensionIndex::MinDim);
+        value <= static_cast<int>(DimensionIndex::MaxDim); ++value)
+    {
+        const auto dimension = static_cast<DimensionIndex>(value);
+        int size = 0;
+        if (dimension != DimensionIndex::S &&
+            statistics.dimBounds.TryGetInterval(dimension, nullptr, &size) && size > 1)
+        {
+            this->indexedPlaneDimensions.push_back(dimension);
+        }
+    }
+
+    for (std::size_t index = 0; index < this->subBlks.size(); ++index)
+    {
+        const auto& entry = this->subBlks[index];
+        PlaneKey planeKey;
+        planeKey.reserve(this->indexedPlaneDimensions.size());
+        for (const auto dimension : this->indexedPlaneDimensions)
+        {
+            int coordinate = (std::numeric_limits<int>::min)();
+            entry.coordinate.TryGetPosition(dimension, &coordinate);
+            planeKey.push_back(coordinate);
+        }
+
+        int scene = (std::numeric_limits<int>::min)();
+        entry.coordinate.TryGetPosition(DimensionIndex::S, &scene);
+        const auto zoom = Utils::CalcZoom(
+            IntSize{static_cast<std::uint32_t>(entry.width), static_cast<std::uint32_t>(entry.height)},
+            IntSize{static_cast<std::uint32_t>(entry.storedWidth), static_cast<std::uint32_t>(entry.storedHeight)});
+        const int zoomKey = static_cast<int>(std::lround(zoom * 1000000.0f));
+        this->subsetIndex[planeKey][{scene, zoomKey}].indicesByX.push_back(static_cast<int>(index));
+
+        int channel = 0;
+        if (entry.coordinate.TryGetPosition(DimensionIndex::C, &channel))
+        {
+            this->firstSubBlockByChannel.emplace(channel, static_cast<int>(index));
+        }
+        else if (this->firstSubBlockWithoutChannel < 0)
+        {
+            this->firstSubBlockWithoutChannel = static_cast<int>(index);
+        }
+    }
+
+    for (auto& planeEntry : this->subsetIndex)
+    {
+        for (auto& groupEntry : planeEntry.second)
+        {
+            auto& group = groupEntry.second;
+            std::sort(group.indicesByX.begin(), group.indicesByX.end(),
+                [this](int left, int right)
+                {
+                    const auto& leftEntry = this->subBlks[left];
+                    const auto& rightEntry = this->subBlks[right];
+                    return leftEntry.x != rightEntry.x ? leftEntry.x < rightEntry.x : left < right;
+                });
+            group.prefixMaximumRight.reserve(group.indicesByX.size());
+            std::int64_t maximumRight = (std::numeric_limits<std::int64_t>::min)();
+            for (const int subBlockIndex : group.indicesByX)
+            {
+                const auto& entry = this->subBlks[subBlockIndex];
+                maximumRight = (std::max)(maximumRight,
+                    static_cast<std::int64_t>(entry.x) + entry.width);
+                group.prefixMaximumRight.push_back(maximumRight);
+            }
+        }
+    }
 }
 
 const libCZI::SubBlockStatistics& CCziSubBlockDirectory::GetStatistics() const
@@ -411,6 +490,134 @@ void CCziSubBlockDirectory::EnumSubBlocks(const std::function<bool(int index, co
             break;
         }
     }
+}
+
+bool CCziSubBlockDirectory::TryEnumSubset(
+    const libCZI::IDimCoordinate* planeCoordinate,
+    const libCZI::IntRect* roi,
+    bool onlyLayer0,
+    const libCZI::IIndexSet* sceneFilter,
+    const std::function<bool(int index, const SubBlkEntry&)>& func) const
+{
+    if (planeCoordinate == nullptr || this->state != State::AddingFinished)
+    {
+        return false;
+    }
+
+    PlaneKey planeKey;
+    planeKey.reserve(this->indexedPlaneDimensions.size());
+    for (const auto dimension : this->indexedPlaneDimensions)
+    {
+        int coordinate = 0;
+        if (!planeCoordinate->TryGetPosition(dimension, &coordinate))
+        {
+            return false;
+        }
+
+        planeKey.push_back(coordinate);
+    }
+
+    const auto planeIterator = this->subsetIndex.find(planeKey);
+    if (planeIterator == this->subsetIndex.end())
+    {
+        return true;
+    }
+
+    std::vector<int> candidates;
+    for (const auto& groupEntry : planeIterator->second)
+    {
+        const int scene = groupEntry.first.first;
+        if (scene != (std::numeric_limits<int>::min)() &&
+            sceneFilter != nullptr && !sceneFilter->IsContained(scene))
+        {
+            continue;
+        }
+
+        const auto& group = groupEntry.second;
+        if (roi == nullptr)
+        {
+            candidates.insert(candidates.end(), group.indicesByX.begin(), group.indicesByX.end());
+            continue;
+        }
+
+        const std::int64_t roiRight = static_cast<std::int64_t>(roi->x) + roi->w;
+        auto end = std::lower_bound(group.indicesByX.begin(), group.indicesByX.end(), roiRight,
+            [this](int index, std::int64_t right)
+            {
+                return static_cast<std::int64_t>(this->subBlks[index].x) < right;
+            });
+        while (end != group.indicesByX.begin())
+        {
+            --end;
+            const auto position = static_cast<std::size_t>(std::distance(group.indicesByX.begin(), end));
+            if (group.prefixMaximumRight[position] <= roi->x)
+            {
+                break;
+            }
+
+            const auto& entry = this->subBlks[*end];
+            const std::int64_t entryRight = static_cast<std::int64_t>(entry.x) + entry.width;
+            const std::int64_t entryBottom = static_cast<std::int64_t>(entry.y) + entry.height;
+            const std::int64_t roiBottom = static_cast<std::int64_t>(roi->y) + roi->h;
+            if (entryRight > roi->x && entryBottom > roi->y &&
+                static_cast<std::int64_t>(entry.y) < roiBottom)
+            {
+                candidates.push_back(*end);
+            }
+        }
+    }
+
+    std::sort(candidates.begin(), candidates.end());
+    candidates.erase(std::unique(candidates.begin(), candidates.end()), candidates.end());
+    for (const int index : candidates)
+    {
+        const auto& entry = this->subBlks[index];
+        if (!CziUtils::CompareCoordinate(planeCoordinate, &entry.coordinate))
+        {
+            continue;
+        }
+
+        if ((!onlyLayer0 || entry.IsStoredSizeEqualLogicalSize()) && !func(index, entry))
+        {
+            break;
+        }
+    }
+
+    return true;
+}
+
+bool CCziSubBlockDirectory::TryGetSubBlockOfArbitrarySubBlockInChannel(
+    int channelIndex, SubBlkEntry& entry) const
+{
+    const auto channelIterator = this->firstSubBlockByChannel.find(channelIndex);
+    if (channelIterator != this->firstSubBlockByChannel.end())
+    {
+        entry = this->subBlks[channelIterator->second];
+        return true;
+    }
+
+    // If a channel dimension exists, a request for an absent channel must fail.
+    // A channel-less subblock is used only for documents without that dimension.
+    if (!this->firstSubBlockByChannel.empty() || this->firstSubBlockWithoutChannel < 0)
+    {
+        return false;
+    }
+
+    entry = this->subBlks[this->firstSubBlockWithoutChannel];
+    return true;
+}
+
+bool CCziSubBlockDirectory::TryGetSceneBoundingBox(int sceneIndex, libCZI::IntRect& boundingBox) const
+{
+    const auto& sceneBoundingBoxes = this->sblkStatistics.GetStatistics().sceneBoundingBoxes;
+    const auto iterator = sceneBoundingBoxes.find(sceneIndex);
+    if (iterator == sceneBoundingBoxes.end())
+    {
+        return false;
+    }
+
+    boundingBox = iterator->second.boundingBox;
+    return true;
 }
 
 bool CCziSubBlockDirectory::TryGetSubBlock(int index, SubBlkEntry& entry) const

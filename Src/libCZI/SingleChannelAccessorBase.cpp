@@ -163,19 +163,42 @@ std::vector<int> CSingleChannelAccessorBase::CheckForVisibility(const libCZI::In
     }
     else
     {
-        const auto bitmap_from_cache = cache->Get(sub_block_index);
-        if (bitmap_from_cache.IsValid())
+        const bool should_cache = [&]()
         {
-            const bool b = sub_block_repository->TryGetSubBlockInfo(sub_block_index, &result.subBlockInfo);
-            if (!b)
+            if (!only_add_compressed_sub_blocks_to_cache)
+            {
+                return true;
+            }
+
+            if (!sub_block_repository->TryGetSubBlockInfo(sub_block_index, &result.subBlockInfo))
             {
                 stringstream ss;
                 ss << "SubBlockInfo not found in repository for subblock index " << sub_block_index << ".";
                 throw logic_error(ss.str());
             }
 
-            result.bitmap = bitmap_from_cache.bitmap;
-            result.mask = bitmap_from_cache.mask;
+            return result.subBlockInfo.GetCompressionMode() != CompressionMode::UnCompressed;
+        }();
+
+        if (should_cache)
+        {
+            const auto cached = cache->GetOrCreate(
+                sub_block_index,
+                [&]() -> ISubBlockCacheOperation::CacheItem
+                {
+                    const auto subblock = sub_block_repository->ReadSubBlock(sub_block_index);
+                    return {
+                        subblock->CreateBitmap(),
+                        mask_aware_mode ? CSingleChannelAccessorBase::TryToGetMaskBitmapFromSubBlock(subblock) : nullptr};
+                });
+            result.bitmap = cached.bitmap;
+            result.mask = cached.mask;
+            if (!sub_block_repository->TryGetSubBlockInfo(sub_block_index, &result.subBlockInfo))
+            {
+                stringstream ss;
+                ss << "SubBlockInfo not found in repository for subblock index " << sub_block_index << ".";
+                throw logic_error(ss.str());
+            }
         }
         else
         {
@@ -183,10 +206,6 @@ std::vector<int> CSingleChannelAccessorBase::CheckForVisibility(const libCZI::In
             result.bitmap = subblock->CreateBitmap();
             result.mask = mask_aware_mode ? CSingleChannelAccessorBase::TryToGetMaskBitmapFromSubBlock(subblock) : nullptr;
             result.subBlockInfo = subblock->GetSubBlockInfo();
-            if (!only_add_compressed_sub_blocks_to_cache || result.subBlockInfo.GetCompressionMode() != CompressionMode::UnCompressed)
-            {
-                cache->Add(sub_block_index, { result.bitmap, result.mask });
-            }
         }
     }
 

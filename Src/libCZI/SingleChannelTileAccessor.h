@@ -26,7 +26,7 @@ namespace libCZI
             void Get(libCZI::IBitmapData* pDest, const libCZI::IntPointAndFrameOfReference& position, const libCZI::IDimCoordinate* planeCoordinate, const Options* pOptions) override;
         private:
             void InternalGet(int xPos, int yPos, libCZI::IBitmapData* pBm, const libCZI::IDimCoordinate* planeCoordinate, const libCZI::ISingleChannelTileAccessor::Options* pOptions);
-            void GetAllSubBlocks(const libCZI::IntRect& roi, const libCZI::IDimCoordinate* planeCoordinate, const std::function<void(int index, int mIndex)>& appender) const;
+            void GetAllSubBlocks(const libCZI::IntRect& roi, const libCZI::IDimCoordinate* planeCoordinate, const libCZI::IIndexSet* sceneFilter, const std::function<void(int index, int mIndex)>& appender) const;
 
             struct IndexAndM
             {
@@ -34,7 +34,7 @@ namespace libCZI
                 int mIndex;
             };
 
-            std::vector<CSingleChannelTileAccessor::IndexAndM> GetSubBlocksSubset(const libCZI::IntRect& roi, const libCZI::IDimCoordinate* planeCoordinate, bool sortByM);
+            std::vector<CSingleChannelTileAccessor::IndexAndM> GetSubBlocksSubset(const libCZI::IntRect& roi, const libCZI::IDimCoordinate* planeCoordinate, const libCZI::IIndexSet* sceneFilter, bool sortByM);
             void ComposeTiles(libCZI::IBitmapData* pBm, int xPos, int yPos, const std::vector<IndexAndM>& subBlocksSet, const libCZI::ISingleChannelTileAccessor::Options& options);
         };
 
