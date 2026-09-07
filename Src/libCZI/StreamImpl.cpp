@@ -147,9 +147,12 @@ CStreamImplInMemory::CStreamImplInMemory(libCZI::IAttachment* attachement)
 
     if (offset >= this->dataBufferSize)
     {
-        std::stringstream ss;
-        ss << "Error reading from memory at offset " << offset << " -> requested size: " << size << " bytes, which exceeds actual data size " << this->dataBufferSize << " bytes.";
-        throw std::runtime_error(ss.str());
+        if (ptrBytesRead != nullptr)
+        {
+            *ptrBytesRead = 0;
+        }
+
+        return;
     }
 
     // Read only to the end of buffer size
@@ -355,6 +358,16 @@ CSimpleInputOutputStreamImplWindows::CSimpleInputOutputStreamImplWindows(const w
     if (!B)
     {
         const DWORD last_error = GetLastError();
+        if (last_error == ERROR_HANDLE_EOF)
+        {
+            if (ptrBytesRead != nullptr)
+            {
+                *ptrBytesRead = 0;
+            }
+
+            return;
+        }
+
         ostringstream ss;
         ss << "Error reading from file (LastError=" << std::hex << std::setfill('0') << std::setw(8) << std::showbase << last_error << ")";
         throw std::runtime_error(ss.str());

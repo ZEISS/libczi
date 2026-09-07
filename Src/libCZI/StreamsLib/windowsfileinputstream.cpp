@@ -53,6 +53,18 @@ void WindowsFileInputStream::Read(std::uint64_t offset, void* pv, std::uint64_t 
     if (!read_file_return_code)
     {
         const DWORD last_error = GetLastError();
+
+        // Reading at or beyond EOF is not an error (which is to be reported by an exception), c.f. documentation of IStream
+        if (last_error == ERROR_HANDLE_EOF)
+        {
+            if (ptrBytesRead != nullptr)
+            {
+                *ptrBytesRead = 0;
+            }
+
+            return;
+        }
+
         std::stringstream ss;
         ss << "Error reading from file (LastError=" << std::hex << std::setfill('0') << std::setw(8) << std::showbase << last_error << ")";
         throw std::runtime_error(ss.str());
