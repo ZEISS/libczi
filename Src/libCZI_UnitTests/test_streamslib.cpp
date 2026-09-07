@@ -12,11 +12,8 @@
 #include <future>
 #include <sstream>
 #include <vector>
-#if defined(_WIN32)
+#ifdef _WIN32
 #include <direct.h>
-#else
-#include <sys/stat.h>
-#include <unistd.h>
 #endif
 
 using namespace libCZI;
@@ -144,7 +141,6 @@ namespace
     };
 
     class EndOfStreamTest : public LocalStreamReadTest {};
-    class ConcurrentStreamReadTest : public LocalStreamReadTest {};
 
     std::vector<std::string> ReadBackends()
     {
