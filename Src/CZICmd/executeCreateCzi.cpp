@@ -150,6 +150,31 @@ private:
                 addInfo.SetCompressionMode(CompressionMode::Zstd0);
                 writer->SyncAddSubBlock(addInfo);
             }
+#if LIBCZI_EXPERIMENTAL_CHUNKED_COMPRESSION_AVAILABLE
+            else if (options.GetCompressionMode() == CompressionMode::ChunkedExtensible)
+            {
+                auto memblk = ChunkedCompress::CompressToMemoryBlock(bm->GetWidth(), bm->GetHeight(), locker.stride, bm->GetPixelType(), locker.ptrDataRoi, options.GetCompressionParameters().get());
+
+                AddSubBlockInfoMemPtr addInfo;
+                addInfo.Clear();
+                addInfo.coordinate = coord;
+                addInfo.mIndexValid = true;
+                addInfo.mIndex = m;
+                addInfo.x = x;
+                addInfo.y = y;
+                addInfo.logicalWidth = bm->GetWidth();
+                addInfo.logicalHeight = bm->GetHeight();
+                addInfo.physicalWidth = bm->GetWidth();
+                addInfo.physicalHeight = bm->GetHeight();
+                addInfo.PixelType = bm->GetPixelType();
+                addInfo.ptrData = memblk->GetPtr();
+                addInfo.dataSize = memblk->GetSizeOfData();
+                addInfo.ptrSbBlkMetadata = sbBlkMetadata;
+                addInfo.sbBlkMetadataSize = sbBlkMetadataSize;
+                addInfo.SetCompressionMode(CompressionMode::ChunkedExtensible);
+                writer->SyncAddSubBlock(addInfo);
+            }
+#endif
         }
     }
 }
