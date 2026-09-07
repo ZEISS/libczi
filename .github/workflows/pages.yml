@@ -8,7 +8,8 @@ on:
       deploy:
         description: "Deploy to GitHub Pages?"
         required: false
-        default: "false"
+        default: false
+        type: boolean
   pull_request:
     branches:
       - main
@@ -32,7 +33,7 @@ jobs:
 
       - name: Setup with apt
         run: |
-          #sudo apt-get update
+          # sudo apt-get update
           sudo apt-get install -y doxygen zip
 
       - name: Install Sphinx and Friends
@@ -70,15 +71,15 @@ jobs:
 
       - name: Setup Pages
         # run this step only if the main branch is pushed to or if the workflow is manually triggered and configured to deploy
-        if: github.ref == 'refs/heads/main' || github.event.inputs.deploy == 'true'
+        if: github.ref == 'refs/heads/main' || inputs.deploy
         uses: actions/configure-pages@v5
       - name: Upload artifact
-        if: github.ref == 'refs/heads/main' || github.event.inputs.deploy == 'true'
+        if: github.ref == 'refs/heads/main' || inputs.deploy
         uses: actions/upload-pages-artifact@v3
         with:
           # The path to the directory containing the files to be uploaded
           path: "${{github.workspace}}/docs/build/html/"
       - name: Deploy to GitHub Pages
-        if: github.ref == 'refs/heads/main' || github.event.inputs.deploy == 'true'
+        if: github.ref == 'refs/heads/main' || inputs.deploy
         id: deployment
         uses: actions/deploy-pages@v4
