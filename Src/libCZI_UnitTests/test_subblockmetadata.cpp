@@ -115,3 +115,39 @@ TEST(SubBlockMetadata, ReadSubBlockMetadataWithInvalidXml)
     EXPECT_THROW(sub_block_metadata->TryGetAttribute(L"TestAttribute", nullptr), LibCZIXmlParseException);
     EXPECT_THROW(sub_block_metadata->EnumAttributes([](const std::wstring&, const std::wstring&) { return true; }), LibCZIXmlParseException);
 }
+
+TEST(SubBlockMetadata, ReadSubBlockMetadataWithDateTimeField)
+{
+    // arrange
+    const string invalid_sub_block_metadata_xml = R"(
+        <METADATA>
+            <Tags>
+                <AcquisitionTime>2019-11-15T08:00:43.6707018Z</AcquisitionTime>
+            </Tags>
+        </METADATA>
+    )";
+
+    auto czi_and_size = CreateCziDocumentOneSubblockWithSubBlockMetadata(invalid_sub_block_metadata_xml);
+
+    // act
+    auto inputStream = CreateStreamFromMemory(get<0>(czi_and_size), get<1>(czi_and_size));
+    auto reader = CreateCZIReader();
+    reader->Open(inputStream);
+    auto sub_block = reader->ReadSubBlock(0);
+    ASSERT_TRUE(sub_block != nullptr);
+    auto sub_block_metadata = libCZI::CreateSubBlockMetadataFromSubBlock(sub_block.get());
+
+    // assert
+    EXPECT_TRUE(sub_block_metadata->IsXmlValid());
+    EXPECT_TRUE(sub_block_metadata->TryGetTagAsXmlDateTime(L"AcquisitionTime", nullptr));
+    libCZI::XmlDateTime date_time;
+    EXPECT_TRUE(sub_block_metadata->TryGetTagAsXmlDateTime(L"AcquisitionTime", &date_time));
+    ASSERT_EQ(date_time.year, 2019);
+    ASSERT_EQ(date_time.mon, 11);
+    ASSERT_EQ(date_time.mday, 15);
+    ASSERT_EQ(date_time.hour, 8);
+    ASSERT_EQ(date_time.min, 0);
+    ASSERT_EQ(date_time.sec, 43);
+    ASSERT_EQ(date_time.fractionalNanoseconds, 670701800);
+    ASSERT_EQ(date_time.isUTC, true);
+}

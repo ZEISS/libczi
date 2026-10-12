@@ -48,6 +48,15 @@ namespace libCZI
         /// \returns	True if it succeeds; false otherwise.
         virtual bool TryGetTagAsString(const std::wstring& tag_name, std::wstring* value) = 0;
 
+        /// Attempts to get the specified tag, parsed as an XML date/time, from the sub-block metadata.
+        /// The data is retrieved from the node "METADATA/Tags/<tag-name>".
+        ///
+        /// \param 		   	tag_name	The tag name.
+        /// \param [in,out]	value   	If non-null, the content is put here
+        ///
+        /// \returns	True if it succeeds; false otherwise.
+        virtual bool TryGetTagAsXmlDateTime(const std::wstring& tag_name, libCZI::XmlDateTime* value) = 0;
+
         /// Attempts to get "stage position" from the sub-block metadata.
         /// This information is retrieved from the node "METADATA/Tags/StageXPosition" and "METADATA/Tags/StageYPosition".
         /// Note that X and Y need to be present in order to have this function return true.

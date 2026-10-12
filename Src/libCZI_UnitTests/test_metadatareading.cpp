@@ -508,6 +508,109 @@ TEST(MetadataReading, DateTimeParse1Test)
     EXPECT_FALSE(b) << "Not expecting a valid parsing.";
 }
 
+TEST(MetadataReading, DateTimeFractionParsingTests)
+{
+    XmlDateTime dt;
+
+    // no fractional part -> 0
+    bool b = XmlDateTime::TryParse("2008-08-30T01:45:36Z", &dt);
+    EXPECT_TRUE(b);
+    EXPECT_EQ(dt.sec, 36);
+    EXPECT_EQ(dt.fractionalNanoseconds, 0);
+
+    // simple fractional -> padded to nanoseconds
+    b = XmlDateTime::TryParse("2008-08-30T01:45:36.123Z", &dt);
+    EXPECT_TRUE(b);
+    EXPECT_EQ(dt.fractionalNanoseconds, 123000000);
+
+    // fractional with trailing zeros -> treated as zero if all zeros
+    b = XmlDateTime::TryParse("2008-08-30T01:45:36.000Z", &dt);
+    EXPECT_TRUE(b);
+    EXPECT_EQ(dt.fractionalNanoseconds, 0);
+
+    // example from SubBlockMetadata test: 7 digits padded to 9
+    b = XmlDateTime::TryParse("2019-11-15T08:00:43.6707018Z", &dt);
+    EXPECT_TRUE(b);
+    EXPECT_EQ(dt.fractionalNanoseconds, 670701800);
+
+    // truncation (no rounding) when extra digits less than rounding threshold
+    b = XmlDateTime::TryParse("2008-08-30T01:45:36.1234567894Z", &dt);
+    EXPECT_TRUE(b);
+    EXPECT_EQ(dt.fractionalNanoseconds, 123456789);
+
+    // truncation (no rounding) when the first discarded digit >= '5'
+    b = XmlDateTime::TryParse("2008-08-30T01:45:36.1234567895Z", &dt);
+    EXPECT_TRUE(b);
+    EXPECT_EQ(dt.fractionalNanoseconds, 123456789);
+
+    // truncation (no rounding) that would overflow nanoseconds: clamp to 999,999,999 (no carry into seconds)
+    b = XmlDateTime::TryParse("2008-08-30T01:45:36.9999999995Z", &dt);
+    EXPECT_TRUE(b);
+    EXPECT_EQ(dt.fractionalNanoseconds, 999999999);
+    EXPECT_EQ(dt.sec, 36) << "Truncation must not carry into seconds (project choice: clamp).";
+}
+
+TEST(MetadataReading, DateTimeToXmlStringTests)
+{
+    // no fractional part -> no fraction emitted
+    {
+        XmlDateTime dt;
+        dt.Clear();
+        dt.year = 2008; dt.mon = 8; dt.mday = 30;
+        dt.hour = 1; dt.min = 45; dt.sec = 36;
+        dt.isUTC = true;
+        dt.fractionalNanoseconds = 0;
+        std::string s = dt.ToXmlString();
+        EXPECT_EQ(s, "2008-08-30T01:45:36Z");
+    }
+
+    // fractional seconds -> trimmed representation
+    {
+        XmlDateTime dt;
+        dt.Clear();
+        dt.year = 2008; dt.mon = 8; dt.mday = 30;
+        dt.hour = 1; dt.min = 45; dt.sec = 36;
+        dt.isUTC = true;
+        dt.fractionalNanoseconds = 123000000; // should become ".123"
+        EXPECT_EQ(dt.ToXmlString(), "2008-08-30T01:45:36.123Z");
+    }
+
+    // example matching SubBlockMetadata test: 7 digits -> ".6707018"
+    {
+        XmlDateTime dt;
+        dt.Clear();
+        dt.year = 2019; dt.mon = 11; dt.mday = 15;
+        dt.hour = 8; dt.min = 0; dt.sec = 43;
+        dt.isUTC = true;
+        dt.fractionalNanoseconds = 670701800; // ".6707018"
+        EXPECT_EQ(dt.ToXmlString(), "2019-11-15T08:00:43.6707018Z");
+    }
+
+    // fractional with single-digit -> ".1" and timezone offset emitted
+    {
+        XmlDateTime dt;
+        dt.Clear();
+        dt.year = 2008; dt.mon = 8; dt.mday = 30;
+        dt.hour = 1; dt.min = 45; dt.sec = 36;
+        dt.isUTC = false;
+        dt.offsetHours = 5;
+        dt.offsetMinutes = 30;
+        dt.fractionalNanoseconds = 100000000; // ".1"
+        EXPECT_EQ(dt.ToXmlString(), "2008-08-30T01:45:36.1+05:30");
+    }
+
+    // full 9-digit fractional part preserved
+    {
+        XmlDateTime dt;
+        dt.Clear();
+        dt.year = 2008; dt.mon = 8; dt.mday = 30;
+        dt.hour = 1; dt.min = 45; dt.sec = 36;
+        dt.isUTC = true;
+        dt.fractionalNanoseconds = 999999999;
+        EXPECT_EQ(dt.ToXmlString(), "2008-08-30T01:45:36.999999999Z");
+    }
+}
+
 TEST(MetadataReading, DimensionInfoChannels1Test)
 {
     auto mockMdSegment = make_shared<MockMetadataSegment>(MockMetadataSegment::Type::Data1);

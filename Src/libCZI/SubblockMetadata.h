@@ -55,6 +55,7 @@ namespace libCZI
             // interface ISubBlockMetadataMetadataView
             bool TryGetAttachmentDataFormat(std::wstring* data_format) override;
             bool TryGetTagAsDouble(const std::wstring& tag_name, double* value) override;
+            bool TryGetTagAsXmlDateTime(const std::wstring& tag_name, libCZI::XmlDateTime* value) override;
             bool TryGetTagAsString(const std::wstring& tag_name, std::wstring* value) override;
             bool TryGetStagePositionFromTags(std::tuple<double, double>* stage_position) override;
 

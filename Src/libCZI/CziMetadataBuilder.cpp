@@ -612,6 +612,24 @@ std::string libCZI::XmlDateTime::ToXmlString() const
     stringstream ss;
     ss << setfill('0') << setw(4) << this->year << '-' << setw(2) << this->mon << '-' << setw(2) << this->mday << 'T'
         << setw(2) << this->hour << ':' << setw(2) << this->min << ':' << setw(2) << this->sec;
+
+    if (this->fractionalNanoseconds != 0)
+    {
+        // zero-pad to 9 digits
+        int ns = this->fractionalNanoseconds;
+        string frac = std::to_string(ns + 1000000000).substr(1);
+        // trim trailing zeros, but if all zeros, output ".0"
+        size_t end = frac.find_last_not_of('0');
+        if (end == string::npos)
+        {
+            ss << ".0";
+        }
+        else
+        {
+            ss << '.' << frac.substr(0, end + 1);
+        }
+    }
+
     if (this->isUTC == true)
     {
         ss << 'Z';
@@ -639,7 +657,8 @@ bool libCZI::XmlDateTime::IsValid() const
         this->mon >= 1 && this->mon <= 12 &&
         this->mday >= 1 &&
         this->mday <= (this->mon == 2 ? (((this->year % 100 != 0 && this->year % 4 == 0) || (this->year % 400 == 0)) ? 29 : 28) :
-            this->mon == 9 || this->mon == 4 || this->mon == 6 || this->mon == 11 ? 30 : 31);
+            this->mon == 9 || this->mon == 4 || this->mon == 6 || this->mon == 11 ? 30 : 31) &&
+        (this->fractionalNanoseconds >= 0 && this->fractionalNanoseconds < 1000000000);
 }
 
 /*static*/bool libCZI::XmlDateTime::TryParse(const wchar_t* szw, libCZI::XmlDateTime* ptrDateTime)
@@ -691,7 +710,29 @@ bool libCZI::XmlDateTime::IsValid() const
             dateTime.sec = std::stoi(pieces_match[6]);
         }
 
-        // note that we skip the decimal places of "second"...
+        // parse fractional seconds (group 7), truncating to nanoseconds (no rounding)
+        if (pieces_match[7].matched)
+        {
+            auto fracStr = pieces_match[7].str(); // like ".123456789123"
+            if (!fracStr.empty() && fracStr[0] == '.')
+            {
+                string digits = fracStr.substr(1); // "123456789123"
+                // Truncate extra digits (no rounding)
+                if (digits.length() > 9)
+                {
+                    digits = digits.substr(0, 9);
+                }
+
+                // Pad with zeros to nanoseconds precision
+                if (digits.length() < 9)
+                {
+                    digits.append(9 - digits.length(), '0');
+                }
+
+                dateTime.fractionalNanoseconds = std::stoi(digits); // 0..999999999
+                // fractionalNanoseconds == 0 is treated as "no fractional part"
+            }
+        }
 
         if (pieces_match[8].matched)
         {
