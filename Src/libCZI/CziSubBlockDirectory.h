@@ -9,6 +9,7 @@
 #include <map>
 #include <functional>
 #include <set>
+#include <cstdint>
 #include "libCZI.h"
 
 namespace libCZI
@@ -85,8 +86,21 @@ namespace libCZI
         class CCziSubBlockDirectory : public CCziSubBlockDirectoryBase
         {
         private:
+            struct SpatialGroup
+            {
+                std::vector<int> indicesByX;
+                std::vector<std::int64_t> prefixMaximumRight;
+            };
+
+            using PlaneKey = std::vector<int>;
+            using SceneAndZoomKey = std::pair<int, int>;
+
             std::vector<SubBlkEntry> subBlks;
             mutable CSbBlkStatisticsUpdater sblkStatistics;
+            std::vector<libCZI::DimensionIndex> indexedPlaneDimensions;
+            std::map<PlaneKey, std::map<SceneAndZoomKey, SpatialGroup>> subsetIndex;
+            std::map<int, int> firstSubBlockByChannel;
+            int firstSubBlockWithoutChannel{-1};
             enum class State
             {
                 AddingAllowed,
@@ -103,7 +117,17 @@ namespace libCZI
             void AddingFinished();
 
             void EnumSubBlocks(const std::function<bool(int index, const SubBlkEntry&)>& func);
+            bool TryEnumSubset(
+                const libCZI::IDimCoordinate* planeCoordinate,
+                const libCZI::IntRect* roi,
+                bool onlyLayer0,
+                const libCZI::IIndexSet* sceneFilter,
+                const std::function<bool(int index, const SubBlkEntry&)>& func) const;
             bool TryGetSubBlock(int index, SubBlkEntry& entry) const;
+            bool TryGetSubBlockOfArbitrarySubBlockInChannel(int channelIndex, SubBlkEntry& entry) const;
+            bool TryGetSceneBoundingBox(int sceneIndex, libCZI::IntRect& boundingBox) const;
+        private:
+            void BuildSubsetIndex();
         };
 
         class PixelTypeForChannelIndexStatistic

@@ -16,8 +16,22 @@ namespace libCZI
 {
     namespace detail
     {
+        class ISubBlockRepositorySubsetEx
+        {
+        public:
+            virtual void EnumSubsetEx(
+                const libCZI::IDimCoordinate* planeCoordinate,
+                const libCZI::IntRect* roi,
+                bool onlyLayer0,
+                const libCZI::IIndexSet* sceneFilter,
+                const std::function<bool(int index, const libCZI::SubBlockInfo& info)>& funcEnum) = 0;
+            virtual bool TryGetSceneBoundingBox(int sceneIndex, libCZI::IntRect& boundingBox) const = 0;
+            virtual ~ISubBlockRepositorySubsetEx() = default;
+        };
 
-        class CCZIReader : public libCZI::ICZIReader, public std::enable_shared_from_this<CCZIReader>
+        class CCZIReader : public libCZI::ICZIReader,
+                           public ISubBlockRepositorySubsetEx,
+                           public std::enable_shared_from_this<CCZIReader>
         {
         private:
             std::shared_ptr<libCZI::IStream> stream;
@@ -35,6 +49,13 @@ namespace libCZI
             // interface ISubBlockRepository
             void EnumerateSubBlocks(const std::function<bool(int index, const libCZI::SubBlockInfo& info)>& funcEnum) override;
             void EnumSubset(const libCZI::IDimCoordinate* planeCoordinate, const libCZI::IntRect* roi, bool onlyLayer0, const std::function<bool(int index, const libCZI::SubBlockInfo& info)>& funcEnum) override;
+            void EnumSubsetEx(
+                const libCZI::IDimCoordinate* planeCoordinate,
+                const libCZI::IntRect* roi,
+                bool onlyLayer0,
+                const libCZI::IIndexSet* sceneFilter,
+                const std::function<bool(int index, const libCZI::SubBlockInfo& info)>& funcEnum) override;
+            bool TryGetSceneBoundingBox(int sceneIndex, libCZI::IntRect& boundingBox) const override;
             std::shared_ptr<libCZI::ISubBlock> ReadSubBlock(int index) override;
             bool TryGetSubBlockInfoOfArbitrarySubBlockInChannel(int channelIndex, libCZI::SubBlockInfo& info) override;
             bool TryGetSubBlockInfo(int index, libCZI::SubBlockInfo* info) const override;

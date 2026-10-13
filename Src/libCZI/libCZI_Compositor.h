@@ -149,6 +149,24 @@ namespace libCZI
         /// \param  cache_item      The cache item to be added.
         virtual void Add(int subblock_index, const CacheItem& cache_item) = 0;
 
+        /// Gets an item or creates it exactly once when multiple callers miss concurrently.
+        /// Cache implementations may override this to coordinate in-flight loads. The default
+        /// implementation preserves compatibility for custom caches but does not serialize loaders.
+        virtual CacheItem GetOrCreate(int subblock_index, const std::function<CacheItem()>& loader)
+        {
+            auto item = this->Get(subblock_index);
+            if (!item.IsValid())
+            {
+                item = loader();
+                if (item.IsValid())
+                {
+                    this->Add(subblock_index, item);
+                }
+            }
+
+            return item;
+        }
+
         virtual ~ISubBlockCacheOperation() = default;
 
         ISubBlockCacheOperation() = default;
@@ -535,6 +553,13 @@ namespace libCZI
             /// If true, then masks (if present) are taken into account when composing the tile-composite.
             bool maskAware;
 
+            /// Maximum number of subblocks to read and decode concurrently. A value of one
+            /// preserves serial behavior. Composition remains deterministic.
+            std::uint32_t maxConcurrentSubBlockReads;
+
+            /// A single explicitly selected scene, or minimum int when sceneFilter should be used.
+            int sceneIndex;
+
             /// Clears this object to its blank state.
             void Clear()
             {
@@ -546,6 +571,8 @@ namespace libCZI
                 this->maskAware = false;
                 this->subBlockCache.reset();
                 this->onlyUseSubBlockCacheForCompressedData = true;
+                this->maxConcurrentSubBlockReads = 1;
+                this->sceneIndex = (std::numeric_limits<int>::min)();
             }
         };
 

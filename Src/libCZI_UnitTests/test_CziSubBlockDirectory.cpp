@@ -237,3 +237,54 @@ TEST(CziSubBlockDirectory, CziSubBlockDirectory1)
 
     //auto pyramidStatistics = subBlkDir.GetPyramidStatistics();
 }
+
+TEST(CziSubBlockDirectory, IndexedSubsetHonorsPlaneSceneRoiAndLayer)
+{
+    static const SubBlockEntryData data[] =
+    {
+        { "C0S0", 0, 0, 0, 100, 100, 100, 100 },
+        { "C0S0", 1, 10, 0, 10, 100, 10, 100 },
+        { "C0S1", 2, 90, 0, 20, 100, 20, 100 },
+        { "C1S0", 3, 90, 0, 20, 100, 20, 100 },
+        { "C0S0", 4, 90, 0, 40, 100, 20, 50 },
+    };
+
+    CCziSubBlockDirectory directory;
+    for (const auto& item : data)
+    {
+        directory.AddSubBlock(SubBlkEntryFromSubBlockEntryData(&item));
+    }
+    directory.AddingFinished();
+
+    const auto plane = CDimCoordinate::Parse("C0");
+    const IntRect roi{ 90, 10, 20, 20 };
+    const auto scenes = Utils::IndexSetFromString(L"0");
+    std::vector<int> indices;
+    EXPECT_TRUE(directory.TryEnumSubset(
+        &plane, &roi, true, scenes.get(),
+        [&indices](int index, const CCziSubBlockDirectory::SubBlkEntry&)
+        {
+            indices.push_back(index);
+            return true;
+        }));
+    EXPECT_EQ(indices, std::vector<int>({ 0 }));
+
+    indices.clear();
+    EXPECT_TRUE(directory.TryEnumSubset(
+        &plane, &roi, false, scenes.get(),
+        [&indices](int index, const CCziSubBlockDirectory::SubBlkEntry&)
+        {
+            indices.push_back(index);
+            return true;
+        }));
+    EXPECT_EQ(indices, std::vector<int>({ 0, 4 }));
+
+    IntRect sceneBoundingBox;
+    EXPECT_TRUE(directory.TryGetSceneBoundingBox(1, sceneBoundingBox));
+    EXPECT_EQ(sceneBoundingBox.x, 90);
+    EXPECT_EQ(sceneBoundingBox.w, 20);
+
+    CCziSubBlockDirectory::SubBlkEntry channelEntry;
+    EXPECT_TRUE(directory.TryGetSubBlockOfArbitrarySubBlockInChannel(1, channelEntry));
+    EXPECT_EQ(channelEntry.mIndex, 3);
+}
