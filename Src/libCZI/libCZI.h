@@ -807,7 +807,7 @@ namespace libCZI
             /// distinguish between sub-block-directory precedence and sub-block-header precedence. The value 'PrecedenceMask'
             /// is used to mask this bit. Bit 7 is used to indicate whether a discrepancy is to be ignored or whether an error
             /// is to be reported.
-            /// Historically, libCZI (up to version 0.63.2) used to give precedence fo the sub-block header information,
+            /// Historically, libCZI (up to version 0.63.2) used to give precedence to the sub-block header information,
             /// and it did not report a discrepancy.
             enum class SubBlockDirectoryInfoPolicy : std::uint8_t
             {
@@ -815,6 +815,13 @@ namespace libCZI
                 SubBlockHeaderPrecedence = 1,    ///< The sub-block information is used for the sub-blocks.
                 PrecedenceMask = 1,              ///< Bit-mask allowing to extract the relevant bits for "precedence".
                 IgnoreDiscrepancy = 0x80,        ///< Flag allowing to choose whether a discrepancy is to be ignored (true) or whether an exception is to be thrown (false) when accessing the sub-block.
+            };
+
+            enum class DimensionSwapWorkaround : std::uint8_t
+            {
+                None = 0,
+                XtSubblocks = 1,
+                XzSubblocks = 2,
             };
 
             /// This option controls whether the lax parameter validation when parsing the dimension-entry of a subblock is to be used.
@@ -844,6 +851,15 @@ namespace libCZI
             /// in this respect - either throw an exception if a discrepancy is encountered or ignore it.
             SubBlockDirectoryInfoPolicy subBlockDirectoryInfoPolicy{ SubBlockDirectoryInfoPolicy::SubBlockDirectoryPrecedence };
 
+            /// Compatibility workaround for legacy CZI documents that store the vertical
+            /// image coordinate in dimension T or Z instead of dimension Y. When enabled,
+            /// libCZI interprets T or Z as Y while parsing sub-block directory entries and
+            /// ignores Y entries. This can make documents using this non-standard
+            /// convention accessible, but changes the interpretation of their dimensions.
+            /// Leave disabled unless needed for an affected document. The default is
+            /// 'DimensionSwapWorkaround::None'.
+            DimensionSwapWorkaround dimension_swap_workaround{ DimensionSwapWorkaround::None };
+
             /// Sets the default.
             void SetDefault()
             {
@@ -851,6 +867,7 @@ namespace libCZI
                 this->ignore_sizem_for_pyramid_subblocks = false;
                 this->default_frame_of_reference = libCZI::CZIFrameOfReference::Invalid;
                 this->subBlockDirectoryInfoPolicy = SubBlockDirectoryInfoPolicy::SubBlockDirectoryPrecedence;
+                this->dimension_swap_workaround = DimensionSwapWorkaround::None;
             }
         };
 
