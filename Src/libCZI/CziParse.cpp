@@ -249,6 +249,194 @@ using namespace libCZI::detail;
     }
 }
 
+/*static*/CCZIParse::SubBlockData CCZIParse::ReadSubBlockWithDimensionSwap(libCZI::IStream* str, std::uint64_t offset, const SubBlockStorageAllocate& allocateInfo, DimensionIndex dimensionIndexToSwapWithY)
+{
+    SubBlockSegment subBlckSegment;
+    std::uint64_t bytesRead;
+
+    // the minimum guaranteed size we can read here is "sizeof(SegmentHeader) + SIZE_SUBBLOCKDATA_MINIMUM", it is NOT sizeof(SubBlockSegment)
+    const uint64_t MinSizeSubBlockSegment = sizeof(SegmentHeader) + SIZE_SUBBLOCKDATA_MINIMUM;
+
+    try
+    {
+        str->Read(offset, &subBlckSegment, MinSizeSubBlockSegment, &bytesRead);
+    }
+    catch (const std::exception&)
+    {
+        std::throw_with_nested(LibCZIIOException("Error reading SubBlock-Segment", offset, MinSizeSubBlockSegment));
+    }
+
+    if (bytesRead != MinSizeSubBlockSegment)
+    {
+        CCZIParse::ThrowNotEnoughDataRead(offset, sizeof(subBlckSegment), bytesRead);
+    }
+
+    ConvertToHostByteOrder::Convert(&subBlckSegment);
+
+    if (memcmp(subBlckSegment.header.Id, CCZIParse::SUBBLKMAGIC, 16) != 0)
+    {
+        CCZIParse::ThrowIllegalData(offset, "Invalid SubBlock-magic");
+    }
+
+    uint32_t lengthSubblockSegmentData = 0;
+    SubBlockData sbd;
+    if (subBlckSegment.data.entrySchema[0] == 'D' && subBlckSegment.data.entrySchema[1] == 'V')
+    {
+        ConvertToHostByteOrder::Convert(&subBlckSegment.data.entryDV);
+        sbd.compression = subBlckSegment.data.entryDV.Compression;
+        sbd.pixelType = subBlckSegment.data.entryDV.PixelType;
+        sbd.mIndex = (std::numeric_limits<int>::max)();
+        memcpy(sbd.spare, subBlckSegment.data.entryDV._spare, sizeof(sbd.spare));
+
+        if (subBlckSegment.data.entryDV.DimensionCount > MAXDIMENSIONS)
+        {
+            stringstream ss;
+            ss << "'DimensionCount' was found to be " << subBlckSegment.data.entryDV.DimensionCount << ", where the maximum allowed is " << MAXDIMENSIONS << ".";
+            CCZIParse::ThrowIllegalData(
+                offset + sizeof(SegmentHeader) + SIZE_SUBBLOCKDATA_FIXEDPART + offsetof(SubBlockDirectoryEntryDV, DimensionCount),
+                ss.str().c_str());
+        }
+
+        // now we can calculate the exact size of the "SubBlockSegmentData" we need here
+        lengthSubblockSegmentData = SIZE_SUBBLOCKDATA_FIXEDPART + 32 + subBlckSegment.data.entryDV.DimensionCount * sizeof(DimensionEntryDV);
+        if (lengthSubblockSegmentData + sizeof(SegmentHeader) > MinSizeSubBlockSegment)
+        {
+            // the required size is larger than the minimal size, so now we need to read the additional data (beyond the minimum size)
+            const uint64_t remainingBytesToRead = lengthSubblockSegmentData + sizeof(SegmentHeader) - MinSizeSubBlockSegment;
+            try
+            {
+                str->Read(
+                    offset + MinSizeSubBlockSegment,
+                    ((uint8_t*)(&subBlckSegment)) + MinSizeSubBlockSegment,
+                    remainingBytesToRead,
+                    &bytesRead);
+            }
+            catch (const std::exception&)
+            {
+                std::throw_with_nested(LibCZIIOException("Error reading additional data from SubBlock-Segment", offset + MinSizeSubBlockSegment, remainingBytesToRead));
+            }
+
+            if (bytesRead != remainingBytesToRead)
+            {
+                CCZIParse::ThrowNotEnoughDataRead(offset + MinSizeSubBlockSegment, remainingBytesToRead, bytesRead);
+            }
+        }
+
+        ConvertToHostByteOrder::Convert(subBlckSegment.data.entryDV.DimensionEntries, subBlckSegment.data.entryDV.DimensionCount);
+
+        for (int i = 0; i < subBlckSegment.data.entryDV.DimensionCount; ++i)
+        {
+            const DimensionEntryDV* dimEntry = subBlckSegment.data.entryDV.DimensionEntries + i;
+            if (IsMDimension(dimEntry->Dimension, sizeof(dimEntry->Dimension)))
+            {
+                sbd.mIndex = dimEntry->Start;
+            }
+            else if (IsXDimension(dimEntry->Dimension, sizeof(dimEntry->Dimension)))
+            {
+                sbd.logicalRect.x = dimEntry->Start;
+                sbd.logicalRect.w = dimEntry->Size;
+                sbd.physicalSize.w = dimEntry->StoredSize;
+            }
+            else if ((dimensionIndexToSwapWithY == DimensionIndex::invalid && IsYDimension(dimEntry->Dimension, sizeof(dimEntry->Dimension))) ||
+                     (dimensionIndexToSwapWithY != DimensionIndex::invalid && IsDimension(dimEntry->Dimension, sizeof(dimEntry->Dimension), Utils::DimensionToChar(dimensionIndexToSwapWithY))))
+            {
+                sbd.logicalRect.y = dimEntry->Start;
+                sbd.logicalRect.h = dimEntry->Size;
+                sbd.physicalSize.h = dimEntry->StoredSize;
+            }
+            else
+            {
+                libCZI::DimensionIndex dim = CCZIParse::DimensionCharToDimensionIndex(dimEntry->Dimension, sizeof(dimEntry->Dimension));
+                sbd.coordinate.Set(dim, dimEntry->Start);
+            }
+        }
+    }
+    else if (subBlckSegment.data.entrySchema[0] == 'D' && subBlckSegment.data.entrySchema[1] == 'E')
+    {
+        sbd.compression = subBlckSegment.data.entryDE.Compression;
+        sbd.pixelType = subBlckSegment.data.entryDE.PixelType;
+
+        lengthSubblockSegmentData = sizeof(SubBlockDirectoryEntryDE);
+        // TODO...
+    }
+    else
+    {
+        CCZIParse::ThrowIllegalData(offset, "Invalid schema");
+    }
+
+    // the minimal size of the "subblock-segment-data" is given by "SIZE_SUBBLOCKDATA_MINIMUM", but the actual size of the
+    //  data-structure (SubBlockDirectoryEntryDV) may be larger than that - so we need to take the max of the actual size and
+    //  the reserved (minimal) size here
+    lengthSubblockSegmentData = max(lengthSubblockSegmentData, (uint32_t)SIZE_SUBBLOCKDATA_MINIMUM);
+
+    // TODO: if subBlckSegment.data.DataSize > size_t (=4GB for 32Bit) then bail out gracefully
+    auto deleter = [&](void* ptr) -> void {allocateInfo.free(ptr); };
+    std::unique_ptr<void, decltype(deleter)> pMetadataBuffer(subBlckSegment.data.MetadataSize > 0 ? allocateInfo.alloc(subBlckSegment.data.MetadataSize) : nullptr, deleter);
+    std::unique_ptr<void, decltype(deleter)> pDataBuffer(subBlckSegment.data.DataSize > 0 ? allocateInfo.alloc(static_cast<size_t>(subBlckSegment.data.DataSize)) : nullptr, deleter);
+    std::unique_ptr<void, decltype(deleter)> pAttachmentBuffer(subBlckSegment.data.AttachmentSize > 0 ? allocateInfo.alloc(subBlckSegment.data.AttachmentSize) : nullptr, deleter);
+
+    // TODO: now get the information from the SubBlockDirectoryEntryDV/DE structure, and figure out their size
+    // TODO: compare this information against the information from the SubBlock-directory
+    if (pMetadataBuffer)
+    {
+        try
+        {
+            str->Read(offset + lengthSubblockSegmentData + sizeof(SegmentHeader), pMetadataBuffer.get(), subBlckSegment.data.MetadataSize, &bytesRead);
+        }
+        catch (const std::exception&)
+        {
+            std::throw_with_nested(LibCZIIOException("Error reading FileHeaderSegment", offset + lengthSubblockSegmentData + sizeof(SegmentHeader), subBlckSegment.data.MetadataSize));
+        }
+
+        if (static_cast<int32_t>(bytesRead) != subBlckSegment.data.MetadataSize)
+        {
+            CCZIParse::ThrowNotEnoughDataRead(offset + lengthSubblockSegmentData + sizeof(SegmentHeader), subBlckSegment.data.MetadataSize, bytesRead);
+        }
+    }
+
+    if (pDataBuffer)
+    {
+        try
+        {
+            str->Read(offset + lengthSubblockSegmentData + sizeof(SegmentHeader) + subBlckSegment.data.MetadataSize, pDataBuffer.get(), subBlckSegment.data.DataSize, &bytesRead);
+        }
+        catch (const std::exception&)
+        {
+            std::throw_with_nested(LibCZIIOException("Error reading FileHeaderSegment", offset + lengthSubblockSegmentData + sizeof(SegmentHeader) + subBlckSegment.data.MetadataSize, subBlckSegment.data.DataSize));
+        }
+
+        if (static_cast<int32_t>(bytesRead) != subBlckSegment.data.DataSize)
+        {
+            CCZIParse::ThrowNotEnoughDataRead(offset + lengthSubblockSegmentData + sizeof(SegmentHeader) + subBlckSegment.data.MetadataSize, subBlckSegment.data.DataSize, bytesRead);
+        }
+    }
+
+    if (pAttachmentBuffer)
+    {
+        try
+        {
+            str->Read(offset + lengthSubblockSegmentData + sizeof(SegmentHeader) + subBlckSegment.data.MetadataSize + subBlckSegment.data.DataSize, pAttachmentBuffer.get(), subBlckSegment.data.AttachmentSize, &bytesRead);
+        }
+        catch (const std::exception&)
+        {
+            std::throw_with_nested(LibCZIIOException("Error reading FileHeaderSegment", offset + lengthSubblockSegmentData + sizeof(SegmentHeader) + subBlckSegment.data.MetadataSize + subBlckSegment.data.DataSize, subBlckSegment.data.AttachmentSize));
+        }
+
+        if (static_cast<int32_t>(bytesRead) != subBlckSegment.data.AttachmentSize)
+        {
+            CCZIParse::ThrowNotEnoughDataRead(offset + lengthSubblockSegmentData + sizeof(SegmentHeader) + subBlckSegment.data.MetadataSize + subBlckSegment.data.DataSize, subBlckSegment.data.AttachmentSize, bytesRead);
+        }
+    }
+
+    sbd.ptrData = pDataBuffer.release();
+    sbd.dataSize = subBlckSegment.data.DataSize;
+    sbd.ptrAttachment = pAttachmentBuffer.release();
+    sbd.attachmentSize = subBlckSegment.data.AttachmentSize;
+    sbd.ptrMetadata = pMetadataBuffer.release();
+    sbd.metaDataSize = subBlckSegment.data.MetadataSize;
+    return sbd;
+}
+
 /*static*/CCZIParse::SubBlockData CCZIParse::ReadSubBlock(libCZI::IStream* str, std::uint64_t offset, const SubBlockStorageAllocate& allocateInfo)
 {
     SubBlockSegment subBlckSegment;
@@ -545,13 +733,17 @@ using namespace libCZI::detail;
             entry.storedWidth = subBlkDirDV->DimensionEntries[i].StoredSize;
             x_was_given = true;
         }
-        else if (CCZIParse::IsYDimension(subBlkDirDV->DimensionEntries[i].Dimension, 4))
+        else if (CCZIParse::HandleYDimension(subBlkDirDV->DimensionEntries[i], options, entry))
+        {
+            y_was_given = true;
+        }
+        /*else if (CCZIParse::IsYDimension(subBlkDirDV->DimensionEntries[i].Dimension, 4))
         {
             entry.y = subBlkDirDV->DimensionEntries[i].Start;
             entry.height = subBlkDirDV->DimensionEntries[i].Size;
             entry.storedHeight = subBlkDirDV->DimensionEntries[i].StoredSize;
             y_was_given = true;
-        }
+        }*/
         else if (CCZIParse::IsMDimension(subBlkDirDV->DimensionEntries[i].Dimension, 4))
         {
             entry.mIndex = subBlkDirDV->DimensionEntries[i].Start;
@@ -579,16 +771,16 @@ using namespace libCZI::detail;
             libCZI::DimensionIndex dim = CCZIParse::DimensionCharToDimensionIndex(subBlkDirDV->DimensionEntries[i].Dimension, 4);
             entry.coordinate.Set(dim, subBlkDirDV->DimensionEntries[i].Start);
 
-            if(options.GetPhysicalDimensionOtherThanMMustHaveSizeOne())
-            { 
+            if (options.GetPhysicalDimensionOtherThanMMustHaveSizeOne())
+            {
                 auto physicalSize = subBlkDirDV->DimensionEntries[i].StoredSize;
-                if(physicalSize != 1)
+                if (physicalSize != 1)
                 {
                     stringstream string_stream;
-                    string_stream 
-                            << "Physical size for dimension '" << Utils::DimensionToChar(dim)
-                            << "' is expected to be 1, but found " << physicalSize
-                            << " (file-offset:" << subBlkDirDV->FilePosition << ").";
+                    string_stream
+                        << "Physical size for dimension '" << Utils::DimensionToChar(dim)
+                        << "' is expected to be 1, but found " << physicalSize
+                        << " (file-offset:" << subBlkDirDV->FilePosition << ").";
                     throw LibCZICZIParseException(string_stream.str().c_str(), LibCZICZIParseException::ErrorCode::NonConformingSubBlockDimensionEntry);
                 }
             }
@@ -768,35 +960,55 @@ using namespace libCZI::detail;
 
 /*static*/bool CCZIParse::IsMDimension(const char* ptr, size_t size)
 {
-    if (size < 1)
-    {
-        CCZIParse::ThrowIllegalData("parameter 'size' is illegal");
-    }
-
-    char c = CCZIParse::ToUpperCase(*ptr);
-    return (c == 'M') ? true : false;
+    return CCZIParse::IsDimension(ptr, size, 'M');
 }
 
 /*static*/bool CCZIParse::IsXDimension(const char* ptr, size_t size)
 {
-    if (size < 1)
-    {
-        CCZIParse::ThrowIllegalData("parameter 'size' is illegal");
-    }
-
-    char c = CCZIParse::ToUpperCase(*ptr);
-    return (c == 'X') ? true : false;
+    return CCZIParse::IsDimension(ptr, size, 'X');
 }
 
 /*static*/bool CCZIParse::IsYDimension(const char* ptr, size_t size)
+{
+    return CCZIParse::IsDimension(ptr, size, 'Y');
+}
+
+/*static*/bool CCZIParse::IsZDimension(const char* ptr, size_t size)
+{
+    return CCZIParse::IsDimension(ptr, size, 'Z');
+}
+
+/*static*/bool CCZIParse::IsTDimension(const char* ptr, size_t size)
+{
+    return CCZIParse::IsDimension(ptr, size, 'T');
+}
+
+/*static*/bool CCZIParse::IsDimension(const char* ptr, size_t size, char dimension)
 {
     if (size < 1)
     {
         CCZIParse::ThrowIllegalData("parameter 'size' is illegal");
     }
 
-    char c = CCZIParse::ToUpperCase(*ptr);
-    return (c == 'Y') ? true : false;
+    const char c = CCZIParse::ToUpperCase(*ptr);
+    return c == dimension;
+}
+
+/*static*/bool CCZIParse::HandleYDimension(const DimensionEntryDV& dimension_entry, const SubblockDirectoryParseOptions& options, CCziSubBlockDirectory::SubBlkEntry& entry)
+{
+    const bool treat_z_as_y = options.GetTreatZAsY();
+    const bool treat_t_as_y = options.GetTreatTAsY();
+    if ((!treat_z_as_y && !treat_t_as_y && CCZIParse::IsYDimension(dimension_entry.Dimension, 4)) ||
+        (treat_t_as_y && CCZIParse::IsTDimension(dimension_entry.Dimension, 4)) ||
+        (treat_z_as_y && CCZIParse::IsZDimension(dimension_entry.Dimension, 4)))
+    {
+        entry.y = dimension_entry.Start;
+        entry.height = dimension_entry.Size;
+        entry.storedHeight = dimension_entry.StoredSize;
+        return true;
+    }
+
+    return false;
 }
 
 [[noreturn]] /*static*/void CCZIParse::ThrowNotEnoughDataRead(std::uint64_t offset, std::uint64_t bytesRequested, std::uint64_t bytesActuallyRead)

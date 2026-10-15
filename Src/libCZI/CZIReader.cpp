@@ -11,6 +11,8 @@
 #include "utilities.h"
 #include "CziAttachment.h"
 #include "CziReaderCommon.h"
+#include "libCZI.h"
+
 
 using namespace std;
 using namespace libCZI;
@@ -344,7 +346,21 @@ std::shared_ptr<ISubBlock> CCZIReader::ReadSubBlock(const CCziSubBlockDirectory:
         throw logic_error("CZIReader::ReadSubBlock: stream is null (Close was already called for this instance)");
     }
 
-    auto subBlkData = CCZIParse::ReadSubBlock(stream_reference.get(), entry.FilePosition, allocateInfo);
+    CCZIParse::SubBlockData subBlkData;
+    switch (this->dimension_swap_workaround_)
+    {
+    case OpenOptions::DimensionSwapWorkaround::None:
+        subBlkData = CCZIParse::ReadSubBlock(stream_reference.get(), entry.FilePosition, allocateInfo);
+        break;
+    case OpenOptions::DimensionSwapWorkaround::XtSubblocks:
+        subBlkData = CCZIParse::ReadSubBlockWithDimensionSwap(stream_reference.get(), entry.FilePosition, allocateInfo,DimensionIndex::T);
+        break;
+    case OpenOptions::DimensionSwapWorkaround::XzSubblocks:
+        subBlkData = CCZIParse::ReadSubBlockWithDimensionSwap(stream_reference.get(), entry.FilePosition, allocateInfo, DimensionIndex::Z);
+        break;
+    default:
+        throw logic_error("CCZIReader::ReadSubBlock: Unsupported dimension-swap-workaround option.");
+    }
 
     // RAII wrapper to ensure memory cleanup in case of exceptions
     auto dataDeleter = [freeFunc = allocateInfo.free](void* ptr) { if (ptr) { freeFunc(ptr); } };

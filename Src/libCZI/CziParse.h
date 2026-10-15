@@ -206,6 +206,7 @@ namespace libCZI
             };
 
             static SubBlockData ReadSubBlock(libCZI::IStream* str, std::uint64_t offset, const SubBlockStorageAllocate& allocateInfo);
+            static SubBlockData ReadSubBlockWithDimensionSwap(libCZI::IStream* str, std::uint64_t offset, const SubBlockStorageAllocate& allocateInfo, DimensionIndex dimensionIndexToSwapWithY);
 
             struct MetadataSegmentData
             {
@@ -237,6 +238,9 @@ namespace libCZI
             static bool IsMDimension(const char* ptr, size_t size);
             static bool IsXDimension(const char* ptr, size_t size);
             static bool IsYDimension(const char* ptr, size_t size);
+            static bool IsZDimension(const char* ptr, size_t size);
+            static bool IsTDimension(const char* ptr, size_t size);
+            static bool IsDimension(const char* ptr, size_t size, char dimension);
             static char ToUpperCase(char c);
 
             [[noreturn]] static void ThrowNotEnoughDataRead(std::uint64_t offset, std::uint64_t bytesRequested, std::uint64_t bytesActuallyRead);
@@ -244,6 +248,9 @@ namespace libCZI
             [[noreturn]] static void ThrowIllegalData(const char* sz);
 
             static bool CheckAttachmentSchemaType(const char* p, size_t cnt);
+
+            //static bool HandleYDimension(const char* dimension_string, size_t size_dimension_string);
+            static bool HandleYDimension(const DimensionEntryDV& dimension_entry, const SubblockDirectoryParseOptions& options, CCziSubBlockDirectory::SubBlkEntry& entry);
         };
 
     } // namespace detail
