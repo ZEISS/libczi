@@ -933,6 +933,27 @@ namespace libCZI
             return std::dynamic_pointer_cast<ISingleChannelScalingTileAccessor, IAccessor>(this->CreateAccessor(libCZI::AccessorType::SingleChannelScalingTileAccessor));
         }
     };
+
+    /// Converts reader open options to a semicolon-separated list of key=value pairs.
+    /// The canonical keys are laxSubblockCoordinateChecks, ignoreSizeMForPyramidSubblocks,
+    /// swapTAndY, defaultFrameOfReference, subBlockDirectoryInfoPrecedence, and
+    /// subBlockDirectoryInfoDiscrepancy. Boolean values are "true" or "false"; the frame-of-reference
+    /// values are the CZIFrameOfReference enumerator names; precedence is
+    /// "SubBlockDirectoryPrecedence" or "SubBlockHeaderPrecedence"; discrepancy is "error" or "ignore".
+    /// \param options Reader open options to serialize.
+    /// \return Semicolon-separated key=value representation of the specified options.
+    /// Throws std::invalid_argument if an option contains an enum value or policy bits that cannot be represented.
+    LIBCZI_API std::string OpenOptionsToString(const ICZIReader::OpenOptions& options);
+
+    /// Parses reader open options from semicolon-separated key=value pairs.
+    /// Whitespace around keys, values, and pairs is ignored. Empty input returns default options;
+    /// omitted keys use their defaults. Unknown keys are ignored. Keys and values are case-sensitive.
+    /// Duplicate keys, empty pairs, malformed pairs, and invalid values throw std::invalid_argument.
+    /// Values cannot contain '=' or ';'; escaping is not supported.
+    /// \param options Null-terminated UTF-8 string containing semicolon-separated key=value pairs.
+    /// \return Parsed reader open options. Defaults are applied for omitted keys.
+    /// Throws std::invalid_argument if the input is null or contains invalid syntax or values.
+    LIBCZI_API ICZIReader::OpenOptions StringToOpenOptions(const char* options);
 }
 
 #include "libCZI_Helpers.h"

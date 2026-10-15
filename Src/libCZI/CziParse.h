@@ -43,6 +43,8 @@ namespace libCZI
                     kPhysicalDimensionOtherThanMMustHaveSizeOne,
                     kDimensionMMustHaveSizeOneExceptForPyramidSubblocks,
                     kDimensionMMustHaveSizeOne,
+                    kTreatTasY,
+                    kTreatZasY,
 
                     kParseFlagsCount    ///< The number of flags - this is not a flag itself, and it must be the last entry in the enum.
                 };
@@ -51,27 +53,37 @@ namespace libCZI
                 /// Require that for each subblock, the dimensions X and Y are present.
                 /// 
                 /// \param  enable  True to enable, false to disable.
-                void SetDimensionXyMustBePresent(bool enable) { return this->SetFlag(ParseFlags::kDimensionXyMustBePresent, enable); }
+                void SetDimensionXyMustBePresent(bool enable) { this->SetFlag(ParseFlags::kDimensionXyMustBePresent, enable); }
 
                 /// Require that for each subblock the physical size (for all dimensions other than X, Y and M) is "1".
                 ///
                 /// \param  enable  True to enable, false to disable.
-                void SetPhysicalDimensionOtherThanMMustHaveSizeOne(bool enable) { return this->SetFlag(ParseFlags::kPhysicalDimensionOtherThanMMustHaveSizeOne, enable); }
+                void SetPhysicalDimensionOtherThanMMustHaveSizeOne(bool enable) { this->SetFlag(ParseFlags::kPhysicalDimensionOtherThanMMustHaveSizeOne, enable); }
 
                 /// Require that for each subblock the size (for all dimensions other than X, Y and M) is "1".
                 ///
                 /// \param  enable  True to enable, false to disable.
 
-                void SetDimensionOtherThanMMustHaveSizeOne(bool enable) { return this->SetFlag(ParseFlags::kDimensionOtherThanMMustHaveSizeOne, enable); }
+                void SetDimensionOtherThanMMustHaveSizeOne(bool enable) { this->SetFlag(ParseFlags::kDimensionOtherThanMMustHaveSizeOne, enable); }
                 /// Require that for all subblocks that the size of dimension M is "1" except for pyramid subblocks.
                 ///
                 /// \param  enable  True to enable, false to disable.
-                void SetDimensionMMustHaveSizeOneExceptForPyramidSubblocks(bool enable) { return this->SetFlag(ParseFlags::kDimensionMMustHaveSizeOneExceptForPyramidSubblocks, enable); }
+                void SetDimensionMMustHaveSizeOneExceptForPyramidSubblocks(bool enable) { this->SetFlag(ParseFlags::kDimensionMMustHaveSizeOneExceptForPyramidSubblocks, enable); }
 
                 /// Require that for all subblocks that the size of dimension M is "1" (without exceptions).
                 ///
                 /// \param  enable  True to enable, false to disable.
-                void SetDimensionMMustHaveSizeOne(bool enable) { return this->SetFlag(ParseFlags::kDimensionMMustHaveSizeOne, enable); }
+                void SetDimensionMMustHaveSizeOne(bool enable) { this->SetFlag(ParseFlags::kDimensionMMustHaveSizeOne, enable); }
+
+                /// Instruct whether to treat dimension T as dimension Y. Note that this option is mutually exclusive with the option to treat dimension Z as dimension Y.
+                ///
+                /// \param  enable  True to enable, false to disable.
+                void SetTreatTasY(bool enable) { this->SetFlag(ParseFlags::kTreatTasY, enable); }
+
+                /// Instruct whether to treat dimension Z as dimension Y. Note that this option is mutually exclusive with the option to treat dimension T as dimension Y.
+                ///
+                /// \param  enable  True to enable, false to disable.
+                void SetTreatZasY(bool enable) { this->SetFlag(ParseFlags::kTreatZasY, enable); }
 
                 /// Gets a boolean indicating whether to check that the dimensions X and Y are be present for each subblock.
                 ///
@@ -98,6 +110,16 @@ namespace libCZI
                 ///
                 /// \returns    True if it is to be checked that the is "1" for dimension M for all subblocks; false otherwise.
                 bool GetDimensionMMustHaveSizeOne() const { return this->GetFlag(ParseFlags::kDimensionMMustHaveSizeOne); }
+
+                /// Gets a boolean indicating whether to treat dimension T as dimension Y.
+                ///
+                /// \returns	True if the dimension T is to be treated as dimension Y; false otherwise.
+                bool GetTreatTAsY() const { return this->GetFlag(ParseFlags::kTreatTasY); }
+
+                /// Gets a boolean indicating whether to treat dimension Z as dimension Y.
+                ///
+                /// \returns	True if the dimension Z is to be treated as dimension Y; false otherwise.
+                bool GetTreatZAsY() const { return this->GetFlag(ParseFlags::kTreatZasY); }
 
                 /// Sets options to "lax parsing". This is the default.
                 void SetLaxParsing()
