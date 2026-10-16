@@ -599,7 +599,7 @@ TEST(Utilities, OpenOptionsStringRoundTrip)
 
     const auto serialized = OpenOptionsToString(options);
     EXPECT_EQ(serialized,
-        "laxSubblockCoordinateChecks=false;ignoreSizeMForPyramidSubblocks=true;swapTAndY=XtSubblocks;"
+        "laxSubblockCoordinateChecks=false;ignoreSizeMForPyramidSubblocks=true;dimensionSwapWorkaround=XtSubblocks;"
         "defaultFrameOfReference=PixelCoordinateSystem;subBlockDirectoryInfoPrecedence=SubBlockHeaderPrecedence;"
         "subBlockDirectoryInfoDiscrepancy=ignore");
 
@@ -634,7 +634,7 @@ TEST(Utilities, OpenOptionsStringRejectsMalformedInput)
 {
     EXPECT_THROW(StringToOpenOptions(nullptr), std::invalid_argument);
     EXPECT_THROW(StringToOpenOptions("laxSubblockCoordinateChecks=yes"), std::invalid_argument);
-    EXPECT_THROW(StringToOpenOptions("swapTAndY=illegal"), std::invalid_argument);
+    EXPECT_THROW(StringToOpenOptions("dimensionSwapWorkaround=illegal"), std::invalid_argument);
     EXPECT_THROW(StringToOpenOptions("defaultFrameOfReference=unknown"), std::invalid_argument);
     EXPECT_THROW(StringToOpenOptions("laxSubblockCoordinateChecks=true;laxSubblockCoordinateChecks=false"), std::invalid_argument);
     EXPECT_THROW(StringToOpenOptions("laxSubblockCoordinateChecks=true;"), std::invalid_argument);
@@ -672,9 +672,9 @@ TEST(Utilities, OpenOptionsStringDimensionSwapWorkaroundValues)
         ICZIReader::OpenOptions options;
         options.dimension_swap_workaround = c.value;
         const auto serialized = OpenOptionsToString(options);
-        EXPECT_NE(serialized.find("swapTAndY=" + std::string(c.text)), std::string::npos);
+        EXPECT_NE(serialized.find("dimensionSwapWorkaround=" + std::string(c.text)), std::string::npos);
 
-        const auto parsed = StringToOpenOptions(("laxSubblockCoordinateChecks=true;swapTAndY=" + std::string(c.text)).c_str());
+        const auto parsed = StringToOpenOptions(("laxSubblockCoordinateChecks=true;dimensionSwapWorkaround=" + std::string(c.text)).c_str());
         EXPECT_EQ(parsed.dimension_swap_workaround, c.value);
     }
 }

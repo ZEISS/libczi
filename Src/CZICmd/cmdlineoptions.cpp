@@ -406,6 +406,27 @@ struct CompressionOptionsValidator : public CLI::Validator
     }
 };
 
+/// CLI11-validator for the option "--open-options".
+struct OpenOptionsValidator : public CLI::Validator
+{
+    OpenOptionsValidator()
+    {
+        this->name_ = "OpenOptionsValidator";
+        this->func_ = [](const std::string& str) -> string
+            {
+                const bool parsed_ok = CCmdLineOptions::TryParseOpenOptions(str, nullptr);
+                if (!parsed_ok)
+                {
+                    ostringstream string_stream;
+                    string_stream << "Invalid open-options given \"" << str << "\"";
+                    throw CLI::ValidationError(string_stream.str());
+                }
+
+                return {};
+            };
+    }
+};
+
 /// CLI11-validator for the option "--generatorpixeltype".
 struct GeneratorPixelTypeValidator : public CLI::Validator
 {
@@ -558,6 +579,7 @@ CCmdLineOptions::ParseResult CCmdLineOptions::Parse(int argc, char** argv)
     const static BitmapGeneratorValidator bitmapgenerator_validator;
     const static CreateSubblockMetadataValidator createsubblockmetadata_validator;
     const static CompressionOptionsValidator compressionoptions_validator;
+    const static OpenOptionsValidator open_options_validator;
     const static GeneratorPixelTypeValidator generatorpixeltype_validator;
     const static CacheSizeValidator cachesize_validator;
     const static TileSizeForPlaneScanValidator tile_size_for_plane_scan_validator;
@@ -594,6 +616,7 @@ CCmdLineOptions::ParseResult CCmdLineOptions::Parse(int argc, char** argv)
     bool argument_versionflag = false;
     string argument_source_stream_class;
     string argument_source_stream_creation_propbag;
+    string argument_open_options;
     bool argument_use_visibility_check_optimization = false;
     bool argument_use_mask_aware_compositing = false;
 
@@ -636,6 +659,10 @@ CCmdLineOptions::ParseResult CCmdLineOptions::Parse(int argc, char** argv)
     cli_app.add_option("--propbag-source-stream-creation", argument_source_stream_creation_propbag,
         "Specifies the property-bag used for creating the stream used for reading the source CZI-file. The data is given in JSON-notation.")
         ->option_text("PROPBAG");
+    cli_app.add_option("--open-options", argument_open_options,
+            "Specifies libCZI reader OpenOptions as semicolon-separated key=value pairs.")
+        ->option_text("OPENOPTIONS")
+        ->check(open_options_validator);
     cli_app.add_option("-o,--output", argument_output_filename,
         "Specifies the output-filename. A suffix will be appended to the name given here depending on the type of the file.")
         ->option_text("OUTPUTFILE");
@@ -821,6 +848,12 @@ CCmdLineOptions::ParseResult CCmdLineOptions::Parse(int argc, char** argv)
         if (!argument_source_stream_class.empty())
         {
             this->source_stream_class = argument_source_stream_class;
+        }
+
+        if (!argument_open_options.empty())
+        {
+            const bool b = TryParseOpenOptions(argument_open_options, &this->open_options_);
+            ThrowIfFalse(b, "--open-options", argument_open_options);
         }
 
         if (!argument_source_stream_creation_propbag.empty())
@@ -2126,6 +2159,24 @@ void CCmdLineOptions::PrintHelpStreamsObjects()
         return true;
     }
     catch (exception&)
+    {
+        return false;
+    }
+}
+
+/*static*/bool CCmdLineOptions::TryParseOpenOptions(const std::string& s, libCZI::ICZIReader::OpenOptions* open_options)
+{
+    try
+    {
+        const auto parsed_options = libCZI::StringToOpenOptions(s.c_str());
+        if (open_options != nullptr)
+        {
+            *open_options = parsed_options;
+        }
+
+        return true;
+    }
+    catch (const std::exception&)
     {
         return false;
     }

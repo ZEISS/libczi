@@ -25,7 +25,7 @@ std::shared_ptr<ICZIReader> CExecuteBase::CreateAndOpenCziReader(const CCmdLineO
     }
 
     auto spReader = libCZI::CreateCZIReader();
-    spReader->Open(stream);
+    spReader->Open(stream, &options.GetOpenOptions());
     return spReader;
 }
 

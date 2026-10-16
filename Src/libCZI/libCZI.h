@@ -934,25 +934,31 @@ namespace libCZI
         }
     };
 
-    /// Converts reader open options to a semicolon-separated list of key=value pairs.
-    /// The canonical keys are laxSubblockCoordinateChecks, ignoreSizeMForPyramidSubblocks,
-    /// swapTAndY, defaultFrameOfReference, subBlockDirectoryInfoPrecedence, and
-    /// subBlockDirectoryInfoDiscrepancy. Boolean values are "true" or "false"; the frame-of-reference
-    /// values are the CZIFrameOfReference enumerator names; precedence is
-    /// "SubBlockDirectoryPrecedence" or "SubBlockHeaderPrecedence"; discrepancy is "error" or "ignore".
-    /// \param options Reader open options to serialize.
-    /// \return Semicolon-separated key=value representation of the specified options.
-    /// Throws std::invalid_argument if an option contains an enum value or policy bits that cannot be represented.
+    /// Converts reader open options to semicolon-separated key=value pairs in canonical order.
+    /// Supported keys and defaults:
+    /// - laxSubblockCoordinateChecks: true/false (default true); controls lax validation of sub-block coordinates.
+    /// - ignoreSizeMForPyramidSubblocks: true/false (default false); ignores pyramid-subblock size-M during strict
+    ///   validation. Has no effect when lax coordinate checks are enabled.
+    /// - dimensionSwapWorkaround: None, XtSubblocks, or XzSubblocks (default None); selects a dimension-swap
+    ///   compatibility workaround.
+    /// - defaultFrameOfReference: Invalid, Default, RawSubBlockCoordinateSystem, or PixelCoordinateSystem
+    ///   (default Invalid). Invalid and Default resolve to the raw sub-block coordinate system.
+    /// - subBlockDirectoryInfoPrecedence: SubBlockDirectoryPrecedence (default) or SubBlockHeaderPrecedence;
+    ///   selects the authoritative source for sub-block information.
+    /// - subBlockDirectoryInfoDiscrepancy: error (default) or ignore; selects how discrepancies are handled.
+    /// \param options The options to serialize.
+    /// \return The canonical semicolon-separated representation.
+    /// \throws std::invalid_argument If an enum value or policy bits cannot be represented.
     LIBCZI_API std::string OpenOptionsToString(const ICZIReader::OpenOptions& options);
 
-    /// Parses reader open options from semicolon-separated key=value pairs.
-    /// Whitespace around keys, values, and pairs is ignored. Empty input returns default options;
-    /// omitted keys use their defaults. Unknown keys are ignored. Keys and values are case-sensitive.
-    /// Duplicate keys, empty pairs, malformed pairs, and invalid values throw std::invalid_argument.
-    /// Values cannot contain '=' or ';'; escaping is not supported.
-    /// \param options Null-terminated UTF-8 string containing semicolon-separated key=value pairs.
-    /// \return Parsed reader open options. Defaults are applied for omitted keys.
-    /// Throws std::invalid_argument if the input is null or contains invalid syntax or values.
+    /// Parses reader open options from semicolon-separated key=value pairs using the keys and values
+    /// documented by OpenOptionsToString. Empty input returns default options; omitted keys retain
+    /// their defaults. Whitespace around pairs, keys, and values is ignored. Unknown keys are ignored.
+    /// Keys and values are case-sensitive. Duplicate keys, empty pairs, malformed pairs, and invalid
+    /// values throw std::invalid_argument. Values cannot contain '=' or ';'; escaping is unsupported.
+    /// \param options Null-terminated string containing the key=value pairs; must not be null.
+    /// \return The parsed options.
+    /// \throws std::invalid_argument If the input is null or contains invalid syntax or values.
     LIBCZI_API ICZIReader::OpenOptions StringToOpenOptions(const char* options);
 }
 

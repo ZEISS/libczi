@@ -887,7 +887,7 @@ std::string libCZI::OpenOptionsToString(const ICZIReader::OpenOptions& options)
         (options.lax_subblock_coordinate_checks ? "true" : "false") +
         ";ignoreSizeMForPyramidSubblocks=" +
         (options.ignore_sizem_for_pyramid_subblocks ? "true" : "false") +
-        ";swapTAndY=" +
+        ";dimensionSwapWorkaround=" +
         DimensionSwapWorkaroundToString(options.dimension_swap_workaround) +
         ";defaultFrameOfReference=" + frame_of_reference +
         ";subBlockDirectoryInfoPrecedence=" + precedence +
@@ -944,7 +944,7 @@ ICZIReader::OpenOptions libCZI::StringToOpenOptions(const char* options_string)
         {
             options.ignore_sizem_for_pyramid_subblocks = ParseOpenOptionsBoolean(value);
         }
-        else if (key == "swapTAndY")
+        else if (key == "dimensionSwapWorkaround")
         {
             options.dimension_swap_workaround = ParseDimensionSwapWorkaround(value);
         }
