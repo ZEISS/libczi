@@ -853,8 +853,8 @@ namespace libCZI
 
             /// Compatibility workaround for legacy CZI documents that store the vertical
             /// image coordinate in dimension T or Z instead of dimension Y. When enabled,
-            /// libCZI interprets T or Z as Y while parsing sub-block directory entries and
-            /// ignores Y entries. This can make documents using this non-standard
+            /// libCZI swaps T or Z with Y in both the directory and sub-block headers.
+            /// The original Y coordinate becomes T or Z. This can make documents using this non-standard
             /// convention accessible, but changes the interpretation of their dimensions.
             /// Leave disabled unless needed for an affected document. The default is
             /// 'DimensionSwapWorkaround::None'.
