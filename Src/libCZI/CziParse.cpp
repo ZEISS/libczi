@@ -346,7 +346,8 @@ using namespace libCZI::detail;
             }
             else
             {
-                libCZI::DimensionIndex dim = CCZIParse::DimensionCharToDimensionIndex(dimEntry->Dimension, sizeof(dimEntry->Dimension));
+                //libCZI::DimensionIndex dim = CCZIParse::DimensionCharToDimensionIndex(dimEntry->Dimension, sizeof(dimEntry->Dimension));
+                libCZI::DimensionIndex dim = CCZIParse::DimensionCharToDimensionIndexConsideringSwapYWith(dimEntry->Dimension, sizeof(dimEntry->Dimension), dimensionIndexToSwapWithY);
                 sbd.coordinate.Set(dim, dimEntry->Start);
             }
         }
@@ -934,6 +935,16 @@ using namespace libCZI::detail;
         {
             return DimensionIndex::Z;
         }
+    }
+
+    return CCZIParse::DimensionCharToDimensionIndex(ptr, size);
+}
+
+/*static*/libCZI::DimensionIndex CCZIParse::DimensionCharToDimensionIndexConsideringSwapYWith(const char* ptr, size_t size, DimensionIndex dimensionIndexToSwapWithY)
+{
+    if (CCZIParse::IsYDimension(ptr, size))
+    {
+        return dimensionIndexToSwapWithY;
     }
 
     return CCZIParse::DimensionCharToDimensionIndex(ptr, size);

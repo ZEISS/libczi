@@ -2241,7 +2241,7 @@ void CCmdLineOptions::PrintHelpStreamsObjects()
 
 /*static*/bool CCmdLineOptions::TryParseRect(const std::string& str, bool* absolute_mode, int* x_position, int* y_position, int* width, int* height)
 {
-    const regex rect_regex(R"(((abs|rel)\(([\+|-]?[[:digit:]]+),([\+|-]?[[:digit:]]+)),([\+]?[[:digit:]]+),([\+]?[[:digit:]]+)\))");
+    const regex rect_regex(R"((\s*(abs|rel)\(\s*([+-]?[[:digit:]]+)\s*,\s*([+-]?[[:digit:]]+)\s*,\s*([+]?[[:digit:]]+)\s*,\s*([+]?[[:digit:]]+)\s*\)\s*))");
     smatch pieces_match;
 
     if (regex_match(str, pieces_match, rect_regex))

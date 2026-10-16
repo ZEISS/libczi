@@ -235,6 +235,7 @@ namespace libCZI
             static void AddEntryToSubBlockDirectory(const SubBlockDirectoryEntryDV* subBlkDirDV, const std::function<void(const CCziSubBlockDirectoryBase::SubBlkEntry&)>& addFunc, const SubblockDirectoryParseOptions& options);
 
             static libCZI::DimensionIndex DimensionCharToDimensionIndexConsideringDimensionSwap(const char* ptr, size_t size, const SubblockDirectoryParseOptions& options);
+            static libCZI::DimensionIndex DimensionCharToDimensionIndexConsideringSwapYWith(const char* ptr, size_t size, DimensionIndex dimensionIndexToSwapWithY);
             static libCZI::DimensionIndex DimensionCharToDimensionIndex(const char* ptr, size_t size);
             static bool IsMDimension(const char* ptr, size_t size);
             static bool IsXDimension(const char* ptr, size_t size);
