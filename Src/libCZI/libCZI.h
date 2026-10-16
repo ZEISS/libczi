@@ -953,12 +953,13 @@ namespace libCZI
 
     /// Parses reader open options from semicolon-separated key=value pairs using the keys and values
     /// documented by OpenOptionsToString. Empty input returns default options; omitted keys retain
-    /// their defaults. Whitespace around pairs, keys, and values is ignored. Unknown keys are ignored.
-    /// Keys and values are case-sensitive. Duplicate keys, empty pairs, malformed pairs, and invalid
-    /// values throw std::invalid_argument. Values cannot contain '=' or ';'; escaping is unsupported.
+    /// their defaults. Whitespace around pairs, keys, and values is ignored. Unknown keys throw
+    /// std::invalid_argument. Keys and values are case-sensitive. Duplicate keys, empty pairs,
+    /// malformed pairs, and invalid values also throw std::invalid_argument.
+    /// Values cannot contain '=' or ';'; escaping is unsupported.
     /// \param options Null-terminated string containing the key=value pairs; must not be null.
     /// \return The parsed options.
-    /// \throws std::invalid_argument If the input is null or contains invalid syntax or values.
+    /// \throws std::invalid_argument If the input is null or contains an unknown key, invalid syntax, or invalid value.
     LIBCZI_API ICZIReader::OpenOptions StringToOpenOptions(const char* options);
 }
 

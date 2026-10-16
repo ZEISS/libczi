@@ -38,7 +38,8 @@ static CCZIParse::SubblockDirectoryParseOptions GetParseOptionsFromOpenOptions(c
 CCZIReader::CCZIReader() :
     isOperational(false),
     default_frame_of_reference(CZIFrameOfReference::Invalid),
-    sub_block_directory_info_policy_(ICZIReader::OpenOptions::SubBlockDirectoryInfoPolicy::SubBlockDirectoryPrecedence)
+    sub_block_directory_info_policy_(ICZIReader::OpenOptions::SubBlockDirectoryInfoPolicy::SubBlockDirectoryPrecedence),
+    dimension_swap_workaround_(ICZIReader::OpenOptions::DimensionSwapWorkaround::None)
 {
 }
 
@@ -78,6 +79,7 @@ CCZIReader::CCZIReader() :
     }
 
     this->sub_block_directory_info_policy_ = options->subBlockDirectoryInfoPolicy;
+    this->dimension_swap_workaround_ = options->dimension_swap_workaround;
 
     this->SetOperationalState(true);
 }

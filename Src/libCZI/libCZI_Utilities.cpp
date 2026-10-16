@@ -81,7 +81,7 @@ namespace
             return ICZIReader::OpenOptions::DimensionSwapWorkaround::XzSubblocks;
         }
 
-        throw std::invalid_argument("Invalid swapTAndY value in OpenOptions string.");
+        throw std::invalid_argument("Invalid dimensionSwapWorkaround value in OpenOptions string.");
     }
 
     bool tryParseCompressionMode(const std::string& s, libCZI::CompressionMode* m)
@@ -1009,6 +1009,10 @@ ICZIReader::OpenOptions libCZI::StringToOpenOptions(const char* options_string)
             }
 
             options.subBlockDirectoryInfoPolicy = static_cast<ICZIReader::OpenOptions::SubBlockDirectoryInfoPolicy>(policy);
+        }
+        else
+        {
+            throw std::invalid_argument("Unknown key in OpenOptions string: " + key);
         }
 
         if (separator == std::string::npos)

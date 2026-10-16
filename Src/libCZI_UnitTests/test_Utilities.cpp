@@ -612,7 +612,7 @@ TEST(Utilities, OpenOptionsStringRoundTrip)
         static_cast<std::uint8_t>(options.subBlockDirectoryInfoPolicy));
 }
 
-TEST(Utilities, OpenOptionsStringDefaultsAndUnknownKeys)
+TEST(Utilities, OpenOptionsStringDefaultsAndRejectsUnknownKeys)
 {
     const auto empty_options = StringToOpenOptions("");
     const ICZIReader::OpenOptions default_options{};
@@ -624,10 +624,9 @@ TEST(Utilities, OpenOptionsStringDefaultsAndUnknownKeys)
     EXPECT_EQ(static_cast<std::uint8_t>(empty_options.subBlockDirectoryInfoPolicy),
         static_cast<std::uint8_t>(default_options.subBlockDirectoryInfoPolicy));
 
-    const auto options_with_unknown_key =
-        StringToOpenOptions("futureOption=value;laxSubblockCoordinateChecks=false");
-    EXPECT_FALSE(options_with_unknown_key.lax_subblock_coordinate_checks);
-    EXPECT_FALSE(options_with_unknown_key.ignore_sizem_for_pyramid_subblocks);
+    EXPECT_THROW(
+        StringToOpenOptions("futureOption=value;laxSubblockCoordinateChecks=false"),
+        std::invalid_argument);
 }
 
 TEST(Utilities, OpenOptionsStringRejectsMalformedInput)
