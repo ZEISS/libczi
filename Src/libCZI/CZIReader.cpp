@@ -18,21 +18,37 @@ using namespace std;
 using namespace libCZI;
 using namespace libCZI::detail;
 
-static CCZIParse::SubblockDirectoryParseOptions GetParseOptionsFromOpenOptions(const ICZIReader::OpenOptions& options)
+namespace
 {
-    CCZIParse::SubblockDirectoryParseOptions parse_options;
-    if (options.lax_subblock_coordinate_checks == false)
+    CCZIParse::SubblockDirectoryParseOptions GetParseOptionsFromOpenOptions(const ICZIReader::OpenOptions& options)
     {
-        parse_options.SetStrictParsing();
-        if (options.ignore_sizem_for_pyramid_subblocks)
+        CCZIParse::SubblockDirectoryParseOptions parse_options;
+        if (options.lax_subblock_coordinate_checks == false)
         {
-            // in this case we require only that non-pyramid-subblocks have a SizeM=1
-            parse_options.SetDimensionMMustHaveSizeOne(false);
-            parse_options.SetDimensionMMustHaveSizeOneExceptForPyramidSubblocks(true);
+            parse_options.SetStrictParsing();
+            if (options.ignore_sizem_for_pyramid_subblocks)
+            {
+                // in this case we require only that non-pyramid-subblocks have a SizeM=1
+                parse_options.SetDimensionMMustHaveSizeOne(false);
+                parse_options.SetDimensionMMustHaveSizeOneExceptForPyramidSubblocks(true);
+            }
         }
-    }
 
-    return parse_options;
+        // Choose the appropriate workaround for dimension-swapping issues.
+        switch (options.dimension_swap_workaround)
+        {
+        case ICZIReader::OpenOptions::DimensionSwapWorkaround::None:
+            break;
+        case ICZIReader::OpenOptions::DimensionSwapWorkaround::XtSubblocks:
+            parse_options.SetTreatTasY(true);
+            break;
+        case ICZIReader::OpenOptions::DimensionSwapWorkaround::XzSubblocks:
+            parse_options.SetTreatZasY(true);
+            break;
+        }
+
+        return parse_options;
+    }
 }
 
 CCZIReader::CCZIReader() :
@@ -78,8 +94,8 @@ CCZIReader::CCZIReader() :
         break;
     }
 
-    this->sub_block_directory_info_policy_ = options->subBlockDirectoryInfoPolicy;
     this->dimension_swap_workaround_ = options->dimension_swap_workaround;
+    this->sub_block_directory_info_policy_ = options->subBlockDirectoryInfoPolicy;
 
     this->SetOperationalState(true);
 }

@@ -768,7 +768,7 @@ using namespace libCZI::detail;
         }
         else
         {
-            libCZI::DimensionIndex dim = CCZIParse::DimensionCharToDimensionIndex(subBlkDirDV->DimensionEntries[i].Dimension, 4);
+            libCZI::DimensionIndex dim = CCZIParse::DimensionCharToDimensionIndexConsideringDimensionSwap(subBlkDirDV->DimensionEntries[i].Dimension, 4, options);
             entry.coordinate.Set(dim, subBlkDirDV->DimensionEntries[i].Start);
 
             if (options.GetPhysicalDimensionOtherThanMMustHaveSizeOne())
@@ -916,6 +916,27 @@ using namespace libCZI::detail;
     }
 
     return c;
+}
+
+/*static*/libCZI::DimensionIndex CCZIParse::DimensionCharToDimensionIndexConsideringDimensionSwap(const char* ptr, size_t size, const SubblockDirectoryParseOptions& options)
+{
+    // here we check if the user wants to treat Z as Y or T as Y, and if so, we check if the dimension is Y and return Z or T instead of Y
+    if (options.GetTreatTAsY())
+    {
+        if (CCZIParse::IsYDimension(ptr, size))
+        {
+            return DimensionIndex::T;
+        }
+    }
+    else if (options.GetTreatZAsY())
+    {
+        if (CCZIParse::IsYDimension(ptr, size))
+        {
+            return DimensionIndex::Z;
+        }
+    }
+
+    return CCZIParse::DimensionCharToDimensionIndex(ptr, size);
 }
 
 /*static*/libCZI::DimensionIndex CCZIParse::DimensionCharToDimensionIndex(const char* ptr, size_t size)
