@@ -346,7 +346,6 @@ using namespace libCZI::detail;
             }
             else
             {
-                //libCZI::DimensionIndex dim = CCZIParse::DimensionCharToDimensionIndex(dimEntry->Dimension, sizeof(dimEntry->Dimension));
                 libCZI::DimensionIndex dim = CCZIParse::DimensionCharToDimensionIndexConsideringSwapYWith(dimEntry->Dimension, sizeof(dimEntry->Dimension), dimensionIndexToSwapWithY);
                 sbd.coordinate.Set(dim, dimEntry->Start);
             }
@@ -440,6 +439,8 @@ using namespace libCZI::detail;
 
 /*static*/CCZIParse::SubBlockData CCZIParse::ReadSubBlock(libCZI::IStream* str, std::uint64_t offset, const SubBlockStorageAllocate& allocateInfo)
 {
+    return CCZIParse::ReadSubBlockWithDimensionSwap(str, offset, allocateInfo, DimensionIndex::invalid);
+    /*
     SubBlockSegment subBlckSegment;
     std::uint64_t bytesRead;
 
@@ -623,6 +624,7 @@ using namespace libCZI::detail;
     sbd.ptrMetadata = pMetadataBuffer.release();
     sbd.metaDataSize = subBlckSegment.data.MetadataSize;
     return sbd;
+    */
 }
 
 /*static*/CCZIParse::AttachmentData CCZIParse::ReadAttachment(libCZI::IStream* str, std::uint64_t offset, const SubBlockStorageAllocate& allocateInfo)
@@ -924,17 +926,11 @@ using namespace libCZI::detail;
     // here we check if the user wants to treat Z as Y or T as Y, and if so, we check if the dimension is Y and return Z or T instead of Y
     if (options.GetTreatTAsY())
     {
-        if (CCZIParse::IsYDimension(ptr, size))
-        {
-            return DimensionIndex::T;
-        }
+        return DimensionCharToDimensionIndexConsideringSwapYWith(ptr, size, DimensionIndex::T);
     }
     else if (options.GetTreatZAsY())
     {
-        if (CCZIParse::IsYDimension(ptr, size))
-        {
-            return DimensionIndex::Z;
-        }
+        return DimensionCharToDimensionIndexConsideringSwapYWith(ptr, size, DimensionIndex::Z);
     }
 
     return CCZIParse::DimensionCharToDimensionIndex(ptr, size);
@@ -942,7 +938,7 @@ using namespace libCZI::detail;
 
 /*static*/libCZI::DimensionIndex CCZIParse::DimensionCharToDimensionIndexConsideringSwapYWith(const char* ptr, size_t size, DimensionIndex dimensionIndexToSwapWithY)
 {
-    if (CCZIParse::IsYDimension(ptr, size))
+    if (dimensionIndexToSwapWithY != DimensionIndex::invalid && CCZIParse::IsYDimension(ptr, size))
     {
         return dimensionIndexToSwapWithY;
     }

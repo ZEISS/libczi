@@ -251,7 +251,6 @@ namespace libCZI
 
             static bool CheckAttachmentSchemaType(const char* p, size_t cnt);
 
-            //static bool HandleYDimension(const char* dimension_string, size_t size_dimension_string);
             static bool HandleYDimension(const DimensionEntryDV& dimension_entry, const SubblockDirectoryParseOptions& options, CCziSubBlockDirectory::SubBlkEntry& entry);
         };
 
