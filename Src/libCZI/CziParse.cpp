@@ -338,7 +338,7 @@ using namespace libCZI::detail;
                 sbd.physicalSize.w = dimEntry->StoredSize;
             }
             else if ((dimensionIndexToSwapWithY == DimensionIndex::invalid && IsYDimension(dimEntry->Dimension, sizeof(dimEntry->Dimension))) ||
-                     (dimensionIndexToSwapWithY != DimensionIndex::invalid && IsDimension(dimEntry->Dimension, sizeof(dimEntry->Dimension), Utils::DimensionToChar(dimensionIndexToSwapWithY))))
+                        (dimensionIndexToSwapWithY != DimensionIndex::invalid && IsDimension(dimEntry->Dimension, sizeof(dimEntry->Dimension), Utils::DimensionToChar(dimensionIndexToSwapWithY))))
             {
                 sbd.logicalRect.y = dimEntry->Start;
                 sbd.logicalRect.h = dimEntry->Size;
