@@ -85,6 +85,10 @@ The synopsis of the program is:
                         for reading the source CZI-file. The data is given in
                         JSON-notation.
 
+      --open-options OPENOPTIONS
+                        Specifies reader options as semicolon-separated
+                        key=value pairs; see "Reader open options" below.
+
       -o,--output OUTPUTFILE
                         Specifies the output-filename. A suffix will be appended to
                         the name given here depending on the type of the file.
@@ -584,6 +588,40 @@ An example for a display-setting when specifying a spline is:
 Note that it is a flat list of numbers, where the first number is interpreted as X and the second as Y - and so on.
 
 Passing this JSON on the commandline might be challenging, though - because many characters need to be escaped (depending on your command shell).
+
+.. _czicmd-reader-options:
+
+Reader open options
+-------------------
+
+``--open-options`` passes reader settings as a quoted string of
+semicolon-separated ``key=value`` pairs. For example, inspect an X-T line-scan
+document with T interpreted as bitmap rows:
+
+.. code-block:: console
+
+    CZIcmd --command PrintInformation --source linescan.czi --open-options "dimensionSwapWorkaround=XtSubblocks"
+
+For a document whose mapped plane coordinates are C0T0, extract a region
+256 columns wide and 1024 rows high from the mapped bounding-box origin:
+
+.. code-block:: console
+
+    CZIcmd --command SingleChannelTileAccessor --source linescan.czi --output linescan --plane-coordinate C0T0 --rect "rel(0,0,256,1024)" --open-options "dimensionSwapWorkaround=XtSubblocks"
+
+Use the actual plane coordinates and desired region reported for your document.
+After the XT swap, rows represent time samples, and the T plane coordinate
+comes from the original Y coordinate. For X-Z sub-blocks use ``XzSubblocks``;
+the original Y coordinate then becomes the Z plane coordinate.
+
+If a known directory/header discrepancy also needs to be ignored, explicitly
+append ``;subBlockDirectoryInfoDiscrepancy=ignore`` inside the quoted option
+string. This is independent of the dimension swap and is disabled by default.
+The directory remains authoritative unless
+``subBlockDirectoryInfoPrecedence=SubBlockHeaderPrecedence`` is selected.
+
+See :doc:`reader_compatibility` for the acquisition background, all supported
+keys, and the C++ equivalents. On Windows the executable is ``CZIcmd.exe``.
 
 command 'ExtractAttachment'
 ----------------------------------------
