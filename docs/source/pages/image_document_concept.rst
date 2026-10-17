@@ -15,6 +15,10 @@ The sub-blocks contained in a CZI-file are conceptually organized as follows:
 .. image:: ../_static/images/image_document_concept1.PNG
    :alt: sub-blocks on a plane
 
+Some acquisition workflows store X-T or X-Z images within individual sub-blocks.
+For explicit reader options that adapt this alternative dimension convention
+to the X-Y bitmap model described here, see :doc:`reader_compatibility`.
+
 The case where we have different planes in one document is depicted here:
 
 .. image:: ../_static/images/image_document_concept2.PNG

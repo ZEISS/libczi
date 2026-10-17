@@ -584,3 +584,96 @@ TEST(Utilities, Tokenize)
     EXPECT_EQ(tokens[0], L"");
     EXPECT_EQ(tokens[1], L"");
 }
+
+TEST(Utilities, OpenOptionsStringRoundTrip)
+{
+    ICZIReader::OpenOptions options;
+    options.lax_subblock_coordinate_checks = false;
+    options.ignore_sizem_for_pyramid_subblocks = true;
+    options.dimension_swap_workaround =
+        ICZIReader::OpenOptions::DimensionSwapWorkaround::XtSubblocks;
+    options.default_frame_of_reference = CZIFrameOfReference::PixelCoordinateSystem;
+    options.subBlockDirectoryInfoPolicy = static_cast<ICZIReader::OpenOptions::SubBlockDirectoryInfoPolicy>(
+        static_cast<std::uint8_t>(ICZIReader::OpenOptions::SubBlockDirectoryInfoPolicy::SubBlockHeaderPrecedence) |
+        static_cast<std::uint8_t>(ICZIReader::OpenOptions::SubBlockDirectoryInfoPolicy::IgnoreDiscrepancy));
+
+    const auto serialized = OpenOptionsToString(options);
+    EXPECT_EQ(serialized,
+        "laxSubblockCoordinateChecks=false;ignoreSizeMForPyramidSubblocks=true;dimensionSwapWorkaround=XtSubblocks;"
+        "defaultFrameOfReference=PixelCoordinateSystem;subBlockDirectoryInfoPrecedence=SubBlockHeaderPrecedence;"
+        "subBlockDirectoryInfoDiscrepancy=ignore");
+
+    const auto parsed = StringToOpenOptions(serialized.c_str());
+    EXPECT_EQ(parsed.lax_subblock_coordinate_checks, options.lax_subblock_coordinate_checks);
+    EXPECT_EQ(parsed.ignore_sizem_for_pyramid_subblocks, options.ignore_sizem_for_pyramid_subblocks);
+    EXPECT_EQ(parsed.dimension_swap_workaround, options.dimension_swap_workaround);
+    EXPECT_EQ(parsed.default_frame_of_reference, options.default_frame_of_reference);
+    EXPECT_EQ(static_cast<std::uint8_t>(parsed.subBlockDirectoryInfoPolicy),
+        static_cast<std::uint8_t>(options.subBlockDirectoryInfoPolicy));
+}
+
+TEST(Utilities, OpenOptionsStringDefaultsAndRejectsUnknownKeys)
+{
+    const auto empty_options = StringToOpenOptions("");
+    const ICZIReader::OpenOptions default_options{};
+
+    EXPECT_EQ(empty_options.lax_subblock_coordinate_checks, default_options.lax_subblock_coordinate_checks);
+    EXPECT_EQ(empty_options.ignore_sizem_for_pyramid_subblocks, default_options.ignore_sizem_for_pyramid_subblocks);
+    EXPECT_EQ(empty_options.dimension_swap_workaround, default_options.dimension_swap_workaround);
+    EXPECT_EQ(empty_options.default_frame_of_reference, default_options.default_frame_of_reference);
+    EXPECT_EQ(static_cast<std::uint8_t>(empty_options.subBlockDirectoryInfoPolicy),
+        static_cast<std::uint8_t>(default_options.subBlockDirectoryInfoPolicy));
+
+    EXPECT_THROW(
+        StringToOpenOptions("futureOption=value;laxSubblockCoordinateChecks=false"),
+        std::invalid_argument);
+}
+
+TEST(Utilities, OpenOptionsStringRejectsMalformedInput)
+{
+    EXPECT_THROW(StringToOpenOptions(nullptr), std::invalid_argument);
+    EXPECT_THROW(StringToOpenOptions("laxSubblockCoordinateChecks=yes"), std::invalid_argument);
+    EXPECT_THROW(StringToOpenOptions("dimensionSwapWorkaround=illegal"), std::invalid_argument);
+    EXPECT_THROW(StringToOpenOptions("defaultFrameOfReference=unknown"), std::invalid_argument);
+    EXPECT_THROW(StringToOpenOptions("laxSubblockCoordinateChecks=true;laxSubblockCoordinateChecks=false"), std::invalid_argument);
+    EXPECT_THROW(StringToOpenOptions("laxSubblockCoordinateChecks=true;"), std::invalid_argument);
+    EXPECT_THROW(StringToOpenOptions("missingEquals"), std::invalid_argument);
+}
+
+TEST(Utilities, OpenOptionsStringRejectsUnrepresentableOptions)
+{
+    ICZIReader::OpenOptions options;
+
+    options.default_frame_of_reference = static_cast<CZIFrameOfReference>(0xff);
+    EXPECT_THROW(OpenOptionsToString(options), std::invalid_argument);
+
+    options.default_frame_of_reference = CZIFrameOfReference::Invalid;
+    options.subBlockDirectoryInfoPolicy = static_cast<ICZIReader::OpenOptions::SubBlockDirectoryInfoPolicy>(0x02);
+    EXPECT_THROW(OpenOptionsToString(options), std::invalid_argument);
+
+    options.subBlockDirectoryInfoPolicy = ICZIReader::OpenOptions::SubBlockDirectoryInfoPolicy::SubBlockDirectoryPrecedence;
+    options.dimension_swap_workaround = static_cast<ICZIReader::OpenOptions::DimensionSwapWorkaround>(0xff);
+    EXPECT_THROW(OpenOptionsToString(options), std::invalid_argument);
+}
+
+TEST(Utilities, OpenOptionsStringDimensionSwapWorkaroundValues)
+{
+    struct Case { ICZIReader::OpenOptions::DimensionSwapWorkaround value; const char* text; };
+    const std::vector<Case> cases =
+    {
+        { ICZIReader::OpenOptions::DimensionSwapWorkaround::None, "None" },
+        { ICZIReader::OpenOptions::DimensionSwapWorkaround::XtSubblocks, "XtSubblocks" },
+        { ICZIReader::OpenOptions::DimensionSwapWorkaround::XzSubblocks, "XzSubblocks" }
+    };
+
+    for (const auto& c : cases)
+    {
+        ICZIReader::OpenOptions options;
+        options.dimension_swap_workaround = c.value;
+        const auto serialized = OpenOptionsToString(options);
+        EXPECT_NE(serialized.find("dimensionSwapWorkaround=" + std::string(c.text)), std::string::npos);
+
+        const auto parsed = StringToOpenOptions(("laxSubblockCoordinateChecks=true;dimensionSwapWorkaround=" + std::string(c.text)).c_str());
+        EXPECT_EQ(parsed.dimension_swap_workaround, c.value);
+    }
+}

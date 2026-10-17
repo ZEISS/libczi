@@ -28,6 +28,7 @@ namespace libCZI
             bool    isOperational;  ///<    If true, then stream, hdrSegmentData and subBlkDir can be considered valid and operational
             libCZI::CZIFrameOfReference default_frame_of_reference;
             libCZI::ICZIReader::OpenOptions::SubBlockDirectoryInfoPolicy sub_block_directory_info_policy_;
+            libCZI::ICZIReader::OpenOptions::DimensionSwapWorkaround dimension_swap_workaround_;
         public:
             CCZIReader();
             ~CCZIReader() override = default;
