@@ -279,7 +279,8 @@ using namespace libCZI::detail;
     }
 
     uint32_t lengthSubblockSegmentData = 0;
-    SubBlockData sbd;
+    SubBlockData sbd{};
+    sbd.logicalRect.Invalidate();  // remains invalid if X or the interpreted row dimension is absent
     if (subBlckSegment.data.entrySchema[0] == 'D' && subBlckSegment.data.entrySchema[1] == 'V')
     {
         ConvertToHostByteOrder::Convert(&subBlckSegment.data.entryDV);

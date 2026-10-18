@@ -40,9 +40,11 @@ namespace
         case ICZIReader::OpenOptions::DimensionSwapWorkaround::None:
             break;
         case ICZIReader::OpenOptions::DimensionSwapWorkaround::XtSubblocks:
+            parse_options.SetDimensionXyMustBePresent(true);  // required even with lax size checks
             parse_options.SetTreatTasY(true);
             break;
         case ICZIReader::OpenOptions::DimensionSwapWorkaround::XzSubblocks:
+            parse_options.SetDimensionXyMustBePresent(true);
             parse_options.SetTreatZasY(true);
             break;
         }
@@ -386,6 +388,9 @@ std::shared_ptr<ISubBlock> CCZIReader::ReadSubBlock(const CCziSubBlockDirectory:
     std::unique_ptr<void, decltype(dataDeleter)> attachmentGuard(subBlkData.ptrAttachment, dataDeleter);
     std::unique_ptr<void, decltype(dataDeleter)> metadataGuard(subBlkData.ptrMetadata, dataDeleter);
 
+    const bool missing_mapped_geometry = this->dimension_swap_workaround_ != OpenOptions::DimensionSwapWorkaround::None &&
+        !subBlkData.logicalRect.IsValid();
+
     // We now use configuration options to determine 
     // - whether we want to use the information from the sub-block-directory or the sub-block-header.
     // - whether we want to ignore discrepancies between the two.
@@ -393,7 +398,7 @@ std::shared_ptr<ISubBlock> CCZIReader::ReadSubBlock(const CCziSubBlockDirectory:
     if (static_cast<std::underlying_type<OpenOptions::SubBlockDirectoryInfoPolicy>::type>(this->sub_block_directory_info_policy_ & OpenOptions::SubBlockDirectoryInfoPolicy::IgnoreDiscrepancy) == 0)
     {
         // check whether the information in the sub-block-directory and the sub-block-header match, and if not, throw an exception
-        if (entry.PixelType != subBlkData.pixelType ||
+        if (missing_mapped_geometry || entry.PixelType != subBlkData.pixelType ||
             entry.Compression != subBlkData.compression ||
             Utils::Compare(&entry.coordinate, &subBlkData.coordinate) != 0 ||
             (Utils::IsValidMindex(entry.mIndex) != Utils::IsValidMindex(subBlkData.mIndex) || (Utils::IsValidMindex(subBlkData.mIndex) && entry.mIndex != subBlkData.mIndex)) ||
@@ -420,6 +425,13 @@ std::shared_ptr<ISubBlock> CCZIReader::ReadSubBlock(const CCziSubBlockDirectory:
     }
     else
     {
+        if (missing_mapped_geometry)
+        {
+            throw LibCZICZIParseException(
+                "CZIReader::ReadSubBlock: Sub-block header has invalid or missing mapped geometry.",
+                LibCZICZIParseException::ErrorCode::NonConformingSubBlockDimensionEntry);
+        }
+
         info.pixelType = CziUtils::PixelTypeFromInt(subBlkData.pixelType);
         info.compressionModeRaw = subBlkData.compression;
         info.coordinate = subBlkData.coordinate;
