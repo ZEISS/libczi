@@ -60,3 +60,4 @@ Version history
  0.69.1             | [174](https://github.com/ZEISS/libczi/pull/174)      | fix CMake package export for external LZ4 and document vcpkg overlay ports
  0.69.2             | [177](https://github.com/ZEISS/libczi/pull/177)      | fix EOF-behavior of Windows-stream-implementations
  0.70.0             | [180](https://github.com/ZEISS/libczi/pull/180)      | add fractional-seconds to `XmlDateTime`, add new method `ISubBlockMetadataMetadataView::TryGetTagAsXmlDateTime`
+ 0.71.0             | [181](https://github.com/ZEISS/libczi/pull/181)      | add opt-in XT/XZ dimension mapping, reader open-options string conversion and CZIcmd `--open-options`; see [Reader compatibility options](reader_compatibility.html)

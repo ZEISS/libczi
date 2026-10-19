@@ -249,7 +249,7 @@ using namespace libCZI::detail;
     }
 }
 
-/*static*/CCZIParse::SubBlockData CCZIParse::ReadSubBlock(libCZI::IStream* str, std::uint64_t offset, const SubBlockStorageAllocate& allocateInfo)
+/*static*/CCZIParse::SubBlockData CCZIParse::ReadSubBlockWithDimensionSwap(libCZI::IStream* str, std::uint64_t offset, const SubBlockStorageAllocate& allocateInfo, DimensionIndex dimensionIndexToSwapWithY)
 {
     SubBlockSegment subBlckSegment;
     std::uint64_t bytesRead;
@@ -279,7 +279,8 @@ using namespace libCZI::detail;
     }
 
     uint32_t lengthSubblockSegmentData = 0;
-    SubBlockData sbd;
+    SubBlockData sbd{};
+    sbd.logicalRect.Invalidate();  // remains invalid if X or the interpreted row dimension is absent
     if (subBlckSegment.data.entrySchema[0] == 'D' && subBlckSegment.data.entrySchema[1] == 'V')
     {
         ConvertToHostByteOrder::Convert(&subBlckSegment.data.entryDV);
@@ -337,7 +338,8 @@ using namespace libCZI::detail;
                 sbd.logicalRect.w = dimEntry->Size;
                 sbd.physicalSize.w = dimEntry->StoredSize;
             }
-            else if (IsYDimension(dimEntry->Dimension, sizeof(dimEntry->Dimension)))
+            else if ((dimensionIndexToSwapWithY == DimensionIndex::invalid && IsYDimension(dimEntry->Dimension, sizeof(dimEntry->Dimension))) ||
+                        (dimensionIndexToSwapWithY != DimensionIndex::invalid && IsDimension(dimEntry->Dimension, sizeof(dimEntry->Dimension), Utils::DimensionToChar(dimensionIndexToSwapWithY))))
             {
                 sbd.logicalRect.y = dimEntry->Start;
                 sbd.logicalRect.h = dimEntry->Size;
@@ -345,7 +347,7 @@ using namespace libCZI::detail;
             }
             else
             {
-                libCZI::DimensionIndex dim = CCZIParse::DimensionCharToDimensionIndex(dimEntry->Dimension, sizeof(dimEntry->Dimension));
+                libCZI::DimensionIndex dim = CCZIParse::DimensionCharToDimensionIndexConsideringSwapYWith(dimEntry->Dimension, sizeof(dimEntry->Dimension), dimensionIndexToSwapWithY);
                 sbd.coordinate.Set(dim, dimEntry->Start);
             }
         }
@@ -434,6 +436,11 @@ using namespace libCZI::detail;
     sbd.ptrMetadata = pMetadataBuffer.release();
     sbd.metaDataSize = subBlckSegment.data.MetadataSize;
     return sbd;
+}
+
+/*static*/CCZIParse::SubBlockData CCZIParse::ReadSubBlock(libCZI::IStream* str, std::uint64_t offset, const SubBlockStorageAllocate& allocateInfo)
+{
+    return CCZIParse::ReadSubBlockWithDimensionSwap(str, offset, allocateInfo, DimensionIndex::invalid);
 }
 
 /*static*/CCZIParse::AttachmentData CCZIParse::ReadAttachment(libCZI::IStream* str, std::uint64_t offset, const SubBlockStorageAllocate& allocateInfo)
@@ -545,11 +552,8 @@ using namespace libCZI::detail;
             entry.storedWidth = subBlkDirDV->DimensionEntries[i].StoredSize;
             x_was_given = true;
         }
-        else if (CCZIParse::IsYDimension(subBlkDirDV->DimensionEntries[i].Dimension, 4))
+        else if (CCZIParse::HandleYDimension(subBlkDirDV->DimensionEntries[i], options, entry))
         {
-            entry.y = subBlkDirDV->DimensionEntries[i].Start;
-            entry.height = subBlkDirDV->DimensionEntries[i].Size;
-            entry.storedHeight = subBlkDirDV->DimensionEntries[i].StoredSize;
             y_was_given = true;
         }
         else if (CCZIParse::IsMDimension(subBlkDirDV->DimensionEntries[i].Dimension, 4))
@@ -576,19 +580,19 @@ using namespace libCZI::detail;
         }
         else
         {
-            libCZI::DimensionIndex dim = CCZIParse::DimensionCharToDimensionIndex(subBlkDirDV->DimensionEntries[i].Dimension, 4);
+            libCZI::DimensionIndex dim = CCZIParse::DimensionCharToDimensionIndexConsideringDimensionSwap(subBlkDirDV->DimensionEntries[i].Dimension, 4, options);
             entry.coordinate.Set(dim, subBlkDirDV->DimensionEntries[i].Start);
 
-            if(options.GetPhysicalDimensionOtherThanMMustHaveSizeOne())
-            { 
+            if (options.GetPhysicalDimensionOtherThanMMustHaveSizeOne())
+            {
                 auto physicalSize = subBlkDirDV->DimensionEntries[i].StoredSize;
-                if(physicalSize != 1)
+                if (physicalSize != 1)
                 {
                     stringstream string_stream;
-                    string_stream 
-                            << "Physical size for dimension '" << Utils::DimensionToChar(dim)
-                            << "' is expected to be 1, but found " << physicalSize
-                            << " (file-offset:" << subBlkDirDV->FilePosition << ").";
+                    string_stream
+                        << "Physical size for dimension '" << Utils::DimensionToChar(dim)
+                        << "' is expected to be 1, but found " << physicalSize
+                        << " (file-offset:" << subBlkDirDV->FilePosition << ").";
                     throw LibCZICZIParseException(string_stream.str().c_str(), LibCZICZIParseException::ErrorCode::NonConformingSubBlockDimensionEntry);
                 }
             }
@@ -726,6 +730,31 @@ using namespace libCZI::detail;
     return c;
 }
 
+/*static*/libCZI::DimensionIndex CCZIParse::DimensionCharToDimensionIndexConsideringDimensionSwap(const char* ptr, size_t size, const SubblockDirectoryParseOptions& options)
+{
+    // here we check if the user wants to treat Z as Y or T as Y, and if so, we check if the dimension is Y and return Z or T instead of Y
+    if (options.GetTreatTAsY())
+    {
+        return DimensionCharToDimensionIndexConsideringSwapYWith(ptr, size, DimensionIndex::T);
+    }
+    else if (options.GetTreatZAsY())
+    {
+        return DimensionCharToDimensionIndexConsideringSwapYWith(ptr, size, DimensionIndex::Z);
+    }
+
+    return CCZIParse::DimensionCharToDimensionIndex(ptr, size);
+}
+
+/*static*/libCZI::DimensionIndex CCZIParse::DimensionCharToDimensionIndexConsideringSwapYWith(const char* ptr, size_t size, DimensionIndex dimensionIndexToSwapWithY)
+{
+    if (dimensionIndexToSwapWithY != DimensionIndex::invalid && CCZIParse::IsYDimension(ptr, size))
+    {
+        return dimensionIndexToSwapWithY;
+    }
+
+    return CCZIParse::DimensionCharToDimensionIndex(ptr, size);
+}
+
 /*static*/libCZI::DimensionIndex CCZIParse::DimensionCharToDimensionIndex(const char* ptr, size_t size)
 {
     if (size < 1)
@@ -768,35 +797,55 @@ using namespace libCZI::detail;
 
 /*static*/bool CCZIParse::IsMDimension(const char* ptr, size_t size)
 {
-    if (size < 1)
-    {
-        CCZIParse::ThrowIllegalData("parameter 'size' is illegal");
-    }
-
-    char c = CCZIParse::ToUpperCase(*ptr);
-    return (c == 'M') ? true : false;
+    return CCZIParse::IsDimension(ptr, size, 'M');
 }
 
 /*static*/bool CCZIParse::IsXDimension(const char* ptr, size_t size)
 {
-    if (size < 1)
-    {
-        CCZIParse::ThrowIllegalData("parameter 'size' is illegal");
-    }
-
-    char c = CCZIParse::ToUpperCase(*ptr);
-    return (c == 'X') ? true : false;
+    return CCZIParse::IsDimension(ptr, size, 'X');
 }
 
 /*static*/bool CCZIParse::IsYDimension(const char* ptr, size_t size)
+{
+    return CCZIParse::IsDimension(ptr, size, 'Y');
+}
+
+/*static*/bool CCZIParse::IsZDimension(const char* ptr, size_t size)
+{
+    return CCZIParse::IsDimension(ptr, size, 'Z');
+}
+
+/*static*/bool CCZIParse::IsTDimension(const char* ptr, size_t size)
+{
+    return CCZIParse::IsDimension(ptr, size, 'T');
+}
+
+/*static*/bool CCZIParse::IsDimension(const char* ptr, size_t size, char dimension)
 {
     if (size < 1)
     {
         CCZIParse::ThrowIllegalData("parameter 'size' is illegal");
     }
 
-    char c = CCZIParse::ToUpperCase(*ptr);
-    return (c == 'Y') ? true : false;
+    const char c = CCZIParse::ToUpperCase(*ptr);
+    return c == dimension;
+}
+
+/*static*/bool CCZIParse::HandleYDimension(const DimensionEntryDV& dimension_entry, const SubblockDirectoryParseOptions& options, CCziSubBlockDirectory::SubBlkEntry& entry)
+{
+    const bool treat_z_as_y = options.GetTreatZAsY();
+    const bool treat_t_as_y = options.GetTreatTAsY();
+    if ((!treat_z_as_y && !treat_t_as_y && CCZIParse::IsYDimension(dimension_entry.Dimension, 4)) ||
+        (treat_t_as_y && CCZIParse::IsTDimension(dimension_entry.Dimension, 4)) ||
+        (treat_z_as_y && CCZIParse::IsZDimension(dimension_entry.Dimension, 4)))
+    {
+        entry.y = dimension_entry.Start;
+        entry.height = dimension_entry.Size;
+        entry.storedHeight = dimension_entry.StoredSize;
+        return true;
+    }
+
+    return false;
 }
 
 [[noreturn]] /*static*/void CCZIParse::ThrowNotEnoughDataRead(std::uint64_t offset, std::uint64_t bytesRequested, std::uint64_t bytesActuallyRead)

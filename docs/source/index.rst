@@ -18,6 +18,7 @@ Documentation of LibCZI and adjacent projects.
    pages/image_document_concept
    pages/valid_pixel_mask_concept
    pages/using_libCZI
+   pages/reader_compatibility
    pages/accessors
    pages/multichannel_composition
    pages/stream_objectsmark
