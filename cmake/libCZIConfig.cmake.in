@@ -37,6 +37,10 @@ if(LIBCZI_BUILD_AZURESDK_BASED_STREAM)
   find_dependency(azure-identity-cpp CONFIG)
   find_dependency(azure-storage-common-cpp CONFIG)
   find_dependency(azure-storage-blobs-cpp CONFIG)
+  # Static consumers inherit Azure's nanoarrow IPC link dependencies. Repair its
+  # missing FlatCC target on affected Linux packages; older SDKs without IPC are unchanged.
+  include("${CMAKE_CURRENT_LIST_DIR}/WorkaroundNanoarrowFlatcc.cmake")
+  libczi_workaround_nanoarrow_flatcc()
 endif()
 
 if(LIBCZI_BUILD_CURL_BASED_STREAM)

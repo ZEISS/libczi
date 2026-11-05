@@ -144,6 +144,7 @@ private:
     Command command;
     std::wstring cziFilename;
     std::string source_stream_class;
+    libCZI::ICZIReader::OpenOptions open_options_;
     std::map<int, libCZI::StreamsFactory::Property> property_bag_for_stream_class;
     libCZI::CDimCoordinate planeCoordinate;
 
@@ -225,6 +226,7 @@ public:
     Command GetCommand() const { return this->command; }
     const std::wstring& GetCZIFilename() const { return this->cziFilename; }
     const std::string& GetInputStreamClassName() const { return this->source_stream_class; }
+    const libCZI::ICZIReader::OpenOptions& GetOpenOptions() const { return this->open_options_; }
     const std::map<int, libCZI::StreamsFactory::Property>& GetInputStreamPropertyBag() const { return this->property_bag_for_stream_class; }
     const libCZI::CDimCoordinate& GetPlaneCoordinate() const { return this->planeCoordinate; }
     const std::map<int, ChannelDisplaySettings>& GetMultiChannelCompositeChannelInfos() const { return this->multiChannelCompositeChannelInfos; }
@@ -287,6 +289,7 @@ private:
     friend struct BitmapGeneratorValidator;
     friend struct CreateSubblockMetadataValidator;
     friend struct CompressionOptionsValidator;
+    friend struct OpenOptionsValidator;
     friend struct GeneratorPixelTypeValidator;
     friend struct CacheSizeValidator;
     friend struct TileSizeForPlaneScanValidator;
@@ -319,6 +322,7 @@ private:
     static bool TryParseBitmapGenerator(const std::string& s, std::string* generator_class_name);
     static bool TryParseSubBlockMetadataKeyValue(const std::string& s, std::map<std::string, std::string>* subblock_metadata_property_bag);
     static bool TryParseCompressionOptions(const std::string& s, libCZI::Utils::CompressionOption* compression_option);
+    static bool TryParseOpenOptions(const std::string& s, libCZI::ICZIReader::OpenOptions* open_options);
     static bool TryParseGeneratorPixeltype(const std::string& s, libCZI::PixelType* pixel_type);
     static bool TryParseInputStreamCreationPropertyBag(const std::string& s, std::map<int, libCZI::StreamsFactory::Property>* property_bag);
     static bool TryParseSubBlockCacheSize(const std::string& text, std::uint64_t* size);

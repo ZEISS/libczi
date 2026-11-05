@@ -807,7 +807,7 @@ namespace libCZI
             /// distinguish between sub-block-directory precedence and sub-block-header precedence. The value 'PrecedenceMask'
             /// is used to mask this bit. Bit 7 is used to indicate whether a discrepancy is to be ignored or whether an error
             /// is to be reported.
-            /// Historically, libCZI (up to version 0.63.2) used to give precedence fo the sub-block header information,
+            /// Historically, libCZI (up to version 0.63.2) used to give precedence to the sub-block header information,
             /// and it did not report a discrepancy.
             enum class SubBlockDirectoryInfoPolicy : std::uint8_t
             {
@@ -815,6 +815,13 @@ namespace libCZI
                 SubBlockHeaderPrecedence = 1,    ///< The sub-block information is used for the sub-blocks.
                 PrecedenceMask = 1,              ///< Bit-mask allowing to extract the relevant bits for "precedence".
                 IgnoreDiscrepancy = 0x80,        ///< Flag allowing to choose whether a discrepancy is to be ignored (true) or whether an exception is to be thrown (false) when accessing the sub-block.
+            };
+
+            enum class DimensionSwapWorkaround : std::uint8_t
+            {
+                None = 0,
+                XtSubblocks = 1,
+                XzSubblocks = 2,
             };
 
             /// This option controls whether the lax parameter validation when parsing the dimension-entry of a subblock is to be used.
@@ -844,6 +851,15 @@ namespace libCZI
             /// in this respect - either throw an exception if a discrepancy is encountered or ignore it.
             SubBlockDirectoryInfoPolicy subBlockDirectoryInfoPolicy{ SubBlockDirectoryInfoPolicy::SubBlockDirectoryPrecedence };
 
+            /// Compatibility workaround for legacy CZI documents that store the vertical
+            /// image coordinate in dimension T or Z instead of dimension Y. When enabled,
+            /// libCZI swaps T or Z with Y in both the directory and sub-block headers.
+            /// The original Y coordinate becomes T or Z. This can make documents using this non-standard
+            /// convention accessible, but changes the interpretation of their dimensions.
+            /// Leave disabled unless needed for an affected document. The default is
+            /// 'DimensionSwapWorkaround::None'.
+            DimensionSwapWorkaround dimension_swap_workaround{ DimensionSwapWorkaround::None };
+
             /// Sets the default.
             void SetDefault()
             {
@@ -851,6 +867,7 @@ namespace libCZI
                 this->ignore_sizem_for_pyramid_subblocks = false;
                 this->default_frame_of_reference = libCZI::CZIFrameOfReference::Invalid;
                 this->subBlockDirectoryInfoPolicy = SubBlockDirectoryInfoPolicy::SubBlockDirectoryPrecedence;
+                this->dimension_swap_workaround = DimensionSwapWorkaround::None;
             }
         };
 
@@ -916,6 +933,34 @@ namespace libCZI
             return std::dynamic_pointer_cast<ISingleChannelScalingTileAccessor, IAccessor>(this->CreateAccessor(libCZI::AccessorType::SingleChannelScalingTileAccessor));
         }
     };
+
+    /// Converts reader open options to semicolon-separated key=value pairs in canonical order.
+    /// Supported keys and defaults:
+    /// - laxSubblockCoordinateChecks: true/false (default true); controls lax validation of sub-block coordinates.
+    /// - ignoreSizeMForPyramidSubblocks: true/false (default false); ignores pyramid-subblock size-M during strict
+    ///   validation. Has no effect when lax coordinate checks are enabled.
+    /// - dimensionSwapWorkaround: None, XtSubblocks, or XzSubblocks (default None); selects a dimension-swap
+    ///   compatibility workaround.
+    /// - defaultFrameOfReference: Invalid, Default, RawSubBlockCoordinateSystem, or PixelCoordinateSystem
+    ///   (default Invalid). Invalid and Default resolve to the raw sub-block coordinate system.
+    /// - subBlockDirectoryInfoPrecedence: SubBlockDirectoryPrecedence (default) or SubBlockHeaderPrecedence;
+    ///   selects the authoritative source for sub-block information.
+    /// - subBlockDirectoryInfoDiscrepancy: error (default) or ignore; selects how discrepancies are handled.
+    /// \param options The options to serialize.
+    /// \return The canonical semicolon-separated representation.
+    /// \throws std::invalid_argument If an enum value or policy bits cannot be represented.
+    LIBCZI_API std::string OpenOptionsToString(const ICZIReader::OpenOptions& options);
+
+    /// Parses reader open options from semicolon-separated key=value pairs using the keys and values
+    /// documented by OpenOptionsToString. Empty input returns default options; omitted keys retain
+    /// their defaults. Whitespace around pairs, keys, and values is ignored. Unknown keys throw
+    /// std::invalid_argument. Keys and values are case-sensitive. Duplicate keys, empty pairs,
+    /// malformed pairs, and invalid values also throw std::invalid_argument.
+    /// Values cannot contain '=' or ';'; escaping is unsupported.
+    /// \param options Null-terminated string containing the key=value pairs; must not be null.
+    /// \return The parsed options.
+    /// \throws std::invalid_argument If the input is null or contains an unknown key, invalid syntax, or invalid value.
+    LIBCZI_API ICZIReader::OpenOptions StringToOpenOptions(const char* options);
 }
 
 #include "libCZI_Helpers.h"

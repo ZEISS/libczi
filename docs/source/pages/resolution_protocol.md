@@ -60,3 +60,15 @@ If the bitmap characteristics (i.e. width, height and pixel type) of the decompr
 The information contained in the DirectoryEntry structure is redundantly present in a CZI - it is given in the SubBlockDirectory, and in the actual subblock-segment.
 In case of a mismatch between those two pieces of information, generally the copy in the SubBlockDirectory is to be seen as authoritative.   
 
+### Explicit reader options
+
+libCZI uses directory precedence by default and reports a directory/header
+discrepancy when the affected sub-block is read. `ICZIReader::OpenOptions`
+allows callers to select header precedence instead and, independently, to
+ignore discrepancies. These are explicit interpretation choices for documents
+whose acquisition convention is understood; they do not establish that either
+copy is correct or change the default rules above.
+
+For the XT/XZ dimension mapping, examples, and the corresponding string options,
+see [Reader compatibility options](reader-compatibility).
+

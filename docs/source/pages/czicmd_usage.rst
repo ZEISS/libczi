@@ -9,14 +9,15 @@ The synopsis of the program is:
 
 .. code-block:: console
 
-    Usage: CZIcmd.exe [OPTIONS]
+    CZIcmd.exe [OPTIONS]
 
-      using libCZI version 0.67.3
 
-    Options:
-      -h,--help         Print this help message and exit
+      using libCZI version 0.71.0
 
-      -c,--command COMMAND
+    OPTIONS:
+      -h, --help        Print this help message and exit
+
+      -c, --command COMMAND
                         COMMAND can be one of 'PrintInformation', 'ExtractSubBlock',
                         'SingleChannelTileAccessor', 'ChannelComposite',
                         'SingleChannelPyramidTileAccessor',
@@ -71,32 +72,36 @@ The synopsis of the program is:
                         option, where a string
                         _X[x-position]_Y[y-position]_W[width]_H[height] is added.
 
-      -s,--source SOURCEFILE
+      -s, --source SOURCEFILE
                         Specifies the source CZI-file.
 
-      --source-stream-class STREAMCLASS
+          --source-stream-class STREAMCLASS
                         Specifies the stream-class used for reading the source
                         CZI-file. If not specified, the default file-reader
                         stream-class is used. Run with argument '--version' to get a
                         list of available stream-classes.
 
-      --propbag-source-stream-creation PROPBAG
+          --propbag-source-stream-creation PROPBAG
                         Specifies the property-bag used for creating the stream used
                         for reading the source CZI-file. The data is given in
                         JSON-notation.
 
-      -o,--output OUTPUTFILE
+          --open-options OPENOPTIONS
+                        Specifies libCZI reader OpenOptions as semicolon-separated
+                        key=value pairs.
+
+      -o, --output OUTPUTFILE
                         Specifies the output-filename. A suffix will be appended to
                         the name given here depending on the type of the file.
 
-      -p,--plane-coordinate PLANE-COORDINATE
+      -p, --plane-coordinate PLANE-COORDINATE
                         Uniquely select a 2D-plane from the document. It is given in
                         the form [DimChar][number], where 'DimChar' specifies a
                         dimension and can be any of 'Z', 'C', 'T', 'R', 'I', 'H',
                         'V' or 'B'. 'number' is an integer.
                         Examples: C1T3, C0T-2, C1T44Z15H1.
 
-      -r,--rect ROI     Select a paraxial rectangular region as the
+      -r, --rect ROI    Select a paraxial rectangular region as the
                         region-of-interest. The coordinates may be given either
                         absolute or relative. If using relative coordinates, they
                         are relative to what is determined as the upper-left point
@@ -107,36 +112,36 @@ The synopsis of the program is:
                         Examples: rel(0, 0, 1024, 1024), rel(-100, -100, 500, 500),
                         abs(-230, 100, 800, 800).
 
-      -d,--display-settings DISPLAYSETTINGS
+      -d, --display-settings DISPLAYSETTINGS
                         Specifies the display-settings used for creating a
                         channel-composite. The data is given in JSON-notation.
 
-      --calc-hash       Calculate a hash of the output-picture. The MD5Sum-algorithm
+          --calc-hash   Calculate a hash of the output-picture. The MD5Sum-algorithm
                         is used for this.
 
-      -t,--drawtileboundaries
+      -t, --drawtileboundaries
                         Draw a one-pixel black line around each tile.
 
-      -j,--jpgxrcodec DECODERNAME
+      -j, --jpgxrcodec DECODERNAME
                         Choose which decoder implementation is used. Specifying
                         "WIC" will request the Windows-provided decoder - which is
                         only available on Windows. By default the internal
                         JPG-XR-decoder is used.
 
-      -v,--verbosity VERBOSITYLEVEL
+      -v, --verbosity VERBOSITYLEVEL
                         Set the verbosity of this program. The argument is a comma-
                         or semicolon-separated list of the following strings :
                         'All', 'Errors', 'Warnings', 'Infos', 'Errors1',
                         'Warnings1', 'Infos1', 'Errors2', 'Warnings2', 'Infos2'.
 
-      -b,--background BACKGROUND
+      -b, --background BACKGROUND
                         Specify the background color. BACKGROUND is either a single
                         float or three floats, separated by a comma or semicolon. In
                         case of a single float, it gives a grayscale value, in case
                         of three floats it gives a RGB - value. The floats are given
                         normalized to a range from 0 to 1.
 
-      -y,--pyramidinfo PYRAMIDINFO
+      -y, --pyramidinfo PYRAMIDINFO
                         For the command 'SingleChannelPyramidTileAccessor' the
                         argument PYRAMIDINFO specifies the pyramid layer. It
                         consists of two integers (separated by a comma, semicolon or
@@ -145,11 +150,11 @@ The synopsis of the program is:
                         the pyramid-layer (starting with 0 for the layer with the
                         highest resolution).
 
-      -z,--zoom ZOOM    The zoom-factor (which is used for the commands
+      -z, --zoom ZOOM   The zoom-factor (which is used for the commands
                         'SingleChannelScalingTileAccessor' and
                         'ScalingChannelComposite'). It is a float between 0 and 1.
 
-      -i,--info-level INFO-LEVEL
+      -i, --info-level INFO-LEVEL
                         When using the command 'PrintInformation' the INFO-LEVEL can
                         be used to specify which information is printed. Possible
                         values are "Statistics", "RawXML", "DisplaySettings",
@@ -158,7 +163,7 @@ The synopsis of the program is:
                         "ScalingInfo" and "All". The values are given as a list
                         separated by comma or semicolon.
 
-      -e,--selection SELECTION
+      -e, --selection SELECTION
                         For the command 'ExtractAttachment' this allows to specify a
                         subset which is to be extracted (and saved to a file). It is
                         possible to specify the name and the index - only
@@ -166,60 +171,60 @@ The synopsis of the program is:
                         values specified are processed. The arguments are given in
                         JSON-notation, e.g. {"name":"Thumbnail"} or {"index":3.0}.
 
-      -f,--tile-filter FILTER
+      -f, --tile-filter FILTER
                         Specify to filter subblocks according to the scene-index. A
                         comma separated list of either an interval or a single
                         integer may be given here, e.g. "2,3" or "2-4,6" or
                         "0-3,5-8".
 
-      -m,--channelcompositionformat CHANNELCOMPOSITIONFORMAT
+      -m, --channelcompositionformat CHANNELCOMPOSITIONFORMAT
                         In case of a channel-composition, specifies the pixeltype of
                         the output. Possible values are "bgr24" (the default) and
                         "bgra32". If specifying "bgra32" it is possible to give the
                         value of the alpha-pixels in the form "bgra32(128)" - for an
                         alpha-value of 128.
 
-      --createbounds BOUNDS
+          --createbounds BOUNDS
                         Only used for 'CreateCZI': specify the range of coordinates
                         used to create a CZI. Format is e.g. 'T0:3Z0:3C0:2'.
 
-      --createsubblocksize SIZE
+          --createsubblocksize SIZE
                         Only used for 'CreateCZI': specify the size of the subblocks
                         created in pixels. Format is e.g. '1600x1200'.
 
-      --createtileinfo TILEINFO
+          --createtileinfo TILEINFO
                         Only used for 'CreateCZI': specify the number of tiles on
                         each plane. Format is e.g. '3x3;10%' for a 3 by 3 tiles
                         arrangement with 10% overlap.
 
-      --font NAME/FILENAME
+          --font NAME/FILENAME
                         Only used for 'CreateCZI': (on Linux) specify the filename
                         of a TrueType-font (.ttf) to be used for generating text in
                         the subblocks; (on Windows) name of the font.
 
-      --fontheight HEIGHT
+          --fontheight HEIGHT
                         Only used for 'CreateCZI': specifies the height of the font
                         in pixels (default: 36).
 
-      -g,--guidofczi CZI-File-GUID
+      -g, --guidofczi CZI-File-GUID
                         Only used for 'CreateCZI': specify the GUID of the file
                         (which is useful for bit-exact reproducible results); the
                         GUID must be given in the form
                         "cfc4a2fe-f968-4ef8-b685-e73d1b77271a" or
                         "{cfc4a2fe-f968-4ef8-b685-e73d1b77271a}"
 
-      --bitmapgenerator BITMAPGENERATORCLASSNAME
+          --bitmapgenerator BITMAPGENERATORCLASSNAME
                         Only used for 'CreateCZI': specifies the bitmap-generator to
                         use. Possible values are "gdi", "freetype", "null" or
                         "default". Run with argument '--version' to get a list of
                         available bitmap-generators.
 
-      --createczisbblkmetadata KEY_VALUE_SUBBLOCKMETADATA
+          --createczisbblkmetadata KEY_VALUE_SUBBLOCKMETADATA
                         Only used for 'CreateCZI': a key-value list in JSON-notation
                         which will be written as subblock-metadata. For example:
                         {"StageXPosition":-8906.346,"StageYPosition":-648.51}
 
-      --compressionopts COMPRESSIONDESCRIPTION
+          --compressionopts COMPRESSIONDESCRIPTION
                         Only used for 'CreateCZI': a string in a defined format
                         which states the compression-method and (compression-method
                         specific) parameters. The format is "compression_method:
@@ -229,32 +234,31 @@ The synopsis of the program is:
                         Examples: "zstd0:ExplicitLevel=3",
                         "zstd1:ExplicitLevel=2;PreProcess=HiLoByteUnpack".
 
-      --generatorpixeltype PIXELTYPE
+          --generatorpixeltype PIXELTYPE
                         Only used for 'CreateCZI': a string defining the pixeltype
                         used by the bitmap - generator. Possible values are 'Gray8',
                         'Gray16', 'Bgr24' or 'Bgr48'. Default is 'Bgr24'.
 
-      --cachesize CACHESIZE
+          --cachesize CACHESIZE
                         Only used for 'PlaneScan' - specify the size of the
                         subblock-cache in bytes. The argument is to be given with a
                         suffix k, M, G, ...
 
-      --tilesize-for-plane-scan TILESIZE
+          --tilesize-for-plane-scan TILESIZE
                         Only used for 'PlaneScan' - specify the size of ROI which is
                         used for scanning the plane in units of pixels. Format is
                         e.g. '1600x1200' and default is 512x512.
 
-      --use-visibility-check-optimization
+          --use-visibility-check-optimization
                         Whether to enable the experimental "visibility check
                         optimization" for the accessors.
 
-      --mask-aware-compositing
+          --mask-aware-compositing
                         Whether to use mask-aware compositing. This is subject to
                         the availability of mask data in the CZI-file.
 
-      --version         Print extended version-info and supported operations, then
+          --version     Print extended version-info and supported operations, then
                         exit.
-
 
 The above text is printed if the program is executed with the argument '-?' or '\--help':
 
@@ -584,6 +588,40 @@ An example for a display-setting when specifying a spline is:
 Note that it is a flat list of numbers, where the first number is interpreted as X and the second as Y - and so on.
 
 Passing this JSON on the commandline might be challenging, though - because many characters need to be escaped (depending on your command shell).
+
+.. _czicmd-reader-options:
+
+Reader open options
+-------------------
+
+``--open-options`` passes reader settings as a quoted string of
+semicolon-separated ``key=value`` pairs. For example, inspect an X-T line-scan
+document with T interpreted as bitmap rows:
+
+.. code-block:: console
+
+    CZIcmd --command PrintInformation --source linescan.czi --open-options "dimensionSwapWorkaround=XtSubblocks"
+
+For a document whose mapped plane coordinates are C0T0, extract a region
+256 columns wide and 1024 rows high from the mapped bounding-box origin:
+
+.. code-block:: console
+
+    CZIcmd --command SingleChannelTileAccessor --source linescan.czi --output linescan --plane-coordinate C0T0 --rect "rel(0,0,256,1024)" --open-options "dimensionSwapWorkaround=XtSubblocks"
+
+Use the actual plane coordinates and desired region reported for your document.
+After the XT swap, rows represent time samples, and the T plane coordinate
+comes from the original Y coordinate. For X-Z sub-blocks use ``XzSubblocks``;
+the original Y coordinate then becomes the Z plane coordinate.
+
+If a known directory/header discrepancy also needs to be ignored, explicitly
+append ``;subBlockDirectoryInfoDiscrepancy=ignore`` inside the quoted option
+string. This is independent of the dimension swap and is disabled by default.
+The directory remains authoritative unless
+``subBlockDirectoryInfoPrecedence=SubBlockHeaderPrecedence`` is selected.
+
+See :doc:`reader_compatibility` for the acquisition background, all supported
+keys, and the C++ equivalents. On Windows the executable is ``CZIcmd.exe``.
 
 command 'ExtractAttachment'
 ----------------------------------------

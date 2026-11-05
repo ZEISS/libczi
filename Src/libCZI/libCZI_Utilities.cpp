@@ -14,6 +14,7 @@
 #include <cmath>
 #include <string>
 #include <regex>
+#include <set>
 
 using namespace libCZI;
 using namespace libCZI::detail;
@@ -21,6 +22,68 @@ using namespace std;
 
 namespace
 {
+    std::string TrimOpenOptionsToken(const std::string& value)
+    {
+        const auto first = value.find_first_not_of(" \t\r\n");
+        if (first == std::string::npos)
+        {
+            return {};
+        }
+
+        const auto last = value.find_last_not_of(" \t\r\n");
+        return value.substr(first, last - first + 1);
+    }
+
+    bool ParseOpenOptionsBoolean(const std::string& value)
+    {
+        if (value == "true")
+        {
+            return true;
+        }
+
+        if (value == "false")
+        {
+            return false;
+        }
+
+        throw std::invalid_argument("Invalid boolean value in OpenOptions string.");
+    }
+
+    const char* DimensionSwapWorkaroundToString(const ICZIReader::OpenOptions::DimensionSwapWorkaround value)
+    {
+        switch (value)
+        {
+        case ICZIReader::OpenOptions::DimensionSwapWorkaround::None:
+            return "None";
+        case ICZIReader::OpenOptions::DimensionSwapWorkaround::XtSubblocks:
+            return "XtSubblocks";
+        case ICZIReader::OpenOptions::DimensionSwapWorkaround::XzSubblocks:
+            return "XzSubblocks";
+        default:
+            throw std::invalid_argument("Invalid DimensionSwapWorkaround value in OpenOptions.");
+        }
+    }
+
+    ICZIReader::OpenOptions::DimensionSwapWorkaround ParseDimensionSwapWorkaround(const std::string& value)
+    {
+        if (value == "None")
+        {
+            return ICZIReader::OpenOptions::DimensionSwapWorkaround::None;
+        }
+
+        if (value == "XtSubblocks")
+        {
+            return ICZIReader::OpenOptions::DimensionSwapWorkaround::XtSubblocks;
+        }
+
+        if (value == "XzSubblocks")
+        {
+            return ICZIReader::OpenOptions::DimensionSwapWorkaround::XzSubblocks;
+        }
+
+        throw std::invalid_argument("Invalid dimensionSwapWorkaround value in OpenOptions string.");
+    }
+
     bool tryParseCompressionMode(const std::string& s, libCZI::CompressionMode* m)
     {
         static constexpr libCZI::CompressionMode AvailableCompressionModes[] =
@@ -784,3 +847,181 @@ Utils::CompressionOption Utils::ParseCompressionOptions(const std::string& optio
     throw logic_error("The specified string could not be processed.");
 }
 
+//-----------------------------------------------------------------------------
+
+std::string libCZI::OpenOptionsToString(const ICZIReader::OpenOptions& options)
+{
+    const char* frame_of_reference = nullptr;
+    switch (options.default_frame_of_reference)
+    {
+    case CZIFrameOfReference::Invalid:
+        frame_of_reference = "Invalid";
+        break;
+    case CZIFrameOfReference::Default:
+        frame_of_reference = "Default";
+        break;
+    case CZIFrameOfReference::RawSubBlockCoordinateSystem:
+        frame_of_reference = "RawSubBlockCoordinateSystem";
+        break;
+    case CZIFrameOfReference::PixelCoordinateSystem:
+        frame_of_reference = "PixelCoordinateSystem";
+        break;
+    default:
+        throw std::invalid_argument("Invalid default frame of reference in OpenOptions.");
+    }
+
+    using Policy = ICZIReader::OpenOptions::SubBlockDirectoryInfoPolicy;
+    const auto policy = static_cast<std::uint8_t>(options.subBlockDirectoryInfoPolicy);
+    constexpr std::uint8_t precedence_mask = static_cast<std::uint8_t>(Policy::PrecedenceMask);
+    constexpr std::uint8_t ignore_discrepancy = static_cast<std::uint8_t>(Policy::IgnoreDiscrepancy);
+
+    if ((policy & static_cast<std::uint8_t>(~(precedence_mask | ignore_discrepancy))) != 0)
+    {
+        throw std::invalid_argument("Invalid sub-block directory information policy in OpenOptions.");
+    }
+
+    const char* precedence = (policy & precedence_mask) == 0 ? "SubBlockDirectoryPrecedence" : "SubBlockHeaderPrecedence";
+    const char* discrepancy = (policy & ignore_discrepancy) == 0 ? "error" : "ignore";
+
+    return std::string("laxSubblockCoordinateChecks=") +
+        (options.lax_subblock_coordinate_checks ? "true" : "false") +
+        ";ignoreSizeMForPyramidSubblocks=" +
+        (options.ignore_sizem_for_pyramid_subblocks ? "true" : "false") +
+        ";dimensionSwapWorkaround=" +
+        DimensionSwapWorkaroundToString(options.dimension_swap_workaround) +
+        ";defaultFrameOfReference=" + frame_of_reference +
+        ";subBlockDirectoryInfoPrecedence=" + precedence +
+        ";subBlockDirectoryInfoDiscrepancy=" + discrepancy;
+}
+
+ICZIReader::OpenOptions libCZI::StringToOpenOptions(const char* options_string)
+{
+    if (options_string == nullptr)
+    {
+        throw std::invalid_argument("OpenOptions string must not be null.");
+    }
+
+    ICZIReader::OpenOptions options{};
+    const std::string input(options_string);
+    if (input.empty())
+    {
+        return options;
+    }
+
+    std::set<std::string> seen_keys;
+    std::size_t start = 0;
+
+    while (start <= input.size())
+    {
+        const auto separator = input.find(';', start);
+        const auto pair = TrimOpenOptionsToken(
+            input.substr(start, separator == std::string::npos ? std::string::npos : separator - start));
+
+        const auto equals = pair.find('=');
+        if (pair.empty() || equals == std::string::npos || equals != pair.rfind('='))
+        {
+            throw std::invalid_argument("Malformed key-value pair in OpenOptions string.");
+        }
+
+        const auto key = TrimOpenOptionsToken(pair.substr(0, equals));
+        const auto value = TrimOpenOptionsToken(pair.substr(equals + 1));
+
+        if (key.empty() || value.empty())
+        {
+            throw std::invalid_argument("OpenOptions keys and values must not be empty.");
+        }
+
+        if (!seen_keys.insert(key).second)
+        {
+            throw std::invalid_argument("Duplicate key in OpenOptions string: " + key);
+        }
+
+        if (key == "laxSubblockCoordinateChecks")
+        {
+            options.lax_subblock_coordinate_checks = ParseOpenOptionsBoolean(value);
+        }
+        else if (key == "ignoreSizeMForPyramidSubblocks")
+        {
+            options.ignore_sizem_for_pyramid_subblocks = ParseOpenOptionsBoolean(value);
+        }
+        else if (key == "dimensionSwapWorkaround")
+        {
+            options.dimension_swap_workaround = ParseDimensionSwapWorkaround(value);
+        }
+        else if (key == "defaultFrameOfReference")
+        {
+            if (value == "Invalid")
+            {
+                options.default_frame_of_reference = CZIFrameOfReference::Invalid;
+            }
+            else if (value == "Default")
+            {
+                options.default_frame_of_reference = CZIFrameOfReference::Default;
+            }
+            else if (value == "RawSubBlockCoordinateSystem")
+            {
+                options.default_frame_of_reference = CZIFrameOfReference::RawSubBlockCoordinateSystem;
+            }
+            else if (value == "PixelCoordinateSystem")
+            {
+                options.default_frame_of_reference = CZIFrameOfReference::PixelCoordinateSystem;
+            }
+            else
+            {
+                throw std::invalid_argument("Invalid defaultFrameOfReference value in OpenOptions string.");
+            }
+        }
+        else if (key == "subBlockDirectoryInfoPrecedence")
+        {
+            if (value == "SubBlockDirectoryPrecedence")
+            {
+                options.subBlockDirectoryInfoPolicy = static_cast<ICZIReader::OpenOptions::SubBlockDirectoryInfoPolicy>(
+                    static_cast<std::uint8_t>(options.subBlockDirectoryInfoPolicy) &
+                    ~static_cast<std::uint8_t>(ICZIReader::OpenOptions::SubBlockDirectoryInfoPolicy::PrecedenceMask));
+            }
+            else if (value == "SubBlockHeaderPrecedence")
+            {
+                options.subBlockDirectoryInfoPolicy = static_cast<ICZIReader::OpenOptions::SubBlockDirectoryInfoPolicy>(
+                    static_cast<std::uint8_t>(options.subBlockDirectoryInfoPolicy) |
+                    static_cast<std::uint8_t>(ICZIReader::OpenOptions::SubBlockDirectoryInfoPolicy::PrecedenceMask));
+            }
+            else
+            {
+                throw std::invalid_argument("Invalid subBlockDirectoryInfoPrecedence value in OpenOptions string.");
+            }
+        }
+        else if (key == "subBlockDirectoryInfoDiscrepancy")
+        {
+            constexpr auto discrepancy_flag = static_cast<std::uint8_t>(ICZIReader::OpenOptions::SubBlockDirectoryInfoPolicy::IgnoreDiscrepancy);
+
+            auto policy = static_cast<std::uint8_t>(options.subBlockDirectoryInfoPolicy);
+            if (value == "error")
+            {
+                policy &= static_cast<std::uint8_t>(~discrepancy_flag);
+            }
+            else if (value == "ignore")
+            {
+                policy |= discrepancy_flag;
+            }
+            else
+            {
+                throw std::invalid_argument("Invalid subBlockDirectoryInfoDiscrepancy value in OpenOptions string.");
+            }
+
+            options.subBlockDirectoryInfoPolicy = static_cast<ICZIReader::OpenOptions::SubBlockDirectoryInfoPolicy>(policy);
+        }
+        else
+        {
+            throw std::invalid_argument("Unknown key in OpenOptions string: " + key);
+        }
+
+        if (separator == std::string::npos)
+        {
+            break;
+        }
+
+        start = separator + 1;
+    }
+
+    return options;
+}

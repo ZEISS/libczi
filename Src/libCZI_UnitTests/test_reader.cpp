@@ -13,6 +13,10 @@
 using namespace libCZI;
 using namespace std;
 
+class DimensionSwapReaderTest : public ::testing::TestWithParam<tuple<bool, bool>>
+{
+};
+
 namespace
 {
     tuple<shared_ptr<void>, size_t> CreateCziDocumentOneSubblock4x4Gray8()
@@ -862,6 +866,180 @@ TEST(CziReader, ReaderStateException)
 
     EXPECT_TRUE(expectedExceptionCaught) << "Incorrect behavior";
 }
+
+TEST_P(DimensionSwapReaderTest, SwapsDirectoryAndHeaderDimensions)
+{
+    const bool swap_t = get<0>(GetParam());
+    const bool header_precedence = get<1>(GetParam());
+    const auto dimension = swap_t ? DimensionIndex::T : DimensionIndex::Z;
+    auto test_czi = CreateCziDocumentOneSubblock4x4Gray8();
+    auto* bytes = static_cast<uint8_t*>(get<0>(test_czi).get());
+
+    // Replace Y with T/Z and C with Y in both DV records. Keep the original
+    // four bitmap rows, and give the replacement Y coordinate a distinct value.
+    // The fixture writes dimension entries in X, Y, M, C order. Each DV entry
+    // has a 32-byte fixed part followed by 20-byte dimension entries (little endian).
+    size_t records_changed = 0;
+    for (size_t i = 0; i + 112 <= get<1>(test_czi); ++i)
+    {
+        if (bytes[i] == 'D' && bytes[i + 1] == 'V' &&
+            bytes[i + 32] == 'X' && bytes[i + 52] == 'Y' &&
+            bytes[i + 72] == 'M' && bytes[i + 92] == 'C')
+        {
+            bytes[i + 52] = swap_t ? 'T' : 'Z';
+            bytes[i + 56] = 7;  // vertical start
+            bytes[i + 92] = 'Y';
+            bytes[i + 96] = 3;  // original Y coordinate, mapped back to T/Z
+            ++records_changed;
+        }
+    }
+
+    ASSERT_EQ(records_changed, 2u);
+    const auto input = CreateStreamFromMemory(get<0>(test_czi), get<1>(test_czi));
+    ICZIReader::OpenOptions options;
+    options.lax_subblock_coordinate_checks = false;
+    options.dimension_swap_workaround = swap_t ?
+        ICZIReader::OpenOptions::DimensionSwapWorkaround::XtSubblocks :
+        ICZIReader::OpenOptions::DimensionSwapWorkaround::XzSubblocks;
+    if (header_precedence)
+    {
+        options.subBlockDirectoryInfoPolicy = ICZIReader::OpenOptions::SubBlockDirectoryInfoPolicy::SubBlockHeaderPrecedence;
+    }
+
+    const auto reader = CreateCZIReader();
+    reader->Open(input, &options);
+    const auto bounds = reader->GetStatistics().boundingBox;
+    EXPECT_EQ(bounds.y, 7);
+    EXPECT_EQ(bounds.h, 4);
+
+    // Default discrepancy checking also verifies that both parsing paths agree.
+    const auto sub_block = reader->ReadSubBlock(0);
+    const auto info = sub_block->GetSubBlockInfo();
+    EXPECT_EQ(info.logicalRect.y, 7);
+    EXPECT_EQ(info.logicalRect.h, 4);
+    EXPECT_EQ(info.physicalSize.h, 4u);
+    int coordinate = -1;
+    ASSERT_TRUE(info.coordinate.TryGetPosition(dimension, &coordinate));
+    EXPECT_EQ(coordinate, 3);
+    const auto bitmap = sub_block->CreateBitmap();
+    EXPECT_EQ(bitmap->GetWidth(), 4u);
+    EXPECT_EQ(bitmap->GetHeight(), 4u);
+
+    // Without the workaround, strict validation rejects the multi-row T/Z entry.
+    const auto default_reader = CreateCZIReader();
+    options.dimension_swap_workaround = ICZIReader::OpenOptions::DimensionSwapWorkaround::None;
+    EXPECT_THROW(default_reader->Open(input, &options), LibCZICZIParseException);
+}
+
+TEST_P(DimensionSwapReaderTest, RejectsMissingDirectoryDimensionsWithLaxChecks)
+{
+    const bool swap_t = get<0>(GetParam());
+    const bool missing_x = get<1>(GetParam());
+    auto test_czi = CreateCziDocumentOneSubblock4x4Gray8();
+    auto* bytes = static_cast<uint8_t*>(get<0>(test_czi).get());
+    if (missing_x)
+    {
+        size_t records_changed = 0;
+        for (size_t i = 0; i + 112 <= get<1>(test_czi); ++i)
+        {
+            if (bytes[i] == 'D' && bytes[i + 1] == 'V' &&
+                bytes[i + 32] == 'X' && bytes[i + 52] == 'Y' &&
+                bytes[i + 72] == 'M' && bytes[i + 92] == 'C')
+            {
+                bytes[i + 32] = 'R';  // no X, but supply the mapped row dimension
+                bytes[i + 52] = swap_t ? 'T' : 'Z';
+                ++records_changed;
+            }
+        }
+        ASSERT_EQ(records_changed, 2u);
+    }
+    // Otherwise leave the ordinary XY fixture unchanged: it has no T or Z.
+    const auto input = CreateStreamFromMemory(get<0>(test_czi), get<1>(test_czi));
+    ICZIReader::OpenOptions options;  // retain default lax size checks
+    options.dimension_swap_workaround = swap_t ?
+        ICZIReader::OpenOptions::DimensionSwapWorkaround::XtSubblocks :
+        ICZIReader::OpenOptions::DimensionSwapWorkaround::XzSubblocks;
+    const auto reader = CreateCZIReader();
+    EXPECT_THROW(reader->Open(input, &options), LibCZICZIParseException);
+}
+
+TEST_P(DimensionSwapReaderTest, MissingMappedHeaderDimensionRespectsPolicy)
+{
+    const bool swap_t = get<0>(GetParam());
+    const bool header_precedence = get<1>(GetParam());
+    auto test_czi = CreateCziDocumentOneSubblock4x4Gray8();
+    auto* bytes = static_cast<uint8_t*>(get<0>(test_czi).get());
+    size_t records_changed = 0;
+    for (size_t i = 0; i + 112 <= get<1>(test_czi); ++i)
+    {
+        if (bytes[i] == 'D' && bytes[i + 1] == 'V' &&
+            bytes[i + 32] == 'X' && bytes[i + 52] == 'Y' &&
+            bytes[i + 72] == 'M' && bytes[i + 92] == 'C')
+        {
+            bytes[i + 52] = swap_t ? 'T' : 'Z';
+            bytes[i + 56] = 7;
+            bytes[i + 92] = 'Y';
+            bytes[i + 96] = 3;
+            ++records_changed;
+        }
+    }
+    ASSERT_EQ(records_changed, 2u);
+
+    // Remove only the header's row entry, leaving X, M and original Y.
+    // The header has reserved space, so the bitmap payload stays in place.
+    auto* header = bytes + 0x250;
+    ASSERT_EQ(header[0], 'D');
+    ASSERT_EQ(header[1], 'V');
+    ASSERT_EQ(header[28], 4);
+    ASSERT_EQ(header[52], swap_t ? 'T' : 'Z');
+    memmove(header + 52, header + 72, 40);
+    memset(header + 92, 0, 20);
+    header[28] = 3;
+
+    const auto input = CreateStreamFromMemory(get<0>(test_czi), get<1>(test_czi));
+    using Policy = ICZIReader::OpenOptions::SubBlockDirectoryInfoPolicy;
+    using Error = LibCZICZIParseException::ErrorCode;
+    for (bool ignore_discrepancy : {false, true})
+    {
+        ICZIReader::OpenOptions options;
+        options.dimension_swap_workaround = swap_t ?
+            ICZIReader::OpenOptions::DimensionSwapWorkaround::XtSubblocks :
+            ICZIReader::OpenOptions::DimensionSwapWorkaround::XzSubblocks;
+        options.subBlockDirectoryInfoPolicy = header_precedence ?
+            Policy::SubBlockHeaderPrecedence : Policy::SubBlockDirectoryPrecedence;
+        if (ignore_discrepancy)
+        {
+            options.subBlockDirectoryInfoPolicy = options.subBlockDirectoryInfoPolicy | Policy::IgnoreDiscrepancy;
+        }
+        const auto reader = CreateCZIReader();
+        reader->Open(input, &options);
+        if (ignore_discrepancy && !header_precedence)
+        {
+            const auto sub_block = reader->ReadSubBlock(0);
+            const auto info = sub_block->GetSubBlockInfo();
+            EXPECT_EQ(info.logicalRect.y, 7);
+            EXPECT_EQ(info.logicalRect.h, 4);
+            EXPECT_EQ(info.physicalSize.h, 4u);
+            EXPECT_EQ(sub_block->CreateBitmap()->GetHeight(), 4u);
+        }
+        else
+        {
+            try
+            {
+                reader->ReadSubBlock(0);
+                FAIL() << "Expected missing header geometry to be rejected";
+            }
+            catch (const LibCZICZIParseException& exception)
+            {
+                EXPECT_EQ(exception.GetErrorCode(), ignore_discrepancy ?
+                    Error::NonConformingSubBlockDimensionEntry : Error::SubBlockDirectoryToSubBlockHeaderMismatch);
+            }
+        }
+    }
+}
+
+INSTANTIATE_TEST_SUITE_P(XtAndXz, DimensionSwapReaderTest,
+    ::testing::Combine(::testing::Bool(), ::testing::Bool()));
 
 TEST(CziReader, CheckThatSubBlockInfoFromSubBlockDirectoryIsAuthorativeByDefaultNoException)
 {

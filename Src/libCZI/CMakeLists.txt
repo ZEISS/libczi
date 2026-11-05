@@ -541,9 +541,12 @@ if(LIBCZI_ENABLE_INSTALL)
         INSTALL_DESTINATION ${INSTALL_CMAKEDIR}
     )
 
+    # Ship the FlatCC workaround alongside the package config so installed static
+    # libCZI consumers can resolve the affected Azure/nanoarrow dependency too.
     install(FILES
         "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake"
         "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake"
+        "${CMAKE_CURRENT_SOURCE_DIR}/../../cmake/WorkaroundNanoarrowFlatcc.cmake"
         DESTINATION ${INSTALL_CMAKEDIR}
     )
 

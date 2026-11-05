@@ -92,6 +92,10 @@ if(LIBCZI_BUILD_AZURESDK_BASED_STREAM)
   # -> https://learn.microsoft.com/en-us/azure/storage/blobs/quickstart-blobs-c-plus-plus?tabs=managed-identity%2Croles-azure-portal
   find_package(azure-identity-cpp CONFIG REQUIRED)
   find_package(azure-storage-blobs-cpp CONFIG REQUIRED)
+  # Repair nanoarrow IPC's missing FlatCC target in affected Linux vcpkg packages.
+  # Older Azure SDKs without nanoarrow IPC and packages with a valid target are unchanged.
+  include(WorkaroundNanoarrowFlatcc)
+  libczi_workaround_nanoarrow_flatcc()
   set(LIBCZI_AZURESDK_VERSION_STRING "core:${azure-core-cpp_VERSION} identity:${azure-identity-cpp_VERSION} storage-blobs:${azure-storage-blobs-cpp_VERSION}")
   message(STATUS "AZURE-SDK available, version-info: ${LIBCZI_AZURESDK_VERSION_STRING}")
 endif()

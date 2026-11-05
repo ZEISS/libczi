@@ -16,7 +16,8 @@ The CZIReader-object has the following methods
 
 .. code:: cpp
 
-   virtual void Open(std::shared_ptr<IStream> stream);
+   virtual void Open(const std::shared_ptr<IStream>& stream,
+                     const OpenOptions* options = nullptr);
    virtual std::shared_ptr<IMetadataSegment> ReadMetadataSegment();
    virtual std::shared_ptr<IAccessor> CreateAccessor(AccessorType accessorType);
    virtual void Close();
@@ -50,6 +51,15 @@ mininum and maximum are determined and are available in the struct
 returned by the method ``ISubBlockRepository::GetStatistics()``. It is
 usually important to examine the dimBounds member in order to determine
 which dimensions are used in the CZI-file.
+
+Reader open options
+-------------------
+
+The optional second argument to ``Open`` controls validation, interpretation
+of sub-block directory/header differences, and dimension compatibility.
+Calling ``Open(stream)`` retains the default behavior. For X-T line-scan or
+X-Z sub-blocks that use an alternative dimension convention, see
+:doc:`reader_compatibility` for the motivation, dimension mapping and examples.
 
 Reading sub-blocks in a CZI-file
 --------------------------------

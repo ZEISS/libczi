@@ -2,8 +2,8 @@ cmake_minimum_required(VERSION 3.15)
 
 cmake_policy(SET CMP0091 NEW) # enable new "MSVC runtime library selection" (https://cmake.org/cmake/help/latest/variable/CMAKE_MSVC_RUNTIME_LIBRARY.html)
 
-project(libCZI 
-      VERSION 0.70.0
+project(libCZI
+      VERSION 0.71.0
       HOMEPAGE_URL "https://github.com/ZEISS/libczi"
       DESCRIPTION "libCZI is an Open Source Cross-Platform C++ library to read and write CZI")
 
@@ -209,4 +209,3 @@ if (LIBCZI_BUILD_UNITTESTS)
 endif()
 
 add_subdirectory(Src)
-
