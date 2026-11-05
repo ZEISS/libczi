@@ -330,6 +330,12 @@ namespace libCZI
         }
 
         template <>
+        inline void CBitmapOperations::Copy<libCZI::PixelType::Bgr96Float, libCZI::PixelType::Bgr96Float>(const void* srcPtr, int srcStride, void* dstPtr, int dstStride, int width, int height, bool drawTileBorder)
+        {
+            CopySamePixelType<libCZI::PixelType::Bgr96Float>(srcPtr, srcStride, dstPtr, dstStride, width, height, drawTileBorder);
+        }
+
+        template <>
         inline void CBitmapOperations::Copy<libCZI::PixelType::Bgr24, libCZI::PixelType::Gray8>(const void* srcPtr, int srcStride, void* dstPtr, int dstStride, int width, int height, bool drawTileBorder)
         {
             Copy<libCZI::PixelType::Bgr24, libCZI::PixelType::Gray8, CConvBgr24ToGray8>(CConvBgr24ToGray8(), srcPtr, srcStride, dstPtr, dstStride, width, height, drawTileBorder);
