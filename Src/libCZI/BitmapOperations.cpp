@@ -169,6 +169,12 @@ using namespace std;
     default:break;
     }
 
+    if (srcPixelType == PixelType::Bgr96Float && dstPixelType == PixelType::Bgr96Float)
+    {
+        Copy<PixelType::Bgr96Float, PixelType::Bgr96Float>(srcPtr, srcStride, dstPtr, dstStride, width, height, drawTileBorder);
+        return;
+    }
+
     throw std::logic_error("It seems that this conversion is not implemented...");
 }
 

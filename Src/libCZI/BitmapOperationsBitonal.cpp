@@ -742,6 +742,10 @@ namespace
     {
         CopySamePixelTypeWithMask<libCZI::PixelType::Bgr48>(parameters);
     }
+    template <> void CopyWithMask<libCZI::PixelType::Bgr96Float, libCZI::PixelType::Bgr96Float>(const CopyParameters& parameters)
+    {
+        CopySamePixelTypeWithMask<libCZI::PixelType::Bgr96Float>(parameters);
+    }
     template <> void CopyWithMask<libCZI::PixelType::Bgr24, libCZI::PixelType::Gray8>(const CopyParameters& parameters)
     {
         CopyWithMask<libCZI::PixelType::Bgr24, libCZI::PixelType::Gray8, CConvBgr24ToGray8>(CConvBgr24ToGray8(), parameters);
@@ -913,6 +917,12 @@ namespace
             }
             break;
         default:break;
+        }
+
+        if (source_pixel_type == PixelType::Bgr96Float && destination_pixel_type == PixelType::Bgr96Float)
+        {
+            CopyWithMask<PixelType::Bgr96Float, PixelType::Bgr96Float>(parameters);
+            return;
         }
 
         throw std::logic_error("It seems that this conversion is not implemented...");

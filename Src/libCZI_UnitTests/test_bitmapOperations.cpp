@@ -40,6 +40,73 @@ TEST(BitmapOperations, NNResizeWithScale1CheckResult)
     EXPECT_TRUE(AreBitmapDataEqual(sourcebitmap, destBitmap)) << "Bitmaps are expected to be equal.";
 }
 
+TEST(BitmapOperations, CopyBgr96Float)
+{
+    const float source_values[] = { 1.f, 2.f, 3.f, 4.f, 5.f, 6.f };
+    auto source = CBitmapData<CHeapAllocator>::Create(PixelType::Bgr96Float, 2, 1);
+    auto destination = CBitmapData<CHeapAllocator>::Create(PixelType::Bgr96Float, 2, 1);
+
+    ScopedBitmapLockerSP source_locked{ source };
+    ScopedBitmapLockerSP destination_locked{ destination };
+    memcpy(source_locked.ptrDataRoi, source_values, sizeof(source_values));
+
+    CBitmapOperations::Copy(
+        source->GetPixelType(),
+        source_locked.ptrDataRoi,
+        source_locked.stride,
+        destination->GetPixelType(),
+        destination_locked.ptrDataRoi,
+        destination_locked.stride,
+        source->GetWidth(),
+        source->GetHeight(),
+        false);
+
+    const auto* copied_values = static_cast<const float*>(destination_locked.ptrDataRoi);
+    for (size_t i = 0; i < sizeof(source_values) / sizeof(source_values[0]); ++i)
+    {
+        EXPECT_FLOAT_EQ(copied_values[i], source_values[i]);
+    }
+}
+
+TEST(BitmapOperations, CopyBgr96FloatWithTileBorder)
+{
+    const float source_values[] =
+    {
+        1.f, 2.f, 3.f, 4.f, 5.f, 6.f, 7.f, 8.f, 9.f, 10.f, 11.f, 12.f,
+        13.f, 14.f, 15.f, 16.f, 17.f, 18.f, 19.f, 20.f, 21.f, 22.f, 23.f, 24.f,
+        25.f, 26.f, 27.f, 28.f, 29.f, 30.f, 31.f, 32.f, 33.f, 34.f, 35.f, 36.f
+    };
+    auto source = CBitmapData<CHeapAllocator>::Create(PixelType::Bgr96Float, 4, 3);
+    auto destination = CBitmapData<CHeapAllocator>::Create(PixelType::Bgr96Float, 4, 3);
+
+    ScopedBitmapLockerSP source_locked{ source };
+    ScopedBitmapLockerSP destination_locked{ destination };
+    memcpy(source_locked.ptrDataRoi, source_values, sizeof(source_values));
+
+    CBitmapOperations::Copy(
+        source->GetPixelType(),
+        source_locked.ptrDataRoi,
+        source_locked.stride,
+        destination->GetPixelType(),
+        destination_locked.ptrDataRoi,
+        destination_locked.stride,
+        source->GetWidth(),
+        source->GetHeight(),
+        true);
+
+    const float expected_values[] =
+    {
+        0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f,
+        0.f, 0.f, 0.f, 16.f, 17.f, 18.f, 19.f, 20.f, 21.f, 0.f, 0.f, 0.f,
+        0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f
+    };
+    const auto* copied_values = static_cast<const float*>(destination_locked.ptrDataRoi);
+    for (size_t i = 0; i < sizeof(expected_values) / sizeof(expected_values[0]); ++i)
+    {
+        EXPECT_FLOAT_EQ(copied_values[i], expected_values[i]);
+    }
+}
+
 TEST(BitmapOperations, CopyWithOffsetGray8ToGray8_1)
 {
     static const uint8_t source_data[8 * 8] =
