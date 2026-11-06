@@ -40,6 +40,34 @@ TEST(BitmapOperations, NNResizeWithScale1CheckResult)
     EXPECT_TRUE(AreBitmapDataEqual(sourcebitmap, destBitmap)) << "Bitmaps are expected to be equal.";
 }
 
+TEST(BitmapOperations, CopyBgr96Float)
+{
+    const float source_values[] = { 1.f, 2.f, 3.f, 4.f, 5.f, 6.f };
+    auto source = CBitmapData<CHeapAllocator>::Create(PixelType::Bgr96Float, 2, 1);
+    auto destination = CBitmapData<CHeapAllocator>::Create(PixelType::Bgr96Float, 2, 1);
+
+    ScopedBitmapLockerSP source_locked{ source };
+    ScopedBitmapLockerSP destination_locked{ destination };
+    memcpy(source_locked.ptrDataRoi, source_values, sizeof(source_values));
+
+    CBitmapOperations::Copy(
+        source->GetPixelType(),
+        source_locked.ptrDataRoi,
+        source_locked.stride,
+        destination->GetPixelType(),
+        destination_locked.ptrDataRoi,
+        destination_locked.stride,
+        source->GetWidth(),
+        source->GetHeight(),
+        false);
+
+    const auto* copied_values = static_cast<const float*>(destination_locked.ptrDataRoi);
+    for (size_t i = 0; i < sizeof(source_values) / sizeof(source_values[0]); ++i)
+    {
+        EXPECT_FLOAT_EQ(copied_values[i], source_values[i]);
+    }
+}
+
 TEST(BitmapOperations, CopyWithOffsetGray8ToGray8_1)
 {
     static const uint8_t source_data[8 * 8] =

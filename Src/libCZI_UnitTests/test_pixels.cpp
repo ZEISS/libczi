@@ -150,6 +150,41 @@ TEST(Pixels, BitonalBitmapOperationsCopyAt_GrayFloat_Scenario1)
     TestBitonalBitmapOperationsCopyAtScenario1<PixelType::Gray32Float, float>();
 }
 
+TEST(Pixels, BitonalBitmapOperationsCopyAt_Bgr96Float)
+{
+    const float source_values[] = { 1.f, 2.f, 3.f, 4.f, 5.f, 6.f };
+    const float expected_values[] = { 1.f, 2.f, 3.f, 123.f, 123.f, 123.f };
+
+    auto source = CStdBitmapData::Create(PixelType::Bgr96Float, 2, 1);
+    auto mask = CStdBitonalBitmapData::Create(2, 1);
+    auto destination = CStdBitmapData::Create(PixelType::Bgr96Float, 2, 1);
+    {
+        ScopedBitmapLockerSP source_locker{ source };
+        memcpy(source_locker.ptrDataRoi, source_values, sizeof(source_values));
+    }
+
+    {
+        ScopedBitmapLockerSP destination_locker{ destination };
+        auto* destination_values = static_cast<float*>(destination_locker.ptrDataRoi);
+        for (size_t i = 0; i < sizeof(expected_values) / sizeof(expected_values[0]); ++i)
+        {
+            destination_values[i] = 123.f;
+        }
+    }
+
+    BitonalBitmapOperations::SetPixelValue(mask, 0, 0, true);
+    BitonalBitmapOperations::SetPixelValue(mask, 1, 0, false);
+
+    BitonalBitmapOperations::CopyAt(source.get(), mask.get(), IntPoint{ 0, 0 }, destination.get());
+
+    ScopedBitmapLockerSP destination_locker{ destination };
+    const auto* actual_values = static_cast<const float*>(destination_locker.ptrDataRoi);
+    for (size_t i = 0; i < sizeof(expected_values) / sizeof(expected_values[0]); ++i)
+    {
+        EXPECT_FLOAT_EQ(actual_values[i], expected_values[i]);
+    }
+}
+
 TEST(Pixels, BitonalFillScenario1)
 {
     // Arrange
