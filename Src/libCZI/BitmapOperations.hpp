@@ -40,7 +40,7 @@ namespace libCZI
                 {
                     char* dest = static_cast<char*>(dstPtr) + y * static_cast<std::ptrdiff_t>(dstStride);
                     const char* src = static_cast<const char*>(srcPtr) + y * static_cast<std::ptrdiff_t>(srcStride);
-                    memcpy(dest + kBytesPerPel, src, bytes_to_copy - 2 * kBytesPerPel);
+                    memcpy(dest + kBytesPerPel, src + kBytesPerPel, bytes_to_copy - 2 * kBytesPerPel);
                     memset(dest, 0, kBytesPerPel);
                     memset(dest + bytes_to_copy - kBytesPerPel, 0, kBytesPerPel);
                 }
