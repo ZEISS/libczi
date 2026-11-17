@@ -16,24 +16,23 @@ std::shared_ptr<ISubBlockCache> libCZI::CreateSubBlockCache()
 ISubBlockCacheStatistics::Statistics SubBlockCache::GetStatistics(std::uint8_t mask) const
 {
     Statistics result{};
+    lock_guard<mutex> lck(this->mutex_);
     if (mask == ISubBlockCacheStatistics::kMemoryUsage)
     {
         result.validityMask = ISubBlockCacheStatistics::kMemoryUsage;
-        result.memoryUsage = this->cache_size_in_bytes_.load();
+        result.memoryUsage = this->cache_size_in_bytes_;
     }
     else if (mask == ISubBlockCacheStatistics::kElementsCount)
     {
         result.validityMask = ISubBlockCacheStatistics::kElementsCount;
-        result.elementsCount = this->cache_subblock_count_.load();
+        result.elementsCount = this->cache_subblock_count_;
     }
     else if (mask == (ISubBlockCacheStatistics::kMemoryUsage | ISubBlockCacheStatistics::kElementsCount))
     {
         result.validityMask = ISubBlockCacheStatistics::kMemoryUsage | ISubBlockCacheStatistics::kElementsCount;
 
-        // We want to ensure that the memory usage and the element count are consistent, therefore we need to lock reading both values.
-        lock_guard<mutex> lck(this->mutex_);
-        result.memoryUsage = this->cache_size_in_bytes_.load();
-        result.elementsCount = this->cache_subblock_count_.load();
+        result.memoryUsage = this->cache_size_in_bytes_;
+        result.elementsCount = this->cache_subblock_count_;
     }
 
     return result;
@@ -42,10 +41,15 @@ ISubBlockCacheStatistics::Statistics SubBlockCache::GetStatistics(std::uint8_t m
 ISubBlockCacheOperation::CacheItem SubBlockCache::Get(int subblock_index)
 {
     lock_guard<mutex> lck(this->mutex_);
+    return this->GetAndTouchLocked(subblock_index);
+}
+
+ISubBlockCacheOperation::CacheItem SubBlockCache::GetAndTouchLocked(int subblock_index)
+{
     const auto element = this->cache_.find(subblock_index);
     if (element != this->cache_.end())
     {
-        element->second.lru_value = this->lru_counter_.fetch_add(1);
+        this->lru_.splice(this->lru_.begin(), this->lru_, element->second.lruPosition);
         return { element->second.bitmap, element->second.mask };
     }
 
@@ -54,24 +58,93 @@ ISubBlockCacheOperation::CacheItem SubBlockCache::Get(int subblock_index)
 
 void SubBlockCache::Add(int subblock_index, const ISubBlockCacheOperation::CacheItem& cache_item)
 {
-    const auto size_of_added_cache_item = SubBlockCache::CalculateSizeInBytes(cache_item.bitmap.get(), cache_item.mask.get());
-    const auto entry_to_be_added = CacheEntry{ cache_item.bitmap, cache_item.mask, this->lru_counter_.fetch_add(1) };
-
     lock_guard<mutex> lck(this->mutex_);
-    const auto result = this->cache_.insert({ subblock_index, entry_to_be_added });
-    if (result.second)
+    this->AddLocked(subblock_index, cache_item);
+}
+
+void SubBlockCache::AddLocked(int subblock_index, const ISubBlockCacheOperation::CacheItem& cache_item)
+{
+    if (!cache_item.IsValid())
     {
-        // New element inserted
-        this->cache_size_in_bytes_ += size_of_added_cache_item;
-        ++this->cache_subblock_count_;
+        return;
     }
-    else
+
+    const auto size = SubBlockCache::CalculateSizeInBytes(cache_item.bitmap.get(), cache_item.mask.get());
+    const auto existing = this->cache_.find(subblock_index);
+    if (existing != this->cache_.end())
     {
-        // Element with the same key already existed
-        this->cache_size_in_bytes_ -= SubBlockCache::CalculateSizeInBytes(result.first->second.bitmap.get(), result.first->second.mask.get());
-        result.first->second = entry_to_be_added;
-        this->cache_size_in_bytes_ += size_of_added_cache_item;
+        this->cache_size_in_bytes_ -= existing->second.sizeInBytes;
+        this->lru_.erase(existing->second.lruPosition);
+        this->cache_.erase(existing);
     }
+
+    this->lru_.push_front(subblock_index);
+    this->cache_.emplace(subblock_index, CacheEntry{
+        cache_item.bitmap, cache_item.mask, size, this->lru_.begin()});
+    this->cache_size_in_bytes_ += size;
+    this->cache_subblock_count_ = static_cast<std::uint32_t>(this->cache_.size());
+}
+
+ISubBlockCacheOperation::CacheItem SubBlockCache::GetOrCreate(
+    int subblock_index, const std::function<CacheItem()>& loader)
+{
+    std::shared_ptr<InFlightLoad> in_flight;
+    {
+        unique_lock<mutex> lock(this->mutex_);
+        auto cached = this->GetAndTouchLocked(subblock_index);
+        if (cached.IsValid())
+        {
+            return cached;
+        }
+
+        const auto existing = this->in_flight_loads_.find(subblock_index);
+        if (existing != this->in_flight_loads_.end())
+        {
+            in_flight = existing->second;
+            in_flight->condition.wait(lock, [&in_flight] { return in_flight->ready; });
+            if (in_flight->exception)
+            {
+                rethrow_exception(in_flight->exception);
+            }
+
+            return in_flight->result;
+        }
+
+        in_flight = make_shared<InFlightLoad>();
+        this->in_flight_loads_.emplace(subblock_index, in_flight);
+    }
+
+    CacheItem loaded;
+    exception_ptr exception;
+    try
+    {
+        loaded = loader();
+    }
+    catch (...)
+    {
+        exception = current_exception();
+    }
+
+    {
+        lock_guard<mutex> lock(this->mutex_);
+        if (!exception && loaded.IsValid())
+        {
+            this->AddLocked(subblock_index, loaded);
+        }
+
+        in_flight->result = loaded;
+        in_flight->exception = exception;
+        in_flight->ready = true;
+        this->in_flight_loads_.erase(subblock_index);
+    }
+    in_flight->condition.notify_all();
+
+    if (exception)
+    {
+        rethrow_exception(exception);
+    }
+
+    return loaded;
 }
 
 void SubBlockCache::Prune(const PruneOptions& options)
@@ -86,21 +159,20 @@ void SubBlockCache::Prune(const PruneOptions& options)
 
 void SubBlockCache::PruneByMemoryUsageAndElementCount(std::uint64_t max_memory_usage, std::uint32_t max_element_count)
 {
-    // TODO(JBL): This is a very simple implementation of the prune operation. We determine the oldest element and remove it.
-    //            This is repeated until the cache size is below the maximum memory usage and the element count is below the maximum element count.
-    //            Detrimental is the fact that we have to iterate over all elements in the cache to determine the oldest element, and we might have 
-    //            to do this multiple times. If the number of elements in the cache is large, this might be a performance bottleneck.
-    while (this->cache_size_in_bytes_.load() > max_memory_usage || this->cache_subblock_count_.load() > max_element_count)
+    // Entries are ordered from most to least recently used, so each eviction is O(1).
+    while (this->cache_size_in_bytes_ > max_memory_usage || this->cache_subblock_count_ > max_element_count)
     {
-        auto oldest_element = std::min_element(this->cache_.begin(), this->cache_.end(), SubBlockCache::CompareForLruValue);
-        if (oldest_element == this->cache_.end())
+        if (this->lru_.empty())
         {
             break;
         }
 
-        this->cache_size_in_bytes_ -= SubBlockCache::CalculateSizeInBytes(oldest_element->second); /// SubBlockCache::CalculateSizeInBytes(oldest_element->second.bitmap.get());
-        --this->cache_subblock_count_;
+        const int oldest_key = this->lru_.back();
+        const auto oldest_element = this->cache_.find(oldest_key);
+        this->cache_size_in_bytes_ -= oldest_element->second.sizeInBytes;
         this->cache_.erase(oldest_element);
+        this->lru_.pop_back();
+        this->cache_subblock_count_ = static_cast<std::uint32_t>(this->cache_.size());
     }
 }
 
@@ -128,10 +200,5 @@ void SubBlockCache::PruneByMemoryUsageAndElementCount(std::uint64_t max_memory_u
 
 /*static*/std::uint64_t SubBlockCache::CalculateSizeInBytes(const CacheEntry& entry)
 {
-    return SubBlockCache::CalculateSizeInBytes(entry.bitmap.get(), entry.mask.get());
-}
-
-/*static*/bool SubBlockCache::CompareForLruValue(const std::pair<int, CacheEntry>& a, const std::pair<int, CacheEntry>& b)
-{
-    return a.second.lru_value < b.second.lru_value;
+    return entry.sizeInBytes;
 }
