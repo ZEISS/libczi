@@ -136,6 +136,14 @@ option(LIBCZI_BUILD_PREFER_EXTERNALPACKAGE_ZSTD "Prefer a ZSTD-package present o
 #  copy of RapidJSON during the CMake-run. This option is only relevant if building CZICmd.
 option(LIBCZI_BUILD_PREFER_EXTERNALPACKAGE_RAPIDJSON "Prefer a RapidJSON-package present on the system" ON)
 
+# When this option is ON, use an installed libjpeg-turbo package (version 3.0 or newer)
+# providing the CMake target libjpeg-turbo::turbojpeg-static. Configuration fails if
+# the package or static TurboJPEG target is unavailable. Set CMAKE_PREFIX_PATH or
+# libjpeg-turbo_DIR if the package is outside CMake's normal search paths.
+# Otherwise, download a private copy of libjpeg-turbo and build its static TurboJPEG
+# library automatically during the build. Both paths link TurboJPEG statically,
+# including when building shared libCZI. Package managers such as vcpkg should
+# enable this option to use their supplied dependency.
 option(LIBCZI_BUILD_PREFER_EXTERNALPACKAGE_JPEGTURBO "Use an installed libjpeg-turbo package with static TurboJPEG" OFF)
 
 # Experimental functionality policy.

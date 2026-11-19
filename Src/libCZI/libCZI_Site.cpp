@@ -67,6 +67,8 @@ private:
     std::shared_ptr<IDecoder> zstd0decoder;
     std::once_flag  zstd1DecoderInitialized;
     std::shared_ptr<IDecoder> zstd1decoder;
+    std::once_flag  jpgDecoderInitialized;
+    std::shared_ptr<IDecoder> jpgdecoder;
 #if LIBCZI_EXPERIMENTAL_CHUNKED_COMPRESSION_AVAILABLE
     std::once_flag  chunkedCompressionDecoderInitialized;
     std::shared_ptr<IDecoder> chunkedCompressiondecoder;
@@ -79,7 +81,15 @@ public:
         switch (type)
         {
         case ImageDecoderType::Jpg:
-            return CSiteImpBase::GetDecoder(type, arguments);
+            {
+            std::call_once(jxrDecoderInitialized,
+                [this]()
+                {
+                    this->jpgdecoder = CWicJpgDecoder::Create();
+                });
+
+            return this->jpgdecoder;
+            }
         case ImageDecoderType::JPXR_JxrLib:
         {
             std::call_once(jxrDecoderInitialized,
