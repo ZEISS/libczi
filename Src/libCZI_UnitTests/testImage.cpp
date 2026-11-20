@@ -1479,9 +1479,9 @@
     return rawData;
 }
 
-/*static*/const void* CTestImage::GetJpgCompressedImage_Bgr24(size_t* size, int* width, int* height)
+namespace
 {
-    static const unsigned char rawData[71319] =
+    constexpr unsigned char jpg_bgr24_data[71319] =
     {
         0xFF, 0xD8, 0xFF, 0xE0, 0x00, 0x10, 0x4A, 0x46, 0x49, 0x46, 0x00, 0x01, 0x01, 0x01, 0x01, 0x2C,
         0x01, 0x2C, 0x00, 0x00, 0xFF, 0xDB, 0x00, 0x43, 0x00, 0x06, 0x04, 0x05, 0x06, 0x05, 0x04, 0x06,
@@ -5942,10 +5942,14 @@
         0x16, 0x00, 0xB8, 0x00, 0x6E, 0x00, 0x00, 0x00, 0x7F, 0xFF, 0xD6, 0x41, 0x60, 0x18, 0x08, 0x62,
         0x00, 0x01, 0x88, 0x06, 0x07, 0xFF, 0xD9,
     };
+}
+
+/*static*/const void* CTestImage::GetJpgCompressedImage_Bgr24(size_t* size, int* width, int* height)
+{
 
     if (size != nullptr)
     {
-        *size = sizeof(rawData);
+        *size = sizeof(jpg_bgr24_data);
     }
 
     if (width != nullptr)
@@ -5958,7 +5962,7 @@
         *height = 1024;
     }
 
-    return rawData;
+    return jpg_bgr24_data;
 }
 
 /*static*/const void* CTestImage::GetJpgCompressedImage_Gray8(size_t* size, int* width, int* height)
