@@ -114,6 +114,43 @@ namespace
         return false;
     }
 
+    bool TryParseJpgCompressionOption(const std::string& key, const std::string& value, std::map<int, libCZI::CompressParameter>& map)
+    {
+        if (Utilities::icasecmp(key, "Quality"))
+        {
+            std::uint32_t quality;
+            if (!Utilities::TryParseUInt32(value.c_str(), &quality) || quality < 1 || quality > 100)
+            {
+                return false;
+            }
+
+            map[static_cast<int>(CompressionParameterKey::JPG_QUALITY)] = CompressParameter(quality);
+        }
+        else if (Utilities::icasecmp(key, "SubSamp"))
+        {
+            std::int32_t subsampling;
+            if (!Utilities::TryParseInt32(value.c_str(), &subsampling) ||
+                (subsampling != 444 && subsampling != 422 && subsampling != 420))
+            {
+                return false;
+            }
+
+            map[static_cast<int>(CompressionParameterKey::JPG_SUBSAMP)] = CompressParameter(subsampling);
+        }
+        else if (Utilities::icasecmp(key, "Optimize"))
+        {
+            const bool optimize = Utilities::icasecmp(value, "true");
+            if (!optimize && !Utilities::icasecmp(value, "false"))
+            {
+                return false;
+            }
+
+            map[static_cast<int>(CompressionParameterKey::JPG_OPTIMIZE)] = CompressParameter(optimize);
+        }
+
+        return true;
+    }
+
     bool tryParseCompressionOptions(CompressionMode compression_mode, const std::string& s, std::map<int, libCZI::CompressParameter>* map)
     {
         const std::regex compressionOptionsRegex(R"(^\s*([a-zA-Z0-9]*)\s*=\s*([a-zA-Z0-9.+-]*)\s*$)");
@@ -126,6 +163,16 @@ namespace
             {
                 const string& key = pieces_match[1].str();
                 const string& value = pieces_match[2].str();
+
+                if (compression_mode == CompressionMode::Jpg && map != nullptr)
+                {
+                    if (!TryParseJpgCompressionOption(key, value, *map))
+                    {
+                        return false;
+                    }
+
+                    continue;
+                }
 
                 // strategy is (currently): anything we do not understand we ignore
                 if (Utilities::icasecmp(key, Utils::KEY_COMPRESS_EXPLICIT_LEVEL))

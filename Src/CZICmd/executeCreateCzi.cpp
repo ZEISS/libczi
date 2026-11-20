@@ -104,9 +104,28 @@ private:
                 addInfo.sbBlkMetadataSize = sbBlkMetadataSize;
                 writer->SyncAddSubBlock(addInfo);
             }
-            else if (options.GetCompressionMode() == CompressionMode::Zstd1)
+            else
             {
-                auto memblk = ZstdCompress::CompressZStd1Alloc(bm->GetWidth(), bm->GetHeight(), locker.stride, bm->GetPixelType(), locker.ptrDataRoi, options.GetCompressionParameters().get());
+                const auto mode = options.GetCompressionMode();
+                const auto parameters = options.GetCompressionParameters();
+                std::shared_ptr<IMemoryBlock> memblk;
+                switch (mode)
+                {
+                case CompressionMode::Jpg:
+                    memblk = JpgCompress::Compress(bm->GetPixelType(), bm->GetWidth(), bm->GetHeight(),
+                                                   locker.stride, locker.ptrDataRoi, parameters.get());
+                    break;
+                case CompressionMode::Zstd1:
+                    memblk = ZstdCompress::CompressZStd1Alloc(bm->GetWidth(), bm->GetHeight(), locker.stride,
+                                                            bm->GetPixelType(), locker.ptrDataRoi, parameters.get());
+                    break;
+                case CompressionMode::Zstd0:
+                    memblk = ZstdCompress::CompressZStd0Alloc(bm->GetWidth(), bm->GetHeight(), locker.stride,
+                                                            bm->GetPixelType(), locker.ptrDataRoi, parameters.get());
+                    break;
+                default:
+                    continue;
+                }
 
                 AddSubBlockInfoMemPtr addInfo;
                 addInfo.Clear();
@@ -124,30 +143,7 @@ private:
                 addInfo.dataSize = memblk->GetSizeOfData();
                 addInfo.ptrSbBlkMetadata = sbBlkMetadata;
                 addInfo.sbBlkMetadataSize = sbBlkMetadataSize;
-                addInfo.SetCompressionMode(CompressionMode::Zstd1);
-                writer->SyncAddSubBlock(addInfo);
-            }
-            else if (options.GetCompressionMode() == CompressionMode::Zstd0)
-            {
-                auto memblk = ZstdCompress::CompressZStd0Alloc(bm->GetWidth(), bm->GetHeight(), locker.stride, bm->GetPixelType(), locker.ptrDataRoi, options.GetCompressionParameters().get());
-
-                AddSubBlockInfoMemPtr addInfo;
-                addInfo.Clear();
-                addInfo.coordinate = coord;
-                addInfo.mIndexValid = true;
-                addInfo.mIndex = m;
-                addInfo.x = x;
-                addInfo.y = y;
-                addInfo.logicalWidth = bm->GetWidth();
-                addInfo.logicalHeight = bm->GetHeight();
-                addInfo.physicalWidth = bm->GetWidth();
-                addInfo.physicalHeight = bm->GetHeight();
-                addInfo.PixelType = bm->GetPixelType();
-                addInfo.ptrData = memblk->GetPtr();
-                addInfo.dataSize = memblk->GetSizeOfData();
-                addInfo.ptrSbBlkMetadata = sbBlkMetadata;
-                addInfo.sbBlkMetadataSize = sbBlkMetadataSize;
-                addInfo.SetCompressionMode(CompressionMode::Zstd0);
+                addInfo.SetCompressionMode(mode);
                 writer->SyncAddSubBlock(addInfo);
             }
         }

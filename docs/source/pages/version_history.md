@@ -62,4 +62,4 @@ Version history
  0.70.0             | [180](https://github.com/ZEISS/libczi/pull/180)      | add fractional-seconds to `XmlDateTime`, add new method `ISubBlockMetadataMetadataView::TryGetTagAsXmlDateTime`
  0.71.0             | [181](https://github.com/ZEISS/libczi/pull/181)      | add opt-in XT/XZ dimension mapping, reader open-options string conversion and CZIcmd `--open-options`; see [Reader compatibility options](reader_compatibility.html)
  0.72.0             | [182](https://github.com/ZEISS/libczi/pull/182)      | fix composition of `Bgr96Float` tiles, including mask-aware composition
- 0.73.0             |                                                      | add JPEG subblock decoding with static libjpeg-turbo
+ 0.73.0             |                                                      | add JPEG subblock encoding and decoding with static libjpeg-turbo
