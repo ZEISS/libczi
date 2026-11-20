@@ -109,6 +109,7 @@ set(LIBCZISRCFILES
             pugiconfig.hpp
             pugixml.hpp
             jxrlibcompress.cpp
+            jpgcompress.cpp
             StreamsLib/streamsFactory.cpp
             StreamsLib/curlhttpinputstream.cpp
             StreamsLib/curlhttpinputstream.h
