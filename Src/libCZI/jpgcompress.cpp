@@ -115,8 +115,8 @@ std::shared_ptr<IMemoryBlock> JpgCompress::Compress(
     unsigned char* output = nullptr;
     size_t output_size = 0;
     const int result = tj3Compress8(encoder.get(), static_cast<const unsigned char*>(ptrData),
-                                   static_cast<int>(width), static_cast<int>(stride), static_cast<int>(height),
-                                   format, &output, &output_size);
+                                    static_cast<int>(width), static_cast<int>(stride), static_cast<int>(height),
+                                    format, &output, &output_size);
     JpegBuffer buffer(output, tj3Free);
     if (result != 0)
     {

@@ -235,23 +235,23 @@ WicDecoderBase::WicDecoderBase()
     //       A proper solution might be: have defined library initialization and deinitialization functions, which the user of the library 
     //       has to call at the beginning and end of the program. For now, we just leak the factory object.
     std::call_once(WicDecoderBase::factory_created,
-               [this]()
-               {
-                   IWICImagingFactory* wicImagingFactor;
-                   HRESULT hr = CoCreateInstance(CLSID_WICImagingFactory, NULL, CLSCTX_INPROC_SERVER, IID_IWICImagingFactory, reinterpret_cast<LPVOID*>(&wicImagingFactor));
-                   if (hr == CO_E_NOTINITIALIZED)
-                   {
-                       // that's for sure a bit controversial (that we call this COM-initialization here, you better make sure
-                       // that the current thread is already initialized by the caller
-                       CoInitializeEx(NULL, COINIT_MULTITHREADED | COINIT_DISABLE_OLE1DDE);
-                       hr = CoCreateInstance(CLSID_WICImagingFactory, NULL, CLSCTX_INPROC_SERVER, IID_IWICImagingFactory, reinterpret_cast<LPVOID*>(&wicImagingFactor));
-                   }
+                    [this]()
+                    {
+                        IWICImagingFactory* wicImagingFactor;
+                        HRESULT hr = CoCreateInstance(CLSID_WICImagingFactory, NULL, CLSCTX_INPROC_SERVER, IID_IWICImagingFactory, reinterpret_cast<LPVOID*>(&wicImagingFactor));
+                        if (hr == CO_E_NOTINITIALIZED)
+                        {
+                           // that's for sure a bit controversial (that we call this COM-initialization here, you better make sure
+                           // that the current thread is already initialized by the caller
+                           CoInitializeEx(NULL, COINIT_MULTITHREADED | COINIT_DISABLE_OLE1DDE);
+                           hr = CoCreateInstance(CLSID_WICImagingFactory, NULL, CLSCTX_INPROC_SERVER, IID_IWICImagingFactory, reinterpret_cast<LPVOID*>(&wicImagingFactor));
+                        }
 
-                   if (SUCCEEDED(hr))
-                   {
-                       WicDecoderBase::codec_factory = wicImagingFactor;
-                   }
-               });
+                        if (SUCCEEDED(hr))
+                        {
+                           WicDecoderBase::codec_factory = wicImagingFactor;
+                        }
+                    });
 }
 
 std::shared_ptr<libCZI::IBitmapData> WicDecoderBase::Decode(WicContainerFormat container_format, const void* ptrData, size_t size, const libCZI::PixelType* pixelType, const std::uint32_t* width, const std::uint32_t* height)

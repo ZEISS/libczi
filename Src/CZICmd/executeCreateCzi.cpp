@@ -113,7 +113,7 @@ private:
                 {
                 case CompressionMode::Jpg:
                     memblk = JpgCompress::Compress(bm->GetPixelType(), bm->GetWidth(), bm->GetHeight(),
-                                                   locker.stride, locker.ptrDataRoi, parameters.get());
+                                                    locker.stride, locker.ptrDataRoi, parameters.get());
                     break;
                 case CompressionMode::Zstd1:
                     memblk = ZstdCompress::CompressZStd1Alloc(bm->GetWidth(), bm->GetHeight(), locker.stride,

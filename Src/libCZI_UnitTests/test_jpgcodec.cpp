@@ -142,7 +142,7 @@ TEST(JpgCompress, WritesRequestedChromaSampling)
     {
         CompressParametersOnMap parameters;
         parameters.map.emplace(static_cast<int>(CompressionParameterKey::JPG_SUBSAMP),
-                               CompressParameter(test_case.mode));
+                                CompressParameter(test_case.mode));
         const auto jpeg = JpgCompress::Compress(PixelType::Bgr24, 1, 1, 3, source, &parameters);
         const auto* begin = static_cast<const std::uint8_t*>(jpeg->GetPtr());
         const auto* end = begin + jpeg->GetSizeOfData();
@@ -197,7 +197,7 @@ TEST(JpgBitmap, CropPadAndConvertToDeclaredPixelType)
     const auto output_width = static_cast<std::uint32_t>(width + 1);
     const auto output_height = static_cast<std::uint32_t>(height - 1);
     const auto bitmap = CreateBitmapFromSubBlockData(CompressionMode::Jpg, data, size,
-                                                     PixelType::Bgr24, output_width, output_height);
+                                                        PixelType::Bgr24, output_width, output_height);
     ASSERT_EQ(bitmap->GetWidth(), output_width);
     ASSERT_EQ(bitmap->GetHeight(), output_height);
     ASSERT_EQ(bitmap->GetPixelType(), PixelType::Bgr24);

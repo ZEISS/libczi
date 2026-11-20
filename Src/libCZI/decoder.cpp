@@ -187,7 +187,7 @@ std::shared_ptr<libCZI::IBitmapData> JpgDecoder::Decode(const void* ptrData, siz
     }
 
     if (tj3Decompress8(decoder.get(), jpeg, size, static_cast<unsigned char*>(lock.ptrDataRoi),
-                       static_cast<int>(lock.stride), pixel_format) != 0)
+                        static_cast<int>(lock.stride), pixel_format) != 0)
     {
         throw std::runtime_error(tj3GetErrorStr(decoder.get()));
     }
