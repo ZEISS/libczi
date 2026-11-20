@@ -19,5 +19,6 @@ public:
     static const void* GetZStd1CompressedImage(size_t* size, int* width, int* height);
     static const void* GetZStd1CompressedImageWithHiLoPacking(size_t* size, int* width, int* height);
     static const void* GetJpgCompressedImage_Bgr24(size_t* size, int* width, int* height);
+    static const void* GetJpgCompressedImage_Gray8(size_t* size, int* width, int* height);
 };
 
