@@ -241,15 +241,15 @@ WicDecoderBase::WicDecoderBase()
                         HRESULT hr = CoCreateInstance(CLSID_WICImagingFactory, NULL, CLSCTX_INPROC_SERVER, IID_IWICImagingFactory, reinterpret_cast<LPVOID*>(&wicImagingFactor));
                         if (hr == CO_E_NOTINITIALIZED)
                         {
-                           // that's for sure a bit controversial (that we call this COM-initialization here, you better make sure
-                           // that the current thread is already initialized by the caller
-                           CoInitializeEx(NULL, COINIT_MULTITHREADED | COINIT_DISABLE_OLE1DDE);
-                           hr = CoCreateInstance(CLSID_WICImagingFactory, NULL, CLSCTX_INPROC_SERVER, IID_IWICImagingFactory, reinterpret_cast<LPVOID*>(&wicImagingFactor));
+                            // that's for sure a bit controversial (that we call this COM-initialization here, you better make sure
+                            // that the current thread is already initialized by the caller
+                            CoInitializeEx(NULL, COINIT_MULTITHREADED | COINIT_DISABLE_OLE1DDE);
+                            hr = CoCreateInstance(CLSID_WICImagingFactory, NULL, CLSCTX_INPROC_SERVER, IID_IWICImagingFactory, reinterpret_cast<LPVOID*>(&wicImagingFactor));
                         }
 
                         if (SUCCEEDED(hr))
                         {
-                           WicDecoderBase::codec_factory = wicImagingFactor;
+                            WicDecoderBase::codec_factory = wicImagingFactor;
                         }
                     });
 }
