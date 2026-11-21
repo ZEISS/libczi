@@ -382,8 +382,8 @@ else()
 
   ExternalProject_Add(libjpeg_turbo_external
     GIT_REPOSITORY https://github.com/libjpeg-turbo/libjpeg-turbo.git
-    GIT_TAG        3.2.1
-    GIT_SHALLOW    TRUE
+    # 3.2.1 plus the upstream fix for a z_errmsg clash with external zlib.
+    GIT_TAG        fa224ebee479046c179605a7070e02f81910c786
     SOURCE_DIR     "${_jpeg_source_dir}"
     BINARY_DIR     "${_jpeg_binary_dir}"
     LIST_SEPARATOR "|"
