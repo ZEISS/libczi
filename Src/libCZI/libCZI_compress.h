@@ -50,6 +50,21 @@ namespace libCZI
         /// for chunked compression.
         CHUNKEDCOMPRESSION_DOLOHIBYTEUNPACKING = 7,
 #endif
+
+        /// JPEG quality (type: uint32). Values are clipped to the range 1 to 100.
+        JPG_QUALITY = 8,
+
+        /// Chroma subsampling for Bgr24 JPEG (type: int32).
+        /// - 444 (default) uses full chroma resolution.
+        /// - 422 halves horizontal chroma resolution.
+        /// - 420 halves horizontal and vertical chroma resolution.
+        /// Gray8 uses grayscale sampling regardless of this parameter.
+        JPG_SUBSAMP = 9,
+
+        /// Whether to compute image-specific Huffman tables for JPEG (type: bool).
+        /// This can reduce the JPEG size without changing decoded pixels, at the cost of
+        /// additional encoding time. Defaults to false.
+        JPG_OPTIMIZE = 10,
     };
 
     /// Simple variant type used for the compression-parameters-property-bag.
@@ -569,6 +584,32 @@ namespace libCZI
             std::uint32_t stride,
             const void* ptrData,
             const ICompressParameters* parameters);
+    };
+
+    /// Compresses an 8-bit grayscale or BGR bitmap into a JPEG bitstream.
+    class LIBCZI_API JpgCompress
+    {
+    public:
+        /// Compress a Gray8 or Bgr24 bitmap for a subblock with CompressionMode::Jpg.
+        /// For Bgr24, reducing chroma resolution can shrink the bitstream at the cost of fine color detail.
+        ///
+        /// \param pixel_type The source pixel type, Gray8 or Bgr24.
+        /// \param width Source width in pixels.
+        /// \param height Source height in pixels.
+        /// \param stride Distance in bytes between successive source rows.
+        /// \param ptrData Pointer to the first row. The buffer must contain all source pixels.
+        /// \param parameters Optional property bag. JPG_QUALITY defaults to 90, JPG_SUBSAMP to 4:4:4,
+        ///                   and JPG_OPTIMIZE to false. Missing or incorrectly typed properties use their defaults.
+        /// \returns A memory block owning the compressed JPEG bitstream.
+        /// \throws std::invalid_argument For unsupported pixel types, invalid source arguments, or an invalid Bgr24 subsampling value.
+        /// \throws std::runtime_error If TurboJPEG cannot encode the bitmap.
+        static std::shared_ptr<IMemoryBlock> Compress(
+            libCZI::PixelType pixel_type,
+            std::uint32_t width,
+            std::uint32_t height,
+            std::uint32_t stride,
+            const void* ptrData,
+            const ICompressParameters* parameters = nullptr);
     };
 
 #if LIBCZI_EXPERIMENTAL_CHUNKED_COMPRESSION_AVAILABLE

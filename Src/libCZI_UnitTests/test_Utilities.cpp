@@ -360,6 +360,23 @@ TEST(Utilities, DimensionCharToDimensionIndex2)
         LibCZICZIParseException) << "was expecting an exception here";
 }
 
+TEST(Utilities, ParseJpgCompressionOptions)
+{
+    const auto options = Utils::ParseCompressionOptions("jpg:Quality=85;SubSamp=420;Optimize=true");
+    EXPECT_EQ(options.first, CompressionMode::Jpg);
+    CompressParameter value;
+    ASSERT_TRUE(options.second->TryGetProperty(CompressionParameterKey::JPG_QUALITY, &value));
+    EXPECT_EQ(value.GetUInt32(), 85u);
+    ASSERT_TRUE(options.second->TryGetProperty(CompressionParameterKey::JPG_SUBSAMP, &value));
+    EXPECT_EQ(value.GetInt32(), 420);
+    ASSERT_TRUE(options.second->TryGetProperty(CompressionParameterKey::JPG_OPTIMIZE, &value));
+    EXPECT_TRUE(value.GetBoolean());
+
+    EXPECT_THROW(Utils::ParseCompressionOptions("jpg:Quality=101"), std::logic_error);
+    EXPECT_THROW(Utils::ParseCompressionOptions("jpg:SubSamp=411"), std::logic_error);
+    EXPECT_THROW(Utils::ParseCompressionOptions("jpg:Optimize=maybe"), std::logic_error);
+}
+
 TEST(Utilities, ParseCompressionOptionAndCheckForCorrectness1)
 {
     const auto compressionOptions = Utils::ParseCompressionOptions("zstd1:ExplicitLevel=2");

@@ -779,7 +779,9 @@ CCmdLineOptions::ParseResult CCmdLineOptions::Parse(int argc, char** argv)
     cli_app.add_option("--compressionopts", argument_compressionoptions,
         "Only used for 'CreateCZI': a string in a defined format which states the compression-method and (compression-method specific) "
         "parameters. The format is \"compression_method: key=value; ...\". It starts with the name of the compression-method, followed by a colon, "
-        "then followed by a list of key-value pairs which are separated by a semicolon. Examples: \"zstd0:ExplicitLevel=3\", \"zstd1:ExplicitLevel=2;PreProcess=HiLoByteUnpack\".")
+        "then followed by a list of key-value pairs which are separated by a semicolon. "
+        "Examples: \"zstd0:ExplicitLevel=3\", \"zstd1:ExplicitLevel=2;PreProcess=HiLoByteUnpack\", and "
+        "\"jpg:Quality=90;SubSamp=420;Optimize=true\". JPEG supports Gray8 and Bgr24.")
         ->option_text("COMPRESSIONDESCRIPTION")
         ->check(compressionoptions_validator);
     cli_app.add_option("--generatorpixeltype", argument_generatorpixeltype,
@@ -1001,6 +1003,13 @@ CCmdLineOptions::ParseResult CCmdLineOptions::Parse(int argc, char** argv)
         {
             const bool b = TryParseGeneratorPixeltype(argument_generatorpixeltype, &this->pixelTypeForBitmapGenerator);
             ThrowIfFalse(b, "--generatorpixeltype", argument_generatorpixeltype);
+        }
+
+        if (this->GetCommand() == Command::CreateCZI && this->compressionMode == libCZI::CompressionMode::Jpg &&
+            this->pixelTypeForBitmapGenerator != libCZI::PixelType::Gray8 &&
+            this->pixelTypeForBitmapGenerator != libCZI::PixelType::Bgr24)
+        {
+            throw runtime_error("JPEG compression requires --generatorpixeltype Gray8 or Bgr24.");
         }
 
         if (!argument_subblock_cachesize.empty())

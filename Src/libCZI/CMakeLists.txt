@@ -109,6 +109,7 @@ set(LIBCZISRCFILES
             pugiconfig.hpp
             pugixml.hpp
             jxrlibcompress.cpp
+            jpgcompress.cpp
             StreamsLib/streamsFactory.cpp
             StreamsLib/curlhttpinputstream.cpp
             StreamsLib/curlhttpinputstream.h
@@ -309,6 +310,109 @@ else()
   add_subdirectory(${zstd_SOURCE_DIR}/build/cmake ${zstd_BINARY_DIR})
 endif()
 
+# The decoder uses the TurboJPEG API (turbojpeg.h). Both dependency paths
+# supply its static archive, including when libCZI itself is built as a DLL
+# or shared library.
+if (LIBCZI_BUILD_PREFER_EXTERNALPACKAGE_JPEGTURBO)
+  find_package(libjpeg-turbo 3.0 CONFIG REQUIRED)
+  if (NOT TARGET libjpeg-turbo::turbojpeg-static)
+    message(FATAL_ERROR "The installed libjpeg-turbo package must provide libjpeg-turbo::turbojpeg-static")
+  endif()
+  set(LIBCZI_JPEG_LINK_TARGET libjpeg-turbo::turbojpeg-static)
+else()
+  # Upstream requires a standalone CMake build. ExternalProject downloads the
+  # pinned release and builds it with the parent build's compiler and settings.
+  include(ExternalProject)
+
+  set(_jpeg_source_dir "${CMAKE_CURRENT_BINARY_DIR}/jpeg-turbo-src")
+  set(_jpeg_binary_dir "${CMAKE_CURRENT_BINARY_DIR}/jpeg-turbo-build")
+
+  # PIC lets the same archive link into shared libCZI on platforms that need it.
+  # On MSVC, match libCZI's choice of static or dynamic C runtime.
+  set(_jpeg_cmake_args
+      "-DCMAKE_C_COMPILER:FILEPATH=${CMAKE_C_COMPILER}"
+      "-DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}"
+      "-DCMAKE_POSITION_INDEPENDENT_CODE:BOOL=ON"
+      "-DENABLE_SHARED:BOOL=OFF"
+      "-DENABLE_STATIC:BOOL=ON"
+      "-DWITH_TURBOJPEG:BOOL=ON"
+      "-DWITH_TOOLS:BOOL=OFF"
+      "-DWITH_TESTS:BOOL=OFF"
+      "-DWITH_SYSTEM_SPNG:BOOL=OFF"
+      "-DWITH_SYSTEM_ZLIB:BOOL=OFF"
+      "-DWITH_CRT_DLL:BOOL=${LIBCZI_DO_NOT_SET_MSVC_RUNTIME_LIBRARY}")
+
+  if (CMAKE_TOOLCHAIN_FILE)
+    list(APPEND _jpeg_cmake_args
+         "-DCMAKE_TOOLCHAIN_FILE:FILEPATH=${CMAKE_TOOLCHAIN_FILE}")
+  endif()
+
+  if (MSVC OR CMAKE_C_SIMULATE_ID STREQUAL "MSVC")
+    set(_jpeg_archive_name "${CMAKE_STATIC_LIBRARY_PREFIX}turbojpeg-static${CMAKE_STATIC_LIBRARY_SUFFIX}")
+  else()
+    set(_jpeg_archive_name "${CMAKE_STATIC_LIBRARY_PREFIX}turbojpeg${CMAKE_STATIC_LIBRARY_SUFFIX}")
+  endif()
+
+  # Use the archive directly from the external build tree. Multi-config
+  # generators put each configuration's archive in its own directory.
+  get_property(_jpeg_multi_config GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG)
+  set(_jpeg_library "${_jpeg_binary_dir}/${_jpeg_archive_name}")
+  if (_jpeg_multi_config)
+    set(_jpeg_library "${_jpeg_binary_dir}/$<CONFIG>/${_jpeg_archive_name}")
+    set(_jpeg_build_config --config $<CONFIG>)
+    string(REPLACE ";" "|" _jpeg_configurations "${CMAKE_CONFIGURATION_TYPES}")
+    list(APPEND _jpeg_cmake_args "-DCMAKE_CONFIGURATION_TYPES:STRING=${_jpeg_configurations}")
+  endif()
+  if (APPLE)
+    string(REPLACE ";" "|" _jpeg_osx_architectures "${CMAKE_OSX_ARCHITECTURES}")
+    list(APPEND _jpeg_cmake_args
+         "-DCMAKE_OSX_ARCHITECTURES:STRING=${_jpeg_osx_architectures}"
+         "-DCMAKE_OSX_DEPLOYMENT_TARGET:STRING=${CMAKE_OSX_DEPLOYMENT_TARGET}"
+         "-DCMAKE_OSX_SYSROOT:STRING=${CMAKE_OSX_SYSROOT}")
+  endif()
+
+  # Older CMake versions cannot use generator expressions in BUILD_BYPRODUCTS.
+  set(_jpeg_byproducts "${_jpeg_library}")
+  if (_jpeg_multi_config AND CMAKE_VERSION VERSION_LESS 3.20)
+    set(_jpeg_byproducts "")
+    foreach(_config IN LISTS CMAKE_CONFIGURATION_TYPES)
+      list(APPEND _jpeg_byproducts "${_jpeg_binary_dir}/${_config}/${_jpeg_archive_name}")
+    endforeach()
+  endif()
+
+  ExternalProject_Add(libjpeg_turbo_external
+    GIT_REPOSITORY https://github.com/libjpeg-turbo/libjpeg-turbo.git
+    # 3.2.1 plus the upstream fix for a z_errmsg clash with external zlib.
+    GIT_TAG        fa224ebee479046c179605a7070e02f81910c786
+    SOURCE_DIR     "${_jpeg_source_dir}"
+    BINARY_DIR     "${_jpeg_binary_dir}"
+    LIST_SEPARATOR "|"
+    CMAKE_ARGS     ${_jpeg_cmake_args}
+    BUILD_COMMAND  "${CMAKE_COMMAND}" --build <BINARY_DIR> ${_jpeg_build_config} --target turbojpeg-static
+    BUILD_BYPRODUCTS ${_jpeg_byproducts}
+    INSTALL_COMMAND ""
+  )
+
+  # CMake validates imported include directories at generation time, before
+  # the download runs. The imported target also orders the download and build
+  # before consumers compile against turbojpeg.h.
+  file(MAKE_DIRECTORY "${_jpeg_source_dir}/src")
+  add_library(libczi_turbojpeg STATIC IMPORTED)
+  if (_jpeg_multi_config)
+    foreach(_config IN LISTS CMAKE_CONFIGURATION_TYPES)
+      string(TOUPPER "${_config}" _config_upper)
+      set_property(TARGET libczi_turbojpeg APPEND PROPERTY IMPORTED_CONFIGURATIONS "${_config}")
+      set_property(TARGET libczi_turbojpeg PROPERTY "IMPORTED_LOCATION_${_config_upper}"
+                   "${_jpeg_binary_dir}/${_config}/${_jpeg_archive_name}")
+    endforeach()
+  else()
+    set_property(TARGET libczi_turbojpeg PROPERTY IMPORTED_LOCATION "${_jpeg_library}")
+  endif()
+  target_include_directories(libczi_turbojpeg INTERFACE "${_jpeg_source_dir}/src")
+  add_dependencies(libczi_turbojpeg libjpeg_turbo_external)
+  set(LIBCZI_JPEG_LINK_TARGET libczi_turbojpeg)
+endif()
+
 if (LIBCZI_BUILD_EXPERIMENTAL_CHUNKED_COMPRESSION)
     if (LIBCZI_BUILD_PREFER_EXTERNALPACKAGE_LZ4)
       find_package(lz4 CONFIG REQUIRED)
@@ -388,7 +492,7 @@ if (LIBCZI_BUILD_DYNLIB)
   SET_TARGET_PROPERTIES (libCZI PROPERTIES DEFINE_SYMBOL  "LIBCZI_EXPORTS" )
   set_target_properties(libCZI PROPERTIES VERSION ${PROJECT_VERSION} SOVERSION 1)
   # add the binary tree to the search path for include files so that we will find libCZI_Config.h
-  target_link_libraries(libCZI PRIVATE  ${ADDITIONAL_LIBS_REQUIRED_FOR_ATOMIC})
+  target_link_libraries(libCZI PRIVATE ${ADDITIONAL_LIBS_REQUIRED_FOR_ATOMIC} ${LIBCZI_JPEG_LINK_TARGET})
   set_target_properties(libCZI PROPERTIES DEBUG_POSTFIX "d")
   if (LIBCZI_BUILD_PREFER_EXTERNALPACKAGE_ZSTD)
    target_link_libraries(libCZI PRIVATE ${LIBCZI_ZSTD_LINK_TARGET})
@@ -475,6 +579,8 @@ if(LIBCZI_HAVE_WIN32_API)
 endif()
 target_compile_definitions(libCZIStatic PUBLIC _LIBCZISTATICLIB)    # make sure that users of the static library get the correct definition
 
+target_link_libraries(libCZIStatic PRIVATE ${LIBCZI_JPEG_LINK_TARGET})
+
 # Static library include directories
 target_include_directories(libCZIStatic
     PUBLIC
@@ -500,7 +606,15 @@ if(LIBCZI_ENABLE_INSTALL)
                 CONFIGURATIONS Release RelWithDebInfo MinSizeRel)
 
     else()
-        # Static lib install
+        # Static libCZI consumers link the TurboJPEG archive separately.
+        # Ship the bundled archive alongside libCZI so the installed package
+        # can resolve it after relocation. System packages are found by the
+        # installed libCZI config.
+        if(NOT LIBCZI_BUILD_PREFER_EXTERNALPACKAGE_JPEGTURBO)
+            install(FILES "${_jpeg_library}"
+                    DESTINATION "${CMAKE_INSTALL_LIBDIR}/libczi"
+                    CONFIGURATIONS Release RelWithDebInfo MinSizeRel)
+        endif()
         install(TARGETS libCZIStatic
                 EXPORT libCZITargets
                 ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
@@ -539,6 +653,7 @@ if(LIBCZI_ENABLE_INSTALL)
         "${CMAKE_CURRENT_SOURCE_DIR}/../../cmake/${PROJECT_NAME}Config.cmake.in"
         "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake"
         INSTALL_DESTINATION ${INSTALL_CMAKEDIR}
+        PATH_VARS CMAKE_INSTALL_LIBDIR
     )
 
     # Ship the FlatCC workaround alongside the package config so installed static
