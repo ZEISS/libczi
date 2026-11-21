@@ -9,6 +9,7 @@
 #if LIBCZI_WINDOWSAPI_AVAILABLE
 
 #include <memory>
+#include <mutex>
 #include <cstdint>
 #include "libCZI_Pixels.h"
 #include "libCZI_Site.h"

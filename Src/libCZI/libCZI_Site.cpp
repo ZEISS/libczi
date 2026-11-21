@@ -61,17 +61,17 @@ public:
 class CSiteImpWic : public CSiteImpBase
 {
 private:
-    std::once_flag  jxrDecoderInitialized;
-    std::shared_ptr<IDecoder> jpgXrdecoder;
-    std::once_flag  zstd0DecoderInitialized;
-    std::shared_ptr<IDecoder> zstd0decoder;
-    std::once_flag  zstd1DecoderInitialized;
-    std::shared_ptr<IDecoder> zstd1decoder;
-    std::once_flag  jpgDecoderInitialized;
-    std::shared_ptr<IDecoder> jpgdecoder;
+    std::once_flag  jpgxr_decoder_initialized_;
+    std::shared_ptr<IDecoder> jpgxr_decoder_;
+    std::once_flag  zstd0_decoder_initialized_;
+    std::shared_ptr<IDecoder> zstd0_decoder_;
+    std::once_flag  zstd1_decoder_initialized_;
+    std::shared_ptr<IDecoder> zstd1_decoder_;
+    std::once_flag  jpg_decoder_initialized_;
+    std::shared_ptr<IDecoder> jpg_decoder_;
 #if LIBCZI_EXPERIMENTAL_CHUNKED_COMPRESSION_AVAILABLE
-    std::once_flag  chunkedCompressionDecoderInitialized;
-    std::shared_ptr<IDecoder> chunkedCompressiondecoder;
+    std::once_flag  chunked_compression_decoder_initialized_;
+    std::shared_ptr<IDecoder> chunked_compression_decoder_;
 #endif
 public:
     std::shared_ptr<IDecoder> GetDecoder(ImageDecoderType type, const char* arguments) override
@@ -82,54 +82,54 @@ public:
         {
         case ImageDecoderType::Jpg:
             {
-            std::call_once(jxrDecoderInitialized,
+            std::call_once(this->jpg_decoder_initialized_,
                 [this]()
                 {
-                    this->jpgdecoder = CWicJpgDecoder::Create();
+                    this->jpg_decoder_ = CWicJpgDecoder::Create();
                 });
 
-            return this->jpgdecoder;
+            return this->jpg_decoder_;
             }
         case ImageDecoderType::JPXR_JxrLib:
         {
-            std::call_once(jxrDecoderInitialized,
+            std::call_once(this->jpgxr_decoder_initialized_,
                 [this]()
                 {
-                    this->jpgXrdecoder = CWicJpgxrDecoder::Create();
+                    this->jpgxr_decoder_ = CWicJpgxrDecoder::Create();
                 });
 
-            return this->jpgXrdecoder;
+            return this->jpgxr_decoder_;
         }
         case ImageDecoderType::ZStd0:
         {
-            std::call_once(zstd0DecoderInitialized,
+            std::call_once(this->zstd0_decoder_initialized_,
                 [this]()
                 {
-                    this->zstd0decoder = CZstd0Decoder::Create();
+                    this->zstd0_decoder_ = CZstd0Decoder::Create();
                 });
 
-            return this->zstd0decoder;
+            return this->zstd0_decoder_;
         }
         case ImageDecoderType::ZStd1:
         {
-            std::call_once(zstd1DecoderInitialized,
+            std::call_once(this->zstd1_decoder_initialized_,
                 [this]()
                 {
-                    this->zstd1decoder = CZstd1Decoder::Create();
+                    this->zstd1_decoder_ = CZstd1Decoder::Create();
                 });
 
-            return this->zstd1decoder;
+            return this->zstd1_decoder_;
         }
 #if LIBCZI_EXPERIMENTAL_CHUNKED_COMPRESSION_AVAILABLE
         case ImageDecoderType::ChunkedCompression:
         {
-            std::call_once(chunkedCompressionDecoderInitialized,
+            std::call_once(this->chunked_compression_decoder_initialized_,
                 [this]()
                 {
-                    this->chunkedCompressiondecoder = CChunkedCompressionDecoder::Create();
+                    this->chunked_compression_decoder_ = CChunkedCompressionDecoder::Create();
                 });
 
-            return this->chunkedCompressiondecoder;
+            return this->chunked_compression_decoder_;
         }
 #endif
         }
@@ -142,17 +142,17 @@ public:
 class CSiteImpJxrLib : public CSiteImpBase
 {
 private:
-    std::once_flag  jxrDecoderInitialized;
-    std::shared_ptr<IDecoder> jpgXrdecoder;
-    std::once_flag  jpgDecoder_initialized;
-    std::shared_ptr<IDecoder> jpg_decoder;
-    std::once_flag  zstd0DecoderInitialized;
-    std::shared_ptr<IDecoder> zstd0decoder;
-    std::once_flag  zstd1DecoderInitialized;
-    std::shared_ptr<IDecoder> zstd1decoder;
+    std::once_flag  jpgxr_decoder_initialized_;
+    std::shared_ptr<IDecoder> jpgxr_decoder_;
+    std::once_flag  jpg_decoder_initialized_;
+    std::shared_ptr<IDecoder> jpg_decoder_;
+    std::once_flag  zstd0_decoder_initialized_;
+    std::shared_ptr<IDecoder> zstd0_decoder_;
+    std::once_flag  zstd1_decoder_initialized_;
+    std::shared_ptr<IDecoder> zstd1_decoder_;
 #if LIBCZI_EXPERIMENTAL_CHUNKED_COMPRESSION_AVAILABLE
-    std::once_flag  chunkedCompressionDecoderInitialized;
-    std::shared_ptr<IDecoder> chunkedCompressiondecoder;
+    std::once_flag  chunked_compression_decoder_initialized_;
+    std::shared_ptr<IDecoder> chunked_compression_decoder_;
 #endif
 public:
     std::shared_ptr<IDecoder> GetDecoder(ImageDecoderType type, const char* arguments) override
@@ -163,54 +163,54 @@ public:
         {
         case ImageDecoderType::Jpg:
         {
-            std::call_once(jpgDecoder_initialized,
+            std::call_once(this->jpg_decoder_initialized_,
                 [this]()
                 {
-                    this->jpg_decoder = JpgDecoder::Create();
+                    this->jpg_decoder_ = JpgDecoder::Create();
                 });
 
-            return this->jpg_decoder;
+            return this->jpg_decoder_;
         }
         case ImageDecoderType::JPXR_JxrLib:
         {
-            std::call_once(jxrDecoderInitialized,
+            std::call_once(this->jpgxr_decoder_initialized_,
                 [this]()
                 {
-                    this->jpgXrdecoder = CJxrLibDecoder::Create();
+                    this->jpgxr_decoder_ = CJxrLibDecoder::Create();
                 });
 
-            return this->jpgXrdecoder;
+            return this->jpgxr_decoder_;
         }
         case ImageDecoderType::ZStd0:
         {
-            std::call_once(zstd0DecoderInitialized,
+            std::call_once(this->zstd0_decoder_initialized_,
                 [this]()
                 {
-                    this->zstd0decoder = CZstd0Decoder::Create();
+                    this->zstd0_decoder_ = CZstd0Decoder::Create();
                 });
 
-            return this->zstd0decoder;
+            return this->zstd0_decoder_;
         }
         case ImageDecoderType::ZStd1:
         {
-            std::call_once(zstd1DecoderInitialized,
+            std::call_once(this->zstd1_decoder_initialized_,
                 [this]()
                 {
-                    this->zstd1decoder = CZstd1Decoder::Create();
+                    this->zstd1_decoder_ = CZstd1Decoder::Create();
                 });
 
-            return this->zstd1decoder;
+            return this->zstd1_decoder_;
         }
 #if LIBCZI_EXPERIMENTAL_CHUNKED_COMPRESSION_AVAILABLE
         case ImageDecoderType::ChunkedCompression:
         {
-            std::call_once(chunkedCompressionDecoderInitialized,
+            std::call_once(this->chunked_compression_decoder_initialized_,
                 [this]()
                 {
-                this->chunkedCompressiondecoder = CChunkedCompressionDecoder::Create();
+                    this->chunked_compression_decoder_ = CChunkedCompressionDecoder::Create();
                 });
 
-            return this->chunkedCompressiondecoder;
+            return this->chunked_compression_decoder_;
         }
 #endif
         }
