@@ -330,7 +330,6 @@ else()
   set(_jpeg_binary_dir "${CMAKE_CURRENT_BINARY_DIR}/jpeg-turbo-build")
 
   # PIC lets the same archive link into shared libCZI on platforms that need it.
-  # On MSVC, match libCZI's choice of static or dynamic C runtime.
   set(_jpeg_cmake_args
       "-DCMAKE_C_COMPILER:FILEPATH=${CMAKE_C_COMPILER}"
       "-DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}"
@@ -341,8 +340,23 @@ else()
       "-DWITH_TOOLS:BOOL=OFF"
       "-DWITH_TESTS:BOOL=OFF"
       "-DWITH_SYSTEM_SPNG:BOOL=OFF"
-      "-DWITH_SYSTEM_ZLIB:BOOL=OFF"
-      "-DWITH_CRT_DLL:BOOL=${LIBCZI_DO_NOT_SET_MSVC_RUNTIME_LIBRARY}")
+      "-DWITH_SYSTEM_ZLIB:BOOL=OFF")
+
+  # The standalone build needs the same C flags, including ABI switches.
+  set(_jpeg_flag_configs Debug Release RelWithDebInfo MinSizeRel
+      ${CMAKE_CONFIGURATION_TYPES} ${CMAKE_BUILD_TYPE})
+  set(_jpeg_c_flag_vars CMAKE_C_FLAGS)
+  foreach(_config IN LISTS _jpeg_flag_configs)
+    string(TOUPPER "${_config}" _config_upper)
+    list(APPEND _jpeg_c_flag_vars "CMAKE_C_FLAGS_${_config_upper}")
+  endforeach()
+  list(REMOVE_DUPLICATES _jpeg_c_flag_vars)
+  foreach(_flag_var IN LISTS _jpeg_c_flag_vars)
+    if (DEFINED ${_flag_var})
+      string(REPLACE ";" "|" _jpeg_flags "${${_flag_var}}")
+      list(APPEND _jpeg_cmake_args "-D${_flag_var}:STRING=${_jpeg_flags}")
+    endif()
+  endforeach()
 
   if (CMAKE_TOOLCHAIN_FILE)
     list(APPEND _jpeg_cmake_args
@@ -351,6 +365,17 @@ else()
 
   if (MSVC OR CMAKE_C_SIMULATE_ID STREQUAL "MSVC")
     set(_jpeg_archive_name "${CMAKE_STATIC_LIBRARY_PREFIX}turbojpeg-static${CMAKE_STATIC_LIBRARY_SUFFIX}")
+    set(_jpeg_msvc_runtime "${CMAKE_MSVC_RUNTIME_LIBRARY}")
+    if (NOT DEFINED CMAKE_MSVC_RUNTIME_LIBRARY)
+      set(_jpeg_msvc_runtime "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
+    endif()
+    # Keep the expressions literal in the external configure command so that
+    # the child evaluates them separately for each configuration.
+    string(REPLACE "$<" "$<1:$><" _jpeg_msvc_runtime "${_jpeg_msvc_runtime}")
+    # WITH_CRT_DLL prevents TurboJPEG from overriding the supplied runtime.
+    list(APPEND _jpeg_cmake_args
+         "-DCMAKE_MSVC_RUNTIME_LIBRARY:STRING=${_jpeg_msvc_runtime}"
+         "-DWITH_CRT_DLL:BOOL=ON")
   else()
     set(_jpeg_archive_name "${CMAKE_STATIC_LIBRARY_PREFIX}turbojpeg${CMAKE_STATIC_LIBRARY_SUFFIX}")
   endif()
@@ -371,6 +396,13 @@ else()
          "-DCMAKE_OSX_ARCHITECTURES:STRING=${_jpeg_osx_architectures}"
          "-DCMAKE_OSX_DEPLOYMENT_TARGET:STRING=${CMAKE_OSX_DEPLOYMENT_TARGET}"
          "-DCMAKE_OSX_SYSROOT:STRING=${CMAKE_OSX_SYSROOT}")
+    # TurboJPEG's SIMD build supports only one architecture per build tree.
+    list(LENGTH CMAKE_OSX_ARCHITECTURES _jpeg_arch_count)
+    if (_jpeg_arch_count GREATER 1)
+      list(APPEND _jpeg_cmake_args "-DWITH_SIMD:BOOL=OFF")
+    else()
+      list(APPEND _jpeg_cmake_args "-DWITH_SIMD:BOOL=ON")
+    endif()
   endif()
 
   # Older CMake versions cannot use generator expressions in BUILD_BYPRODUCTS.
