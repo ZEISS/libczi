@@ -59,6 +59,7 @@ jobs:
           sudo apt-get install libfreetype6-dev -y
           sudo apt-get install rapidjson-dev -y
           sudo apt-get install libssl-dev -y
+          sudo apt-get install nasm -y
           vcpkg install azure-storage-blobs-cpp azure-identity-cpp lz4
 
       - name: Install Azurite (for Azure SDK based stream tests)
