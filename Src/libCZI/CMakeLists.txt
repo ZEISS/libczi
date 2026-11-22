@@ -310,15 +310,17 @@ else()
   add_subdirectory(${zstd_SOURCE_DIR}/build/cmake ${zstd_BINARY_DIR})
 endif()
 
-# The decoder uses the TurboJPEG API (turbojpeg.h). Both dependency paths
-# supply its static archive, including when libCZI itself is built as a DLL
-# or shared library.
+# libCZI uses the TurboJPEG API (turbojpeg.h). The bundled build is static.
+# For installed packages, prefer static linkage and accept a shared target.
 if (LIBCZI_BUILD_PREFER_EXTERNALPACKAGE_JPEGTURBO)
   find_package(libjpeg-turbo 3.0 CONFIG REQUIRED)
-  if (NOT TARGET libjpeg-turbo::turbojpeg-static)
-    message(FATAL_ERROR "The installed libjpeg-turbo package must provide libjpeg-turbo::turbojpeg-static")
+  if (TARGET libjpeg-turbo::turbojpeg-static)
+    set(LIBCZI_JPEG_LINK_TARGET libjpeg-turbo::turbojpeg-static)
+  elseif (TARGET libjpeg-turbo::turbojpeg)
+    set(LIBCZI_JPEG_LINK_TARGET libjpeg-turbo::turbojpeg)
+  else()
+    message(FATAL_ERROR "The installed libjpeg-turbo package must provide libjpeg-turbo::turbojpeg-static or libjpeg-turbo::turbojpeg")
   endif()
-  set(LIBCZI_JPEG_LINK_TARGET libjpeg-turbo::turbojpeg-static)
 else()
   # Upstream requires a standalone CMake build. ExternalProject downloads the
   # pinned release and builds it with the parent build's compiler and settings.
