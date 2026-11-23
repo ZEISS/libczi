@@ -24,6 +24,8 @@ namespace libCZI
         ZStd1,              ///< Identifies a decoder capable of decoding a zstd compressed image (type "zstd1").
 
         ChunkedCompression, ///< Identifies a decoder capable of decoding an image compressed with the chunked-compression scheme.
+
+        Jpg                 ///< Identifies a decoder capable of decoding a JPG compressed image.
     };
 
     class IBitmapData;
@@ -116,7 +118,7 @@ namespace libCZI
         /// \param type      The type.
         /// \param arguments The arguments.
         ///
-        /// \return The decoder object.
+        /// \return The decoder object, or nullptr if the site does not provide the requested decoder.
         virtual std::shared_ptr<IDecoder> GetDecoder(ImageDecoderType type, const char* arguments) = 0;
 
         /// Creates a bitmap object. All internal bitmap allocations are done with this method, and overloading

@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.15)
 cmake_policy(SET CMP0091 NEW) # enable new "MSVC runtime library selection" (https://cmake.org/cmake/help/latest/variable/CMAKE_MSVC_RUNTIME_LIBRARY.html)
 
 project(libCZI
-      VERSION 0.72.0
+      VERSION 0.73.0
       HOMEPAGE_URL "https://github.com/ZEISS/libczi"
       DESCRIPTION "libCZI is an Open Source Cross-Platform C++ library to read and write CZI")
 
@@ -134,7 +134,16 @@ option(LIBCZI_BUILD_PREFER_EXTERNALPACKAGE_ZSTD "Prefer a ZSTD-package present o
 
 # When this option is ON, we try to use an existing RapidJSON-library. Otherwise, we download a private
 #  copy of RapidJSON during the CMake-run. This option is only relevant if building CZICmd.
-option(LIBCZI_BUILD_PREFER_EXTERNALPACKAGE_RAPIDJSON "Prefer an RapidJSON-package present on the system" ON)
+option(LIBCZI_BUILD_PREFER_EXTERNALPACKAGE_RAPIDJSON "Prefer a RapidJSON-package present on the system" ON)
+
+# When this option is ON, use an installed libjpeg-turbo package (version 3.0 or newer).
+# Prefer libjpeg-turbo::turbojpeg-static and fall back to the shared target
+# libjpeg-turbo::turbojpeg. Configuration fails if the package provides neither.
+# Set CMAKE_PREFIX_PATH or libjpeg-turbo_DIR if the package is outside CMake's
+# normal search paths. For vcpkg, enable the libjpeg-turbo port's turbojpeg feature
+# when using a port version that exposes TurboJPEG as a feature.
+# When OFF, download and build a private static TurboJPEG library automatically.
+option(LIBCZI_BUILD_PREFER_EXTERNALPACKAGE_JPEGTURBO "Use TurboJPEG from an installed libjpeg-turbo package" OFF)
 
 # Experimental functionality policy.
 #

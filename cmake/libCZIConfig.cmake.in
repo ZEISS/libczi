@@ -23,6 +23,16 @@ set(LIBCZI_BUILD_PREFER_EXTERNALPACKAGE_LZ4 @LIBCZI_BUILD_PREFER_EXTERNALPACKAGE
 
 include(CMakeFindDependencyMacro)
 
+if(NOT @LIBCZI_BUILD_DYNLIB@)
+  if(@LIBCZI_BUILD_PREFER_EXTERNALPACKAGE_JPEGTURBO@)
+    find_dependency(libjpeg-turbo 3.0 CONFIG)
+  elseif(NOT TARGET libczi_turbojpeg)
+    add_library(libczi_turbojpeg STATIC IMPORTED)
+    set_target_properties(libczi_turbojpeg PROPERTIES IMPORTED_LOCATION
+      "@PACKAGE_CMAKE_INSTALL_LIBDIR@/libczi/@_jpeg_archive_name@")
+  endif()
+endif()
+
 # Find all required dependencies that libCZI expects clients to link against.
 # These must also be declared in vcpkg.json dependencies to work properly across all platforms.
 find_dependency(zstd CONFIG REQUIRED)

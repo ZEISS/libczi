@@ -37,7 +37,7 @@ namespace libCZI
     enum class SiteObjectType
     {
         Default,        ///< An enum constant representing the default option (which is JXRLib)
-        WithJxrDecoder, ///< An enum constant representing a Site-object using the internal JXRLib.
+        WithJxrDecoder, ///< An enum constant representing a Site-object using the internal codecs (JXRLib and turbojpeg).
         WithWICDecoder, ///< An enum constant representing a Site-object using the Windows WIC-codec. Note that this option is only available on Windows.
     };
 
@@ -144,6 +144,10 @@ namespace libCZI
         /// In case of chunked-compression pixel data, apply the resolution protocol for chunked-compression data.
         /// If false, an exception is thrown (in case of a discrepancy).
         bool handle_chunked_compression_data_size_mismatch{ true };
+
+        /// In case of Jpg compressed pixel data, apply the resolution protocol for Jpg-compressed data.
+        /// If false, an exception is thrown  (in case of a discrepancy).
+        bool handle_jpg_bitmap_mismatch{ true };
     };
 
     /// Creates bitmap from sub block.

@@ -232,7 +232,8 @@ The synopsis of the program is:
                         compression-method, followed by a colon, then followed by a
                         list of key-value pairs which are separated by a semicolon.
                         Examples: "zstd0:ExplicitLevel=3",
-                        "zstd1:ExplicitLevel=2;PreProcess=HiLoByteUnpack".
+                        "zstd1:ExplicitLevel=2;PreProcess=HiLoByteUnpack", and
+                        "jpg:Quality=90;SubSamp=420;Optimize=true".
 
           --generatorpixeltype PIXELTYPE
                         Only used for 'CreateCZI': a string defining the pixeltype
@@ -266,6 +267,14 @@ The above text is printed if the program is executed with the argument '-?' or '
 
     CZIcmd --help
     
+
+For JPEG subblocks, use ``--compressionopts "jpg:"`` with ``CreateCZI`` and a
+``Gray8`` or ``Bgr24`` bitmap generator pixel type. The optional ``Quality``
+setting accepts 1 through 100 and defaults to 90. ``SubSamp`` accepts
+444 (the default), 422, or 420 for Bgr24. Lower chroma resolution can reduce
+size at the cost of color detail. Gray8 always uses grayscale sampling.
+``Optimize=true`` computes image-specific Huffman tables for potentially
+smaller output at the cost of encoding time. It defaults to false.
 
 The program expects the argument '-c' or '\--command' in order to select between different operations. The command choosen then determines
 which other arguments have to be given for proper operation or are meaningful.
