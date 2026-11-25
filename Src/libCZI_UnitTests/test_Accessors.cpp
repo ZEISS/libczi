@@ -298,6 +298,7 @@ TEST_P(ZOrderAndResultGray8Fixture, CreateDocumentAndUseSingleChannelScalingTile
     const CDimCoordinate plane_coordinate{ {DimensionIndex::C, 0} };
     ISingleChannelScalingTileAccessor::Options options;
     options.Clear();
+    options.maxConcurrentSubBlockReads = 3;
 
     // act
     const auto composite_bitmap = accessor->Get(PixelType::Gray8, IntRect{ 0,0,4,1 }, &plane_coordinate, 1.f, &options);
@@ -467,6 +468,88 @@ TEST(Accessor, CreateDocumentAndUseSingleChannelTileAccessorAndCheckResult)
                 memcmp(p, &expected_variant2, sizeof(expected_variant2)) == 0 ||
                 memcmp(p, &expected_variant3, sizeof(expected_variant3)) == 0 ||
                 memcmp(p, &expected_variant4, sizeof(expected_variant4)) == 0);
+}
+
+TEST(Accessor, ExactTileWithOverlappingSubblockUsesComposition)
+{
+    const auto czi_document_as_blob = CreateTestCziDocumentAndGetAsBlob(array<int, 3>{ 0, 1, 2 });
+    const auto memory_stream = make_shared<CMemInputOutputStream>(get<0>(czi_document_as_blob).get(), get<1>(czi_document_as_blob));
+    const auto reader = CreateCZIReader();
+    reader->Open(memory_stream);
+    const auto accessor = reader->CreateSingleChannelTileAccessor();
+    const CDimCoordinate plane_coordinate{ {DimensionIndex::C, 0} };
+
+    // The first subblock exactly covers this ROI, but the second subblock
+    // overlaps its right-hand pixel.  The result must be composed.
+    const auto bitmap = accessor->Get(PixelType::Gray8, IntRect{ 0, 0, 2, 1 }, &plane_coordinate, nullptr);
+    EXPECT_EQ(bitmap->GetWidth(), 2U);
+    EXPECT_EQ(bitmap->GetHeight(), 1U);
+    const ScopedBitmapLockerSP lock{ bitmap };
+    const auto* pixels = static_cast<const uint8_t*>(lock.ptrDataRoi);
+    EXPECT_EQ(pixels[0], 42);
+    EXPECT_EQ(pixels[1], 45);
+}
+
+TEST(Accessor, UniqueLayerZeroTileCanBeReadDirectly)
+{
+    const auto czi_document_as_blob = CreateCziWhichWasFoundProblematicWrtPixelAccuracyAndGetAsBlob();
+    const auto memory_stream = make_shared<CMemInputOutputStream>(get<0>(czi_document_as_blob).get(), get<1>(czi_document_as_blob));
+    const auto reader = CreateCZIReader();
+    reader->Open(memory_stream);
+    const auto accessor = reader->CreateSingleChannelTileAccessor();
+    const CDimCoordinate plane_coordinate{ {DimensionIndex::C, 0} };
+
+    // This document contains one layer-zero subblock which exactly covers the
+    // requested ROI, exercising the direct decoded-bitmap path.
+    const auto bitmap = accessor->Get(PixelType::Gray8, IntRect{ 0, 2671, 761, 2449 }, &plane_coordinate, nullptr);
+    EXPECT_EQ(bitmap->GetWidth(), 761U);
+    EXPECT_EQ(bitmap->GetHeight(), 2449U);
+    const ScopedBitmapLockerSP lock{ bitmap };
+    EXPECT_EQ(*static_cast<const uint8_t*>(lock.ptrDataRoi), 42);
+}
+
+TEST(Accessor, MinifiedSubblockDoesNotUseExactLayerZeroFastPath)
+{
+    auto writer = CreateCZIWriter();
+    const auto out_stream = make_shared<CMemOutputStream>(0);
+    const auto writer_info = make_shared<CCziWriterInfo>(
+        GUID{ 0x1234567,0x89ab,0xcdef,{ 1,2,3,4,5,6,7,8 } },
+        CDimBounds{ { DimensionIndex::C, 0, 1 } }, 0, 0);
+    writer->Create(out_stream, writer_info);
+
+    const auto source = CreateGray8BitmapAndFill(2, 1, 42);
+    AddSubBlockInfoStridedBitmap info;
+    info.Clear();
+    info.coordinate.Set(DimensionIndex::C, 0);
+    info.mIndexValid = true;
+    info.mIndex = 0;
+    info.x = 0;
+    info.y = 0;
+    info.logicalWidth = 4;
+    info.logicalHeight = 2;
+    info.physicalWidth = source->GetWidth();
+    info.physicalHeight = source->GetHeight();
+    info.PixelType = source->GetPixelType();
+    {
+        const ScopedBitmapLockerSP lock{ source };
+        info.ptrBitmap = lock.ptrDataRoi;
+        info.strideBitmap = lock.stride;
+        writer->SyncAddSubBlock(info);
+    }
+    writer->Close();
+
+    size_t document_size = 0;
+    const auto document = out_stream->GetCopy(&document_size);
+    const auto reader = CreateCZIReader();
+    reader->Open(make_shared<CMemInputOutputStream>(document.get(), document_size));
+    const auto accessor = reader->CreateSingleChannelTileAccessor();
+    const CDimCoordinate plane_coordinate{ {DimensionIndex::C, 0} };
+
+    // The logical ROI matches, but the stored bitmap is a pyramid level.
+    // Returning it directly would incorrectly produce a 2x1 result.
+    const auto bitmap = accessor->Get(PixelType::Gray8, IntRect{ 0, 0, 4, 2 }, &plane_coordinate, nullptr);
+    EXPECT_EQ(bitmap->GetWidth(), 4U);
+    EXPECT_EQ(bitmap->GetHeight(), 2U);
 }
 
 TEST(Accessor, CreateDocumentAndUseSingleChannelPyramidLayerTileAccessorWithAndCheckResult)
